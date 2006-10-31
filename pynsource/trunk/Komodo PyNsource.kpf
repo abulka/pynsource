@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="5B7B28D0-B5FB-4403-A540-F909FA028B09" name="Komodo PyNsource" kpf_version="2">
+<preference-set id="">
+</preference-set>
+<file url="pynsource/printframework.py" id="4B88B5EE-8F16-48AF-BFE5-FE119C5D56B3" name="printframework.py">
+</file>
+<file url="pynsource/pynsource.py" id="EB62C67A-188D-4881-91DC-0429FD880EB5" name="pynsource.py">
+<preference-set id="">
+</preference-set>
+</file>
+<file url="pynsource/pyNsourceGui.py" id="40B16FA2-0833-4C90-A83E-68FA06B9C10C" name="pyNsourceGui.py">
+<preference-set id="">
+</preference-set>
+</file>
+<file url="pynsource/Readme.txt" id="4598880B-2FC9-4F39-821E-DB96AFCFAA1D" name="Readme.txt">
+</file>
+<file url="pynsource/setup.py" id="2F89366A-77D9-4D3A-A7C4-4C83491125AC" name="setup.py">
+</file>
+<file url="pynsource/buildstandaloneexe.bat" id="A90BADA3-E384-415D-845E-3ED876E2120F" name="buildstandaloneexe.bat">
+</file>
+<file url="pynsource/keywords.py" id="7C8B0A51-CD31-4C85-B837-F36A160DBD69" name="keywords.py">
+</file>
+<file url="Tests/testmodule01.py" id="58BE70EF-B109-4774-A11E-7948BF177210" name="testmodule01.py">
+</file>
+<file url="Tests/testmodule02.py" id="C2226788-5230-4A43-8C71-AE452D2D9D7E" name="testmodule02.py">
+</file>
+<file url="Tests/testmodule03.py" id="8CAC6DAA-965D-40FF-A684-7B0282ECAA34" name="testmodule03.py">
+</file>
+<file url="Tests/testmodule04.py" id="FE9B3EFF-9716-42FA-BA1F-F057A6F3D9F6" name="testmodule04.py">
+</file>
+<file url="Tests/testmodule05.py" id="446A3230-A590-4C8D-8B7B-C56CFE6168A4" name="testmodule05.py">
+</file>
+<file url="Tests/testmodule06.py" id="273682A6-81A8-416C-A5E6-4F840B0FF139" name="testmodule06.py">
+</file>
+<file url="Tests/testmodule07.py" id="48689A24-91B3-49FA-90F7-7F7C3A2F61CF" name="testmodule07.py">
+</file>
+<file url="Tests/testmodule66.py" id="00F99779-CF46-4A44-B07F-B6F89E18BF82" name="testmodule66.py">
+</file>
+<file url="Tests/testmodule67clippy.py" id="F724E5B8-17EF-4C15-8F34-80D5AD983295" name="testmodule67clippy.py">
+</file>
+<file url="Tests/unittests_parse_01.py" id="CC5FEA1B-7ED0-4E18-8237-A58B4F455F45" name="unittests_parse_01.py">
+<preference-set id="">
+  <string id="lastInvocation">default</string>
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="postparams"></string>
+  <string id="getparams"></string>
+  <boolean id="use-console">0</boolean>
+  <string id="filename">C:\Documents and Settings\Andy\My Documents\Software Development\aa python\pyNsource\Tests\unittests_parse_01.py</string>
+  <string id="executable-params"></string>
+  <boolean id="show-dialog">1</boolean>
+  <string id="request-method">GET</string>
+  <string id="params"></string>
+  <string id="mpostparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="documentRoot"></string>
+  <string id="cookieparams"></string>
+  <string id="userEnvironment"></string>
+  <boolean id="sim-cgi">0</boolean>
+  <string id="cwd"></string>
+  <string id="userCGIEnvironment"></string>
+</preference-set>
+</preference-set>
+</preference-set>
+</file>
+<file url="Tests/unittests_parse_02.py" id="AF5E6083-A39B-4C47-9B54-44746C764D01" name="unittests_parse_02.py">
+</file>
+<file url="Tests/unittests_parse_03.py" id="7DB8559E-83BF-4C6E-85AF-520C312F59E8" name="unittests_parse_03.py">
+</file>
+<file url="Tests/unittests_parse_04.py" id="6B983430-C322-4C65-BBEB-3DC6556EEBDE" name="unittests_parse_04.py">
+<preference-set id="">
+</preference-set>
+</file>
+<file url="Tests/unittests_parse_05.py" id="2BC05C9B-A150-4265-8670-6225CDC4BFD3" name="unittests_parse_05.py">
+</file>
+<file url="Tests/unittests_parse_06.py" id="CA0768BD-0FC0-4BA1-800C-FB5EA4D90348" name="unittests_parse_06.py">
+</file>
+<file url="Tests/unittests_parse_07.py" id="99B4A2A1-E969-4E72-A85E-3FDF0B45B9FF" name="unittests_parse_07.py">
+<preference-set id="">
+</preference-set>
+</file>
+<file url="Tests/alltests.py" id="4841BE46-BFFA-4783-B1A8-0A357CB4ADAF" name="alltests.py">
+<preference-set id="">
+  <string id="lastInvocation">default</string>
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="postparams"></string>
+  <string id="getparams"></string>
+  <boolean id="use-console">0</boolean>
+  <string id="filename">C:\Documents and Settings\Andy\My Documents\Software Development\aa python\pyNsource\Tests\alltests.py</string>
+  <string id="executable-params"></string>
+  <boolean id="show-dialog">1</boolean>
+  <string id="request-method">GET</string>
+  <string id="params"></string>
+  <string id="mpostparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="documentRoot"></string>
+  <string id="cookieparams"></string>
+  <string id="userEnvironment"></string>
+  <boolean id="sim-cgi">0</boolean>
+  <string id="cwd"></string>
+  <string id="userCGIEnvironment"></string>
+</preference-set>
+</preference-set>
+</preference-set>
+</file>
+</project>
