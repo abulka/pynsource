@@ -1,0 +1,1 @@
+c:\python24\python.exe pyNsourceGui-wx26.py
