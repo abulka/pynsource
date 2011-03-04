@@ -1,6 +1,11 @@
 ''' This is copied from the wx demo, but contains some code
     we'll likely want to use in the reporting part of the
     framework.
+	
+	Dabo seems to be a desktop development framework for python
+	See http://dabodev.com/documentation
+	See https://docs.google.com/View?id=dg79jzmg_85f737ww6x
+	
 '''
 
 from wxPython.wx         import *
