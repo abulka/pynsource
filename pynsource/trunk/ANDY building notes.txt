@@ -16,3 +16,4 @@ then run inno
 SVN repository is
  http://pyidea.svn.sourceforge.net/svnroot/pyidea/pynsource/trunk
 
+----
