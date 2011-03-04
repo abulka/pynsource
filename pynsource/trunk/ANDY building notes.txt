@@ -1,0 +1,18 @@
+Notes for building various pynsource release pieces
+---------------------------------------------------
+
+run andyDoBuildExe.bat to build win32 installers in dist
+[put into frontpage]
+
+zip up pynsource and Tests and ./setup.py into a release e.g. pynsource1.4c.zip
+(remove .pyc and java test rubbish before uploading)
+[put into frontpage]
+
+run pynsource/buildstandaloneexe.bat to build standalone gui exe in pynsource/dist
+then run inno
+[this gets uploaded to atug/downloads]
+
+
+SVN repository is
+ http://pyidea.svn.sourceforge.net/svnroot/pyidea/pynsource/trunk
+
