@@ -1,0 +1,11 @@
+build.menu.1[0]=com.borland.jbuilder.build.ProjectBuilder$ProjectBuildAction;make
+build.menu.2[0]=com.borland.jbuilder.build.ProjectBuilder$ProjectBuildAction;rebuild
+content.layout.xml.[0]=<?xml version="1.0" encoding="UTF-8"?>`r`n<project-layout>`r`n  <tab_container selected_index="6">`r`n    <tab node_name="src/EventPlayAPI.java"/>`r`n    <tab node_name="src/list.java"/>`r`n    <tab node_name="src/PlayAPI.java"/>`r`n    <tab node_name="src/Playhead.java"/>`r`n    <tab node_name="pythoninput01/playhead.py"/>`r`n    <tab node_name="src/PlayheadMediator.java"/>`r`n    <tab node_name="src/TestCase00.java"/>`r`n    <tab node_name="src/TestCase01.java"/>`r`n    <tab node_name="src/TestCase02.java"/>`r`n    <tab node_name="src/TimePlayAPI.java"/>`r`n    <tab node_name="src/TurnPlayAPI.java"/>`r`n    <tab node_name="src/UniqueList.java"/>`r`n    <tab node_name="src/unittest.java"/>`r`n    <tab node_name="src/variant.java"/>`r`n  </tab_container>`r`n</project-layout>`r`n
+debug.NoTracingClasses.1[0]=16 java.lang.Object1  1 -1
+debug.NoTracingClasses.2[0]=21 java.lang.ClassLoader1  1 -1
+debug.NoTracingClasses.3[0]=16 java.lang.String1  1 -1
+debug.SplitThreadsAndDataView[0]=0
+import.optimize.legacyPropertiesRead[0]=1
+sys.Author[0]=
+sys.DefaultPackage[0]=pythontojavatest01
+wizard.package.package_history.1[0]=

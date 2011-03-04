@@ -1,47 +1,32 @@
 aboutmsg = """
 PyNSource GUI
-http://www.atug.com/andypatterns/pynsource.htm
+http://www.andypatterns.com/pynsource
 
 A GUI front end to the python code scanner PyNSource that generates UML diagrams.
-Version 1.4c
+Version 1.5
 
-(c) Andy Bulka 2004-2006
+(c) Andy Bulka 2004-2009
 
-Some code borrowed from wxPython Library and Boa.
+Some code borrowed from the wxPython Demo App OGL.py and Boa.
 License: Free
 """
 
-
-from wxPython.wx import *
-from wxPython.ogl import *
 import wx
+import wx.lib.ogl as ogl
 from wx import Frame
-
-#import images
-
-import os
 import os,stat
 
 UML_STYLE_1 = 0
 WINDOW_SIZE = (640,480)
 
-
-
-class DiamondShape(wxPolygonShape):
+class DiamondShape(ogl.PolygonShape):
     def __init__(self, w=0.0, h=0.0):
-        wxPolygonShape.__init__(self)
+        ogl.PolygonShape.__init__(self)
         if w == 0.0:
             w = 60.0
         if h == 0.0:
             h = 60.0
 
-        ## Either wxRealPoints or 2-tuples of floats  works.
-
-        #points = [ wxRealPoint(0.0,    -h/2.0),
-        #          wxRealPoint(w/2.0,  0.0),
-        #          wxRealPoint(0.0,    h/2.0),
-        #          wxRealPoint(-w/2.0, 0.0),
-        #          ]
         points = [ (0.0,    -h/2.0),
                    (w/2.0,  0.0),
                    (0.0,    h/2.0),
@@ -53,42 +38,103 @@ class DiamondShape(wxPolygonShape):
 
 #----------------------------------------------------------------------
 
-class RoundedRectangleShape(wxRectangleShape):
+class RoundedRectangleShape(ogl.RectangleShape):
     def __init__(self, w=0.0, h=0.0):
-        wxRectangleShape.__init__(self, w, h)
+        ogl.RectangleShape.__init__(self, w, h)
         self.SetCornerRadius(-0.3)
 
 
 #----------------------------------------------------------------------
 
-class DividedShape(wxDividedShape):
+class CompositeDivisionShape(ogl.CompositeShape):
+    def __init__(self, canvas):
+        ogl.CompositeShape.__init__(self)
+
+        self.SetCanvas(canvas)
+
+        # create a division in the composite
+        self.MakeContainer()
+
+        # add a shape to the original division
+        shape2 = ogl.RectangleShape(40, 60)
+        self.GetDivisions()[0].AddChild(shape2)
+
+        # now divide the division so we get 2
+        self.GetDivisions()[0].Divide(wx.HORIZONTAL)
+
+        # and add a shape to the second division (and move it to the
+        # centre of the division)
+        shape3 = ogl.CircleShape(40)
+        shape3.SetBrush(wx.CYAN_BRUSH)
+        self.GetDivisions()[1].AddChild(shape3)
+        shape3.SetX(self.GetDivisions()[1].GetX())
+
+        for division in self.GetDivisions():
+            division.SetSensitivityFilter(0)
+        
+#----------------------------------------------------------------------
+
+class CompositeShape(ogl.CompositeShape):
+    def __init__(self, canvas):
+        ogl.CompositeShape.__init__(self)
+
+        self.SetCanvas(canvas)
+
+        constraining_shape = ogl.RectangleShape(120, 100)
+        constrained_shape1 = ogl.CircleShape(50)
+        constrained_shape2 = ogl.RectangleShape(80, 20)
+
+        constraining_shape.SetBrush(wx.BLUE_BRUSH)
+        constrained_shape2.SetBrush(wx.RED_BRUSH)
+        
+        self.AddChild(constraining_shape)
+        self.AddChild(constrained_shape1)
+        self.AddChild(constrained_shape2)
+
+        constraint = ogl.Constraint(ogl.CONSTRAINT_MIDALIGNED_BOTTOM, constraining_shape, [constrained_shape1, constrained_shape2])
+        self.AddConstraint(constraint)
+        self.Recompute()
+
+        # If we don't do this, the shapes will be able to move on their
+        # own, instead of moving the composite
+        constraining_shape.SetDraggable(False)
+        constrained_shape1.SetDraggable(False)
+        constrained_shape2.SetDraggable(False)
+
+        # If we don't do this the shape will take all left-clicks for itself
+        constraining_shape.SetSensitivityFilter(0)
+
+        
+#----------------------------------------------------------------------
+
+class DividedShape(ogl.DividedShape):
     def __init__(self, width, height, canvas):
-        wxDividedShape.__init__(self, width, height)
+        ogl.DividedShape.__init__(self, width, height)
         if UML_STYLE_1:
             self.BuildRegions(canvas)
 
     def BuildRegions(self, canvas):
-        region1 = wxShapeRegion()
-        region1.SetText('wxDividedShape')
+        region1 = ogl.ShapeRegion()
+        region1.SetText('DividedShape')
         region1.SetProportions(0.0, 0.2)
-        region1.SetFormatMode(FORMAT_CENTRE_HORIZ)
+        region1.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
         self.AddRegion(region1)
 
-        region2 = wxShapeRegion()
+        region2 = ogl.ShapeRegion()
         region2.SetText('This is Region number two.')
         region2.SetProportions(0.0, 0.3)
-        region2.SetFormatMode(FORMAT_NONE)
-        #region2.SetFormatMode(FORMAT_CENTRE_HORIZ|FORMAT_CENTRE_VERT)
+        region2.SetFormatMode(ogl.FORMAT_NONE)
+        #region2.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ|ogl.FORMAT_CENTRE_VERT)
         self.AddRegion(region2)
 
-        region3 = wxShapeRegion()
+        region3 = ogl.ShapeRegion()
 
         region3.SetText("blah\nblah\nblah blah")
         region3.SetProportions(0.0, 0.5)
-        region3.SetFormatMode(FORMAT_NONE)
+        region3.SetFormatMode(ogl.FORMAT_NONE)
         self.AddRegion(region3)
 
-
+        # Andy Added
         self.region1 = region1   # for external access...
         self.region2 = region2   # for external access...
         self.region3 = region3   # for external access...
@@ -103,7 +149,7 @@ class DividedShape(wxDividedShape):
         regions and draws it. There seems to be a problem that
         the text is not normally drawn. """
         canvas = self.GetCanvas()
-        dc = wxClientDC(canvas)
+        dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
         count = 0
         for region in self.GetRegions():
@@ -115,7 +161,7 @@ class DividedShape(wxDividedShape):
         rnum = 0
         if canvas is None:
             canvas = self.GetCanvas()
-        dc = wxClientDC(canvas)  # used for measuring
+        dc = wx.ClientDC(canvas)  # used for measuring
         for region in self.GetRegions():
             text = region.GetText()
             self.FormatText(dc, text, rnum)
@@ -123,7 +169,7 @@ class DividedShape(wxDividedShape):
 
 
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
-        self.base_OnSizingEndDragLeft(pt, x, y, keys, attch)
+        ogl.DividedShape.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
         self.SetRegionSizes()
         self.ReformatRegions()
         self.GetCanvas().Refresh()
@@ -134,10 +180,10 @@ class DividedShapeSmall(DividedShape):
         DividedShape.__init__(self, width, height, canvas)
 
     def BuildRegions(self, canvas):
-        region1 = wxShapeRegion()
+        region1 = ogl.ShapeRegion()
         region1.SetText('wxDividedShapeSmall')
         region1.SetProportions(0.0, 0.9)
-        region1.SetFormatMode(FORMAT_CENTRE_HORIZ)
+        region1.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
         self.AddRegion(region1)
 
         self.region1 = region1   # for external access...
@@ -149,23 +195,24 @@ class DividedShapeSmall(DividedShape):
         rnum = 0
         if canvas is None:
             canvas = self.GetCanvas()
-        dc = wxClientDC(canvas)  # used for measuring
+        dc = wx.ClientDC(canvas)  # used for measuring
         for region in self.GetRegions():
             text = region.GetText()
             self.FormatText(dc, text, rnum)
             rnum += 1
 
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
-        self.base_OnSizingEndDragLeft(pt, x, y, keys, attch)
+        #self.base_OnSizingEndDragLeft(pt, x, y, keys, attch)
+        ogl.DividedShape.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
         self.SetRegionSizes()
         self.ReformatRegions()
         self.GetCanvas().Refresh()
 
 #----------------------------------------------------------------------
 
-class MyEvtHandler(wxShapeEvtHandler):
+class MyEvtHandler(ogl.ShapeEvtHandler):
     def __init__(self, log, frame):
-        wxShapeEvtHandler.__init__(self)
+        ogl.ShapeEvtHandler.__init__(self)
         self.log = log
         self.statbarFrame = frame
         self.ZapShape = self._ZapShapeStub
@@ -191,7 +238,7 @@ class MyEvtHandler(wxShapeEvtHandler):
 
     def UpdateStatusBar(self, shape):
         #print 'UpdateStatusBar', shape.region1.GetText(), shape.GetX(), shape.GetY()
-        x,y = shape.GetX(), shape.GetY()
+        x, y = shape.GetX(), shape.GetY()
         width, height = shape.GetBoundingBoxMax()
         self.statbarFrame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)" %
                                         (x, y, width, height))
@@ -201,14 +248,15 @@ class MyEvtHandler(wxShapeEvtHandler):
         shape = self.GetShape()
         #print shape.__class__, shape.GetClassName()
         canvas = shape.GetCanvas()
-        dc = wxClientDC(canvas)
+        dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
 
         if shape.Selected():
             shape.Select(False, dc)
-            canvas.Redraw(dc)
+            #canvas.Redraw(dc)
+            canvas.Refresh(False)
         else:
-            redraw = False
+            #############redraw = False
             shapeList = canvas.GetDiagram().GetShapeList()
             toUnselect = []
             for s in shapeList:
@@ -222,79 +270,115 @@ class MyEvtHandler(wxShapeEvtHandler):
 
             if toUnselect:
                 for s in toUnselect:
+                    
+                    ########################
+                    canvas = s.GetCanvas()
+                    dc = wx.ClientDC(canvas)
+                    canvas.PrepareDC(dc)
+                    ########################
+        
                     s.Select(False, dc)
-                canvas.Redraw(dc)
+                    
+                #canvas.Redraw(dc)
+                canvas.Refresh(False)
 
         self.UpdateStatusBar(shape)
 
 
     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
         shape = self.GetShape()
-        self.base_OnEndDragLeft(x, y, keys, attachment)
+        #self.base_OnEndDragLeft(x, y, keys, attachment)
+        #wxShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)
+        ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)
+        
         if not shape.Selected():
             self.OnLeftClick(x, y, keys, attachment)
         self.UpdateStatusBar(shape)
 
 
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
-        self.base_OnSizingEndDragLeft(pt, x, y, keys, attch)
+        #self.base_OnSizingEndDragLeft(pt, x, y, keys, attch)
+        #wxShapeEvtHandler.OnSizingEndDragLeft(self.pt, x, y, keys, attch)
+        ogl.ShapeEvtHandler.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
         self.UpdateStatusBar(self.GetShape())
 
 
     def OnMovePost(self, dc, x, y, oldX, oldY, display):
-        self.base_OnMovePost(dc, x, y, oldX, oldY, display)
-        self.UpdateStatusBar(self.GetShape())
+        shape = self.GetShape()
+        ogl.ShapeEvtHandler.OnMovePost(self, dc, x, y, oldX, oldY, display)
+        self.UpdateStatusBar(shape)
+        if "wxMac" in wx.PlatformInfo:
+            shape.GetCanvas().Refresh(False)
 
-
-    def OnRightClick(self, *dontcare):
+    #def OnShowPopup(self, event):
+    #    pos = event.GetPosition()
+    #    pos = self.panel.ScreenToClient(pos)
+    #    self.panel.PopupMenu(self.popupmenu, pos)
+    def OnPopupItemSelected(self, event): 
+        item = self.popupmenu.FindItemById(event.GetId()) 
+        text = item.GetText() 
+        #wx.MessageBox("You selected item '%s'" % text)
+        if text == "Delete Node":
+            self.RightClickDeleteNode()
+        
+    #def OnRightClick(self, *dontcare):
+    def OnRightClick(self, x, y, keys, attachment):
         #self.log.WriteText("%s\n" % self.GetShape())
 
+        self.popupmenu = wx.Menu()     # Creating a menu
+        item = self.popupmenu.Append(2011, "Delete Node")
+        self.statbarFrame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        item = self.popupmenu.Append(2012, "Cancel")
+        self.statbarFrame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+
+        self.statbarFrame.PopupMenu(self.popupmenu, wx.Point(x,y))
+
+    def RightClickDeleteNode(self):
         shape = self.GetShape()
 
         canvas = shape.GetCanvas()
-        dc = wxClientDC(canvas)
+        dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
         diagram = canvas.GetDiagram()
+        
+        assert 1 == 1
 
         if shape.Selected():
             shape.Select(False, dc)
-            canvas.Redraw(dc)
+            ###############canvas.Redraw(dc)
+            canvas.Refresh(False)
 
+
+        ###################  should do list clone instead, just don't want pointer want true copy of refs
+        lineList = shape.GetLines()
+        toDelete = []
         for line in shape.GetLines():
+            toDelete.append(line)
+            
+        for line in toDelete:
             line.Unlink()
             #shape.RemoveLine(line)
-            diagram.RemoveShape(line)
+            diagram.RemoveShape(line)            
+        ###################
+
+        ###################
+        #for line in shape.GetLines():
+        #    line.Unlink()
+        #    #shape.RemoveLine(line)
+        #    diagram.RemoveShape(line)
+        ###################
 
         self.ZapShape(shape)
         diagram.RemoveShape(shape)
-        diagram.Clear(dc)
-        canvas.Redraw(dc)
+        
+        ##############  wrong dc value anyway... ? of shape not of diagram canvas.
+        #diagram.Clear(dc)
+        #canvas.Redraw(dc)
+        #################
 
-        self.Refreshredraw(event=self)   # will call the app level refresh() method in window.  Event is passed for fun - we don't look at it.
+        ####### self.Refreshredraw(event=self)   # will call the app level refresh() method in window.  Event is passed for fun - we don't look at it.
 
-        """
-        Some useful documentation on wxOGL
 
-        wxLineShape::Unlink
-        void Unlink()
-        Unlinks the line from the nodes at either end.
-
-        wxShape::GetLines
-        wxList& GetLines() const
-        Returns a reference to the list of lines connected to this shape.
-
-        wxShape::RemoveLine
-        void RemoveLine(wxLineShape* line)
-        Removes the given line from the shape's list of attached lines.
-
-        wxDiagram::Redraw
-        void Redraw(wxDC& dc)
-        Draws the shapes in the diagram on the specified device context.
-
-        wxDiagram::Clear
-        void Clear(wxDC& dc)
-        Clears the specified device context.
-        """
 #----------------------------------------------------------------------
 import sys, glob
 
@@ -308,14 +392,14 @@ import sys, glob
 from pynsource import PythonToJava, PySourceAsJava
 
 
-class TestWindow(wxShapeCanvas):
+class TestWindow(ogl.ShapeCanvas):
     scrollStepX = 10
     scrollStepY = 10
     classnametoshape = {}
 
 
     def __init__(self, parent, log, frame):
-        wxShapeCanvas.__init__(self, parent)
+        ogl.ShapeCanvas.__init__(self, parent)
 
         maxWidth  = 1000
         maxHeight = 1000
@@ -325,15 +409,15 @@ class TestWindow(wxShapeCanvas):
         self.frame = frame
         self.SetBackgroundColour("LIGHT BLUE") #wxWHITE)
 
-        self.diagram = wxDiagram()
+        self.diagram = ogl.Diagram()
         self.SetDiagram(self.diagram)
         self.diagram.SetCanvas(self)
         self.shapes = []
         self.save_gdi = []
-        EVT_WINDOW_DESTROY(self, self.OnDestroy)
+        wx.EVT_WINDOW_DESTROY(self, self.OnDestroy)
 
-        self.font1 = wxFont(14, wxMODERN, wxNORMAL, wxNORMAL, false)
-        self.font2 = wxFont(10, wxMODERN, wxNORMAL, wxNORMAL, false)
+        self.font1 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+        self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
 
         #self.Go(path=r'C:\Documents and Settings\Administrator\My Documents\aa Python\pyNsource\Tests\PythonToJavaTest01\pythoninput01\*.py')
 
@@ -362,8 +446,9 @@ class TestWindow(wxShapeCanvas):
     def Clear(self):
         self.diagram.DeleteAllShapes()
 
-        dc = wxClientDC(self)
-        self.diagram.Clear(dc)
+        ############## ensure we are using the right canvas here.....
+        dc = wx.ClientDC(self)
+        self.diagram.Clear(dc)   # only ends up calling dc.Clear() - I wonder if this clears the screen?
         # self.redraw()   # do not redraw cos nothing exists!
 
         # Re-init - doesn't help the File New problem....
@@ -373,7 +458,7 @@ class TestWindow(wxShapeCanvas):
         self.diagram.SetCanvas(self)
         """
 
-        self.shapes = []
+        self.shapes = []    # different to self.diagram._shapeList
         self.save_gdi = []
 
         # THIS is the one that we need....
@@ -432,9 +517,9 @@ class TestWindow(wxShapeCanvas):
                 #
                 if classname not in self.classnametoshape:
                     #print 'BUILDING', classname, 'SEARCH', classname in self.classnametoshape, 'LEN', len(self.classnametoshape)
-                    rRectBrush = wxBrush("MEDIUM TURQUOISE", wxSOLID)
-                    dsBrush = wxBrush("WHEAT", wxSOLID)
-                    ds = self.MyAddShape(DividedShape(100, 150, self), 50, 145, wxBLACK_PEN, dsBrush, '')
+                    rRectBrush = wx.Brush("MEDIUM TURQUOISE", wx.SOLID)
+                    dsBrush = wx.Brush("WHEAT", wx.SOLID)
+                    ds = self.MyAddShape(DividedShape(100, 150, self), 50, 145, wx.BLACK_PEN, dsBrush, '')
                     ds.SetCentreResize(0)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
 
                     ds.region1.SetText(classname)
@@ -475,7 +560,7 @@ class TestWindow(wxShapeCanvas):
                     regionAttribs.SetProportions(0.0, 1.0*(attribsHeight/float(totHeight)))
                     regionMeths.SetProportions(0.0, 1.0*(methsHeight/float(totHeight)))
 
-                    regionName.SetFormatMode(FORMAT_CENTRE_HORIZ)
+                    regionName.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
                     shape.region1 = regionName  # Andy added, for later external reference to classname from just having the shap instance.
 
                     shape.AddRegion(regionName)
@@ -486,9 +571,9 @@ class TestWindow(wxShapeCanvas):
 
                     shape.SetRegionSizes()
 
-                    dsBrush = wxBrush("WHEAT", wxSOLID)
+                    dsBrush = wx.Brush("WHEAT", wx.SOLID)
                     #idx = self.addShape(shape, pos[0], pos[1], wxBLACK_PEN, dsBrush, '') # get back index
-                    ds = self.MyAddShape(shape, pos[0], pos[1], wxBLACK_PEN, dsBrush, '') # get back instance - but already had it...
+                    ds = self.MyAddShape(shape, pos[0], pos[1], wx.BLACK_PEN, dsBrush, '') # get back instance - but already had it...
 
                     shape.FlushText()
 
@@ -504,9 +589,9 @@ class TestWindow(wxShapeCanvas):
             if not classestocreate:
                 classestocreate = ('variant', 'unittest', 'list', 'object', 'dict')  # should add more classes and add them to a jar file to avoid namespace pollution.
             for classname in classestocreate:
-                rRectBrush = wxBrush("MEDIUM TURQUOISE", wxSOLID)
-                dsBrush = wxBrush("WHEAT", wxSOLID)
-                ds = self.MyAddShape(DividedShapeSmall(100, 30, self), 50, 145, wxBLACK_PEN, dsBrush, '')
+                rRectBrush = wx.Brush("MEDIUM TURQUOISE", wx.SOLID)
+                dsBrush = wx.Brush("WHEAT", wx.SOLID)
+                ds = self.MyAddShape(DividedShapeSmall(100, 30, self), 50, 145, wx.BLACK_PEN, dsBrush, '')
                 if not UML_STYLE_1:
                     ds.BuildRegions(canvas=self)  # build the one region
                 ds.SetCentreResize(0)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
@@ -553,11 +638,12 @@ class TestWindow(wxShapeCanvas):
 
 
         # Wire up the associations
-        dc = wxClientDC(self)
-        self.PrepareDC(dc)
+        ###dc = wxClientDC(self)
+        ###self.PrepareDC(dc)
+        dc = "NONEED"
 
-        self.DrawAssocLines(self.associations_generalisation, ARROW_ARROW, dc)
-        self.DrawAssocLines(self.associations_composition, ARROW_FILLED_CIRCLE, dc)
+        self.DrawAssocLines(self.associations_generalisation, ogl.ARROW_ARROW, dc)
+        self.DrawAssocLines(self.associations_composition, ogl.ARROW_FILLED_CIRCLE, dc)
 
         # Layout
         self.ArrangeShapes()
@@ -576,10 +662,10 @@ class TestWindow(wxShapeCanvas):
                 self._BuildAuxClasses(classestocreate=[toClassname]) # Emergency creation of some unknown class.
             toShape = self.classnametoshape[toClassname]
 
-            line = wxLineShape()
+            line = ogl.LineShape()
             line.SetCanvas(self)
-            line.SetPen(wxBLACK_PEN)
-            line.SetBrush(wxBLACK_BRUSH)
+            line.SetPen(wx.BLACK_PEN)
+            line.SetBrush(wx.BLACK_BRUSH)
             line.AddArrow(arrowtype)
             line.MakeLineControlPoints(2)
             fromShape.AddLine(line, toShape)
@@ -587,7 +673,7 @@ class TestWindow(wxShapeCanvas):
             line.Show(True)
 
             # for some reason, the shapes have to be moved for the line to show up...
-            fromShape.Move(dc, fromShape.GetX(), fromShape.GetY())
+            #fromShape.Move(dc, fromShape.GetX(), fromShape.GetY())
 
 
 
@@ -595,7 +681,7 @@ class TestWindow(wxShapeCanvas):
     def redraw(self):
         diagram = self.GetDiagram()
         canvas = diagram.GetCanvas()
-        dc = wxClientDC(canvas)
+        dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
         for shape in self.shapes:
             shape.Move(dc, shape.GetX(), shape.GetY())
@@ -607,7 +693,7 @@ class TestWindow(wxShapeCanvas):
         diagram = self.GetDiagram()
         canvas = diagram.GetCanvas()
 
-        dc = wxClientDC(self)        # NEW! handles scrolled situations
+        dc = wx.ClientDC(self)        # NEW! handles scrolled situations
         #dc = wxClientDC(canvas)     # doesn't handle scrolled situations
 
         canvas.PrepareDC(dc)
@@ -619,8 +705,8 @@ class TestWindow(wxShapeCanvas):
 
     def newRegion(self, font, name, textLst, maxWidth, totHeight = 10):
         # Taken from Boa, but put into the canvas class instead of the scrolled window class.
-        region = wxShapeRegion()
-        dc = wxClientDC(self)  # self is the canvas
+        region = ogl.ShapeRegion()
+        dc = wx.ClientDC(self)  # self is the canvas
         dc.SetFont(font)
 
         for text in textLst:
@@ -663,7 +749,7 @@ class TestWindow(wxShapeCanvas):
 
         shapeslist = self.SortShapes()
 
-        dc = wxClientDC(self)
+        dc = wx.ClientDC(self)
         self.PrepareDC(dc)
 
         # When look at the status bar whilst dragging UML shapes, the coords of the top left are
@@ -713,13 +799,13 @@ class TestWindow(wxShapeCanvas):
         # Set size of entire diagram.
         height = y + 500
         width = maxx
-        self.setSize(wxSize(int(width+50), int(height+50))) # fudge factors to keep some extra space
+        self.setSize(wx.Size(int(width+50), int(height+50))) # fudge factors to keep some extra space
 
         # Now move the shapes into place.
         for (pos, classShape) in zip(positions, shapeslist):
             #print pos, classShape.region1.GetText()
             x, y = pos
-            classShape.Move(dc, x, y, false)
+            classShape.Move(dc, x, y, False)
 
 
 
@@ -736,14 +822,22 @@ class TestWindow(wxShapeCanvas):
         canvas.SetSize(canvas.GetVirtualSize())
 
     def MyAddShape(self, shape, x, y, pen, brush, text):
-        shape.SetDraggable(True, True)
+        # Composites have to be moved for all children to get in place
+        if isinstance(shape, ogl.CompositeShape):
+            dc = wx.ClientDC(self)
+            self.PrepareDC(dc)
+            shape.Move(dc, x, y)
+        else:
+            shape.SetDraggable(True, True)
         shape.SetCanvas(self)
         shape.SetX(x)
         shape.SetY(y)
         if pen:    shape.SetPen(pen)
         if brush:  shape.SetBrush(brush)
-        if text:   shape.AddText(text)
-        shape.SetShadowMode(SHADOW_RIGHT)
+        if text:
+            for line in text.split('\n'):
+                shape.AddText(line)
+        #shape.SetShadowMode(ogl.SHADOW_RIGHT)
         self.diagram.AddShape(shape)
         shape.Show(True)
 
@@ -759,18 +853,39 @@ class TestWindow(wxShapeCanvas):
 
 
     def addShape(self, shape, x, y, pen, brush, text):
-        # Taken from Boa - we used to use MyAddShape
-#        shape.SetDraggable(false)
-        shape.SetCanvas(self.canvas)
-        shape.SetX(x)
-        shape.SetY(y)
-        shape.SetPen(pen)
-        shape.SetBrush(brush)
-#        shape.SetFont(wxFont(6, wxMODERN, wxNORMAL, wxNORMAL, false))
-        shape.AddText(text)
-        shape.SetShadowMode(SHADOW_RIGHT)
+        
+        # Not sure it makes much difference which one to use...
+        if False:        
+            # Taken from Boa - we used to use MyAddShape
+            # shape.SetDraggable(false)
+            shape.SetCanvas(self.canvas)
+            shape.SetX(x)
+            shape.SetY(y)
+            shape.SetPen(pen)
+            shape.SetBrush(brush)
+            # shape.SetFont(wxFont(6, wxMODERN, wxNORMAL, wxNORMAL, false))
+            shape.AddText(text)
+            shape.SetShadowMode(ogl.SHADOW_RIGHT)
+        else:
+            # Composites have to be moved for all children to get in place
+            if isinstance(shape, ogl.CompositeShape):
+                dc = wx.ClientDC(self)
+                self.PrepareDC(dc)
+                shape.Move(dc, x, y)
+            else:
+                shape.SetDraggable(True, True)
+                shape.SetCanvas(self)
+                shape.SetX(x)
+                shape.SetY(y)
+                if pen:    shape.SetPen(pen)
+                if brush:  shape.SetBrush(brush)
+                if text:
+                    for line in text.split('\n'):
+                        shape.AddText(line)
+                shape.SetShadowMode(ogl.SHADOW_RIGHT)            
+        
         self.diagram.AddShape(shape)
-        shape.Show(true)
+        shape.Show(True)
 
         evthandler = MyEvtHandler()
         evthandler.menu = self.shapeMenu
@@ -784,13 +899,14 @@ class TestWindow(wxShapeCanvas):
         return len(self.shapes) -1
 
 
+    # DO WE NEED THIS? - OGL.py doesn't.
     def OnDestroy(self, evt):
         # Do some cleanup
         for shape in self.diagram.GetShapeList():
             if shape.GetParent() == None:
                 shape.SetCanvas(None)
-                shape.Destroy()
-        self.diagram.Destroy()
+                #shape.Destroy()   # no such method
+        #self.diagram.Destroy()    # no such method
 
 
 
@@ -826,22 +942,46 @@ class TestWindow(wxShapeCanvas):
                 toUnselect.append(s)
 
         if toUnselect:
-            canvas = self.diagram.GetCanvas()
-            dc = wxClientDC(self)        # NEW! handles scrolled situations
-            canvas.PrepareDC(dc)
+            
+            ########
+            #canvas = self.diagram.GetCanvas()
+            #dc = wx.ClientDC(self)        # NEW! handles scrolled situations
+            #canvas.PrepareDC(dc)
+            ########
 
             for s in toUnselect:
+                
+                #############
+                canvas = s.GetCanvas()
+                dc = wx.ClientDC(canvas)        # NEW! handles scrolled situations
+                canvas.PrepareDC(dc)
+                ############
+                
                 s.Select(False, dc)
-            canvas.Redraw(dc)
+                
+            ########
+            canvas = self.diagram.GetCanvas()
+            dc = wx.ClientDC(self)        # NEW! handles scrolled situations
+            canvas.PrepareDC(dc)
+            ########
+
+            ##########canvas.Redraw(dc)
+            canvas.Refresh(False)
 
 #----------------------------------------------------------------------
 
-#def runTest(frame, nb, log):
-#    win = TestWindow(nb, log, frame)
-#    return win
+def runTest(frame, nb, log):
+    # This creates some pens and brushes that the OGL library uses.
+    # It should be called after the app object has been created, but
+    # before OGL is used.
+    ogl.OGLInitialize()
+
+    win = TestWindow(nb, log, frame)
+    return win
 
 #----------------------------------------------------------------------
 
+"""
 class __Cleanup:
     cleanup = wxOGLCleanUp
     def __del__(self):
@@ -850,7 +990,7 @@ class __Cleanup:
 # when this module gets cleaned up then wxOGLCleanUp() will get called
 __cu = __Cleanup()
 
-
+"""
 
 
 
@@ -881,9 +1021,9 @@ class Log:
 
 
 
-class BoaApp(wxApp):
+class BoaApp(wx.App):
     def OnInit(self):
-        wxInitAllImageHandlers()
+        wx.InitAllImageHandlers()
 
         #self.main = wxFrame1.create(None)
 
@@ -985,20 +1125,35 @@ class BoaApp(wxApp):
         self.SetTopWindow(self.frame)
 
 
+        #self.popupmenu = wx.Menu()     # Creating a menu
+        #item = self.popupmenu.Append(-1, "AAAAAAA")
+        ##self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        ##self.win.Bind(wx.EVT_CONTEXT_MENU, self.OnShowPopup)
+        ##self.frame(wx.EVT_CONTEXT_MENU, self.OnShowPopup)
+        #self.frame.PopupMenu(self.popupmenu, wx.Point(10,110))
 
         #self.main.Show()
         #self.SetTopWindow(self.main)
 
         return True
 
-
+    #def OnShowPopup(self, event):
+    #    print "AAAAAAAAAAAAAAAAAAAA"
+    #    pos = event.GetPosition()
+    #    pos = self.panel.ScreenToClient(pos)
+    #    self.panel.PopupMenu(self.popupmenu, pos)
+    #def OnPopupItemSelected(self, event): 
+    #    item = self.popupmenu.FindItemById(event.GetId()) 
+    #    text = item.GetText() 
+    #    wx.MessageBox("You selected item '%s'" % text)
+        
     def RecursivePathImport(self,event=None):
-        dlg = wxFileDialog(parent=self.frame, message="choose", defaultDir='.',
-            defaultFile="", wildcard="*.py", style=wxOPEN|wxMULTIPLE, pos=wxDefaultPosition)
-        if dlg.ShowModal() == wxID_OK:
+        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
+            defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
             filenames = dlg.GetPaths() # dlg.GetFilename()
             print 'Importing...'
-            wxBeginBusyCursor(cursor=wxHOURGLASS_CURSOR)
+            wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
             # self.fileloadhandler(filename)
             print filenames
 
@@ -1009,7 +1164,7 @@ class BoaApp(wxApp):
 
             self._HackToForceTheScrollbarToShowUp()
 
-            wxEndBusyCursor()
+            wx.EndBusyCursor()
             print 'Import - Done.'
 
 
@@ -1040,26 +1195,30 @@ class BoaApp(wxApp):
             pathname = os.path.join( dir, f )
             mode = os.stat(pathname)[stat.ST_MODE]
             if stat.S_ISDIR(mode):
+                # It's a directory, ignore it
+                pass
                 # It's a directory, recurse into it
-                self.RecursivePathImport(pathname)
+                #self.RecursivePathImport(pathname)
             elif stat.S_ISREG(mode):
                 # It's a file
                 if( os.path.splitext(f)[1] != ".pyc" and f != "__init__.py" ):
                     self.fileList.append( os.path.join(dir,f) )
 
     def FileImport(self, event):
-        dlg = wxFileDialog(parent=self.frame, message="choose", defaultDir='.',
-            defaultFile="", wildcard="*.py", style=wxOPEN|wxMULTIPLE, pos=wxDefaultPosition)
-        if dlg.ShowModal() == wxID_OK:
+        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
+            defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
             filenames = dlg.GetPaths() # dlg.GetFilename()
             print 'Importing...'
-            wxBeginBusyCursor(cursor=wxHOURGLASS_CURSOR)
+            wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
             # self.fileloadhandler(filename)
             print filenames
 
             self.win.Go(files=filenames)
 
-            wxEndBusyCursor()
+            self.win.redraw2()  #ADDED AT MAC PORT TIME
+
+            wx.EndBusyCursor()
             print 'Import - Done.'
 
         self._HackToForceTheScrollbarToShowUp()
@@ -1116,21 +1275,21 @@ Helpful Reminder:
 
         from printframework import MyPrintout
 
-        self.printData = wxPrintData()
-        self.printData.SetPaperId(wxPAPER_LETTER)
+        self.printData = wx.PrintData()
+        self.printData.SetPaperId(wx.PAPER_LETTER)
 
-        self.box = wxBoxSizer(wxVERTICAL)
+        self.box = wx.BoxSizer(wx.VERTICAL)
         self.canvas = self.win.GetDiagram().GetCanvas()
 
         #self.log.WriteText("OnPrintPreview\n")
         printout = MyPrintout(self.canvas)
         printout2 = MyPrintout(self.canvas)
-        self.preview = wxPrintPreview(printout, printout2, self.printData)
+        self.preview = wx.PrintPreview(printout, printout2, self.printData)
         if not self.preview.Ok():
             self.log.WriteText("Houston, we have a problem...\n")
             return
 
-        frame = wxPreviewFrame(self.preview, self.frame, "This is a print preview")
+        frame = wx.PreviewFrame(self.preview, self.frame, "This is a print preview")
 
         frame.Initialize()
         frame.SetPosition(self.frame.GetPosition())
@@ -1157,8 +1316,8 @@ Helpful Reminder:
         self._HackToForceTheScrollbarToShowUp()  # this is just as necessary to get the screen to refresh.
 
     def MessageBox(self, msg):
-        dlg = wxMessageDialog(self.frame, msg,
-                              'A Message Box', wxOK | wxICON_INFORMATION)
+        dlg = wx.MessageDialog(self.frame, msg,
+                              'A Message Box', wx.OK | wx.ICON_INFORMATION)
                               #wxYES_NO | wxNO_DEFAULT | wxCANCEL | wxICON_INFORMATION)
         dlg.ShowModal()
         dlg.Destroy()
@@ -1177,10 +1336,22 @@ def main():
 #----------------------------------------------------------------------
 # This creates some pens and brushes that the OGL library uses.
 
-    wxOGLInitialize()    # moved here for wxpython 2.5 compatibility
+    ogl.OGLInitialize()
 
 #----------------------------------------------------------------------
     application.MainLoop()
 
+
 if __name__ == '__main__':
     main()
+
+
+# run.py is a wx demo module found in
+# C:\Program Files\wxPython2.8 Docs and Demos\demo
+"""
+if __name__ == '__main__':
+    import sys, os
+    import run
+    run.main(['', os.path.basename(sys.argv[0])] + sys.argv[1:])
+"""
+
