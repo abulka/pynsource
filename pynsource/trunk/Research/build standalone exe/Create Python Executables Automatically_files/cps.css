@@ -1,0 +1,402 @@
+.error {
+	BORDER-RIGHT: red 2px solid; PADDING-RIGHT: 10px; BORDER-TOP: red 2px solid; PADDING-LEFT: 10px; PADDING-BOTTOM: 10px; MARGIN: 20px; FONT: 11px Verdana, Geneva, Arial, Helvetica, sans-serif; BORDER-LEFT: red 2px solid; COLOR: black; PADDING-TOP: 10px; BORDER-BOTTOM: red 2px solid; BACKGROUND-COLOR: white
+}
+.copyright {
+	FONT-WEIGHT: bold; FONT-SIZE: 11px; COLOR: red; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; TEXT-ALIGN: center
+}
+.formFieldError {
+	FONT-WEIGHT: bold; FONT-SIZE: 11px; COLOR: red; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; TEXT-ALIGN: right
+}
+.billingMessage {
+	FONT-WEIGHT: bold; FONT-SIZE: 11px; COLOR: red; FONT-STYLE: italic; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; TEXT-ALIGN: left
+}
+.imgBtn {
+	BORDER-RIGHT: medium none; BORDER-TOP: medium none; BORDER-LEFT: medium none; CURSOR: hand; BORDER-BOTTOM: medium none
+}
+.stageControlBar {
+	BORDER-RIGHT: #6f6c60 2px solid; BORDER-TOP: white 2px solid; BORDER-LEFT: white 2px solid; BORDER-BOTTOM: #6f6c60 2px solid; BACKGROUND-COLOR: #cdccc5
+}
+.smOptionTag {
+	FONT-WEIGHT: bold; FONT-SIZE: 10px; LEFT: 0px; LINE-HEIGHT: 14px; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; POSITION: relative; TOP: -2px
+}
+.menuItems {
+	MARGIN-LEFT: 3px; BORDER-BOTTOM: white 1px solid
+}
+.taxTypesDiv {
+	BORDER-RIGHT: black 2px solid; PADDING-RIGHT: 3px; BORDER-TOP: black 2px solid; PADDING-LEFT: 3px; LEFT: 0px; PADDING-BOTTOM: 3px; BORDER-LEFT: black 2px solid; PADDING-TOP: 3px; BORDER-BOTTOM: black 2px solid; POSITION: absolute; TOP: 16px; BACKGROUND-COLOR: #d3d3d3; TEXT-ALIGN: left
+}
+.navBar {
+	BORDER-RIGHT: #e0c189 1px solid; PADDING-RIGHT: 5px; BORDER-TOP: white 1px solid; MARGIN-TOP: 2px; PADDING-LEFT: 5px; PADDING-BOTTOM: 5px; MARGIN-LEFT: 2px; VERTICAL-ALIGN: top; BORDER-LEFT: white 1px solid; PADDING-TOP: 5px; BORDER-BOTTOM: #e0c189 1px solid; BACKGROUND-COLOR: #fff5ce
+}
+.tabOn {
+	BORDER-RIGHT: gray 2px solid; PADDING-RIGHT: 5px; BORDER-TOP: #eeeeee 2px solid; PADDING-LEFT: 5px; BACKGROUND: silver; PADDING-BOTTOM: 3px; FONT: bold 11px Verdana, Geneva, Arial, Helvetica, sans-serif; BORDER-LEFT: #eeeeee 2px solid; CURSOR: pointer; COLOR: white; PADDING-TOP: 3px; BORDER-BOTTOM: silver 2px solid; TEXT-ALIGN: center
+}
+.widgetBox {
+	BORDER-RIGHT: pink 1px solid; BORDER-TOP: pink 1px solid; MARGIN: 1px; BORDER-LEFT: pink 1px solid; BORDER-BOTTOM: pink 1px solid
+}
+.widgetEdit {
+	BACKGROUND: silver; OVERFLOW: hidden; WIDTH: 100%; HEIGHT: 15px; TEXT-ALIGN: left
+}
+.widgetName {
+	LEFT: 0px; FONT: 9px Verdana, Geneva, Arial, Helvetica, sans-serif; POSITION: relative; TOP: -2px
+}
+.tabOff {
+	BORDER-RIGHT: gray 1px solid; PADDING-RIGHT: 5px; BORDER-TOP: #d3d3d3 1px solid; PADDING-LEFT: 5px; BACKGROUND: darkgray; PADDING-BOTTOM: 3px; FONT: bold 11px Verdana, Geneva, Arial, Helvetica, sans-serif; BORDER-LEFT: #d3d3d3 1px solid; CURSOR: hand; COLOR: white; PADDING-TOP: 3px; BORDER-BOTTOM: #d3d3d3 2px solid; TEXT-ALIGN: center
+}
+.tabCardBG {
+	BORDER-RIGHT: gray 2px solid; PADDING-RIGHT: 10px; PADDING-LEFT: 10px; BACKGROUND: silver; PADDING-BOTTOM: 10px; BORDER-LEFT: #eeeeee 2px solid; PADDING-TOP: 10px; BORDER-BOTTOM: gray 2px solid
+}
+.tabCardPosition {
+	LEFT: 0px; POSITION: relative; TOP: 0px
+}
+.tabCardFirst {
+	LEFT: 0px; VISIBILITY: visible; OVERFLOW: auto; POSITION: absolute; TOP: 0px
+}
+.tabCard {
+	LEFT: 0px; VISIBILITY: hidden; OVERFLOW: auto; POSITION: absolute; TOP: 0px
+}
+.pageTitle {
+	BORDER-RIGHT: #3d583e 2px solid; PADDING-RIGHT: 10px; BORDER-TOP: #6495ed 2px solid; PADDING-LEFT: 10px; BACKGROUND: #aaaaaa; PADDING-BOTTOM: 5px; FONT: bold 16px Verdana, Geneva, Arial, Helvetica, sans-serif; BORDER-LEFT: #6495ed 2px solid; COLOR: white; PADDING-TOP: 5px; BORDER-BOTTOM: #3d583e 2px solid
+}
+.miniPageTitle {
+	BORDER-RIGHT: #3d583e 1px solid; PADDING-RIGHT: 5px; BORDER-TOP: #6495ed 1px solid; PADDING-LEFT: 5px; BACKGROUND: #0000cd; MARGIN-BOTTOM: 10px; PADDING-BOTTOM: 5px; FONT: bold 10px Verdana, Geneva, Arial, Helvetica, sans-serif; BORDER-LEFT: #6495ed 1px solid; COLOR: white; PADDING-TOP: 3px; BORDER-BOTTOM: #3d583e 1px solid
+}
+.dlgBox {
+	BORDER-RIGHT: black 2px solid; PADDING-RIGHT: 2px; BORDER-TOP: black 1px solid; PADDING-LEFT: 2px; RIGHT: 0px; BACKGROUND: silver; LEFT: 0px; PADDING-BOTTOM: 2px; BORDER-LEFT: black 1px solid; PADDING-TOP: 2px; BORDER-BOTTOM: black 2px solid; POSITION: absolute
+}
+.insetBox {
+	BORDER-RIGHT: #d3d3d3 1px solid; BORDER-TOP: gray 1px solid; BORDER-LEFT: gray 1px solid; BORDER-BOTTOM: #d3d3d3 1px solid
+}
+TH {
+	BORDER-RIGHT: black 1px solid; BORDER-TOP: #6495ed 1px solid; FONT: bold 11px Verdana, Geneva, Arial, Helvetica, sans-serif; BORDER-LEFT: #6495ed 1px solid; COLOR: #ffffff; BORDER-BOTTOM: black 1px solid; BACKGROUND-COLOR: #0000cd
+}
+TH.subHead {
+	BORDER-RIGHT: black 1px solid; BORDER-TOP: #f5f5f5 1px solid; FONT: 10px Verdana, Geneva, Arial, Helvetica, sans-serif; BORDER-LEFT: #f5f5f5 1px solid; COLOR: black; BORDER-BOTTOM: black 1px solid; BACKGROUND-COLOR: #d3d3d3
+}
+.simpleBox {
+	BORDER-RIGHT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-BOTTOM: black 1px solid; BACKGROUND-COLOR: #ffffff
+}
+.grayLineAbove {
+	BORDER-TOP: silver 1px solid
+}
+.menuDiv {
+	BORDER-RIGHT: #3d583e 1px solid; BORDER-TOP: #6495ed 1px solid; MARGIN-TOP: 10px; BACKGROUND: #0000cd; MARGIN-BOTTOM: 5px; PADDING-BOTTOM: 2px; FONT: bold 11px Verdana, Geneva, Arial, Helvetica, sans-serif; BORDER-LEFT: #6495ed 1px solid; COLOR: white; PADDING-TOP: 2px; BORDER-BOTTOM: #3d583e 1px solid
+}
+TH.tableSort {
+	FONT-WEIGHT: normal; FONT-SIZE: 8pt; CURSOR: hand; COLOR: white; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; BACKGROUND-COLOR: #0000cd; TEXT-DECORATION: none
+}
+TH.tableSortOver {
+	BORDER-RIGHT: 1px solid; BORDER-TOP: black 1px solid; FONT-WEIGHT: normal; FONT-SIZE: 8pt; BORDER-LEFT: black 1px solid; CURSOR: hand; COLOR: #000000; BORDER-BOTTOM: #c0c0c0 1px solid; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; BACKGROUND-COLOR: #b9ceba; TEXT-DECORATION: none
+}
+.disabledText {
+	OVERFLOW-Y: scroll; FONT-SIZE: 12px; OVERFLOW-X: scroll; WIDTH: 600px; WORD-BREAK: normal; FONT-FAMILY: monospace; HEIGHT: 230px; BACKGROUND-COLOR: #f5f5f5
+}
+.fieldLabel {
+	FONT-WEIGHT: bold; FONT-SIZE: 11px; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; TEXT-ALIGN: right
+}
+.fieldLabelLeft {
+	FONT-WEIGHT: bold; FONT-SIZE: 11px; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; TEXT-ALIGN: left
+}
+.fieldEntry {
+	FONT-SIZE: 11px; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif
+}
+.smOptionTag {
+	FONT-WEIGHT: bold; FONT-SIZE: 10px; LEFT: 0px; LINE-HEIGHT: 14px; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; POSITION: relative; TOP: -2px
+}
+.smTag {
+	FONT-WEIGHT: bold; FONT-SIZE: 10px; LEFT: 0px; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif
+}
+A:hover {
+	TEXT-DECORATION: underline
+}
+.navItem {
+	FONT: bold 11px Verdana, Geneva, Arial, Helvetica, sans-serif; COLOR: blue; TEXT-DECORATION: none
+}
+.navItemDiv {
+	PADDING-BOTTOM: 1px; MARGIN-LEFT: 3px; PADDING-TOP: 1px; BORDER-BOTTOM: white 1px solid
+}
+.mdSans {
+	FONT: 11px Verdana, Geneva, Arial, Helvetica, sans-serif
+}
+.mdBldSans {
+	FONT: bold 11px Verdana, Geneva, Arial, Helvetica, sans-serif
+}
+.smFieldLabel {
+	FONT-WEIGHT: bold; FONT-SIZE: 10px; LINE-HEIGHT: 14px; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif
+}
+.smBtn {
+	FONT-WEIGHT: bold; FONT-SIZE: 10px; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif
+}
+TD {
+	FONT-SIZE: smaller; FONT-FAMILY: Arial, Helvetica, Sans-serif
+}
+.message {
+	FONT-SIZE: 9pt; FONT-FAMILY: Arial, Helvetica, Sans-serif
+}
+.tinyMessage {
+	FONT-SIZE: 8pt; FONT-FAMILY: Arial, Helvetica, Sans-serif
+}
+.btnBar {
+	MARGIN-TOP: 5px; MARGIN-BOTTOM: 5px; TEXT-ALIGN: center
+}
+.regFeedback {
+	FONT-WEIGHT: bold; COLOR: red
+}
+.surveyQuestion {
+	FONT: 11px Verdana, Geneva, Arial, Helvetica, sans-serif; COLOR: black
+}
+.surveyInstructions {
+	FONT: italic 10px "Tahoma", Geneva, Arial, Helvetica, sans-serif; BACKGROUND-COLOR: #99ff66
+}
+.surveyChoice {
+	FONT: 10px "Comic Sans MS", Geneva, Arial, Helvetica, sans-serif
+}
+.surveyRequired {
+	COLOR: red
+}
+.surveyQEHeaderText {
+	FONT-WEIGHT: normal; FONT-SIZE: 12px; COLOR: #000000; FONT-FAMILY: Futura, Arial, Helvetica, sans-serif; TEXT-DECORATION: none
+}
+.surveyQEFooterText {
+	FONT-WEIGHT: normal; FONT-SIZE: 12px; COLOR: #000000; FONT-FAMILY: Futura, Arial, Helvetica, sans-serif; TEXT-DECORATION: none
+}
+A {
+	COLOR: #003366; TEXT-DECORATION: none
+}
+A.leftnav {
+	COLOR: #ffffff
+}
+A.rightnav {
+	COLOR: #336699
+}
+A:hover {
+	TEXT-DECORATION: underline
+}
+.smallfont {
+	FONT-SIZE: 11px; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.smallfontRight {
+	FONT-SIZE: 11px; FONT-FAMILY: Arial, Helvetica, Sans-Serif; TEXT-ALIGN: right; TEXT-DECORATION: underline
+}
+.newsletterFont {
+	FONT-SIZE: 11px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.doorFeatureAreaLabel {
+	FONT-WEIGHT: bolder; FONT-SIZE: 16px; COLOR: #003366; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-Serif
+}
+.doorFeatureArea {
+	FONT-SIZE: 11px; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.doorFeatureAreaTitle {
+	FONT-SIZE: 14px; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.articleTitle {
+	FONT-WEIGHT: bolder; FONT-SIZE: 16px; COLOR: #336699; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-Serif
+}
+.articleDek {
+	MARGIN-TOP: 0px; FONT-WEIGHT: bolder; FONT-SIZE: 12px; FONT-STYLE: italic; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-Serif
+}
+.articleAuthor {
+	MARGIN-TOP: 12px; FONT-SIZE: 10px; FONT-STYLE: normal; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.articleBio {
+	FONT-SIZE: 11px; FONT-STYLE: italic; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+A.downloadLink {
+	FONT-WEIGHT: bold; FONT-SIZE: 11px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.downloadMoreLink {
+	FONT-WEIGHT: bold; FONT-SIZE: 12px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+A.FeaturedBoxLink {
+	FONT-WEIGHT: bolder; FONT-SIZE: 11px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.downloadText {
+	FONT-SIZE: 11px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.regFeedback {
+	COLOR: red
+}
+.regTopLabel {
+	FONT-WEIGHT: bolder; FONT-SIZE: 16px; COLOR: #003366; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-Serif
+}
+.regLabel {
+	FONT-WEIGHT: bolder; FONT-SIZE: 12px; COLOR: #003366; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.downloadTopTitle {
+	FONT-WEIGHT: bolder; FONT-SIZE: 16px; COLOR: #336699; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-Serif
+}
+.downloadIntro {
+	FONT-SIZE: 13px; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-Serif
+}
+A.downloadTryIt {
+	FONT-SIZE: 12px; COLOR: #ff6600; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.downloadTitle {
+	FONT-WEIGHT: bolder; FONT-SIZE: 14px; COLOR: #336699; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-Serif
+}
+.smallestText {
+	FONT-SIZE: 10px; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.licenseAgreement {
+	FONT-WEIGHT: bolder; FONT-SIZE: 14px; COLOR: #336699; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-Serif
+}
+.licenseDesc {
+	FONT-SIZE: 11px; FONT-STYLE: italic; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+A.discMsgNavLink {
+	
+}
+A.discMsgNavLinkDisabled {
+	
+}
+A.discTopicLink {
+	FONT-SIZE: 12px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discTopOfPageTD {
+	
+}
+.discTopicsTD {
+	FONT-SIZE: 12px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discAuthorTH {
+	
+}
+.discAuthorTD {
+	
+}
+.discDatePostedTH {
+	
+}
+.discDatePostedTD {
+	
+}
+.discMsgSubjectTH {
+	
+}
+.discMsgSubjectTD {
+	
+}
+.discSimpleBox {
+	
+}
+.discAuthorLabel {
+	FONT-WEIGHT: bolder; FONT-SIZE: 12px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discAuthorEntry {
+	FONT-SIZE: 12px; COLOR: #000000; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discDatePostedLabel {
+	FONT-WEIGHT: bolder; FONT-SIZE: 12px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discDatePostedEntry {
+	FONT-SIZE: 12px; COLOR: #000000; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discSubjectLabel {
+	FONT-WEIGHT: bolder; FONT-SIZE: 12px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discSubjectEntry {
+	FONT-WEIGHT: bolder; FONT-SIZE: 12px; COLOR: #000000; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discMsgBody {
+	PADDING-RIGHT: 3px; PADDING-LEFT: 3px; FONT-SIZE: 12px; PADDING-BOTTOM: 3px; COLOR: #000000; PADDING-TOP: 3px; FONT-FAMILY: Arial, Helvetica, Sans-Serif; BACKGROUND-COLOR: #ccffff
+}
+.discRecentMsgsTH {
+	
+}
+.discRecentMsgsTD {
+	
+}
+.discRecentAuthorTH {
+	
+}
+.discRecentAuthorTD {
+	
+}
+.discRecentDatePostedTH {
+	
+}
+.discRecentDatePostedTD {
+	
+}
+.discSubjectTD {
+	
+}
+.discMessageTitle {
+	FONT-WEIGHT: bolder; FONT-SIZE: 14px; COLOR: #336699; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-Serif
+}
+.discMultipage {
+	
+}
+.discPostAuthorLabel {
+	FONT-WEIGHT: bolder; FONT-SIZE: 12px; COLOR: #000000; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discPostEmailLabel {
+	FONT-WEIGHT: bolder; FONT-SIZE: 12px; COLOR: #000000; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discPostDatePostedLabel {
+	
+}
+.discPostSubjectLabel {
+	FONT-WEIGHT: bolder; FONT-SIZE: 12px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discPostParentMsgLabel {
+	FONT-WEIGHT: bolder; FONT-SIZE: 12px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discPostParentMsg {
+	FONT-SIZE: 12px; COLOR: #003366; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discPostFieldEntry {
+	
+}
+.discPostMsgLabel {
+	FONT-WEIGHT: bolder; FONT-SIZE: 12px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, Sans-Serif
+}
+.discPostMsgBody {
+	
+}
+.discFieldLabel {
+	FONT-WEIGHT: bolder; FONT-SIZE: 12px; COLOR: #336699; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-Serif; TEXT-ALIGN: right
+}
+.discTblHead {
+	PADDING-RIGHT: 2px; PADDING-LEFT: 2px; FONT-WEIGHT: bold; FONT-SIZE: 11px; PADDING-BOTTOM: 2px; COLOR: #ffffff; PADDING-TOP: 2px; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-Serif; BACKGROUND-COLOR: #336699
+}
+.discHeader {
+	PADDING-RIGHT: 2px; PADDING-LEFT: 2px; FONT-WEIGHT: bold; FONT-SIZE: 11px; PADDING-BOTTOM: 2px; CURSOR: hand; COLOR: #ffffff; PADDING-TOP: 2px; FONT-FAMILY: Arial, Helvetica, Sans-Serif; BACKGROUND-COLOR: #394d8c
+}
+.discSortHeader {
+	PADDING-RIGHT: 2px; PADDING-LEFT: 2px; FONT-WEIGHT: bold; FONT-SIZE: 11px; PADDING-BOTTOM: 2px; CURSOR: hand; COLOR: #fed980; PADDING-TOP: 2px; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-Serif; BACKGROUND-COLOR: #336699; TEXT-DECORATION: underline
+}
+.discAuthor {
+	PADDING-RIGHT: 2px; PADDING-LEFT: 2px; FONT-SIZE: 11px; PADDING-BOTTOM: 2px; COLOR: #000000; PADDING-TOP: 2px; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-Serif; BACKGROUND-COLOR: #ccffff
+}
+.HeadingStyle {
+	FONT-WEIGHT: bold; FONT-SIZE: 16px; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.WhiteHeadingStyle {
+	FONT-WEIGHT: bold; FONT-SIZE: 16px; COLOR: #ffffff; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.QuestionStyle {
+	FONT-WEIGHT: normal; FONT-SIZE: 12px; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.InstructionStyle {
+	FONT-WEIGHT: normal; FONT-SIZE: 12px; FONT-STYLE: italic; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.AnswerStyle {
+	FONT-WEIGHT: normal; FONT-SIZE: 12px; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.ViewResultsStyle {
+	FONT-WEIGHT: normal; FONT-SIZE: 11px; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.ScoreStyle {
+	FONT-WEIGHT: normal; FONT-SIZE: 12px; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.TotalVotesStyle {
+	FONT-WEIGHT: bold; FONT-SIZE: 12px; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.defaultText {
+	FONT-WEIGHT: normal; FONT-SIZE: 12px; COLOR: #000000; FONT-FAMILY: Arial, Helvetica, sans-serif; TEXT-DECORATION: none
+}
+CODE {
+	FONT-SIZE: 110%
+}
