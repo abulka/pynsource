@@ -17,6 +17,10 @@ import copy
 #Global Stuff   -------------------------------------------------------------------------
 clipboard=[]
 
+#ANDY
+ANDYMAIN = None
+##############
+
 def menuMaker(frame, menus):
     menubar = wxMenuBar()
     for m,n in menus.items():
@@ -168,18 +172,16 @@ class LineShape(Shape):
         if dist>7: return false
         return true
 
-ANDYVIEW = None
-
 class RectangleShape(Shape):
     def __init__(self,x=20, y=20, x2=90, y2=90):
         
         #ANDY
-        if ANDYVIEW:
-            topx,topy = ANDYVIEW.GetViewStart() # The positions are in logical scroll units, not pixels, so to convert to pixels you will have to multiply by the number of pixels per scroll increment.
+        if ANDYMAIN:
+            topx,topy = ANDYMAIN.canvas.GetViewStart() # The positions are in logical scroll units, not pixels, so to convert to pixels you will have to multiply by the number of pixels per scroll increment.
             print topx,topy
-            px,py = ANDYVIEW.GetScrollPixelsPerUnit() 
+            px,py = ANDYMAIN.canvas.GetScrollPixelsPerUnit() 
             print topx,topy, px,py, topx*px, topy*py
-            topx,topy = ANDYVIEW.CalcUnscrolledPosition(topx*px,topy*py) 
+            topx,topy = ANDYMAIN.canvas.CalcUnscrolledPosition(topx*px,topy*py) 
             print topx,topy
             Shape.__init__(self, [topx+x,topx+x2] ,  [topy+y,topy+y2])
         else:
@@ -319,9 +321,40 @@ class ShapeCanvas(wxScrolledWindow):
         dc.EndDrawing()
 
     def OnRightDown(self,event):
-        self.getCurrentShape(event).OnRightDown(event)
+        #ANDY
+        #self.getCurrentShape(event).OnRightDown(event)
+
+        #ANDY
+        if self.getCurrentShape(event):
+            self.getCurrentShape(event).OnRightDown(event)
+        
     def OnRightUp(self,event):
-        self.getCurrentShape(event).OnRightUp(event)
+        #ANDY        
+        #self.getCurrentShape(event).OnRightUp(event)
+
+        #ANDY
+        if self.getCurrentShape(event):
+            self.getCurrentShape(event).OnRightUp(event)
+        else:
+            #
+            self.popupmenu = wx.Menu()
+            item = self.popupmenu.Append(2021, "Properties...")
+            self.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+            item = self.popupmenu.Append(2022, "Cancel")
+            self.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+            
+            pos = event.GetPosition()
+            pos = self.ScreenToClient(pos)
+            self.PopupMenu(self.popupmenu, pos)
+        ########
+
+    #ANDY
+    def OnPopupItemSelected(self, event): 
+        item = self.popupmenu.FindItemById(event.GetId()) 
+        text = item.GetText() 
+        wx.MessageBox("You selected item '%s'" % text)
+    ################        
+        
     def OnRightDClick(self,event):
         self.getCurrentShape(event).OnRightDClick(event)
     def OnLeftDClick(self,event):
@@ -564,6 +597,7 @@ class ConnectionShape(LineShape,Resizeable,Selectable):
 
 
 class Block(RectangleShape,Connectable,Resizeable,Selectable,Attributable):
+   
     def __init__(self):
         RectangleShape.__init__(self)
         Resizeable.__init__(self)
@@ -571,7 +605,7 @@ class Block(RectangleShape,Connectable,Resizeable,Selectable,Attributable):
         Attributable.__init__(self)
         self.AddAttributes(['label','pen','fill','input','output'])
         self.label='Block' 
-  
+      
     def draw(self,dc):
         RectangleShape.draw(self,dc)
         w,h =  dc.GetTextExtent(self.label)
@@ -585,12 +619,36 @@ class Block(RectangleShape,Connectable,Resizeable,Selectable,Attributable):
             d.ShowModal()
             self.label = d.GetValue()
 
+    #ANDY
+    #def OnRightDown(self,event):
+    #    f = AttributeEditor(NULL, -1, "props",self)
+    #    f.Show(true)
+    
+    #ANDY
     def OnRightDown(self,event):
-        f = AttributeEditor(NULL, -1, "props",self)
-        f.Show(true)
+        self.popupmenu = wx.Menu()
+        item = self.popupmenu.Append(2011, "Properties...")
+        ANDYMAIN.canvas.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        item = self.popupmenu.Append(2012, "Delete Node")
+        ANDYMAIN.canvas.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        item = self.popupmenu.Append(2013, "Cancel")
+        ANDYMAIN.canvas.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        #
+        pos = event.GetPosition()
+        pos = ANDYMAIN.canvas.ScreenToClient(pos)
+        ANDYMAIN.canvas.PopupMenu(self.popupmenu, pos)
+    ##########
 
-
-
+    #ANDY
+    def OnPopupItemSelected(self, event): 
+        item = self.popupmenu.FindItemById(event.GetId()) 
+        text = item.GetText() 
+        #wx.MessageBox("You selected item '%s'" % text)
+        if text == "Properties...":
+            f = AttributeEditor(NULL, -1, "props",self)
+            f.Show(true)
+    ################
+    
 class CodeBlock(Block):
 
     def __init__(self):
@@ -775,35 +833,29 @@ class CodeFrame(wxFrame):
         self.canvas.SetBackgroundColour(wxWHITE)
 
         #ANDY
-        global ANDYVIEW
-        ANDYVIEW = self.canvas        
+        global ANDYMAIN
+        ANDYMAIN = self
+        #
         self.canvas.SetScrollbars(1, 1, 600, 400)
         self.canvas.SetVirtualSize((600, 400))
-
-        #ANDY
-        self.popupmenu = wx.Menu()     # Creating a menu
-        item = self.popupmenu.Append(2011, "Delete Node")
-        self.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
-        item = self.popupmenu.Append(2012, "Cancel")
-        self.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
-        #
-        #self.canvas.Bind(wx.EVT_CONTEXT_MENU, self.OnShowPopup)
-        
+        ################
+      
         self.Show(true)
 
-        #ANDY
-    #def OnShowPopup(self, event):
-    #    pos = event.GetPosition()
-    #    pos = self.canvas.ScreenToClient(pos)
-    #    self.canvas.PopupMenu(self.popupmenu, pos)
-        
-        #ANDY
-    def OnPopupItemSelected(self, event): 
-        item = self.popupmenu.FindItemById(event.GetId()) 
-        text = item.GetText() 
-        wx.MessageBox("You selected item '%s'" % text)
-
-            
+    #ANDY
+    #def OnPopupItemSelected(self, event):
+    #    OnPopupItemSelected(self, event):
+    #        
+    #    item = self.popupmenu.FindItemById(event.GetId()) 
+    #    text = item.GetText() 
+    #    wx.MessageBox("You selected item '%s'" % text)
+    #    if text == "Properties...":
+    #        f = AttributeEditor(NULL, -1, "props",self)
+    #        f.Show(true)
+    ################
+    
+    
+    
     def zoomin(self,event):
         self.canvas.scalex=max(self.canvas.scalex+.05,.3)
         self.canvas.scaley=max(self.canvas.scaley+.05,.3)
@@ -812,6 +864,7 @@ class CodeFrame(wxFrame):
         self.canvas.SetVirtualSize((1900, 1600))
 
         self.canvas.Refresh()
+
 
     def zoomout(self,event):
         self.canvas.scalex=self.canvas.scalex-.05

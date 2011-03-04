@@ -308,7 +308,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         ogl.ShapeEvtHandler.OnMovePost(self, dc, x, y, oldX, oldY, display)
         self.UpdateStatusBar(shape)
         if "wxMac" in wx.PlatformInfo:
-            shape.GetCanvas().Refresh(False)
+            shape.GetCanvas().Refresh(False) 
 
     #def OnShowPopup(self, event):
     #    pos = event.GetPosition()
@@ -330,6 +330,9 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         self.statbarFrame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
         item = self.popupmenu.Append(2012, "Cancel")
         self.statbarFrame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+
+        #cx,cy=self.scroll.GetClientSizeTuple()
+        #sx,sy=self.scroll.GetViewStart()
 
         self.statbarFrame.PopupMenu(self.popupmenu, wx.Point(x,y))
 
