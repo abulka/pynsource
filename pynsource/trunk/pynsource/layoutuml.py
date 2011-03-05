@@ -2,22 +2,23 @@
 
 import networkx as NX
 import networkx.drawing.layout as lay
-import networkx.paths as P
+#import networkx.paths as P
+import networkx.algorithms.dag as P
 import random
 
 G=NX.Graph()
-G.add_node("hello")
-G.add_node("there")
-G.add_node("again")
-G.add_node("please")
-G.add_node("silly")
-G.add_edge("hello", "there")
-G.add_edge("there", "again")
-G.add_edge("again", "please")
-G.add_edge("hello", "silly")
+G.add_node("hello",size=10)
+G.add_node("there",size=10)
+G.add_node("again",size=10)
+G.add_node("please",weight=0.4,UTM=('13S',382871,3972649))
+G.add_node("aa")
+G.add_edge("hello", "there",weight=0.6)
+G.add_edge("there", "again",weight=0.4)
+G.add_edge("there", "please",weight=0.2)
+G.add_edge("hello", "aa",weight=0.2)
 print G.nodes()
 print G.edges()
-print G.info()
+#print G.info()
 
 print dir(lay)
 res01 = lay.circular_layout(G)
@@ -27,8 +28,72 @@ res02 = lay.spring_layout(G)
 print "res02", res02
 print
 print "sorted! "
-P.topological_sort(G)
-P.topological_sort_recursive(G)
+
+#P.topological_sort(G)
+#P.topological_sort_recursive(G)
+
+nx = NX
+
+"""
+ ANDY NOTE: requires graphviz which doesn't come easy under windows
+ 
+# Added from example http://networkx.lanl.gov/examples/drawing/atlas.html
+print("graph has %d nodes with %d edges"\
+	  %(nx.number_of_nodes(G),nx.number_of_edges(G)))
+print(nx.number_connected_components(G),"connected components")
+
+try:
+	from networkx import graphviz_layout
+except ImportError:
+	raise ImportError("This example needs Graphviz and either PyGraphviz or Pydot")
+
+import matplotlib.pyplot as plt
+plt.figure(1,figsize=(8,8))
+# layout graphs with positions using graphviz neato
+pos=nx.graphviz_layout(G,prog="neato")
+# color nodes the same in each connected subgraph
+C=nx.connected_component_subgraphs(G)
+for g in C:
+	c=[random.random()]*nx.number_of_nodes(g) # random color...
+	nx.draw(g,
+		 pos,
+		 node_size=40,
+		 node_color=c,
+		 vmin=0.0,
+		 vmax=1.0,
+		 with_labels=False
+		 )
+plt.savefig("andy.png",dpi=75)
+"""
+
+
+# From example weighted_graph.py
+try:
+    import matplotlib.pyplot as plt
+except:
+    raise
+elarge=[(u,v) for (u,v,d) in G.edges(data=True) if d['weight'] >0.5]
+esmall=[(u,v) for (u,v,d) in G.edges(data=True) if d['weight'] <=0.5]
+pos=nx.spring_layout(G) # positions for all nodes
+# nodes
+#nx.draw_networkx_nodes(G,pos,node_size=700)
+#nx.draw_networkx_nodes(G,pos,node_size=7000)
+nx.draw_networkx_nodes(G,pos,node_size=2000)
+# edges
+nx.draw_networkx_edges(G,pos,edgelist=elarge,
+                    width=6)
+nx.draw_networkx_edges(G,pos,edgelist=esmall,
+                    width=6,alpha=0.5,edge_color='b',style='dashed')
+# labels
+nx.draw_networkx_labels(G,pos,font_size=20,font_family='sans-serif')
+plt.axis('off')
+plt.savefig("weighted_graph.png") # save as png
+plt.show() # display
+
+
+
+
+#--------------------------
 
 
 def calcMinMax(res):
@@ -77,8 +142,10 @@ def CollectY(res):
     ys = [ v[1] for v in res.values() ]
 
     # remove duplicates
-    from sets import Set
-    ys = list(Set(ys))
+    
+    #from sets import Set
+    #ys = list(Set(ys))    python 2.6 now has built in sets 
+    ys = list(set(ys))
 
     ys.sort()
     ys.reverse()
