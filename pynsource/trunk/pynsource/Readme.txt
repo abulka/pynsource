@@ -1,11 +1,13 @@
 PyNSource
-http://www.atug.com/andypatterns/pynsource.htm
+http://www.andypatterns.com/index.php/products/pynsource_-_uml_tool_for_python/
 
-(c) 2003, 2004, 2005, 2006 Andy Bulka
+(c) 2003-2011 Andy Bulka
+andy@andypatterns.com
 License: Free to use as long as acknowledgement is made in source code.
-abulka@netspace.net.au
-http://www.atug.com/andypatterns
 
+Version 1.5
+- Python 2.6 compatibility
+- Runs with latest wxpython
 
 Version 1.4c
 - Fixed some parsing bugs.

@@ -4,17 +4,17 @@
  as there may be old relics in there that get installed.
 """
 
-# http://www.atug.com/andypatterns/pynsource.htm
+# http://www.andypatterns.com/index.php/products/pynsource_-_uml_tool_for_python/
 
 from distutils.core import setup
 setup (name = "PyNsource",
-       version = "1.4c",
+       version = "1.5",
        author = "Andy Bulka",
-       author_email = "abulka@netspace.net.au",
+       author_email = "abulka@gmail.com",
        description = "A python reverse engineering code scanner that generates  - UML pictures (as text or UML diagrams) - Java or Delphi code (which can be imported into advanced UML modelling tools.)",
        keywords = "UML modelling python reverse engineering",
        license = "GPL? i.e. free as long as author acknowledged and derivitave source is also open source.",
-       packages=['pynsource'])
+       packages=['pynsource', 'pynsource.ogl'])
 
 
 """
