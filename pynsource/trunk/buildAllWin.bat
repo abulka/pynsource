@@ -8,6 +8,8 @@ set outsetupexe=pyNsource-1.5-setup.exe
 
 REM delete all generated files and regen the build.txt file from subversion
 del /q dist\*.*
+
+REM remember to run "svn update" before running this in order to get the correct repo number
 svn info > build.txt
 
 REM goto step3
@@ -20,10 +22,10 @@ move dist\%outsourceexe1% dist\%outsourceexe%
 
 :step2
 REM Build raw source zip by zipping up appropriate files
-"c:\Program Files\7-Zip"\7z a -tzip  -xr!".svn" -xr!"build" -xr!"dist" -xr!*.pyc dist\%outsourcezip% pynsource\* Tests\*.py setup.py Readme.txt rungui.bat build.txt
+"c:\Program Files\7-Zip"\7z a -tzip  -xr!".svn" -xr!"build" -xr!"dist" -xr!*.pyc dist\%outsourcezip% pynsource\* Tests\*.py setup.py Readme.txt rungui.bat runtests.bat build.txt
 
 :step3
-REM buildstandaloneexe.bat
+REM buildstandalone exe zip
 cd pynsource
 del /q dist\*.*
 python setup.py py2exe
