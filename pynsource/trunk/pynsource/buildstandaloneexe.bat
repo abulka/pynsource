@@ -1,1 +1,2 @@
-\python23\python.exe setup.py py2exe
+del /q dist\*.*
+python setup.py py2exe
