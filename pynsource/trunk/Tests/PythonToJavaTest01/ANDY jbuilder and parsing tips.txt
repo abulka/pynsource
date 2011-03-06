@@ -1,8 +1,0 @@
-Consider some folder e.g. .../Tests/ and create a jbuilder project based off there called PythonToJavaTest01 which will actually create a folder called PythonToJavaTest01 plus subfolders called src and classes etc.  The Borland project file will also live in .../Tests/PythonToJavaTest01/ with a name PythonToJavaTest01.jpx
-
-Run pynsource so that it dumps the output into the src folder
-
-e.g. assuming the batch file is in the PythonToJavaTest01 folder and the python source is in 
-    .../Tests/PythonToJavaTest01/pythoninput01
-then the command is
-    pynsource -j src pythoninput01\*.py

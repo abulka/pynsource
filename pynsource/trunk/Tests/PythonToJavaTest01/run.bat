@@ -1,1 +1,0 @@
-..\..\pynsource -j src pythoninput01\*.py
