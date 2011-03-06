@@ -28,16 +28,18 @@ cd pynsource
 del /q dist\*.*
 python setup.py py2exe
 cd ..
-copy build.txt pynsource\dist
-copy Readme.txt pynsource\dist
-"c:\Program Files\7-Zip"\7z a -tzip  dist\%outstandalonezip% pynsource\dist\*
-
 :step3a
+REM copy build.txt pynsource\dist
+REM copy Readme.txt pynsource\dist
+"c:\Program Files\7-Zip"\7z a -tzip  dist\%outstandalonezip% .\pynsource\dist\* .\Readme.txt .\build.txt
+goto end
+
+:step4
 REM Build standalone with convenient setup using innosetup
 if not exist pynsource\dist\Readme.txt goto skipdeletereadme
   del /q pynsource\dist\Readme.txt
 :skipdeletereadme
-"c:\Program Files\Inno Setup 5\ISCC.exe" "standalone exe inno\pynsourcegui.iss"
-move "standalone exe inno\Output\setup.exe" dist\%outstandalonesetupexe%
+"c:\Program Files\Inno Setup 5\ISCC.exe" buildSetupExeWin.iss
+move build\setup.exe dist\%outstandalonesetupexe%
 
 :end
