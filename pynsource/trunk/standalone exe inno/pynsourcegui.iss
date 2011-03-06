@@ -13,6 +13,9 @@ AppVersion=1.5
 UninstallDisplayIcon={app}\pyNsourceGui.exe
 UninstallDisplayName=PyNSource Gui
 DefaultGroupName=PyNSource
+VersionInfoVersion=1.5
+
 [Files]
 Source: ..\pynsource\dist\*; DestDir: {app}; Flags: recursesubdirs
 Source: ..\Readme.txt; DestDir: {app}
+Source: ..\pynsource\dist\pyNsourceGui.exe; DestDir: {app}; 
