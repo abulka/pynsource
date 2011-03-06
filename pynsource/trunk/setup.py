@@ -14,7 +14,7 @@ setup (name = "PyNsource",
        description = "A python reverse engineering code scanner that generates  - UML pictures (as text or UML diagrams) - Java or Delphi code (which can be imported into advanced UML modelling tools.)",
        keywords = "UML modelling python reverse engineering",
        license = "GPL? i.e. free as long as author acknowledged and derivitave source is also open source.",
-       packages=['pynsource', 'pynsource.ogl'])
+       packages=['pynsource'])
 
 
 """
