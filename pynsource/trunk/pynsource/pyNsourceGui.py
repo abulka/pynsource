@@ -1,18 +1,19 @@
 aboutmsg = """
 PyNSource GUI
-http://www.andypatterns.com/pynsource
+http://www.andypatterns.com/index.php/products/pynsource_-_uml_tool_for_python/
 
 A GUI front end to the python code scanner PyNSource that generates UML diagrams.
-Version 1.5
+Version 1.5 alpha
 
-(c) Andy Bulka 2004-2009
+(c) Andy Bulka 2004-2011
 
 Some code borrowed from the wxPython Demo App OGL.py and Boa.
-License: Free
+License: Free as long as you acknowledge the author and this website.
 """
 
 import wx
 import wx.lib.ogl as ogl
+#import ogl
 from wx import Frame
 import os,stat
 
@@ -1026,6 +1027,8 @@ class Log:
 
 class BoaApp(wx.App):
     def OnInit(self):
+        self.log = Log()
+
         wx.InitAllImageHandlers()
 
         #self.main = wxFrame1.create(None)
@@ -1042,6 +1045,7 @@ class BoaApp(wx.App):
         menuBar = wx.MenuBar()
         menu = wx.Menu()
         menu2 = wx.Menu()
+        menu3 = wx.Menu()
 
 
         menu.Append(103, "File &Import...\tCtrl-I", "Import Python Source Files")
@@ -1058,21 +1062,16 @@ class BoaApp(wx.App):
 
         menu.AppendSeparator()
 
-        menu.Append(104, "File &Open\tCtrl-O", "Open")
-        wx.EVT_MENU(self, 104, self.FileOpen)
+        #menu.Append(104, "File &Open\tCtrl-O", "Open")
+        #wx.EVT_MENU(self, 104, self.FileOpen)
 
-        menu.Append(105, "File &Save\tCtrl-S", "Save")
-        wx.EVT_MENU(self, 105, self.FileSave)
+        #menu.Append(105, "File &Save\tCtrl-S", "Save")
+        #wx.EVT_MENU(self, 105, self.FileSave)
 
-        menu.AppendSeparator()
+        #menu.AppendSeparator()
 
-        menu.Append(1056, "File &Print / Preview\tCtrl-P", "Print")
+        menu.Append(1056, "File &Print / Preview...\tCtrl-P", "Print")
         wx.EVT_MENU(self, 1056, self.FilePrint)
-
-        menu.AppendSeparator()
-
-        menu.Append(106, "&About...", "About...")
-        wx.EVT_MENU(self, 106, self.OnAbout)
 
         menu.AppendSeparator()
 
@@ -1092,10 +1091,21 @@ class BoaApp(wx.App):
         menu2.Append(124, "&Refresh", "Refresh")
         wx.EVT_MENU(self, 124, self.OnRefresh)
 
+        # -----------
 
+        menu3.Append(301, "&Help on Printing...", "Help on Printing")
+        wx.EVT_MENU(self, 301, self.OnHelpPrint)
+
+        menu3.AppendSeparator()
+
+        menu3.Append(106, "&About...", "About...")
+        wx.EVT_MENU(self, 106, self.OnAbout)
+
+        # -----------
 
         menuBar.Append(menu, "&File")
         menuBar.Append(menu2, "&Edit")
+        menuBar.Append(menu3, "&Help")
         self.frame.SetMenuBar(menuBar)
         self.frame.Show(True)
         wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
@@ -1266,15 +1276,6 @@ class BoaApp(wx.App):
 
 
     def FilePrint(self, event):
-        self.MessageBox("""
-Helpful Reminder:
-
-   Ensure you have resized your UML diagram
-   to be big enough to fit most of your UML
-   otherwise the print preview will only
-   show a partial diagram. (I hope to auto fix this soon)
-
-""")
 
         from printframework import MyPrintout
 
@@ -1285,8 +1286,8 @@ Helpful Reminder:
         self.canvas = self.win.GetDiagram().GetCanvas()
 
         #self.log.WriteText("OnPrintPreview\n")
-        printout = MyPrintout(self.canvas)
-        printout2 = MyPrintout(self.canvas)
+        printout = MyPrintout(self.canvas, self.log)
+        printout2 = MyPrintout(self.canvas, self.log)
         self.preview = wx.PrintPreview(printout, printout2, self.printData)
         if not self.preview.Ok():
             self.log.WriteText("Houston, we have a problem...\n")
@@ -1305,6 +1306,16 @@ Helpful Reminder:
     def OnAbout(self, event):
         self.MessageBox(aboutmsg)
 
+    def OnHelpPrint(self, event):
+        self.MessageBox("""
+Helpful Reminder:
+
+   Ensure you have resized your visible UML diagram window
+   to be big enough to fit most of your UML
+   otherwise the print preview will only
+   show a partial diagram. (I hope to auto fix this soon)
+
+""")
 
     def OnDeleteNode(self, event):
         self.MessageBox("To delete a node simply right click with your mouse on it.")
@@ -1320,7 +1331,7 @@ Helpful Reminder:
 
     def MessageBox(self, msg):
         dlg = wx.MessageDialog(self.frame, msg,
-                              'A Message Box', wx.OK | wx.ICON_INFORMATION)
+                              'About', wx.OK | wx.ICON_INFORMATION)
                               #wxYES_NO | wxNO_DEFAULT | wxCANCEL | wxICON_INFORMATION)
         dlg.ShowModal()
         dlg.Destroy()
