@@ -1,0 +1,179 @@
+PyNSource and PyNSource GUI
+---------------------------
+Reverse engineer python source code into UML - display UML as Ascii art or in a visual workspace.
+You can also generate java and delphi skeleton code from the python, for the purpose of importing that into other UML tools.
+
+Version 1.5
+(c) Andy Bulka 2004-2011
+andy@andypatterns.com
+http://www.andypatterns.com/index.php/products/pynsource_-_uml_tool_for_python/
+License: GPL 3 (free software).
+
+========================================
+
+Features
+
+ - Resilient: doesn't import the python files, thus will never get "stuck" when syntax is wrong.
+ - Fast
+ - Recognises inheritance and composition  relationships
+ - Recognises self.SOMEVAR as a UML field (no other UML tool does this for python)
+ - Detects the cardinality of associations e.g. one to one or 1..*  etc
+ - Optionally treat modules as classes - creating a pseudo class for each 
+   module - module variables and functions are  treated as attributes and methods of a class
+ - Has been developed using unit tests (supplied) so that you can trust it just that little bit more ;-)
+
+========================================
+
+Quick Start
+
+Run the GUI tool pynsourcegui.exe and:
+ - Import a python file and it will be reverse engineered and represented as UML.
+ - Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.
+ - Import recursively at your own peril - too many classes will clutter you diagrams.
+ - Layout is a bit dodgy so arrange you layout a little and then screen grab (using your favourite screen grabbing tool) or print.
+ - You cannot add new classes in the GUI, this is just a reverse engineering tool.  You can however delete uncessesary classes by right clicking on the node.
+
+Run the Command Line tool pynsource.py and:
+ - Reverse engineer python source code into UML - display UML as Ascii art.
+ - You can also generate java and delphi skeleton code from the python, for the purpose of importing that into other UML tools.
+
+========================================
+
+Installation
+
+ - If you have the standlone exe deployment, unzip anywhere and run pynsourcegui.exe
+ - If you have the source code deployment, unzip anywhere and run pynsource.py or pynsourcegui.py
+ - If you have the source code deployment distutil exe, your source code will be installed into 
+   \PythonXX\Lib\site-packages\pynsource\ so adjust your python command lines to refer to that location.
+   
+========================================
+ 
+Change Log
+
+Version 1.5
+- Python 2.6 compatibility
+- Runs with latest wxpython
+- Menus reworked, help added, visit website added.
+- Print preview now much smarter about showing your entire uml workspace
+
+Version 1.4c
+- Fixed some parsing bugs.
+- Parsing now more correct under python 2.4 (python changed token.py !!)
+- Unit tests now all pass
+
+Version 1.4b
+- Added wxpython 2.5 compatibility (thanks Thomas Margraf!)
+
+Version 1.4a
+- GUI changes:
+- Right Click on a node to delete it.
+- Run Layout anytime from menu.
+- Left click on background will deselect any selected shapes
+
+Version 1.4
+- Fixed indentation error causing more output than normal in text ouput
+- Module level functions not treated as classes any more
+- Smarter detection of composition relationships, as long as classname 
+  and variable name are the same (ignoring case) then PyNSource will detect e.g.
+
+  class Cat:
+    pass
+
+  class A:
+    def __init__(self, cat):
+      self.cats.append(Cat())  # always has worked, composition detected.
+      self.cats.append(cat)    # new 1.4 feature, composition detected here too.
+
+Version 1.3a
+- Announced: A reverse engineering tool for Python source code
+- UML diagram models that you can layout, arrange and print out.
+- UML text diagrams, which you can paste into your source code for documentation purposes.
+- Java or Delphi code (which can be subsequently imported into more sophisticated UML 
+  modelling tools, like Enterprise Architect or ESS-Model (free).)
+
+========================================
+
+Instructions for running the GUI
+
+- Run the standalone: pynsourcegui.exe
+- Run from source code: python pyNsourceGui.py
+
+If you used the distutil installer your files might be in e.g.
+  Python26\Lib\site-packages\pynsource\pyNsourceGui.py
+
+The GUI relies on wxpython http://www.wxpython.org
+
+The PyNSource command line tool is pynsource.py
+
+========================================
+
+Instructions for running the Command line tool
+
+ pynsource -v -m [-j outdir] sourceDirOrListOfPythonFiles...   
+
+no options - generate Ascii UML
+
+-j generate java files, specify output folder for java files
+-d generate pascal files, specify output folder for pascal files
+-v verbose
+-m create psuedo class for each module,
+   module attrs/defs etc treated as class attrs/defs
+
+Examples
+
+BASIC ASCII UML OUTPUT from PYTHON - EXAMPLES
+e.g. pynsource Test/testmodule01.py
+e.g. pynsource -m Test/testmodule03.py
+
+GENERATE JAVA FILES from PYTHON - EXAMPLES
+e.g. pynsource -j c:/try c:/try
+e.g. pynsource -v -m -j c:/try c:/try
+e.g. pynsource -v -m -j c:/try c:/try/s*.py
+e.g. pynsource -j c:/try c:/try/s*.py Tests/u*.py
+e.g. pynsource -v -m -j c:/try c:/try/s*.py Tests/u*.py c:\cc\Devel\Client\w*.py
+
+GENERATE DELPHI  FILES from PYTHON - EXAMPLE
+e.g. pynsource -d c:/delphiouputdir c:/pythoninputdir/*.py
+e.g. \python26\python.exe  \Python26\Lib\site-packages\pynsource\pynsource.py  -d  c:\delphiouputdir  c:\pythoninputdir\*.py
+ (The above line will scan all the files in c:\pythoninputdir and generate a bunch of delphi files in the folder c:\delphiouputdir)
+
+========================================
+
+Notes for building a pynsource release
+
+Just run 
+ - buildAllWin.bat
+
+This will
+ - Build win32 installers in dist as an exe.  
+   People can run this to install the source code into \PythonXX\Lib\site-packages\pynsource
+ - Zip up pynsource source files and Tests and ./setup.py into a pure source code release e.g. pynsourceX.X.zip
+ - Build a standalone exe using py2exe.  This is done in the pynsource subdirectory's dist dir.  
+   These files (incl. the standalone pynsourcegui.exe) are zipped.  
+
+Optionally run innosetup on the standalone py2exe output in pynsource/dist/* and create a setup.exe
+The innosetup project is in the directory standalone exe inno
+
+========================================
+
+SVN repository is
+ http://pyidea.svn.sourceforge.net/svnroot/pyidea/pynsource/trunk
+
+========================================
+
+License
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+========================================

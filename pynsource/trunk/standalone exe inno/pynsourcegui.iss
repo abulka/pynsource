@@ -4,23 +4,15 @@ Name: {group}\Readme; Filename: {app}\Readme.txt
 [Setup]
 AppCopyright=© Andy Bulka
 AppName=PyNSource Gui
-AppVerName=1.4c
+AppVerName=1.5
 DefaultDirName={pf}\PyNSource
 ShowLanguageDialog=yes
 AppPublisher=Andy Bulka
-AppPublisherURL=http://www.atug.com/andypatterns/pynsource.htm
-AppVersion=1.4c
+AppPublisherURL=http://www.andypatterns.com/index.php/products/pynsource_-_uml_tool_for_python/
+AppVersion=1.5
 UninstallDisplayIcon={app}\pyNsourceGui.exe
 UninstallDisplayName=PyNSource Gui
 DefaultGroupName=PyNSource
 [Files]
-Source: ..\pynsource\dist\pyNsourceGui.exe; DestDir: {app}
-Source: ..\pynsource\dist\python23.dll; DestDir: {app}
-Source: ..\pynsource\dist\w9xpopen.exe; DestDir: {app}
-Source: ..\pynsource\dist\wxc.pyd; DestDir: {app}
-Source: ..\pynsource\dist\wxmsw24h.dll; DestDir: {app}
-Source: ..\pynsource\dist\_sre.pyd; DestDir: {app}
-Source: ..\pynsource\dist\datetime.pyd; DestDir: {app}
-Source: ..\pynsource\dist\library.zip; DestDir: {app}
-Source: ..\pynsource\dist\oglc.pyd; DestDir: {app}
+Source: ..\pynsource\dist\*; DestDir: {app}; Flags: recursesubdirs
 Source: ..\pynsource\Readme.txt; DestDir: {app}

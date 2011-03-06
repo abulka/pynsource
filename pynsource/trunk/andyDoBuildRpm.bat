@@ -1,1 +1,1 @@
-\python23\python.exe setup.py bdist_rpm
+python setup.py bdist_rpm
