@@ -41,10 +41,18 @@ Run the Command Line tool pynsource.py and:
 
 Installation
 
- - If you have the standlone exe deployment, unzip anywhere and run pynsourcegui.exe or pynsource.exe
- - If you have the source code deployment, unzip anywhere and run pynsourcegui.py or pynsource.py
- - If you have the source code deployment distutil exe, your source code will be installed into 
-   \PythonXX\Lib\site-packages\pynsource\ so adjust your python command lines to refer to that location.
+There are 4 distributions variations
+
+pyNsource-X.X-setup.exe       - windows setup, install and run pynsourcegui.exe from the shortcut
+pyNsource-X.X-src.zip         - source code deployment, unzip anywhere and run python pynsourcegui.py or python pynsource.py
+pyNsource-X.X-standalone.zip  - standlone exe deployment, unzip anywhere and run pynsourcegui.exe or pynsource.exe
+PyNsource-X.X.win32-py26.exe  - source code / package deployment via Distutils exe
+
+Note re Distutils package installation.  Your source code will be installed into 
+   \PythonXX\Lib\site-packages\pynsource\ so adjust your python command line invocations to refer to that location.
+   Using the pynsource as a package doesn't make sense at the moment as you can't import pynsource and do
+   anything useful (well it hasn't been thought out yet, anyway) so its really just a handy place to keep the source.
+   You'd probably want to write a script to invoke things more nicely.
    
 ========================================
  

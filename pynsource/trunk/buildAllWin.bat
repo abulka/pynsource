@@ -4,13 +4,13 @@ set outsourceexe1=PyNsource-1.5.win32.exe
 set outsourceexe=PyNsource-1.5.win32-py26.exe
 set outsourcezip=pyNsource-1.5-src.zip
 set outstandalonezip=pyNsource-1.5-standalone.zip
-set outstandalonesetupexe=pyNsource-1.5-standalone-setup.exe
+set outsetupexe=pyNsource-1.5-setup.exe
 
 REM delete all generated files and regen the build.txt file from subversion
 del /q dist\*.*
 svn info > build.txt
 
-goto step3a
+REM goto step3
 
 :step1
 REM Build source distribution via setup tools exe
@@ -29,17 +29,13 @@ del /q dist\*.*
 python setup.py py2exe
 cd ..
 :step3a
-REM copy build.txt pynsource\dist
-REM copy Readme.txt pynsource\dist
 "c:\Program Files\7-Zip"\7z a -tzip  dist\%outstandalonezip% .\pynsource\dist\* .\Readme.txt .\build.txt
-goto end
 
 :step4
 REM Build standalone with convenient setup using innosetup
-if not exist pynsource\dist\Readme.txt goto skipdeletereadme
-  del /q pynsource\dist\Readme.txt
-:skipdeletereadme
 "c:\Program Files\Inno Setup 5\ISCC.exe" buildSetupExeWin.iss
-move build\setup.exe dist\%outstandalonesetupexe%
+move build\setup.exe dist\%outsetupexe%
 
 :end
+dir dist
+echo All done!
