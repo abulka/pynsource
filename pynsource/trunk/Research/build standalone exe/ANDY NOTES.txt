@@ -1,4 +1,0 @@
-Doesn't quite work in that the exe is built, but when you run it, it cannot import pynsource.Java....
-
-Must investigate this further.  So instead I have created a setup.py in the pynsource/pynsource folder
-which you run using buildstandaloneexe.bat
