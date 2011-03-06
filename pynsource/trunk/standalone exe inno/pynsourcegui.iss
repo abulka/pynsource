@@ -15,4 +15,4 @@ UninstallDisplayName=PyNSource Gui
 DefaultGroupName=PyNSource
 [Files]
 Source: ..\pynsource\dist\*; DestDir: {app}; Flags: recursesubdirs
-Source: ..\pynsource\Readme.txt; DestDir: {app}
+Source: ..\Readme.txt; DestDir: {app}

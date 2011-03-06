@@ -16,7 +16,7 @@ Features
  - Resilient: doesn't import the python files, thus will never get "stuck" when syntax is wrong.
  - Fast
  - Recognises inheritance and composition  relationships
- - Recognises self.SOMEVAR as a UML field (no other UML tool does this for python)
+ - Recognises ocurrences of self.somevar as UML fields (no other UML tool does this for python)
  - Detects the cardinality of associations e.g. one to one or 1..*  etc
  - Optionally treat modules as classes - creating a pseudo class for each 
    module - module variables and functions are  treated as attributes and methods of a class
@@ -41,8 +41,8 @@ Run the Command Line tool pynsource.py and:
 
 Installation
 
- - If you have the standlone exe deployment, unzip anywhere and run pynsourcegui.exe
- - If you have the source code deployment, unzip anywhere and run pynsource.py or pynsourcegui.py
+ - If you have the standlone exe deployment, unzip anywhere and run pynsourcegui.exe or pynsource.exe
+ - If you have the source code deployment, unzip anywhere and run pynsourcegui.py or pynsource.py
  - If you have the source code deployment distutil exe, your source code will be installed into 
    \PythonXX\Lib\site-packages\pynsource\ so adjust your python command lines to refer to that location.
    
@@ -53,8 +53,10 @@ Change Log
 Version 1.5
 - Python 2.6 compatibility
 - Runs with latest wxpython
-- Menus reworked, help added, visit website added.
+- Menus reworked, help added, command to visit website added.
 - Print preview now much smarter about showing your entire uml workspace
+- pynsource.exe added to standalone distribution
+- Readme vastly improved
 
 Version 1.4c
 - Fixed some parsing bugs.
