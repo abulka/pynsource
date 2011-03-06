@@ -49,8 +49,7 @@ class MyPrintout(wx.Printout):
 
         canvasMaxX = self.canvas.GetSize()[0]
         canvasMaxY = self.canvas.GetSize()[1]
-        #self.GetShapeListInfo()
-        canvasMaxX, canvasMaxY = self.AdjustMaxCoords(canvasMaxX, canvasMaxY)
+        canvasMaxX, canvasMaxY = self.IncreasePrintAreaSize(canvasMaxX, canvasMaxY)
 
         # Let's have at least 50 device units margin
         marginX = 50
@@ -85,27 +84,21 @@ class MyPrintout(wx.Printout):
 
         return True
 
-    def AdjustMaxCoords(self, maxX, maxY):
+    def IncreasePrintAreaSize(self, maxX, maxY):
+        # Increase maxX, maxY by taking into account the positions of the shapes
+        # this fixes the print preview bug which didn't allocated enough space and only used the current window size -Andy
         shapelist = self.canvas.GetDiagram().GetShapeList()
-        msg = "initial %d  %d\n" %(maxX, maxY)
+        if len(shapelist) == 0:
+            return maxX, maxY
         xs = []
         ys = []
         for shape in shapelist:
             width, height = shape.GetBoundingBoxMax()
-            x1 = shape.GetX() - width / 2.0
-            y1 = shape.GetY() - height / 2.0
-            xs.append(x1+width)
-            ys.append(y1+height)
-            msg += "x = %d  shape.GetX() = %d width = %d  --- y = %d shape.GetY() = %d height = %d\n" % (x1, shape.GetX(), width, y1, shape.GetY(), height)
-        msg += "max %d %d\n" % (max(xs), max(ys))
-        #self.log.WriteText(msg)
+            # shape.GetX() etc. get the centre of the shape not the proper x, so need to derive it
+            x = shape.GetX() - width / 2.0
+            y = shape.GetY() - height / 2.0
+            # remember the shapes' biggest x and y points
+            xs.append(x+width)
+            ys.append(y+height)
         return max(xs), max(ys)
-            
-    def GetShapeListInfo_diagnostic(self):
-        # Andy diagnostic.  Even lists lines and selected node effect shapes.
-        shapelist = self.canvas.GetDiagram().GetShapeList()
-        msg = ""
-        for shape in shapelist:
-            width, height = shape.GetBoundingBoxMax()
-            msg += "shape %d width %d height %d\n" % (shape.GetId(), width, height)
-        self.log.WriteText(msg)
+

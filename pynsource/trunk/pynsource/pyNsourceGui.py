@@ -1,14 +1,27 @@
+"""
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 aboutmsg = """
 PyNSource GUI
-http://www.andypatterns.com/index.php/products/pynsource_-_uml_tool_for_python/
 
-A GUI front end to the python code scanner PyNSource that generates UML diagrams.
-Version 1.5 alpha
+A GUI front end to the python code scanner PyNSource that generates UML diagrams from Python Source code.
 
+Version 1.5
 (c) Andy Bulka 2004-2011
 
-Some code borrowed from the wxPython Demo App OGL.py and Boa.
-License: Free as long as you acknowledge the author and this website.
+License: GPL 3 (free software).
 """
 
 import wx
@@ -1046,6 +1059,7 @@ class BoaApp(wx.App):
         menu = wx.Menu()
         menu2 = wx.Menu()
         menu3 = wx.Menu()
+        menu4 = wx.Menu()
 
 
         menu.Append(103, "File &Import...\tCtrl-I", "Import Python Source Files")
@@ -1057,7 +1071,8 @@ class BoaApp(wx.App):
 
         menu.AppendSeparator()
 
-        menu.Append(102, "File &New\tCtrl-N", "New")
+        #menu.Append(102, "File &New\tCtrl-N", "New")
+        menu.Append(102, "&Clear\tCtrl-N", "Clear Diagram")
         wx.EVT_MENU(self, 102, self.FileNew)
 
         menu.AppendSeparator()
@@ -1080,21 +1095,24 @@ class BoaApp(wx.App):
 
         # -----------
 
-        menu2.Append(122, "&Delete Node (r.mouse click)", "Delete Node")
+        menu2.Append(122, "&Delete Class", "Delete Node")
         wx.EVT_MENU(self, 122, self.OnDeleteNode)
 
-        menu2.AppendSeparator()
+        #menu2.AppendSeparator()
 
-        menu2.Append(123, "&Layout", "Layout")
+        menu4.Append(123, "&Layout UML", "Layout UML")
         wx.EVT_MENU(self, 123, self.OnLayout)
 
-        menu2.Append(124, "&Refresh", "Refresh")
+        menu4.Append(124, "&Refresh", "Refresh")
         wx.EVT_MENU(self, 124, self.OnRefresh)
 
         # -----------
 
-        menu3.Append(301, "&Help on Printing...", "Help on Printing")
-        wx.EVT_MENU(self, 301, self.OnHelpPrint)
+        menu3.Append(301, "&Help...", "Help")
+        wx.EVT_MENU(self, 301, self.OnHelp)
+
+        menu3.Append(302, "&Visit PyNSource Website...", "PyNSource Website")
+        wx.EVT_MENU(self, 302, self.OnVisitWebsite)
 
         menu3.AppendSeparator()
 
@@ -1105,6 +1123,7 @@ class BoaApp(wx.App):
 
         menuBar.Append(menu, "&File")
         menuBar.Append(menu2, "&Edit")
+        menuBar.Append(menu4, "&Layout")
         menuBar.Append(menu3, "&Help")
         self.frame.SetMenuBar(menuBar)
         self.frame.Show(True)
@@ -1306,21 +1325,33 @@ class BoaApp(wx.App):
     def OnAbout(self, event):
         self.MessageBox(aboutmsg)
 
-    def OnHelpPrint(self, event):
+    def OnVisitWebsite(self, event):
+        import webbrowser
+        webbrowser.open("http://www.andypatterns.com/index.php/products/pynsource_-_uml_tool_for_python/")
+
+    def OnHelp(self, event):
         self.MessageBox("""
-Helpful Reminder:
+PyNSource Gui Help:
 
-   Ensure you have resized your visible UML diagram window
-   to be big enough to fit most of your UML
-   otherwise the print preview will only
-   show a partial diagram. (I hope to auto fix this soon)
-
+   Import a python file and it will be reverse engineered and represented as UML.
+   
+   Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.
+   Import recursively at your own peril - too many classes will clutter you diagrams.
+   
+   Layout is a bit dodgy so arrange you layout a little and then screen grab (using your favourite screen grabbing tool) or print.
+   You cannot add new classes in the GUI, this is just a reverse engineering tool.  You can however delete uncessesary classes by right clicking on the node.
 """)
 
     def OnDeleteNode(self, event):
-        self.MessageBox("To delete a node simply right click with your mouse on it.")
+        for shape in self.win.GetDiagram().GetShapeList():
+            if shape.Selected():
+                self.MessageBox("To delete a node, right click on it with your mouse (delete via main menu functionality coming soon) %d" % shape.GetX())
 
     def OnLayout(self, event):
+        if self.win.GetDiagram().GetCount() == 0:
+            self.MessageBox("Nothing to layout.  Import a python source file first.")
+            return
+        
         self.win.ArrangeShapes()
         self.win.redraw()
         self._HackToForceTheScrollbarToShowUp()
