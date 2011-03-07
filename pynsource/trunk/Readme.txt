@@ -21,6 +21,9 @@ Features
  - Optionally treat modules as classes - creating a pseudo class for each 
    module - module variables and functions are  treated as attributes and methods of a class
  - Has been developed using unit tests (supplied) so that you can trust it just that little bit more ;-)
+ - Can generate UML Ascii-art :-)
+ - Can generate Java and Delphi code skeletons (out of your python code) so that you can import those into a proper UML tool.
+ - Free
 
 ========================================
 
@@ -149,6 +152,39 @@ e.g. \python26\python.exe  \Python26\Lib\site-packages\pynsource\pynsource.py  -
 
 ========================================
 
+Displaying UML in Ascii using pynsource
+
+Sample:
+
+                                                               +---------------------------+
+             +------------------------------------+            |RoleServicesObject         |
+             |AI                                  |            |...........................|
+             |.....................................          * |role                       |
+             |roleServiceObjects                  '''''''''''''|gameservices               |----- ...|
+ +-----+     |gameServices                        |_____       |_rolemanager               |         |
+ |game `-.   |....................................|     |      |_etc1                      |         |
+ +-----+  `-.|API_RunABit                         |     |      |...........................|         |
+             |API_GetOrdersForRole                |     |      |API_GetCurrentStoryline    |         |
+             |API_CreateRoleServicesObjectForRole |     |      |API_GetCurrentRoleName     |         |
+             +------------------------------------+     |      |API_GetRoleSubordinates    |         |
+                                                        |      +---------------------------+         |
+                                                        |                                            |
+                                                        |                                            |
+                                                        | 1 +-------------------------------+ /      |
+                                                        .---+GameServices                   |_.......'
+                                                            +-------------------------------| -.
+                                                            |_scenario                      |
+                                                            |_game                          |
+                                                            ................................|
+                                                            |API_GetAstarTravelTimeBlahBlah |
+                                                            |API_GetOobtreeInfoOnOobId      |
+                                                            |API_GetOobtreeInfoOnMe         |
+                                                            +-------------------------------+
+  
+See http://www.andypatterns.com/index.php/products/pynsource_-_uml_tool_for_python/pynsource_-_uml_in_ascii/ for more into
+
+========================================
+
 Notes for building a pynsource release
 
 Just run 
@@ -156,13 +192,11 @@ Just run
 
 This will
  - Build win32 installers in dist as an exe.  
-   People can run this to install the source code into \PythonXX\Lib\site-packages\pynsource
+   People can run this exe to install the source code as a package into \PythonXX\Lib\site-packages\pynsource
  - Zip up pynsource source files and Tests and ./setup.py into a pure source code release e.g. pynsourceX.X.zip
  - Build a standalone exe using py2exe.  This is done in the pynsource subdirectory's dist dir.  
-   These files (incl. the standalone pynsourcegui.exe) are zipped.  
-
-Optionally run innosetup on the standalone py2exe output in pynsource/dist/* and create a setup.exe
-The innosetup project is in the directory standalone exe inno
+   These files (incl. the standalone pynsourcegui.exe) are zipped. 
+ - Run Inno setup to create a standalone setup.exe, together with uninstall tool.   
 
 ========================================
 

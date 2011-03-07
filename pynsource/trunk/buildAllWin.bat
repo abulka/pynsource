@@ -22,7 +22,7 @@ move dist\%outsourceexe1% dist\%outsourceexe%
 
 :step2
 REM Build raw source zip by zipping up appropriate files
-"c:\Program Files\7-Zip"\7z a -tzip  -xr!".svn" -xr!"build" -xr!"dist" -xr!*.pyc dist\%outsourcezip% pynsource\* Tests\*.py setup.py Readme.txt rungui.bat runtests.bat build.txt
+"c:\Program Files\7-Zip"\7z a -tzip  -xr!".svn" -xr!"build" -xr!"dist" -xr!"java-ide-import-results" -xr!*.pyc dist\%outsourcezip% pynsource\* tests\* setup.py Readme.txt rungui.bat runtests.bat build.txt
 
 :step3
 REM buildstandalone exe zip
