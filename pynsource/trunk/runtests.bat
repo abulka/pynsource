@@ -1,5 +1,5 @@
 @echo off
-cd Tests
+cd tests
 python alltests.py
 cd ...
 pause
