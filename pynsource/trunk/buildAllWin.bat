@@ -1,10 +1,10 @@
 @echo off
 REM All in one build script
-set outsourceexe1=PyNsource-1.5.win32.exe
-set outsourceexe=PyNsource-1.5.win32-py26.exe
-set outsourcezip=pyNsource-1.5-src.zip
-set outstandalonezip=pyNsource-1.5-standalone.zip
-set outsetupexe=pyNsource-1.5-setup.exe
+set outsourceexe1=PyNsource-1.51.win32.exe
+set outsourceexe=PyNsource-1.51.win32-py26.exe
+set outsourcezip=pyNsource-1.51-src.zip
+set outstandalonezip=pyNsource-1.51-standalone.zip
+set outsetupexe=pyNsource-1.51-setup.exe
 
 REM delete all generated files and regen the build.txt file from subversion
 del /q dist\*.*
