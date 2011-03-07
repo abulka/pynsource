@@ -1,12 +1,12 @@
 PyNSource and PyNSource GUI
 ---------------------------
-Reverse engineer python source code into UML - display UML as Ascii art or in a visual workspace.
+Reverse engineer python source code into UML - display UML as Ascii art or in a proper diagramming visual workspace.
 You can also generate java and delphi skeleton code from the python, for the purpose of importing that into other UML tools.
 
 Version 1.5
 (c) Andy Bulka 2004-2011
 andy@andypatterns.com
-http://www.andypatterns.com/index.php/products/pynsource_-_uml_tool_for_python/
+http://www.andypatterns.com/index.php/products/pynsource/
 License: GPL 3 (free software).
 
 ========================================
@@ -48,7 +48,7 @@ There are 4 distributions variations
 
 pyNsource-X.X-setup.exe       - windows setup, install and run pynsourcegui.exe from the shortcut
 pyNsource-X.X-src.zip         - source code deployment, unzip anywhere and run python pynsourcegui.py or python pynsource.py
-pyNsource-X.X-standalone.zip  - standlone exe deployment, unzip anywhere and run pynsourcegui.exe or pynsource.exe
+pyNsource-X.X-standalone.zip  - standalone exe deployment, unzip anywhere and run pynsourcegui.exe or pynsource.exe
 PyNsource-X.X.win32-py26.exe  - source code / package deployment via Distutils exe
 
 Note re Distutils package installation.  Your source code will be installed into 
@@ -122,9 +122,9 @@ The PyNSource command line tool is pynsource.py
 
 Instructions for running the Command line tool
 
- pynsource -v -m [-j outdir] sourceDirOrListOfPythonFiles...   
+ pynsource -v -m [-j outdir] [-d outdir] sourceDirOrListOfPythonFiles...   
 
-no options - generate Ascii UML
+no options - generate UML Ascii art
 
 -j generate java files, specify output folder for java files
 -d generate pascal files, specify output folder for pascal files
@@ -149,6 +149,10 @@ GENERATE DELPHI  FILES from PYTHON - EXAMPLE
 e.g. pynsource -d c:/delphiouputdir c:/pythoninputdir/*.py
 e.g. \python26\python.exe  \Python26\Lib\site-packages\pynsource\pynsource.py  -d  c:\delphiouputdir  c:\pythoninputdir\*.py
  (The above line will scan all the files in c:\pythoninputdir and generate a bunch of delphi files in the folder c:\delphiouputdir)
+
+TIP on long path names and path names with spaces:  
+  If you have long filenames, then enclosing paths and file references in double quotes is necessary and works ok. 
+  e.g. "c:\Documents and Settings\Administrator\Desktop\stuff"
 
 ========================================
 
@@ -181,7 +185,7 @@ Sample:
                                                             |API_GetOobtreeInfoOnMe         |
                                                             +-------------------------------+
   
-See http://www.andypatterns.com/index.php/products/pynsource_-_uml_tool_for_python/pynsource_-_uml_in_ascii/ for more into
+See http://www.andypatterns.com/index.php/products/pynsource/asciiart/ for more into
 
 ========================================
 

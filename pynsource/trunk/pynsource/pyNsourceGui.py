@@ -18,6 +18,8 @@ PyNSource GUI
 
 A GUI front end to the python code scanner PyNSource that generates UML diagrams from Python Source code.
 
+http://www.andypatterns.com/index.php/products/pynsource/
+
 Version 1.5
 (c) Andy Bulka 2004-2011
 
@@ -1327,7 +1329,7 @@ class BoaApp(wx.App):
 
     def OnVisitWebsite(self, event):
         import webbrowser
-        webbrowser.open("http://www.andypatterns.com/index.php/products/pynsource_-_uml_tool_for_python/")
+        webbrowser.open("http://www.andypatterns.com/index.php/products/pynsource/")
 
     def OnHelp(self, event):
         self.MessageBox("""
