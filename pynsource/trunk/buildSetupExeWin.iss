@@ -4,16 +4,16 @@ Name: {group}\Readme; Filename: {app}\Readme.txt
 [Setup]
 AppCopyright=© Andy Bulka
 AppName=PyNSource Gui
-AppVerName=1.5
+AppVerName=1.51
 DefaultDirName={pf}\PyNSource
 ShowLanguageDialog=yes
 AppPublisher=Andy Bulka
 AppPublisherURL=http://www.andypatterns.com/index.php/products/pynsource/
-AppVersion=1.5
+AppVersion=1.51
 UninstallDisplayIcon={app}\pyNsourceGui.exe
 UninstallDisplayName=PyNSource Gui
 DefaultGroupName=PyNSource
-VersionInfoVersion=1.5
+VersionInfoVersion=1.51
 OutputDir=build
 
 [Files]

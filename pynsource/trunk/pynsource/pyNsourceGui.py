@@ -13,18 +13,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+APP_VERSION = 1.51
+
 aboutmsg = """
 PyNSource GUI
 
+Version %s
+
 A GUI front end to the python code scanner PyNSource that generates UML diagrams from Python Source code.
 
+(c) Andy Bulka 2004-2011
 http://www.andypatterns.com/index.php/products/pynsource/
 
-Version 1.5
-(c) Andy Bulka 2004-2011
-
 License: GPL 3 (free software).
-"""
+""" % APP_VERSION
+
+WEB_VERSION_CHECK_URL = "http://www.atug.com/downloads/pynsource-latest.txt"
+WEB_PYNSOURCE_HOME_URL = "http://www.andypatterns.com/index.php/products/pynsource/"
 
 import wx
 import wx.lib.ogl as ogl
@@ -1116,7 +1121,11 @@ class BoaApp(wx.App):
         menu3.Append(302, "&Visit PyNSource Website...", "PyNSource Website")
         wx.EVT_MENU(self, 302, self.OnVisitWebsite)
 
+        
         menu3.AppendSeparator()
+
+        menu3.Append(303, "&Check for Updates...", "Check for Updates")
+        wx.EVT_MENU(self, 303, self.OnCheckForUpdates)
 
         menu3.Append(106, "&About...", "About...")
         wx.EVT_MENU(self, 106, self.OnAbout)
@@ -1325,12 +1334,34 @@ class BoaApp(wx.App):
 
 
     def OnAbout(self, event):
-        self.MessageBox(aboutmsg)
+        self.MessageBox(aboutmsg.strip())
 
     def OnVisitWebsite(self, event):
         import webbrowser
-        webbrowser.open("http://www.andypatterns.com/index.php/products/pynsource/")
+        webbrowser.open(WEB_PYNSOURCE_HOME_URL)
 
+    def OnCheckForUpdates(self, event):
+        import urllib2
+        s = urllib2.urlopen(WEB_VERSION_CHECK_URL).read()
+        s = s.replace("\r", "")
+        info = eval(s)
+        ver = info["latest_version"]
+        
+        if ver > APP_VERSION:
+            msg = """
+There is a newer version of PyNSource GUI available:  %s
+
+%s
+
+Do you wish to visit the download page now?
+""" % (ver, info["latest_announcement"].strip())
+            retCode = wx.MessageBox(msg.strip(), "Update Check", wx.YES_NO | wx.ICON_QUESTION)  # MessageBox simpler than MessageDialog
+            if (retCode == wx.YES):
+                import webbrowser
+                webbrowser.open(info["download_url"])
+        else:
+            self.MessageBox("You already have the latest version:  %s" % APP_VERSION)
+    
     def OnHelp(self, event):
         self.MessageBox("""
 PyNSource Gui Help:
@@ -1340,9 +1371,9 @@ PyNSource Gui Help:
    Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.
    Import recursively at your own peril - too many classes will clutter you diagrams.
    
-   Layout is a bit dodgy so arrange you layout a little and then screen grab (using your favourite screen grabbing tool) or print.
+   Layout is a bit dodgy so arrange your layout a little and then do a screen grab (using your favourite screen grabbing tool) or print.
    You cannot add new classes in the GUI, this is just a reverse engineering tool.  You can however delete uncessesary classes by right clicking on the node.
-""")
+""".strip())
 
     def OnDeleteNode(self, event):
         for shape in self.win.GetDiagram().GetShapeList():

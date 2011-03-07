@@ -6,7 +6,7 @@
 
 from distutils.core import setup
 setup (name = "PyNsource",
-       version = "1.5",
+       version = "1.51",
        author = "Andy Bulka",
        author_email = "abulka@gmail.com",
        url='http://www.andypatterns.com/index.php/products/pynsource/',

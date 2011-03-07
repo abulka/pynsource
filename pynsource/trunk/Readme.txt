@@ -3,7 +3,7 @@ PyNSource and PyNSource GUI
 Reverse engineer python source code into UML - display UML as Ascii art or in a proper diagramming visual workspace.
 You can also generate java and delphi skeleton code from the python, for the purpose of importing that into other UML tools.
 
-Version 1.5
+Version 1.51
 (c) Andy Bulka 2004-2011
 andy@andypatterns.com
 http://www.andypatterns.com/index.php/products/pynsource/
@@ -33,7 +33,7 @@ Run the GUI tool pynsourcegui.exe and:
  - Import a python file and it will be reverse engineered and represented as UML.
  - Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.
  - Import recursively at your own peril - too many classes will clutter you diagrams.
- - Layout is a bit dodgy so arrange you layout a little and then screen grab (using your favourite screen grabbing tool) or print.
+ - Layout is a bit dodgy so arrange your layout a little and then do a screen grab (using your favourite screen grabbing tool) or print.
  - You cannot add new classes in the GUI, this is just a reverse engineering tool.  You can however delete uncessesary classes by right clicking on the node.
 
 Run the Command Line tool pynsource.py and:
@@ -60,6 +60,9 @@ Note re Distutils package installation.  Your source code will be installed into
 ========================================
  
 Change Log
+
+Version 1.51
+- Check the web for updates feature (via help menu)
 
 Version 1.5
 - Python 2.6 compatibility
