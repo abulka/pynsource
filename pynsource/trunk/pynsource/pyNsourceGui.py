@@ -26,7 +26,6 @@ import os, stat
 APP_VERSION = 1.51
 WEB_VERSION_CHECK_URL = "http://www.atug.com/downloads/pynsource-latest.txt"
 WEB_PYNSOURCE_HOME_URL = "http://www.andypatterns.com/index.php/products/pynsource/"
-UML_STYLE_1 = 0
 WINDOW_SIZE = (640,480)
 
 ABOUT_MSG = """
@@ -144,8 +143,6 @@ class CompositeShape(ogl.CompositeShape):
 class DividedShape(ogl.DividedShape):
     def __init__(self, width, height, canvas):
         ogl.DividedShape.__init__(self, width, height)
-        if UML_STYLE_1:
-            self.BuildRegions(canvas)
 
     def BuildRegions(self, canvas):
         region1 = ogl.ShapeRegion()
@@ -371,7 +368,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
 import sys, glob
 from pynsource import PythonToJava, PySourceAsJava
 
-class TestWindow(ogl.ShapeCanvas):
+class UmlDiagramWindow(ogl.ShapeCanvas):
     scrollStepX = 10
     scrollStepY = 10
     classnametoshape = {}
@@ -441,25 +438,10 @@ class TestWindow(ogl.ShapeCanvas):
     def _Process(self, filepath):
         print '_Process', filepath
 
-        p = PySourceAsJava('c:\\try')
+        p = PySourceAsJava()
         p.optionModuleAsClass = 0
         p.verbose = 0
         p.Parse(filepath)
-
-        """
-        if self.verbose:
-            padding = ' '
-        else:
-            padding = ''
-        thefile = os.path.basename(filepath)
-        if thefile[0] == '_':
-            print '  ', 'Skipped', thefile, 'cos begins with underscore.'
-            return
-        print '%sProcessing %s...'%(padding, thefile)
-        p = self._CreateParser()
-        p.Parse(filepath)
-        str(p)  # triggers the output.
-        """
 
         for classname, classentry in p.classlist.items():
             #print 'CLASS', classname, classentry
@@ -479,75 +461,54 @@ class TestWindow(ogl.ShapeCanvas):
 
                     self.associations_generalisation.append((classname, parentclass))
 
-            if UML_STYLE_1:
-                # Build the UML shape
-                #
-                if classname not in self.classnametoshape:
-                    #print 'BUILDING', classname, 'SEARCH', classname in self.classnametoshape, 'LEN', len(self.classnametoshape)
-                    rRectBrush = wx.Brush("MEDIUM TURQUOISE", wx.SOLID)
-                    dsBrush = wx.Brush("WHEAT", wx.SOLID)
-                    ds = self.MyAddShape(DividedShape(100, 150, self), 50, 145, wx.BLACK_PEN, dsBrush, '')
-                    ds.SetCentreResize(0)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
+            # Build the UML shape
+            #
+            if classname not in self.classnametoshape:
+                shape = DividedShape(width=100, height=150, canvas=self)
 
-                    ds.region1.SetText(classname)
-                    ds.region2.SetText('\n'.join([ attrobj.attrname for attrobj in classentry.attrs ]))
-                    ds.region3.SetText('\n'.join(classentry.defs))
-                    ds.ReformatRegions()
-                    #ds1.SetSize(ds1.GetBoundingBoxMax()[0]+1, ds1.GetBoundingBoxMax()[1])
+                pos = (50,50)
+                maxWidth = 10 #padding
+                #if not self.showAttributes: classAttrs = [' ']
+                #if not self.showMethods: classMeths = [' ']
+                className = classname
+                classAttrs = [ attrobj.attrname for attrobj in classentry.attrs ]
+                classMeths = classentry.defs
 
-                    # Record the name to shape map so that we can wire up the links later.
-                    self.classnametoshape[classname] = ds
-                else:
-                    print 'Skipping', classname, 'already built shape...'
+
+                regionName, maxWidth, nameHeight = self.newRegion(
+                      self.font1, 'class_name', [className], maxWidth)
+                regionAttribs, maxWidth, attribsHeight = self.newRegion(
+                      self.font2, 'attributes', classAttrs, maxWidth)
+                regionMeths, maxWidth, methsHeight = self.newRegion(
+                      self.font2, 'methods', classMeths, maxWidth)
+
+                totHeight = nameHeight + attribsHeight + methsHeight
+
+                regionName.SetProportions(0.0, 1.0*(nameHeight/float(totHeight)))
+                regionAttribs.SetProportions(0.0, 1.0*(attribsHeight/float(totHeight)))
+                regionMeths.SetProportions(0.0, 1.0*(methsHeight/float(totHeight)))
+
+                regionName.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
+                shape.region1 = regionName  # Andy added, for later external reference to classname from just having the shap instance.
+
+                shape.AddRegion(regionName)
+                shape.AddRegion(regionAttribs)
+                shape.AddRegion(regionMeths)
+
+                shape.SetSize(maxWidth + 10, totHeight + 10)
+
+                shape.SetRegionSizes()
+
+                dsBrush = wx.Brush("WHEAT", wx.SOLID)
+                #idx = self.addShape(shape, pos[0], pos[1], wxBLACK_PEN, dsBrush, '') # get back index
+                ds = self.MyAddShape(shape, pos[0], pos[1], wx.BLACK_PEN, dsBrush, '') # get back instance - but already had it...
+
+                shape.FlushText()
+
+                # Record the name to shape map so that we can wire up the links later.
+                self.classnametoshape[classname] = ds
             else:
-                # Build the UML shape
-                #
-                if classname not in self.classnametoshape:
-                    shape = DividedShape(width=100, height=150, canvas=self)
-
-                    pos = (50,50)
-                    maxWidth = 10 #padding
-                    #if not self.showAttributes: classAttrs = [' ']
-                    #if not self.showMethods: classMeths = [' ']
-                    className = classname
-                    classAttrs = [ attrobj.attrname for attrobj in classentry.attrs ]
-                    classMeths = classentry.defs
-
-
-                    regionName, maxWidth, nameHeight = self.newRegion(
-                          self.font1, 'class_name', [className], maxWidth)
-                    regionAttribs, maxWidth, attribsHeight = self.newRegion(
-                          self.font2, 'attributes', classAttrs, maxWidth)
-                    regionMeths, maxWidth, methsHeight = self.newRegion(
-                          self.font2, 'methods', classMeths, maxWidth)
-
-                    totHeight = nameHeight + attribsHeight + methsHeight
-
-                    regionName.SetProportions(0.0, 1.0*(nameHeight/float(totHeight)))
-                    regionAttribs.SetProportions(0.0, 1.0*(attribsHeight/float(totHeight)))
-                    regionMeths.SetProportions(0.0, 1.0*(methsHeight/float(totHeight)))
-
-                    regionName.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
-                    shape.region1 = regionName  # Andy added, for later external reference to classname from just having the shap instance.
-
-                    shape.AddRegion(regionName)
-                    shape.AddRegion(regionAttribs)
-                    shape.AddRegion(regionMeths)
-
-                    shape.SetSize(maxWidth + 10, totHeight + 10)
-
-                    shape.SetRegionSizes()
-
-                    dsBrush = wx.Brush("WHEAT", wx.SOLID)
-                    #idx = self.addShape(shape, pos[0], pos[1], wxBLACK_PEN, dsBrush, '') # get back index
-                    ds = self.MyAddShape(shape, pos[0], pos[1], wx.BLACK_PEN, dsBrush, '') # get back instance - but already had it...
-
-                    shape.FlushText()
-
-                    # Record the name to shape map so that we can wire up the links later.
-                    self.classnametoshape[classname] = ds
-                else:
-                    print 'Skipping', classname, 'already built shape...'
+                print 'Skipping', classname, 'already built shape...'
 
     def _BuildAuxClasses(self, classestocreate=None):
             if not classestocreate:
@@ -556,8 +517,7 @@ class TestWindow(ogl.ShapeCanvas):
                 rRectBrush = wx.Brush("MEDIUM TURQUOISE", wx.SOLID)
                 dsBrush = wx.Brush("WHEAT", wx.SOLID)
                 ds = self.MyAddShape(DividedShapeSmall(100, 30, self), 50, 145, wx.BLACK_PEN, dsBrush, '')
-                if not UML_STYLE_1:
-                    ds.BuildRegions(canvas=self)  # build the one region
+                ds.BuildRegions(canvas=self)  # build the one region
                 ds.SetCentreResize(0)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
                 ds.region1.SetText(classname)
                 ds.ReformatRegions()
@@ -877,9 +837,12 @@ class MainApp(wx.App):
         self.InitMenus()
         self.frame.Show(True)
         wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
-        self.win = TestWindow(self.frame, Log(), self.frame)
+        
+        self.win = UmlDiagramWindow(self.frame, Log(), self.frame)
         self.win.secretredrawmethod = self.OnRefresh    # Hack so can do a high level refresh screen after a delete node event.
-        # so set the frame to a good size for showing stuff
+        ogl.OGLInitialize()  # creates some pens and brushes that the OGL library uses.
+        
+        # Set the frame to a good size for showing stuff
         self.frame.SetSize(WINDOW_SIZE)
         self.win.SetFocus()
         self.SetTopWindow(self.frame)
@@ -938,7 +901,8 @@ class MainApp(wx.App):
             print self.fileList
             self.win.Go(files=self.fileList)
 
-            self._HackToForceTheScrollbarToShowUp()
+            #self._HackToForceTheScrollbarToShowUp()
+            self.win.redraw2()  #ADDED AT MAC PORT TIME
 
             wx.EndBusyCursor()
             print 'Import - Done.'
@@ -961,10 +925,12 @@ class MainApp(wx.App):
             self.frame.SetSize(oldSize)
 
 
-    def DoRecursivePathImport(self,dir):
+    def DoRecursivePathImport(self, dir):
+        print "Recursing into %s..." % dir
         if( os.path.split(dir)[1] == "CVS"):
             #print dir,os.path.split(dir)[0]
             return
+        print "split %s" % os.path.split(dir)[1]
 
         for f in os.listdir(dir):
             pathname = os.path.join( dir, f )
@@ -976,8 +942,9 @@ class MainApp(wx.App):
                 #self.RecursivePathImport(pathname)
             elif stat.S_ISREG(mode):
                 # It's a file
-                if( os.path.splitext(f)[1] != ".pyc" and f != "__init__.py" ):
+                if( os.path.splitext(f)[1] == ".py" and f != "__init__.py" ):
                     self.fileList.append( os.path.join(dir,f) )
+                    print "Added...." + os.path.join(dir,f)
 
     def FileImport(self, event):
         dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
@@ -1089,7 +1056,6 @@ class MainApp(wx.App):
 
 def main():
     application = MainApp(0)
-    ogl.OGLInitialize()  # creates some pens and brushes that the OGL library uses.
     application.MainLoop()
 
 if __name__ == '__main__':
