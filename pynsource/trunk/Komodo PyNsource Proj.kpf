@@ -33,8 +33,8 @@
 <preference-set id="testPlans">
 <preference-set id="New test plan #1">
   <string id="command_line">unittests_parse_01.py</string>
-  <string relative="url" id="directory">Tests/</string>
-  <string id="language">Python</string>
+  <string relative="url" id="directory">Tests</string>
+  <string id="language">Python - unittest</string>
 </preference-set>
 </preference-set>
 </preference-set>
@@ -61,5 +61,29 @@
 </preference-set>
 </preference-set>
   <string id="lastInvocation">Project</string>
+</preference-set>
+<preference-set idref="5b92cc7c-0d2a-43ba-af47-98e3dfa9df39/pynsource/pyNsourceGui.py">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">pynsource/pyNsourceGui.py</string>
+  <string id="getparams"></string>
+  <string id="language">Python</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
 </preference-set>
 </project>
