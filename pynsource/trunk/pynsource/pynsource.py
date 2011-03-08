@@ -766,9 +766,6 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
             self.result +=  '-'*20   +'\n'
 
     def _DumpClassNameAndGeneralisations(self):
-        if self.classentry.ismodulenotrealclass:
-            self.result +=  '[%s  (file)]\n' % (self.aclass,)
-        else:
             self.result +=  '[%s]^[%s]\n' % (self.classentry.classesinheritsfrom[0], self.aclass)  #TODO don't throw away all the inherited classes - just grab 0 for now
 
     def _DumpAttributes(self):
@@ -802,16 +799,41 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
 
     def __str__(self):
         self.result = ''
-        
         classnames = self.classlist.keys()
         for self.aclass in classnames:
             self.classentry = self.classlist[self.aclass]
 
+            """
+            
+            #TODO handle modules (but first debug method scanning, which is not under unit test see unittests_parse06.py )
+            
+            if self.classentry.ismodulenotrealclass:
+                continue
+                self.result +=  '[%s  (file)]\n' % (self.aclass,)
+                if self.modulemethods:
+                    self.result += '  ModuleMethods = %s\n' % `self.modulemethods`
+                    self.result += "-[note: module/file's methods]"
+                continue
+            """
+            
             attrs = ""
             for attrobj in self.classentry.attrs:
                 if attrs:
                     attrs += ";"
                 attrs += attrobj.attrname
+
+                # gen extra yUml lines showing class relationships
+                # SHOULD not dump so many extra lines as yUml likes the info consolidated if at all possible
+                compositescreated = self._GetCompositeCreatedClassesFor(attrobj.attrname)
+                for c in compositescreated:
+                    if 'many' in attrobj.attrtype:
+                        line = "++-"
+                        cardinality = "*"
+                    else:
+                        line = "-.->"
+                        cardinality = ""
+                    connector = "%s%s%s" % (attrobj.attrname, line, cardinality)
+                    self.result += "[%s]%s[%s]\n" % (self.aclass, connector, c)
 
             defs = ""
             for adef in self.classentry.defs:
@@ -827,6 +849,33 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
             else:
                 parentclass = ""
                 self.result +=  '[%s]\n' % (theclass,)
+
+        # render with http://yuml.me/diagram/scruffy/class/draw
+
+        """
+        [ParseMeTest|a;b;d;e;e2;f|__init__();IsInBattle();DoA()]
+        [ParseMeTest]^[ParseMeTest2|_secretinfo|DoB()]
+        [ParseMeTest]b->[Blah]
+        [ParseMeTest]f++-*[Blah]
+        
+        work ok
+        [ParseMeTest]b->hello[Blah|aa;bb;cc]
+        [ParseMeTest]f++-*there[Blah]
+        
+        sends it mad? - but its straught from example
+        [Customer{bg:orange}]<>1->*[Order{bg:green}]
+
+        complication !!!
+        
+        #this works
+        [Flags|flags;numberOfFlags|__init__();readFlags();AddFlag();__repr__()]flags++-*[Flag|flagx;flagy;owner|__init__();readflag();__repr__()]
+        
+        #this doesn't work
+        [Flag|flagx;flagy;owner|__init__();readflag();__repr__()]
+        [Flags]flags++-*[Flag]
+        [Flags|flags;numberOfFlags|__init__();readFlags();AddFlag();__repr__()]
+
+        """
 
         return self.result
     
@@ -1230,11 +1279,13 @@ def test():
     #FILE = "c:\\cc\devel\storyline\\battle.py"
     #FILE = "c:\\cc\devel\storyline\\battleresult.py"
     #FILE = "c:\\cc\devel\storyline\\battlestabs.py"
-    FILE = "..\\tests\\python-in\\testmodule01.py"
+    #FILE = "..\\tests\\python-in\\testmodule01.py"
+    FILE = "..\\tests\\python-in\\testmodule66.py"
     
     #p = PySourceAsText()
     #p = JavaDumper("c:\\try")
     p = PySourceAsYuml()
+    #p.optionModuleAsClass = True
     p.Parse(FILE)
 
     #print '*'*20, 'parsing', FILE, '*'*20
@@ -1242,8 +1293,8 @@ def test():
     #print 'Done.'
 
 if __name__ == '__main__':
-    test()
-    exit(0)
+    #test()
+    #exit(0)
 
     import sys, glob, getopt
     SIMPLE = 0
