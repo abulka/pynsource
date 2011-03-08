@@ -32,7 +32,7 @@ Quick Start
 Run the GUI tool pynsourcegui.exe and:
  - Import a python file and it will be reverse engineered and represented as UML.
  - Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.
- - Import recursively at your own peril - too many classes will clutter you diagrams.
+ - You can import several times and classes will be added and wired up to existing classes on the workspace.
  - Layout is a bit dodgy so arrange your layout a little and then do a screen grab (using your favourite screen grabbing tool) or print.
  - You cannot add new classes in the GUI, this is just a reverse engineering tool.  You can however delete uncessesary classes by right clicking on the node.
 
@@ -60,6 +60,12 @@ Note re Distutils package installation.  Your source code will be installed into
 ========================================
  
 Change Log
+
+Version 1.52
+- Source code clean up
+- File Import Recursively feature removed.  You can already multi select files
+  during import. You can already import repeatedly and incoming classes will
+  be added and wired up to existing classes on the workspace.
 
 Version 1.51
 - Check the web for updates feature (via help menu)

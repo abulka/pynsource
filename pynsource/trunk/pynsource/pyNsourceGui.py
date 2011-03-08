@@ -55,7 +55,7 @@ PyNSource Gui Help:
    Import a python file and it will be reverse engineered and represented as UML.
    
    Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.
-   Import recursively at your own peril - too many classes will clutter you diagrams.
+   You can import repeatedly and incoming classes will be added and wired up to existing classes on the workspace.
    
    Layout is a bit dodgy so arrange your layout a little and then do a screen grab (using your favourite screen grabbing tool) or print.
    You cannot add new classes in the GUI, this is just a reverse engineering tool.  You can however delete uncessesary classes by right clicking on the node.
@@ -862,7 +862,6 @@ class MainApp(wx.App):
             self.next_menu_id +=1
 
         Add(menu1, "File &Import...\tCtrl-I", "Import Python Source Files", self.FileImport)
-        Add(menu1, "File Import &Recursive...", "Import Python Source Files PLUS all modules imported by your sources - WARNING - may generate lots of UML!!", self.RecursivePathImport)
         menu1.AppendSeparator()
         Add(menu1, "&Clear\tCtrl-N", "Clear Diagram", self.FileNew)
         menu1.AppendSeparator()
@@ -887,27 +886,6 @@ class MainApp(wx.App):
         menuBar.Append(menu4, "&Help")
         self.frame.SetMenuBar(menuBar)
         
-    def RecursivePathImport(self,event=None):
-        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
-            defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
-        if dlg.ShowModal() == wx.ID_OK:
-            filenames = dlg.GetPaths() # dlg.GetFilename()
-            print 'Importing...'
-            wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
-            print filenames
-
-            self.fileList = []
-            self.DoRecursivePathImport( os.path.split(filenames[0])[0] )
-            print self.fileList
-            self.win.Go(files=self.fileList)
-
-            #self._HackToForceTheScrollbarToShowUp()
-            self.win.redraw2()  #ADDED AT MAC PORT TIME
-
-            wx.EndBusyCursor()
-            print 'Import - Done.'
-
-
     def _HackToForceTheScrollbarToShowUp(self):
             """
             sizeX,sizeY = WINDOW_SIZE
@@ -923,28 +901,6 @@ class MainApp(wx.App):
 
             # Return the size to what it was
             self.frame.SetSize(oldSize)
-
-
-    def DoRecursivePathImport(self, dir):
-        print "Recursing into %s..." % dir
-        if( os.path.split(dir)[1] == "CVS"):
-            #print dir,os.path.split(dir)[0]
-            return
-        print "split %s" % os.path.split(dir)[1]
-
-        for f in os.listdir(dir):
-            pathname = os.path.join( dir, f )
-            mode = os.stat(pathname)[stat.ST_MODE]
-            if stat.S_ISDIR(mode):
-                # It's a directory, ignore it
-                pass
-                # It's a directory, recurse into it
-                #self.RecursivePathImport(pathname)
-            elif stat.S_ISREG(mode):
-                # It's a file
-                if( os.path.splitext(f)[1] == ".py" and f != "__init__.py" ):
-                    self.fileList.append( os.path.join(dir,f) )
-                    print "Added...." + os.path.join(dir,f)
 
     def FileImport(self, event):
         dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
@@ -964,7 +920,6 @@ class MainApp(wx.App):
             print 'Import - Done.'
 
         self._HackToForceTheScrollbarToShowUp()
-
 
     def FileNew(self, event):
         self.win.Clear()
