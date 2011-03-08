@@ -957,84 +957,28 @@ class TestWindow(ogl.ShapeCanvas):
 
     def DeselectAllShapes(self):
         shapeList = self.diagram.GetShapeList()
+
+        def GetCanvasDc(s):
+            canvas = s.GetCanvas()
+            dc = wx.ClientDC(canvas)        # NEW! handles scrolled situations
+            canvas.PrepareDC(dc)
+            return canvas, dc
+            
+        # If we unselect too early, some of the objects in
+        # shapeList will become invalid (the control points are
+        # shapes too!) and bad things will happen...
         toUnselect = []
         for s in shapeList:
             if s.Selected():
-                # If we unselect it now then some of the objects in
-                # shapeList will become invalid (the control points are
-                # shapes too!) and bad things will happen...
                 toUnselect.append(s)
 
         if toUnselect:
-            
-            ########
-            #canvas = self.diagram.GetCanvas()
-            #dc = wx.ClientDC(self)        # NEW! handles scrolled situations
-            #canvas.PrepareDC(dc)
-            ########
-
             for s in toUnselect:
-                
-                #############
-                canvas = s.GetCanvas()
-                dc = wx.ClientDC(canvas)        # NEW! handles scrolled situations
-                canvas.PrepareDC(dc)
-                ############
-                
+                canvas, dc = GetCanvasDc(s)
                 s.Select(False, dc)
                 
-            ########
-            canvas = self.diagram.GetCanvas()
-            dc = wx.ClientDC(self)        # NEW! handles scrolled situations
-            canvas.PrepareDC(dc)
-            ########
-
-            ##########canvas.Redraw(dc)
+            canvas, dc = GetCanvasDc(s)
             canvas.Refresh(False)
-
-#----------------------------------------------------------------------
-
-def runTest(frame, nb, log):
-    # This creates some pens and brushes that the OGL library uses.
-    # It should be called after the app object has been created, but
-    # before OGL is used.
-    ogl.OGLInitialize()
-
-    win = TestWindow(nb, log, frame)
-    return win
-
-#----------------------------------------------------------------------
-
-"""
-class __Cleanup:
-    cleanup = wxOGLCleanUp
-    def __del__(self):
-        self.cleanup()
-
-# when this module gets cleaned up then wxOGLCleanUp() will get called
-__cu = __Cleanup()
-
-"""
-
-
-
-
-
-
-overview = """\
-The Object Graphics Library is a library supporting the creation and
-manipulation of simple and complex graphic images on a canvas.
-
-"""
-
-
-
-#if __name__ == '__main__':
-#    import sys,os
-#    import run
-#    run.main(['', os.path.basename(sys.argv[0])])
-
-
 
 class Log:
     def WriteText(self, text):
@@ -1043,152 +987,64 @@ class Log:
         wx.LogMessage(text)
     write = WriteText
 
-
-
-class BoaApp(wx.App):
+class MainApp(wx.App):
     def OnInit(self):
         self.log = Log()
-
         wx.InitAllImageHandlers()
-
-        #self.main = wxFrame1.create(None)
-
-        #self.main = TestWindow(parent=self, log=None, frame=None)
-
         self.andyapptitle = 'PyNsource GUI - Python Reverse Engineering Tool - Python Code into UML.'
-
-
 
         self.frame = Frame(None, -1, self.andyapptitle, pos=(50,50), size=(0,0),
                         style=wx.NO_FULL_REPAINT_ON_RESIZE|wx.DEFAULT_FRAME_STYLE)
         self.frame.CreateStatusBar()
+        self.InitMenus()
+        self.frame.Show(True)
+        wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
+        self.win = TestWindow(self.frame, Log(), self.frame)
+        self.win.secretredrawmethod = self.OnRefresh    # Hack so can do a high level refresh screen after a delete node event.
+        # so set the frame to a good size for showing stuff
+        self.frame.SetSize(WINDOW_SIZE)
+        self.win.SetFocus()
+        self.SetTopWindow(self.frame)
+        return True
+
+    def InitMenus(self):
         menuBar = wx.MenuBar()
-        menu = wx.Menu()
+        menu1 = wx.Menu()
         menu2 = wx.Menu()
         menu3 = wx.Menu()
         menu4 = wx.Menu()
 
+        self.next_menu_id = 200
+        def Add(menu, s1, s2, func):
+            menu.Append(self.next_menu_id, s1, s2)
+            wx.EVT_MENU(self, self.next_menu_id, func)
+            self.next_menu_id +=1
 
-        menu.Append(103, "File &Import...\tCtrl-I", "Import Python Source Files")
-        wx.EVT_MENU(self, 103, self.FileImport)
-
-        menu.Append(1055, "File Import &Recursive...", "Import Python Source Files PLUS all modules imported by your sources - WARNING - may generate lots of UML!!")
-        wx.EVT_MENU(self, 1055, self.RecursivePathImport)
-
-
-        menu.AppendSeparator()
-
-        #menu.Append(102, "File &New\tCtrl-N", "New")
-        menu.Append(102, "&Clear\tCtrl-N", "Clear Diagram")
-        wx.EVT_MENU(self, 102, self.FileNew)
-
-        menu.AppendSeparator()
-
-        #menu.Append(104, "File &Open\tCtrl-O", "Open")
-        #wx.EVT_MENU(self, 104, self.FileOpen)
-
-        #menu.Append(105, "File &Save\tCtrl-S", "Save")
-        #wx.EVT_MENU(self, 105, self.FileSave)
-
-        #menu.AppendSeparator()
-
-        menu.Append(1056, "File &Print / Preview...\tCtrl-P", "Print")
-        wx.EVT_MENU(self, 1056, self.FilePrint)
-
-        menu.AppendSeparator()
-
-        menu.Append(101, "E&xit\tAlt-X", "Exit demo")
-        wx.EVT_MENU(self, 101, self.OnButton)
-
-        # -----------
-
-        menu2.Append(122, "&Delete Class", "Delete Node")
-        wx.EVT_MENU(self, 122, self.OnDeleteNode)
-
-        #menu2.AppendSeparator()
-
-        menu4.Append(123, "&Layout UML", "Layout UML")
-        wx.EVT_MENU(self, 123, self.OnLayout)
-
-        menu4.Append(124, "&Refresh", "Refresh")
-        wx.EVT_MENU(self, 124, self.OnRefresh)
-
-        # -----------
-
-        menu3.Append(301, "&Help...", "Help")
-        wx.EVT_MENU(self, 301, self.OnHelp)
-
-        menu3.Append(302, "&Visit PyNSource Website...", "PyNSource Website")
-        wx.EVT_MENU(self, 302, self.OnVisitWebsite)
-
+        Add(menu1, "File &Import...\tCtrl-I", "Import Python Source Files", self.FileImport)
+        Add(menu1, "File Import &Recursive...", "Import Python Source Files PLUS all modules imported by your sources - WARNING - may generate lots of UML!!", self.RecursivePathImport)
+        menu1.AppendSeparator()
+        Add(menu1, "&Clear\tCtrl-N", "Clear Diagram", self.FileNew)
+        menu1.AppendSeparator()
+        Add(menu1, "File &Print / Preview...\tCtrl-P", "Print", self.FilePrint)
+        menu1.AppendSeparator()
+        Add(menu1, "E&xit\tAlt-X", "Exit demo", self.OnButton)
         
-        menu3.AppendSeparator()
+        Add(menu2, "&Delete Class", "Delete Node", self.OnDeleteNode)
+        
+        Add(menu3, "&Layout UML", "Layout UML", self.OnLayout)
+        Add(menu3, "&Refresh", "Refresh", self.OnRefresh)
+        
+        Add(menu4, "&Help...", "Help", self.OnHelp)
+        Add(menu4, "&Visit PyNSource Website...", "PyNSource Website", self.OnVisitWebsite)
+        menu4.AppendSeparator()
+        Add(menu4, "&Check for Updates...", "Check for Updates", self.OnCheckForUpdates)
+        Add(menu4, "&About...", "About...", self.OnAbout)
 
-        menu3.Append(303, "&Check for Updates...", "Check for Updates")
-        wx.EVT_MENU(self, 303, self.OnCheckForUpdates)
-
-        menu3.Append(106, "&About...", "About...")
-        wx.EVT_MENU(self, 106, self.OnAbout)
-
-        # -----------
-
-        menuBar.Append(menu, "&File")
+        menuBar.Append(menu1, "&File")
         menuBar.Append(menu2, "&Edit")
-        menuBar.Append(menu4, "&Layout")
-        menuBar.Append(menu3, "&Help")
+        menuBar.Append(menu3, "&Layout")
+        menuBar.Append(menu4, "&Help")
         self.frame.SetMenuBar(menuBar)
-        self.frame.Show(True)
-        wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
-
-        #win = self.demoModule.runTest(frame, frame, Log())
-        #win = runTest(frame, frame, )
-        self.win = TestWindow(self.frame, Log(), self.frame)
-        self.win.secretredrawmethod = self.OnRefresh    # Hack so can do a high level refresh screen after a delete node event.
-
-        # a window will be returned if the demo does not create
-        # its own top-level window
-        if self.win:
-            # so set the frame to a good size for showing stuff
-            self.frame.SetSize(WINDOW_SIZE)
-            self.win.SetFocus()
-
-        else:
-            # otherwise the demo made its own frame, so just put a
-            # button in this one
-            if hasattr(self.frame, 'otherWin'):
-                b = wx.Button(self.frame, -1, " Exit ")
-                self.frame.SetSize((200, 100))
-                wx.EVT_BUTTON(self.frame, b.GetId(), self.OnButton)
-            else:
-                # It was probably a dialog or something that is already
-                # gone, so we're done.
-                self.frame.Destroy()
-                return True
-
-        self.SetTopWindow(self.frame)
-
-
-        #self.popupmenu = wx.Menu()     # Creating a menu
-        #item = self.popupmenu.Append(-1, "AAAAAAA")
-        ##self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
-        ##self.win.Bind(wx.EVT_CONTEXT_MENU, self.OnShowPopup)
-        ##self.frame(wx.EVT_CONTEXT_MENU, self.OnShowPopup)
-        #self.frame.PopupMenu(self.popupmenu, wx.Point(10,110))
-
-        #self.main.Show()
-        #self.SetTopWindow(self.main)
-
-        return True
-
-    #def OnShowPopup(self, event):
-    #    print "AAAAAAAAAAAAAAAAAAAA"
-    #    pos = event.GetPosition()
-    #    pos = self.panel.ScreenToClient(pos)
-    #    self.panel.PopupMenu(self.popupmenu, pos)
-    #def OnPopupItemSelected(self, event): 
-    #    item = self.popupmenu.FindItemById(event.GetId()) 
-    #    text = item.GetText() 
-    #    wx.MessageBox("You selected item '%s'" % text)
         
     def RecursivePathImport(self,event=None):
         dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
@@ -1197,7 +1053,6 @@ class BoaApp(wx.App):
             filenames = dlg.GetPaths() # dlg.GetFilename()
             print 'Importing...'
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
-            # self.fileloadhandler(filename)
             print filenames
 
             self.fileList = []
@@ -1226,7 +1081,6 @@ class BoaApp(wx.App):
 
             # Return the size to what it was
             self.frame.SetSize(oldSize)
-
 
 
     def DoRecursivePathImport(self,dir):
@@ -1269,42 +1123,6 @@ class BoaApp(wx.App):
 
     def FileNew(self, event):
         self.win.Clear()
-
-    def FileOpen(self, event):
-        self.MessageBox("Sorry, FileOpen not implemented yet.")
-        self.win.diagram.LoadFile('c:\\try\\testUml.txt')
-        return
-        """
-        dlg = wxFileDialog(parent=self.frame, message="choose", defaultDir='.',
-            defaultFile="", wildcard="*.py", style=wxOPEN|wxMULTIPLE, pos=wxDefaultPosition)
-        if dlg.ShowModal() == wxID_OK:
-            filenames = dlg.GetPaths() # dlg.GetFilename()
-            print 'Importing...'
-            wxBeginBusyCursor(cursor=wxHOURGLASS_CURSOR)
-            # self.fileloadhandler(filename)
-            print filenames
-            wxEndBusyCursor()
-            print 'Import - Done.'
-        """
-
-    def FileSave(self, event):
-        self.MessageBox("Sorry, FileSave not implemented yet.")
-        return
-        self.win.diagram.SaveFile('c:\\try\\testUml.txt')
-        """
-        dlg = wxFileDialog(parent=self.frame, message="choose", defaultDir='.',
-            defaultFile="", wildcard="*.py", style=wxOPEN|wxMULTIPLE, pos=wxDefaultPosition)
-        if dlg.ShowModal() == wxID_OK:
-            filenames = dlg.GetPaths() # dlg.GetFilename()
-            print 'Importing...'
-            wxBeginBusyCursor(cursor=wxHOURGLASS_CURSOR)
-            # self.fileloadhandler(filename)
-            print filenames
-            wxEndBusyCursor()
-            print 'Import - Done.'
-        """
-
-
     def FilePrint(self, event):
 
         from printframework import MyPrintout
@@ -1394,9 +1212,7 @@ PyNSource Gui Help:
         self._HackToForceTheScrollbarToShowUp()  # this is just as necessary to get the screen to refresh.
 
     def MessageBox(self, msg):
-        dlg = wx.MessageDialog(self.frame, msg,
-                              'About', wx.OK | wx.ICON_INFORMATION)
-                              #wxYES_NO | wxNO_DEFAULT | wxCANCEL | wxICON_INFORMATION)
+        dlg = wx.MessageDialog(self.frame, msg, 'Message', wx.OK | wx.ICON_INFORMATION)
         dlg.ShowModal()
         dlg.Destroy()
 
@@ -1410,26 +1226,9 @@ PyNSource Gui Help:
         evt.Skip()
 
 def main():
-    application = BoaApp(0)
-#----------------------------------------------------------------------
-# This creates some pens and brushes that the OGL library uses.
-
-    ogl.OGLInitialize()
-
-#----------------------------------------------------------------------
+    application = MainApp(0)
+    ogl.OGLInitialize()  # creates some pens and brushes that the OGL library uses.
     application.MainLoop()
-
 
 if __name__ == '__main__':
     main()
-
-
-# run.py is a wx demo module found in
-# C:\Program Files\wxPython2.8 Docs and Demos\demo
-"""
-if __name__ == '__main__':
-    import sys, os
-    import run
-    run.main(['', os.path.basename(sys.argv[0])] + sys.argv[1:])
-"""
-
