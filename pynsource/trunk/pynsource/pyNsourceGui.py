@@ -375,7 +375,6 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
 
     def __init__(self, parent, log, frame):
         ogl.ShapeCanvas.__init__(self, parent)
-
         maxWidth  = 1000
         maxHeight = 1000
         self.SetScrollbars(20, 20, maxWidth/20, maxHeight/20)
@@ -582,7 +581,9 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
 
     def redraw(self):
         diagram = self.GetDiagram()
-        canvas = diagram.GetCanvas()
+        canvas = self
+        assert self == canvas == diagram.GetCanvas()
+
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
         for shape in self.shapes:
@@ -591,19 +592,12 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
         diagram.Clear(dc)
         diagram.Redraw(dc)
 
-    def redraw2(self):
-        diagram = self.GetDiagram()
-        canvas = diagram.GetCanvas()
-
-        dc = wx.ClientDC(self)        # NEW! handles scrolled situations
-        #dc = wxClientDC(canvas)     # doesn't handle scrolled situations
-
-        canvas.PrepareDC(dc)
-        for shape in self.shapes:
-            shape.Move(dc, shape.GetX(), shape.GetY())
-            shape.SetRegionSizes()
-        diagram.Clear(dc)
-        diagram.Redraw(dc)
+        # Hack To Force The Scrollbar To Show Up
+        # Set the window size to something different
+        # Return the size to what it was
+        oldSize = self.frame.GetSize()
+        self.frame.SetSize((oldSize[0]+1,oldSize[1]+1))
+        self.frame.SetSize(oldSize)
 
     def newRegion(self, font, name, textLst, maxWidth, totHeight = 10):
         # Taken from Boa, but put into the canvas class instead of the scrolled window class.
@@ -817,7 +811,7 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
                 
             canvas, dc = GetCanvasDc(s)
             canvas.Refresh(False)
-
+            
 class Log:
     def WriteText(self, text):
         if text[-1:] == '\n':
@@ -829,7 +823,7 @@ class MainApp(wx.App):
     def OnInit(self):
         self.log = Log()
         wx.InitAllImageHandlers()
-        self.andyapptitle = 'PyNsource GUI - Python Reverse Engineering Tool - Python Code into UML.'
+        self.andyapptitle = 'PyNsource GUI - Python Code into UML'
 
         self.frame = Frame(None, -1, self.andyapptitle, pos=(50,50), size=(0,0),
                         style=wx.NO_FULL_REPAINT_ON_RESIZE|wx.DEFAULT_FRAME_STYLE)
@@ -846,6 +840,12 @@ class MainApp(wx.App):
         self.frame.SetSize(WINDOW_SIZE)
         self.win.SetFocus()
         self.SetTopWindow(self.frame)
+        
+        # Debug bootstrap
+        self.frame.SetSize((1024,768))
+        self.win.Go(files=['E:\\Devel_Andy\\pyNsource\\pynsource\\pyNsourceGui.py'])
+        self.win.redraw()
+        
         return True
 
     def InitMenus(self):
@@ -886,40 +886,18 @@ class MainApp(wx.App):
         menuBar.Append(menu4, "&Help")
         self.frame.SetMenuBar(menuBar)
         
-    def _HackToForceTheScrollbarToShowUp(self):
-            """
-            sizeX,sizeY = WINDOW_SIZE
-            self.frame.SetSize((sizeX+1,sizeY+1))
-            self.frame.SetSize((sizeX,sizeY))
-            """
-
-            # Actual size of the window
-            oldSize = self.frame.GetSize()
-
-            # Set the window size to something different
-            self.frame.SetSize((oldSize[0]+1,oldSize[1]+1))
-
-            # Return the size to what it was
-            self.frame.SetSize(oldSize)
-
     def FileImport(self, event):
         dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
             defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
-            filenames = dlg.GetPaths() # dlg.GetFilename()
+            filenames = dlg.GetPaths()
             print 'Importing...'
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
-            # self.fileloadhandler(filename)
             print filenames
-
             self.win.Go(files=filenames)
-
-            self.win.redraw2()  #ADDED AT MAC PORT TIME
-
+            self.win.redraw()
             wx.EndBusyCursor()
             print 'Import - Done.'
-
-        self._HackToForceTheScrollbarToShowUp()
 
     def FileNew(self, event):
         self.win.Clear()
@@ -989,11 +967,9 @@ class MainApp(wx.App):
         
         self.win.ArrangeShapes()
         self.win.redraw()
-        self._HackToForceTheScrollbarToShowUp()
 
     def OnRefresh(self, event):
-        self.win.redraw2()
-        self._HackToForceTheScrollbarToShowUp()  # this is just as necessary to get the screen to refresh.
+        self.win.redraw()
 
     def MessageBox(self, msg):
         dlg = wx.MessageDialog(self.frame, msg, 'Message', wx.OK | wx.ICON_INFORMATION)
