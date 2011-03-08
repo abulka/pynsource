@@ -1,4 +1,9 @@
 """
+    PyNSource GUI
+    -------------
+    
+    LICENSE: GPL 3
+    
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -13,9 +18,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-APP_VERSION = 1.51
+import wx
+import wx.lib.ogl as ogl
+from wx import Frame
+import os, stat
 
-aboutmsg = """
+APP_VERSION = 1.51
+WEB_VERSION_CHECK_URL = "http://www.atug.com/downloads/pynsource-latest.txt"
+WEB_PYNSOURCE_HOME_URL = "http://www.andypatterns.com/index.php/products/pynsource/"
+UML_STYLE_1 = 0
+WINDOW_SIZE = (640,480)
+
+ABOUT_MSG = """
 PyNSource GUI
 
 Version %s
@@ -28,17 +42,25 @@ http://www.andypatterns.com/index.php/products/pynsource/
 License: GPL 3 (free software).
 """ % APP_VERSION
 
-WEB_VERSION_CHECK_URL = "http://www.atug.com/downloads/pynsource-latest.txt"
-WEB_PYNSOURCE_HOME_URL = "http://www.andypatterns.com/index.php/products/pynsource/"
+WEB_UPDATE_MSG = """
+There is a newer version of PyNSource GUI available:  %s
 
-import wx
-import wx.lib.ogl as ogl
-#import ogl
-from wx import Frame
-import os,stat
+%s
 
-UML_STYLE_1 = 0
-WINDOW_SIZE = (640,480)
+Do you wish to visit the download page now?
+"""
+
+HELP_MSG = """
+PyNSource Gui Help:
+
+   Import a python file and it will be reverse engineered and represented as UML.
+   
+   Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.
+   Import recursively at your own peril - too many classes will clutter you diagrams.
+   
+   Layout is a bit dodgy so arrange your layout a little and then do a screen grab (using your favourite screen grabbing tool) or print.
+   You cannot add new classes in the GUI, this is just a reverse engineering tool.  You can however delete uncessesary classes by right clicking on the node.
+"""
 
 class DiamondShape(ogl.PolygonShape):
     def __init__(self, w=0.0, h=0.0):
@@ -56,16 +78,11 @@ class DiamondShape(ogl.PolygonShape):
 
         self.Create(points)
 
-
-#----------------------------------------------------------------------
-
 class RoundedRectangleShape(ogl.RectangleShape):
     def __init__(self, w=0.0, h=0.0):
         ogl.RectangleShape.__init__(self, w, h)
         self.SetCornerRadius(-0.3)
 
-
-#----------------------------------------------------------------------
 
 class CompositeDivisionShape(ogl.CompositeShape):
     def __init__(self, canvas):
@@ -93,8 +110,6 @@ class CompositeDivisionShape(ogl.CompositeShape):
         for division in self.GetDivisions():
             division.SetSensitivityFilter(0)
         
-#----------------------------------------------------------------------
-
 class CompositeShape(ogl.CompositeShape):
     def __init__(self, canvas):
         ogl.CompositeShape.__init__(self)
@@ -126,8 +141,6 @@ class CompositeShape(ogl.CompositeShape):
         constraining_shape.SetSensitivityFilter(0)
 
         
-#----------------------------------------------------------------------
-
 class DividedShape(ogl.DividedShape):
     def __init__(self, width, height, canvas):
         ogl.DividedShape.__init__(self, width, height)
@@ -188,7 +201,6 @@ class DividedShape(ogl.DividedShape):
             self.FormatText(dc, text, rnum)
             rnum += 1
 
-
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
         ogl.DividedShape.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
         self.SetRegionSizes()
@@ -223,13 +235,10 @@ class DividedShapeSmall(DividedShape):
             rnum += 1
 
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
-        #self.base_OnSizingEndDragLeft(pt, x, y, keys, attch)
         ogl.DividedShape.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
         self.SetRegionSizes()
         self.ReformatRegions()
         self.GetCanvas().Refresh()
-
-#----------------------------------------------------------------------
 
 class MyEvtHandler(ogl.ShapeEvtHandler):
     def __init__(self, log, frame):
@@ -245,7 +254,6 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
     def SetPostDeleteRefreshMethod(self, dorefreshredraw):
         self.Refreshredraw = dorefreshredraw
 
-
     def _ZapShapeStub(self, shape):
         """
         This event handler method calls the window zap shape method, which removes the shape from the
@@ -258,26 +266,26 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         print 'No Refreshredraw method defined.'
 
     def UpdateStatusBar(self, shape):
-        #print 'UpdateStatusBar', shape.region1.GetText(), shape.GetX(), shape.GetY()
         x, y = shape.GetX(), shape.GetY()
         width, height = shape.GetBoundingBoxMax()
-        self.statbarFrame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)" %
-                                        (x, y, width, height))
-
+        self.statbarFrame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)" % (x, y, width, height))
 
     def OnLeftClick(self, x, y, keys = 0, attachment = 0):
         shape = self.GetShape()
-        #print shape.__class__, shape.GetClassName()
         canvas = shape.GetCanvas()
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
 
+        def GetCanvasDc(s):
+            canvas = s.GetCanvas()
+            dc = wx.ClientDC(canvas)
+            canvas.PrepareDC(dc)
+            return canvas, dc
+
         if shape.Selected():
             shape.Select(False, dc)
-            #canvas.Redraw(dc)
             canvas.Refresh(False)
         else:
-            #############redraw = False
             shapeList = canvas.GetDiagram().GetShapeList()
             toUnselect = []
             for s in shapeList:
@@ -291,16 +299,8 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
 
             if toUnselect:
                 for s in toUnselect:
-                    
-                    ########################
-                    canvas = s.GetCanvas()
-                    dc = wx.ClientDC(canvas)
-                    canvas.PrepareDC(dc)
-                    ########################
-        
+                    canvas, dc = GetCanvasDc(s)
                     s.Select(False, dc)
-                    
-                #canvas.Redraw(dc)
                 canvas.Refresh(False)
 
         self.UpdateStatusBar(shape)
@@ -308,21 +308,14 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
 
     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
         shape = self.GetShape()
-        #self.base_OnEndDragLeft(x, y, keys, attachment)
-        #wxShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)
         ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)
-        
         if not shape.Selected():
             self.OnLeftClick(x, y, keys, attachment)
         self.UpdateStatusBar(shape)
 
-
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
-        #self.base_OnSizingEndDragLeft(pt, x, y, keys, attch)
-        #wxShapeEvtHandler.OnSizingEndDragLeft(self.pt, x, y, keys, attch)
         ogl.ShapeEvtHandler.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
         self.UpdateStatusBar(self.GetShape())
-
 
     def OnMovePost(self, dc, x, y, oldX, oldY, display):
         shape = self.GetShape()
@@ -331,10 +324,6 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         if "wxMac" in wx.PlatformInfo:
             shape.GetCanvas().Refresh(False) 
 
-    #def OnShowPopup(self, event):
-    #    pos = event.GetPosition()
-    #    pos = self.panel.ScreenToClient(pos)
-    #    self.panel.PopupMenu(self.popupmenu, pos)
     def OnPopupItemSelected(self, event): 
         item = self.popupmenu.FindItemById(event.GetId()) 
         text = item.GetText() 
@@ -342,24 +331,17 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         if text == "Delete Node":
             self.RightClickDeleteNode()
         
-    #def OnRightClick(self, *dontcare):
     def OnRightClick(self, x, y, keys, attachment):
         #self.log.WriteText("%s\n" % self.GetShape())
-
         self.popupmenu = wx.Menu()     # Creating a menu
         item = self.popupmenu.Append(2011, "Delete Node")
         self.statbarFrame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
         item = self.popupmenu.Append(2012, "Cancel")
         self.statbarFrame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
-
-        #cx,cy=self.scroll.GetClientSizeTuple()
-        #sx,sy=self.scroll.GetViewStart()
-
         self.statbarFrame.PopupMenu(self.popupmenu, wx.Point(x,y))
 
     def RightClickDeleteNode(self):
         shape = self.GetShape()
-
         canvas = shape.GetCanvas()
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
@@ -369,11 +351,9 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
 
         if shape.Selected():
             shape.Select(False, dc)
-            ###############canvas.Redraw(dc)
             canvas.Refresh(False)
 
-
-        ###################  should do list clone instead, just don't want pointer want true copy of refs
+        # should do list clone instead, just don't want pointer want true copy of refs
         lineList = shape.GetLines()
         toDelete = []
         for line in shape.GetLines():
@@ -383,44 +363,18 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
             line.Unlink()
             #shape.RemoveLine(line)
             diagram.RemoveShape(line)            
-        ###################
-
-        ###################
-        #for line in shape.GetLines():
-        #    line.Unlink()
-        #    #shape.RemoveLine(line)
-        #    diagram.RemoveShape(line)
-        ###################
 
         self.ZapShape(shape)
         diagram.RemoveShape(shape)
         
-        ##############  wrong dc value anyway... ? of shape not of diagram canvas.
-        #diagram.Clear(dc)
-        #canvas.Redraw(dc)
-        #################
 
-        ####### self.Refreshredraw(event=self)   # will call the app level refresh() method in window.  Event is passed for fun - we don't look at it.
-
-
-#----------------------------------------------------------------------
 import sys, glob
-
-#if not '.' in sys.path: sys.path.insert(0, '.')  # so find local pynsource package first.
-#import pprint
-#pprint.pprint(sys.path)
-#import pynsource
-#print pynsource
-#from pynsource.pynsource import PythonToJava, PySourceAsJava
-
 from pynsource import PythonToJava, PySourceAsJava
-
 
 class TestWindow(ogl.ShapeCanvas):
     scrollStepX = 10
     scrollStepY = 10
     classnametoshape = {}
-
 
     def __init__(self, parent, log, frame):
         ogl.ShapeCanvas.__init__(self, parent)
@@ -456,13 +410,14 @@ class TestWindow(ogl.ShapeCanvas):
                 break
 
         del self.classnametoshape[classname]
-
-# Too hard to remove the classname from these structures since these are tuples
-# between two classes.  Harmless to keep them in here.
-##        if class1, class2 in self.associations_generalisation:
-##            self.associations_generalisation.remove(shape)
-##        if shape in self.associations_composition:
-##            self.associations_composition.remove(shape)
+        """
+        Too hard to remove the classname from these structures since these are tuples
+        between two classes.  Harmless to keep them in here.
+        """
+        #if class1, class2 in self.associations_generalisation:
+        #    self.associations_generalisation.remove(shape)
+        #if shape in self.associations_composition:
+        #    self.associations_composition.remove(shape)
 
         assert shape in self.shapes
         self.shapes.remove(shape)
@@ -470,17 +425,8 @@ class TestWindow(ogl.ShapeCanvas):
     def Clear(self):
         self.diagram.DeleteAllShapes()
 
-        ############## ensure we are using the right canvas here.....
         dc = wx.ClientDC(self)
         self.diagram.Clear(dc)   # only ends up calling dc.Clear() - I wonder if this clears the screen?
-        # self.redraw()   # do not redraw cos nothing exists!
-
-        # Re-init - doesn't help the File New problem....
-        """
-        self.diagram = wxDiagram()
-        self.SetDiagram(self.diagram)
-        self.diagram.SetCanvas(self)
-        """
 
         self.shapes = []    # different to self.diagram._shapeList
         self.save_gdi = []
@@ -491,7 +437,6 @@ class TestWindow(ogl.ShapeCanvas):
         # and maybe this too
         self.associations_generalisation = None
         self.associations_composition = None
-
 
     def _Process(self, filepath):
         print '_Process', filepath
@@ -521,7 +466,7 @@ class TestWindow(ogl.ShapeCanvas):
 
             # These are a list of (attr, otherclass) however they imply that THIS class
             # owns all those other classes.
-            #print classentry.classdependencytuples
+            
             for attr, otherclass in classentry.classdependencytuples:
                 self.associations_composition.append((otherclass, classname))  # reverse direction so round black arrows look ok
 
@@ -533,8 +478,6 @@ class TestWindow(ogl.ShapeCanvas):
                         parentclass = parentclass.split('.')[0] # take the lhs
 
                     self.associations_generalisation.append((classname, parentclass))
-                    #print 'ADDED Generalisation!!!!!!!!!!!!!!!'
-
 
             if UML_STYLE_1:
                 # Build the UML shape
@@ -606,9 +549,6 @@ class TestWindow(ogl.ShapeCanvas):
                 else:
                     print 'Skipping', classname, 'already built shape...'
 
-
-
-
     def _BuildAuxClasses(self, classestocreate=None):
             if not classestocreate:
                 classestocreate = ('variant', 'unittest', 'list', 'object', 'dict')  # should add more classes and add them to a jar file to avoid namespace pollution.
@@ -624,17 +564,11 @@ class TestWindow(ogl.ShapeCanvas):
                 # Record the name to shape map so that we can wire up the links later.
                 self.classnametoshape[classname] = ds
 
-
-
-
     def Go(self, files=None, path=None):
 
         # these are tuples between class names.
         self.associations_generalisation = []
         self.associations_composition = []
-
-        # self._BuildAuxClasses()   # Now we do it on demand....
-
 
         if files:
             u = PythonToJava(None, treatmoduleasclass=0, verbose=0)
@@ -654,27 +588,17 @@ class TestWindow(ogl.ShapeCanvas):
                     filepath = directory
                 else:
                     filepath = os.path.join(directory, "*.py")
-                #print 'Processing directory', filepath
                 globbed2 = glob.glob(filepath)
                 for f in globbed2:
                     self._Process(f)    # Build a shape with all attrs and methods, and prepare association dict
 
-
-
-        # Wire up the associations
-        ###dc = wxClientDC(self)
-        ###self.PrepareDC(dc)
-        dc = "NONEED"
-
-        self.DrawAssocLines(self.associations_generalisation, ogl.ARROW_ARROW, dc)
-        self.DrawAssocLines(self.associations_composition, ogl.ARROW_FILLED_CIRCLE, dc)
+        self.DrawAssocLines(self.associations_generalisation, ogl.ARROW_ARROW)
+        self.DrawAssocLines(self.associations_composition, ogl.ARROW_FILLED_CIRCLE)
 
         # Layout
         self.ArrangeShapes()
 
-
-
-    def DrawAssocLines(self, associations, arrowtype, dc):
+    def DrawAssocLines(self, associations, arrowtype):
         for fromClassname, toClassname in associations:
             #print 'DrawAssocLines', fromClassname, toClassname
 
@@ -695,12 +619,6 @@ class TestWindow(ogl.ShapeCanvas):
             fromShape.AddLine(line, toShape)
             self.diagram.AddShape(line)
             line.Show(True)
-
-            # for some reason, the shapes have to be moved for the line to show up...
-            #fromShape.Move(dc, fromShape.GetX(), fromShape.GetY())
-
-
-
 
     def redraw(self):
         diagram = self.GetDiagram()
@@ -831,9 +749,6 @@ class TestWindow(ogl.ShapeCanvas):
             x, y = pos
             classShape.Move(dc, x, y, False)
 
-
-
-
     def getShapeSize( self, shape ):
         """Return the size of a shape's representation, an abstraction point"""
         return shape.GetBoundingBoxMax()
@@ -875,38 +790,23 @@ class TestWindow(ogl.ShapeCanvas):
         self.shapes.append(shape)
         return shape
 
-
     def addShape(self, shape, x, y, pen, brush, text):
-        
-        # Not sure it makes much difference which one to use...
-        if False:        
-            # Taken from Boa - we used to use MyAddShape
-            # shape.SetDraggable(false)
-            shape.SetCanvas(self.canvas)
+        # Composites have to be moved for all children to get in place
+        if isinstance(shape, ogl.CompositeShape):
+            dc = wx.ClientDC(self)
+            self.PrepareDC(dc)
+            shape.Move(dc, x, y)
+        else:
+            shape.SetDraggable(True, True)
+            shape.SetCanvas(self)
             shape.SetX(x)
             shape.SetY(y)
-            shape.SetPen(pen)
-            shape.SetBrush(brush)
-            # shape.SetFont(wxFont(6, wxMODERN, wxNORMAL, wxNORMAL, false))
-            shape.AddText(text)
-            shape.SetShadowMode(ogl.SHADOW_RIGHT)
-        else:
-            # Composites have to be moved for all children to get in place
-            if isinstance(shape, ogl.CompositeShape):
-                dc = wx.ClientDC(self)
-                self.PrepareDC(dc)
-                shape.Move(dc, x, y)
-            else:
-                shape.SetDraggable(True, True)
-                shape.SetCanvas(self)
-                shape.SetX(x)
-                shape.SetY(y)
-                if pen:    shape.SetPen(pen)
-                if brush:  shape.SetBrush(brush)
-                if text:
-                    for line in text.split('\n'):
-                        shape.AddText(line)
-                shape.SetShadowMode(ogl.SHADOW_RIGHT)            
+            if pen:    shape.SetPen(pen)
+            if brush:  shape.SetBrush(brush)
+            if text:
+                for line in text.split('\n'):
+                    shape.AddText(line)
+            shape.SetShadowMode(ogl.SHADOW_RIGHT)            
         
         self.diagram.AddShape(shape)
         shape.Show(True)
@@ -919,40 +819,18 @@ class TestWindow(ogl.ShapeCanvas):
         shape.SetEventHandler(evthandler)
 
         self.shapes.append(shape)
-
         return len(self.shapes) -1
 
 
-    # DO WE NEED THIS? - OGL.py doesn't.
     def OnDestroy(self, evt):
         # Do some cleanup
+        # DO WE NEED THIS? - OGL.py doesn't.
         for shape in self.diagram.GetShapeList():
             if shape.GetParent() == None:
                 shape.SetCanvas(None)
-                #shape.Destroy()   # no such method
-        #self.diagram.Destroy()    # no such method
-
-
-
-##    def OnBeginDragLeft(self, x, y, keys):
-##        self.log.write("OnBeginDragLeft: %s, %s, %s\n" % (x, y, keys))
-##
-##    def OnEndDragLeft(self, x, y, keys):
-##        self.log.write("OnEndDragLeft: %s, %s, %s\n" % (x, y, keys))
 
     def OnLeftClick(self, x, y, keys):
-        """
-        wxShapeCanvas::OnLeftClick
-        void OnLeftClick(double x, double y, int keys = 0)
-
-        Called when a left click event on the canvas background is detected by OnEvent. You may override this member; by default it does nothing.
-
-        keys is a bit list of the following:
-
-
-        KEY_SHIFT
-        KEY_CTRL
-        """
+        # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
         self.DeselectAllShapes()
 
     def DeselectAllShapes(self):
@@ -1152,7 +1030,7 @@ class MainApp(wx.App):
 
 
     def OnAbout(self, event):
-        self.MessageBox(aboutmsg.strip())
+        self.MessageBox(ABOUT_MSG.strip())
 
     def OnVisitWebsite(self, event):
         import webbrowser
@@ -1166,13 +1044,7 @@ class MainApp(wx.App):
         ver = info["latest_version"]
         
         if ver > APP_VERSION:
-            msg = """
-There is a newer version of PyNSource GUI available:  %s
-
-%s
-
-Do you wish to visit the download page now?
-""" % (ver, info["latest_announcement"].strip())
+            msg = WEB_UPDATE_MSG % (ver, info["latest_announcement"].strip())
             retCode = wx.MessageBox(msg.strip(), "Update Check", wx.YES_NO | wx.ICON_QUESTION)  # MessageBox simpler than MessageDialog
             if (retCode == wx.YES):
                 import webbrowser
@@ -1181,17 +1053,7 @@ Do you wish to visit the download page now?
             self.MessageBox("You already have the latest version:  %s" % APP_VERSION)
     
     def OnHelp(self, event):
-        self.MessageBox("""
-PyNSource Gui Help:
-
-   Import a python file and it will be reverse engineered and represented as UML.
-   
-   Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.
-   Import recursively at your own peril - too many classes will clutter you diagrams.
-   
-   Layout is a bit dodgy so arrange your layout a little and then do a screen grab (using your favourite screen grabbing tool) or print.
-   You cannot add new classes in the GUI, this is just a reverse engineering tool.  You can however delete uncessesary classes by right clicking on the node.
-""".strip())
+        self.MessageBox(HELP_MSG.strip())
 
     def OnDeleteNode(self, event):
         for shape in self.win.GetDiagram().GetShapeList():
