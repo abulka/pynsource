@@ -809,7 +809,7 @@ class MainApp(wx.App):
         
         # Debug bootstrap
         self.frame.SetSize((1024,768))
-        self.win.Go(files=['E:\\Devel_Andy\\pyNsource\\pynsource\\pyNsourceGui.py'])
+        self.win.Go(files=[os.path.abspath( __file__ )])
         self.win.redraw()
         
         return True
