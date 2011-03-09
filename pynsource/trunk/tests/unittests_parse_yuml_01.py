@@ -12,37 +12,55 @@ class TestCaseYuml01(unittest.TestCase):
     def setUp(self):
         self.p = PySourceAsYuml()
 
-    def check01(self):
+    def _check01(self):
         FILE = 'python-in/testmodule01.py'
         self.p.Parse(FILE)
         
-        OLDexpected = """
+        ORIexpected = """
 [ParseMeTest]b-.->[Blah]
 [ParseMeTest]f++-*[Blah]
 [ParseMeTest|a;b;d;e;e2;f|__init__();IsInBattle();DoA()]
 [ParseMeTest]^[ParseMeTest2|_secretinfo|DoB()]
 """.strip()
         expected = """
+[ParseMeTest|a;b;d;e;e2;f|__init__();IsInBattle();DoA()]
+[ParseMeTest]^[ParseMeTest2|_secretinfo|DoB()]
+[ParseMeTest]b-.->[Blah]
+[ParseMeTest]f++-*[Blah]
+""".strip()
+        NEWexpected = """
 [ParseMeTest|a;b;d;e;e2;f|__init__();IsInBattle();DoA()]^[ParseMeTest2|_secretinfo|DoB()]
 [ParseMeTest]b-.->[Blah]
 [ParseMeTest]f++-*[Blah]
 """.strip()
+
+        print "----------------------------------------------- got"
+        print str(self.p).strip()
+        print "----------------------------------------------- expected"
+        print expected
+        
         self.assertEquals(expected, str(self.p).strip())
 
     def check02(self):
         FILE = 'python-in/testmodule66.py'
         self.p.Parse(FILE)
 
-        OLDexpected = """
+        expected = """
 [Flag|flagx;flagy;owner|__init__();readflag();__repr__()]
 [Flags]flags++-*[Flag]
 [Flags|flags;numberOfFlags|__init__();readFlags();AddFlag();__repr__()]
         """.strip()
-        expected = """
+        NEWexpected = """
 [Flags|flags;numberOfFlags|__init__();readFlags();AddFlag();__repr__()]flags++-*[Flag|flagx;flagy;owner|__init__();readflag();__repr__()]
         """.strip()
-        self.assertEquals(expected, str(self.p).strip())
 
+        print "----------------------------------------------- got"
+        print str(self.p).strip()
+        print "----------------------------------------------- expected"
+        print expected
+        
+        self.assertEquals(expected, str(self.p).strip())
+        
 def suite():
     suite1 = unittest.makeSuite(TestCaseYuml01, 'check')
     alltests = unittest.TestSuite((suite1, ))

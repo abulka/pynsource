@@ -728,6 +728,35 @@ class PySourceAsText(HandleModuleLevelDefsAndAttrs):
             self._DumpClassFooter()
         return self.result
 
+class YumlLine:
+    def __init__(self, lhsclass, connector, rhsclass):
+        self.lhsclass = lhsclass
+        self.connector = connector
+        self.rhsclass = rhsclass
+        self.rhsattrs = ""
+        self.rhsdefs = ""
+        
+    def IsRichRhs(self):
+        return self.rhsattrs <> "" or self.rhsdefs <> ""
+    
+    def IsRichLhs(self):
+        # lhs is only rich when it is alone
+        return self.RhsAloneWithNoParent()
+
+    def RhsAloneWithNoParent(self):
+        if self.connector == "":
+            assert self.lhsclass == ""
+        return self.connector == ""
+    
+    def __str__(self):
+        if self.lhsclass == "" and self.connector == "":
+            s = "[%s|%s|%s]" % (self.rhsclass, self.rhsattrs, self.rhsdefs)
+        else:
+            s = "[%s]%s[%s|%s|%s]" % (self.lhsclass, self.connector, self.rhsclass, self.rhsattrs, self.rhsdefs)
+        s = s.replace("||", "")
+        s = s.replace("|]", "]")
+        return  s
+                
 class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
     def __init__(self):
         HandleModuleLevelDefsAndAttrs.__init__(self)
@@ -735,9 +764,64 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
         self.aclass = None
         self.classentry = None
         self.verbose = 0
+        self.yumls = []
+        self.yumls_enhanced = []
 
-    def __str__(self):
-        self.result = ''
+    def GetCompositeClassesForAttr(self, classname, classentry):
+        resultlist = []
+        for dependencytuple in classentry.classdependencytuples:
+            if dependencytuple[0] == classname:
+                resultlist.append(dependencytuple[1])
+        return resultlist
+
+    def _GetCompositeCreatedClassesFor(self, classname):
+        return self.GetCompositeClassesForAttr(classname, self.classentry)
+
+    def FindIndexRichRhsYuml(self, classname):
+        index = 0
+        for yuml in self.yumls:
+            if yuml.rhsclass == classname and yuml.IsRichRhs():
+                return index
+            index += 1            
+        return None
+
+    def AddYuml(self, lhsclass, connector, rhsclass):
+        yuml = YumlLine(lhsclass, connector, rhsclass)
+        self.yumls.append(yuml)
+
+    def InsertYuml(self, lhsclass, connector, rhsclass, rhsattrs, rhsdefs):
+        yuml = YumlLine(lhsclass, connector, rhsclass)
+        yuml.rhsattrs = rhsattrs
+        yuml.rhsdefs = rhsdefs
+        self.yumls.insert(0, yuml)
+        
+    def YumlOptimise(self):
+        sortedyumls = []
+        for yuml in self.yumls:
+            print "OPTIMISE RhsAloneWithNoParent() = %d yuml.IsRichRhs() = %d for %s  YUML %s" % (yuml.RhsAloneWithNoParent(), yuml.IsRichRhs(), yuml.rhsclass, str(yuml))
+            #if not yuml.RhsAloneWithNoParent() and not yuml.IsRichRhs():
+            if not yuml.IsRichRhs() and not yuml.rhsclass in self.yumls_enhanced:
+                index = self.FindIndexRichRhsYuml(yuml.rhsclass) 
+                print "    scanning for RICH version of RHS class %s" % yuml.rhsclass
+                if index == None:
+                    print "    no rich yuml found"
+                else:
+                    print "    found at index %d, need to swap rhs at that index into lhs here.  YUML %s" % (index, str(yuml))
+                    self.yumls_enhanced.append(yuml.rhsclass)
+            if not yuml.IsRichLhs() and not yuml.lhsclass in self.yumls_enhanced:
+                index = self.FindIndexRichRhsYuml(yuml.lhsclass)
+                print "    scanning for RICH lhs version of LHS class %s" % yuml.lhsclass
+                if index == None:
+                    print "    no rich yuml found"
+                else:
+                    print "    found at index %d, need to swap rhs at that index into lhs here.  YUML %s" % (index, str(yuml))
+                    self.yumls_enhanced.append(yuml.lhsclass)
+            else:
+                pass
+        #self.yumls = sortedyumls
+        
+    def CalcYumls(self):
+        self.yumls = []
         classnames = self.classlist.keys()
         for self.aclass in classnames:
             self.classentry = self.classlist[self.aclass]
@@ -772,7 +856,9 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
                         line = "-.->"
                         cardinality = ""
                     connector = "%s%s%s" % (attrobj.attrname, line, cardinality)
-                    self.result += "[%s]%s[%s]\n" % (self.aclass, connector, c)
+                    
+                    self.AddYuml(self.aclass, connector, c)
+                    #self.result += "[%s]%s[%s]\n" % (self.aclass, connector, c)
 
             defs = ""
             for adef in self.classentry.defs:
@@ -780,42 +866,27 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
                     defs += ";"
                 defs += adef + "()"
                 
-            theclass = "%s|%s|%s" % (self.aclass, attrs, defs)
+            #theclass = "%s|%s|%s" % (self.aclass, attrs, defs)
             
             if self.classentry.classesinheritsfrom:
                 parentclass = self.classentry.classesinheritsfrom[0]  #TODO don't throw away all the inherited classes - just grab 0 for now
-                self.result +=  '[%s]^[%s]\n' % (parentclass, theclass)
+                self.InsertYuml(parentclass, "^", self.aclass, attrs, defs)
+                #self.result +=  '[%s]^[%s]\n' % (parentclass, theclass)
             else:
                 parentclass = ""
-                self.result +=  '[%s]\n' % (theclass,)
-
-        # render with http://yuml.me/diagram/scruffy/class/draw
-
-        """
-        [ParseMeTest|a;b;d;e;e2;f|__init__();IsInBattle();DoA()]
-        [ParseMeTest]^[ParseMeTest2|_secretinfo|DoB()]
-        [ParseMeTest]b->[Blah]
-        [ParseMeTest]f++-*[Blah]
+                self.InsertYuml("", "", self.aclass, attrs, defs)
+                #self.result +=  '[%s]\n' % (theclass,)
+        self.YumlOptimise()
         
-        work ok
-        [ParseMeTest]b->hello[Blah|aa;bb;cc]
-        [ParseMeTest]f++-*there[Blah]
-        
-        sends it mad? - but its straught from example
-        [Customer{bg:orange}]<>1->*[Order{bg:green}]
-
-        complication !!!
-        
-        #this works
-        [Flags|flags;numberOfFlags|__init__();readFlags();AddFlag();__repr__()]flags++-*[Flag|flagx;flagy;owner|__init__();readflag();__repr__()]
-        
-        #this doesn't work
-        [Flag|flagx;flagy;owner|__init__();readflag();__repr__()]
-        [Flags]flags++-*[Flag]
-        [Flags|flags;numberOfFlags|__init__();readFlags();AddFlag();__repr__()]
-
-        """
-
+    def YumlDump(self):
+        for yuml in self.yumls:
+            self.result += str(yuml) + "\n"
+            
+    def __str__(self):
+        if not self.yumls:
+            self.CalcYumls()
+        self.result = ''
+        self.YumlDump()
         return self.result
     
 import urllib
