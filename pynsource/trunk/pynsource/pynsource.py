@@ -1340,7 +1340,7 @@ def ParseArgsAndRun():
         params = sys.argv[1]
         globbed = glob.glob(params)
     else:
-        listofoptionvaluepairs, params = getopt.getopt(sys.argv[1:], "mvy:j:d:")
+        listofoptionvaluepairs, params = getopt.getopt(sys.argv[1:], "amvy:j:d:")
         #print listofoptionvaluepairs, params
         #print dict(listofoptionvaluepairs) # turn e.g. [('-v', ''), ('-y', 'fred.png')] into nicer? dict e.g. {'-v': '', '-y': 'fred.png'}
         
@@ -1350,6 +1350,8 @@ def ParseArgsAndRun():
                 raise RuntimeError, ('Output directory %s for %s file output does not exist.'%(outdir,outlanguagemsg))
 
         for optionvaluepair in listofoptionvaluepairs:
+            if '-a' == optionvaluepair[0]:
+                pass  # default is asciart, so don't need to specify
             if '-m' == optionvaluepair[0]:
                 optionModuleAsClass = 1
             if '-v' == optionvaluepair[0]:
@@ -1404,6 +1406,7 @@ def ParseArgsAndRun():
     else:
         print """Usage: pynsource -v -m [-j|d outdir] | [-y outpng] sourcedirorpythonfiles...
 
+-a generate ascii art uml (default option, no need to specify)
 -j generate java files, specify output folder for java files
 -d generate delphi files, specify output folder for delphi files
 -y generate yUml text, specify output png or None if you don't want one
@@ -1411,17 +1414,20 @@ def ParseArgsAndRun():
 -m create psuedo class for each module,
    module attrs/defs etc treated as class attrs/defs
 
-BASIC EXAMPLES
-e.g. pynsource Test/testmodule01.py
-e.g. pynsource -m Test/testmodule03.py
+UML ASCI-ART EXAMPLES
+python pynsource.py Test/testmodule01.py
+python pynsource.py -m Test/testmodule03.py
 JAVA EXAMPLES
-e.g. pynsource -j c:/try c:/try
-e.g. pynsource -v -m -j c:/try c:/try
-e.g. pynsource -v -m -j c:/try c:/try/s*.py
-e.g. pynsource -j c:/try c:/try/s*.py Tests/u*.py
-e.g. pynsource -v -m -j c:/try c:/try/s*.py Tests/u*.py c:\cc\Devel\Client\w*.py
+python pynsource.py -j c:/try c:/try
+python pynsource.py -v -m -j c:/try c:/try
+python pynsource.py -v -m -j c:/try c:/try/s*.py
+python pynsource.py -j c:/try c:/try/s*.py Tests/u*.py
+python pynsource.py -v -m -j c:/try c:/try/s*.py Tests/u*.py c:\cc\Devel\Client\w*.py
 DELPHI EXAMPLE
-e.g. pynsource -d c:/delphiouputdir c:/pythoninputdir/*.py
+python pynsource.py -d c:/delphiouputdir c:/pythoninputdir/*.py
+yUML EXAMPLES
+python pynsource.py -y yumlout.png tests\python-in\testmodule01.py
+python pynsource.py -y None tests\python-in\testmodule01.py
 """
 
 if __name__ == '__main__':
