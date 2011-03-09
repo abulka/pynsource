@@ -731,71 +731,10 @@ class PySourceAsText(HandleModuleLevelDefsAndAttrs):
 class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
     def __init__(self):
         HandleModuleLevelDefsAndAttrs.__init__(self)
-        self.listcompositesatend = 0
-        self.embedcompositeswithattributelist = 1
         self.result = ''
         self.aclass = None
         self.classentry = None
-        self.staticmessage = ""
-        self.manymessage = ""
         self.verbose = 0
-
-    def GetCompositeClassesForAttr(self, classname, classentry):
-        resultlist = []
-        for dependencytuple in classentry.classdependencytuples:
-            if dependencytuple[0] == classname:
-                resultlist.append(dependencytuple[1])
-        return resultlist
-
-    def _GetCompositeCreatedClassesFor(self, classname):
-        return self.GetCompositeClassesForAttr(classname, self.classentry)
-
-    def _DumpAttribute(self, attrobj):
-        compositescreated = self._GetCompositeCreatedClassesFor(attrobj.attrname)
-        if compositescreated and self.embedcompositeswithattributelist:
-            self.result +=  "%s %s <@>----> %s" % (attrobj.attrname, self.staticmessage, str(compositescreated))
-        else:
-            self.result +=  "%s %s" % (attrobj.attrname, self.staticmessage)
-        self.result += self.manymessage
-        self.result += '\n'
-
-    def _DumpCompositeExtraFooter(self):
-        if self.classentry.classdependencytuples and self.listcompositesatend:
-            for dependencytuple in self.classentry.classdependencytuples:
-                self.result +=  "%s <*>---> %s\n" % dependencytuple
-            self.result +=  '-'*20   +'\n'
-
-    def _DumpClassNameAndGeneralisations(self):
-            self.result +=  '[%s]^[%s]\n' % (self.classentry.classesinheritsfrom[0], self.aclass)  #TODO don't throw away all the inherited classes - just grab 0 for now
-
-    def _DumpAttributes(self):
-        for attrobj in self.classentry.attrs:
-            self.staticmessage = ""
-            self.manymessage = ""
-            if 'static' in attrobj.attrtype:
-                self.staticmessage = " static"
-            if 'many' in attrobj.attrtype:
-                self.manymessage = " 1..*"
-            self._DumpAttribute(attrobj)
-
-    def _DumpMethods(self):
-        for adef in self.classentry.defs:
-            self.result +=  adef +'\n'
-
-    def _Line(self):
-        self.result +=  '-'*20   +'\n'
-
-    def _DumpClassHeader(self):
-        self.result += '\n'
-
-    def _DumpClassFooter(self):
-        self.result += '\n'
-        self.result += '\n'
-
-    def _DumpModuleMethods(self):
-        if self.modulemethods:
-            self.result += '  ModuleMethods = %s\n' % `self.modulemethods`
-##        self.result += '\n'
 
     def __str__(self):
         self.result = ''
@@ -1368,9 +1307,6 @@ def ParseArgsAndRun():
             if optionvaluepair[0] in ('-y'):
                 optionExportToYuml = True
                 optionExportTo_outpng = optionvaluepair[1]
-                if not '.png' in optionExportTo_outpng.lower():
-                    print "output filename %s must have .png in the name" % optionExportTo_outpng
-                    exit(0)
         for param in params:
             files = glob.glob(param)
             globbed += files
@@ -1390,7 +1326,10 @@ def ParseArgsAndRun():
                 p.Parse(f)
             print p
             
-            if optionExportTo_outpng <> "None" :
+            if optionExportTo_outpng <> "nopng" :
+                if not '.png' in optionExportTo_outpng.lower():
+                    print "output filename %s must have .png in the name" % optionExportTo_outpng
+                    exit(0)
                 print 'Generating yuml diagram...'
                 yumlcreate(','.join(str(p).split()), optionExportTo_outpng)
                 os.system(optionExportTo_outpng)
@@ -1404,30 +1343,37 @@ def ParseArgsAndRun():
                 p.Parse(f)
             print p
     else:
-        print """Usage: pynsource -v -m [-j|d outdir] | [-y outpng] sourcedirorpythonfiles...
+        print """Usage: pynsource -v -m [-j|d outdir] | [-y outfile.png | nopng] sourcedir_or_pythonfiles...
 
 -a generate ascii art uml (default option, no need to specify)
 -j generate java files, specify output folder for java files
 -d generate delphi files, specify output folder for delphi files
--y generate yUml text, specify output png or None if you don't want one
+-y generate yUml text, specify output png or 'nopng' if you don't want one
 -v verbose
 -m create psuedo class for each module,
    module attrs/defs etc treated as class attrs/defs
 
 UML ASCI-ART EXAMPLES
-python pynsource.py Test/testmodule01.py
-python pynsource.py -m Test/testmodule03.py
+---------------------
+python pynsource.py Test\\testmodule01.py
+python pynsource.py -m Test\\testmodule03.py
+
 JAVA EXAMPLES
-python pynsource.py -j c:/try c:/try
-python pynsource.py -v -m -j c:/try c:/try
-python pynsource.py -v -m -j c:/try c:/try/s*.py
-python pynsource.py -j c:/try c:/try/s*.py Tests/u*.py
-python pynsource.py -v -m -j c:/try c:/try/s*.py Tests/u*.py c:\cc\Devel\Client\w*.py
+-------------
+python pynsource.py -j c:\\try c:\\try
+python pynsource.py -v -m -j c:\\try c:\\try
+python pynsource.py -v -m -j c:\\try c:\\try\\s*.py
+python pynsource.py -j c:\\try c:\\try\\s*.py Tests\\u*.py
+python pynsource.py -v -m -j c:\\try c:\\try\\s*.py Tests\\u*.py c:\cc\Devel\Client\w*.py
+
 DELPHI EXAMPLE
-python pynsource.py -d c:/delphiouputdir c:/pythoninputdir/*.py
+--------------
+python pynsource.py -d c:\\delphiouputdir c:\\pythoninputdir\\*.py
+
 yUML EXAMPLES
-python pynsource.py -y yumlout.png tests\python-in\testmodule01.py
-python pynsource.py -y None tests\python-in\testmodule01.py
+-------------
+python pynsource.py -y yumlout.png tests\\python-in\\testmodule01.py
+python pynsource.py -y None tests\\python-in\\testmodule01.py
 """
 
 if __name__ == '__main__':
