@@ -879,6 +879,36 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
 
         return self.result
     
+import urllib
+import urllib2
+import png    # codeproject version, not the "easy_install pypng" version.
+
+def write_yuml_to_png(yuml, in_stream, out_stream):
+    signature = png.read_signature(in_stream)
+    out_stream.write(signature)
+    
+    for chunk in png.all_chunks(in_stream):
+        if chunk.chunk_type == 'IEND':
+            break
+        chunk.write(out_stream)
+
+    itxt_chunk = png.iTXtChunk.create('yuml', yuml)
+    itxt_chunk.write(out_stream)
+
+    # write the IEND chunk
+    chunk.write(out_stream)
+
+def yumlcreate(yuml, output_filename):
+    #baseUrl = 'http://yuml.me/diagram/scruffy/class/'
+    baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
+    url = baseUrl + urllib.quote(yuml)
+    
+    original_png = urllib2.urlopen(url)
+    output_file = file(output_filename, 'wb')
+
+    write_yuml_to_png(yuml, original_png, output_file)
+
+    output_file.close()
     
 class PySourceAsJava(PySourceAsText):
     def __init__(self, outdir=None):
@@ -1292,11 +1322,10 @@ def test():
     print p
     #print 'Done.'
 
-if __name__ == '__main__':
-    #test()
-    #exit(0)
-
-    import sys, glob, getopt
+def ParseArgsAndRun():
+    import sys, glob
+    import getopt   # good doco http://www.doughellmann.com/PyMOTW/getopt/
+                    # should possibly upgrade to using http://docs.python.org/library/argparse.html#module-argparse
     SIMPLE = 0
     globbed = []
 
@@ -1311,9 +1340,10 @@ if __name__ == '__main__':
         params = sys.argv[1]
         globbed = glob.glob(params)
     else:
-        listofoptionvaluepairs, params = getopt.getopt(sys.argv[1:], "mvyj:d:")
+        listofoptionvaluepairs, params = getopt.getopt(sys.argv[1:], "mvy:j:d:")
         #print listofoptionvaluepairs, params
-
+        #print dict(listofoptionvaluepairs) # turn e.g. [('-v', ''), ('-y', 'fred.png')] into nicer? dict e.g. {'-v': '', '-y': 'fred.png'}
+        
         def EnsurePathExists(outdir, outlanguagemsg):
             assert outdir, 'Need to specify output folder for %s output - got %s.'%(outlanguagemsg, outdir)
             if not os.path.exists(outdir):
@@ -1335,7 +1365,10 @@ if __name__ == '__main__':
                 EnsurePathExists(optionExportTo_outdir, language)
             if optionvaluepair[0] in ('-y'):
                 optionExportToYuml = True
-
+                optionExportTo_outpng = optionvaluepair[1]
+                if not '.png' in optionExportTo_outpng.lower():
+                    print "output filename %s must have .png in the name" % optionExportTo_outpng
+                    exit(0)
         for param in params:
             files = glob.glob(param)
             globbed += files
@@ -1354,6 +1387,13 @@ if __name__ == '__main__':
             for f in globbed:
                 p.Parse(f)
             print p
+            
+            if optionExportTo_outpng <> "None" :
+                print 'Generating yuml diagram...'
+                yumlcreate(','.join(str(p).split()), optionExportTo_outpng)
+                os.system(optionExportTo_outpng)
+                print 'Done!'
+            
         else:
             p = PySourceAsText()
             p.optionModuleAsClass = optionModuleAsClass
@@ -1362,11 +1402,11 @@ if __name__ == '__main__':
                 p.Parse(f)
             print p
     else:
-        print """Usage: pynsource -v -m -j -d -y outdir sourcedirorpythonfiles...
+        print """Usage: pynsource -v -m [-j|d outdir] | [-y outpng] sourcedirorpythonfiles...
 
 -j generate java files, specify output folder for java files
 -d generate delphi files, specify output folder for delphi files
--y generate yUml text
+-y generate yUml text, specify output png or None if you don't want one
 -v verbose
 -m create psuedo class for each module,
    module attrs/defs etc treated as class attrs/defs
@@ -1384,3 +1424,8 @@ DELPHI EXAMPLE
 e.g. pynsource -d c:/delphiouputdir c:/pythoninputdir/*.py
 """
 
+if __name__ == '__main__':
+    #test()
+    #exit(0)
+    ParseArgsAndRun()
+    

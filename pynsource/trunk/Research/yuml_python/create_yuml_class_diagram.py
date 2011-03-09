@@ -21,7 +21,8 @@ def add_yuml_to_png(yuml, in_stream, out_stream):
     
 
 def create(yuml, output_filename):
-    baseUrl = 'http://yuml.me/diagram/scruffy/class/'
+    #baseUrl = 'http://yuml.me/diagram/scruffy/class/'
+    baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
     url = baseUrl + urllib.quote(yuml)
     
     original_png = urllib2.urlopen(url)

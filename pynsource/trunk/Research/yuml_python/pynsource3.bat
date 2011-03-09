@@ -1,0 +1,5 @@
+REM do it in three stages - doesn't seem to append actually.
+del yuml_pynsource3_example.png
+python create_yuml_class_diagram.py "[HandleDefs]^[HandleClassAttributes|attrslist;waitingfordot;waitingforsubsequentdot;waitingforvarname;waitingforequalsymbol;currvarname;lastcurrvarname;waitforappendopenbracket;nextvarnameisstatic;nextvarnameismany|__init__();On_newline();_Clearwaiting();JustGotASelfAttr();On_meat();_AddAttribute()]" yuml_pynsource3_example.png
+python create_yuml_class_diagram.py "[AndyBasicParseEngine]^[HandleClasses|currclasslist;_currclass;nexttokenisclass;classlist;modulemethods;optionModuleAsClass;inbetweenClassAndFirstDef|__init__();On_deindent();_DeriveNestedClassName();PushCurrClass();PopCurrClass();GetCurrClassIndentLevel();GetCurrClass();_JustThenGotclass();On_newline();On_meat()]" yuml_pynsource3_example.png
+python create_yuml_class_diagram.py "[object]^[AndyBasicParseEngine|meat;tokens;isfreshline;indentlevel|__init__();_ReadAllTokensFromFile();Parse();_ParseLoop();On_deindent();On_newline();On_meat();_Gotmeat();_Isblank();_Isnewline();_Ispadding()]" yuml_pynsource3_example.png
