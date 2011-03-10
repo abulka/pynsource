@@ -6,6 +6,7 @@ cd tests
 python alltests.py
 cd ..
 REM pause
+goto end
 
 :java
 cd tests\testing-generate-java
@@ -17,7 +18,7 @@ cd tests\testing-generate-delphi
 python ..\..\pynsource\pynsource.py -d delphi-out python-in\*.py
 cd ..\..
 
-:end
 echo OK, Done
+:end
 pause
 

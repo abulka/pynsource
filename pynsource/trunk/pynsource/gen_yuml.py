@@ -5,8 +5,8 @@ from core_parser import HandleModuleLevelDefsAndAttrs
 class Klass:
     def __init__(self, name, parent=None, connectsto=None, connectorstyle=None, attrs="", defs=""):
         self.name = name
-        self.parent = parent
-        self.connectsto = connectsto
+        self.parent = parent           # Klass
+        self.connectsto = connectsto   # Klass
         self.connectorstyle = connectorstyle
         self.attrs = attrs
         self.defs = defs
@@ -74,7 +74,7 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
         self.classentry = None
         self.verbose = 0
         self.yumls = []
-        self.yumls_optimised = []
+        self.enriched_yuml_classes = []
 
     def GetCompositeClassesForAttr(self, classname, classentry):
         resultlist = []
@@ -86,42 +86,52 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
     def _GetCompositeCreatedClassesFor(self, classname):
         return self.GetCompositeClassesForAttr(classname, self.classentry)
 
-    def FindIndexRichRhsYuml(self, classname):
-        index = 0
-        for yuml in self.yumls:
-            if yuml.rhs.name == classname and yuml.rhs.IsRich():
-                return index
-            index += 1            
-        return None
-
     def AddYuml(self, lhsclass, connector, rhsclass, rhsattrs="", rhsdefs=""):
         yuml = Yuml(lhsclass, connector, rhsclass, rhsattrs, rhsdefs)
         self.yumls.append(yuml)
 
-    def YumlOptimise(self, debug=False):
+    def FindRichYumlClass(self, classname):
+        index = 0
         for yuml in self.yumls:
-            if not yuml.rhs.IsRich() and not yuml.rhs.name in self.yumls_optimised:
-                index = self.FindIndexRichRhsYuml(yuml.rhs.name) 
-                if index <> None:
-                    self.yumls[index].rhs.MoveAttrsDefsInto(yuml.rhs)
-                    self.yumls_optimised.append(yuml.rhs.name)
-            if not yuml.lhs.IsRich() and not yuml.lhs.name in self.yumls_optimised:
-                index = self.FindIndexRichRhsYuml(yuml.lhs.name)
-                if index <> None:
-                    self.yumls[index].rhs.MoveAttrsDefsInto(yuml.lhs)
-                    self.yumls_optimised.append(yuml.lhs.name)
-            
-        # Now delete lone lines with one lone class that is not rich,
-        # and which is not mentioned anywhere else (if its been optimised then a rich version exists somewhere else, so checking yuml.rhsclass in self.yumls_optimised is the logic)
+            if yuml.rhs.name == classname and yuml.rhs.IsRich():
+                return index
+            # No need to check the lhs since the order the yumls are
+            # generated guarantee rich klasses will occur on the right.
+            # Simplifies the Enrich method too as it always moves attrs & defs out of rhs
+            index += 1            
+        return None
+
+    def HasBeenEnriched(self, klass):
+        return klass.name in self.enriched_yuml_classes
+
+    def MarkAsEnriched(self, klass):
+        self.enriched_yuml_classes.append(klass.name)
+
+    def Enrich(self, YY):    
+        if not YY.IsRich() and not self.HasBeenEnriched(YY):
+            index = self.FindRichYumlClass(YY.name) 
+            if index <> None:
+                self.yumls[index].rhs.MoveAttrsDefsInto(YY)
+                self.MarkAsEnriched(YY)
+                
+    def CompactYumls(self):
+        # Now delete lone lines whose rich info has been extracted.
         newyumls = []
         for yuml in self.yumls:
-            if not (yuml.OneClassAlone() and not yuml.klass.IsRich() and yuml.klass.name in self.yumls_optimised):
+            if not (yuml.OneClassAlone() and not yuml.klass.IsRich() and self.HasBeenEnriched(yuml.klass)):
                 newyumls.append(yuml)
         self.yumls = newyumls
         
+    def OptimiseAndEnrichYumls(self):
+        for yuml in self.yumls:
+            self.Enrich(yuml.rhs)
+            self.Enrich(yuml.lhs)
+        self.CompactYumls()
+        
     def CalcYumls(self, optimise=True):
         self.yumls = []
-        self.yumls_optimised = []
+        self.enriched_yuml_classes = []
+        
         classnames = self.classlist.keys()
         for self.aclass in classnames:
             self.classentry = self.classlist[self.aclass]
@@ -171,7 +181,7 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
                 parentclass = ""
                 self.AddYuml("", "", self.aclass, attrs, defs)
         if optimise:
-            self.YumlOptimise(debug=False)
+            self.OptimiseAndEnrichYumls()
         
     def YumlDump(self):
         for yuml in self.yumls:
