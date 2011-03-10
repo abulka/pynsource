@@ -16,5 +16,8 @@ cd ..\..
 cd tests\testing-generate-delphi
 python ..\..\pynsource\pynsource.py -d delphi-out python-in\*.py
 cd ..\..
+
+:end
+echo OK, Done
 pause
 
