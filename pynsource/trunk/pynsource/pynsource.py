@@ -3,7 +3,7 @@
 import os
 from core_parser import *
 from gen_asciiart import PySourceAsText
-from gen_yuml import PySourceAsYuml
+from gen_yuml import PySourceAsYuml, yuml_create_png
 from gen_delphi import PythonToDelphi
 from gen_java import PythonToJava
 import messages
@@ -92,7 +92,7 @@ def ParseArgsAndRun():
                     print "output filename %s must have .png in the name" % optionExportTo_outpng
                     exit(0)
                 print 'Generating yuml diagram...'
-                yumlcreate(','.join(str(p).split()), optionExportTo_outpng)
+                yuml_create_png(','.join(str(p).split()), optionExportTo_outpng)
                 os.system(optionExportTo_outpng)
                 print 'Done!'
             

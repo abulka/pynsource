@@ -16,7 +16,11 @@ class Klass:
         klass.defs = self.defs
         self.attrs = self.defs = ""
 
-class YumlLine:
+    def IsRich(self):
+        return (self.attrs <> "" or self.defs <> "")
+    
+class Yuml:
+    # A line of yUML which is one class or two classes in a relationship
     def __init__(self, lhsclass, connector, rhsclass, rhsattrs, rhsdefs):
         if connector == "^":
             self.klass = Klass(rhsclass, parent=Klass(lhsclass), connectorstyle=connector, attrs=rhsattrs, defs=rhsdefs)
@@ -26,7 +30,7 @@ class YumlLine:
         else:
             self.klass = Klass(lhsclass, connectsto=Klass(rhsclass, attrs=rhsattrs, defs=rhsdefs), connectorstyle=connector)
             
-    def GetRhs(self):
+    def _getrhs(self):
         # if alone then rhs is N/A - interpret as self
         # if have parent then rhs is self
         # if have connector then rhs is connectsto
@@ -35,7 +39,7 @@ class YumlLine:
         else:
             return self.klass
 
-    def GetLhs(self):
+    def _getlhs(self):
         # if alone then lhs is N/A - interpret as self
         # if have parent then lhs is parent
         # if have connector then lhs is self
@@ -44,27 +48,18 @@ class YumlLine:
         else:
             return self.klass
 
-    def IsRichRhs(self):
-        c = self.GetRhs()
-        return (c.attrs <> "" or c.defs <> "")
-    
-    def IsRichLhs(self):
-        c = self.GetLhs()
-        return (c.attrs <> "" or c.defs <> "")
-        
-    def RhsAloneWithNoParent(self):
-        if self.klass.parent == None and self.klass.connectsto == None:
-            assert self.klass == self.GetRhs()
-            return True
-        else:
-            return False
+    rhs = property(_getrhs)
+    lhs = property(_getlhs)
+
+    def OneClassAlone(self):
+        return self.klass.parent == None and self.klass.connectsto == None
     
     def __str__(self):
-        if self.RhsAloneWithNoParent():
+        if self.OneClassAlone():
             s = "[%s|%s|%s]" % (self.klass.name, self.klass.attrs, self.klass.defs)
         else:
-            l = self.GetLhs()
-            r = self.GetRhs()
+            l = self.lhs
+            r = self.rhs
             s = "[%s|%s|%s]%s[%s|%s|%s]" % (l.name, l.attrs, l.defs, self.klass.connectorstyle, r.name, r.attrs, r.defs)
         s = s.replace("||", "")
         s = s.replace("|]", "]")
@@ -94,33 +89,33 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
     def FindIndexRichRhsYuml(self, classname):
         index = 0
         for yuml in self.yumls:
-            if yuml.GetRhs().name == classname and yuml.IsRichRhs():
+            if yuml.rhs.name == classname and yuml.rhs.IsRich():
                 return index
             index += 1            
         return None
 
     def AddYuml(self, lhsclass, connector, rhsclass, rhsattrs="", rhsdefs=""):
-        yuml = YumlLine(lhsclass, connector, rhsclass, rhsattrs, rhsdefs)
+        yuml = Yuml(lhsclass, connector, rhsclass, rhsattrs, rhsdefs)
         self.yumls.append(yuml)
 
     def YumlOptimise(self, debug=False):
         for yuml in self.yumls:
-            if not yuml.IsRichRhs() and not yuml.GetRhs().name in self.yumls_optimised:
-                index = self.FindIndexRichRhsYuml(yuml.GetRhs().name) 
+            if not yuml.rhs.IsRich() and not yuml.rhs.name in self.yumls_optimised:
+                index = self.FindIndexRichRhsYuml(yuml.rhs.name) 
                 if index <> None:
-                    self.yumls[index].GetRhs().MoveAttrsDefsInto(yuml.GetRhs())
-                    self.yumls_optimised.append(yuml.GetRhs().name)
-            if not yuml.IsRichLhs() and not yuml.GetLhs().name in self.yumls_optimised:
-                index = self.FindIndexRichRhsYuml(yuml.GetLhs().name)
+                    self.yumls[index].rhs.MoveAttrsDefsInto(yuml.rhs)
+                    self.yumls_optimised.append(yuml.rhs.name)
+            if not yuml.lhs.IsRich() and not yuml.lhs.name in self.yumls_optimised:
+                index = self.FindIndexRichRhsYuml(yuml.lhs.name)
                 if index <> None:
-                    self.yumls[index].GetRhs().MoveAttrsDefsInto(yuml.GetLhs())
-                    self.yumls_optimised.append(yuml.GetLhs().name)
+                    self.yumls[index].rhs.MoveAttrsDefsInto(yuml.lhs)
+                    self.yumls_optimised.append(yuml.lhs.name)
             
         # Now delete lone lines with one lone class that is not rich,
         # and which is not mentioned anywhere else (if its been optimised then a rich version exists somewhere else, so checking yuml.rhsclass in self.yumls_optimised is the logic)
         newyumls = []
         for yuml in self.yumls:
-            if not (yuml.RhsAloneWithNoParent() and not yuml.IsRichRhs() and yuml.GetRhs().name in self.yumls_optimised):
+            if not (yuml.OneClassAlone() and not yuml.klass.IsRich() and yuml.klass.name in self.yumls_optimised):
                 newyumls.append(yuml)
         self.yumls = newyumls
         
@@ -194,7 +189,7 @@ import urllib
 import urllib2
 import png    # codeproject version, not the "easy_install pypng" version.
 
-def write_yuml_to_png(yuml, in_stream, out_stream):
+def _yuml_write_to_png(yuml, in_stream, out_stream):
     signature = png.read_signature(in_stream)
     out_stream.write(signature)
     
@@ -209,21 +204,21 @@ def write_yuml_to_png(yuml, in_stream, out_stream):
     # write the IEND chunk
     chunk.write(out_stream)
 
-def yumlcreate(yuml, output_filename):
+def yuml_create_png(yuml_txt, output_filename):
     #baseUrl = 'http://yuml.me/diagram/scruffy/class/'
     baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
-    url = baseUrl + urllib.quote(yuml)
+    url = baseUrl + urllib.quote(yuml_txt)
     
     original_png = urllib2.urlopen(url)
     output_file = file(output_filename, 'wb')
 
-    write_yuml_to_png(yuml, original_png, output_file)
+    _yuml_write_to_png(yuml_txt, original_png, output_file)
 
     output_file.close()
 
 if __name__ == '__main__':
-    y = YumlLine('a','->','b', "fielda", "doa;dob")
+    y = Yuml('a','->','b', "fielda", "doa;dob")
     print y
-    print YumlLine('a','^','b', "fielda", "doa;dob")
+    print Yuml('a','^','b', "fielda", "doa;dob")
     
     
