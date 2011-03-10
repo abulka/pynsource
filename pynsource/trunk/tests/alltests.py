@@ -45,7 +45,8 @@ def suite():
             'unittests_parse_04',
             'unittests_parse_05',
             'unittests_parse_06',
-            'unittests_parse_07'
+            'unittests_parse_07',
+            'unittests_parse_yuml_01'
             )   # ANDY - and so on
     alltests = unittest.TestSuite()
     for module in map(__import__, modules_to_test):

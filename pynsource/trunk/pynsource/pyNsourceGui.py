@@ -332,7 +332,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         
 
 import sys, glob
-from pynsource import PythonToJava, PySourceAsJava
+from gen_java import PythonToJava, PySourceAsJava
 
 class UmlDiagramWindow(ogl.ShapeCanvas):
     scrollStepX = 10
