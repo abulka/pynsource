@@ -11,6 +11,11 @@ class Klass:
         self.attrs = attrs
         self.defs = defs
 
+    def MoveAttrsDefsInto(self, klass):
+        klass.attrs = self.attrs
+        klass.defs = self.defs
+        self.attrs = self.defs = ""
+
 class YumlLine:
     def __init__(self, lhsclass, connector, rhsclass, rhsattrs, rhsdefs):
         if connector == "^":
@@ -98,29 +103,17 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
         yuml = YumlLine(lhsclass, connector, rhsclass, rhsattrs, rhsdefs)
         self.yumls.append(yuml)
 
-    def GetAndZapYumlRhsAttrsDefs(self, from_yuml):
-        a = from_yuml.GetRhs().attrs
-        d = from_yuml.GetRhs().defs
-        from_yuml.GetRhs().attrs = from_yuml.GetRhs().defs = ""
-        return a, d
-    
-    def YumlSuckAttrsAndDefsIntoRhs(self, from_yuml, to_yuml):
-        to_yuml.GetRhs().attrs, to_yuml.GetRhs().defs = self.GetAndZapYumlRhsAttrsDefs(from_yuml)
-
-    def YumlSuckAttrsAndDefsIntoLhs(self, from_yuml=None, to_yuml=None):
-        to_yuml.GetLhs().attrs, to_yuml.GetLhs().defs = self.GetAndZapYumlRhsAttrsDefs(from_yuml)
-
     def YumlOptimise(self, debug=False):
         for yuml in self.yumls:
             if not yuml.IsRichRhs() and not yuml.GetRhs().name in self.yumls_optimised:
                 index = self.FindIndexRichRhsYuml(yuml.GetRhs().name) 
                 if index <> None:
-                    self.YumlSuckAttrsAndDefsIntoRhs(from_yuml=self.yumls[index], to_yuml=yuml)
+                    self.yumls[index].GetRhs().MoveAttrsDefsInto(yuml.GetRhs())
                     self.yumls_optimised.append(yuml.GetRhs().name)
             if not yuml.IsRichLhs() and not yuml.GetLhs().name in self.yumls_optimised:
                 index = self.FindIndexRichRhsYuml(yuml.GetLhs().name)
                 if index <> None:
-                    self.YumlSuckAttrsAndDefsIntoLhs(from_yuml=self.yumls[index], to_yuml=yuml)
+                    self.yumls[index].GetRhs().MoveAttrsDefsInto(yuml.GetLhs())
                     self.yumls_optimised.append(yuml.GetLhs().name)
             
         # Now delete lone lines with one lone class that is not rich,
