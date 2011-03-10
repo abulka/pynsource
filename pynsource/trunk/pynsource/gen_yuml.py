@@ -65,48 +65,6 @@ class YumlLine:
         s = s.replace("|]", "]")
         return  s
 
-class YumlLine_:
-    def __init__(self, lhsclass, connector, rhsclass, rhsattrs, rhsdefs):
-        self.lhsclass = lhsclass
-        self.lhsattrs = ""
-        self.lhsdefs = ""
-        self.connector = connector
-        self.rhsclass = rhsclass
-        self.rhsattrs = rhsattrs
-        self.rhsdefs = rhsdefs
-        
-    def IsRichRhs(self):
-        return self.rhsattrs <> "" or self.rhsdefs <> ""
-    
-    def IsRichLhs(self):
-        # lhs is only rich when it is alone
-        return self.RhsAloneWithNoParent()
-
-    def RhsAloneWithNoParent(self):
-        if self.connector == "":
-            assert self.lhsclass == ""
-        return self.connector == ""
-    
-    def __str__(self):
-        if self.lhsclass == "" and self.connector == "":
-            s = "[%s|%s|%s]" % (self.rhsclass, self.rhsattrs, self.rhsdefs)
-        else:
-            s = "[%s|%s|%s]%s[%s|%s|%s]" % (self.lhsclass, self.lhsattrs, self.lhsdefs, self.connector, self.rhsclass, self.rhsattrs, self.rhsdefs)
-        s = s.replace("||", "")
-        s = s.replace("|]", "]")
-        return  s
-    
-    def GetRhs(self):
-        class Junk:
-            def __init__(self, name):
-                self.name = name
-        return Junk(self.rhsclass)
-        
-    def GetLhs(self):
-        class Junk:
-            def __init__(self, name):
-                self.name = name
-        return Junk(self.lhsclass)
                  
 class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
     def __init__(self):
@@ -140,76 +98,36 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
         yuml = YumlLine(lhsclass, connector, rhsclass, rhsattrs, rhsdefs)
         self.yumls.append(yuml)
 
-    #def YumlSuckAttrsAndDefsIntoRhs(self, from_yuml=None, to_yuml=None):
-    #    to_yuml.rhsattrs = from_yuml.rhsattrs
-    #    to_yuml.rhsdefs = from_yuml.rhsdefs
-    #    from_yuml.rhsattrs = from_yuml.rhsdefs = ""
-    #
-    #def YumlSuckAttrsAndDefsIntoLhs(self, from_yuml=None, to_yuml=None):
-    #    to_yuml.lhsattrs = from_yuml.rhsattrs
-    #    to_yuml.lhsdefs = from_yuml.rhsdefs
-    #    from_yuml.rhsattrs = from_yuml.rhsdefs = ""
-        
-    def YumlSuckAttrsAndDefsIntoRhs(self, from_yuml=None, to_yuml=None):
+    def GetAndZapYumlRhsAttrsDefs(self, from_yuml):
         a = from_yuml.GetRhs().attrs
         d = from_yuml.GetRhs().defs
         from_yuml.GetRhs().attrs = from_yuml.GetRhs().defs = ""
-
-        to_yuml.GetRhs().attrs = a
-        to_yuml.GetRhs().defs = d
+        return a, d
+    
+    def YumlSuckAttrsAndDefsIntoRhs(self, from_yuml, to_yuml):
+        to_yuml.GetRhs().attrs, to_yuml.GetRhs().defs = self.GetAndZapYumlRhsAttrsDefs(from_yuml)
 
     def YumlSuckAttrsAndDefsIntoLhs(self, from_yuml=None, to_yuml=None):
-        a = from_yuml.GetRhs().attrs
-        d = from_yuml.GetRhs().defs
-        from_yuml.GetRhs().attrs = from_yuml.GetRhs().defs = ""
-
-        to_yuml.GetLhs().attrs = a
-        to_yuml.GetLhs().defs = d
+        to_yuml.GetLhs().attrs, to_yuml.GetLhs().defs = self.GetAndZapYumlRhsAttrsDefs(from_yuml)
 
     def YumlOptimise(self, debug=False):
-        if debug:
-            print
         for yuml in self.yumls:
-            if debug:
-                print "OPTIMISE RhsAloneWithNoParent() = %d yuml.IsRichRhs() = %d for %s  YUML %s" % (yuml.RhsAloneWithNoParent(), yuml.IsRichRhs(), yuml.rhsclass, str(yuml))
             if not yuml.IsRichRhs() and not yuml.GetRhs().name in self.yumls_optimised:
                 index = self.FindIndexRichRhsYuml(yuml.GetRhs().name) 
-                if debug:
-                    print "    scanning for RICH version of RHS class %s" % yuml.GetRhs().name
-                if index == None:
-                    if debug:
-                        print "    no rich yuml found"
-                else:
-                    if debug:
-                        print "    found at index %d, need to swap rhs at that index into lhs here.  YUML %s" % (index, str(yuml))
+                if index <> None:
                     self.YumlSuckAttrsAndDefsIntoRhs(from_yuml=self.yumls[index], to_yuml=yuml)
                     self.yumls_optimised.append(yuml.GetRhs().name)
             if not yuml.IsRichLhs() and not yuml.GetLhs().name in self.yumls_optimised:
                 index = self.FindIndexRichRhsYuml(yuml.GetLhs().name)
-                if debug:
-                    print "    scanning for RICH lhs version of LHS class %s" % yuml.GetLhs().name
-                if index == None:
-                    if debug:
-                        print "    no rich yuml found"
-                else:
-                    if debug:
-                        print "    found at index %d, need to swap rhs at that index into lhs here.  YUML %s" % (index, str(yuml))
+                if index <> None:
                     self.YumlSuckAttrsAndDefsIntoLhs(from_yuml=self.yumls[index], to_yuml=yuml)
                     self.yumls_optimised.append(yuml.GetLhs().name)
-            else:
-                pass
             
         # Now delete lone lines with one lone class that is not rich,
         # and which is not mentioned anywhere else (if its been optimised then a rich version exists somewhere else, so checking yuml.rhsclass in self.yumls_optimised is the logic)
-        if debug:
-            print "CLEANUP OPTIMISATION"
         newyumls = []
         for yuml in self.yumls:
-            if debug:
-                print "if yuml.RhsAloneWithNoParent() %s and not yuml.IsRichRhs() %r and yuml.rhsclass in self.yumls_optimised %r" %(yuml.RhsAloneWithNoParent(), not yuml.IsRichRhs(), yuml.GetRhs().name in self.yumls_optimised)
-            if yuml.RhsAloneWithNoParent() and not yuml.IsRichRhs() and yuml.GetRhs().name in self.yumls_optimised:
-                pass
-            else:
+            if not (yuml.RhsAloneWithNoParent() and not yuml.IsRichRhs() and yuml.GetRhs().name in self.yumls_optimised):
                 newyumls.append(yuml)
         self.yumls = newyumls
         
@@ -239,8 +157,7 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
                     attrs += ";"
                 attrs += attrobj.attrname
 
-                # gen extra yUml lines showing class relationships
-                # SHOULD not dump so many extra lines as yUml likes the info consolidated if at all possible
+                # Generate extra yUml lines showing class dependency and composition relationships - generalisation relationship not done here.
                 compositescreated = self._GetCompositeCreatedClassesFor(attrobj.attrname)
                 for c in compositescreated:
                     if 'many' in attrobj.attrtype:
@@ -252,7 +169,6 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
                     connector = "%s%s%s" % (attrobj.attrname, line, cardinality)
                     
                     self.AddYuml(self.aclass, connector, c)
-                    #self.result += "[%s]%s[%s]\n" % (self.aclass, connector, c)
 
             defs = ""
             for adef in self.classentry.defs:
@@ -260,16 +176,12 @@ class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
                     defs += ";"
                 defs += adef + "()"
                 
-            #theclass = "%s|%s|%s" % (self.aclass, attrs, defs)
-            
             if self.classentry.classesinheritsfrom:
                 parentclass = self.classentry.classesinheritsfrom[0]  #TODO don't throw away all the inherited classes - just grab 0 for now
                 self.AddYuml(parentclass, "^", self.aclass, attrs, defs)
-                #self.result +=  '[%s]^[%s]\n' % (parentclass, theclass)
             else:
                 parentclass = ""
                 self.AddYuml("", "", self.aclass, attrs, defs)
-                #self.result +=  '[%s]\n' % (theclass,)
         if optimise:
             self.YumlOptimise(debug=False)
         
