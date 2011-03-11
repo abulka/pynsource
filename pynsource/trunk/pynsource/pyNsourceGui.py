@@ -26,6 +26,7 @@ from messages import *
 
 APP_VERSION = 1.51
 WINDOW_SIZE = (640,480)
+IMAGENODES = False
 
 class DiamondShape(ogl.PolygonShape):
     def __init__(self, w=0.0, h=0.0):
@@ -429,7 +430,15 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
             # Build the UML shape
             #
             if classname not in self.classnametoshape:
-                shape = DividedShape(width=100, height=150, canvas=self)
+                if not IMAGENODES:
+                    shape = DividedShape(width=100, height=150, canvas=self)
+                else:
+                    F = 'Research\\wx doco\\Images\\SPLASHSCREEN.BMP'
+                    # wx.ImageFromBitmap(bitmap) and wx.BitmapFromImage(image)
+                    shape = ogl.BitmapShape()
+                    img = wx.Image(F, wx.BITMAP_TYPE_ANY)
+                    bmp = wx.BitmapFromImage(img)
+                    shape.SetBitmap(bmp)
 
                 pos = (50,50)
                 maxWidth = 10 #padding
@@ -462,13 +471,14 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
 
                 shape.SetSize(maxWidth + 10, totHeight + 10)
 
-                shape.SetRegionSizes()
+                if not IMAGENODES:
+                    shape.SetRegionSizes()
 
                 dsBrush = wx.Brush("WHEAT", wx.SOLID)
-                #idx = self.addShape(shape, pos[0], pos[1], wxBLACK_PEN, dsBrush, '') # get back index
                 ds = self.MyAddShape(shape, pos[0], pos[1], wx.BLACK_PEN, dsBrush, '') # get back instance - but already had it...
 
-                shape.FlushText()
+                if not IMAGENODES:
+                    shape.FlushText()
 
                 # Record the name to shape map so that we can wire up the links later.
                 self.classnametoshape[classname] = ds
@@ -554,7 +564,8 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
         canvas.PrepareDC(dc)
         for shape in self.shapes:
             shape.Move(dc, shape.GetX(), shape.GetY())
-            shape.SetRegionSizes()
+            if not IMAGENODES:
+                shape.SetRegionSizes()
         diagram.Clear(dc)
         diagram.Redraw(dc)
 
@@ -709,37 +720,6 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
 
         self.shapes.append(shape)
         return shape
-
-    def addShape(self, shape, x, y, pen, brush, text):
-        # Composites have to be moved for all children to get in place
-        if isinstance(shape, ogl.CompositeShape):
-            dc = wx.ClientDC(self)
-            self.PrepareDC(dc)
-            shape.Move(dc, x, y)
-        else:
-            shape.SetDraggable(True, True)
-            shape.SetCanvas(self)
-            shape.SetX(x)
-            shape.SetY(y)
-            if pen:    shape.SetPen(pen)
-            if brush:  shape.SetBrush(brush)
-            if text:
-                for line in text.split('\n'):
-                    shape.AddText(line)
-            shape.SetShadowMode(ogl.SHADOW_RIGHT)            
-        
-        self.diagram.AddShape(shape)
-        shape.Show(True)
-
-        evthandler = MyEvtHandler()
-        evthandler.menu = self.shapeMenu
-        evthandler.view = self
-        evthandler.SetShape(shape)
-        evthandler.SetPreviousHandler(shape.GetEventHandler())
-        shape.SetEventHandler(evthandler)
-
-        self.shapes.append(shape)
-        return len(self.shapes) -1
 
 
     def OnDestroy(self, evt):
@@ -957,3 +937,50 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+"""
+http://wxpython-users.1045709.n5.nabble.com/OGL-smart-shape-position-in-a-canvas-td2351397.html
+
+
+Am 15.05.2007, 10:13 Uhr, schrieb Marco Meoni - Sbaush <[hidden email]>: 
+
+> Infact i need a application that can zoom and use all the good 
+> possibilities of Float Canvas but i need also 
+> "lines-connecting-boxes", that i'm trying to implement in FloatCanvas. 
+
+I have an ogl app which has zooming. I override GetDC and PrepareDC like   
+this: 
+
+     def GetDC(self): 
+         dc = wx.ClientDC(self) 
+         self.PrepareDC(dc) 
+         return dc 
+
+     def PrepareDC(self, dc): 
+         ogl.ShapeCanvas.PrepareDC(self, dc) 
+         dc.SetUserScale( self.zoom, self.zoom ) 
+
+
+I did the project some months ago, so I am not sure about the caveats. I   
+think you need to redraw the shapes + lines after you've set the zoom   
+factor. 
+With a bit of work ogl can do a lot of nice things. Reading the source in   
+wx.lib helps tremendously when messing with ogl. 
+In my project the shapes are not self-drawn, but wx.Panels (or other wx.   
+objects). This allows me to reuse a lot of widgets. Maybe you want to look   
+at a similar approach. If you have lots and lots of shapes you might want   
+to optimize this approach a bit to save window resources. 
+My wx.Panels hold a wx.PropertyGrid and I can attach lines to each   
+property. You can achieve behaviour like this by hooking into the   
+connection point stuff. There are probably many more possibilities to   
+extend ogl. 
+You are right though, the docs are not beautiful, the source code isn't   
+too cleanly structured because of it's C++ ancestry and it's difficult to   
+hook into several things. 
+I never dealt with FloatCanvas, so it might be the better choice for you.   
+I just wanted to say that ogl can do what you want although you might have   
+to put a bit of effort into it. 
+
+-Matthias
+"""
