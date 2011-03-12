@@ -154,7 +154,11 @@ class MyCanvas(wx.ScrolledWindow):
         if self.andyscale == 0:
             self.andyscale = 1.0 
         print self.andyscale
-        self.ClearBackground() 
+        
+        #if BUFFERED:
+        #    self.BufferRedraw()
+            
+        #self.ClearBackground() 
         self.Refresh()
 
     def OnPaint(self, event):   # ANDY
@@ -356,7 +360,6 @@ class MyCanvas(wx.ScrolledWindow):
            xscale = self.GetScaleX() / self.andyscale
            yscale = self.GetScaleY() / self.andyscale
         newpos = self.CalcUnscrolledPosition(event.GetX()*xscale, event.GetY()*yscale)  # ANDY
-        #newpos = self.CalcUnscrolledPosition(event.GetX(), event.GetY())
         print newpos
         return newpos
 
@@ -367,17 +370,17 @@ class MyCanvas(wx.ScrolledWindow):
             self.SetCursor(wx.StockCursor(wx.CURSOR_PENCIL))
             self.lines = []
 
-            self.buffer = wx.EmptyBitmap(self.maxWidth, self.maxHeight)
-            dc = wx.BufferedDC(None, self.buffer)
-            dc.SetUserScale(self.andyscale, self.andyscale)
-            dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
-            dc.Clear()
-            self.DoDrawing(dc)
-
-            #self.ClearBackground() 
-            #self.Refresh(eraseBackground=True)
+            if BUFFERED:
+                self.BufferRedraw()
             self.Refresh()
             
+    def BufferRedraw(self):  # ANDY
+        dc = wx.BufferedDC(None, self.buffer)
+        #dc.SetUserScale(self.andyscale, self.andyscale)  # DO NOT or else lose zoom
+        dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
+        dc.Clear()
+        self.DoDrawing(dc)
+        
     def OnLeftButtonEvent(self, event):   # PEN DRAWING
         
         if event.ShiftDown():
