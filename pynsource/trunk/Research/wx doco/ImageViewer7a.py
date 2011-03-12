@@ -54,12 +54,13 @@ class MyCanvas(wx.ScrolledWindow):
             
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         
+        # ANDY
         self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnErase) # ANDY
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheel) # ANDY
+        self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheel2) # ANDY
         self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)  # ANDY
         self.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)  # ANDY
         self.Bind(wx.EVT_MOTION, self.OnMove)  # ANDY
-        # ANDY
         self.was_dragging = False               # True if dragging map
         self.move_dx = 0                        # drag delta values
         self.move_dy = 0
@@ -68,6 +69,7 @@ class MyCanvas(wx.ScrolledWindow):
         self.SetScrollbars(1,1,2000,2000)
         self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
         self.Bind(wx.EVT_KEY_UP, self.onKeyUp)
+        self.andywheelScroll = 0
         ##############
         
     def onKeyPress(self, event):   #ANDY
@@ -109,6 +111,38 @@ class MyCanvas(wx.ScrolledWindow):
         else:
             event.Skip()
 
+    def OnWheel2(self, event):
+        if event.ControlDown():
+            event.Skip()
+            return
+
+## This is an example of what to do for the EVT_MOUSEWHEEL event,
+## but since wx.ScrolledWindow does this already it's not
+## necessary to do it ourselves.
+#
+# ANDY
+# But since I set the ScrollRate to 1
+# in order for panning to work nicely
+# scrolling is too slow.  So invoke this code!!
+#
+        delta = event.GetWheelDelta()
+        rot = event.GetWheelRotation()
+        linesPer = event.GetLinesPerAction()
+        print delta, rot, linesPer
+        linesPer *= 20   # ANDY trick to override the small ScrollRate
+        ws = self.andywheelScroll
+        ws = ws + rot
+        lines = ws / delta
+        ws = ws - lines * delta
+        self.andywheelScroll = ws
+        if lines != 0:
+            lines = lines * linesPer
+            vsx, vsy = self.GetViewStart()
+            scrollTo = vsy - lines
+            self.Scroll(-1, scrollTo)
+        event.Skip()
+        
+        
     def zoom(self, out=True, reset=False):
         if reset:
             self.andyscale = 1.0
@@ -290,7 +324,7 @@ class MyCanvas(wx.ScrolledWindow):
         dc.EndDrawing()
 
 
-    def DrawSavedLines(self, dc):
+    def DrawSavedLines(self, dc):   # PEN DRAWING
         dc.SetPen(wx.Pen('MEDIUM FOREST GREEN', 4))
 
         for line in self.lines:
@@ -298,30 +332,16 @@ class MyCanvas(wx.ScrolledWindow):
                 apply(dc.DrawLine, coords)
 
 
-    def SetXY(self, event):
+    def SetXY(self, event):   # PEN DRAWING
         self.x, self.y = self.ConvertEventCoords(event)
 
-    def ConvertEventCoords(self, event):
-        
-        #ANDY
-        fudgemethod = "GetScale"  # Works!
-        #fudgemethod = "andyscale"
-        if fudgemethod == "ori":
-            scalefactorx = scalefactory = 1
-        elif fudgemethod == "andyscale":
-            scalefactorx = scalefactory = self.andyscale
-        elif fudgemethod == "getscale":
-            scalefactorx = self.GetScaleX()
-            scalefactorx = self.GetScaleY()
-        else:
-            scalefactorx = scalefactory = 1
-        
-        newpos = self.CalcUnscrolledPosition(event.GetX()*scalefactorx, event.GetY()*scalefactory)  # ANDY
+    def ConvertEventCoords(self, event):    # PEN DRAWING
+        newpos = self.CalcUnscrolledPosition(event.GetX()*self.GetScaleX(), event.GetY()*self.GetScaleY())  # ANDY
         #newpos = self.CalcUnscrolledPosition(event.GetX(), event.GetY())
         print newpos
         return newpos
 
-    def OnLeftButtonEvent(self, event):
+    def OnLeftButtonEvent(self, event):   # PEN DRAWING
         
         if event.ShiftDown():
             self.SetCursor(wx.StockCursor(wx.CURSOR_PENCIL))
@@ -374,66 +394,10 @@ class MyCanvas(wx.ScrolledWindow):
 
             self.SetCursor(wx.StockCursor(wx.CURSOR_DEFAULT))
 
-
-## This is an example of what to do for the EVT_MOUSEWHEEL event,
-## but since wx.ScrolledWindow does this already it's not
-## necessary to do it ourselves. You would need to add an event table 
-## entry to __init__() to direct wheelmouse events to this handler.
-
-##     wheelScroll = 0
-##     def OnWheel(self, evt):
-##         delta = evt.GetWheelDelta()
-##         rot = evt.GetWheelRotation()
-##         linesPer = evt.GetLinesPerAction()
-##         print delta, rot, linesPer
-##         ws = self.wheelScroll
-##         ws = ws + rot
-##         lines = ws / delta
-##         ws = ws - lines * delta
-##         self.wheelScroll = ws
-##         if lines != 0:
-##             lines = lines * linesPer
-##             vsx, vsy = self.GetViewStart()
-##             scrollTo = vsy - lines
-##             self.Scroll(-1, scrollTo)
-
-#---------------------------------------------------------------------------
-
-def runTest(frame, nb, log):
-    win = MyCanvas(nb)
-    return win
-
-#---------------------------------------------------------------------------
-
-
-
-overview = """
-<html>
-<body>
-The wx.ScrolledWindow class manages scrolling for its client area, transforming the 
-coordinates according to the scrollbar positions, and setting the scroll positions, 
-thumb sizes and ranges according to the area in view.
-</body>
-</html>
-"""
-
-
-#if __name__ == '__main__':
-#    import sys,os
-#    import run
-#    run.main(['', os.path.basename(sys.argv[0])] + sys.argv[1:])
-    
 class TestFrame(wx.Frame):
     def __init__(self, *args, **kwargs):
-
         wx.Frame.__init__(self, *args, **kwargs)
-        
-        sw = MyCanvas(self)
-        
-        #bmp = wx.Image('moo.jpg',wx.BITMAP_TYPE_JPEG).ConvertToBitmap()
-        #wx.StaticBitmap(sw, -1, bmp)
-        
-        
+        MyCanvas(self)
         
 class App(wx.App):
     def OnInit(self):
@@ -448,37 +412,4 @@ if __name__ == "__main__":
     
     
     
-"""
-
-ALTERNATIVE TECHNIQUE
-
-These are all (?) of the pieces in my working image display program. It 
-rotates and scales. It's an exercise to the reader to divide it up. 
-For example, you don't want to rerun all of this every time the mouse
-drags a little. So these are in two different places, where the first 
-group only happens when you change the image file, or rotate by an angle 
-other than 90 degrees
-self._img = wx.Image(self.fname, wx.BITMAP_TYPE_ANY)
-self._img = wx.EmptyImage(42, 42, True) #create a plain 
-black image, 42 x 42 pixels
-self._img = self._img.Rotate90()
-self._img = self._img.Rotate(-radians, center)
-
-img2 = img1.Scale(self.imageW()*scale/1000, 
-self.imageH()*scale/1000) #this is where image is scaled to final bit 
-dimensions. It's clipped during drawBitmap()
-tracer("drawStuff Scale", "draw")
-bmp = wx.BitmapFromImage(img2)
-
-w, h = self.GetClientSize() #self is a 
-subclass of Panel
-self.buffer = wx.EmptyBitmap(w, h)
-dc = wx.BufferedDC(wx.ClientDC(self), self.buffer)
-dc.DrawBitmap(bmp, cornerX, cornerY, False)
-
-Hope this helps. I tied the scaling to the mousewheel, and used drag to 
-move the cornerX and cornerY. Notice they can go negative, as well as 
-positive.
-
-"""
 
