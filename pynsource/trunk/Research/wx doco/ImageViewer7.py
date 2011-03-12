@@ -1,5 +1,6 @@
 import  wx
 #import  images
+import sys
 
 BUFFERED = 1
 
@@ -10,8 +11,8 @@ class MyCanvas(wx.ScrolledWindow):
         wx.ScrolledWindow.__init__(self, parent, id, (0, 0), size=size, style=wx.SUNKEN_BORDER)
 
         self.lines = []
-        self.maxWidth  = 1000
-        self.maxHeight = 1000
+        self.maxWidth  = 2000
+        self.maxHeight = 2000
         self.x = self.y = 0
         self.curLine = []
         self.drawing = False
@@ -30,7 +31,8 @@ class MyCanvas(wx.ScrolledWindow):
         self.bmp = bmp
 
         self.SetVirtualSize((self.maxWidth, self.maxHeight))
-        self.SetScrollRate(20,20)
+        #self.SetScrollRate(20,20)
+        self.SetScrollRate(1,1)
 
         if BUFFERED:
             # Initialize the buffer bitmap.  No real DC is needed at this point.
@@ -40,14 +42,23 @@ class MyCanvas(wx.ScrolledWindow):
             dc.Clear()
             self.DoDrawing(dc)
 
-        self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftButtonEvent)
-        self.Bind(wx.EVT_LEFT_UP,   self.OnLeftButtonEvent)
-        self.Bind(wx.EVT_MOTION,    self.OnLeftButtonEvent)
+        #self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftButtonEvent)
+        #self.Bind(wx.EVT_LEFT_UP,   self.OnLeftButtonEvent)
+        #self.Bind(wx.EVT_MOTION,    self.OnLeftButtonEvent)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         
         self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnErase) # ANDY
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheel) # ANDY
-        self.andyscale = 1
+        self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)  # ANDY
+        self.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)  # ANDY
+        self.Bind(wx.EVT_MOTION, self.OnMove)  # ANDY
+        # ANDY
+        self.was_dragging = False               # True if dragging map
+        self.move_dx = 0                        # drag delta values
+        self.move_dy = 0
+        self.last_drag_x = None                 # previous drag position
+        self.last_drag_y = None
+        self.andyscale = 1.0
         
     def getWidth(self):
         return self.maxWidth
@@ -68,12 +79,13 @@ class MyCanvas(wx.ScrolledWindow):
         print 'delta', delta, 'rot', rot
         
         if event.ControlDown():
-            if rot > 0:
-                self.andyscale *= 2
+            INCR = 1.3
+            if rot < 0:
+                self.andyscale *= INCR
             else:
-                self.andyscale /= 2
+                self.andyscale /= INCR
             if self.andyscale == 0:
-                self.andyscale = 1
+                self.andyscale = 1.0 
             print self.andyscale
             self.ClearBackground() 
             self.Refresh()
@@ -81,7 +93,7 @@ class MyCanvas(wx.ScrolledWindow):
             event.Skip()
 
 
-    def OnPaint(self, event):
+    def OnPaint(self, event):   # ANDY
         if BUFFERED:
             # Create a buffered paint DC.  It will create the real
             # wx.PaintDC and then blit the bitmap to it when dc is
@@ -97,6 +109,65 @@ class MyCanvas(wx.ScrolledWindow):
         #dc.SetUserScale(1,1) # ANDY
         #dc.SetUserScale(.5,.5) # ANDY
         dc.SetUserScale(self.andyscale, self.andyscale)
+
+
+# ANDY = pan from http://code.google.com/p/pyslip/
+
+    def OnLeftDown(self, event):
+        """Left mouse button down. Prepare for possible drag."""
+        click_posn = event.GetPositionTuple()
+        self.SetCursor(wx.StockCursor(wx.CURSOR_HAND))
+        (self.last_drag_x, self.last_drag_y) = click_posn
+        event.Skip()
+
+
+    def OnLeftUp(self, event):
+        """Left mouse button up."""
+        self.last_drag_x = self.last_drag_y = None
+        self.SetCursor(wx.StockCursor(wx.CURSOR_DEFAULT))
+        # turn off drag
+        self.was_dragging = False
+        # force PAINT event to remove selection box (if required)
+        #self.Update()
+        event.Skip()
+        
+    def OnMove(self, event):
+        """Handle a mouse move (map drag).
+        event  the mouse move event
+        """
+
+        # for windows, set focus onto pyslip window
+        # linux seems to do this automatically
+        if sys.platform == 'win32' and self.FindFocus() != self:
+            self.SetFocus()
+
+        # get current mouse position
+        (x, y) = event.GetPositionTuple()
+
+        #self.RaiseMousePositionEvent((x, y))
+
+        if event.Dragging() and event.LeftIsDown():
+            # are we doing box select?
+            if not self.last_drag_x is None:
+                # no, just a map drag
+                self.was_dragging = True
+                dx = self.last_drag_x - x
+                dy = self.last_drag_y - y
+
+                # move the map in the view
+                #self.view_offset_x += dx
+                #self.view_offset_y += dy
+                print "PAN %d %d" % (dx, dy)
+                print self.GetViewStart()
+                currx, curry = self.GetViewStart()
+                self.Scroll(currx+dx, curry+dy)  # Note The positions are in scroll units, not pixels, so to convert to pixels you will have to multiply by the number of pixels per scroll increment. If either parameter is -1, that position will be ignored (no change in that direction).
+                
+                # adjust remembered X,Y
+                self.last_drag_x = x
+                self.last_drag_y = y
+
+            # redraw client area
+            self.Update()
 
     def DoDrawing(self, dc, printing=False):
         dc.BeginDrawing()
@@ -300,7 +371,8 @@ class TestFrame(wx.Frame):
         #bmp = wx.Image('moo.jpg',wx.BITMAP_TYPE_JPEG).ConvertToBitmap()
         #wx.StaticBitmap(sw, -1, bmp)
         
-        sw.SetScrollbars(20,20,55,40)
+        #sw.SetScrollbars(20,20,55,40)
+        sw.SetScrollbars(1,1,2000,2000)
         
         
 class App(wx.App):
@@ -315,3 +387,38 @@ if __name__ == "__main__":
     app.MainLoop()
     
     
+    
+"""
+
+ALTERNATIVE TECHNIQUE
+
+These are all (?) of the pieces in my working image display program. It 
+rotates and scales. It's an exercise to the reader to divide it up. 
+For example, you don't want to rerun all of this every time the mouse
+drags a little. So these are in two different places, where the first 
+group only happens when you change the image file, or rotate by an angle 
+other than 90 degrees
+self._img = wx.Image(self.fname, wx.BITMAP_TYPE_ANY)
+self._img = wx.EmptyImage(42, 42, True) #create a plain 
+black image, 42 x 42 pixels
+self._img = self._img.Rotate90()
+self._img = self._img.Rotate(-radians, center)
+
+img2 = img1.Scale(self.imageW()*scale/1000, 
+self.imageH()*scale/1000) #this is where image is scaled to final bit 
+dimensions. It's clipped during drawBitmap()
+tracer("drawStuff Scale", "draw")
+bmp = wx.BitmapFromImage(img2)
+
+w, h = self.GetClientSize() #self is a 
+subclass of Panel
+self.buffer = wx.EmptyBitmap(w, h)
+dc = wx.BufferedDC(wx.ClientDC(self), self.buffer)
+dc.DrawBitmap(bmp, cornerX, cornerY, False)
+
+Hope this helps. I tied the scaling to the mousewheel, and used drag to 
+move the cornerX and cornerY. Notice they can go negative, as well as 
+positive.
+
+"""
+
