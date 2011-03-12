@@ -2,7 +2,8 @@ import  wx
 #import  images
 import sys
 
-BUFFERED = 1
+BUFFERED = True
+ALLOW_DRAWING = True
 
 #---------------------------------------------------------------------------
 
@@ -18,7 +19,7 @@ class MyCanvas(wx.ScrolledWindow):
         self.drawing = False
 
         self.SetBackgroundColour("WHITE")
-        self.SetCursor(wx.StockCursor(wx.CURSOR_PENCIL))
+        #self.SetCursor(wx.StockCursor(wx.CURSOR_PENCIL))
         
         #bmp = images.Test2.GetBitmap()
 
@@ -34,17 +35,23 @@ class MyCanvas(wx.ScrolledWindow):
         #self.SetScrollRate(20,20)
         self.SetScrollRate(1,1)
 
+        # ANDY
+        self.andyscale = 1.0
+
         if BUFFERED:
             # Initialize the buffer bitmap.  No real DC is needed at this point.
             self.buffer = wx.EmptyBitmap(self.maxWidth, self.maxHeight)
             dc = wx.BufferedDC(None, self.buffer)
+            dc.SetUserScale(self.andyscale, self.andyscale)
             dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
             dc.Clear()
             self.DoDrawing(dc)
 
-        #self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftButtonEvent)
-        #self.Bind(wx.EVT_LEFT_UP,   self.OnLeftButtonEvent)
-        #self.Bind(wx.EVT_MOTION,    self.OnLeftButtonEvent)
+        if ALLOW_DRAWING:
+            self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftButtonEvent)
+            self.Bind(wx.EVT_LEFT_UP,   self.OnLeftButtonEvent)
+            self.Bind(wx.EVT_MOTION,    self.OnLeftButtonEvent)
+            
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         
         self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnErase) # ANDY
@@ -58,9 +65,25 @@ class MyCanvas(wx.ScrolledWindow):
         self.move_dy = 0
         self.last_drag_x = None                 # previous drag position
         self.last_drag_y = None
-        self.andyscale = 1.0
-
         self.SetScrollbars(1,1,2000,2000)
+        self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
+        self.Bind(wx.EVT_KEY_UP, self.onKeyUp)
+        ##############
+        
+    def onKeyPress(self, event):   #ANDY
+        keycode = event.GetKeyCode()
+        #print keycode
+        #if keycode == wx.WXK_SPACE:
+        #    print "you pressed the spacebar!"
+        if event.ShiftDown():
+            self.SetCursor(wx.StockCursor(wx.CURSOR_PENCIL))
+            #self.zoom(reset=True)
+        event.Skip()
+        
+    def onKeyUp(self, event):   #ANDY
+        #print "up"
+        self.SetCursor(wx.StockCursor(wx.CURSOR_DEFAULT))
+        event.Skip()
         
     def getWidth(self):
         return self.maxWidth
@@ -74,6 +97,7 @@ class MyCanvas(wx.ScrolledWindow):
     
     def OnWheel(self, event):    # ANDY
         print "wheeeeel %s" % event.ControlDown()  # http://www.cs.cofc.edu/~jimmy/wxPython/wx153.htm#topic592
+        #self.SetCursor(wx.StockCursor(wx.CURSOR_DEFAULT))
         
         print event
         delta = event.GetWheelDelta() 
@@ -81,19 +105,24 @@ class MyCanvas(wx.ScrolledWindow):
         print 'delta', delta, 'rot', rot
         
         if event.ControlDown():
-            INCR = 1.3
-            if rot < 0:
-                self.andyscale *= INCR
-            else:
-                self.andyscale /= INCR
-            if self.andyscale == 0:
-                self.andyscale = 1.0 
-            print self.andyscale
-            self.ClearBackground() 
-            self.Refresh()
+            self.zoom(rot < 0)
         else:
             event.Skip()
 
+    def zoom(self, out=True, reset=False):
+        if reset:
+            self.andyscale = 1.0
+        else:
+            INCR = 1.3
+            if out:
+                self.andyscale *= INCR
+            else:
+                self.andyscale /= INCR
+        if self.andyscale == 0:
+            self.andyscale = 1.0 
+        print self.andyscale
+        self.ClearBackground() 
+        self.Refresh()
 
     def OnPaint(self, event):   # ANDY
         if BUFFERED:
@@ -102,29 +131,34 @@ class MyCanvas(wx.ScrolledWindow):
             # deleted.  Since we don't need to draw anything else
             # here that's all there is to it.
             dc = wx.BufferedPaintDC(self, self.buffer, wx.BUFFER_VIRTUAL_AREA)
+            dc.SetUserScale(self.andyscale, self.andyscale)
         else:
             dc = wx.PaintDC(self)
             self.PrepareDC(dc)
+            dc.SetUserScale(self.andyscale, self.andyscale)
             # since we're not buffering in this case, we have to
             # paint the whole window, potentially very time consuming.
             self.DoDrawing(dc)
-        #dc.SetUserScale(1,1) # ANDY
-        #dc.SetUserScale(.5,.5) # ANDY
-        dc.SetUserScale(self.andyscale, self.andyscale)
 
 
 # ANDY = pan from http://code.google.com/p/pyslip/
 
-    def OnLeftDown(self, event):
+    def OnLeftDown(self, event):   # ANDY PAN
         """Left mouse button down. Prepare for possible drag."""
+        if event.ShiftDown():
+            event.Skip()
+            return
         click_posn = event.GetPositionTuple()
         self.SetCursor(wx.StockCursor(wx.CURSOR_HAND))
         (self.last_drag_x, self.last_drag_y) = click_posn
         event.Skip()
 
 
-    def OnLeftUp(self, event):
+    def OnLeftUp(self, event): # ANDY PAN
         """Left mouse button up."""
+        if event.ShiftDown():
+            event.Skip()
+            return
         self.last_drag_x = self.last_drag_y = None
         self.SetCursor(wx.StockCursor(wx.CURSOR_DEFAULT))
         # turn off drag
@@ -133,11 +167,14 @@ class MyCanvas(wx.ScrolledWindow):
         #self.Update()
         event.Skip()
         
-    def OnMove(self, event):
+    def OnMove(self, event): # ANDY PAN
         """Handle a mouse move (map drag).
         event  the mouse move event
         """
-
+        if event.ShiftDown():
+            event.Skip()
+            return
+        
         # for windows, set focus onto pyslip window
         # linux seems to do this automatically
         if sys.platform == 'win32' and self.FindFocus() != self:
@@ -265,11 +302,30 @@ class MyCanvas(wx.ScrolledWindow):
         self.x, self.y = self.ConvertEventCoords(event)
 
     def ConvertEventCoords(self, event):
-        #newpos = self.CalcUnscrolledPosition(event.GetX()/2, event.GetY()/2)  # ANDY
-        newpos = self.CalcUnscrolledPosition(event.GetX(), event.GetY())
+        
+        #ANDY
+        fudgemethod = "GetScale"  # Works!
+        #fudgemethod = "andyscale"
+        if fudgemethod == "ori":
+            scalefactorx = scalefactory = 1
+        elif fudgemethod == "andyscale":
+            scalefactorx = scalefactory = self.andyscale
+        elif fudgemethod == "getscale":
+            scalefactorx = self.GetScaleX()
+            scalefactorx = self.GetScaleY()
+        else:
+            scalefactorx = scalefactory = 1
+        
+        newpos = self.CalcUnscrolledPosition(event.GetX()*scalefactorx, event.GetY()*scalefactory)  # ANDY
+        #newpos = self.CalcUnscrolledPosition(event.GetX(), event.GetY())
+        print newpos
         return newpos
 
     def OnLeftButtonEvent(self, event):
+        
+        if event.ShiftDown():
+            self.SetCursor(wx.StockCursor(wx.CURSOR_PENCIL))
+            
         if event.LeftDown():
             self.SetFocus()
             self.SetXY(event)
@@ -284,10 +340,12 @@ class MyCanvas(wx.ScrolledWindow):
                 # window, then that portion of the buffer will be
                 # redrawn in the EVT_PAINT handler.
                 dc = wx.BufferedDC(None, self.buffer)
+                dc.SetUserScale(self.andyscale, self.andyscale)
             else:
                 # otherwise we'll draw directly to a wx.ClientDC
                 dc = wx.ClientDC(self)
                 self.PrepareDC(dc)
+                dc.SetUserScale(self.andyscale, self.andyscale)
 
             dc.SetPen(wx.Pen('MEDIUM FOREST GREEN', 4))
             coords = (self.x, self.y) + self.ConvertEventCoords(event)
@@ -313,6 +371,8 @@ class MyCanvas(wx.ScrolledWindow):
             self.curLine = []
             self.ReleaseMouse()
             self.drawing = False
+
+            self.SetCursor(wx.StockCursor(wx.CURSOR_DEFAULT))
 
 
 ## This is an example of what to do for the EVT_MOUSEWHEEL event,
@@ -373,8 +433,6 @@ class TestFrame(wx.Frame):
         #bmp = wx.Image('moo.jpg',wx.BITMAP_TYPE_JPEG).ConvertToBitmap()
         #wx.StaticBitmap(sw, -1, bmp)
         
-        #sw.SetScrollbars(20,20,55,40)
-        #sw.SetScrollbars(1,1,2000,2000)
         
         
 class App(wx.App):
