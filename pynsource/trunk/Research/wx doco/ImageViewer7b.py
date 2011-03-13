@@ -1,10 +1,8 @@
 import  wx
 import sys
 
-BUFFERED = True
+BUFFERED = False
 ALLOW_DRAWING = True
-
-#---------------------------------------------------------------------------
 
 class MyCanvas(wx.ScrolledWindow):
     def __init__(self, parent, id = -1, size = wx.DefaultSize):
@@ -97,13 +95,13 @@ class MyCanvas(wx.ScrolledWindow):
         pass
     
     def OnWheel(self, event):    # ANDY
-        print "wheeeeel %s" % event.ControlDown()  # http://www.cs.cofc.edu/~jimmy/wxPython/wx153.htm#topic592
+        #print "wheeeeel %s" % event.ControlDown()  # http://www.cs.cofc.edu/~jimmy/wxPython/wx153.htm#topic592
         #self.SetCursor(wx.StockCursor(wx.CURSOR_DEFAULT))
         
-        print event
+        #print event
         delta = event.GetWheelDelta() 
         rot = event.GetWheelRotation() 
-        print 'delta', delta, 'rot', rot
+        #print 'delta', delta, 'rot', rot
         
         if event.ControlDown():
             self.zoom(rot < 0)
@@ -127,7 +125,7 @@ class MyCanvas(wx.ScrolledWindow):
         delta = event.GetWheelDelta()
         rot = event.GetWheelRotation()
         linesPer = event.GetLinesPerAction()
-        print delta, rot, linesPer
+        #print delta, rot, linesPer
         linesPer *= 20   # ANDY trick to override the small ScrollRate
         ws = self.andywheelScroll
         ws = ws + rot
@@ -143,6 +141,8 @@ class MyCanvas(wx.ScrolledWindow):
         
         
     def zoom(self, out=True, reset=False):
+        if not BUFFERED:
+            out = not out  # For some reason in non buffred mode, zoom is in reverse!?
         if reset:
             self.andyscale = 1.0
         else:
@@ -153,10 +153,9 @@ class MyCanvas(wx.ScrolledWindow):
                 self.andyscale /= INCR
         if self.andyscale == 0:
             self.andyscale = 1.0 
-        print self.andyscale
+        print "zoom %f" % self.andyscale
         
-        #if BUFFERED:
-        #    self.BufferRedraw()
+        #self.BufferRedraw()  # Doesn't help with quality problem
             
         #self.ClearBackground() 
         self.Refresh()
@@ -177,10 +176,7 @@ class MyCanvas(wx.ScrolledWindow):
             # paint the whole window, potentially very time consuming.
             self.DoDrawing(dc)
 
-
-# ANDY = pan from http://code.google.com/p/pyslip/
-
-    def OnLeftDown(self, event):   # ANDY PAN
+    def OnLeftDown(self, event):   # ANDY some PAN ideas from http://code.google.com/p/pyslip/
         """Left mouse button down. Prepare for possible drag."""
         if event.ShiftDown():
             event.Skip()
@@ -230,11 +226,8 @@ class MyCanvas(wx.ScrolledWindow):
                 dx = self.last_drag_x - x
                 dy = self.last_drag_y - y
 
-                # move the map in the view
-                #self.view_offset_x += dx
-                #self.view_offset_y += dy
-                print "PAN %d %d" % (dx, dy)
-                print self.GetViewStart()
+                #print "PAN %d %d" % (dx, dy)
+                #print self.GetViewStart()
                 currx, curry = self.GetViewStart()
                 self.Scroll(currx+dx, curry+dy)  # Note The positions are in scroll units, not pixels, so to convert to pixels you will have to multiply by the number of pixels per scroll increment. If either parameter is -1, that position will be ignored (no change in that direction).
                 
@@ -248,9 +241,11 @@ class MyCanvas(wx.ScrolledWindow):
     def DoDrawing(self, dc, printing=False):
 
         # Only gets called ONCE at startup, when in doublebuffered mode. (except when clear user drawn pen lines)
-        
-        # ANDY
-        if not BUFFERED:
+        import random
+        print "++DoDrawing++ %d" % random.randint(1,99999)
+        if BUFFERED:
+            pass
+        else:
             dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
             dc.Clear()
         #############
@@ -336,9 +331,11 @@ class MyCanvas(wx.ScrolledWindow):
                               "red", "blue")
         dc.GradientFillConcentric((20, 325, 50, 50),
                                   "red", "blue", (25,25))
-        #if not BUFFERED:
-        #    self.DrawSavedLines(dc)
-        self.DrawSavedLines(dc)
+
+        self.DrawSavedLines(dc)  # not usually necessary for buffered mode unless clearing lines,
+                                 # in which case don't need this line anyway cos no lines to draw.
+                                 # But it MIGHT be used when zooming.
+                        
         dc.EndDrawing()
 
 
@@ -353,20 +350,31 @@ class MyCanvas(wx.ScrolledWindow):
         self.x, self.y = self.ConvertEventCoords(event)
 
     def ConvertEventCoords(self, event):    # PEN DRAWING
+        # ANDY
         if BUFFERED:
-           xscale = self.GetScaleX()
-           yscale = self.GetScaleY()
+            newpos = self.CalcUnscrolledPosition(event.GetX()*self.GetScaleX(), event.GetY()*self.GetScaleY())
         else:
-           xscale = self.GetScaleX() / self.andyscale
-           yscale = self.GetScaleY() / self.andyscale
-        newpos = self.CalcUnscrolledPosition(event.GetX()*xscale, event.GetY()*yscale)  # ANDY
+            newpos = self.CalcUnscrolledPosition(event.GetX(), event.GetY())
+            newpos = newpos[0]*self.GetScaleX()/self.andyscale, newpos[1]*self.GetScaleY()/self.andyscale
         print newpos
         return newpos
 
+    def ConvertEventCoords_WORKS_OLD(self, event):    # PEN DRAWING
+        if BUFFERED:
+            xscale = self.GetScaleX()
+            yscale = self.GetScaleY()
+            newpos = self.CalcUnscrolledPosition(event.GetX()*xscale, event.GetY()*yscale)  # ANDY
+        else:
+            xscale = self.GetScaleX() / self.andyscale
+            yscale = self.GetScaleY() / self.andyscale
+            newpos = self.CalcUnscrolledPosition(event.GetX(), event.GetY())  # ANDY
+            newpos = newpos[0] * xscale, newpos[1] * yscale
+        print newpos
+        return newpos
     
     def OnRightButtonEvent(self, event):   # PEN DRAWING - ANDY
         if event.ShiftDown():
-            print "Clearing pen lines!"
+            #print "Clearing pen lines!"
             self.SetCursor(wx.StockCursor(wx.CURSOR_PENCIL))
             self.lines = []
 
@@ -429,8 +437,8 @@ class MyCanvas(wx.ScrolledWindow):
 
         elif event.LeftUp() and self.drawing:
             self.lines.append(self.curLine)
-            print "Appended line count is now %d" % len(self.lines)
-            print self.curLine
+            #print "Appended line count is now %d" % len(self.lines)
+            #print self.curLine
             self.curLine = []
             self.ReleaseMouse()
             self.drawing = False
