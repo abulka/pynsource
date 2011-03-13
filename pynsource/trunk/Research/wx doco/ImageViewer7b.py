@@ -6,10 +6,10 @@ ALLOW_DRAWING = True
 
 FILE = "Images/fish1.png"
 #FILE = "C:/Users/Andy/Documents/My Dropbox/Photos/Other Good1/german_autopanogiga_sample1.jpg"
-# hmmm, with bigger image zoom doesnt work?
+# hmmm, with bigger image zoom doesnt work in buffered mode?
 
 if BUFFERED:
-    TRIMTO_VIRTUALSIZE = False   # experimental - complications in buffered mode
+    TRIMTO_VIRTUALSIZE = False   # complications in buffered mode
 else:
     TRIMTO_VIRTUALSIZE = True
     
@@ -25,9 +25,6 @@ class MyCanvas(wx.ScrolledWindow):
         self.drawing = False
 
         self.SetBackgroundColour("WHITE")
-        #self.SetCursor(wx.StockCursor(wx.CURSOR_PENCIL))
-        
-        #bmp = images.Test2.GetBitmap()
 
         img = wx.Image(FILE, wx.BITMAP_TYPE_ANY)
         bmp = img.ConvertToBitmap()
@@ -49,7 +46,6 @@ class MyCanvas(wx.ScrolledWindow):
         # ANDY
         self.andyscale = 1.0
         self.bufferedzoom = 1.0
-        #self.mypanel = parent.mypanel
         self.clear_whole_window = False
 
         if BUFFERED:
@@ -184,31 +180,20 @@ class MyCanvas(wx.ScrolledWindow):
                 self.SetVirtualSize((self.maxWidth*self.bufferedzoom, self.maxHeight*self.bufferedzoom))
                 self.SetScrollbars(1, 1, self.GetVirtualSize()[0], self.GetVirtualSize()[1])
             else:
-                x,y = self.GetViewStart()
-                #print "self.GetViewStart()", self.GetViewStart()
-                #print "CalcUnscrolledPosition", self.CalcUnscrolledPosition((x,y))
-                self.SetVirtualSize((self.maxWidth*self.andyscale, self.maxHeight*self.andyscale))
-
-                #self.SetScrollbars(1, 1, self.GetVirtualSize()[0], self.GetVirtualSize()[1])
-                #self.Scroll(x*INCR,y*INCR)
-
                 if out:
-                    self.SetScrollbars(1, 1, self.GetVirtualSize()[0], self.GetVirtualSize()[1], x*INCR, y*INCR, False)
+                    jumptox, jumptoy = self.GetViewStart()[0]*INCR, self.GetViewStart()[1]*INCR
                 else:
-                    self.SetScrollbars(1, 1, self.GetVirtualSize()[0], self.GetVirtualSize()[1], x/INCR, y/INCR, False)
-                     
-                #print "scrolled to %d %d" % (x*self.andyscale,y*self.andyscale)
-                #print "self.GetViewStart() now", self.GetViewStart()
-                
+                    jumptox, jumptoy = self.GetViewStart()[0]/INCR, self.GetViewStart()[1]/INCR
+                self.SetVirtualSize(self.CalcVirtSize())
+                self.SetScrollbars(1, 1, self.GetVirtualSize()[0], self.GetVirtualSize()[1], jumptox, jumptoy, True) # boolean is skip refresh or not, doesn't seem to matter
+               
                 # If zoom out so much you need to clear the whole window to get rid of bigger image remnants
                 if self.NeedToClear():
                     self.clear_whole_window = True
+                    self.SetScrollbars(1, 1, self.GetVirtualSize()[0], self.GetVirtualSize()[1], 0, 0, True) # workaround a bug where whole screen doesn't clear if you are scrolled to the right and y is non scrolled, and you zoom out - you see a screen fragment not erased
                 self.DebugSizez("zoom")
 
-       
         # self.BufferRedraw()  # Doesn't help with quality problem nor with virtual size issues
-        #self.mypanel.Clear()
-        
         self.Refresh()
 
     def OnResize (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
@@ -217,15 +202,17 @@ class MyCanvas(wx.ScrolledWindow):
             self.clear_whole_window = True
             self.Refresh()
 
+    def CalcVirtSize(self):
+        # VirtualSize is essentially the visible picture
+        return (self.maxWidth*self.andyscale, self.maxHeight*self.andyscale)  # if BUFFERED may need to use self.bufferedzoom instead.
+    
     def NeedToClear(self):
-        #return self.GetVirtualSize()[0] < self.getWidth() #or self.GetVirtualSize()[1] < self.getHeight():
-        #return self.GetClientSize()[0] > self.maxWidth
-        #return (self.GetClientSize()[0] > self.GetVirtualSize()[0]) or (self.GetClientSize()[0] > self.maxWidth)
-        #return (self.GetClientSize()[0] > self.GetVirtualSize()[0])
-        ori_virt_sizeX = self.maxWidth*self.andyscale  # if BUFFERED may need to use self.bufferedzoom instead.
-        return self.GetClientSize()[0] > ori_virt_sizeX
+        # Since VirtualSize auto grows when resize frame, can't rely on it to know if client area is bigger than visible pic.
+        # Need to rederive the original VirtualSize set when zoom calculated rather than relying on calls to self.GetVirtualSize()
+        return self.GetClientSize()[0] > self.CalcVirtSize()[0] or self.GetClientSize()[1] > self.CalcVirtSize()[1]
                 
     def DebugSizez(self, fromwheremsg):
+        return
         if self.NeedToClear():
             msg = "!!!!!!! "
         else:
@@ -303,7 +290,7 @@ class MyCanvas(wx.ScrolledWindow):
                 #print self.GetViewStart()
                 currx, curry = self.GetViewStart()
                 self.Scroll(currx+dx, curry+dy)  # Note The positions are in scroll units, not pixels, so to convert to pixels you will have to multiply by the number of pixels per scroll increment. If either parameter is -1, that position will be ignored (no change in that direction).
-                print "Scroll pan %d %d" % (currx+dx, curry+dy)
+                #print "Scroll pan %d %d" % (currx+dx, curry+dy)
 
                 # adjust remembered X,Y
                 self.last_drag_x = x
@@ -513,7 +500,6 @@ class MyCanvas(wx.ScrolledWindow):
 class TestFrame(wx.Frame):
     def __init__(self, *args, **kwargs):
         wx.Frame.__init__(self, *args, **kwargs)
-        #self.mypanel = wx.Panel(self)
         MyCanvas(self)
         
 class App(wx.App):
