@@ -5,9 +5,88 @@ ALLOW_DRAWING = True
 ZOOM_INCR = 1.3
 
 #FILE = "Images/fish1.png"
-FILE = "C:/Users/Andy/Documents/My Dropbox/Photos/Other Good1/german_autopanogiga_sample1.jpg"
+#FILE = "C:/Users/Andy/Documents/My Dropbox/Photos/Other Good1/german_autopanogiga_sample1.jpg"
+#FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/outuml.png"
+#FILE = "c:/inetpub/wwwroot/welcome.png"
+#FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/welcome.png"
+#FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/outyuml4.jpg"
+FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/outyuml3a.png"
+#FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/Research/wx doco/Images/SPLASHSCREEN.BMP"
+#FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/Research/wx doco/Images/outyuml.png"
 
-class MyCanvas(wx.ScrolledWindow):
+
+
+def debugAlpha(img):
+    print "Has mask? %s" % img.HasMask()
+    print "Has alpha? %s" % img.HasAlpha()
+    
+    if img.HasMask():
+        print img.GetOrFindMaskColour()
+        
+    if img.HasAlpha():
+        msg = ""
+        for y in range(0, img.GetHeight()):
+            for x in range(0, img.GetWidth()/15):
+                msg += "%d " % img.GetAlpha(x,y) # img.IsTransparent(x,y)
+            msg += "\n"
+        print msg
+
+def trans1(img):
+    import array
+    a = array.array('B', img.GetData())
+    for i in range(len(a)):
+        a[i] = (25+i) % 256
+    img.SetData(a.tostring())
+
+def trans2(img):
+    img.ConvertAlphaToMask()
+    #img.SetMask(False)
+    img.SetMaskColour(255, 255, 255) 
+
+def trans3(img):
+    pass
+
+def trans4(img):
+    if img.HasAlpha():    
+        for y in range(0, img.GetHeight()):
+            for x in range(0, img.GetWidth()):
+                if img.GetAlpha(x,y) < 255:
+                    img.SetRGB(x, y, 255, 255, 255) # white
+                    img.SetAlpha(x, y, 255)         # 255 means can see the rgb pixel totally
+
+def trans5(bmp):
+    #oldPix = bmp
+    #newPix = wx.EmptyBitmap(bmp.GetWidth(), bmp.GetHeight())
+    #mem = wxMemoryDC()
+    #mem.SelectObject(oldPix)
+    #mem.Clear()                       # The images have to be cleared
+    #mem.SelectObject(newPix)          # because wxEmptyBitmap only
+    #mem.SetBackground(wxBLACK_BRUSH)  # allocates the space
+    #mem.Clear()
+    
+    empty = wx.EmptyBitmap(bmp.GetWidth(), bmp.GetHeight())
+    dc = wx.MemoryDC()
+    dc.SelectObject(empty)
+    dc.Clear()
+
+
+    #dc.SetPen(wx.Pen('RED', 1))
+    #dc.DrawLine(0, 3, 11, 3)
+    #dc.DrawLine(0, 6, 11, 6)
+    #dc.DrawLine(0, 9, 22, 9)
+    
+    #dc.SetTextForeground('BLUE')
+    #text = "UML via PyNSource and yUml service"
+    ##tw, th = dc.GetTextExtent(text)
+    ##dc.DrawText(text, (bmp.GetWidth()-tw)/2,  (bmp.GetHeight()-th)/2)
+    #dc.DrawText(text, 2, 2)
+        
+    dc.DrawBitmap(bmp, 0, 0, True)
+    dc.SelectObject(wx.NullBitmap)
+    
+    return empty
+
+class ImageViewer(wx.ScrolledWindow):
     def __init__(self, parent, id = -1, size = wx.DefaultSize):
         wx.ScrolledWindow.__init__(self, parent, id, (0, 0), size=size, style=wx.SUNKEN_BORDER)# | wx.FULL_REPAINT_ON_RESIZE)
 
@@ -18,15 +97,40 @@ class MyCanvas(wx.ScrolledWindow):
         self.curLine = []
         self.drawing = False
 
+        #self.SetBackgroundColour("RED")
         self.SetBackgroundColour("WHITE")
 
-        img = wx.Image(FILE, wx.BITMAP_TYPE_ANY)
-        bmp = img.ConvertToBitmap()
+
+        import urllib
+        from cStringIO import StringIO
+        try:
+            baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
+            yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
+            url = baseUrl + urllib.quote(yuml_txt)
+            fp = urllib.urlopen(url)
+            data = fp.read()
+            fp.close()
+            img = wx.ImageFromStream(StringIO(data))
+            debugAlpha(img)
+            #trans1(img)
+            #trans4(img)
+        except Exception, e:
+            print e
+
+            img = wx.Image(FILE, wx.BITMAP_TYPE_ANY)
+            #img = wx.Image(FILE, wx.BITMAP_TYPE_PNG)
+
+        try:
+            bmp = img.ConvertToBitmap()
+        except Exception, e:
+            print e
+            exit(0)
 
         self.maxWidth, self.maxHeight = bmp.GetSize()[0], bmp.GetSize()[1]
         
-        mask = wx.Mask(bmp, wx.BLUE)
-        bmp.SetMask(mask)
+        #mask = wx.Mask(bmp, wx.BLUE)
+        #bmp.SetMask(mask)
+        bmp = trans5(bmp)
         self.bmp = bmp
 
         self.SetVirtualSize((self.maxWidth, self.maxHeight))
@@ -241,13 +345,18 @@ class MyCanvas(wx.ScrolledWindow):
 
     def DoDrawing(self, dc, printing=False):
 
-        if self.clear_whole_window:
+        if True or self.clear_whole_window:
             dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
             dc.Clear()
             self.clear_whole_window = False
         
         dc.BeginDrawing()
-        dc.DrawBitmap(self.bmp, 0, 0, True)
+        dc.DrawBitmap(self.bmp, 0, 0, False) # false means don't use mask
+
+        dc.SetTextForeground('BLUE')
+        text = "UML via PyNSource and yUml service"
+        dc.DrawText(text, 2, 2)
+
         self.DrawSavedLines(dc)
         dc.EndDrawing()
 
@@ -305,7 +414,7 @@ class MyCanvas(wx.ScrolledWindow):
 class TestFrame(wx.Frame):
     def __init__(self, *args, **kwargs):
         wx.Frame.__init__(self, *args, **kwargs)
-        MyCanvas(self)
+        ImageViewer(self)
         
 class App(wx.App):
     def OnInit(self):
