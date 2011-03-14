@@ -62,7 +62,6 @@ class ImageViewer(wx.ScrolledWindow):
         self.SetScrollbars(1, 1, self.GetVirtualSize()[0], self.GetVirtualSize()[1])
         self.mywheelscroll = 0
         
-    #def ViewImage(self, thefile):
     def ViewImage(self, thefile="", url=""):
         
         def fallback():
@@ -107,22 +106,42 @@ class ImageViewer(wx.ScrolledWindow):
 
         self.SetVirtualSize((self.maxWidth, self.maxHeight))
         self.SetScrollRate(1,1)  # set the ScrollRate to 1 in order for panning to work nicely
+        self.Scroll(0,0)
         self.zoomscale = 1.0
         self.clear_whole_window = False
         self.Refresh()        
+
+    def OnPopupItemSelected(self, event): 
+        item = self.popupmenu.FindItemById(event.GetId()) 
+        text = item.GetText() 
+        #wx.MessageBox("You selected item '%s'" % text)
+        if text == "Load Image from Disk":
+            self.ViewImage(FILE)
+        elif text == "Load Image from Url":
+            baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
+            yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
+            url = baseUrl + urllib.quote(yuml_txt)
+            self.ViewImage(url=url)
 
     def OnRightButtonMenu(self, event):   # Menu
         if event.ShiftDown():
             event.Skip()
             return
+
+        x, y = event.GetPosition()
+        frame = self.GetTopLevelParent()
         
-        #self.ViewImage("asdasd")
+        self.popupmenu = wx.Menu()     # Create a menu
+        item = self.popupmenu.Append(2011, "Load Image from Disk")
+        frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
         
-        baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
-        yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
-        url = baseUrl + urllib.quote(yuml_txt)
-        self.ViewImage(url=url)
-            
+        item = self.popupmenu.Append(2012, "Load Image from Url")
+        frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        
+        item = self.popupmenu.Append(2013, "Cancel")
+        frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        
+        frame.PopupMenu(self.popupmenu, wx.Point(x,y))
         
     def onKeyPress(self, event):   #ANDY
         keycode = event.GetKeyCode()
