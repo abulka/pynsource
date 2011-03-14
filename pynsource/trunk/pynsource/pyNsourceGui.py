@@ -27,6 +27,7 @@ from messages import *
 APP_VERSION = 1.51
 WINDOW_SIZE = (640,480)
 IMAGENODES = False
+MULTI_TAB_GUI = True
 
 class DiamondShape(ogl.PolygonShape):
     def __init__(self, w=0.0, h=0.0):
@@ -757,13 +758,15 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
                 
             canvas, dc = GetCanvasDc(s)
             canvas.Refresh(False)
-            
+
 class Log:
     def WriteText(self, text):
         if text[-1:] == '\n':
             text = text[:-1]
         wx.LogMessage(text)
     write = WriteText
+
+from gui_imageviewer import ImageViewer
 
 class MainApp(wx.App):
     def OnInit(self):
@@ -775,10 +778,30 @@ class MainApp(wx.App):
                         style=wx.NO_FULL_REPAINT_ON_RESIZE|wx.DEFAULT_FRAME_STYLE)
         self.frame.CreateStatusBar()
         self.InitMenus()
-        self.frame.Show(True)
-        wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
-        
-        self.win = UmlDiagramWindow(self.frame, Log(), self.frame)
+
+        if MULTI_TAB_GUI:
+            self.notebook = wx.Notebook(self.frame, -1)
+            self.win = UmlDiagramWindow(self.notebook, Log(), self.frame)
+            self.yuml = ImageViewer(self.notebook) # wx.Panel(self.notebook, -1)
+            self.asciiart = wx.Panel(self.notebook, -1)
+    
+            self.notebook.AddPage(self.win, "ogl")
+            self.notebook.AddPage(self.yuml, "yuml")
+            self.notebook.AddPage(self.asciiart, "ascii art")
+    
+            self.multiText = wx.TextCtrl(self.asciiart, -1,
+            "Here is a looooooooooooooong line "
+            "of text set in the control.\n\n"
+            "See that it wrapped, and that "
+            "this line is after a blank",
+            style=wx.TE_MULTILINE)
+            bsizer = wx.BoxSizer()
+            bsizer.Add(self.multiText, 1, wx.EXPAND)
+            self.asciiart.SetSizerAndFit(bsizer)
+            self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))
+        else:
+            self.win = UmlDiagramWindow(self.frame, Log(), self.frame)
+            
         self.win.secretredrawmethod = self.OnRefresh    # Hack so can do a high level refresh screen after a delete node event.
         ogl.OGLInitialize()  # creates some pens and brushes that the OGL library uses.
         
@@ -786,11 +809,14 @@ class MainApp(wx.App):
         self.frame.SetSize(WINDOW_SIZE)
         self.win.SetFocus()
         self.SetTopWindow(self.frame)
+
+        self.frame.Show(True)
+        wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
         
         # Debug bootstrap
-        self.frame.SetSize((1024,768))
-        self.win.Go(files=[os.path.abspath( __file__ )])
-        self.win.redraw()
+        #self.frame.SetSize((1024,768))
+        #self.win.Go(files=[os.path.abspath( __file__ )])
+        #self.win.redraw()
         
         return True
 
