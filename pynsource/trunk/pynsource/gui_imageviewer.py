@@ -12,9 +12,9 @@ DEFAULT_IMAGE_SIZE = (200, 200)
 #FILE = "Images/fish1.png"
 #FILE = "C:/Users/Andy/Documents/My Dropbox/Photos/Other Good1/german_autopanogiga_sample1.jpg"
 #FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/outyuml.png"
-FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/outyuml3a.png"
 #FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/Research/wx doco/Images/SPLASHSCREEN.BMP"
 #FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/Research/wx doco/Images/outyuml.png"
+FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/Research/wx doco/Images/outyuml_big.png"
 
 
 class ImageViewer(wx.ScrolledWindow):

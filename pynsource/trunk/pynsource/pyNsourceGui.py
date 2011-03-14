@@ -799,6 +799,9 @@ class MainApp(wx.App):
             bsizer.Add(self.multiText, 1, wx.EXPAND)
             self.asciiart.SetSizerAndFit(bsizer)
             self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))
+            
+            self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabPageChanged)
+            
         else:
             self.win = UmlDiagramWindow(self.frame, Log(), self.frame)
             
@@ -812,7 +815,8 @@ class MainApp(wx.App):
 
         self.frame.Show(True)
         wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
-        
+
+
         # Debug bootstrap
         #self.frame.SetSize((1024,768))
         #self.win.Go(files=[os.path.abspath( __file__ )])
@@ -820,6 +824,16 @@ class MainApp(wx.App):
         
         return True
 
+    def OnTabPageChanged(self, event):
+        if event.GetSelection() == 0:  # ogl
+            pass
+        elif event.GetSelection() == 1:  # yuml
+            self.yuml.ViewImage(thefile='../outyuml.png')
+        elif event.GetSelection() == 2:  # ascii art
+            pass
+        
+        event.Skip()
+         
     def InitMenus(self):
         menuBar = wx.MenuBar()
         menu1 = wx.Menu()
@@ -965,48 +979,3 @@ if __name__ == '__main__':
     main()
 
 
-"""
-http://wxpython-users.1045709.n5.nabble.com/OGL-smart-shape-position-in-a-canvas-td2351397.html
-
-
-Am 15.05.2007, 10:13 Uhr, schrieb Marco Meoni - Sbaush <[hidden email]>: 
-
-> Infact i need a application that can zoom and use all the good 
-> possibilities of Float Canvas but i need also 
-> "lines-connecting-boxes", that i'm trying to implement in FloatCanvas. 
-
-I have an ogl app which has zooming. I override GetDC and PrepareDC like   
-this: 
-
-     def GetDC(self): 
-         dc = wx.ClientDC(self) 
-         self.PrepareDC(dc) 
-         return dc 
-
-     def PrepareDC(self, dc): 
-         ogl.ShapeCanvas.PrepareDC(self, dc) 
-         dc.SetUserScale( self.zoom, self.zoom ) 
-
-
-I did the project some months ago, so I am not sure about the caveats. I   
-think you need to redraw the shapes + lines after you've set the zoom   
-factor. 
-With a bit of work ogl can do a lot of nice things. Reading the source in   
-wx.lib helps tremendously when messing with ogl. 
-In my project the shapes are not self-drawn, but wx.Panels (or other wx.   
-objects). This allows me to reuse a lot of widgets. Maybe you want to look   
-at a similar approach. If you have lots and lots of shapes you might want   
-to optimize this approach a bit to save window resources. 
-My wx.Panels hold a wx.PropertyGrid and I can attach lines to each   
-property. You can achieve behaviour like this by hooking into the   
-connection point stuff. There are probably many more possibilities to   
-extend ogl. 
-You are right though, the docs are not beautiful, the source code isn't   
-too cleanly structured because of it's C++ ancestry and it's difficult to   
-hook into several things. 
-I never dealt with FloatCanvas, so it might be the better choice for you.   
-I just wanted to say that ogl can do what you want although you might have   
-to put a bit of effort into it. 
-
--Matthias
-"""
