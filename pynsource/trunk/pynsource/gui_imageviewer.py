@@ -1,5 +1,9 @@
-import  wx
+# Image viewer
+
+import wx
 import sys
+import urllib
+from cStringIO import StringIO
 
 ALLOW_DRAWING = True
 ZOOM_INCR = 1.3
@@ -37,19 +41,19 @@ class ImageViewer(wx.ScrolledWindow):
             self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftButtonEvent)
             self.Bind(wx.EVT_LEFT_UP,   self.OnLeftButtonEvent)
             self.Bind(wx.EVT_MOTION,    self.OnLeftButtonEvent)
-            self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonEvent)  # ANDY
+            self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonEvent)
             
         self.Bind(wx.EVT_PAINT, self.OnPaint)
-        self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnErase) # ANDY
-        self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom) # ANDY
-        self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelScroll) # ANDY
-        self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)  # ANDY
-        self.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)  # ANDY
-        self.Bind(wx.EVT_MOTION, self.OnMove)  # ANDY
-        self.Bind ( wx.EVT_SIZE, self.OnResize ) # ANDY
+        self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnErase)
+        self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
+        self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelScroll)
+        self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
+        self.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)
+        self.Bind(wx.EVT_MOTION, self.OnMove)
+        self.Bind ( wx.EVT_SIZE, self.OnResize )
         self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
         self.Bind(wx.EVT_KEY_UP, self.onKeyUp)
-        self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)  # ANDY
+        self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)
         self.was_dragging = False               # True if dragging map
         self.move_dx = 0                        # drag delta values
         self.move_dy = 0
@@ -58,31 +62,34 @@ class ImageViewer(wx.ScrolledWindow):
         self.SetScrollbars(1, 1, self.GetVirtualSize()[0], self.GetVirtualSize()[1])
         self.mywheelscroll = 0
         
-    def ViewImage(self, thefile):
-        #img = wx.Image(FILE, wx.BITMAP_TYPE_ANY)
-
-        import urllib
-        from cStringIO import StringIO
-        try:
-            baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
-            yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
-            url = baseUrl + urllib.quote(yuml_txt)
-            fp = urllib.urlopen(url)
-            data = fp.read()
-            fp.close()
-            img = wx.ImageFromStream(StringIO(data))
-        except Exception, e:
-            print e
-            # Fallback to loading default image
+    #def ViewImage(self, thefile):
+    def ViewImage(self, thefile="", url=""):
+        
+        def fallback():
             img = wx.Image(FILE, wx.BITMAP_TYPE_ANY)
-            #img = wx.Image(FILE, wx.BITMAP_TYPE_PNG)
             
+        if thefile:
+            try:
+                img = wx.Image(thefile, wx.BITMAP_TYPE_ANY)
+            except Exception, e:
+                print e
+                fallback()
+                
+        elif url:
+            try:
+                fp = urllib.urlopen(url)
+                data = fp.read()
+                fp.close()
+                img = wx.ImageFromStream(StringIO(data))
+            except Exception, e:
+                print e
+                fallback()
             
         try:
             bmp = img.ConvertToBitmap()
         except Exception, e:
             print e
-            exit(0)
+            return
 
         self.maxWidth, self.maxHeight = bmp.GetWidth(), bmp.GetHeight()
         
@@ -105,9 +112,17 @@ class ImageViewer(wx.ScrolledWindow):
         self.Refresh()        
 
     def OnRightButtonMenu(self, event):   # Menu
-        if not event.ShiftDown():
-            self.ViewImage("asdasd")
-        event.Skip()
+        if event.ShiftDown():
+            event.Skip()
+            return
+        
+        #self.ViewImage("asdasd")
+        
+        baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
+        yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
+        url = baseUrl + urllib.quote(yuml_txt)
+        self.ViewImage(url=url)
+            
         
     def onKeyPress(self, event):   #ANDY
         keycode = event.GetKeyCode()
