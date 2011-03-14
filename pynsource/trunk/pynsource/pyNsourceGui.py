@@ -507,7 +507,7 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
         self.associations_composition = []
 
         if files:
-            u = PythonToJava(None, treatmoduleasclass=0, verbose=0)
+            #u = PythonToJava(None, treatmoduleasclass=0, verbose=0)
             for f in files:
                 self._Process(f)    # Build a shape with all attrs and methods, and prepare association dict
 
@@ -518,7 +518,7 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
             globbed += files
             #print 'parsing', globbed
 
-            u = PythonToJava(globbed, treatmoduleasclass=0, verbose=0)
+            #u = PythonToJava(globbed, treatmoduleasclass=0, verbose=0)
             for directory in globbed:
                 if '*' in directory or '.' in directory:
                     filepath = directory
@@ -828,7 +828,8 @@ class MainApp(wx.App):
         if event.GetSelection() == 0:  # ogl
             pass
         elif event.GetSelection() == 1:  # yuml
-            self.yuml.ViewImage(thefile='../outyuml.png')
+            #self.yuml.ViewImage(thefile='../outyuml.png')
+            pass
         elif event.GetSelection() == 2:  # ascii art
             pass
         
@@ -848,6 +849,7 @@ class MainApp(wx.App):
             self.next_menu_id +=1
 
         Add(menu1, "File &Import...\tCtrl-I", "Import Python Source Files", self.FileImport)
+        Add(menu1, "File &Import2...\tCtrl-I", "Import Python Source Files", self.FileImport2)
         menu1.AppendSeparator()
         Add(menu1, "&Clear\tCtrl-N", "Clear Diagram", self.FileNew)
         menu1.AppendSeparator()
@@ -881,6 +883,40 @@ class MainApp(wx.App):
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
             print filenames
             self.win.Go(files=filenames)
+            self.win.redraw()
+            wx.EndBusyCursor()
+            print 'Import - Done.'
+
+    def FileImport2(self, event):
+        from gen_yuml import PySourceAsYuml
+        import urllib
+        
+        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
+            defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            filenames = dlg.GetPaths()
+            print 'Importing...'
+            wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
+            print filenames
+            
+            
+            #self.win.Go(files=filenames)
+            files=filenames
+            p = PySourceAsYuml()
+            p.optionModuleAsClass = 0
+            p.verbose = 0
+            if files:
+                for f in files:
+                    p.Parse(f)
+            p.CalcYumls()
+            print p
+
+            #yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
+            yuml_txt = ','.join(str(p).split())
+            baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
+            url = baseUrl + urllib.quote(yuml_txt)
+            self.yuml.ViewImage(url=url)
+
             self.win.redraw()
             wx.EndBusyCursor()
             print 'Import - Done.'
