@@ -3,6 +3,7 @@ import sys
 
 ALLOW_DRAWING = True
 ZOOM_INCR = 1.3
+DEFAULT_IMAGE_SIZE = (200, 200)
 
 #FILE = "Images/fish1.png"
 #FILE = "C:/Users/Andy/Documents/My Dropbox/Photos/Other Good1/german_autopanogiga_sample1.jpg"
@@ -17,49 +18,15 @@ class ImageViewer(wx.ScrolledWindow):
         wx.ScrolledWindow.__init__(self, parent, id, (0, 0), size=size, style=wx.SUNKEN_BORDER)# | wx.FULL_REPAINT_ON_RESIZE)
 
         self.lines = []
-        self.maxWidth  = 2000
-        self.maxHeight = 2000
+        self.maxWidth, self.maxHeight = DEFAULT_IMAGE_SIZE
         self.x = self.y = 0
         self.curLine = []
         self.drawing = False
 
-        self.SetBackgroundColour("WHITE")
+        self.SetBackgroundColour("WHITE")  # for areas of the frame not covered by the bmp
 
-        import urllib
-        from cStringIO import StringIO
-        try:
-            baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
-            yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
-            url = baseUrl + urllib.quote(yuml_txt)
-            fp = urllib.urlopen(url)
-            data = fp.read()
-            fp.close()
-            img = wx.ImageFromStream(StringIO(data))
-        except Exception, e:
-            print e
-            # Fallback to loading default image
-            img = wx.Image(FILE, wx.BITMAP_TYPE_ANY)
-            #img = wx.Image(FILE, wx.BITMAP_TYPE_PNG)
-
-        try:
-            bmp = img.ConvertToBitmap()
-        except Exception, e:
-            print e
-            exit(0)
-
-        self.maxWidth, self.maxHeight = bmp.GetWidth(), bmp.GetHeight()
-        
-        # Render bmp to a second white bmp to remove transparency effects
-        if bmp.HasAlpha():
-            bmp2 = wx.EmptyBitmap(bmp.GetWidth(), bmp.GetHeight())
-            dc = wx.MemoryDC()
-            dc.SelectObject(bmp2)
-            dc.Clear()
-            dc.DrawBitmap(bmp, 0, 0, True)
-            dc.SelectObject(wx.NullBitmap)
-            self.bmp = bmp2
-        else:
-            self.bmp = bmp
+        bmp = wx.EmptyBitmap(self.maxWidth, self.maxHeight)
+        self.bmp = bmp
 
         self.SetVirtualSize((self.maxWidth, self.maxHeight))
         self.SetScrollRate(1,1)  # set the ScrollRate to 1 in order for panning to work nicely
@@ -92,8 +59,25 @@ class ImageViewer(wx.ScrolledWindow):
         self.mywheelscroll = 0
         
     def ViewImage(self, thefile):
-        img = wx.Image(FILE, wx.BITMAP_TYPE_ANY)
+        #img = wx.Image(FILE, wx.BITMAP_TYPE_ANY)
 
+        import urllib
+        from cStringIO import StringIO
+        try:
+            baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
+            yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
+            url = baseUrl + urllib.quote(yuml_txt)
+            fp = urllib.urlopen(url)
+            data = fp.read()
+            fp.close()
+            img = wx.ImageFromStream(StringIO(data))
+        except Exception, e:
+            print e
+            # Fallback to loading default image
+            img = wx.Image(FILE, wx.BITMAP_TYPE_ANY)
+            #img = wx.Image(FILE, wx.BITMAP_TYPE_PNG)
+            
+            
         try:
             bmp = img.ConvertToBitmap()
         except Exception, e:
@@ -119,7 +103,7 @@ class ImageViewer(wx.ScrolledWindow):
         self.zoomscale = 1.0
         self.clear_whole_window = False
         self.Refresh()        
-        
+
     def OnRightButtonMenu(self, event):   # Menu
         if not event.ShiftDown():
             self.ViewImage("asdasd")
