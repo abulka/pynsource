@@ -785,9 +785,9 @@ class MainApp(wx.App):
             self.yuml = ImageViewer(self.notebook) # wx.Panel(self.notebook, -1)
             self.asciiart = wx.Panel(self.notebook, -1)
     
-            self.notebook.AddPage(self.win, "ogl")
-            self.notebook.AddPage(self.yuml, "yuml")
-            self.notebook.AddPage(self.asciiart, "ascii art")
+            self.notebook.AddPage(self.win, "UML")
+            self.notebook.AddPage(self.yuml, "yUml")
+            self.notebook.AddPage(self.asciiart, "Ascii Art")
     
             self.multiText = wx.TextCtrl(self.asciiart, -1,
             "Here is a looooooooooooooong line "
@@ -849,7 +849,8 @@ class MainApp(wx.App):
             self.next_menu_id +=1
 
         Add(menu1, "File &Import...\tCtrl-I", "Import Python Source Files", self.FileImport)
-        Add(menu1, "File &Import2...\tCtrl-I", "Import Python Source Files", self.FileImport2)
+        Add(menu1, "File &Import yUml...\tCtrl-O", "Import Python Source Files", self.FileImport2)
+        Add(menu1, "File &Import Ascii Art...\tCtrl-J", "Import Python Source Files", self.FileImport3)
         menu1.AppendSeparator()
         Add(menu1, "&Clear\tCtrl-N", "Clear Diagram", self.FileNew)
         menu1.AppendSeparator()
@@ -875,6 +876,7 @@ class MainApp(wx.App):
         self.frame.SetMenuBar(menuBar)
         
     def FileImport(self, event):
+        self.notebook.SetSelection(0)
         dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
             defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
@@ -891,6 +893,7 @@ class MainApp(wx.App):
         from gen_yuml import PySourceAsYuml
         import urllib
         
+        self.notebook.SetSelection(1)
         dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
             defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
@@ -899,8 +902,6 @@ class MainApp(wx.App):
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
             print filenames
             
-            
-            #self.win.Go(files=filenames)
             files=filenames
             p = PySourceAsYuml()
             p.optionModuleAsClass = 0
@@ -917,7 +918,35 @@ class MainApp(wx.App):
             url = baseUrl + urllib.quote(yuml_txt)
             self.yuml.ViewImage(url=url)
 
-            self.win.redraw()
+            wx.EndBusyCursor()
+            print 'Import - Done.'
+
+    def FileImport3(self, event):
+        from gen_asciiart import PySourceAsText
+        import urllib
+        
+        self.notebook.SetSelection(2)
+        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
+            defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            filenames = dlg.GetPaths()
+            print 'Importing...'
+            wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
+            print filenames
+            
+            files=filenames
+            p = PySourceAsText()
+            p.optionModuleAsClass = 0
+            p.verbose = 0
+            if files:
+                for f in files:
+                    p.Parse(f)
+            print p
+
+            self.multiText.SetValue(str(p))
+            self.multiText.ShowPosition(0)
+
+            #self.win.redraw()
             wx.EndBusyCursor()
             print 'Import - Done.'
 

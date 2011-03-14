@@ -232,7 +232,7 @@ class ImageViewer(wx.ScrolledWindow):
 
     def OnResize (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
         self.DebugSizez("resize")
-        if self.NeedToClear():
+        if self.NeedToClear() and self.IsShownOnScreen():
             self.clear_whole_window = True
             self.Refresh()
 
@@ -251,8 +251,8 @@ class ImageViewer(wx.ScrolledWindow):
             msg = "!!!!!!! "
         else:
             msg = "!       "
-        print msg + "(%s) NeedToClear %s GetVirtualSize %d getWidth %d GetClientSize %d self.GetViewStart() %d self.maxWidth %d " % \
-        (fromwheremsg, self.NeedToClear(), self.GetVirtualSize()[0], self.getWidth(), self.GetClientSize()[0], self.GetViewStart()[0], self.maxWidth)
+        print msg + "(%s) visible %d NeedToClear %s GetVirtualSize %d getWidth %d GetClientSize %d self.GetViewStart() %d self.maxWidth %d " % \
+        (fromwheremsg, self.IsShownOnScreen(), self.NeedToClear(), self.GetVirtualSize()[0], self.getWidth(), self.GetClientSize()[0], self.GetViewStart()[0], self.maxWidth)
         
     def OnPaint(self, event):   # ANDY
         dc = wx.PaintDC(self)
@@ -326,7 +326,7 @@ class ImageViewer(wx.ScrolledWindow):
 
     def DoDrawing(self, dc, printing=False):
 
-        if True or self.clear_whole_window:
+        if self.clear_whole_window:
             dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
             dc.Clear()
             self.clear_whole_window = False
