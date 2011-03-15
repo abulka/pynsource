@@ -210,22 +210,12 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         ogl.ShapeEvtHandler.__init__(self)
         self.log = log
         self.statbarFrame = frame
-        self.ZapShape = self._ZapShapeStub
+        
         self.Refreshredraw = self._RefreshredrawStub
-
-    def SetShapeZappingMethod(self, dozapshape):
-        self.ZapShape = dozapshape
 
     def SetPostDeleteRefreshMethod(self, dorefreshredraw):
         self.Refreshredraw = dorefreshredraw
 
-    def _ZapShapeStub(self, shape):
-        """
-        This event handler method calls the window zap shape method, which removes the shape from the
-        app's private list of shapes and composiiton and generalisation shapes.
-        The event handler than removes the shape from the diagram.
-        """
-        print 'No zap shape method defined.'
 
     def _RefreshredrawStub(self):
         print 'No Refreshredraw method defined.'
@@ -329,7 +319,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
             #shape.RemoveLine(line)
             diagram.RemoveShape(line)            
 
-        self.ZapShape(shape)
+        canvas.ZapShape(shape)
         diagram.RemoveShape(shape)
         
 
@@ -709,7 +699,6 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         shape.Show(True)
 
         evthandler = MyEvtHandler(self.log, self.frame)
-        evthandler.SetShapeZappingMethod(self.ZapShape)
         evthandler.SetPostDeleteRefreshMethod(self.secretredrawmethod)
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
