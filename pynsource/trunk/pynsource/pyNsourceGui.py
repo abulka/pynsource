@@ -336,7 +336,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
 import sys, glob
 from gen_java import PythonToJava, PySourceAsJava
 
-class UmlDiagramWindow(ogl.ShapeCanvas):
+class UmlShapeCanvas(ogl.ShapeCanvas):
     scrollStepX = 10
     scrollStepY = 10
     classnametoshape = {}
@@ -351,10 +351,9 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
         self.frame = frame
         self.SetBackgroundColour("LIGHT BLUE") #wxWHITE)
 
-        self.diagram = ogl.Diagram()
-        self.SetDiagram(self.diagram)
-        self.diagram.SetCanvas(self)
-        self.shapes = []
+        self.SetDiagram(ogl.Diagram())
+        self.GetDiagram().SetCanvas(self)
+        self.shapes = []  # ELIMINATE self.shapes!
         self.save_gdi = []
         wx.EVT_WINDOW_DESTROY(self, self.OnDestroy)
 
@@ -383,16 +382,16 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
         #if shape in self.associations_composition:
         #    self.associations_composition.remove(shape)
 
-        assert shape in self.shapes
-        self.shapes.remove(shape)
+        assert shape in self.shapes  # ELIMINATE self.shapes!
+        self.shapes.remove(shape)  # ELIMINATE self.shapes!
 
     def Clear(self):
-        self.diagram.DeleteAllShapes()
+        self.GetDiagram().DeleteAllShapes()
 
         dc = wx.ClientDC(self)
-        self.diagram.Clear(dc)   # only ends up calling dc.Clear() - I wonder if this clears the screen?
+        self.GetDiagram().Clear(dc)   # only ends up calling dc.Clear() - I wonder if this clears the screen?
 
-        self.shapes = []    # different to self.diagram._shapeList
+        self.shapes = []   # ELIMINATE self.shapes!   # different to self.GetDiagram()._shapeList
         self.save_gdi = []
 
         # THIS is the one that we need....
@@ -553,7 +552,7 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
             line.AddArrow(arrowtype)
             line.MakeLineControlPoints(2)
             fromShape.AddLine(line, toShape)
-            self.diagram.AddShape(line)
+            self.GetDiagram().AddShape(line)
             line.Show(True)
 
     def redraw(self):
@@ -563,7 +562,7 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
 
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
-        for shape in self.shapes:
+        for shape in self.shapes:  # ELIMINATE self.shapes!
             shape.Move(dc, shape.GetX(), shape.GetY())
             if not IMAGENODES:
                 shape.SetRegionSizes()
@@ -614,7 +613,7 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
                 mostshapesinpriorityorder.append(shape)
 
         # find and loose shapes not associated to anything
-        remainingshapes = [ shape for shape in self.shapes if shape not in mostshapesinpriorityorder ]
+        remainingshapes = [ shape for shape in self.shapes if shape not in mostshapesinpriorityorder ]  # ELIMINATE self.shapes!
 
         return mostshapesinpriorityorder + remainingshapes
 
@@ -650,15 +649,15 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
                 y = y + biggestYthisrow + verticalWhiteSpace
                 biggestYthisrow = 0
 
-            whiteSpace = 50 # (width - currentWidth)/(len(self.shapes)-1.0 or 2.0)
+            whiteSpace = 50 # (width - currentWidth)/(len(self.shapes)-1.0 or 2.0)  # ELIMINATE self.shapes!
             shapeX, shapeY = self.getShapeSize(classShape)
 
             if shapeY >= biggestYthisrow:
                 biggestYthisrow = shapeY
 
             # snap to diagram grid coords
-            #csX, csY = self.diagram.Snap((shapeX/2.0)+x, (shapeY/2.0)+y)
-            #csX, csY = self.diagram.Snap(x, y)
+            #csX, csY = self.GetDiagram().Snap((shapeX/2.0)+x, (shapeY/2.0)+y)
+            #csX, csY = self.GetDiagram().Snap(x, y)
             # don't display until finished
             positions.append((x,y))
 
@@ -709,7 +708,7 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
             for line in text.split('\n'):
                 shape.AddText(line)
         #shape.SetShadowMode(ogl.SHADOW_RIGHT)
-        self.diagram.AddShape(shape)
+        self.GetDiagram().AddShape(shape)
         shape.Show(True)
 
         evthandler = MyEvtHandler(self.log, self.frame)
@@ -719,14 +718,33 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
 
-        self.shapes.append(shape)
+        self.shapes.append(shape)  # ELIMINATE self.shapes!
+        
+        # Diagnostic re shapes.
+        # we have our own private self.shapes which I am trying to get rid of.  # ELIMINATE self.shapes!
+        sl = self.GetDiagram().GetShapeList()
+        sl2 = [s for s in sl if isinstance(s, DividedShape)]
+        
+        def AreListsExactlyTheSame(l1, l2):
+            for i in l1:
+                if i not in l2:
+                    return False
+            if len(l1) <> len(l2):
+                for i in l2:
+                    if i not in l1:
+                        return False
+            return True
+                
+        print "uml shapes %2d  diagram shapes %2d  same %s" % (len(self.shapes), len(sl2), AreListsExactlyTheSame(self.shapes, sl2))  # ELIMINATE self.shapes!
+        
+        
         return shape
 
 
     def OnDestroy(self, evt):
         # Do some cleanup
         # DO WE NEED THIS? - OGL.py doesn't.
-        for shape in self.diagram.GetShapeList():
+        for shape in self.GetDiagram().GetShapeList():
             if shape.GetParent() == None:
                 shape.SetCanvas(None)
 
@@ -735,7 +753,7 @@ class UmlDiagramWindow(ogl.ShapeCanvas):
         self.DeselectAllShapes()
 
     def DeselectAllShapes(self):
-        shapeList = self.diagram.GetShapeList()
+        shapeList = self.GetDiagram().GetShapeList()
 
         def GetCanvasDc(s):
             canvas = s.GetCanvas()
@@ -781,7 +799,7 @@ class MainApp(wx.App):
 
         if MULTI_TAB_GUI:
             self.notebook = wx.Notebook(self.frame, -1)
-            self.win = UmlDiagramWindow(self.notebook, Log(), self.frame)
+            self.win = UmlShapeCanvas(self.notebook, Log(), self.frame)
             self.yuml = ImageViewer(self.notebook) # wx.Panel(self.notebook, -1)
             self.asciiart = wx.Panel(self.notebook, -1)
     
@@ -803,7 +821,7 @@ class MainApp(wx.App):
             self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabPageChanged)
             
         else:
-            self.win = UmlDiagramWindow(self.frame, Log(), self.frame)
+            self.win = UmlShapeCanvas(self.frame, Log(), self.frame)
             
         self.win.secretredrawmethod = self.OnRefresh    # Hack so can do a high level refresh screen after a delete node event.
         ogl.OGLInitialize()  # creates some pens and brushes that the OGL library uses.
@@ -818,9 +836,9 @@ class MainApp(wx.App):
 
 
         # Debug bootstrap
-        #self.frame.SetSize((1024,768))
-        #self.win.Go(files=[os.path.abspath( __file__ )])
-        #self.win.redraw()
+        self.frame.SetSize((1024,768))
+        self.win.Go(files=[os.path.abspath( __file__ )])
+        self.win.redraw()
         
         return True
 
