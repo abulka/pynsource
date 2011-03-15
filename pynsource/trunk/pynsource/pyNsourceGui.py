@@ -353,7 +353,6 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
         self.SetDiagram(ogl.Diagram())
         self.GetDiagram().SetCanvas(self)
-        self.shapes = []  # ELIMINATE self.shapes!
         self.save_gdi = []
         wx.EVT_WINDOW_DESTROY(self, self.OnDestroy)
 
@@ -382,8 +381,8 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         #if shape in self.associations_composition:
         #    self.associations_composition.remove(shape)
 
-        assert shape in self.shapes  # ELIMINATE self.shapes!
-        self.shapes.remove(shape)  # ELIMINATE self.shapes!
+        assert shape in self.umlboxshapes
+        # Actual removal of shape occurs in calling method, RightClickDeleteNode
 
     def Clear(self):
         self.GetDiagram().DeleteAllShapes()
@@ -391,7 +390,6 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         dc = wx.ClientDC(self)
         self.GetDiagram().Clear(dc)   # only ends up calling dc.Clear() - I wonder if this clears the screen?
 
-        self.shapes = []   # ELIMINATE self.shapes!   # different to self.GetDiagram()._shapeList
         self.save_gdi = []
 
         # THIS is the one that we need....
@@ -562,7 +560,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
-        for shape in self.shapes:  # ELIMINATE self.shapes!
+        for shape in self.umlboxshapes:
             shape.Move(dc, shape.GetX(), shape.GetY())
             if not IMAGENODES:
                 shape.SetRegionSizes()
@@ -613,7 +611,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
                 mostshapesinpriorityorder.append(shape)
 
         # find and loose shapes not associated to anything
-        remainingshapes = [ shape for shape in self.shapes if shape not in mostshapesinpriorityorder ]  # ELIMINATE self.shapes!
+        remainingshapes = [ shape for shape in self.umlboxshapes if shape not in mostshapesinpriorityorder ]
 
         return mostshapesinpriorityorder + remainingshapes
 
@@ -649,7 +647,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
                 y = y + biggestYthisrow + verticalWhiteSpace
                 biggestYthisrow = 0
 
-            whiteSpace = 50 # (width - currentWidth)/(len(self.shapes)-1.0 or 2.0)  # ELIMINATE self.shapes!
+            whiteSpace = 50
             shapeX, shapeY = self.getShapeSize(classShape)
 
             if shapeY >= biggestYthisrow:
@@ -707,7 +705,6 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         if text:
             for line in text.split('\n'):
                 shape.AddText(line)
-        #shape.SetShadowMode(ogl.SHADOW_RIGHT)
         self.GetDiagram().AddShape(shape)
         shape.Show(True)
 
@@ -718,29 +715,15 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
 
-        self.shapes.append(shape)  # ELIMINATE self.shapes!
-        
-        # Diagnostic re shapes.
-        # we have our own private self.shapes which I am trying to get rid of.  # ELIMINATE self.shapes!
-        sl = self.GetDiagram().GetShapeList()
-        sl2 = [s for s in sl if isinstance(s, DividedShape)]
-        
-        def AreListsExactlyTheSame(l1, l2):
-            for i in l1:
-                if i not in l2:
-                    return False
-            if len(l1) <> len(l2):
-                for i in l2:
-                    if i not in l1:
-                        return False
-            return True
-                
-        print "uml shapes %2d  diagram shapes %2d  same %s" % (len(self.shapes), len(sl2), AreListsExactlyTheSame(self.shapes, sl2))  # ELIMINATE self.shapes!
-        
-        
         return shape
 
 
+    def get_umlboxshapes(self):
+        return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]
+
+    umlboxshapes = property(get_umlboxshapes)
+    
+    
     def OnDestroy(self, evt):
         # Do some cleanup
         # DO WE NEED THIS? - OGL.py doesn't.
