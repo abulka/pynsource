@@ -296,32 +296,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         self.statbarFrame.PopupMenu(self.popupmenu, wx.Point(x,y))
 
     def RightClickDeleteNode(self):
-        shape = self.GetShape()
-        canvas = shape.GetCanvas()
-        dc = wx.ClientDC(canvas)
-        canvas.PrepareDC(dc)
-        diagram = canvas.GetDiagram()
-        
-        assert 1 == 1
-
-        if shape.Selected():
-            shape.Select(False, dc)
-            canvas.Refresh(False)
-
-        # should do list clone instead, just don't want pointer want true copy of refs
-        lineList = shape.GetLines()
-        toDelete = []
-        for line in shape.GetLines():
-            toDelete.append(line)
-            
-        for line in toDelete:
-            line.Unlink()
-            #shape.RemoveLine(line)
-            diagram.RemoveShape(line)            
-
-        canvas.ZapShape(shape)
-        diagram.RemoveShape(shape)
-        
+        self.GetShape().GetCanvas().CmdZapShape(self.GetShape())
 
 import sys, glob
 from gen_java import PythonToJava, PySourceAsJava
@@ -354,7 +329,29 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.associations_generalisation = None
         self.associations_composition = None
 
-    def ZapShape(self, shape):
+    def CmdZapShape(self, shape):
+        canvas = self
+        diagram = self.GetDiagram()
+
+        dc = wx.ClientDC(canvas)
+        canvas.PrepareDC(dc)
+        
+        if shape.Selected():
+            shape.Select(False, dc)
+            canvas.Refresh(False)
+
+        # should do list clone instead, just don't want pointer want true copy of refs
+        lineList = shape.GetLines()
+        toDelete = []
+        for line in shape.GetLines():
+            toDelete.append(line)
+            
+        for line in toDelete:
+            line.Unlink()
+            #shape.RemoveLine(line)
+            diagram.RemoveShape(line)            
+
+        # Uml related....
         classnames = self.classnametoshape.keys()
         for classname in classnames:
             if self.classnametoshape[classname] == shape:
@@ -372,7 +369,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         #    self.associations_composition.remove(shape)
 
         assert shape in self.umlboxshapes
-        # Actual removal of shape occurs in calling method, RightClickDeleteNode
+        diagram.RemoveShape(shape)
 
     def Clear(self):
         self.GetDiagram().DeleteAllShapes()
@@ -999,7 +996,7 @@ class MainApp(wx.App):
     def OnDeleteNode(self, event):
         for shape in self.win.GetDiagram().GetShapeList():
             if shape.Selected():
-                self.MessageBox("To delete a node, right click on it with your mouse (delete via main menu functionality coming soon) %d" % shape.GetX())
+                self.win.CmdZapShape(shape)
 
     def OnLayout(self, event):
         if self.win.GetDiagram().GetCount() == 0:
