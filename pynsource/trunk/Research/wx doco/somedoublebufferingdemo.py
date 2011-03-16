@@ -1,3 +1,5 @@
+# -*- coding: iso-8859-1 -*-#
+
 #!/usr/bin/env python
 
 import wx
@@ -24,7 +26,7 @@ class BufferedWindow(wx.Window):
     When the drawing needs to change, you app needs to call the
     UpdateDrawing() method. Since the drawing is stored in a bitmap, you
     can also save the drawing to file by calling the
-    SaveToFile(self,file_name,file_type) method.
+    SaveToFile(self, file_name, file_type) method.
 
     """
     def __init__(self, *args, **kwargs):
@@ -39,8 +41,9 @@ class BufferedWindow(wx.Window):
         # This might result in OnSize getting called twice on some
         # platforms at initialization, but little harm done.
         self.OnSize(None)
+        self.paint_count = 0
 
-    def Draw(self,dc):
+    def Draw(self, dc):
         ## just here as a place holder.
         ## This method should be over-ridden when subclassed
         pass
@@ -51,12 +54,13 @@ class BufferedWindow(wx.Window):
             dc = wx.BufferedPaintDC(self, self._Buffer)
         else:
             dc = wx.PaintDC(self)
-            dc.DrawBitmap(self._Buffer,0,0)
+            dc.DrawBitmap(self._Buffer, 0, 0)
 
     def OnSize(self,event):
         # The Buffer init is done here, to make sure the buffer is always
         # the same size as the Window
-        Size  = self.GetClientSizeTuple()
+        #Size  = self.GetClientSizeTuple()
+        Size  = self.ClientSize
 
         # Make new offscreen bitmap: this bitmap will always have the
         # current drawing in it, so it can be used to save the image to
@@ -64,11 +68,11 @@ class BufferedWindow(wx.Window):
         self._Buffer = wx.EmptyBitmap(*Size)
         self.UpdateDrawing()
 
-    def SaveToFile(self,FileName,FileType):
+    def SaveToFile(self, FileName, FileType=wx.BITMAP_TYPE_PNG):
         ## This will save the contents of the buffer
         ## to the specified file. See the wxWindows docs for 
         ## wx.Bitmap::SaveFile for the details
-        self._Buffer.SaveFile(FileName,FileType)
+        self._Buffer.SaveFile(FileName, FileType)
 
     def UpdateDrawing(self):
         """
@@ -83,9 +87,10 @@ class BufferedWindow(wx.Window):
         dc = wx.MemoryDC()
         dc.SelectObject(self._Buffer)
         self.Draw(dc)
+        del dc # need to get rid of the MemoryDC before Update() is called.
         self.Refresh()
         self.Update()
-            
+
 class DrawWindow(BufferedWindow):
     def __init__(self, *args, **kwargs):
         ## Any data the Draw() function needs must be initialized before
@@ -99,7 +104,7 @@ class DrawWindow(BufferedWindow):
         dc.Clear() # make sure you clear the bitmap!
 
         # Here's the actual drawing code.
-        for key,data in self.DrawData.items():
+        for key, data in self.DrawData.items():
             if key == "Rectangles":
                 dc.SetBrush(wx.BLUE_BRUSH)
                 dc.SetPen(wx.Pen('VIOLET', 4))
@@ -122,17 +127,17 @@ class TestFrame(wx.Frame):
         wx.Frame.__init__(self, parent,
                           size = (500,500),
                           title="Double Buffered Test",
-                          style=wx.DEFAULT_FRAME_STYLE | wx.NO_FULL_REPAINT_ON_RESIZE)
+                          style=wx.DEFAULT_FRAME_STYLE)
 
         ## Set up the MenuBar
         MenuBar = wx.MenuBar()
-        
+
         file_menu = wx.Menu()
-        
+
         item = file_menu.Append(wx.ID_EXIT, text="&Exit")
         self.Bind(wx.EVT_MENU, self.OnQuit, item)
         MenuBar.Append(file_menu, "&File")
-        
+
         draw_menu = wx.Menu()
         item = draw_menu.Append(wx.ID_ANY, "&New Drawing","Update the Drawing Data")
         self.Bind(wx.EVT_MENU, self.NewDrawing, item)
@@ -141,14 +146,16 @@ class TestFrame(wx.Frame):
         MenuBar.Append(draw_menu, "&Draw")
 
         self.SetMenuBar(MenuBar)
-
-
         self.Window = DrawWindow(self)
+        self.Show()
+        # Initialize a drawing -- it has to be done after Show() is called
+        #   so that the Windows has teh right size.
+        self.NewDrawing()
 
     def OnQuit(self,event):
         self.Close(True)
-        
-    def NewDrawing(self,event):
+
+    def NewDrawing(self, event=None):
         self.Window.DrawData = self.MakeNewData()
         self.Window.UpdateDrawing()
 
@@ -159,7 +166,7 @@ class TestFrame(wx.Frame):
                            wildcard = "*.png",
                            style = wx.SAVE)
         if dlg.ShowModal() == wx.ID_OK:
-            self.Window.SaveToFile(dlg.GetPath(),wx.BITMAP_TYPE_PNG)
+            self.Window.SaveToFile(dlg.GetPath(), wx.BITMAP_TYPE_PNG)
         dlg.Destroy()
 
     def MakeNewData(self):
@@ -201,40 +208,11 @@ class TestFrame(wx.Frame):
 
 class DemoApp(wx.App):
     def OnInit(self):
-        #wx.InitAllImageHandlers() # called so a PNG can be saved      
         frame = TestFrame()
-        frame.Show(True)
-
-        ## initialize a drawing
-        ## It doesn't seem like this should be here, but the Frame does
-        ## not get sized until Show() is called, so it doesn't work if
-        ## it is put in the __init__ method.
-        frame.NewDrawing(None)
-
         self.SetTopWindow(frame)
 
         return True
 
 if __name__ == "__main__":
-    print "about to initialize the app"
     app = DemoApp(0)
     app.MainLoop()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
