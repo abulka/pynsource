@@ -5,6 +5,11 @@ import os, glob
 from keywords import javakeywords
 
 class PySourceAsJava(PySourceAsText):
+    """
+    PySourceAsText actually does the parsing by virtue of inheriting from PynsourcePythonParser
+    PySourceAsText just happens to have a __str__ template method which calls overridden _methods here
+    TODO: Refactor so that we inherit from a common 'Generator' class.  The generator class can then either inherit from PynsourcePythonParser or own a PynsourcePythonParser
+    """
     def __init__(self, outdir=None):
         PySourceAsText.__init__(self)
         self.outdir = outdir
@@ -91,7 +96,7 @@ class PySourceAsJava(PySourceAsText):
         pass
 
 
-class PythonToJava:
+class CmdLinePythonToJava:
     def __init__(self, directories, treatmoduleasclass=0, verbose=0):
         self.directories = directories
         self.optionModuleAsClass = treatmoduleasclass
@@ -136,10 +141,11 @@ class PythonToJava:
         print '%sProcessing %s...'%(padding, thefile)
         p = self._CreateParser()
         p.Parse(filepath)
-        str(p)  # triggers the output.
+        str(p)  # triggers the output.  (template method in the __str__ parent class will trigger the _methods overriden in PySourceAsJava)
 
     def _CreateParser(self):
-        p = PySourceAsJava(self.outpath)
+        self.p = PySourceAsJava(self.outpath)  # using self.p = rather than p = to get pynsource to see the dependency - need to fix so that regular p = PySourceAsJava() will get recognised (see todo doco)
+        p = self.p
         p.optionModuleAsClass = self.optionModuleAsClass
         p.verbose = self.verbose
         return p

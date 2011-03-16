@@ -1,10 +1,10 @@
 # generate asciiart
 
-from core_parser import HandleModuleLevelDefsAndAttrs
+from core_parser import PynsourcePythonParser
 
-class PySourceAsText(HandleModuleLevelDefsAndAttrs):
+class PySourceAsText(PynsourcePythonParser):
     def __init__(self):
-        HandleModuleLevelDefsAndAttrs.__init__(self)
+        PynsourcePythonParser.__init__(self)
         self.listcompositesatend = 0
         self.embedcompositeswithattributelist = 1
         self.result = ''
@@ -76,7 +76,7 @@ class PySourceAsText(HandleModuleLevelDefsAndAttrs):
             self.result += '  ModuleMethods = %s\n' % `self.modulemethods`
 ##        self.result += '\n'
 
-    def __str__(self):
+    def __str__(self):   # DESIGN PATTERN: Template method, subclasses override the _methods to vary
         self.result = ''
         self._DumpClassHeader()
         self._DumpModuleMethods()
@@ -97,11 +97,10 @@ class PySourceAsText(HandleModuleLevelDefsAndAttrs):
                     else:
                         return 1
             classnames.sort(cmpfunc)
-        for self.aclass in classnames:
+            
+        for self.aclass in classnames:   # for self.aclass, self.classentry in self.classlist.items():
             self.classentry = self.classlist[self.aclass]
 
-
-##        for self.aclass, self.classentry in self.classlist.items():
             self._DumpClassNameAndGeneralisations()
             self._DumpAttributes()
             self._Line()

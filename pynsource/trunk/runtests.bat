@@ -6,7 +6,7 @@ cd tests
 python alltests.py
 cd ..
 REM pause
-goto end
+REM goto end
 
 :java
 cd tests\testing-generate-java

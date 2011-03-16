@@ -1,7 +1,7 @@
 # generate delphi
 
 from gen_asciiart import PySourceAsText
-from gen_java import PythonToJava
+from gen_java import CmdLinePythonToJava
 import os
 from keywords import delphikeywords
 
@@ -219,12 +219,13 @@ class PySourceAsDelphi(PySourceAsText):
     def _Line(self):
         pass
 
-class PythonToDelphi(PythonToJava):
+class CmdLinePythonToDelphi(CmdLinePythonToJava):
     def _GenerateAuxilliaryJavaClasses(self):
         pass
 
     def _CreateParser(self):
-        p = PySourceAsDelphi(self.outpath)
+        self.p = PySourceAsDelphi(self.outpath)    # using self.p = rather than p = to get pynsource to see the dependency - need to fix so that regular p = PySourceAsJava() will get recognised (see todo doco)
+        p = self.p
         p.optionModuleAsClass = self.optionModuleAsClass
         p.verbose = self.verbose
         return p

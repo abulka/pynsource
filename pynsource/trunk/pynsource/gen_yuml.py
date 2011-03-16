@@ -1,6 +1,6 @@
 # generate Yuml (both text and png)
 
-from core_parser import HandleModuleLevelDefsAndAttrs
+from core_parser import PynsourcePythonParser
 
 class Klass:
     def __init__(self, name, parent=None, connectsto=None, connectorstyle=None, attrs="", defs=""):
@@ -66,9 +66,9 @@ class Yuml:
         return  s
 
                  
-class PySourceAsYuml(HandleModuleLevelDefsAndAttrs):
+class PySourceAsYuml(PynsourcePythonParser):
     def __init__(self):
-        HandleModuleLevelDefsAndAttrs.__init__(self)
+        PynsourcePythonParser.__init__(self)
         self.result = ''
         self.aclass = None
         self.classentry = None

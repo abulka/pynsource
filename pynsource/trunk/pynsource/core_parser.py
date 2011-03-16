@@ -546,3 +546,7 @@ class HandleModuleLevelDefsAndAttrs(HandleClassStaticAttrs):
         classentry.AddAttribute(self.modulelevelattrname, attrtype)
         #print '       ATTR  ', self.currvarname
         #self.JustGotASelfAttr(self.currvarname)
+
+class PynsourcePythonParser(HandleModuleLevelDefsAndAttrs):
+    def __init__(self):
+        HandleModuleLevelDefsAndAttrs.__init__(self)

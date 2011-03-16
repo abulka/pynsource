@@ -1,0 +1,6 @@
+TODO
+====
+
+Regular dependencies should be represented in the uml
+e.g. CmdLinePythonToJava creates an instance of PySourceAsText but because its assigned to a local variable, it doesn't register as a dependency.
+

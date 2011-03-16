@@ -2,10 +2,10 @@
 
 import os
 from core_parser import *
-from gen_asciiart import PySourceAsText
-from gen_yuml import PySourceAsYuml, yuml_create_png
-from gen_delphi import PythonToDelphi
-from gen_java import PythonToJava
+from gen_asciiart import PySourceAsText  # TODO should create an equivalent CmdLinePythonToAsciiArt to point to PySourceAsText
+from gen_yuml import PySourceAsYuml, yuml_create_png # TODO should create an equivalent CmdLinePythonToYuml to point to PySourceAsYuml
+from gen_delphi import CmdLinePythonToDelphi
+from gen_java import CmdLinePythonToJava
 import messages
 
 def test():
@@ -74,9 +74,9 @@ def ParseArgsAndRun():
     if globbed:
         if optionExportToJava or optionExportToDelphi:
             if optionExportToJava:
-                u = PythonToJava(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
+                u = CmdLinePythonToJava(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
             else:
-                u = PythonToDelphi(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
+                u = CmdLinePythonToDelphi(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
             u.ExportTo(optionExportTo_outdir)
         elif optionExportToYuml:
             p = PySourceAsYuml()
