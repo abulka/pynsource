@@ -1,12 +1,12 @@
 # generate java
 
-import os, glob
+import os
 from keywords import javakeywords
-from gen_base import ParseReportGenerator
+from gen_base import ReportGenerator, CmdLineGenerator
 
-class PySourceAsJava(ParseReportGenerator):
+class PySourceAsJava(ReportGenerator):
     def __init__(self, outdir=None):
-        ParseReportGenerator.__init__(self)
+        ReportGenerator.__init__(self)
         self.outdir = outdir
         self.fp = None
 
@@ -21,7 +21,7 @@ class PySourceAsJava(ParseReportGenerator):
 
     def _DumpModuleMethods(self):
         self.result += '/*\n'
-        ParseReportGenerator._DumpModuleMethods(self)
+        ReportGenerator._DumpModuleMethods(self)
         self.result += '*/\n'
 
     def _OpenNextFile(self):
@@ -89,11 +89,7 @@ class PySourceAsJava(ParseReportGenerator):
         pass
 
 
-class CmdLinePythonToJava:
-    def __init__(self, directories, treatmoduleasclass=0, verbose=0):
-        self.directories = directories
-        self.optionModuleAsClass = treatmoduleasclass
-        self.verbose = verbose
+class CmdLinePythonToJava(CmdLineGenerator):
 
     def _GenerateAuxilliaryClasses(self):
         classestocreate = ('variant', 'unittest', 'list', 'object', 'dict')  # should add more classes and add them to a jar file to avoid namespace pollution.
@@ -105,41 +101,6 @@ class CmdLinePythonToJava:
     def GenerateSourceFileForAuxClass(self, aclass):
        return '\npublic class %s {\n}\n'%aclass
 
-    def ExportTo(self, outpath):
-        self.outpath = outpath
-
-        self._GenerateAuxilliaryClasses()
-
-        for directory in self.directories:
-            if '*' in directory or '.' in directory:
-                filepath = directory
-            else:
-                filepath = os.path.join(directory, "*.py")
-            if self.verbose:
-                print 'Processing directory', filepath
-            globbed = glob.glob(filepath)
-            #print 'Java globbed is', globbed
-            for f in globbed:
-                self._Process(f)
-
-    def _Process(self, filepath):
-        if self.verbose:
-            padding = ' '
-        else:
-            padding = ''
-        thefile = os.path.basename(filepath)
-        if thefile[0] == '_':
-            print '  ', 'Skipped', thefile, 'cos begins with underscore.'
-            return
-        print '%sProcessing %s...'%(padding, thefile)
-        p = self._CreateParser()
-        p.Parse(filepath)
-        str(p)  # triggers the output.  (template method in the __str__ parent class will trigger the _methods overriden in PySourceAsJava)
-
     def _CreateParser(self):
-        self.p = PySourceAsJava(self.outpath)  # using self.p = rather than p = to get pynsource to see the dependency - need to fix so that regular p = PySourceAsJava() will get recognised (see todo doco)
-        p = self.p
-        p.optionModuleAsClass = self.optionModuleAsClass
-        p.verbose = self.verbose
-        return p
+        self.p = PySourceAsJava(self.outpath)
 

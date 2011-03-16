@@ -1,10 +1,10 @@
 # generate asciiart
 
-from gen_base import ParseReportGenerator
+from gen_base import ReportGenerator
 
-class PySourceAsText(ParseReportGenerator):
+class PySourceAsText(ReportGenerator):
     def __init__(self):
-        ParseReportGenerator.__init__(self)
+        ReportGenerator.__init__(self)
 
     def _DumpAttribute(self, attrobj):
         compositescreated = self._GetCompositeCreatedClassesFor(attrobj.attrname)

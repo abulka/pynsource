@@ -69,3 +69,19 @@ yUML EXAMPLES
 python pynsource.py -y yumlout.png tests\\python-in\\testmodule01.py
 python pynsource.py -y None tests\\python-in\\testmodule01.py
 """
+
+DELPHI_UNIT_FILE_TEMPLATE = """
+unit unit_%s;
+
+interface
+
+type
+
+    %s = class
+    public
+    end;
+
+implementation
+
+end.
+"""

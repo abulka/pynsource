@@ -1,8 +1,9 @@
-# gen_base - ParseReportGenerator
+# base class for output generators and for the cmdline wrappers for those generators
 
 from core_parser import PynsourcePythonParser
+import os, glob
 
-class ParseReportGenerator(PynsourcePythonParser):
+class ReportGenerator(PynsourcePythonParser):
     def __init__(self):
         PynsourcePythonParser.__init__(self)
         self.listcompositesatend = 0
@@ -78,3 +79,42 @@ class ParseReportGenerator(PynsourcePythonParser):
     def __str__(self):
         return self.GenReportDump()
     
+class CmdLineGenerator:
+    def __init__(self, directories, treatmoduleasclass=0, verbose=0):
+        self.directories = directories
+        self.optionModuleAsClass = treatmoduleasclass
+        self.verbose = verbose
+
+    def ExportTo(self, outpath):     # Template method
+        self.outpath = outpath
+
+        self._GenerateAuxilliaryClasses()  # overridden by subclasses
+
+        for directory in self.directories:
+            if '*' in directory or '.' in directory:
+                filepath = directory
+            else:
+                filepath = os.path.join(directory, "*.py")
+            if self.verbose:
+                print 'Processing directory', filepath
+            globbed = glob.glob(filepath)
+            for f in globbed:
+                self._Process(f)
+
+    def _Process(self, filepath):    # Template method
+        if self.verbose:
+            padding = ' '
+        else:
+            padding = ''
+        thefile = os.path.basename(filepath)
+        if thefile[0] == '_':
+            print '  ', 'Skipped', thefile, 'cos begins with underscore.'
+            return
+        print '%sProcessing %s...'%(padding, thefile)
+
+        self._CreateParser() # overridden by subclasses
+        self.p.optionModuleAsClass = self.optionModuleAsClass
+        self.p.verbose = self.verbose
+        
+        self.p.Parse(filepath)
+        str(self.p)  # triggers the output on the generator.  Usually involves calling a complex template method being invoked, which calls overridden methods in particular generator classes.

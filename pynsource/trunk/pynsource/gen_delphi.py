@@ -2,8 +2,8 @@
 
 import os
 from keywords import delphikeywords
-from gen_base import ParseReportGenerator
-from gen_java import CmdLinePythonToJava  # TODO get rid of this dependency
+from gen_base import ReportGenerator, CmdLineGenerator
+from messages import DELPHI_UNIT_FILE_TEMPLATE
 
 def unique(s):
     """ Return a list of the elements in list s in arbitrary order, but without duplicates """
@@ -21,9 +21,9 @@ def unique(s):
 
     raise "uniqueness algorithm failed .. type more of it in please - see http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52560"
 
-class PySourceAsDelphi(ParseReportGenerator):
+class PySourceAsDelphi(ReportGenerator):
     def __init__(self, outdir=None):
-        ParseReportGenerator.__init__(self)
+        ReportGenerator.__init__(self)
         self.outdir = outdir
         self.fp = None
 
@@ -44,7 +44,7 @@ class PySourceAsDelphi(ParseReportGenerator):
 
     def _DumpModuleMethods(self):
         self.result += '(*\n'
-        ParseReportGenerator._DumpModuleMethods(self)
+        ReportGenerator._DumpModuleMethods(self)
         self.result += '*)\n\n'
 
     def _OpenNextFile(self):
@@ -173,16 +173,7 @@ class PySourceAsDelphi(ParseReportGenerator):
     def _Line(self):
         pass
 
-class CmdLinePythonToDelphi(CmdLinePythonToJava):
-    def _GenerateAuxilliaryJavaClasses(self):
-        pass
-
-    def _CreateParser(self):
-        self.p = PySourceAsDelphi(self.outpath)    # using self.p = rather than p = to get pynsource to see the dependency - need to fix so that regular p = PySourceAsJava() will get recognised (see todo doco)
-        p = self.p
-        p.optionModuleAsClass = self.optionModuleAsClass
-        p.verbose = self.verbose
-        return p
+class CmdLinePythonToDelphi(CmdLineGenerator):
 
     def _GenerateAuxilliaryClasses(self):
         # Delphi version omits the class 'object' and 'variant' since these already are pre-defined in Delphi.
@@ -193,33 +184,15 @@ class CmdLinePythonToDelphi(CmdLinePythonToJava):
             fp.close()
 
     def GenerateSourceFileForAuxClass(self, aclass):
-       template = """
-unit unit_%s;
+       return DELPHI_UNIT_FILE_TEMPLATE%(aclass, aclass)
 
-interface
-
-type
-
-    %s = class
-    public
-    end;
-
-implementation
-
-end.
-       """
-       return template%(aclass,aclass)
-
-
-
-
-###########################################################
-
+    def _CreateParser(self):
+        self.p = PySourceAsDelphi(self.outpath)
 
 
 
 """
-Example Delphi source file:
+  // Example Delphi source file:
 
   unit test000123;
 

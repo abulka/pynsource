@@ -1,6 +1,6 @@
 # generate Yuml (both text and png)
 
-from gen_base import ParseReportGenerator
+from gen_base import ReportGenerator
 
 class Klass:
     def __init__(self, name, parent=None, connectsto=None, connectorstyle=None, attrs="", defs=""):
@@ -66,9 +66,9 @@ class Yuml:
         return  s
 
                  
-class PySourceAsYuml(ParseReportGenerator):
+class PySourceAsYuml(ReportGenerator):
     def __init__(self):
-        ParseReportGenerator.__init__(self)
+        ReportGenerator.__init__(self)
         self.yumls = []
         self.enriched_yuml_classes = []
 
