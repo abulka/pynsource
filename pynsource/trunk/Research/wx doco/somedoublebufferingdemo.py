@@ -96,6 +96,10 @@ class BufferedWindow(wx.Window):
             self.Draw(dc)
             # update the screen
             wx.ClientDC(self).DrawBitmap(self._Buffer,0,0)
+            
+            # Attempted fix by Christopher Barker via email -  resulted in a worse result - just a white screen with nothing there. 
+            #self.Refresh()
+            #self.Update()
 
 class DrawWindow(BufferedWindow):
     def __init__(self, parent, id = -1):
