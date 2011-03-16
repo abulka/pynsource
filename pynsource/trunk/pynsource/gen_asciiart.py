@@ -51,12 +51,12 @@ class CmdLinePythonToAsciiArt(CmdLineGenerator):
     def _CreateParser(self):
         self.p = PySourceAsText()
 
-    def _Process(self):             # Override Template method entirely
+    def _Process(self):
         self._CreateParser()
         self.p.optionModuleAsClass = self.optionModuleAsClass
         self.p.verbose = self.verbose
 
-    def ExportTo(self, outpath=None):     # Override Template method entirely
+    def ExportTo(self, outpath=None):     # Override and redefine Template method entirely
         """
         In this asciiart case self.directories
         actually is a list of files
@@ -64,6 +64,6 @@ class CmdLinePythonToAsciiArt(CmdLineGenerator):
         globbed = self.directories  # files
         self._Process()
         for f in globbed:
-            p.Parse(f)
-        print p  # triggers the complex output behaviour on the generator
+            self.p.Parse(f)
+        print self.p  # triggers the complex output behaviour on the generator
         

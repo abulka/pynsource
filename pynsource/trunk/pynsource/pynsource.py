@@ -1,9 +1,9 @@
 # pynsource command line tool
 
 import os
-from core_parser import *
+#from core_parser import *
 from gen_asciiart import CmdLinePythonToAsciiArt
-from gen_yuml import PySourceAsYuml, yuml_create_png # TODO should create an equivalent CmdLinePythonToYuml to point to PySourceAsYuml
+from gen_yuml import CmdLinePythonToYuml
 from gen_delphi import CmdLinePythonToDelphi
 from gen_java import CmdLinePythonToJava
 import messages
@@ -79,23 +79,8 @@ def ParseArgsAndRun():
                 u = CmdLinePythonToDelphi(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
             u.ExportTo(optionExportTo_outdir)
         elif optionExportToYuml:
-            p = PySourceAsYuml()
-            p.optionModuleAsClass = optionModuleAsClass
-            p.verbose = optionVerbose
-            for f in globbed:
-                p.Parse(f)
-            p.CalcYumls()
-            print p
-            
-            if optionExportTo_outpng <> "nopng" :
-                if not '.png' in optionExportTo_outpng.lower():
-                    print "output filename %s must have .png in the name" % optionExportTo_outpng
-                    exit(0)
-                print 'Generating yuml diagram...'
-                yuml_create_png(','.join(str(p).split()), optionExportTo_outpng)
-                os.system(optionExportTo_outpng)
-                print 'Done!'
-            
+            u = CmdLinePythonToYuml(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
+            u.ExportTo(optionExportTo_outpng)
         else:
             u = CmdLinePythonToAsciiArt(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
             u.ExportTo(None)

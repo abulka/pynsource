@@ -1,6 +1,6 @@
 # generate Yuml (both text and png)
 
-from gen_base import ReportGenerator
+from gen_base import ReportGenerator, CmdLineGenerator
 
 class Klass:
     def __init__(self, name, parent=None, connectsto=None, connectorstyle=None, attrs="", defs=""):
@@ -180,7 +180,46 @@ class PySourceAsYuml(ReportGenerator):
         self.result = ''
         self.YumlDump()
         return self.result
-    
+
+class CmdLinePythonToYuml(CmdLineGenerator):
+    """
+    The only thing we inherit from CmdLineGenerator is the constructor
+    At least we offer similar interface to the world.
+    """
+    def _GenerateAuxilliaryClasses(self):
+        pass
+
+    def _CreateParser(self):
+        self.p = PySourceAsYuml()
+
+    def _Process(self):
+        self._CreateParser()
+        self.p.optionModuleAsClass = self.optionModuleAsClass
+        self.p.verbose = self.verbose
+
+    def ExportTo(self, outpath=None):     # Override and redefine Template method entirely
+        """
+        In this asciiart case self.directories
+        actually is a list of files
+        """
+        globbed = self.directories  # files
+        self._Process()
+        for f in globbed:
+            self.p.Parse(f)
+        self.p.CalcYumls()
+        print self.p  # triggers the complex output behaviour on the generator
+        
+        optionExportTo_outpng = outpath
+        
+        if optionExportTo_outpng <> "nopng" :
+            if not '.png' in optionExportTo_outpng.lower():
+                print "output filename %s must have .png in the name" % optionExportTo_outpng
+                exit(0)
+            print 'Generating yuml diagram %s...' % optionExportTo_outpng
+            yuml_create_png(','.join(str(self.p).split()), optionExportTo_outpng)
+            #os.system(optionExportTo_outpng)  # launch notepad or whatever on it
+            print 'Done!'
+
 import urllib
 import urllib2
 import png    # codeproject version, not the "easy_install pypng" version.
