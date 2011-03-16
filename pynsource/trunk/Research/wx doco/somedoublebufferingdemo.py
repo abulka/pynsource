@@ -1,7 +1,4 @@
-# -*- coding: iso-8859-1 -*-#
-#!/usr/bin/env python2.4
-
-# From http://wiki.wxpython.org/index.cgi/DoubleBufferedDrawing
+#!/usr/bin/env python
 
 import wx
 import random
@@ -10,7 +7,8 @@ import random
 # USE_BUFFERED_DC is True, it will be used. Otherwise, it uses the raw
 # wx.Memory DC , etc.
 
-USE_BUFFERED_DC = 0
+USE_BUFFERED_DC = False
+#USE_BUFFERED_DC = True
 
 class BufferedWindow(wx.Window):
 
@@ -29,17 +27,13 @@ class BufferedWindow(wx.Window):
     SaveToFile(self,file_name,file_type) method.
 
     """
-
-
-    def __init__(self, parent, id,
-                 pos = wx.DefaultPosition,
-                 size = wx.DefaultSize,
-                 style = wx.NO_FULL_REPAINT_ON_RESIZE):
-        wx.Window.__init__(self, parent, id, pos, size, style)
+    def __init__(self, *args, **kwargs):
+        # make sure the NO_FULL_REPAINT_ON_RESIZE style flag is set.
+        kwargs['style'] = kwargs.setdefault('style', wx.NO_FULL_REPAINT_ON_RESIZE) | wx.NO_FULL_REPAINT_ON_RESIZE
+        wx.Window.__init__(self, *args, **kwargs)
 
         wx.EVT_PAINT(self, self.OnPaint)
         wx.EVT_SIZE(self, self.OnSize)
-
 
         # OnSize called to make sure the buffer is initialized.
         # This might result in OnSize getting called twice on some
@@ -84,31 +78,21 @@ class BufferedWindow(wx.Window):
         elsewhere in the system. If that data changes, the drawing needs to
         be updated.
 
+        This code re-draws the buffer, then calls Update, which forces a paint event.
         """
-
-        if USE_BUFFERED_DC:
-            dc = wx.BufferedDC(wx.ClientDC(self), self._Buffer)
-            self.Draw(dc)
-        else:
-            # update the buffer
-            dc = wx.MemoryDC()
-            dc.SelectObject(self._Buffer)
-            self.Draw(dc)
-            # update the screen
-            wx.ClientDC(self).DrawBitmap(self._Buffer,0,0)
+        dc = wx.MemoryDC()
+        dc.SelectObject(self._Buffer)
+        self.Draw(dc)
+        self.Refresh()
+        self.Update()
             
-            # Attempted fix by Christopher Barker via email -  resulted in a worse result - just a white screen with nothing there. 
-            #self.Refresh()
-            #self.Update()
-
 class DrawWindow(BufferedWindow):
-    def __init__(self, parent, id = -1):
+    def __init__(self, *args, **kwargs):
         ## Any data the Draw() function needs must be initialized before
         ## calling BufferedWindow.__init__, as it will call the Draw
         ## function.
-
         self.DrawData = {}
-        BufferedWindow.__init__(self, parent, id)
+        BufferedWindow.__init__(self, *args, **kwargs)
 
     def Draw(self, dc):
         dc.SetBackground( wx.Brush("White") )
@@ -134,28 +118,26 @@ class DrawWindow(BufferedWindow):
 
 
 class TestFrame(wx.Frame):
-    def __init__(self):
-        wx.Frame.__init__(self, None, -1, "Double Buffered Test",
-                         wx.DefaultPosition,
-                         size=(500,500),
-                         style=wx.DEFAULT_FRAME_STYLE | wx.NO_FULL_REPAINT_ON_RESIZE)
+    def __init__(self, parent=None):
+        wx.Frame.__init__(self, parent,
+                          size = (500,500),
+                          title="Double Buffered Test",
+                          style=wx.DEFAULT_FRAME_STYLE | wx.NO_FULL_REPAINT_ON_RESIZE)
 
         ## Set up the MenuBar
         MenuBar = wx.MenuBar()
-
+        
         file_menu = wx.Menu()
-        ID_EXIT_MENU = wx.NewId()
-        file_menu.Append(ID_EXIT_MENU, "E&xit","Terminate the program")
-        wx.EVT_MENU(self, ID_EXIT_MENU, self.OnQuit)
+        
+        item = file_menu.Append(wx.ID_EXIT, text="&Exit")
+        self.Bind(wx.EVT_MENU, self.OnQuit, item)
         MenuBar.Append(file_menu, "&File")
-
+        
         draw_menu = wx.Menu()
-        ID_DRAW_MENU = wx.NewId()
-        draw_menu.Append(ID_DRAW_MENU, "&New Drawing","Update the Drawing Data")
-        wx.EVT_MENU(self, ID_DRAW_MENU,self.NewDrawing)
-        BMP_ID = wx.NewId()
-        draw_menu.Append(BMP_ID,'&Save Drawing\tAlt-I','')
-        wx.EVT_MENU(self,BMP_ID, self.SaveToFile)
+        item = draw_menu.Append(wx.ID_ANY, "&New Drawing","Update the Drawing Data")
+        self.Bind(wx.EVT_MENU, self.NewDrawing, item)
+        item = draw_menu.Append(wx.ID_ANY,'&Save Drawing\tAlt-I','')
+        self.Bind(wx.EVT_MENU, self.SaveToFile, item)
         MenuBar.Append(draw_menu, "&Draw")
 
         self.SetMenuBar(MenuBar)
@@ -165,7 +147,7 @@ class TestFrame(wx.Frame):
 
     def OnQuit(self,event):
         self.Close(True)
-
+        
     def NewDrawing(self,event):
         self.Window.DrawData = self.MakeNewData()
         self.Window.UpdateDrawing()
@@ -237,3 +219,22 @@ if __name__ == "__main__":
     print "about to initialize the app"
     app = DemoApp(0)
     app.MainLoop()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
