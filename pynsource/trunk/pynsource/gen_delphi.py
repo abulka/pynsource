@@ -1,9 +1,9 @@
 # generate delphi
 
-from gen_asciiart import PySourceAsText
-from gen_java import CmdLinePythonToJava
 import os
 from keywords import delphikeywords
+from gen_base import ParseReportGenerator
+from gen_java import CmdLinePythonToJava  # TODO get rid of this dependency
 
 def unique(s):
     """ Return a list of the elements in list s in arbitrary order, but without duplicates """
@@ -21,54 +21,9 @@ def unique(s):
 
     raise "uniqueness algorithm failed .. type more of it in please - see http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52560"
 
-class PySourceAsDelphi(PySourceAsText):
-    """
-    Example Delphi source file:
-
-      unit test000123;
-
-      interface
-
-      uses
-        SysUtils, Windows, Messages, Classes, Graphics, Controls,
-        Forms, Dialogs;
-
-      type
-        TDefault1 = class (TObject)
-        private
-          field0012: Variant;
-        public
-          class var field0123434: Variant;
-          procedure Member1;
-          class procedure Member2;
-        end;
-
-
-      procedure Register;
-
-      implementation
-
-      procedure Register;
-      begin
-      end;
-
-      {
-      ********************************** TDefault1 ***********************************
-      }
-      procedure TDefault1.Member1;
-      begin
-      end;
-
-      class procedure TDefault1.Member2;
-      begin
-      end;
-
-
-      end.
-
-    """
+class PySourceAsDelphi(ParseReportGenerator):
     def __init__(self, outdir=None):
-        PySourceAsText.__init__(self)
+        ParseReportGenerator.__init__(self)
         self.outdir = outdir
         self.fp = None
 
@@ -89,7 +44,7 @@ class PySourceAsDelphi(PySourceAsText):
 
     def _DumpModuleMethods(self):
         self.result += '(*\n'
-        PySourceAsText._DumpModuleMethods(self)
+        ParseReportGenerator._DumpModuleMethods(self)
         self.result += '*)\n\n'
 
     def _OpenNextFile(self):
@@ -136,11 +91,11 @@ class PySourceAsDelphi(PySourceAsText):
             vartype = 'Variant'
         self.result +=  "%s : %s;\n"%(attrname, vartype)
 
-        # generate more complex stuff in the implementation section...
-##        if compositecreated and self.embedcompositeswithattributelist:
-##            self.result +=  "    public %s %s %s = new %s();\n" % (self.staticmessage, compositecreated, attrname, compositecreated)
-##        else:
-##            self.result +=  "%s : Variant;\n"%attrname
+        """ generate more complex stuff in the implementation section..."""
+        #if compositecreated and self.embedcompositeswithattributelist:
+        #    self.result +=  "    public %s %s %s = new %s();\n" % (self.staticmessage, compositecreated, attrname, compositecreated)
+        #else:
+        #    self.result +=  "%s : Variant;\n"%attrname
 
     def _DumpCompositeExtraFooter(self):
         pass
@@ -176,7 +131,7 @@ class PySourceAsDelphi(PySourceAsText):
             if adef == '__init__':
                 self.result +=  "    constructor Create;\n"
             else:
-##                self.result +=  "    function %s(): void; virtual;\n" % adef
+                #self.result +=  "    function %s(): void; virtual;\n" % adef
                 self.result +=  "    procedure %s(); virtual;\n" % adef
 
         self.result +=  "end;\n"   # end of class
@@ -186,13 +141,12 @@ class PySourceAsDelphi(PySourceAsText):
             if adef == '__init__':
                 self.result +=  "constructor %s.Create;\n" % self.aclass  # replace __init__ with the word 'Create'
             else:
-##                self.result +=  "function %s.%s(): void;\n" % (self.aclass, adef)
+                #self.result +=  "function %s.%s(): void;\n" % (self.aclass, adef)
                 self.result +=  "procedure %s.%s();\n" % (self.aclass, adef)
             self.result +=  "begin\n"
             if adef == '__init__':
                 self.CreateCompositeAttributeClassCreationAndAssignmentInImplementation()
             self.result +=  "end;\n\n"
-
 
     def CreateCompositeAttributeClassCreationAndAssignmentInImplementation(self):
         # Only do those attributes that are composite and need to create an instance of something
@@ -210,7 +164,7 @@ class PySourceAsDelphi(PySourceAsText):
                 compositecreated = compositescreated[0]
                 result.append(compositecreated)
 
-        # Also use any inherited calss modules.
+        # Also use any inherited class modules.
         if self.classentry.classesinheritsfrom:
             result.append(self._NiceNameToPreventCompilerErrors(self.classentry.classesinheritsfrom[0]))
 
@@ -255,3 +209,57 @@ implementation
 end.
        """
        return template%(aclass,aclass)
+
+
+
+
+###########################################################
+
+
+
+
+"""
+Example Delphi source file:
+
+  unit test000123;
+
+  interface
+
+  uses
+    SysUtils, Windows, Messages, Classes, Graphics, Controls,
+    Forms, Dialogs;
+
+  type
+    TDefault1 = class (TObject)
+    private
+      field0012: Variant;
+    public
+      class var field0123434: Variant;
+      procedure Member1;
+      class procedure Member2;
+    end;
+
+
+  procedure Register;
+
+  implementation
+
+  procedure Register;
+  begin
+  end;
+
+  {
+  ********************************** TDefault1 ***********************************
+  }
+  procedure TDefault1.Member1;
+  begin
+  end;
+
+  class procedure TDefault1.Member2;
+  begin
+  end;
+
+
+  end.
+
+"""

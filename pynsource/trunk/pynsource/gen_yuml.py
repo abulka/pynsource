@@ -1,6 +1,6 @@
 # generate Yuml (both text and png)
 
-from core_parser import PynsourcePythonParser
+from gen_base import ParseReportGenerator
 
 class Klass:
     def __init__(self, name, parent=None, connectsto=None, connectorstyle=None, attrs="", defs=""):
@@ -66,25 +66,11 @@ class Yuml:
         return  s
 
                  
-class PySourceAsYuml(PynsourcePythonParser):
+class PySourceAsYuml(ParseReportGenerator):
     def __init__(self):
-        PynsourcePythonParser.__init__(self)
-        self.result = ''
-        self.aclass = None
-        self.classentry = None
-        self.verbose = 0
+        ParseReportGenerator.__init__(self)
         self.yumls = []
         self.enriched_yuml_classes = []
-
-    def GetCompositeClassesForAttr(self, classname, classentry):
-        resultlist = []
-        for dependencytuple in classentry.classdependencytuples:
-            if dependencytuple[0] == classname:
-                resultlist.append(dependencytuple[1])
-        return resultlist
-
-    def _GetCompositeCreatedClassesFor(self, classname):
-        return self.GetCompositeClassesForAttr(classname, self.classentry)
 
     def AddYuml(self, lhsclass, connector, rhsclass, rhsattrs="", rhsdefs=""):
         yuml = Yuml(lhsclass, connector, rhsclass, rhsattrs, rhsdefs)
@@ -186,8 +172,8 @@ class PySourceAsYuml(PynsourcePythonParser):
     def YumlDump(self):
         for yuml in self.yumls:
             self.result += str(yuml) + "\n"
-            
-    def __str__(self):
+
+    def GenReportDump(self):            # Override template method entirely and do it ourselves
         if not self.yumls:
             print "Warning, should call CalcYumls() after .Parse() and before str(p) - repairing..."
             self.CalcYumls()
