@@ -210,15 +210,6 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         ogl.ShapeEvtHandler.__init__(self)
         self.log = log
         self.statbarFrame = frame
-        
-        self.Refreshredraw = self._RefreshredrawStub
-
-    def SetPostDeleteRefreshMethod(self, dorefreshredraw):
-        self.Refreshredraw = dorefreshredraw
-
-
-    def _RefreshredrawStub(self):
-        print 'No Refreshredraw method defined.'
 
     def UpdateStatusBar(self, shape):
         x, y = shape.GetX(), shape.GetY()
@@ -323,8 +314,6 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
         self.font1 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
-
-        #self.Go(path=r'C:\Documents and Settings\Administrator\My Documents\aa Python\pyNsource\Tests\PythonToJavaTest01\pythoninput01\*.py')
 
         self.associations_generalisation = None
         self.associations_composition = None
@@ -540,7 +529,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             self.GetDiagram().AddShape(line)
             line.Show(True)
 
-    def redraw(self):
+    def RedrawEverything(self):
         diagram = self.GetDiagram()
         canvas = self
         assert self == canvas == diagram.GetCanvas()
@@ -696,23 +685,18 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         shape.Show(True)
 
         evthandler = MyEvtHandler(self.log, self.frame)
-        evthandler.SetPostDeleteRefreshMethod(self.secretredrawmethod)
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
 
         return shape
 
-
     def get_umlboxshapes(self):
         return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]
 
     umlboxshapes = property(get_umlboxshapes)
     
-    
     def OnDestroy(self, evt):
-        # Do some cleanup
-        # DO WE NEED THIS? - OGL.py doesn't.
         for shape in self.GetDiagram().GetShapeList():
             if shape.GetParent() == None:
                 shape.SetCanvas(None)
@@ -768,11 +752,11 @@ class MainApp(wx.App):
 
         if MULTI_TAB_GUI:
             self.notebook = wx.Notebook(self.frame, -1)
-            self.win = UmlShapeCanvas(self.notebook, Log(), self.frame)
+            self.umlwin = UmlShapeCanvas(self.notebook, Log(), self.frame)
             self.yuml = ImageViewer(self.notebook) # wx.Panel(self.notebook, -1)
             self.asciiart = wx.Panel(self.notebook, -1)
     
-            self.notebook.AddPage(self.win, "UML")
+            self.notebook.AddPage(self.umlwin, "UML")
             self.notebook.AddPage(self.yuml, "yUml")
             self.notebook.AddPage(self.asciiart, "Ascii Art")
     
@@ -790,24 +774,22 @@ class MainApp(wx.App):
             self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabPageChanged)
             
         else:
-            self.win = UmlShapeCanvas(self.frame, Log(), self.frame)
+            self.umlwin = UmlShapeCanvas(self.frame, Log(), self.frame)
             
-        self.win.secretredrawmethod = self.OnRefresh    # Hack so can do a high level refresh screen after a delete node event.
         ogl.OGLInitialize()  # creates some pens and brushes that the OGL library uses.
         
         # Set the frame to a good size for showing stuff
         self.frame.SetSize(WINDOW_SIZE)
-        self.win.SetFocus()
+        self.umlwin.SetFocus()
         self.SetTopWindow(self.frame)
 
         self.frame.Show(True)
         wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
 
-
         # Debug bootstrap
         self.frame.SetSize((1024,768))
-        self.win.Go(files=[os.path.abspath( __file__ )])
-        self.win.redraw()
+        self.umlwin.Go(files=[os.path.abspath( __file__ )])
+        self.umlwin.RedrawEverything()
         
         return True
 
@@ -848,7 +830,7 @@ class MainApp(wx.App):
         Add(menu2, "&Delete Class", "Delete Node", self.OnDeleteNode)
         
         Add(menu3, "&Layout UML", "Layout UML", self.OnLayout)
-        Add(menu3, "&Refresh", "Refresh", self.OnRefresh)
+        Add(menu3, "&Refresh", "Refresh", self.OnRefreshUmlWindow)
         
         Add(menu4, "&Help...", "Help", self.OnHelp)
         Add(menu4, "&Visit PyNSource Website...", "PyNSource Website", self.OnVisitWebsite)
@@ -871,8 +853,8 @@ class MainApp(wx.App):
             print 'Importing...'
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
             print filenames
-            self.win.Go(files=filenames)
-            self.win.redraw()
+            self.umlwin.Go(files=filenames)
+            self.umlwin.RedrawEverything()
             wx.EndBusyCursor()
             print 'Import - Done.'
 
@@ -933,12 +915,11 @@ class MainApp(wx.App):
             self.multiText.SetValue(str(p))
             self.multiText.ShowPosition(0)
 
-            #self.win.redraw()
             wx.EndBusyCursor()
             print 'Import - Done.'
 
     def FileNew(self, event):
-        self.win.Clear()
+        self.umlwin.Clear()
     def FilePrint(self, event):
 
         from printframework import MyPrintout
@@ -947,7 +928,7 @@ class MainApp(wx.App):
         self.printData.SetPaperId(wx.PAPER_LETTER)
 
         self.box = wx.BoxSizer(wx.VERTICAL)
-        self.canvas = self.win.GetDiagram().GetCanvas()
+        self.canvas = self.umlwin.GetDiagram().GetCanvas()
 
         #self.log.WriteText("OnPrintPreview\n")
         printout = MyPrintout(self.canvas, self.log)
@@ -994,20 +975,20 @@ class MainApp(wx.App):
         self.MessageBox(HELP_MSG.strip())
 
     def OnDeleteNode(self, event):
-        for shape in self.win.GetDiagram().GetShapeList():
+        for shape in self.umlwin.GetDiagram().GetShapeList():
             if shape.Selected():
-                self.win.CmdZapShape(shape)
+                self.umlwin.CmdZapShape(shape)
 
     def OnLayout(self, event):
-        if self.win.GetDiagram().GetCount() == 0:
+        if self.umlwin.GetDiagram().GetCount() == 0:
             self.MessageBox("Nothing to layout.  Import a python source file first.")
             return
         
-        self.win.ArrangeShapes()
-        self.win.redraw()
+        self.umlwin.ArrangeShapes()
+        self.umlwin.RedrawEverything()
 
-    def OnRefresh(self, event):
-        self.win.redraw()
+    def OnRefreshUmlWindow(self, event):
+        self.umlwin.RedrawEverything()
 
     def MessageBox(self, msg):
         dlg = wx.MessageDialog(self.frame, msg, 'Message', wx.OK | wx.ICON_INFORMATION)
@@ -1020,7 +1001,7 @@ class MainApp(wx.App):
 
     def OnCloseFrame(self, evt):
         if hasattr(self, "window") and hasattr(self.window, "ShutdownDemo"):
-            self.win.ShutdownDemo()
+            self.umlwin.ShutdownDemo()
         evt.Skip()
 
 def main():
