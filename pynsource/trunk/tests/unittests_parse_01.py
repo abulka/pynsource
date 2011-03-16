@@ -5,7 +5,7 @@ import unittest
 
 import sys
 if not '..'in sys.path: sys.path.append('..')
-from pynsource.pynsource import PySourceAsText
+from pynsource.gen_asciiart import PySourceAsText
 
 class TestCase01(unittest.TestCase):
     def setUp(self):

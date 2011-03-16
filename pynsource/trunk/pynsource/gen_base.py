@@ -117,4 +117,4 @@ class CmdLineGenerator:
         self.p.verbose = self.verbose
         
         self.p.Parse(filepath)
-        str(self.p)  # triggers the output on the generator.  Usually involves calling a complex template method being invoked, which calls overridden methods in particular generator classes.
+        str(self.p)  # triggers the complex output on the generator.  Usually involves calling a complex template method being invoked, which calls overridden methods in particular generator classes.

@@ -6,7 +6,7 @@ import os
 
 import sys
 if not '..'in sys.path: sys.path.insert(0, '..')  # get to local version of pynsource and avoid any version of pynsource in the site-packages folder.
-from pynsource.pynsource import PySourceAsText
+from pynsource.gen_asciiart import PySourceAsText
 
 class TestCase01(unittest.TestCase):
     def setUp(self):

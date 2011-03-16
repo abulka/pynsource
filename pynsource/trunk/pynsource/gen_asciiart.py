@@ -1,6 +1,6 @@
 # generate asciiart
 
-from gen_base import ReportGenerator
+from gen_base import ReportGenerator, CmdLineGenerator
 
 class PySourceAsText(ReportGenerator):
     def __init__(self):
@@ -40,3 +40,30 @@ class PySourceAsText(ReportGenerator):
         self.result += '\n'
         self.result += '\n'
 
+class CmdLinePythonToAsciiArt(CmdLineGenerator):
+    """
+    The only thing we inherit from CmdLineGenerator is the constructor
+    At least we offer similar interface to the world.
+    """
+    def _GenerateAuxilliaryClasses(self):
+        pass
+
+    def _CreateParser(self):
+        self.p = PySourceAsText()
+
+    def _Process(self):             # Override Template method entirely
+        self._CreateParser()
+        self.p.optionModuleAsClass = self.optionModuleAsClass
+        self.p.verbose = self.verbose
+
+    def ExportTo(self, outpath=None):     # Override Template method entirely
+        """
+        In this asciiart case self.directories
+        actually is a list of files
+        """
+        globbed = self.directories  # files
+        self._Process()
+        for f in globbed:
+            p.Parse(f)
+        print p  # triggers the complex output behaviour on the generator
+        
