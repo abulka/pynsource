@@ -26,7 +26,7 @@ from messages import *
 from gui_umlshapes import *
 
 APP_VERSION = 1.51
-WINDOW_SIZE = (640,480)
+WINDOW_SIZE = (1024,768)
 IMAGENODES = False
 MULTI_TAB_GUI = True
 
@@ -585,10 +585,11 @@ class MainApp(wx.App):
             self.notebook.AddPage(self.asciiart, "Ascii Art")
     
             self.multiText = wx.TextCtrl(self.asciiart, -1,
-            "Here is a looooooooooooooong line "
-            "of text set in the control.\n\n"
-            "See that it wrapped, and that "
-            "this line is after a blank",
+            "Use the file menu to import python source code "
+            "and generate UML ascii art here.\n\n"
+            "Optionally join up your asci art UML using a tool like "
+            "e.g Java Ascii Versatile Editor http://www.jave.de/\n\n"
+            "Idea: Paste your UML Ascii art into your source code as comments!\n\n",
             style=wx.TE_MULTILINE)
             bsizer = wx.BoxSizer()
             bsizer.Add(self.multiText, 1, wx.EXPAND)
@@ -611,7 +612,7 @@ class MainApp(wx.App):
         wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
 
         # Debug bootstrap
-        self.frame.SetSize((1024,768))
+        #self.frame.SetSize((1024,768))
         self.umlwin.Go(files=[os.path.abspath( __file__ )])
         self.umlwin.RedrawEverything()
         

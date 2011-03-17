@@ -7,7 +7,7 @@ from cStringIO import StringIO
 
 ALLOW_DRAWING = True
 ZOOM_INCR = 1.3
-DEFAULT_IMAGE_SIZE = (200, 200)
+DEFAULT_IMAGE_SIZE = (2000, 2000)  # Bigger image size helps refresh the screen when switching tabs (when housed in pynsourceGui)
 
 #FILE = "Images/fish1.png"
 #FILE = "C:/Users/Andy/Documents/My Dropbox/Photos/Other Good1/german_autopanogiga_sample1.jpg"
