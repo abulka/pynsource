@@ -28,9 +28,12 @@ class ImageViewer(wx.ScrolledWindow):
         self.drawing = False
 
         self.SetBackgroundColour("WHITE")  # for areas of the frame not covered by the bmp
+                                           # TODO these areas don't get refreshed properly when scrolling when pen marks are around, we only refresh bmp area and when bmp area < client window we get artifacts.
 
-        bmp = wx.EmptyBitmap(self.maxWidth, self.maxHeight)
+        bmp = self._CreateNewWhiteBmp(self.maxWidth, self.maxHeight)
+        
         self.bmp = bmp
+        self.bmp_transparent_ori = None
 
         self.SetVirtualSize((self.maxWidth, self.maxHeight))
         self.SetScrollRate(1,1)  # set the ScrollRate to 1 in order for panning to work nicely
@@ -94,6 +97,7 @@ class ImageViewer(wx.ScrolledWindow):
         
         # Render bmp to a second white bmp to remove transparency effects
         if bmp.HasAlpha():
+            self.bmp_transparent_ori = bmp
             bmp2 = wx.EmptyBitmap(bmp.GetWidth(), bmp.GetHeight())
             dc = wx.MemoryDC()
             dc.SelectObject(bmp2)
@@ -102,6 +106,7 @@ class ImageViewer(wx.ScrolledWindow):
             dc.SelectObject(wx.NullBitmap)
             self.bmp = bmp2
         else:
+            self.bmp_transparent_ori = None
             self.bmp = bmp
 
         self.SetVirtualSize((self.maxWidth, self.maxHeight))
@@ -111,6 +116,19 @@ class ImageViewer(wx.ScrolledWindow):
         self.clear_whole_window = False
         self.Refresh()        
 
+    def _CreateNewWhiteBmp(self, width, height, wantdc=False):
+        bmp = wx.EmptyBitmap(width, height)
+        # Could simply return here, but bitmap would be black (or a bit random, under linux)
+        dc = wx.MemoryDC()
+        dc.SelectObject(bmp)
+        dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
+        dc.Clear()
+        if wantdc:  # just in case want to continue drawing
+            return bmp, dc
+        else:
+            dc.SelectObject(wx.NullBitmap)
+            return bmp
+        
     def OnPopupItemSelected(self, event): 
         item = self.popupmenu.FindItemById(event.GetId()) 
         text = item.GetText() 
@@ -122,7 +140,31 @@ class ImageViewer(wx.ScrolledWindow):
             yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
             url = baseUrl + urllib.quote(yuml_txt)
             self.ViewImage(url=url)
+        elif text == "Save Image as PNG...":
+            self.SaveImage(self.bmp, format="png")
+        elif text == "Save Image as transparent PNG...":
+            self.SaveImage(self.bmp_transparent_ori, format="png")
+        elif text == "Save Image incl. pen doodles as PNG...":
+            """
+            Draw the whole client area into a fresh new bitmap
+            Dont use PrepareDC since scrolling not an issue in this 'in memory' rendering (re PrepareDC: If your image is on a scrolled window, then you have two coordinate systems -- the "virtual" one and the actual pixel coords of the window in its current position. PrepareDC() sets up the DC to deal with that, so you can draw in the virtual coordinate system.)
+            """
+            bmp, dc = self._CreateNewWhiteBmp(self.bmp.GetWidth(), self.bmp.GetHeight())
+            dc.SetUserScale(self.zoomscale, self.zoomscale)
+            self.DoDrawing(dc)
+            dc.SelectObject(wx.NullBitmap)
 
+            self.SaveImage(bmp, format="png")
+        
+    def SaveImage(self, bmp, format="png"):
+        frame = self.GetTopLevelParent()
+        dlg = wx.FileDialog(parent=frame, message="choose", defaultDir='.',
+            defaultFile="", wildcard="*.png", style=wx.FD_SAVE, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            filename = dlg.GetPath()
+            bmp.SaveFile(filename, wx.BITMAP_TYPE_PNG)
+        dlg.Destroy()
+        
     def OnRightButtonMenu(self, event):   # Menu
         if event.ShiftDown():
             event.Skip()
@@ -132,12 +174,28 @@ class ImageViewer(wx.ScrolledWindow):
         frame = self.GetTopLevelParent()
         
         self.popupmenu = wx.Menu()     # Create a menu
-        item = self.popupmenu.Append(2011, "Load Image from Disk")
-        frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
         
-        item = self.popupmenu.Append(2012, "Load Image from Url")
-        frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
         
+        if event.ControlDown():
+            # Debug menu items
+            item = self.popupmenu.Append(2011, "Load Image from Disk")
+            frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+            
+            item = self.popupmenu.Append(2012, "Load Image from Url")
+            frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+
+            self.popupmenu.AppendSeparator()
+
+        item = self.popupmenu.Append(2014, "Save Image as PNG...")
+        frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+
+        item = self.popupmenu.Append(2015, "Save Image incl. pen doodles as PNG...")
+        frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+
+        if self.bmp_transparent_ori:
+            item = self.popupmenu.Append(2016, "Save Image as transparent PNG...")
+            frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+
         item = self.popupmenu.Append(2013, "Cancel")
         frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
         
