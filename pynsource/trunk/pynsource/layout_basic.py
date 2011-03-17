@@ -2,11 +2,11 @@
 
 class LayoutBasic:
 
-    def getShapeSize( self, shape ):
+    def _getShapeSize( self, shape ):
         """Return the size of a shape's representation, an abstraction point"""
         return shape.GetBoundingBoxMax()
     
-    def SortShapes(self, umlworkspace):
+    def _SortShapes(self, umlworkspace, umlboxshapes):
         priority1 = [parentclassname for (classname, parentclassname) in umlworkspace.associations_generalisation ]
         priority2 = [classname       for (classname, parentclassname) in umlworkspace.associations_generalisation ]
         priority3 = [lhs            for (rhs, lhs) in umlworkspace.associations_composition ]
@@ -24,13 +24,14 @@ class LayoutBasic:
                 mostshapesinpriorityorder.append(shape)
     
         # find and loose shapes not associated to anything
-        remainingshapes = [ shape for shape in umlworkspace.umlboxshapes if shape not in mostshapesinpriorityorder ]
+        remainingshapes = [ shape for shape in umlboxshapes if shape not in mostshapesinpriorityorder ]
     
         # return list of sorted shapes
         return mostshapesinpriorityorder + remainingshapes
     
-    def Layout(self, umlworkspace):
-        shapeslist = self.SortShapes(umlworkspace)
+    def Layout(self, umlworkspace, umlboxshapes):
+    
+        shapeslist = self._SortShapes(umlworkspace, umlboxshapes)
     
         # When look at the status bar whilst dragging UML shapes, the coords of the top left are
         # this.  This is different to what you see when mouse dragging on the canvas - there you DO get 0,0
@@ -57,7 +58,7 @@ class LayoutBasic:
                 biggestYthisrow = 0
     
             whiteSpace = 50
-            shapeX, shapeY = self.getShapeSize(classShape)
+            shapeX, shapeY = self._getShapeSize(classShape)
     
             if shapeY >= biggestYthisrow:
                 biggestYthisrow = shapeY
@@ -80,6 +81,5 @@ class LayoutBasic:
         height = y + 500
         width = maxx
         newdiagramsize = (int(width+50), int(height+50)) # fudge factors to keep some extra space
-        print "newdiagramsize", newdiagramsize
         
         return positions, shapeslist, newdiagramsize

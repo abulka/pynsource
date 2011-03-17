@@ -128,8 +128,6 @@ class UmlWorkspace:
     def Clear(self):
         self.classnametoshape = {}             # dict of classname => shape entries
         self.ClearAssociations()
-        
-        self.umlboxshapes = []                 # list of all uml box shapes, lines not included
 
     def ClearAssociations(self):
         self.associations_generalisation = []  # list of (classname, parentclassname) tuples
@@ -421,7 +419,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
     
     def LayoutAndPositionShapes(self):
 
-        positions, shapeslist, newdiagramsize = self.layout.Layout(self.umlworkspace)
+        positions, shapeslist, newdiagramsize = self.layout.Layout(self.umlworkspace, self.umlboxshapes)
         
         dc = wx.ClientDC(self)
         self.PrepareDC(dc)
@@ -439,7 +437,6 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         
     def setSize(self, size):
         size = wx.Size(size[0], size[1])
-        print 'size[0], size[1]', size[0], size[1]
         
         nvsx, nvsy = size.x / self.scrollStepX, size.y / self.scrollStepY
         self.Scroll(0, 0)
