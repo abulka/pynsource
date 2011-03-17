@@ -115,8 +115,55 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
     def RightClickDeleteNode(self):
         self.GetShape().GetCanvas().CmdZapShape(self.GetShape())
 
+
+
 import sys, glob
 from gen_java import PySourceAsJava
+
+
+class UmlWorkspace:
+    def __init__(self):
+        self.Clear()
+        
+    def Clear(self):
+        self.classnametoshape = {}             # dict of classname => shape entries
+        self.ClearAssociations()
+        
+        self.umlboxshapes = []                 # list of all uml box shapes, lines not included
+
+    def ClearAssociations(self):
+        self.associations_generalisation = []  # list of (classname, parentclassname) tuples
+        self.associations_composition = []     # list of (rhs, lhs) tuples
+        
+    def DeleteShape(self, shape):
+        classnames = self.classnametoshape.keys()
+        for classname in classnames:
+            if self.classnametoshape[classname] == shape:
+                print 'found class to delete: ', classname
+                break
+
+        del self.classnametoshape[classname]
+        """
+        Too hard to remove the classname from these structures since these are tuples
+        between two classes.  Harmless to keep them in here.
+        """
+        #if class1, class2 in self.associations_generalisation:
+        #    self.associations_generalisation.remove(shape)
+        #if shape in self.associations_composition:
+        #    self.associations_composition.remove(shape)
+
+    def Dump(self):
+        # Debug
+        from pprint import pprint
+        print "="*80, "DUMP UML KNOWLEDGE: classnametoshape"
+        pprint(self.classnametoshape)
+        print "="*80, "associations_generalisation (class, parent)"
+        pprint(self.associations_generalisation)
+        print "="*80, "associations_composition (to, from)"
+        pprint(self.associations_composition)
+        print "======================"
+
+from layout_basic import LayoutBasic
 
 class UmlShapeCanvas(ogl.ShapeCanvas):
     scrollStepX = 10
@@ -141,8 +188,8 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.font1 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
 
-        self.associations_generalisation = None
-        self.associations_composition = None
+        self.umlworkspace = UmlWorkspace()
+        self.layout = LayoutBasic()
 
     def CmdZapShape(self, shape):
         canvas = self
@@ -163,25 +210,10 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             
         for line in toDelete:
             line.Unlink()
-            #shape.RemoveLine(line)
             diagram.RemoveShape(line)            
 
         # Uml related....
-        classnames = self.classnametoshape.keys()
-        for classname in classnames:
-            if self.classnametoshape[classname] == shape:
-                print 'found class to delete: ', classname
-                break
-
-        del self.classnametoshape[classname]
-        """
-        Too hard to remove the classname from these structures since these are tuples
-        between two classes.  Harmless to keep them in here.
-        """
-        #if class1, class2 in self.associations_generalisation:
-        #    self.associations_generalisation.remove(shape)
-        #if shape in self.associations_composition:
-        #    self.associations_composition.remove(shape)
+        self.umlworkspace.DeleteShape(shape)
 
         assert shape in self.umlboxshapes
         diagram.RemoveShape(shape)
@@ -193,13 +225,8 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.GetDiagram().Clear(dc)   # only ends up calling dc.Clear() - I wonder if this clears the screen?
 
         self.save_gdi = []
-
-        # THIS is the one that we need....
-        self.classnametoshape = {}
-
-        # and maybe this too
-        self.associations_generalisation = None
-        self.associations_composition = None
+        
+        self.umlworkspace.Clear()
 
     def _Process(self, filepath):
         print '_Process', filepath
@@ -216,7 +243,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             # owns all those other classes.
             
             for attr, otherclass in classentry.classdependencytuples:
-                self.associations_composition.append((otherclass, classname))  # reverse direction so round black arrows look ok
+                self.umlworkspace.associations_composition.append((otherclass, classname))  # reverse direction so round black arrows look ok
 
             # Generalisations
             if classentry.classesinheritsfrom:
@@ -225,11 +252,11 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
                     if parentclass.find('.') <> -1:         # fix names like "unittest.TestCase" into "unittest"
                         parentclass = parentclass.split('.')[0] # take the lhs
 
-                    self.associations_generalisation.append((classname, parentclass))
+                    self.umlworkspace.associations_generalisation.append((classname, parentclass))
 
             # Build the UML shape
             #
-            if classname not in self.classnametoshape:
+            if classname not in self.umlworkspace.classnametoshape:
                 if not IMAGENODES:
                     shape = DividedShape(width=100, height=150, canvas=self)
                 else:
@@ -281,7 +308,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
                     shape.FlushText()
 
                 # Record the name to shape map so that we can wire up the links later.
-                self.classnametoshape[classname] = ds
+                self.umlworkspace.classnametoshape[classname] = ds
             else:
                 print 'Skipping', classname, 'already built shape...'
 
@@ -297,13 +324,12 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
                 ds.region1.SetText(classname)
                 ds.ReformatRegions()
                 # Record the name to shape map so that we can wire up the links later.
-                self.classnametoshape[classname] = ds
+                self.umlworkspace.classnametoshape[classname] = ds
 
     def Go(self, files=None, path=None):
 
         # these are tuples between class names.
-        self.associations_generalisation = []
-        self.associations_composition = []
+        self.umlworkspace.ClearAssociations()
 
         if files:
             for f in files:
@@ -325,23 +351,23 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
                 for f in globbed2:
                     self._Process(f)    # Build a shape with all attrs and methods, and prepare association dict
 
-        self.DrawAssocLines(self.associations_generalisation, ogl.ARROW_ARROW)
-        self.DrawAssocLines(self.associations_composition, ogl.ARROW_FILLED_CIRCLE)
+        self.DrawAssocLines(self.umlworkspace.associations_generalisation, ogl.ARROW_ARROW)
+        self.DrawAssocLines(self.umlworkspace.associations_composition, ogl.ARROW_FILLED_CIRCLE)
 
         # Layout
-        self.ArrangeShapes()
+        self.LayoutAndPositionShapes()
 
     def DrawAssocLines(self, associations, arrowtype):
         for fromClassname, toClassname in associations:
             #print 'DrawAssocLines', fromClassname, toClassname
 
-            if fromClassname not in self.classnametoshape:
+            if fromClassname not in self.umlworkspace.classnametoshape:
                 self._BuildAuxClasses(classestocreate=[fromClassname]) # Emergency creation of some unknown class.
-            fromShape = self.classnametoshape[fromClassname]
+            fromShape = self.umlworkspace.classnametoshape[fromClassname]
 
-            if toClassname not in self.classnametoshape:
+            if toClassname not in self.umlworkspace.classnametoshape:
                 self._BuildAuxClasses(classestocreate=[toClassname]) # Emergency creation of some unknown class.
-            toShape = self.classnametoshape[toClassname]
+            toShape = self.umlworkspace.classnametoshape[toClassname]
 
             line = ogl.LineShape()
             line.SetCanvas(self)
@@ -392,97 +418,29 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
         return region, maxWidth, totHeight
 
+    
+    def LayoutAndPositionShapes(self):
 
-    def SortShapes(self):
-        priority1 = [parentclassname for (classname, parentclassname) in self.associations_generalisation ]
-        priority2 = [classname       for (classname, parentclassname) in self.associations_generalisation ]
-        priority3 = [lhs            for (rhs, lhs) in self.associations_composition ]
-        priority4 = [rhs             for (rhs, lhs) in self.associations_composition ]
-
-        # convert classnames to shapes, avoid duplicating shapes.
-        mostshapesinpriorityorder = []
-        for classname in (priority1 + priority2 + priority3 + priority4):
-
-            if classname not in self.classnametoshape:  # skip user deleted classes.
-                continue
-
-            shape = self.classnametoshape[classname]
-            if shape not in mostshapesinpriorityorder:
-                mostshapesinpriorityorder.append(shape)
-
-        # find and loose shapes not associated to anything
-        remainingshapes = [ shape for shape in self.umlboxshapes if shape not in mostshapesinpriorityorder ]
-
-        return mostshapesinpriorityorder + remainingshapes
-
-
-    def ArrangeShapes(self):
-
-        shapeslist = self.SortShapes()
-
+        positions, shapeslist, newdiagramsize = self.layout.Layout(self.umlworkspace)
+        
         dc = wx.ClientDC(self)
         self.PrepareDC(dc)
 
-        # When look at the status bar whilst dragging UML shapes, the coords of the top left are
-        # this.  This is different to what you see when mouse dragging on the canvas - there you DO get 0,0
-        # Perhaps one measurement takes into account the menubar and the other doesn't.  Dunno.
-        # UPDATE!!!! - it depends onteh size of the class you are dragging - get different values!
-        LEFTMARGIN = 200
-        TOPMARGIN = 230
-
-        positions = []
-
-        x = LEFTMARGIN
-        y = TOPMARGIN
-
-        maxx = 0
-        biggestYthisrow = 0
-        verticalWhiteSpace = 50
-        count = 0
-        for classShape in shapeslist:
-            count += 1
-            if count == 5:
-                count = 0
-                x = LEFTMARGIN
-                y = y + biggestYthisrow + verticalWhiteSpace
-                biggestYthisrow = 0
-
-            whiteSpace = 50
-            shapeX, shapeY = self.getShapeSize(classShape)
-
-            if shapeY >= biggestYthisrow:
-                biggestYthisrow = shapeY
-
-            # snap to diagram grid coords
-            #csX, csY = self.GetDiagram().Snap((shapeX/2.0)+x, (shapeY/2.0)+y)
-            #csX, csY = self.GetDiagram().Snap(x, y)
-            # don't display until finished
-            positions.append((x,y))
-
-            #print 'ArrangeShapes', classShape.region1.GetText(), (x,y)
-
-            x = x + shapeX + whiteSpace
-            if x > maxx:
-                maxx = x + 300
-
-        assert len(positions) == len(shapeslist)
-
-        # Set size of entire diagram.
-        height = y + 500
-        width = maxx
-        self.setSize(wx.Size(int(width+50), int(height+50))) # fudge factors to keep some extra space
+        self.setSize(newdiagramsize)
 
         # Now move the shapes into place.
         for (pos, classShape) in zip(positions, shapeslist):
             #print pos, classShape.region1.GetText()
             x, y = pos
             classShape.Move(dc, x, y, False)
-
-    def getShapeSize( self, shape ):
-        """Return the size of a shape's representation, an abstraction point"""
-        return shape.GetBoundingBoxMax()
-
+            
+        #self.umlworkspace.Dump()
+        
+        
     def setSize(self, size):
+        size = wx.Size(size[0], size[1])
+        print 'size[0], size[1]', size[0], size[1]
+        
         nvsx, nvsy = size.x / self.scrollStepX, size.y / self.scrollStepY
         self.Scroll(0, 0)
         self.SetScrollbars(self.scrollStepX, self.scrollStepY, nvsx, nvsy)
@@ -745,6 +703,7 @@ class MainApp(wx.App):
 
     def FileNew(self, event):
         self.umlwin.Clear()
+        
     def FilePrint(self, event):
 
         from printframework import MyPrintout
@@ -769,9 +728,6 @@ class MainApp(wx.App):
         frame.SetPosition(self.frame.GetPosition())
         frame.SetSize(self.frame.GetSize())
         frame.Show(True)
-
-
-
 
     def OnAbout(self, event):
         self.MessageBox(ABOUT_MSG.strip() %  APP_VERSION)
@@ -809,7 +765,7 @@ class MainApp(wx.App):
             self.MessageBox("Nothing to layout.  Import a python source file first.")
             return
         
-        self.umlwin.ArrangeShapes()
+        self.umlwin.LayoutAndPositionShapes()
         self.umlwin.RedrawEverything()
 
     def OnRefreshUmlWindow(self, event):
