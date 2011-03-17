@@ -119,48 +119,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
 
 import sys, glob
 from gen_java import PySourceAsJava
-
-
-class UmlWorkspace:
-    def __init__(self):
-        self.Clear()
-        
-    def Clear(self):
-        self.classnametoshape = {}             # dict of classname => shape entries
-        self.ClearAssociations()
-
-    def ClearAssociations(self):
-        self.associations_generalisation = []  # list of (classname, parentclassname) tuples
-        self.associations_composition = []     # list of (rhs, lhs) tuples
-        
-    def DeleteShape(self, shape):
-        classnames = self.classnametoshape.keys()
-        for classname in classnames:
-            if self.classnametoshape[classname] == shape:
-                print 'found class to delete: ', classname
-                break
-
-        del self.classnametoshape[classname]
-        """
-        Too hard to remove the classname from these structures since these are tuples
-        between two classes.  Harmless to keep them in here.
-        """
-        #if class1, class2 in self.associations_generalisation:
-        #    self.associations_generalisation.remove(shape)
-        #if shape in self.associations_composition:
-        #    self.associations_composition.remove(shape)
-
-    def Dump(self):
-        # Debug
-        from pprint import pprint
-        print "="*80, "DUMP UML KNOWLEDGE: classnametoshape"
-        pprint(self.classnametoshape)
-        print "="*80, "associations_generalisation (class, parent)"
-        pprint(self.associations_generalisation)
-        print "="*80, "associations_composition (to, from)"
-        pprint(self.associations_composition)
-        print "======================"
-
+from umlworkspace import UmlWorkspace
 from layout_basic import LayoutBasic
 
 class UmlShapeCanvas(ogl.ShapeCanvas):
@@ -188,6 +147,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
         self.umlworkspace = UmlWorkspace()
         self.layout = LayoutBasic()
+        #self.layout = LayoutBasic(leftmargin=0, topmargin=0, verticalwhitespace=0, horizontalwhitespace=0, maxclassesperline=5)
 
     def CmdZapShape(self, shape):
         canvas = self
@@ -420,18 +380,27 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
     def LayoutAndPositionShapes(self):
 
         positions, shapeslist, newdiagramsize = self.layout.Layout(self.umlworkspace, self.umlboxshapes)
+        print "Layout positions", positions
         
+        self.setSize(newdiagramsize)
+
         dc = wx.ClientDC(self)
         self.PrepareDC(dc)
-
-        self.setSize(newdiagramsize)
 
         # Now move the shapes into place.
         for (pos, classShape) in zip(positions, shapeslist):
             #print pos, classShape.region1.GetText()
             x, y = pos
-            classShape.Move(dc, x, y, False)
             
+            classShape.Move(dc, x, y, False)
+
+            # Crazy experiment
+            #shape = ogl.RectangleShape( 10, 10 )
+            #shape.SetX( x )
+            #shape.SetY( y )
+            ##self.AddShape( shape )
+            #self.GetDiagram().AddShape(shape)
+
         #self.umlworkspace.Dump()
         
         
@@ -518,6 +487,8 @@ class Log:
 
 from gui_imageviewer import ImageViewer
 
+USE_SIZER = False
+
 class MainApp(wx.App):
     def OnInit(self):
         self.log = Log()
@@ -531,11 +502,26 @@ class MainApp(wx.App):
 
         if MULTI_TAB_GUI:
             self.notebook = wx.Notebook(self.frame, -1)
-            self.umlwin = UmlShapeCanvas(self.notebook, Log(), self.frame)
+         
+            if USE_SIZER:
+                # create the chain of real objects
+                panel = wx.Panel(self.notebook, -1)
+                self.umlwin = UmlShapeCanvas(panel, Log(), self.frame)
+                # add children to sizers and set the sizer to the parent
+                sizer = wx.BoxSizer( wx.VERTICAL )
+                sizer.Add(self.umlwin, 1, wx.GROW)
+                panel.SetSizer(sizer)
+            else:
+                self.umlwin = UmlShapeCanvas(self.notebook, Log(), self.frame)
+
             self.yuml = ImageViewer(self.notebook) # wx.Panel(self.notebook, -1)
+            
             self.asciiart = wx.Panel(self.notebook, -1)
     
-            self.notebook.AddPage(self.umlwin, "UML")
+            if USE_SIZER:
+                self.notebook.AddPage(panel, "UML")
+            else:
+                self.notebook.AddPage(self.umlwin, "UML")
             self.notebook.AddPage(self.yuml, "yUml")
             self.notebook.AddPage(self.asciiart, "Ascii Art")
     

@@ -1,6 +1,14 @@
 # basic layout
 
+from umlworkspace import UmlWorkspace
+
 class LayoutBasic:
+    def __init__(self, leftmargin=200, topmargin=230, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=5):
+        self.leftmargin = leftmargin
+        self.topmargin = topmargin
+        self.verticalwhitespace = verticalwhitespace
+        self.horizontalwhitespace = horizontalwhitespace
+        self.maxclassesperline = maxclassesperline
 
     def _getShapeSize( self, shape ):
         """Return the size of a shape's representation, an abstraction point"""
@@ -32,54 +40,64 @@ class LayoutBasic:
     def Layout(self, umlworkspace, umlboxshapes):
     
         shapeslist = self._SortShapes(umlworkspace, umlboxshapes)
-    
-        # When look at the status bar whilst dragging UML shapes, the coords of the top left are
-        # this.  This is different to what you see when mouse dragging on the canvas - there you DO get 0,0
-        # Perhaps one measurement takes into account the menubar and the other doesn't.  Dunno.
-        # UPDATE!!!! - it depends onteh size of the class you are dragging - get different values!
-        LEFTMARGIN = 200
-        TOPMARGIN = 230
-    
         positions = []
     
-        x = LEFTMARGIN
-        y = TOPMARGIN
+        x = self.leftmargin
+        y = self.topmargin
     
-        maxx = 0
+        biggestx = 0
+        biggesty = 0
+        
         biggestYthisrow = 0
-        verticalWhiteSpace = 50
         count = 0
         for classShape in shapeslist:
             count += 1
-            if count == 5:
+            if count == self.maxclassesperline:
                 count = 0
-                x = LEFTMARGIN
-                y = y + biggestYthisrow + verticalWhiteSpace
+                x = self.leftmargin
+                y = y + biggestYthisrow + self.verticalwhitespace
                 biggestYthisrow = 0
     
-            whiteSpace = 50
-            shapeX, shapeY = self._getShapeSize(classShape)
+            width, height = self._getShapeSize(classShape)
     
-            if shapeY >= biggestYthisrow:
-                biggestYthisrow = shapeY
+            if height >= biggestYthisrow:
+                biggestYthisrow = height
     
-            # snap to diagram grid coords
-            #csX, csY = self.GetDiagram().Snap((shapeX/2.0)+x, (shapeY/2.0)+y)
-            #csX, csY = self.GetDiagram().Snap(x, y)
-            # don't display until finished
             positions.append((x,y))
-    
             #print 'layout', classShape.region1.GetText(), (x,y)
     
-            x = x + shapeX + whiteSpace
-            if x > maxx:
-                maxx = x + 300
-    
+            x = x + width + self.horizontalwhitespace
+            if x > biggestx:
+                biggestx = x
+
+        biggesty = y + biggestYthisrow + self.verticalwhitespace
+
         assert len(positions) == len(shapeslist)
-    
-        # Calculate new size of entire diagram.
-        height = y + 500
-        width = maxx
-        newdiagramsize = (int(width+50), int(height+50)) # fudge factors to keep some extra space
         
+        newdiagramsize = (int(biggestx), int(biggesty))
         return positions, shapeslist, newdiagramsize
+
+
+if __name__ == '__main__':
+    
+    class Shape:
+        def GetBoundingBoxMax(self):
+            return 10, 10
+    
+    layout = LayoutBasic(leftmargin=0, topmargin=0, verticalwhitespace=0, horizontalwhitespace=0, maxclassesperline=5)
+    umlworkspace = UmlWorkspace()
+    umlboxshapes = [Shape(), Shape(), Shape()]
+    positions, shapeslist, newdiagramsize = layout.Layout(umlworkspace, umlboxshapes)
+    print "positions", positions
+    #print "shapeslist", shapeslist
+    print "newdiagramsize", newdiagramsize
+    assert positions == [(0, 0), (10, 0), (20, 0)]
+    assert newdiagramsize == (30, 10)
+    
+    umlboxshapes = [Shape(), Shape(), Shape(), Shape(), Shape(), Shape()]
+    positions, shapeslist, newdiagramsize = layout.Layout(umlworkspace, umlboxshapes)
+    print "positions", positions
+    #print "shapeslist", shapeslist
+    print "newdiagramsize", newdiagramsize
+    assert positions == [(0, 0), (10, 0), (20, 0), (30, 0), (0, 10), (10, 10)]
+    assert newdiagramsize == (40, 20)
