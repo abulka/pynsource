@@ -30,7 +30,18 @@ WINDOW_SIZE = (1024,768)
 IMAGENODES = False
 MULTI_TAB_GUI = True
 
+# compensate for the fact that x, y for a ogl shape are the centre of the shape, not the top left
+def setpos(shape, x, y):
+    width, height = shape.GetBoundingBoxMax()
+    shape.SetX( x + width/2 )
+    shape.SetY( y + height/2 )
+def getpos(shape):
+    width, height = shape.GetBoundingBoxMax()
+    x = shape.GetX()
+    y = shape.GetY()
+    return x - width/2, y - height/2
 
+    
 class MyEvtHandler(ogl.ShapeEvtHandler):
     def __init__(self, log, frame):
         ogl.ShapeEvtHandler.__init__(self)
@@ -39,6 +50,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
 
     def UpdateStatusBar(self, shape):
         x, y = shape.GetX(), shape.GetY()
+        x, y = getpos(shape)
         width, height = shape.GetBoundingBoxMax()
         self.statbarFrame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)" % (x, y, width, height))
 
@@ -146,8 +158,9 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
 
         self.umlworkspace = UmlWorkspace()
-        self.layout = LayoutBasic()
+        #self.layout = LayoutBasic()
         #self.layout = LayoutBasic(leftmargin=0, topmargin=0, verticalwhitespace=0, horizontalwhitespace=0, maxclassesperline=5)
+        self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
 
     def CmdZapShape(self, shape):
         canvas = self
@@ -391,15 +404,13 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         for (pos, classShape) in zip(positions, shapeslist):
             #print pos, classShape.region1.GetText()
             x, y = pos
-            
-            classShape.Move(dc, x, y, False)
 
-            # Crazy experiment
-            #shape = ogl.RectangleShape( 10, 10 )
-            #shape.SetX( x )
-            #shape.SetY( y )
-            ##self.AddShape( shape )
-            #self.GetDiagram().AddShape(shape)
+            # compensate for the fact that x, y for a ogl shape are the centre of the shape, not the top left
+            width, height = classShape.GetBoundingBoxMax()
+            x += width/2
+            y += height/2
+
+            classShape.Move(dc, x, y, False)
 
         #self.umlworkspace.Dump()
         
