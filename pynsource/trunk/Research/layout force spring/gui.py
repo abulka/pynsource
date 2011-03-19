@@ -37,22 +37,88 @@ class GraphRendererOgl:
         dy = length * Math.sin(angle)
         return [point[0]+dx, point[1]+dy]
 
+
+
+
+
     def draw(self):
+        self.translate_node_coords()
+        self.remove_overlaps()
         for i in range(0, len(self.graph.nodes)):
             self.drawNode(self.graph.nodes[i])
         for i in range(0, len(self.graph.edges)):
             self.drawEdge(self.graph.edges[i])
+
+    def translate_node_coords(self):
+        for node in self.graph.nodes:
+            point = self.translate([node.layoutPosX, node.layoutPosY])
+            node.value.top      = point[1]
+            node.value.left     = point[0]
+
+    def remove_overlaps(self, fix=True):
+        # Removing node overlap is actually no easy task. None of the layout
+        # algorithms in JUNG, or few perhaps in the graphing world take vertex
+        # size into account. As such, the technique is to usually run the layout
+        # you desire and then run an overlap removal algorithm afterwards which
+        # should slightly move the vertices around to remove overlap. I was able
+        # to do such with the scaling and quadratic algorithms in the paper
+        # above.
+        # Forces on nodes due to node-node repulsions
+        print "remove_overlaps"
+
+        #for i in range(0, len(self.graph.nodes)):
+        #    node1 = self.graph.nodes[i];
+        #    for j in range(i + 1, len(self.graph.nodes)):
+        #        node2 = self.graph.nodes[j]
+
+        for i in range(0,10):
+            for node1 in self.graph.nodes:
+                for node2 in self.graph.nodes:
+                    if node1 == node2:
+                        continue
+                    
+                    if node1.value.left < node2.value.left:
+                        onleft = node1
+                        onright = node2
+                    else:
+                        onleft = node2
+                        onright = node1
+                    left_bigx = onleft.value.left + onleft.value.width
+                    print "check: %s bigx %d %s left %d" % (onleft.value.id, left_bigx, onright.value.id, onright.value.left)
+                    if left_bigx > onright.value.left:
+                        overlap_amount = left_bigx - onright.value.left
+                        print "OVERLAP!!!! by %d between %s and %s - %s %s" % (overlap_amount, onleft.value.id, onright.value.id, onleft, onright)
+                        if fix:
+                            onright.value.left += overlap_amount
+
+
+
+
+
+
+
+
+
+
+
+
+
+    #def draw(self):
+    #    for i in range(0, len(self.graph.nodes)):
+    #        self.drawNode(self.graph.nodes[i])
+    #    for i in range(0, len(self.graph.edges)):
+    #        self.drawEdge(self.graph.edges[i])
        
     def drawNode(self, node):
-        point = self.translate([node.layoutPosX, node.layoutPosY])
-
-        node.value.top      = point[1]
-        node.value.left     = point[0]
+        #point = self.translate([node.layoutPosX, node.layoutPosY])
+        #
+        #node.value.top      = point[1]
+        #node.value.left     = point[0]
                
         print node
-        shape = ogl.RectangleShape( 60, 60 )
+        shape = ogl.RectangleShape( node.value.width, node.value.height )
         shape.AddText(node.value.id)
-        setpos(shape, node.value.top, node.value.left)
+        setpos(shape, node.value.left, node.value.top)
         self.oglcanvas.AddShape( shape )
         node.shape = shape
         

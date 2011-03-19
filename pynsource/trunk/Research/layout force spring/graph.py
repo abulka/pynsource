@@ -45,7 +45,12 @@ class Graph:
         self.nodeSet = {}
         self.nodes = []
         self.edges = []
-       
+
+        self.layoutMinX = 0
+        self.layoutMaxX = 0
+        self.layoutMinY = 0
+        self.layoutMaxY = 0
+        
     def addNode(self, div):
         key = div.id
         element = div
@@ -67,17 +72,25 @@ class Graph:
 class GraphNode:
     def __init__(self, value):
         self.value = value
+        
+        self.layoutPosX = 0
+        self.layoutPosY = 0
+        self.layoutForceX = 0
+        self.layoutForceY = 0
+        
     def __str__(self):
-        return "Node: %s top, left (%d, %d)" % (self.value.id, self.value.top, self.value.left)
+        return "Node: %s top, left (%d, %d) w/h (%d, %d)" % (self.value.id, self.value.top, self.value.left, self.value.width, self.value.height)
         
 class Context:
     pass
 
 class Div:
-    def __init__(self, id, top, left):
+    def __init__(self, id, top, left, width=60, height=60):
         self.id = id
         self.top = top
         self.left = left
+        self.width=width
+        self.height=height
     
 class GraphRendererBasic:
     def __init__(self, element, graph):
@@ -103,16 +116,51 @@ class GraphRendererBasic:
         return [point[0]+dx, point[1]+dy]
 
     def draw(self):
+        self.translate_node_coords()
+        self.remove_overlaps()
         for i in range(0, len(self.graph.nodes)):
             self.drawNode(self.graph.nodes[i])
         for i in range(0, len(self.graph.edges)):
             self.drawEdge(self.graph.edges[i])
-       
-    def drawNode(self, node):
-        point = self.translate([node.layoutPosX, node.layoutPosY])
 
-        node.value.top      = point[1]
-        node.value.left     = point[0]
+    def translate_node_coords(self):
+        for node in self.graph.nodes:
+            point = self.translate([node.layoutPosX, node.layoutPosY])
+            node.value.top      = point[1]
+            node.value.left     = point[0]
+
+    def remove_overlaps(self, fix=True):
+        # Removing node overlap is actually no easy task. None of the layout
+        # algorithms in JUNG, or few perhaps in the graphing world take vertex
+        # size into account. As such, the technique is to usually run the layout
+        # you desire and then run an overlap removal algorithm afterwards which
+        # should slightly move the vertices around to remove overlap. I was able
+        # to do such with the scaling and quadratic algorithms in the paper
+        # above.
+        # Forces on nodes due to node-node repulsions
+        
+        for i in range(0, len(self.graph.nodes)):
+            node1 = self.graph.nodes[i];
+            for j in range(i + 1, len(self.graph.nodes)):
+                node2 = self.graph.nodes[j]
+                
+                if node1.value.left < node2.value.left:
+                    onleft = node1
+                    onright = node2
+                else:
+                    onleft = node2
+                    onright = node1
+                left_bigx = onleft.value.left + onleft.value.width
+                if left_bigx > onright.value.left:
+                    overlap_amount = left_bigx - onright.value.left
+                    print "OVERLAP!!!! by %d between %s and %s - %s %s" % (overlap_amount, onleft.value.id, onright.value.id, onleft, onright)
+                    if fix:
+                        onright.value.left += overlap_amount
+
+    def drawNode(self, node):
+        #point = self.translate([node.layoutPosX, node.layoutPosY])
+        #node.value.top      = point[1]
+        #node.value.left     = point[0]
                
         print node
         
@@ -272,11 +320,15 @@ if __name__ == '__main__':
 
     g = Graph()
     
-    n1 = Div('wilma', 10, 10)
-    n2 = Div('fred', 50, 50)
+    #n1 = Div('wilma', 10, 10)
+    #n2 = Div('fred', 50, 50)
+    #g.addEdge(n1, n2)
+    #n3 = Div('andy', 500, 500)
+    #g.addEdge(n1, n3)
+
+    n1 = Div('A', 0, 0, 200, 200)
+    n2 = Div('B', 0, 0, 200, 200)
     g.addEdge(n1, n2)
-    n3 = Div('andy', 500, 500)
-    g.addEdge(n1, n3)
     
     layouter = GraphLayoutSpring(g)
     layouter.layout()
@@ -291,7 +343,7 @@ if __name__ == '__main__':
         def getContext(self, whatever):
             return Context()
            
-    people = Canvas(500, 500)        
+    people = Canvas(200, 200)
     renderer = GraphRendererBasic(people, g);
     renderer.draw();
     
