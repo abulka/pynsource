@@ -43,7 +43,7 @@ class GraphRendererOgl:
 
     def draw(self):
         self.translate_node_coords()
-        #self.remove_overlaps()
+        self.remove_overlaps()
         for i in range(0, len(self.graph.nodes)):
             self.drawNode(self.graph.nodes[i])
         for i in range(0, len(self.graph.edges)):
@@ -72,7 +72,33 @@ class GraphRendererOgl:
         #    for j in range(i + 1, len(self.graph.nodes)):
         #        node2 = self.graph.nodes[j]
 
-        for i in range(0,10):
+        def wouldnotclashwithany_x(onleft, proposed_left):
+            for node in self.graph.nodes:
+                if node == onleft:
+                    continue
+                node_bigx = node.value.left + node.value.width + MARGIN
+                if ((proposed_left < node_bigx) and (proposed_left > node.value.left)):
+                    print "sorry, proposed_left %d clashes with %s's %d...%d" % (proposed_left, onleft.value.id, node.value.left, node_bigx)
+                    return False
+            return True
+
+        def wouldnotclashwithany_y(ontop, proposed_top):
+            for node in self.graph.nodes:
+                if node == ontop:
+                    continue
+                node_bigy = node.value.top + node.value.height + MARGIN
+                if ((proposed_top < node_bigy) and (proposed_top > node.value.top)):
+                    print "sorry, proposed_top %d clashes with %s's %d...%d" % (proposed_top, ontop.value.id, node.value.top, node_bigy)
+                    return False
+            return True
+
+        iterations = 0
+        overlaps_found = 0
+        fancy_negative_technique = 0
+        for i in range(0,25):
+            print i
+            iterations += 1
+            foundoverlaps = False
             for node1 in self.graph.nodes:
                 for node2 in self.graph.nodes:
                     if node1 == node2:
@@ -94,28 +120,36 @@ class GraphRendererOgl:
                         onbottom = node1
                     top_bigy = ontop.value.top + ontop.value.height + MARGIN
                     
-                    
-                    print "check: %s-%s %d > %d ?  %d > %d ?" % (onleft.value.id, onright.value.id, left_bigx, onright.value.left, top_bigy, onbottom.value.top)
+                    #print "check: %s-%s %d > %d ?  %d > %d ?" % (onleft.value.id, onright.value.id, left_bigx, onright.value.left, top_bigy, onbottom.value.top)
                     if ((left_bigx > onright.value.left) and (top_bigy > onbottom.value.top)):
+                        foundoverlaps = True
+                        overlaps_found += 1
                         xoverlap_amount = left_bigx - onright.value.left
                         yoverlap_amount = top_bigy - onbottom.value.top
                         print "OVERLAP!!!! by %d/%d between %s and %s - %s %s" % (xoverlap_amount, yoverlap_amount, node1.value.id, node2.value.id, node1, node2)
                         if fix:
                             # only repair one dimension at a time
-                            if xoverlap_amount and yoverlap_amount:
-                                if xoverlap_amount < yoverlap_amount:
+                            if xoverlap_amount < yoverlap_amount:
+                                if ((onleft.value.left - xoverlap_amount > 0) and wouldnotclashwithany_x(onleft, proposed_left=onleft.value.left - xoverlap_amount)):
+                                    onleft.value.left -= xoverlap_amount
+                                    fancy_negative_technique += 1
+                                else:
                                     onright.value.left += xoverlap_amount
+                            else:
+                                if ((ontop.value.top - yoverlap_amount > 0) and wouldnotclashwithany_y(ontop, proposed_top=ontop.value.top - yoverlap_amount)):
+                                    ontop.value.top -= yoverlap_amount
+                                    fancy_negative_technique += 1
                                 else:
                                     onbottom.value.top += yoverlap_amount
-                            else:                                
-                                if xoverlap_amount:
-                                    onright.value.left += xoverlap_amount
-                                if yoverlap_amount:
-                                    onbottom.value.top += yoverlap_amount
+
                             print "  fixed %s %s" % (node1, node2)
 
-
-
+            if not foundoverlaps:
+                print "no overlaps anymore :-)"
+                break
+        if foundoverlaps:
+            print "Exiting with overlaps remaining :-("
+        print "Overlaps fixed: %d  Iterations made: %d  fancy_negative_techniques: %d  " % (overlaps_found, iterations, fancy_negative_technique)
 
 
 
@@ -138,7 +172,7 @@ class GraphRendererOgl:
         #node.value.top      = point[1]
         #node.value.left     = point[0]
                
-        print node
+        #print node
         shape = ogl.RectangleShape( node.value.width, node.value.height )
         shape.AddText(node.value.id)
         setpos(shape, node.value.left, node.value.top)
@@ -161,7 +195,7 @@ class GraphRendererOgl:
         source = self.rotate(source, -self.radius, theta)
         target = self.rotate(target, self.radius, theta)
 
-        print "Edge: from (%d, %d) to (%d, %d)" % (source[0], source[1], target[0], target[1])
+        #print "Edge: from (%d, %d) to (%d, %d)" % (source[0], source[1], target[0], target[1])
         
         line = ogl.LineShape()
         line.SetCanvas(self.oglcanvas)
