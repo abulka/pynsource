@@ -65,7 +65,8 @@ class GraphRendererOgl:
         # above.
         # Forces on nodes due to node-node repulsions
         print "remove_overlaps"
-
+        MARGIN = 10
+        
         #for i in range(0, len(self.graph.nodes)):
         #    node1 = self.graph.nodes[i];
         #    for j in range(i + 1, len(self.graph.nodes)):
@@ -83,13 +84,28 @@ class GraphRendererOgl:
                     else:
                         onleft = node2
                         onright = node1
-                    left_bigx = onleft.value.left + onleft.value.width
-                    print "check: %s bigx %d %s left %d" % (onleft.value.id, left_bigx, onright.value.id, onright.value.left)
-                    if left_bigx > onright.value.left:
-                        overlap_amount = left_bigx - onright.value.left
-                        print "OVERLAP!!!! by %d between %s and %s - %s %s" % (overlap_amount, onleft.value.id, onright.value.id, onleft, onright)
+                    left_bigx = onleft.value.left + onleft.value.width + MARGIN
+                    
+                    if node1.value.top < node2.value.top:
+                        ontop = node1
+                        onbottom = node2
+                    else:
+                        ontop = node2
+                        onbottom = node1
+                    top_bigy = ontop.value.top + ontop.value.height + MARGIN
+                    
+                    
+                    print "check: %s-%s %d > %d ?  %d > %d ?" % (onleft.value.id, onright.value.id, left_bigx, onright.value.left, top_bigy, onbottom.value.top)
+                    if ((left_bigx > onright.value.left) and (top_bigy > onbottom.value.top)):
+                        xoverlap_amount = left_bigx - onright.value.left
+                        yoverlap_amount = top_bigy - onbottom.value.top
+                        print "OVERLAP!!!! by %d/%d between %s and %s - %s %s" % (xoverlap_amount, yoverlap_amount, node1.value.id, node2.value.id, node1, node2)
                         if fix:
-                            onright.value.left += overlap_amount
+                            if xoverlap_amount:
+                                onright.value.left += xoverlap_amount
+                            if yoverlap_amount:
+                                onbottom.value.top += yoverlap_amount
+                            print "  fixed %s %s" % (node1, node2)
 
 
 
@@ -180,7 +196,7 @@ class AppFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__( self,
                           None, -1, "Demo",
-                          size=(500,500),
+                          size=(600,600),
                           style=wx.DEFAULT_FRAME_STYLE )
         sizer = wx.BoxSizer( wx.VERTICAL )
         # put stuff into sizer
