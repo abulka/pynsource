@@ -43,7 +43,7 @@ class GraphRendererOgl:
 
     def draw(self):
         self.translate_node_coords()
-        self.remove_overlaps()
+        #self.remove_overlaps()
         for i in range(0, len(self.graph.nodes)):
             self.drawNode(self.graph.nodes[i])
         for i in range(0, len(self.graph.edges)):
@@ -101,10 +101,17 @@ class GraphRendererOgl:
                         yoverlap_amount = top_bigy - onbottom.value.top
                         print "OVERLAP!!!! by %d/%d between %s and %s - %s %s" % (xoverlap_amount, yoverlap_amount, node1.value.id, node2.value.id, node1, node2)
                         if fix:
-                            if xoverlap_amount:
-                                onright.value.left += xoverlap_amount
-                            if yoverlap_amount:
-                                onbottom.value.top += yoverlap_amount
+                            # only repair one dimension at a time
+                            if xoverlap_amount and yoverlap_amount:
+                                if xoverlap_amount < yoverlap_amount:
+                                    onright.value.left += xoverlap_amount
+                                else:
+                                    onbottom.value.top += yoverlap_amount
+                            else:                                
+                                if xoverlap_amount:
+                                    onright.value.left += xoverlap_amount
+                                if yoverlap_amount:
+                                    onbottom.value.top += yoverlap_amount
                             print "  fixed %s %s" % (node1, node2)
 
 
@@ -196,7 +203,7 @@ class AppFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__( self,
                           None, -1, "Demo",
-                          size=(600,600),
+                          size=(800,800),
                           style=wx.DEFAULT_FRAME_STYLE )
         sizer = wx.BoxSizer( wx.VERTICAL )
         # put stuff into sizer
@@ -214,7 +221,7 @@ class AppFrame(wx.Frame):
         
         g = Graph()
         
-        a = Div('A', 0, 0)
+        a = Div('A', 0, 0, 250, 250)
         a1 = Div('A1', 0, 0)
         a2 = Div('A2', 0, 0)
         g.addEdge(a, a1)
@@ -227,7 +234,7 @@ class AppFrame(wx.Frame):
         g.addEdge(b, b2)
 
         b21 = Div('B21', 0, 0)
-        b22 = Div('B22', 0, 0)
+        b22 = Div('B22', 0, 0, 100, 200)
         g.addEdge(b2, b21)
         g.addEdge(b2, b22)
 
@@ -236,7 +243,7 @@ class AppFrame(wx.Frame):
         c2 = Div('c2', 0, 0)
         c3 = Div('c3', 0, 0)
         c4 = Div('c4', 0, 0)
-        c5 = Div('c5', 0, 0)
+        c5 = Div('c5', 0, 0, 60, 120)
         g.addEdge(c, c1)
         g.addEdge(c, c2)
         g.addEdge(c, c3)
