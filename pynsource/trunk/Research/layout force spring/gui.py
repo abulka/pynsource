@@ -26,6 +26,8 @@ class GraphRendererOgl:
         self.factorX = (element.width - 2 * self.radius) / (graph.layoutMaxX - graph.layoutMinX)
         self.factorY = (element.height - 2 * self.radius) / (graph.layoutMaxY - graph.layoutMinY)
 
+        self.oglcanvas.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
+
     def translate(self, point):
         return [
           (point[0] - self.graph.layoutMinX) * self.factorX + self.radius,
@@ -38,17 +40,29 @@ class GraphRendererOgl:
         return [point[0]+dx, point[1]+dy]
 
 
+    def OnWheelZoom(self, event):
+        self.remove_overlaps()
 
+        for node in self.graph.nodes:
+            self.moveNode(node)
+
+        self.Redraw()
 
 
     def draw(self):
+        import time
+        
         self.translate_node_coords()
-        self.remove_overlaps()
+
         for i in range(0, len(self.graph.nodes)):
             self.drawNode(self.graph.nodes[i])
         for i in range(0, len(self.graph.edges)):
             self.drawEdge(self.graph.edges[i])
 
+        self.Redraw()
+        #time.sleep(1)
+        
+        
     def translate_node_coords(self):
         for node in self.graph.nodes:
             point = self.translate([node.layoutPosX, node.layoutPosY])
@@ -157,6 +171,40 @@ class GraphRendererOgl:
 
 
 
+    def moveNode(self, node):
+        assert node.shape
+        
+        #setpos(node.shape, node.value.left, node.value.top)
+
+
+        dc = wx.ClientDC(self.oglcanvas)
+        self.oglcanvas.PrepareDC(dc)
+
+        x, y = node.value.left, node.value.top
+
+        # compensate for the fact that x, y for a ogl shape are the centre of the shape, not the top left
+        width, height = node.shape.GetBoundingBoxMax()
+        assert width == node.value.width
+        assert height == node.value.height
+        x += width/2
+        y += height/2
+
+        node.shape.Move(dc, x, y, False)
+        
+    def Redraw(self):
+        
+        diagram = self.oglcanvas.GetDiagram()
+        canvas = self.oglcanvas
+        assert canvas == diagram.GetCanvas()
+
+        dc = wx.ClientDC(canvas)
+        canvas.PrepareDC(dc)
+        
+        for node in self.graph.nodes:
+            shape = node.shape
+            shape.Move(dc, shape.GetX(), shape.GetY())
+        diagram.Clear(dc)
+        diagram.Redraw(dc)
 
 
 
