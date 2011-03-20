@@ -40,27 +40,6 @@ class GraphRendererOgl:
         return [point[0]+dx, point[1]+dy]
 
 
-    def OnWheelZoom(self, event):
-        self.remove_overlaps()
-
-        for node in self.graph.nodes:
-            self.moveNode(node)
-
-        self.Redraw()
-
-
-    def draw(self):
-        import time
-        
-        self.translate_node_coords()
-
-        for i in range(0, len(self.graph.nodes)):
-            self.drawNode(self.graph.nodes[i])
-        for i in range(0, len(self.graph.edges)):
-            self.drawEdge(self.graph.edges[i])
-
-        self.Redraw()
-        #time.sleep(1)
         
         
     def translate_node_coords(self):
@@ -171,11 +150,32 @@ class GraphRendererOgl:
 
 
 
+    def OnWheelZoom(self, event):
+        self.remove_overlaps()
+
+        #for node in self.graph.nodes:
+        #    self.moveNode(node)
+
+        self.Redraw()
+
+
+    def draw(self):
+        import time
+        
+        self.translate_node_coords()
+
+        for i in range(0, len(self.graph.nodes)):
+            self.drawNode(self.graph.nodes[i])
+        for i in range(0, len(self.graph.edges)):
+            self.drawEdge(self.graph.edges[i])
+
+        self.Redraw()
+        #time.sleep(1)
+        
     def moveNode(self, node):
         assert node.shape
         
         #setpos(node.shape, node.value.left, node.value.top)
-
 
         dc = wx.ClientDC(self.oglcanvas)
         self.oglcanvas.PrepareDC(dc)
@@ -206,17 +206,9 @@ class GraphRendererOgl:
         diagram.Clear(dc)
         diagram.Redraw(dc)
 
-
-
-    #def draw(self):
-    #    for i in range(0, len(self.graph.nodes)):
-    #        self.drawNode(self.graph.nodes[i])
-    #    for i in range(0, len(self.graph.edges)):
-    #        self.drawEdge(self.graph.edges[i])
-       
+     
     def drawNode(self, node):
         #point = self.translate([node.layoutPosX, node.layoutPosY])
-        #
         #node.value.top      = point[1]
         #node.value.left     = point[0]
                
