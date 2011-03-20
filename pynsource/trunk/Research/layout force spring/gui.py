@@ -1,5 +1,7 @@
 import wx
 import wx.lib.ogl as ogl
+import time
+import thread
 
 from graph import *
 
@@ -27,6 +29,7 @@ class GraphRendererOgl:
         self.factorY = (element.height - 2 * self.radius) / (graph.layoutMaxY - graph.layoutMinY)
 
         self.oglcanvas.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
+        self.need_abort = False
 
     def translate(self, point):
         return [
@@ -151,15 +154,9 @@ class GraphRendererOgl:
 
 
     def OnWheelZoom(self, event):
-        self.remove_overlaps()
+        self.stage2()
 
-        #for node in self.graph.nodes:
-        #    self.moveNode(node)
-
-        self.Redraw()
-
-
-    def draw(self):
+    def stage1(self):
         import time
         
         self.translate_node_coords()
@@ -171,25 +168,104 @@ class GraphRendererOgl:
 
         self.Redraw()
         #time.sleep(1)
+
+    def stage2(self):
+        self.remove_overlaps()
+
+        for node in self.graph.nodes:
+            self.moveNode(node)
+
+        self.Redraw()
+        
+    def draw(self):
+        self.stage1()
+        thread.start_new_thread(self.DoSomeLongTask, ())
+
+
+    def DoSomeLongTask(self):
+        
+        for i in range(1,50):
+            if self.need_abort:
+                print "aborted."
+                return
+            wx.CallAfter(self.stage2)
+            #print '*',
+            #wx.CallAfter(self.DoStuff)
+            time.sleep(2)   # lets events through to the main wx thread and paints/messages get through ok
+        print "Done."
+        
+        """
+        print "Task started"
+        if self.need_abort:
+            print "aborted."
+            return
+        wx.CallAfter(self.stage1)
+        #time.sleep(0.5)   # lets events through to the main wx thread and paints/messages get through ok
+        #wx.CallAfter(self.stage2)
+        print "Done."
+        """
+        
         
     def moveNode(self, node):
         assert node.shape
         
-        #setpos(node.shape, node.value.left, node.value.top)
+        # Don't need to use node.shape.Move(dc, x, y, False)
+        setpos(node.shape, node.value.left, node.value.top)
 
+        # But you DO need to use a dc to adjust the links
         dc = wx.ClientDC(self.oglcanvas)
         self.oglcanvas.PrepareDC(dc)
+        node.shape.MoveLinks(dc)
 
-        x, y = node.value.left, node.value.top
 
-        # compensate for the fact that x, y for a ogl shape are the centre of the shape, not the top left
-        width, height = node.shape.GetBoundingBoxMax()
-        assert width == node.value.width
-        assert height == node.value.height
-        x += width/2
-        y += height/2
 
-        node.shape.Move(dc, x, y, False)
+
+        """
+        fromShape = edge['source'].shape
+        toShape = edge['target'].shape
+        fromShape.AddLine(line, toShape)
+        #line.SetEnds(source[0], source[1], target[0], target[1])
+        
+        self.oglcanvas.GetDiagram().AddShape(line)
+        line.Show(True)
+        """
+
+
+        
+        """
+        - To add a line, use ogl.LineShape().  The exact sequence of calls is
+        tricky, but this seems to work:
+          line = ogl.LineShape()
+          line.MakeControlPoints(2) # has to be at least 2
+          line.SetEnds(x1, y1, x2, y2) # sets the first + last control points
+          line.InsertControlPoint(x, y) # see below
+          line.Initialise()
+          line.SetSplit(True) # for a spline
+          canvas.AddShape(line)
+        The InsertControlPoint() adds an additional point in the list of control
+        points; it is always inserted just before the end (ie (x2, y2) above), so
+        repeatedly calling this "fills in" the line from start to end.
+        """
+
+
+
+
+
+
+
+        #dc = wx.ClientDC(self.oglcanvas)
+        #self.oglcanvas.PrepareDC(dc)
+        #
+        #x, y = node.value.left, node.value.top
+        #
+        ## compensate for the fact that x, y for a ogl shape are the centre of the shape, not the top left
+        #width, height = node.shape.GetBoundingBoxMax()
+        #assert width == node.value.width
+        #assert height == node.value.height
+        #x += width/2
+        #y += height/2
+        #
+        #node.shape.Move(dc, x, y, False)
         
     def Redraw(self):
         
@@ -200,9 +276,9 @@ class GraphRendererOgl:
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
         
-        for node in self.graph.nodes:
-            shape = node.shape
-            shape.Move(dc, shape.GetX(), shape.GetY())
+        #for node in self.graph.nodes:
+        #    shape = node.shape
+        #    shape.Move(dc, shape.GetX(), shape.GetY())
         diagram.Clear(dc)
         diagram.Redraw(dc)
 
@@ -237,6 +313,21 @@ class GraphRendererOgl:
 
         #print "Edge: from (%d, %d) to (%d, %d)" % (source[0], source[1], target[0], target[1])
         
+        
+        
+        
+        
+          #line = ogl.LineShape()
+          #line.MakeControlPoints(2) # has to be at least 2
+          #line.SetEnds(x1, y1, x2, y2) # sets the first + last control points
+          #line.InsertControlPoint(x, y) # see below
+          #line.Initialise()
+          #line.SetSplit(True) # for a spline
+          #canvas.AddShape(line)        
+        
+        
+        
+        
         line = ogl.LineShape()
         line.SetCanvas(self.oglcanvas)
         line.SetPen(wx.BLACK_PEN)
@@ -247,7 +338,18 @@ class GraphRendererOgl:
         fromShape = edge['source'].shape
         toShape = edge['target'].shape
         fromShape.AddLine(line, toShape)
-        #line.SetEnds(source[0], source[1], target[0], target[1])
+        #line.SetEnds(fromShape.GetX(), fromShape.GetY(), toShape.GetX(), toShape.GetY())
+        
+        
+        """
+        Getting splines to work is a nightmare
+        Seems to reply on there being shape._lineControlPoints which are sometimes zapped by ogl
+        during recalculations etc. which means spline drawing can fail.
+        """
+        #print "GetLineControlPoints", line.GetLineControlPoints()
+        #if line.GetLineControlPoints() >= 2:
+        #    line.SetSpline(True)  # uses GetLineControlPoints - ensure there are at least 2 !
+        
         
         self.oglcanvas.GetDiagram().AddShape(line)
         line.Show(True)        
