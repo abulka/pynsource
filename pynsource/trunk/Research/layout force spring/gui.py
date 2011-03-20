@@ -260,14 +260,15 @@ class GraphRendererOgl:
             iterations += 1
             foundoverlaps = False
             self.stateofthenation()
+            ignorethisround = []
             for node1 in self.graph.nodes:
-                if foundoverlaps:
-                    break  # restart
+                #if foundoverlaps:
+                #    break  # restart
                 for node2 in self.graph.nodes:
                     if node1 == node2:
                         continue
-                    if foundoverlaps:
-                        break  # restart
+                    #if foundoverlaps:
+                    #    break  # restart
                     
                     if node1.value.left < node2.value.left:
                         onleft = node1
@@ -293,22 +294,27 @@ class GraphRendererOgl:
                         xoverlap_amount = left_bigx - onright.value.left
                         yoverlap_amount = top_bigy - onbottom.value.top
                         print "OVERLAP!!!! by %d/%d between %s and %s - %s %s" % (xoverlap_amount, yoverlap_amount, node1.value.id, node2.value.id, node1, node2)
+                        
                         if fix:
                             # only repair one dimension at a time
-                            if xoverlap_amount < yoverlap_amount:
+                            if ((xoverlap_amount < yoverlap_amount) and (onleft not in ignorethisround and onright not in ignorethisround)):
                                 #if ((onleft.value.left - xoverlap_amount > 0) and wouldnotclashwithany_x(onleft, proposed_left=onleft.value.left - xoverlap_amount)):
-                                if (stayinbounds(onleft, deltaX=xoverlap_amount) and wouldnotclashwithany_othernode(onleft, deltaX=xoverlap_amount)):
+                                if (stayinbounds(onleft, deltaX=xoverlap_amount) and wouldnotclashwithany_othernode(onleft, deltaX=xoverlap_amount) and (onleft not in ignorethisround)):
                                     onleft.value.left -= xoverlap_amount
                                     fancy_negative_technique += 1
+                                    ignorethisround.append(onleft)
                                 else:
                                     onright.value.left += xoverlap_amount
+                                    ignorethisround.append(onright)
                             else:
                                 #if ((ontop.value.top - yoverlap_amount > 0) and wouldnotclashwithany_y(ontop, proposed_topY=ontop.value.top - yoverlap_amount, deltaY=yoverlap_amount)):
-                                if (stayinbounds(ontop, deltaY=yoverlap_amount) and wouldnotclashwithany_othernode(ontop, deltaY=yoverlap_amount)):
+                                if (stayinbounds(ontop, deltaY=yoverlap_amount) and wouldnotclashwithany_othernode(ontop, deltaY=yoverlap_amount) and  (ontop not in ignorethisround)):
                                     ontop.value.top -= yoverlap_amount
                                     fancy_negative_technique += 1
+                                    ignorethisround.append(ontop)
                                 else:
                                     onbottom.value.top += yoverlap_amount
+                                    ignorethisround.append(onbottom)
 
                             #print "  fixed %s %s" % (node1, node2)
 
@@ -352,7 +358,7 @@ class GraphRendererOgl:
             self.moveNode(node)
         self.Redraw()
         wx.SafeYield()
-        time.sleep(0.3)
+        time.sleep(0.2)
         
         
     def draw(self):
