@@ -231,8 +231,8 @@ class GraphRendererOgl:
             if deltaY:
                 return node.value.top - deltaY > 0
 
-        def wouldnotclashwithany_othernode(ontop, deltaY=0, deltaX=0):
-            assert deltaX > 0 or deltaY > 0
+        def noclash(ontop, deltaY=0, deltaX=0):
+            #assert deltaX > 0 or deltaY > 0
             for node in self.graph.nodes:
                 if node == ontop:
                     continue
@@ -296,25 +296,68 @@ class GraphRendererOgl:
                         print "OVERLAP!!!! by %d/%d between %s and %s - %s %s" % (xoverlap_amount, yoverlap_amount, node1.value.id, node2.value.id, node1, node2)
                         
                         if fix:
-                            # only repair one dimension at a time
-                            if ((xoverlap_amount < yoverlap_amount) and (onleft not in ignorethisround and onright not in ignorethisround)):
-                                #if ((onleft.value.left - xoverlap_amount > 0) and wouldnotclashwithany_x(onleft, proposed_left=onleft.value.left - xoverlap_amount)):
-                                if (stayinbounds(onleft, deltaX=xoverlap_amount) and wouldnotclashwithany_othernode(onleft, deltaX=xoverlap_amount) and (onleft not in ignorethisround)):
-                                    onleft.value.left -= xoverlap_amount
-                                    fancy_negative_technique += 1
-                                    ignorethisround.append(onleft)
-                                else:
-                                    onright.value.left += xoverlap_amount
-                                    ignorethisround.append(onright)
+                            ## only repair one dimension at a time
+                            #if ((xoverlap_amount < yoverlap_amount) and (onleft not in ignorethisround and onright not in ignorethisround)):
+                            #    #if ((onleft.value.left - xoverlap_amount > 0) and wouldnotclashwithany_x(onleft, proposed_left=onleft.value.left - xoverlap_amount)):
+                            #    if (stayinbounds(onleft, deltaX=xoverlap_amount) and wouldnotclashwithany_othernode(onleft, deltaX=xoverlap_amount) and (onleft not in ignorethisround)):
+                            #        onleft.value.left -= xoverlap_amount
+                            #        fancy_negative_technique += 1
+                            #        ignorethisround.append(onleft)
+                            #    else:
+                            #        onright.value.left += xoverlap_amount
+                            #        ignorethisround.append(onright)
+                            #else:
+                            #    #if ((ontop.value.top - yoverlap_amount > 0) and wouldnotclashwithany_y(ontop, proposed_topY=ontop.value.top - yoverlap_amount, deltaY=yoverlap_amount)):
+                            #    if (stayinbounds(ontop, deltaY=yoverlap_amount) and wouldnotclashwithany_othernode(ontop, deltaY=yoverlap_amount) and  (ontop not in ignorethisround)):
+                            #        ontop.value.top -= yoverlap_amount
+                            #        fancy_negative_technique += 1
+                            #        ignorethisround.append(ontop)
+                            #    else:
+                            #        onbottom.value.top += yoverlap_amount
+                            #        ignorethisround.append(onbottom)
+
+
+                            proposals = []
+                            if (stayinbounds(onleft, deltaX=xoverlap_amount) and noclash(onleft, deltaX=xoverlap_amount)):
+                                proposals.append({'node':onleft, 'xory':'x', 'amount':-xoverlap_amount, 'isneg':True})
                             else:
-                                #if ((ontop.value.top - yoverlap_amount > 0) and wouldnotclashwithany_y(ontop, proposed_topY=ontop.value.top - yoverlap_amount, deltaY=yoverlap_amount)):
-                                if (stayinbounds(ontop, deltaY=yoverlap_amount) and wouldnotclashwithany_othernode(ontop, deltaY=yoverlap_amount) and  (ontop not in ignorethisround)):
-                                    ontop.value.top -= yoverlap_amount
-                                    fancy_negative_technique += 1
-                                    ignorethisround.append(ontop)
+                                proposals.append({'node':onright, 'xory':'x', 'amount':xoverlap_amount, 'isneg':False})
+                            if (stayinbounds(ontop, deltaY=yoverlap_amount) and noclash(ontop, deltaY=yoverlap_amount)):
+                                proposals.append({'node':ontop, 'xory':'y', 'amount':-yoverlap_amount, 'isneg':True})
+                            else:
+                                proposals.append({'node':onbottom, 'xory':'y', 'amount':yoverlap_amount, 'isneg':False})
+
+                            proposals2 = [p for p in proposals if not (p['node'] in ignorethisround)]
+                            if not proposals2:
+                                continue
+                            amounts = [abs(p['amount']) for p in proposals2]
+                            lowest_amount = min(amounts)
+                            proposal = [p for p in proposals2 if abs(p['amount']) == lowest_amount][0]
+                            print proposal
+
+                            def applytrans(prop):
+                                if prop['xory'] == 'x':
+                                    prop['node'].value.left += prop['amount']
                                 else:
-                                    onbottom.value.top += yoverlap_amount
-                                    ignorethisround.append(onbottom)
+                                    prop['node'].value.top += prop['amount']
+                            
+                            applytrans(proposal)
+                            proposals2.remove(proposal)
+                            
+                            self.stateofthenation()
+                            
+                            # if still clashing, find the matching other movement
+                            if not noclash(proposal['node']):
+                                matching_proposals = [p for p in proposals2 if p['node'] == proposal['node']]
+                                if matching_proposals:
+                                    proposalother = matching_proposals[0]
+                                    applytrans(proposalother)
+                                    assert proposal['xory'] != proposalother['xory']
+                                
+                            ignorethisround.append(proposal['node'])
+                            
+                            if proposal['isneg']:
+                                fancy_negative_technique += 1
 
                             #print "  fixed %s %s" % (node1, node2)
 
