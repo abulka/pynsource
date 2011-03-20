@@ -15,18 +15,54 @@ def getpos(shape):
     y = shape.GetY()
     return (x - width/2, y - height/2)
 
+
+class MyEvtHandler(ogl.ShapeEvtHandler):
+    def __init__(self, log, oglcanvas):
+        ogl.ShapeEvtHandler.__init__(self)
+        self.log = log
+        self.oglcanvas = oglcanvas
+
+    #def OnLeftClick(self, x, y, keys = 0, attachment = 0):
+    #    print "OnLeftClick"
+
+    def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
+        #print "OnEndDragLeft"
+        shape = self.GetShape()
+
+        oldpos = getpos(shape) # (int(shape.GetX()), int(shape.GetY()))
+        ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)  # super
+        newpos = getpos(shape) # (int(shape.GetX()), int(shape.GetY()))
+
+        print shape.node.value.id, shape.node.value.left, shape.node.value.top, "moved from", oldpos, newpos
+        
+        # Adjust the Div to match the shape x,y
+        shape.node.value.left, shape.node.value.top = newpos
+
+        wx.SafeYield()
+        time.sleep(0.2)
+        
+        self.naughtyref_to_graphrenderer.stage2()
+
+
 class GraphRendererOgl:
-    def __init__(self, element, graph, oglcanvas):
-        self.element = element
+    def __init__(self, graph, oglcanvas):
         self.graph = graph
         self.oglcanvas = oglcanvas
 
-        self.ctx = element.getContext("2d")
-        self.radius = 20
+        #self.ctx = element.getContext("2d")
+        self.radius = 10
         self.arrowAngle = Math.PI()/10
 
-        self.factorX = (element.width - 2 * self.radius) / (graph.layoutMaxX - graph.layoutMinX)
-        self.factorY = (element.height - 2 * self.radius) / (graph.layoutMaxY - graph.layoutMinY)
+        #self.factorX = (element.width - 2 * self.radius) / (graph.layoutMaxX - graph.layoutMinX)
+        #self.factorY = (element.height - 2 * self.radius) / (graph.layoutMaxY - graph.layoutMinY)
+
+        #width, height = oglcanvas.GetSize()
+        #self.factorX = (width/2 - 2 * self.radius) / (graph.layoutMaxX - graph.layoutMinX)
+        #self.factorY = (height/2 - 2 * self.radius) / (graph.layoutMaxY - graph.layoutMinY)
+
+        width, height = oglcanvas.GetSize()
+        self.factorX = (width/2 ) / (graph.layoutMaxX - graph.layoutMinX)
+        self.factorY = (height/2 ) / (graph.layoutMaxY - graph.layoutMinY)
 
         self.oglcanvas.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
         self.need_abort = False
@@ -48,8 +84,8 @@ class GraphRendererOgl:
     def translate_node_coords(self):
         for node in self.graph.nodes:
             point = self.translate([node.layoutPosX, node.layoutPosY])
-            node.value.top      = point[1]
-            node.value.left     = point[0]
+            node.value.top      = int(point[1])
+            node.value.left     = int(point[0])
 
     def remove_overlaps(self, fix=True):
         # Removing node overlap is actually no easy task. None of the layout
@@ -60,7 +96,7 @@ class GraphRendererOgl:
         # to do such with the scaling and quadratic algorithms in the paper
         # above.
         # Forces on nodes due to node-node repulsions
-        print "remove_overlaps"
+        #print "remove_overlaps"
         MARGIN = 10
         
         #for i in range(0, len(self.graph.nodes)):
@@ -74,7 +110,7 @@ class GraphRendererOgl:
                     continue
                 node_bigx = node.value.left + node.value.width + MARGIN
                 if ((proposed_left < node_bigx) and (proposed_left > node.value.left)):
-                    print "sorry, proposed_left %d clashes with %s's %d...%d" % (proposed_left, onleft.value.id, node.value.left, node_bigx)
+                    #print "sorry, proposed_left %d clashes with %s's %d...%d" % (proposed_left, onleft.value.id, node.value.left, node_bigx)
                     return False
             return True
 
@@ -84,7 +120,7 @@ class GraphRendererOgl:
                     continue
                 node_bigy = node.value.top + node.value.height + MARGIN
                 if ((proposed_top < node_bigy) and (proposed_top > node.value.top)):
-                    print "sorry, proposed_top %d clashes with %s's %d...%d" % (proposed_top, ontop.value.id, node.value.top, node_bigy)
+                    #print "sorry, proposed_top %d clashes with %s's %d...%d" % (proposed_top, ontop.value.id, node.value.top, node_bigy)
                     return False
             return True
 
@@ -92,7 +128,7 @@ class GraphRendererOgl:
         overlaps_found = 0
         fancy_negative_technique = 0
         for i in range(0,25):
-            print i
+            #print i
             iterations += 1
             foundoverlaps = False
             for node1 in self.graph.nodes:
@@ -122,7 +158,7 @@ class GraphRendererOgl:
                         overlaps_found += 1
                         xoverlap_amount = left_bigx - onright.value.left
                         yoverlap_amount = top_bigy - onbottom.value.top
-                        print "OVERLAP!!!! by %d/%d between %s and %s - %s %s" % (xoverlap_amount, yoverlap_amount, node1.value.id, node2.value.id, node1, node2)
+                        #print "OVERLAP!!!! by %d/%d between %s and %s - %s %s" % (xoverlap_amount, yoverlap_amount, node1.value.id, node2.value.id, node1, node2)
                         if fix:
                             # only repair one dimension at a time
                             if xoverlap_amount < yoverlap_amount:
@@ -138,15 +174,16 @@ class GraphRendererOgl:
                                 else:
                                     onbottom.value.top += yoverlap_amount
 
-                            print "  fixed %s %s" % (node1, node2)
+                            #print "  fixed %s %s" % (node1, node2)
 
             if not foundoverlaps:
-                print "no overlaps anymore :-)"
+                #print "no overlaps anymore :-)"
                 break
-        if foundoverlaps:
-            print "Exiting with overlaps remaining :-("
-        print "Overlaps fixed: %d  Iterations made: %d  fancy_negative_techniques: %d  " % (overlaps_found, iterations, fancy_negative_technique)
-
+        #if foundoverlaps:
+        #    print "Exiting with overlaps remaining :-("
+        if overlaps_found:
+            print "Overlaps fixed: %d  Iterations made: %d  fancy_negative_techniques: %d  " % (overlaps_found, iterations, fancy_negative_technique)
+        return overlaps_found
 
 
 
@@ -170,16 +207,15 @@ class GraphRendererOgl:
         #time.sleep(1)
 
     def stage2(self):
-        self.remove_overlaps()
-
-        for node in self.graph.nodes:
-            self.moveNode(node)
-
-        self.Redraw()
+        numfixed = self.remove_overlaps()
+        if numfixed:
+            for node in self.graph.nodes:
+                self.moveNode(node)
+            self.Redraw()
         
     def draw(self):
         self.stage1()
-        thread.start_new_thread(self.DoSomeLongTask, ())
+        #thread.start_new_thread(self.DoSomeLongTask, ())
 
 
     def DoSomeLongTask(self):
@@ -294,6 +330,14 @@ class GraphRendererOgl:
         setpos(shape, node.value.left, node.value.top)
         self.oglcanvas.AddShape( shape )
         node.shape = shape
+        shape.node = node
+        
+        # wire in the event handler for the new shape
+        evthandler = MyEvtHandler(None, self.oglcanvas)
+        evthandler.SetShape(shape)
+        evthandler.SetPreviousHandler(shape.GetEventHandler())
+        shape.SetEventHandler(evthandler)
+        evthandler.naughtyref_to_graphrenderer = self
         
         #self.ctx.strokeStyle = 'black'
         #self.ctx.beginPath()
@@ -312,7 +356,7 @@ class GraphRendererOgl:
         target = self.rotate(target, self.radius, theta)
 
         #print "Edge: from (%d, %d) to (%d, %d)" % (source[0], source[1], target[0], target[1])
-        
+         
         
         
         
@@ -437,13 +481,6 @@ class AppFrame(wx.Frame):
         for node in g.nodes:
             print node.value.id, (node.layoutPosX, node.layoutPosY)
         
-        class Canvas:
-            def __init__(self, width, height):
-                self.width = width
-                self.height = height
-            def getContext(self, whatever):
-                return Context()
-               
         ## ==========================================
         
         # apply sizer
@@ -453,8 +490,7 @@ class AppFrame(wx.Frame):
 
         ## ==========================================
 
-        people = Canvas(400, 400)        
-        renderer = GraphRendererOgl(people, g, canvas);
+        renderer = GraphRendererOgl(g, canvas);
         renderer.draw();
         
         diagram.ShowAll( 1 )
