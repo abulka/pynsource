@@ -22,8 +22,17 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         self.log = log
         self.oglcanvas = oglcanvas
 
-    #def OnLeftClick(self, x, y, keys = 0, attachment = 0):
-    #    print "OnLeftClick"
+    def UpdateStatusBar(self, shape):
+        x, y = shape.GetX(), shape.GetY()
+        x, y = getpos(shape)
+        width, height = shape.GetBoundingBoxMax()
+        frame = self.oglcanvas.GetTopLevelParent()
+        frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)" % (x, y, width, height))
+
+    def OnLeftClick(self, x, y, keys = 0, attachment = 0):
+        #print "OnLeftClick"
+        shape = self.GetShape()
+        self.UpdateStatusBar(shape)
 
     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
         #print "OnEndDragLeft"
@@ -87,6 +96,33 @@ class GraphRendererOgl:
             node.value.top      = int(point[1])
             node.value.left     = int(point[0])
 
+
+    #def HitTest(self, x, y):
+    #    """Given a point on a canvas, returns TRUE if the point was on the
+    #    shape, and returns the nearest attachment point and distance from
+    #    the given point and target.
+    #    """
+    #    width, height = self.GetBoundingBoxMax()
+    #    if abs(width) < 4:
+    #        width = 4.0
+    #    if abs(height) < 4:
+    #        height = 4.0
+    #
+    #    width += 4 # Allowance for inaccurate mousing
+    #    height += 4
+    #    
+    #    left = self._xpos - width / 2.0
+    #    top = self._ypos - height / 2.0
+    #    right = self._xpos + width / 2.0
+    #    bottom = self._ypos + height / 2.0
+    #
+    #    nearest_attachment = 0
+    #
+    #     If within the bounding box, check the attachment points
+    #     within the object.
+    #    if x >= left and x <= right and y >= top and y <= bottom:
+            
+            
     def remove_overlaps(self, fix=True):
         # Removing node overlap is actually no easy task. None of the layout
         # algorithms in JUNG, or few perhaps in the graphing world take vertex
@@ -96,14 +132,15 @@ class GraphRendererOgl:
         # to do such with the scaling and quadratic algorithms in the paper
         # above.
         # Forces on nodes due to node-node repulsions
-        #print "remove_overlaps"
-        MARGIN = 10
+        MARGIN = 1
         
-        #for i in range(0, len(self.graph.nodes)):
-        #    node1 = self.graph.nodes[i];
-        #    for j in range(i + 1, len(self.graph.nodes)):
-        #        node2 = self.graph.nodes[j]
-
+        def GetBounds(node):
+            left = node.value.left
+            right = node.value.left + node.value.width
+            top = node.value.top
+            bottom = node.value.top + node.value.height
+            return left, right, top, bottom
+        
         def wouldnotclashwithany_x(onleft, proposed_left):
             for node in self.graph.nodes:
                 if node == onleft:
@@ -118,11 +155,35 @@ class GraphRendererOgl:
             for node in self.graph.nodes:
                 if node == ontop:
                     continue
-                node_bigy = node.value.top + node.value.height + MARGIN
-                if ((proposed_top < node_bigy) and (proposed_top > node.value.top)):
-                    #print "sorry, proposed_top %d clashes with %s's %d...%d" % (proposed_top, ontop.value.id, node.value.top, node_bigy)
-                    return False
+                left, right, top, bottom = GetBounds(node)
+                
+                #proposed_left, proposed_right, proposed_top, proposed_bottom = GetBounds(ontop)
+                #
+                #proposed_topleftpoint = proposed_left, proposed_top
+                #proposed_toprightpoint = proposed_left + ontop.value.width, proposed_top
+                #proposed_bottomleftpoint = proposed_left, proposed_top + ontop.value.height
+                #proposed_bottomrightpoint = proposed_left + ontop.value.width, proposed_top + ontop.value.height
+                #
+                #assert proposed_topleftpoint == (ontop.value.left, proposed_top), "%s not equal to %s" %(proposed_topleftpoint, (ontop.value.left, proposed_top))
+                #assert proposed_toprightpoint == (ontop.value.left + ontop.value.width, proposed_top)
+                #assert proposed_bottomleftpoint == (ontop.value.left, proposed_top + ontop.value.height)
+                #assert proposed_bottomrightpoint == (ontop.value.left + ontop.value.width, proposed_top + ontop.value.height)
+
+                proposed_topleftpoint = ontop.value.left, proposed_top
+                proposed_toprightpoint = ontop.value.left + ontop.value.width, proposed_top
+                proposed_bottomleftpoint = ontop.value.left, proposed_top + ontop.value.height
+                proposed_bottomrightpoint = ontop.value.left + ontop.value.width, proposed_top + ontop.value.height
+
+                for point in [proposed_topleftpoint, proposed_toprightpoint, proposed_bottomleftpoint, proposed_bottomrightpoint]:
+                    #hit = node.shape.HitTest(point[0], point[1])
+                    x,y = point
+                    hit = x >= left and x <= right and y >= top and y <= bottom
+                    if hit:
+                        print "moving %s up would hit %s. Point %s is within %s" % (ontop.value.id, node.value.id, point, node)
+                        return False
             return True
+
+
 
         iterations = 0
         overlaps_found = 0
@@ -154,6 +215,7 @@ class GraphRendererOgl:
                     
                     #print "check: %s-%s %d > %d ?  %d > %d ?" % (onleft.value.id, onright.value.id, left_bigx, onright.value.left, top_bigy, onbottom.value.top)
                     if ((left_bigx > onright.value.left) and (top_bigy > onbottom.value.top)):
+                        print "ontop %s, onbottom %s, onleft %s, onright %s" % (ontop.value.id, onbottom.value.id, onleft.value.id, onright.value.id)
                         foundoverlaps = True
                         overlaps_found += 1
                         xoverlap_amount = left_bigx - onright.value.left
@@ -427,6 +489,8 @@ class AppFrame(wx.Frame):
                           style=wx.DEFAULT_FRAME_STYLE )
         sizer = wx.BoxSizer( wx.VERTICAL )
         # put stuff into sizer
+
+        self.CreateStatusBar()
 
         canvas = ogl.ShapeCanvas( self )
         sizer.Add( canvas, 1, wx.GROW )

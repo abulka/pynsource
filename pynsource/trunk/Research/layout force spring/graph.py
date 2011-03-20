@@ -79,7 +79,7 @@ class GraphNode:
         self.layoutForceY = 0
         
     def __str__(self):
-        return "Node: %s top, left (%d, %d) w/h (%d, %d)" % (self.value.id, self.value.top, self.value.left, self.value.width, self.value.height)
+        return "NodeDiv %s: x,y (%d, %d) w,h (%d, %d)" % (self.value.id, self.value.left, self.value.top, self.value.width, self.value.height)
         
 class Context:
     pass
