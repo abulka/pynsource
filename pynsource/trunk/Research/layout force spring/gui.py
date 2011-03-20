@@ -151,13 +151,26 @@ class GraphRendererOgl:
                     return False
             return True
 
-        def wouldnotclashwithany_y(ontop, proposed_top):
+        def wouldnotclashwithany_y(ontop, proposed_topY, deltaY):
+            result1 = wouldnotclashwithany_yGOOD(ontop, proposed_topY, deltaY)
+            result2 = wouldnotclashwithany_y2(ontop, deltaY)
+            if result1 != result2:
+                print "GOOD result1 says %s  != new result2 %s" % (result1, result2)
+            assert result1 == result2
+            return result1
+            
+        def wouldnotclashwithany_yGOOD(ontop, proposed_topY, deltaY):
             for node in self.graph.nodes:
                 if node == ontop:
                     continue
                 left, right, top, bottom = GetBounds(node)
                 
-                #proposed_left, proposed_right, proposed_top, proposed_bottom = GetBounds(ontop)
+                l, r, t, b = GetBounds(ontop)  # proposed
+                delta = (t -proposed_topY)
+                assert delta == deltaY, "%d not %d" % (delta, deltaY)
+                t -= delta
+                b -= delta
+                
                 #
                 #proposed_topleftpoint = proposed_left, proposed_top
                 #proposed_toprightpoint = proposed_left + ontop.value.width, proposed_top
@@ -169,12 +182,21 @@ class GraphRendererOgl:
                 #assert proposed_bottomleftpoint == (ontop.value.left, proposed_top + ontop.value.height)
                 #assert proposed_bottomrightpoint == (ontop.value.left + ontop.value.width, proposed_top + ontop.value.height)
 
-                proposed_topleftpoint = ontop.value.left, proposed_top
-                proposed_toprightpoint = ontop.value.left + ontop.value.width, proposed_top
-                proposed_bottomleftpoint = ontop.value.left, proposed_top + ontop.value.height
-                proposed_bottomrightpoint = ontop.value.left + ontop.value.width, proposed_top + ontop.value.height
+                # GOOD
+                proposed_topleftpoint = ontop.value.left, proposed_topY
+                proposed_toprightpoint = ontop.value.left + ontop.value.width, proposed_topY
+                proposed_bottomleftpoint = ontop.value.left, proposed_topY + ontop.value.height
+                proposed_bottomrightpoint = ontop.value.left + ontop.value.width, proposed_topY + ontop.value.height
+
+
+                assert proposed_topleftpoint == (l,t), "%s not equal to %s" %(proposed_topleftpoint, (l,t))
+                assert proposed_toprightpoint == (r,t)
+                assert proposed_bottomleftpoint == (l,b)
+                assert proposed_bottomrightpoint == (r,b)
+
 
                 for point in [proposed_topleftpoint, proposed_toprightpoint, proposed_bottomleftpoint, proposed_bottomrightpoint]:
+                #for point in [(l,t), (r,t), (l,b), (r,b)]:
                     #hit = node.shape.HitTest(point[0], point[1])
                     x,y = point
                     hit = x >= left and x <= right and y >= top and y <= bottom
@@ -183,6 +205,24 @@ class GraphRendererOgl:
                         return False
             return True
 
+        def wouldnotclashwithany_y2(ontop, deltaY):
+            for node in self.graph.nodes:
+                if node == ontop:
+                    continue
+                left, right, top, bottom = GetBounds(node)
+                
+                l, r, t, b = GetBounds(ontop)  # proposed
+                t -= deltaY
+                b -= deltaY
+                
+                #for point in [proposed_topleftpoint, proposed_toprightpoint, proposed_bottomleftpoint, proposed_bottomrightpoint]:
+                for point in [(l,t), (r,t), (l,b), (r,b)]:
+                    x,y = point
+                    hit = x >= left and x <= right and y >= top and y <= bottom
+                    if hit:
+                        print "moving %s up would hit %s. Point %s is within %s" % (ontop.value.id, node.value.id, point, node)
+                        return False
+            return True
 
 
         iterations = 0
@@ -230,7 +270,7 @@ class GraphRendererOgl:
                                 else:
                                     onright.value.left += xoverlap_amount
                             else:
-                                if ((ontop.value.top - yoverlap_amount > 0) and wouldnotclashwithany_y(ontop, proposed_top=ontop.value.top - yoverlap_amount)):
+                                if ((ontop.value.top - yoverlap_amount > 0) and wouldnotclashwithany_y(ontop, proposed_topY=ontop.value.top - yoverlap_amount, deltaY=yoverlap_amount)):
                                     ontop.value.top -= yoverlap_amount
                                     fancy_negative_technique += 1
                                 else:
