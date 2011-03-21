@@ -130,7 +130,7 @@ class GraphRendererOgl:
             
         def amhitting(currnode, ignorenode=None):
             for node in self.graph.nodes:
-                if node == movingnode or node == ignorenode:
+                if node == currnode or node == ignorenode:
                     continue
                 if hit(currnode, node):
                     print "  ! sitting here, %s is hitting %s." % (currnode.value.id, node.value.id)
@@ -216,7 +216,7 @@ class GraphRendererOgl:
                 msg += " %s," % (n.value.id)
             print "  ignore list now ", msg
 
-        def GatherProposals(node1, node2):
+        def GatherProposals(node1, node2, ignorenodes):
             proposals = []
             leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = calcbasics(node1, node2)
                         
@@ -232,6 +232,10 @@ class GraphRendererOgl:
             else:
                 proposals.append({'node':bottomnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':topnode})
             print dumpproposals(proposals)
+            
+            proposals = [p for p in proposals if not p['node'] in ignorenodes]
+            if not proposals:
+                print "  All proposals eliminated - worry about this overlap later"
             return proposals
         
         def GatherProposal2(lastmovedirection, clashingnode, movingnode):
@@ -265,68 +269,60 @@ class GraphRendererOgl:
             lowest_amount = min(amounts)
             proposal = [p for p in proposals if abs(p['amount']) == lowest_amount][0]
             applytrans(proposal)
-            return proposal
+            return proposal['node'], proposal['amount'], proposal['xory']
+
+        def ApplyPostMoveMove(lastmovedirection, clashingnode, movednode):
+            proposal = GatherProposal2(lastmovedirection, clashingnode, movednode)
+            if proposal:
+                applytrans(proposal)
+                print "  * extra correction to %s" % (movednode.value.id)
+                return True
+            return False
         
-        iterations = 0
+        total_iterations = 0
         total_overlaps_found = 0
         total_contractive_moves = 0
+        total_postmove_fixes = 0
         ignorenodes = []
         numfixedthisround = 0
-        total_postmove_fixes = 0
         
         for i in range(0,10):
-            
-            print i
-            iterations += 1
-            
-            if numfixedthisround == 0:
-                print "No fixes made last round, clearing bans"
-                ignorenodes = []
+            total_iterations += 1
             numfixedthisround = 0
 
-            foundoverlap = False
-            
             self.stateofthenation()
                     
-            for node1, node2 in getpermutations(self.graph.nodes):
+            foundoverlap = False
+            for node1, node2 in getpermutations(self.graph.nodes):  # a 'round'
                 if hit(node1, node2):
                     foundoverlap = True
                     total_overlaps_found += 1
                     
-                    proposals = GatherProposals(node1, node2)
-                    proposals = [p for p in proposals if not p['node'] in ignorenodes]
+                    proposals = GatherProposals(node1, node2, ignorenodes)
                     if not proposals:
-                        print "  All proposals eliminated - worry about this overlap later"
                         continue
                     
-                    proposal = ApplyMinimalProposal(proposals)
+                    movednode, movedamount, lastmovedirection = ApplyMinimalProposal(proposals)
+                    ignorenodes.append(movednode)
+
                     numfixedthisround += 1
-                    ignorenodes.append(proposal['node'])
-                    #dumpignorelist()
-                    if proposal['amount'] < 0:
+                    if movedamount < 0:
                         total_contractive_moves += 1
                     #self.stateofthenation()
                     
-                    # Post Move Algorithm - move the same node again, under certain circumstances
-                    if True:
-                        movingnode = proposal['node']
-                        lastmovedirection = proposal['xory']
-                        proposal = None
-                        
-                        # What am I clashing with now?
-                        clashingnode = amhitting(movingnode)
-                        if clashingnode:
-                            proposal = GatherProposal2(lastmovedirection, clashingnode, movingnode)
-                            if proposal:
-                                applytrans(proposal)
-                                total_postmove_fixes += 1
-                                print "  * extra correction to %s" % (movingnode.value.id)
-                        
+                    # Post Move Algorithm - move the same node again, under certain circumstances, despite ignorenodes list
+                    clashingnode = amhitting(movednode)  # What am I clashing with now?
+                    if clashingnode:
+                        if ApplyPostMoveMove(lastmovedirection, clashingnode, movednode):
+                            total_postmove_fixes += 1
+            if numfixedthisround == 0:
+                print "No fixes made last round, clearing bans"
+                ignorenodes = []
             if not foundoverlap:
-                break  # the failsafe for loop
+                break  # exit the failsafe for loop, our job is done !
 
         if total_overlaps_found:
-            print "Overlaps fixed: %d  Iterations made: %d  total_postmove_fixes: %d  total_contractive_moves: %d  " % (total_overlaps_found, iterations, total_postmove_fixes, total_contractive_moves)
+            print "Overlaps fixed: %d  total_iterations made: %d  total_postmove_fixes: %d  total_contractive_moves: %d  " % (total_overlaps_found, total_iterations, total_postmove_fixes, total_contractive_moves)
             if foundoverlap:
                 print "Exiting with overlaps remaining :-("
         return total_overlaps_found
