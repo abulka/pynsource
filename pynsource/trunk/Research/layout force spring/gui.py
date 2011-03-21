@@ -110,7 +110,7 @@ class GraphRendererOgl:
             bottom = node.value.top + node.value.height
             return left, right, top, bottom
         
-        def stayinbounds(node, deltaX=0, deltaY=0):
+        def ContractiveMoveWouldStayInBounds(node, deltaX=0, deltaY=0):
             assert deltaX >0 or deltaY >0
             if deltaX:
                 return node.value.left - deltaX > 0
@@ -138,7 +138,11 @@ class GraphRendererOgl:
             print "  ! sitting here, %s is  n o t  h i t t i n g  anything." % (currnode.value.id)
             return None
 
-        def wouldclash(movingnode, deltaY=0, deltaX=0, ignorenode=None):
+        def ContractiveMoveOk(movingnode, deltaY=0, deltaX=0, ignorenode=None):
+            return ContractiveMoveWouldStayInBounds(movingnode, deltaX=deltaX, deltaY=deltaY) and \
+                    not ContractiveMoveWouldClash(movingnode, deltaX=deltaX, deltaY=deltaY, ignorenode=ignorenode)
+    
+        def ContractiveMoveWouldClash(movingnode, deltaY=0, deltaX=0, ignorenode=None):
             l, r, t, b = GetBounds(movingnode)  # proposed
             checkednodesmsg = "node %s we are proposing to move: points are %s/%s/%s/%s " % (movingnode.value.id,(l,t), (r,t), (l,b), (r,b))
             
@@ -154,7 +158,7 @@ class GraphRendererOgl:
                 if node == movingnode or node == ignorenode:
                     continue
                 if hit(proposednode, node):
-                    print "  ! moving %s by -%d/-%d would hit %s." % (movingnode.value.id, deltaX, deltaY, node.value.id)
+                    print "  ! moving %s by -%d/-%d would hit %s. %s" % (movingnode.value.id, deltaX, deltaY, node.value.id, checkednodesmsg)
                     return node
             print "  ! moving %s by -%d/-%d would NOT HIT anything. %s" % (movingnode.value.id, deltaX, deltaY, checkednodesmsg)
             return None
@@ -162,14 +166,20 @@ class GraphRendererOgl:
         def ExpansiveMoveWouldClash(movingnode, deltaY=0, deltaX=0, ignorenode=None):
             assert deltaX >0 or deltaY >0
             l, r, t, b = GetBounds(movingnode)  # proposed
+            checkednodesmsg = "node %s we are proposing to move: points are %s/%s/%s/%s " % (movingnode.value.id,(l,t), (r,t), (l,b), (r,b))
             proposednode = GraphNode(Div('temp', top=t+deltaY, left=l+deltaX, width=r-l+deltaX+1, height=b-t+deltaY+1))
+
+            # debug
+            left, right, top, bottom = GetBounds(proposednode)
+            checkednodesmsg += "adjusted to proposed points tmpnode %d/%d/%d/%d" % (left, right, top, bottom)
+
             for node in self.graph.nodes:
                 if node == movingnode or node == ignorenode:
                     continue
                 if hit(proposednode, node):
-                    print "  ! expansive moving %s by +%d/+%d would hit %s." % (movingnode.value.id, deltaX, deltaY, node.value.id)
+                    print "  ! expansive moving %s by +%d/+%d would hit %s. %s" % (movingnode.value.id, deltaX, deltaY, node.value.id, checkednodesmsg)
                     return node
-            print "  ! expansive moving %s by +%d/+%d would NOT HIT anything." % (movingnode.value.id, deltaX, deltaY)
+            print "  ! expansive moving %s by +%d/+%d would NOT HIT anything. %s" % (movingnode.value.id, deltaX, deltaY, checkednodesmsg)
             return None
         
         def whoisonleft(node1, node2):
@@ -213,20 +223,25 @@ class GraphRendererOgl:
                     topnode, bottomnode = whoisontop(node1, node2)
                     xoverlap_amount = (leftnode.value.left + leftnode.value.width + MARGIN) - rightnode.value.left
                     yoverlap_amount = (topnode.value.top + topnode.value.height + MARGIN) - bottomnode.value.top
-                    
+
+                    xoverlap_amount = abs(xoverlap_amount)
+                    yoverlap_amount = abs(yoverlap_amount)
+                                
                     foundoverlap = True
                     total_overlaps_found += 1
                     print "Overlap %s/%s by %d/%d  (leftnode is %s  topnode is %s)" % (node1.value.id, node2.value.id, xoverlap_amount, yoverlap_amount, leftnode.value.id, topnode.value.id)
                     
                     if fix:
                         proposals = []
-                        
-                        if (stayinbounds(leftnode, deltaX=xoverlap_amount) and not wouldclash(leftnode, deltaX=xoverlap_amount, ignorenode=rightnode)):
+
+                        if ContractiveMoveOk(leftnode, deltaX=xoverlap_amount, ignorenode=rightnode):
+                        #if (ContractiveMoveWouldStayInBounds(leftnode, deltaX=xoverlap_amount) and not ContractiveMoveWouldClash(leftnode, deltaX=xoverlap_amount, ignorenode=rightnode)):
                             proposals.append({'node':leftnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':rightnode})
                         else:
                             proposals.append({'node':rightnode, 'xory':'x', 'amount':xoverlap_amount, 'clashnode':leftnode})
                             
-                        if (stayinbounds(topnode, deltaY=yoverlap_amount) and not wouldclash(topnode, deltaY=yoverlap_amount, ignorenode=bottomnode)):
+                        if ContractiveMoveOk(topnode, deltaY=yoverlap_amount, ignorenode=bottomnode):
+                        #if (ContractiveMoveWouldStayInBounds(topnode, deltaY=yoverlap_amount) and not ContractiveMoveWouldClash(topnode, deltaY=yoverlap_amount, ignorenode=bottomnode)):
                             proposals.append({'node':topnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':bottomnode})
                         else:
                             proposals.append({'node':bottomnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':topnode})
@@ -291,17 +306,23 @@ class GraphRendererOgl:
                                 # check the axis opposite to that I just moved
                                 if proposal['xory'] == 'x':
                                     # check y movement possibilities
-                                    if ((movingnode == topnode) and stayinbounds(movingnode, deltaY=yoverlap_amount) and not wouldclash(movingnode, deltaY=yoverlap_amount)):
+                                    if ((movingnode == topnode) and ContractiveMoveOk(movingnode, deltaY=yoverlap_amount) and (yoverlap_amount < xoverlap_amount)):
                                         movingnode.value.top -= yoverlap_amount
                                         total_postmove_fixes += 1
                                         print "  * extra correction to %s" % (movingnode.value.id)
-                                    if ((movingnode == bottomnode) and not ExpansiveMoveWouldClash(movingnode, deltaY=yoverlap_amount)):
+                                    if ((movingnode == bottomnode) and not ExpansiveMoveWouldClash(movingnode, deltaY=yoverlap_amount) and (yoverlap_amount < xoverlap_amount)):
                                         movingnode.value.top += yoverlap_amount
                                         total_postmove_fixes += 1
                                         print "  * extra correction to %s" % (movingnode.value.id)
                                 else:
-                                    print "  ************** no logic in place so couldn't do any possible extra correction to %s" % (movingnode.value.id)
-                                    pass
+                                    if ((movingnode == leftnode) and ContractiveMoveOk(movingnode, deltaX=xoverlap_amount) and (xoverlap_amount < yoverlap_amount)):
+                                        movingnode.value.left -= xoverlap_amount
+                                        total_postmove_fixes += 1
+                                        print "  * extra correction to %s" % (movingnode.value.id)
+                                    if ((movingnode == rightnode) and not ExpansiveMoveWouldClash(movingnode, deltaX=xoverlap_amount) and (xoverlap_amount < yoverlap_amount)):
+                                        movingnode.value.left += xoverlap_amount
+                                        total_postmove_fixes += 1
+                                        print "  * extra correction to %s" % (movingnode.value.id)
                         
                         
             if not foundoverlap:
