@@ -215,10 +215,61 @@ class GraphRendererOgl:
             for n in ignorenodes:
                 msg += " %s," % (n.value.id)
             print "  ignore list now ", msg
-                            
+
+        def GatherProposals(node1, node2):
+            proposals = []
+            leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = calcbasics(node1, node2)
+                        
+            print "Overlap %s/%s by %d/%d  (leftnode is %s  topnode is %s)" % (node1.value.id, node2.value.id, xoverlap_amount, yoverlap_amount, leftnode.value.id, topnode.value.id)
+
+            if ContractiveMoveOk(leftnode, deltaX=xoverlap_amount, ignorenode=rightnode):
+                proposals.append({'node':leftnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':rightnode})
+            else:
+                proposals.append({'node':rightnode, 'xory':'x', 'amount':xoverlap_amount, 'clashnode':leftnode})
+                
+            if ContractiveMoveOk(topnode, deltaY=yoverlap_amount, ignorenode=bottomnode):
+                proposals.append({'node':topnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':bottomnode})
+            else:
+                proposals.append({'node':bottomnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':topnode})
+            print dumpproposals(proposals)
+            return proposals
+        
+        def GatherProposal2(lastmovedirection, clashingnode, movingnode):
+            proposal = None
+            leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = calcbasics(clashingnode, movingnode)
+            # check the axis opposite to that I just moved
+            if lastmovedirection == 'x' and (yoverlap_amount < xoverlap_amount):  # check instant y movement possibilities
+                if ((movingnode == topnode) and ContractiveMoveOk(movingnode, deltaY=yoverlap_amount)):
+                    proposal = {'node':movingnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':clashingnode}
+                    
+                if ((movingnode == bottomnode) and not ExpansiveMoveWouldClash(movingnode, deltaY=yoverlap_amount)):
+                    proposal = {'node':movingnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':clashingnode}
+                    
+            if lastmovedirection == 'y' and (xoverlap_amount < yoverlap_amount):
+                if ((movingnode == leftnode) and ContractiveMoveOk(movingnode, deltaX=xoverlap_amount)):
+                    proposal = {'node':movingnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':clashingnode}
+                    
+                if ((movingnode == rightnode) and not ExpansiveMoveWouldClash(movingnode, deltaX=xoverlap_amount)):
+                    proposal = {'node':movingnode, 'xory':'x', 'amount':+xoverlap_amount, 'clashnode':clashingnode}
+            return proposal
+
+        def applytrans(proposal):
+            print dumpproposal(proposal)
+            if proposal['xory'] == 'x':
+                proposal['node'].value.left += proposal['amount']
+            else:
+                proposal['node'].value.top += proposal['amount']
+
+        def ApplyMinimalProposal(proposals):
+            amounts = [abs(p['amount']) for p in proposals]
+            lowest_amount = min(amounts)
+            proposal = [p for p in proposals if abs(p['amount']) == lowest_amount][0]
+            applytrans(proposal)
+            return proposal
+        
         iterations = 0
         total_overlaps_found = 0
-        fancy_negative_technique = 0
+        total_contractive_moves = 0
         ignorenodes = []
         numfixedthisround = 0
         total_postmove_fixes = 0
@@ -239,87 +290,43 @@ class GraphRendererOgl:
                     
             for node1, node2 in getpermutations(self.graph.nodes):
                 if hit(node1, node2):
-                    leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = calcbasics(node1, node2)
-                                
                     foundoverlap = True
                     total_overlaps_found += 1
-                    print "Overlap %s/%s by %d/%d  (leftnode is %s  topnode is %s)" % (node1.value.id, node2.value.id, xoverlap_amount, yoverlap_amount, leftnode.value.id, topnode.value.id)
                     
-                    if fix:
-                        proposals = []
-
-                        if ContractiveMoveOk(leftnode, deltaX=xoverlap_amount, ignorenode=rightnode):
-                            proposals.append({'node':leftnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':rightnode})
-                        else:
-                            proposals.append({'node':rightnode, 'xory':'x', 'amount':xoverlap_amount, 'clashnode':leftnode})
-                            
-                        if ContractiveMoveOk(topnode, deltaY=yoverlap_amount, ignorenode=bottomnode):
-                            proposals.append({'node':topnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':bottomnode})
-                        else:
-                            proposals.append({'node':bottomnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':topnode})
-
-                        print dumpproposals(proposals)
-                        proposals2 = [p for p in proposals if not p['node'] in ignorenodes]
-                        if not proposals2:
-                            print "  All proposals eliminated - worry about this overlap later"
-                            dumpignorelist()
-                            continue
+                    proposals = GatherProposals(node1, node2)
+                    proposals = [p for p in proposals if not p['node'] in ignorenodes]
+                    if not proposals:
+                        print "  All proposals eliminated - worry about this overlap later"
+                        continue
+                    
+                    proposal = ApplyMinimalProposal(proposals)
+                    numfixedthisround += 1
+                    ignorenodes.append(proposal['node'])
+                    #dumpignorelist()
+                    if proposal['amount'] < 0:
+                        total_contractive_moves += 1
+                    #self.stateofthenation()
+                    
+                    # Post Move Algorithm - move the same node again, under certain circumstances
+                    if True:
+                        movingnode = proposal['node']
+                        lastmovedirection = proposal['xory']
+                        proposal = None
                         
-                        amounts = [abs(p['amount']) for p in proposals2]
-                        lowest_amount = min(amounts)
-                        proposal = [p for p in proposals2 if abs(p['amount']) == lowest_amount][0]
-
-                        def applytrans(prop):
-                            print dumpproposal(prop)
-                            if prop['xory'] == 'x':
-                                prop['node'].value.left += prop['amount']
-                            else:
-                                prop['node'].value.top += prop['amount']
-                            
-                        applytrans(proposal)
-                        numfixedthisround += 1
-                        proposals2.remove(proposal)
-                        ignorenodes.append(proposal['node'])
-                        dumpignorelist()
-                        if proposal['amount'] < 0:
-                            fancy_negative_technique += 1
-                        #self.stateofthenation()
-                        
-                        # Post Move Algorithm - move the same node again, under certain circumstances
-                        if True:
-                            movingnode = proposal['node']
-                            lastmovedirection = proposal['xory']
-                            proposal = None
-                            # What am I clashing with now?
-                            clashingnode = amhitting(movingnode)
-                            if clashingnode:
-                                leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = calcbasics(clashingnode, movingnode)
-                                
-                                # check the axis opposite to that I just moved
-                                if lastmovedirection == 'x' and (yoverlap_amount < xoverlap_amount):  # check instant y movement possibilities
-                                    if ((movingnode == topnode) and ContractiveMoveOk(movingnode, deltaY=yoverlap_amount)):
-                                        proposal = {'node':movingnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':clashingnode}
-                                        
-                                    if ((movingnode == bottomnode) and not ExpansiveMoveWouldClash(movingnode, deltaY=yoverlap_amount)):
-                                        proposal = {'node':movingnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':clashingnode}
-                                        
-                                if lastmovedirection == 'y' and (xoverlap_amount < yoverlap_amount):
-                                    if ((movingnode == leftnode) and ContractiveMoveOk(movingnode, deltaX=xoverlap_amount)):
-                                        proposal = {'node':movingnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':clashingnode}
-                                        
-                                    if ((movingnode == rightnode) and not ExpansiveMoveWouldClash(movingnode, deltaX=xoverlap_amount)):
-                                        proposal = {'node':movingnode, 'xory':'x', 'amount':+xoverlap_amount, 'clashnode':clashingnode}
-                                        
-                                if proposal:
-                                    applytrans(proposal)
-                                    total_postmove_fixes += 1
-                                    print "  * extra correction to %s" % (movingnode.value.id)
+                        # What am I clashing with now?
+                        clashingnode = amhitting(movingnode)
+                        if clashingnode:
+                            proposal = GatherProposal2(lastmovedirection, clashingnode, movingnode)
+                            if proposal:
+                                applytrans(proposal)
+                                total_postmove_fixes += 1
+                                print "  * extra correction to %s" % (movingnode.value.id)
                         
             if not foundoverlap:
                 break  # the failsafe for loop
 
         if total_overlaps_found:
-            print "Overlaps fixed: %d  Iterations made: %d  total_postmove_fixes: %d  fancy_negative_techniques: %d  " % (total_overlaps_found, iterations, total_postmove_fixes, fancy_negative_technique)
+            print "Overlaps fixed: %d  Iterations made: %d  total_postmove_fixes: %d  total_contractive_moves: %d  " % (total_overlaps_found, iterations, total_postmove_fixes, total_contractive_moves)
             if foundoverlap:
                 print "Exiting with overlaps remaining :-("
         return total_overlaps_found
