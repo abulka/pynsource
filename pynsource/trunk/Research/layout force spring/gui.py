@@ -128,24 +128,54 @@ class GraphRendererOgl:
         def hit(node1, node2):
             return nodepointsin(node1, node2) or nodepointsin(node2, node1)
             
-        def clash(ontop, deltaY=0, deltaX=0):
+        def wouldclash_BAD(movingnode, deltaY=0, deltaX=0):
+            assert deltaX >= 0 and deltaY >=0
+            
+            l, r, t, b = GetBounds(movingnode)  # proposed
+            checkednodesmsg = "node %s we are proposing to move points %s/%s/%s/%s " % (movingnode.value.id,(l,t), (r,t), (l,b), (r,b))
+
+            l -= deltaX
+            r -= deltaX
+            t -= deltaY
+            b -= deltaY
+            checkednodesmsg += "adjusted to proposed points %s/%s/%s/%s " % ((l,t), (r,t), (l,b), (r,b))
+
             for node in self.graph.nodes:
-                if node == ontop:
+                if node == movingnode:
                     continue
+
                 left, right, top, bottom = GetBounds(node)
                 
-                l, r, t, b = GetBounds(ontop)  # proposed
-                l -= deltaX
-                r -= deltaX
-                t -= deltaY
-                b -= deltaY
+                checkednodesmsg += "checked against %s %d/%d/%d/%d  " % (node.value.id, left, right, top, bottom)
                 
                 for x,y in [(l,t), (r,t), (l,b), (r,b)]:
                     if x >= left and x <= right and y >= top and y <= bottom:
-                        #print "moving %s would hit %s. Point %d,%d is within %s" % (ontop.value.id, node.value.id, x, y, node)
+                        print "  ! moving %s would hit %s. Point %d,%d is within %s" % (movingnode.value.id, node.value.id, x, y, node)
                         return node
+            print "  ! moving %s by -%d/-%d would NOT HIT anything. %s" % (movingnode.value.id, deltaX, deltaY, checkednodesmsg)
             return None
 
+        def wouldclash(movingnode, deltaY=0, deltaX=0, ignorenode=None):
+            l, r, t, b = GetBounds(movingnode)  # proposed
+            checkednodesmsg = "node %s we are proposing to move: points are %s/%s/%s/%s " % (movingnode.value.id,(l,t), (r,t), (l,b), (r,b))
+            
+            l -= deltaX
+            r -= deltaX
+            t -= deltaY
+            b -= deltaY
+            proposednode = GraphNode(Div('temp moving proposed', top=t, left=l, width=r-l+1, height=b-t+1))
+            left, right, top, bottom = GetBounds(proposednode)
+            checkednodesmsg += "adjusted to proposed points %s/%s/%s/%s tmpnode %d/%d/%d/%d" % ((l,t), (r,t), (l,b), (r,b), left, right, top, bottom)
+            
+            for node in self.graph.nodes:
+                if node == movingnode or node == ignorenode:
+                    continue
+                if hit(proposednode, node):
+                    print "  ! moving %s would hit %s." % (movingnode.value.id, node.value.id)
+                    return node
+            print "  ! moving %s by -%d/-%d would NOT HIT anything. %s" % (movingnode.value.id, deltaX, deltaY, checkednodesmsg)
+            return None
+        
         def whoisonleft(node1, node2):
             if node1.value.left < node2.value.left:
                 return node1, node2
@@ -160,103 +190,103 @@ class GraphRendererOgl:
         
 
         iterations = 0
-        overlaps_found = 0
+        total_overlaps_found = 0
         fancy_negative_technique = 0
+        ignorenodes = []
+        numfixedthisround = 0
+        
         for i in range(0,10):
             
-            print i, "ignore list cleared ------------------"
+            print i
             iterations += 1
-            foundoverlaps = False
+            
+            if numfixedthisround == 0:
+                print "No fixes made last round, clearing bans"
+                ignorenodes = []
+            numfixedthisround = 0
+
+            foundoverlap = False
+            
             self.stateofthenation()
-            ignorethisround = []
                     
             for node1, node2 in getpermutations(self.graph.nodes):
-
-                onleft, onright = whoisonleft(node1, node2)
-                left_bigx = onleft.value.left + onleft.value.width + MARGIN
-                
-                ontop, onbottom = whoisontop(node1, node2)
-                top_bigy = ontop.value.top + ontop.value.height + MARGIN
-                
-                #print "check: %s-%s %d > %d ?  %d > %d ?" % (onleft.value.id, onright.value.id, left_bigx, onright.value.left, top_bigy, onbottom.value.top)
-                
-                if ((left_bigx > onright.value.left) and (top_bigy > onbottom.value.top)):
+                if hit(node1, node2):
+                    leftnode, rightnode = whoisonleft(node1, node2)
+                    topnode, bottomnode = whoisontop(node1, node2)
                     
-                    if not hit(onleft, onright):
-                        assert hit(onleft, onright)
-                    if not hit(ontop, onbottom):
-                        assert hit(ontop, onbottom)
+                    foundoverlap = True
+                    total_overlaps_found += 1
                     
-                    #print "ontop %s, onbottom %s, onleft %s, onright %s" % (ontop.value.id, onbottom.value.id, onleft.value.id, onright.value.id)
-                    foundoverlaps = True
-                    overlaps_found += 1
-                    xoverlap_amount = left_bigx - onright.value.left
-                    yoverlap_amount = top_bigy - onbottom.value.top
-                    print "OVERLAP!!!! by %d/%d between %s and %s - %s %s" % (xoverlap_amount, yoverlap_amount, node1.value.id, node2.value.id, node1, node2)
+                    xoverlap_amount = (leftnode.value.left + leftnode.value.width + MARGIN) - rightnode.value.left
+                    yoverlap_amount = (topnode.value.top + topnode.value.height + MARGIN) - bottomnode.value.top
+                    
+                    print "Overlap %s/%s by %d/%d  (leftnode is %s  topnode is %s)" % (node1.value.id, node2.value.id, xoverlap_amount, yoverlap_amount, leftnode.value.id, topnode.value.id)
                     
                     if fix:
                         proposals = []
                         
-                        clashnode = clash(onleft, deltaX=xoverlap_amount)
-                        if (stayinbounds(onleft, deltaX=xoverlap_amount) and not clashnode):
-                            proposals.append({'node':onleft, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':onright})
+                        if (stayinbounds(leftnode, deltaX=xoverlap_amount) and not wouldclash(leftnode, deltaX=xoverlap_amount, ignorenode=rightnode)):
+                            proposals.append({'node':leftnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':rightnode})
                         else:
-                            proposals.append({'node':onright, 'xory':'x', 'amount':xoverlap_amount, 'clashnode':onleft})
+                            proposals.append({'node':rightnode, 'xory':'x', 'amount':xoverlap_amount, 'clashnode':leftnode})
                             
-                        clashnode = clash(ontop, deltaY=yoverlap_amount)
-                        if (stayinbounds(ontop, deltaY=yoverlap_amount) and not clashnode):
-                            proposals.append({'node':ontop, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':onbottom})
+                        if (stayinbounds(topnode, deltaY=yoverlap_amount) and not wouldclash(topnode, deltaY=yoverlap_amount, ignorenode=bottomnode)):
+                            proposals.append({'node':topnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':bottomnode})
                         else:
-                            proposals.append({'node':onbottom, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':ontop})
+                            proposals.append({'node':bottomnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':topnode})
 
-                        proposals2 = [p for p in proposals if not (p['node'] in ignorethisround)]
+                        def dumpproposal(prop):
+                            return "  moving %s.%s by %s" % (prop['node'].value.id, prop['xory'], prop['amount'])
+                            
+                        def dumpproposals(props):
+                            msg = "  Proposals: "
+                            for p in props:
+                                msg += dumpproposal(p)
+                            return msg
+                            
+                        def dumpignorelist():
+                            msg = ""
+                            for n in ignorenodes:
+                                msg += " %s," % (n.value.id)
+                            print "  ignore list now ", msg
+
+                        print dumpproposals(proposals)
+                        #proposals2 = [p for p in proposals if not ((p['node'],p['clashnode']) in ignorenodes)]
+                        proposals2 = [p for p in proposals if not p['node'] in ignorenodes]
                         if not proposals2:
+                            print "  All proposals eliminated - worry about this overlap later"
+                            dumpignorelist()
                             continue
+                        
                         amounts = [abs(p['amount']) for p in proposals2]
                         lowest_amount = min(amounts)
                         proposal = [p for p in proposals2 if abs(p['amount']) == lowest_amount][0]
 
                         def applytrans(prop):
-                            print "  moving %s %s by %s" % (prop['node'].value.id, prop['xory'], prop['amount'])
+                            print dumpproposal(prop)
                             if prop['xory'] == 'x':
                                 prop['node'].value.left += prop['amount']
                             else:
                                 prop['node'].value.top += prop['amount']
-                        def dumpignorelist():
-                            msg = ""
-                            for n in ignorethisround:
-                                msg += " " + n.value.id
-                            print "  ignore list now ", msg
                             
                         applytrans(proposal)
+                        numfixedthisround += 1
                         proposals2.remove(proposal)
-                        ignorethisround.append(proposal['node'])
+                        #ignorenodes.append((proposal['node'],proposal['clashnode']))
+                        ignorenodes.append(proposal['node'])
                         dumpignorelist()
                         if proposal['amount'] < 0:
                             fancy_negative_technique += 1
                         #self.stateofthenation()
                         
-                        # if still clashing, find the matching other movement
-                        # should only use if still clashing with the SAME node again.
-                        #if True or clash(proposal['node']) == proposal['clashnode']:
-                        #    matching_proposals = [p for p in proposals2 if p['node'] == proposal['node']]
-                        #    if matching_proposals:
-                        #        proposalother = matching_proposals[0]
-                        #        applytrans(proposalother)
-                        #        assert proposal['xory'] != proposalother['xory']
-                            
-                        
+            if not foundoverlap:
+                break  # the failsafe for loop
 
-                        #print "  fixed %s %s" % (node1, node2)
-
-            if not foundoverlaps:
-                #print "no overlaps anymore :-)"
-                break
-        #if foundoverlaps:
-        #    print "Exiting with overlaps remaining :-("
-        if overlaps_found:
-            print "Overlaps fixed: %d  Iterations made: %d  fancy_negative_techniques: %d  " % (overlaps_found, iterations, fancy_negative_technique)
-        return overlaps_found
+        if total_overlaps_found:
+            print "Overlaps fixed: %d  Iterations made: %d  fancy_negative_techniques: %d  " % (total_overlaps_found, iterations, fancy_negative_technique)
+            if foundoverlap:
+                print "Exiting with overlaps remaining :-("
+        return total_overlaps_found
 
 
 
