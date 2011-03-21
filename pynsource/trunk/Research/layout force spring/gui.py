@@ -117,7 +117,7 @@ class GraphRendererOgl:
             if deltaY:
                 return node.value.top - deltaY > 0
 
-        def nodepointsin(node1, node2):
+        def arenodepointsin(node1, node2):
             l, r, t, b = GetBounds(node1)
             left, right, top, bottom = GetBounds(node2)
             for x,y in [(l,t), (r,t), (l,b), (r,b)]:
@@ -126,33 +126,16 @@ class GraphRendererOgl:
             return False
 
         def hit(node1, node2):
-            return nodepointsin(node1, node2) or nodepointsin(node2, node1)
+            return arenodepointsin(node1, node2) or arenodepointsin(node2, node1)
             
-        def wouldclash_BAD(movingnode, deltaY=0, deltaX=0):
-            assert deltaX >= 0 and deltaY >=0
-            
-            l, r, t, b = GetBounds(movingnode)  # proposed
-            checkednodesmsg = "node %s we are proposing to move points %s/%s/%s/%s " % (movingnode.value.id,(l,t), (r,t), (l,b), (r,b))
-
-            l -= deltaX
-            r -= deltaX
-            t -= deltaY
-            b -= deltaY
-            checkednodesmsg += "adjusted to proposed points %s/%s/%s/%s " % ((l,t), (r,t), (l,b), (r,b))
-
+        def amhitting(currnode, ignorenode=None):
             for node in self.graph.nodes:
-                if node == movingnode:
+                if node == movingnode or node == ignorenode:
                     continue
-
-                left, right, top, bottom = GetBounds(node)
-                
-                checkednodesmsg += "checked against %s %d/%d/%d/%d  " % (node.value.id, left, right, top, bottom)
-                
-                for x,y in [(l,t), (r,t), (l,b), (r,b)]:
-                    if x >= left and x <= right and y >= top and y <= bottom:
-                        print "  ! moving %s would hit %s. Point %d,%d is within %s" % (movingnode.value.id, node.value.id, x, y, node)
-                        return node
-            print "  ! moving %s by -%d/-%d would NOT HIT anything. %s" % (movingnode.value.id, deltaX, deltaY, checkednodesmsg)
+                if hit(currnode, node):
+                    print "  ! sitting here, %s is hitting %s." % (currnode.value.id, node.value.id)
+                    return node
+            print "  ! sitting here, %s is  n o t  h i t t i n g  anything." % (currnode.value.id)
             return None
 
         def wouldclash(movingnode, deltaY=0, deltaX=0, ignorenode=None):
@@ -171,9 +154,22 @@ class GraphRendererOgl:
                 if node == movingnode or node == ignorenode:
                     continue
                 if hit(proposednode, node):
-                    print "  ! moving %s would hit %s." % (movingnode.value.id, node.value.id)
+                    print "  ! moving %s by -%d/-%d would hit %s." % (movingnode.value.id, deltaX, deltaY, node.value.id)
                     return node
             print "  ! moving %s by -%d/-%d would NOT HIT anything. %s" % (movingnode.value.id, deltaX, deltaY, checkednodesmsg)
+            return None
+
+        def ExpansiveMoveWouldClash(movingnode, deltaY=0, deltaX=0, ignorenode=None):
+            assert deltaX >0 or deltaY >0
+            l, r, t, b = GetBounds(movingnode)  # proposed
+            proposednode = GraphNode(Div('temp', top=t+deltaY, left=l+deltaX, width=r-l+deltaX+1, height=b-t+deltaY+1))
+            for node in self.graph.nodes:
+                if node == movingnode or node == ignorenode:
+                    continue
+                if hit(proposednode, node):
+                    print "  ! expansive moving %s by +%d/+%d would hit %s." % (movingnode.value.id, deltaX, deltaY, node.value.id)
+                    return node
+            print "  ! expansive moving %s by +%d/+%d would NOT HIT anything." % (movingnode.value.id, deltaX, deltaY)
             return None
         
         def whoisonleft(node1, node2):
@@ -194,6 +190,7 @@ class GraphRendererOgl:
         fancy_negative_technique = 0
         ignorenodes = []
         numfixedthisround = 0
+        total_postmove_fixes = 0
         
         for i in range(0,10):
             
@@ -211,15 +208,14 @@ class GraphRendererOgl:
                     
             for node1, node2 in getpermutations(self.graph.nodes):
                 if hit(node1, node2):
+                    # CALC AAA1
                     leftnode, rightnode = whoisonleft(node1, node2)
                     topnode, bottomnode = whoisontop(node1, node2)
-                    
-                    foundoverlap = True
-                    total_overlaps_found += 1
-                    
                     xoverlap_amount = (leftnode.value.left + leftnode.value.width + MARGIN) - rightnode.value.left
                     yoverlap_amount = (topnode.value.top + topnode.value.height + MARGIN) - bottomnode.value.top
                     
+                    foundoverlap = True
+                    total_overlaps_found += 1
                     print "Overlap %s/%s by %d/%d  (leftnode is %s  topnode is %s)" % (node1.value.id, node2.value.id, xoverlap_amount, yoverlap_amount, leftnode.value.id, topnode.value.id)
                     
                     if fix:
@@ -251,7 +247,6 @@ class GraphRendererOgl:
                             print "  ignore list now ", msg
 
                         print dumpproposals(proposals)
-                        #proposals2 = [p for p in proposals if not ((p['node'],p['clashnode']) in ignorenodes)]
                         proposals2 = [p for p in proposals if not p['node'] in ignorenodes]
                         if not proposals2:
                             print "  All proposals eliminated - worry about this overlap later"
@@ -272,18 +267,48 @@ class GraphRendererOgl:
                         applytrans(proposal)
                         numfixedthisround += 1
                         proposals2.remove(proposal)
-                        #ignorenodes.append((proposal['node'],proposal['clashnode']))
                         ignorenodes.append(proposal['node'])
                         dumpignorelist()
                         if proposal['amount'] < 0:
                             fancy_negative_technique += 1
                         #self.stateofthenation()
                         
+                        # Post Move Algorithm - move the same node again, under certain circumstances
+                        if True:
+                            movingnode = proposal['node']
+                            # What am I clashing with now?
+                            clashingnode = amhitting(movingnode)
+                            if clashingnode:
+                                # CALC AAA1
+                                leftnode, rightnode = whoisonleft(clashingnode, movingnode)
+                                topnode, bottomnode = whoisontop(clashingnode, movingnode)
+                                xoverlap_amount = (leftnode.value.left + leftnode.value.width + MARGIN) - rightnode.value.left
+                                yoverlap_amount = (topnode.value.top + topnode.value.height + MARGIN) - bottomnode.value.top
+        
+                                xoverlap_amount = abs(xoverlap_amount)
+                                yoverlap_amount = abs(yoverlap_amount)
+                                
+                                # check the axis opposite to that I just moved
+                                if proposal['xory'] == 'x':
+                                    # check y movement possibilities
+                                    if ((movingnode == topnode) and stayinbounds(movingnode, deltaY=yoverlap_amount) and not wouldclash(movingnode, deltaY=yoverlap_amount)):
+                                        movingnode.value.top -= yoverlap_amount
+                                        total_postmove_fixes += 1
+                                        print "  * extra correction to %s" % (movingnode.value.id)
+                                    if ((movingnode == bottomnode) and not ExpansiveMoveWouldClash(movingnode, deltaY=yoverlap_amount)):
+                                        movingnode.value.top += yoverlap_amount
+                                        total_postmove_fixes += 1
+                                        print "  * extra correction to %s" % (movingnode.value.id)
+                                else:
+                                    print "  ************** no logic in place so couldn't do any possible extra correction to %s" % (movingnode.value.id)
+                                    pass
+                        
+                        
             if not foundoverlap:
                 break  # the failsafe for loop
 
         if total_overlaps_found:
-            print "Overlaps fixed: %d  Iterations made: %d  fancy_negative_techniques: %d  " % (total_overlaps_found, iterations, fancy_negative_technique)
+            print "Overlaps fixed: %d  Iterations made: %d  total_postmove_fixes: %d  fancy_negative_techniques: %d  " % (total_overlaps_found, iterations, total_postmove_fixes, fancy_negative_technique)
             if foundoverlap:
                 print "Exiting with overlaps remaining :-("
         return total_overlaps_found
