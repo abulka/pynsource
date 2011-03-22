@@ -13,12 +13,12 @@
 <preference-set id="testPlans">
 <preference-set id="Layout">
   <string id="command_line"></string>
-  <string relative="url" id="directory">Research/layout%20force%20spring/</string>
+  <string relative="url" id="directory">Research/layout%2520force%2520spring</string>
   <string id="language">Python - unittest</string>
 </preference-set>
 <preference-set id="Main Tests">
   <string id="command_line"></string>
-  <string relative="url" id="directory">tests/</string>
+  <string relative="url" id="directory">tests</string>
   <string id="language">Python - unittest</string>
 </preference-set>
 </preference-set>
