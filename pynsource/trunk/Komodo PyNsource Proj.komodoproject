@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="eb97fa29-311d-43fb-9d11-4fcf0f8a33dd" kpf_version="5" name="Komodo PyNsource Proj.komodoproject">
+<preference-set idref="eb97fa29-311d-43fb-9d11-4fcf0f8a33dd">
+  <string id="currentInvocationLanguage">Python</string>
+  <string relative="path" id="import_dirname"></string>
+  <string id="import_exclude_matches">*.*~;*.bak;*.tmp;CVS;.#*;*.pyo;*.pyc;.svn;_svn;*%*;tmp*.html;.DS_Store</string>
+  <string id="import_include_matches"></string>
+  <string id="language">Python</string>
+  <string id="lastInvocation"></string>
+  <string id="lastTestPlanName_pref">New test plan #1</string>
+  <string id="mappedPaths"></string>
+<preference-set id="testPlans">
+<preference-set id="New test plan #1">
+  <string id="command_line"></string>
+  <string relative="url" id="directory">tests</string>
+  <string id="language">Python - unittest</string>
+</preference-set>
+</preference-set>
+</preference-set>
+</project>
