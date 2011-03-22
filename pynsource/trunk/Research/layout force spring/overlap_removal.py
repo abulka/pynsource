@@ -239,7 +239,8 @@ class OverlapRemoval:
                         if ApplyPostMoveMove(lastmovedirection, clashingnode, movednode):
                             total_postmove_fixes += 1
             if numfixedthisround == 0:
-                print "No fixes made last round, clearing bans"
+                if total_iterations > 1:
+                    print "No fixes made last round, clearing bans"
                 ignorenodes = []
             if not foundoverlap:
                 break  # exit the failsafe for loop, our job is done !
@@ -248,5 +249,7 @@ class OverlapRemoval:
             print "Overlaps fixed: %d  total_iterations made: %d  total_postmove_fixes: %d  total_contractive_moves: %d  " % (total_overlaps_found, total_iterations, total_postmove_fixes, total_contractive_moves)
             if foundoverlap:
                 print "Exiting with overlaps remaining :-("
+        else:
+            print "No Overlaps found."
         return total_overlaps_found
 

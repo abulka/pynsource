@@ -1,5 +1,8 @@
 import unittest
 
+import sys
+sys.path.append("../Research/layout force spring")
+
 from overlap_removal import OverlapRemoval
 from graph import Graph, GraphNode, Div
 
@@ -7,6 +10,7 @@ from graph import Graph, GraphNode, Div
 class MathLibraryTests(unittest.TestCase):
 
     def setUp(self):
+
         class FakeGui:
             def stateofthenation(self):
                 pass
