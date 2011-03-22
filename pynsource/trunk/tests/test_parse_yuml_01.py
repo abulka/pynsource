@@ -21,7 +21,7 @@ class TestCaseYuml01(unittest.TestCase):
         print "_"*80 + " yUML END DUMP"
 
 
-    def check01ParseMeTestUnoptimised(self):
+    def test01ParseMeTestUnoptimised(self):
         FILE = 'python-in/testmodule01.py'
         self.p.Parse(FILE)
         self.p.CalcYumls(optimise=False)
@@ -34,7 +34,7 @@ class TestCaseYuml01(unittest.TestCase):
         #self._dump(self.p, expected)
         self.assertEquals(expected, str(self.p).strip())
 
-    def check02ParseMeTestOptimised(self):
+    def test02ParseMeTestOptimised(self):
         FILE = 'python-in/testmodule01.py'
         self.p.Parse(FILE)
         self.p.CalcYumls(optimise=True)
@@ -46,7 +46,7 @@ class TestCaseYuml01(unittest.TestCase):
         #self._dump(self.p, expected)
         self.assertEquals(expected, str(self.p).strip())
 
-    def check01FlagUnoptimised(self):
+    def test01FlagUnoptimised(self):
         FILE = 'python-in/testmodule66.py'
         self.p.Parse(FILE)
         self.p.CalcYumls(optimise=False)
@@ -58,7 +58,7 @@ class TestCaseYuml01(unittest.TestCase):
         #self._dump(self.p, expected)
         self.assertEquals(expected, str(self.p).strip())
 
-    def check02FlagOptimised(self):
+    def test02FlagOptimised(self):
         FILE = 'python-in/testmodule66.py'
         self.p.Parse(FILE)
         self.p.CalcYumls(optimise=True)
@@ -70,7 +70,7 @@ class TestCaseYuml01(unittest.TestCase):
 
         
 def suite():
-    suite1 = unittest.makeSuite(TestCaseYuml01, 'check')
+    suite1 = unittest.makeSuite(TestCaseYuml01, 'test')
     alltests = unittest.TestSuite((suite1, ))
     return alltests
 

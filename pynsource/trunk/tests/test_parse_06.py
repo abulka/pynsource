@@ -12,7 +12,7 @@ class TestCase01(unittest.TestCase):
     def setUp(self):
         self.p = PySourceAsText()
 
-    def check01(self):
+    def test01(self):
         """
         """
         FILE = 'python-in/testmodule66.py'
@@ -91,7 +91,7 @@ class TestCase01(unittest.TestCase):
 
 
 def suite():
-    suite1 = unittest.makeSuite(TestCase01, 'check')
+    suite1 = unittest.makeSuite(TestCase01, 'test')
     alltests = unittest.TestSuite((suite1, ))
     return alltests
 

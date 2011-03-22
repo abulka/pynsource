@@ -12,7 +12,7 @@ class TestCase01(unittest.TestCase):
     def setUp(self):
         self.p = PySourceAsText()
 
-    def checkNestedClasses01(self):
+    def testNestedClasses01(self):
         """
         class ParseMeTest:
             a = 100
@@ -97,7 +97,7 @@ class TestCase01(unittest.TestCase):
 
        
 def suite():
-    suite1 = unittest.makeSuite(TestCase01, 'check')
+    suite1 = unittest.makeSuite(TestCase01, 'test')
     alltests = unittest.TestSuite((suite1, ))
     return alltests
 

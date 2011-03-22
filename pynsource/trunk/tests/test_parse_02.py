@@ -18,7 +18,7 @@ class TestCase01(unittest.TestCase):
     def setUp(self):
         self.p = PySourceAsText()
 
-    def checkModuleVarsAndFunctions01(self):
+    def testModuleVarsAndFunctions01(self):
         """
         class ParseMeTest:
             def __init__(self):
@@ -120,7 +120,7 @@ class TestCase01(unittest.TestCase):
             assert gotevent8 
         
 
-    def checkModuleVarsAndFunctions02(self):
+    def testModuleVarsAndFunctions02(self):
         """
         class ParseMeTest:
             a = 100
@@ -218,7 +218,7 @@ class TestCase01(unittest.TestCase):
         
         
 def suite():
-    suite1 = unittest.makeSuite(TestCase01, 'check')
+    suite1 = unittest.makeSuite(TestCase01, 'test')
     alltests = unittest.TestSuite((suite1, ))
     return alltests
 

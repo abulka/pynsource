@@ -7,11 +7,12 @@ import sys
 if not '..'in sys.path: sys.path.append('..')
 from pynsource.gen_asciiart import PySourceAsText
 
+
 class TestCase01(unittest.TestCase):
     def setUp(self):
         self.p = PySourceAsText()
 
-    def checkBasics01(self):
+    def testBasics01(self):
         """
         --------------------
         ParseMeTest  --------|> []
@@ -110,7 +111,7 @@ class TestCase01(unittest.TestCase):
         assert gotevent2 
         assert gotevents == 6
 
-    def checkBasicsCommentGlitch01(self):
+    def testBasicsCommentGlitch01(self):
         FILE = 'python-in/testmodule02.py'
         self.p.Parse(FILE)
 
@@ -141,7 +142,7 @@ class TestCase01(unittest.TestCase):
         
 
 def suite():
-    suite1 = unittest.makeSuite(TestCase01, 'check')
+    suite1 = unittest.makeSuite(TestCase01, 'test')
     alltests = unittest.TestSuite((suite1, ))
     return alltests
 
@@ -151,6 +152,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 

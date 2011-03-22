@@ -12,50 +12,63 @@ class TestCase01(unittest.TestCase):
     def setUp(self):
         self.p = PySourceAsText()
 
-    def checkParsesCorrectly01(self):
+    def testNestedClasses01(self):
         """
-        class ParseMeTest:
-            ...
-            ...
-            def SetFlagsFromMemento(self, memento):
-                if memento:
-                    self.flagsdict = eval(memento)
-                else:
-                    self.flagsdict = {}
+        class ParseMeTest(undo.UndoItem):
+
+            DEFAULT_ELEVATION = 30
+
+            def __init__(self, map):
+                self.map = map
+
+            def PlaceTile(self, coord, terrainbmp):
+                self.EnsureGraphicsSubDictAllocated(coord)
+                newterraintype = self.bmpUtils.BmpToTerrainType(terrainbmp)
+
+
         """
-        FILE = 'python-in/testmodule06.py'
+        FILE = 'python-in/testmodule07.py'
         self.p.Parse(FILE)
 
         #print self.p
-        #return
 
         # -------------------------------------------------------
+
+        gotevent1 = 0
+        gotevent2 = 0
+        gotevent3 = 0
 
         for classname, classentry in self.p.classlist.items():
             if classname == 'ParseMeTest':
                 gotevent1 = 1
                 assert classentry.classesinheritsfrom == ['undo.UndoItem']
 
-                assert len(classentry.attrs) == 7
-                attrnames = [a.attrname for a in classentry.attrs]
-                assert 'scenario' in attrnames
-                assert 'flagsdict' in attrnames
-                assert 'pointsdict' in attrnames
-                assert 'weatherdict' in attrnames
-                assert 'flageditor' in attrnames
-                assert 'weathereditor' in attrnames
-                assert 'turnseditor' in attrnames
+                assert len(classentry.attrs) == 2
+                for attrobj in classentry.attrs:
+                    attrname = attrobj.attrname
+                    if attrname == 'map':
+                        gotevent2 = 1
+                    if attrname == 'DEFAULT_ELEVATION':
+                        gotevent3 = 1
+                        assert 'static' in attrobj.attrtype
 
                 for adef in classentry.defs:
                     pass
                 assert len(classentry.defs) == 2
                 assert '__init__' in classentry.defs
-                assert 'SetFlagsFromMemento' in classentry.defs
+                assert 'PlaceTile' in classentry.defs
+
+
+
+        assert gotevent1
+        assert gotevent2
+        assert gotevent3
+
 
 
 
 def suite():
-    suite1 = unittest.makeSuite(TestCase01, 'check')
+    suite1 = unittest.makeSuite(TestCase01, 'test')
     alltests = unittest.TestSuite((suite1, ))
     return alltests
 
