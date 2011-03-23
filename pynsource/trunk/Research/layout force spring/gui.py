@@ -179,8 +179,7 @@ class GraphRendererOgl:
         self.oglcanvas.GetDiagram().Clear(dc)   # only ends up calling dc.Clear() - I wonder if this clears the screen?
         
         # clear model
-        self.graph.nodes = []
-        self.graph.edges = []
+        self.graph.clear()
         filedata = filedata.split('\n')
         for data in filedata:
             data = data.strip()
@@ -188,14 +187,27 @@ class GraphRendererOgl:
                 continue
             print data
             data = eval(data)
-            if data['type'] == 'edge':
-                source = data['source']
-                target = data['target']
+            if data['type'] == 'node':
+                # {'type':'node', 'id':'c5', 'x':230, 'y':174, 'width':60, 'height':120}
+                div = Div(data['id'], data['x'], data['y'], data['width'], data['height'])
+                self.graph.addNode(div)
+            elif data['type'] == 'edge':
+                source_id = data['source']
+                target_id = data['target']
                 # need to find the node corresponding to a div of id whatever
                 # wire together the two divs
-                self.graph.addEdge(source, target)
-        self.draw()
-        self.oglcanvas.GetDiagram().ShowAll(1) # need?
+                sourcenode = self.graph.findNode(source_id)
+                targetnode = self.graph.findNode(target_id)
+                if not sourcenode:
+                    print "Couldn't load source from persistence", source_id
+                    continue
+                if not targetnode:
+                    print "Couldn't load target from persistence", target_id
+                    continue
+                self.graph.addEdge(sourcenode.value, targetnode.value)  # addEdge takes div objects as parameters
+        self.draw(tranlatecoords=False)
+        self.oglcanvas.GetDiagram().ShowAll(1) # need this, yes
+        self.stateofthenation()
 
     def SaveGraph(self, filename):
         nodes = ""
@@ -213,10 +225,11 @@ class GraphRendererOgl:
     def OnWheelZoom(self, event):
         self.stage2()
 
-    def stage1(self):
+    def stage1(self, tranlatecoords=True):
         import time
         
-        self.translate_node_coords()
+        if tranlatecoords:
+            self.translate_node_coords()
 
         for i in range(0, len(self.graph.nodes)):
             self.drawNode(self.graph.nodes[i])
@@ -241,8 +254,8 @@ class GraphRendererOgl:
         #time.sleep(0.2)
         
         
-    def draw(self):
-        self.stage1()
+    def draw(self, tranlatecoords=True):
+        self.stage1(tranlatecoords=tranlatecoords)
         #thread.start_new_thread(self.DoSomeLongTask, ())
 
 
@@ -377,11 +390,11 @@ class GraphRendererOgl:
         source = self.translate([edge['source'].layoutPosX, edge['source'].layoutPosY])
         target = self.translate([edge['target'].layoutPosX, edge['target'].layoutPosY])
 
-        tan = (target[1] - source[1]) / (target[0] - source[0])
-        theta = Math.atan(tan)
-        if(source[0] <= target[0]): theta = Math.PI()+theta
-        source = self.rotate(source, -self.radius, theta)
-        target = self.rotate(target, self.radius, theta)
+        #tan = (target[1] - source[1]) / (target[0] - source[0])
+        #theta = Math.atan(tan)
+        #if(source[0] <= target[0]): theta = Math.PI()+theta
+        #source = self.rotate(source, -self.radius, theta)
+        #target = self.rotate(target, self.radius, theta)
 
         #print "Edge: from (%d, %d) to (%d, %d)" % (source[0], source[1], target[0], target[1])
          
@@ -436,7 +449,7 @@ class GraphRendererOgl:
         #self.ctx.lineTo(target[0], target[1])
         #self.ctx.stroke()
        
-        self.drawArrowHead(20, self.arrowAngle, theta, source[0], source[1], target[0], target[1])
+        #self.drawArrowHead(20, self.arrowAngle, theta, source[0], source[1], target[0], target[1])
 
     def drawArrowHead(self, length, alpha, theta, startx, starty, endx, endy):
         top = self.rotate([endx, endy], length, theta + alpha)

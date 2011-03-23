@@ -42,6 +42,9 @@ class Math:
     
 class Graph:
     def __init__(self):
+        self.clear()
+        
+    def clear(self):
         self.nodeSet = {}
         self.nodes = []
         self.edges = []
@@ -62,6 +65,10 @@ class Graph:
             self.nodes.append(node)
         return node
 
+    def findNode(self, id):
+        node = self.nodeSet.get(id, None)
+        return node
+        
     def addEdge(self, source, target):
         # Uniqueness must be ensured by caller
         s = self.addNode(source)
