@@ -5,6 +5,7 @@ import thread
 
 from graph import *
 from overlap_removal import OverlapRemoval
+import random
 
 def setpos(shape, x, y):
     width, height = shape.GetBoundingBoxMax()
@@ -68,6 +69,8 @@ class GraphRendererOgl:
 
         self.oglcanvas.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
         self.oglcanvas.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)
+        self.oglcanvas.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
+        
         self.popupmenu = None
         self.need_abort = False
 
@@ -91,6 +94,39 @@ class GraphRendererOgl:
             node.value.top      = int(point[1])
             node.value.left     = int(point[0])
 
+    
+    def onKeyPress(self, event):
+        keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
+        #if event.ShiftDown():
+        if keycode == wx.WXK_DOWN:
+            print "DOWN"
+        elif keycode == wx.WXK_RIGHT:
+            print "RIGHT"
+        elif keycode == wx.WXK_LEFT:
+            print "LEFT"
+        elif keycode == wx.WXK_UP:
+            print "UP"
+        elif keycode == wx.WXK_DELETE:
+            print "DELETE"
+        elif keycode == wx.WXK_INSERT:
+            print "INSERT"
+            
+            id = 'D' + str(random.randint(1,99))
+            dialog = wx.TextEntryDialog ( None, 'Enter an id string:', 'Create a new node', id )
+            if dialog.ShowModal() == wx.ID_OK:
+                id = dialog.GetValue()
+                if self.graph.findNode(id):
+                    id += str(random.randint(1,9999))
+                div = Div(id, random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160))
+                node = self.graph.addNode(div)
+                self.drawNode(node)
+                node.shape.Show(True)
+                self.stateofthenation()
+            dialog.Destroy()
+   
+            
+            
+        event.Skip()
 
     def OnRightButtonMenu(self, event):   # Menu
 
@@ -144,17 +180,17 @@ class GraphRendererOgl:
         filedata = """
 {'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}
 {'type':'node', 'id':'A1', 'x':10, 'y':86, 'width':60, 'height':60}
-{'type':'node', 'id':'A2', 'x':97, 'y':10, 'width':60, 'height':60}
+{'type':'node', 'id':'A2', 'x':97, 'y':10, 'width':260, 'height':160}
 {'type':'node', 'id':'B', 'x':256, 'y':103, 'width':60, 'height':60}
-{'type':'node', 'id':'B1', 'x':345, 'y':10, 'width':60, 'height':60}
+{'type':'node', 'id':'B1', 'x':345, 'y':10, 'width':160, 'height':60}
 {'type':'node', 'id':'B2', 'x':149, 'y':229, 'width':60, 'height':60}
-{'type':'node', 'id':'B21', 'x':16, 'y':251, 'width':60, 'height':60}
-{'type':'node', 'id':'B22', 'x':68, 'y':338, 'width':100, 'height':200}
+{'type':'node', 'id':'B21', 'x':16, 'y':251, 'width':60, 'height':420}
+{'type':'node', 'id':'B22', 'x':68, 'y':338, 'width':100, 'height':100}
 {'type':'node', 'id':'c', 'x':268, 'y':257, 'width':60, 'height':60}
-{'type':'node', 'id':'c1', 'x':395, 'y':203, 'width':60, 'height':60}
-{'type':'node', 'id':'c2', 'x':223, 'y':375, 'width':60, 'height':60}
+{'type':'node', 'id':'c1', 'x':395, 'y':203, 'width':160, 'height':160}
+{'type':'node', 'id':'c2', 'x':223, 'y':375, 'width':30, 'height':30}
 {'type':'node', 'id':'c3', 'x':329, 'y':379, 'width':60, 'height':60}
-{'type':'node', 'id':'c4', 'x':402, 'y':290, 'width':60, 'height':60}
+{'type':'node', 'id':'c4', 'x':402, 'y':190, 'width':30, 'height':40}
 {'type':'node', 'id':'c5', 'x':230, 'y':174, 'width':60, 'height':120}
 {'type':'edge', 'id':'A_to_A1', 'source':'A', 'target':'A1'}
 {'type':'edge', 'id':'A_to_A2', 'source':'A', 'target':'A2'}
@@ -180,6 +216,8 @@ class GraphRendererOgl:
         
         # clear model
         self.graph.clear()
+        
+        # load from persistence
         filedata = filedata.split('\n')
         for data in filedata:
             data = data.strip()
@@ -205,7 +243,11 @@ class GraphRendererOgl:
                     print "Couldn't load target from persistence", target_id
                     continue
                 self.graph.addEdge(sourcenode.value, targetnode.value)  # addEdge takes div objects as parameters
+                
+        # build view from model
         self.draw(tranlatecoords=False)
+        
+        # refresh view
         self.oglcanvas.GetDiagram().ShowAll(1) # need this, yes
         self.stateofthenation()
 
