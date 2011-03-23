@@ -14,7 +14,8 @@ DEFAULT_IMAGE_SIZE = (2000, 2000)  # Bigger image size helps refresh the screen 
 #FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/outyuml.png"
 #FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/Research/wx doco/Images/SPLASHSCREEN.BMP"
 #FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/Research/wx doco/Images/outyuml.png"
-FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/Research/wx doco/Images/outyuml_big.png"
+#FILE = "F:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/Research/wx doco/Images/outyuml_big.png"
+FILE = "../Research/wx doco/Images/outyuml_big.png"
 
 
 class ImageViewer(wx.ScrolledWindow):
@@ -64,6 +65,7 @@ class ImageViewer(wx.ScrolledWindow):
         self.last_drag_y = None
         self.SetScrollbars(1, 1, self.GetVirtualSize()[0], self.GetVirtualSize()[1])
         self.mywheelscroll = 0
+        self.popupmenu = None
         
     def ViewImage(self, thefile="", url=""):
         
@@ -133,9 +135,9 @@ class ImageViewer(wx.ScrolledWindow):
         item = self.popupmenu.FindItemById(event.GetId()) 
         text = item.GetText() 
         #wx.MessageBox("You selected item '%s'" % text)
-        if text == "Load Image from Disk":
+        if text == "Quick Load Image from Disk":
             self.ViewImage(FILE)
-        elif text == "Load Image from Url":
+        elif text == "Quick Load Image from Url":
             baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
             yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
             url = baseUrl + urllib.quote(yuml_txt)
@@ -156,15 +158,6 @@ class ImageViewer(wx.ScrolledWindow):
 
             self.SaveImage(bmp, format="png")
         
-    def SaveImage(self, bmp, format="png"):
-        frame = self.GetTopLevelParent()
-        dlg = wx.FileDialog(parent=frame, message="choose", defaultDir='.',
-            defaultFile="", wildcard="*.png", style=wx.FD_SAVE, pos=wx.DefaultPosition)
-        if dlg.ShowModal() == wx.ID_OK:
-            filename = dlg.GetPath()
-            bmp.SaveFile(filename, wx.BITMAP_TYPE_PNG)
-        dlg.Destroy()
-        
     def OnRightButtonMenu(self, event):   # Menu
         if event.ShiftDown():
             event.Skip()
@@ -173,15 +166,20 @@ class ImageViewer(wx.ScrolledWindow):
         x, y = event.GetPosition()
         frame = self.GetTopLevelParent()
         
+        if self.popupmenu:
+            self.popupmenu.Destroy()    # wx.Menu objects need to be explicitly destroyed (e.g. menu.Destroy()) in this situation. Otherwise, they will rack up the USER Objects count on Windows; eventually crashing a program when USER Objects is maxed out. -- U. Artie Eoff  http://wiki.wxpython.org/index.cgi/PopupMenuOnRightClick
         self.popupmenu = wx.Menu()     # Create a menu
         
         
         if event.ControlDown():
             # Debug menu items
-            item = self.popupmenu.Append(2011, "Load Image from Disk")
+            item = self.popupmenu.Append(2017, "Load Image...")
+            frame.Bind(wx.EVT_MENU, self.FileLoad, item)
+
+            item = self.popupmenu.Append(2011, "Quick Load Image from Disk")
             frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
             
-            item = self.popupmenu.Append(2012, "Load Image from Url")
+            item = self.popupmenu.Append(2012, "Quick Load Image from Url")
             frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
 
             self.popupmenu.AppendSeparator()
@@ -200,6 +198,23 @@ class ImageViewer(wx.ScrolledWindow):
         frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
         
         frame.PopupMenu(self.popupmenu, wx.Point(x,y))
+        
+    def SaveImage(self, bmp, format="png"):
+        frame = self.GetTopLevelParent()
+        dlg = wx.FileDialog(parent=frame, message="choose", defaultDir='.',
+            defaultFile="", wildcard="*.png", style=wx.FD_SAVE, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            filename = dlg.GetPath()
+            bmp.SaveFile(filename, wx.BITMAP_TYPE_PNG)
+        dlg.Destroy()
+        
+    def FileLoad(self, event):
+        frame = self.GetTopLevelParent()
+        dlg = wx.FileDialog(parent=frame, message="choose", defaultDir='.',
+            defaultFile="", wildcard="*.*", style=wx.OPEN, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            filename = dlg.GetPath()
+            self.ViewImage(filename)
         
     def onKeyPress(self, event):   #ANDY
         keycode = event.GetKeyCode()

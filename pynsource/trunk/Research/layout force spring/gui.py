@@ -67,6 +67,8 @@ class GraphRendererOgl:
         self.factorY = (height/2 ) / (graph.layoutMaxY - graph.layoutMinY)
 
         self.oglcanvas.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
+        self.oglcanvas.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)
+        self.popupmenu = None
         self.need_abort = False
 
         self.overlap_remover = OverlapRemoval(self.graph, gui=self)
@@ -90,6 +92,124 @@ class GraphRendererOgl:
             node.value.left     = int(point[0])
 
 
+    def OnRightButtonMenu(self, event):   # Menu
+
+        x, y = event.GetPosition()
+        frame = self.oglcanvas.GetTopLevelParent()
+        
+        if self.popupmenu:
+            self.popupmenu.Destroy()    # wx.Menu objects need to be explicitly destroyed (e.g. menu.Destroy()) in this situation. Otherwise, they will rack up the USER Objects count on Windows; eventually crashing a program when USER Objects is maxed out. -- U. Artie Eoff  http://wiki.wxpython.org/index.cgi/PopupMenuOnRightClick
+        self.popupmenu = wx.Menu()     # Create a menu
+        
+        item = self.popupmenu.Append(2011, "Load Graph...")
+        frame.Bind(wx.EVT_MENU, self.OnLoadGraph, item)
+        
+        item = self.popupmenu.Append(2012, "Save Graph...")
+        frame.Bind(wx.EVT_MENU, self.OnSaveGraph, item)
+
+        self.popupmenu.AppendSeparator()
+
+        item = self.popupmenu.Append(2013, "Cancel")
+        #frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        
+        frame.PopupMenu(self.popupmenu, wx.Point(x,y))
+
+            
+    def OnSaveGraph(self, event):
+        self.SaveGraph(None)
+        return
+
+        frame = self.oglcanvas.GetTopLevelParent()
+        dlg = wx.FileDialog(parent=frame, message="choose", defaultDir='.',
+            defaultFile="", wildcard="*.txt", style=wx.FD_SAVE, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            filename = dlg.GetPath()
+            self.SaveGraph(filename)
+            #self.MessageBox("graph saving not implemented yet")
+        dlg.Destroy()
+        
+    def OnLoadGraph(self, event):
+        self.LoadGraph(None)
+        return
+        frame = self.oglcanvas.GetTopLevelParent()
+        dlg = wx.FileDialog(parent=frame, message="choose", defaultDir='.',
+            defaultFile="", wildcard="*.txt", style=wx.OPEN, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            filename = dlg.GetPath()
+            self.LoadGraph(filename)
+            self.MessageBox("graph loading not implemented yet")
+        dlg.Destroy()
+
+    def LoadGraph(self, filename):
+        filedata = """
+{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}
+{'type':'node', 'id':'A1', 'x':10, 'y':86, 'width':60, 'height':60}
+{'type':'node', 'id':'A2', 'x':97, 'y':10, 'width':60, 'height':60}
+{'type':'node', 'id':'B', 'x':256, 'y':103, 'width':60, 'height':60}
+{'type':'node', 'id':'B1', 'x':345, 'y':10, 'width':60, 'height':60}
+{'type':'node', 'id':'B2', 'x':149, 'y':229, 'width':60, 'height':60}
+{'type':'node', 'id':'B21', 'x':16, 'y':251, 'width':60, 'height':60}
+{'type':'node', 'id':'B22', 'x':68, 'y':338, 'width':100, 'height':200}
+{'type':'node', 'id':'c', 'x':268, 'y':257, 'width':60, 'height':60}
+{'type':'node', 'id':'c1', 'x':395, 'y':203, 'width':60, 'height':60}
+{'type':'node', 'id':'c2', 'x':223, 'y':375, 'width':60, 'height':60}
+{'type':'node', 'id':'c3', 'x':329, 'y':379, 'width':60, 'height':60}
+{'type':'node', 'id':'c4', 'x':402, 'y':290, 'width':60, 'height':60}
+{'type':'node', 'id':'c5', 'x':230, 'y':174, 'width':60, 'height':120}
+{'type':'edge', 'id':'A_to_A1', 'source':'A', 'target':'A1'}
+{'type':'edge', 'id':'A_to_A2', 'source':'A', 'target':'A2'}
+{'type':'edge', 'id':'B_to_B1', 'source':'B', 'target':'B1'}
+{'type':'edge', 'id':'B_to_B2', 'source':'B', 'target':'B2'}
+{'type':'edge', 'id':'B2_to_B21', 'source':'B2', 'target':'B21'}
+{'type':'edge', 'id':'B2_to_B22', 'source':'B2', 'target':'B22'}
+{'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1'}
+{'type':'edge', 'id':'c_to_c2', 'source':'c', 'target':'c2'}
+{'type':'edge', 'id':'c_to_c3', 'source':'c', 'target':'c3'}
+{'type':'edge', 'id':'c_to_c4', 'source':'c', 'target':'c4'}
+{'type':'edge', 'id':'c_to_c5', 'source':'c', 'target':'c5'}
+{'type':'edge', 'id':'A_to_c', 'source':'A', 'target':'c'}
+{'type':'edge', 'id':'B2_to_c', 'source':'B2', 'target':'c'}
+{'type':'edge', 'id':'B2_to_c5', 'source':'B2', 'target':'c5'}
+{'type':'edge', 'id':'A_to_c5', 'source':'A', 'target':'c5'}
+        """
+
+        # Clear view        
+        self.oglcanvas.GetDiagram().DeleteAllShapes()
+        dc = wx.ClientDC(self.oglcanvas)
+        self.oglcanvas.GetDiagram().Clear(dc)   # only ends up calling dc.Clear() - I wonder if this clears the screen?
+        
+        # clear model
+        self.graph.nodes = []
+        self.graph.edges = []
+        filedata = filedata.split('\n')
+        for data in filedata:
+            data = data.strip()
+            if not data:
+                continue
+            print data
+            data = eval(data)
+            if data['type'] == 'edge':
+                source = data['source']
+                target = data['target']
+                # need to find the node corresponding to a div of id whatever
+                # wire together the two divs
+                self.graph.addEdge(source, target)
+        self.draw()
+        self.oglcanvas.GetDiagram().ShowAll(1) # need?
+
+    def SaveGraph(self, filename):
+        nodes = ""
+        edges = ""
+        for node in self.graph.nodes:
+            v = node.value
+            nodes += "{'type':'node', 'id':'%s', 'x':%d, 'y':%d, 'width':%d, 'height':%d}\n" % (v.id, v.left, v.top, v.width, v.height)
+        for edge in self.graph.edges:
+            source = edge['source'].value.id
+            target = edge['target'].value.id
+            edges += "{'type':'edge', 'id':'%s_to_%s', 'source':'%s', 'target':'%s'}\n" % (source, target, source, target)
+        print nodes + edges
+            
+            
     def OnWheelZoom(self, event):
         self.stage2()
 
