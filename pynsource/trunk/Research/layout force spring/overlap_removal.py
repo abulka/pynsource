@@ -40,17 +40,13 @@ class OverlapRemoval:
             if deltaY:
                 return node.value.top - deltaY > 0
 
-        def arenodepointsin(node1, node2):
-            l, r, t, b = GetBounds(node1)
-            left, right, top, bottom = GetBounds(node2)
-            for x,y in [(l,t), (r,t), (l,b), (r,b)]:
-                if x >= left and x <= right and y >= top and y <= bottom:
-                    return True
-            return False
-
         def hit(node1, node2):
-            return arenodepointsin(node1, node2) or arenodepointsin(node2, node1)
-            
+            Left =   max(node1.value.left, node2.value.left)
+            Right =  min(node1.value.left+node1.value.width, node2.value.left+node2.value.width)
+            Top =    max(node1.value.top, node2.value.top)
+            Bottom = min(node1.value.top+node1.value.height, node2.value.top+node2.value.height)
+            return (Right>Left) and (Bottom>Top)            
+
         def amhitting(currnode, ignorenode=None):
             for node in self.graph.nodes:
                 if node == currnode or node == ignorenode:

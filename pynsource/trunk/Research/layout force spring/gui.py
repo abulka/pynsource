@@ -29,7 +29,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         x, y = getpos(shape)
         width, height = shape.GetBoundingBoxMax()
         frame = self.oglcanvas.GetTopLevelParent()
-        frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)" % (x, y, width, height))
+        frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)  - div is %s" % (x, y, width, height, shape.node))
 
     def OnLeftClick(self, x, y, keys = 0, attachment = 0):
         #print "OnLeftClick"
@@ -44,14 +44,12 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
             
       
     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
-        #print "OnEndDragLeft"
         shape = self.GetShape()
 
         # take care of selection points
         ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)
         if not shape.Selected():
             self.OnLeftClick(x, y, keys, attachment)
-        self.UpdateStatusBar(shape)
         
         oldpos = getpos(shape) # (int(shape.GetX()), int(shape.GetY()))
         ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)  # super
@@ -62,11 +60,34 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         # Adjust the Div to match the shape x,y
         shape.node.value.left, shape.node.value.top = newpos
 
+        self.UpdateStatusBar(shape)
+
         wx.SafeYield()
         time.sleep(0.2)
         
-        self.naughtyref_to_graphrenderer.stage2()
+        shape.GetCanvas().graphrendererogl.stage2()
 
+    def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
+        shape = self.GetShape()
+
+        # super        
+        ogl.ShapeEvtHandler.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
+        
+        width, height = shape.GetBoundingBoxMin()
+        print shape.node, "resized to", width, height
+        #print shape.node.value.id, shape.node.value.left, shape.node.value.top, "resized to", width, height
+        # Adjust the Div to match the shape x,y
+        shape.node.value.width, shape.node.value.height = width, height
+        shape.node.value.left, shape.node.value.top = getpos(shape)
+        
+        self.UpdateStatusBar(self.GetShape())
+
+        wx.SafeYield()
+        time.sleep(0.2)
+        
+        shape.GetCanvas().graphrendererogl.stage2()
+
+        
 class GraphShapeCanvas(ogl.ShapeCanvas):
     scrollStepX = 10
     scrollStepY = 10
@@ -516,7 +537,6 @@ class GraphRendererOgl:
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
-        evthandler.naughtyref_to_graphrenderer = self
         
         #self.ctx.strokeStyle = 'black'
         #self.ctx.beginPath()
