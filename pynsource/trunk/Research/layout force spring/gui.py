@@ -34,12 +34,25 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
     def OnLeftClick(self, x, y, keys = 0, attachment = 0):
         #print "OnLeftClick"
         shape = self.GetShape()
+        
+        # size handles
+        shape.GetCanvas().graphrendererogl.DeselectAllShapes()
+        shape.Select(True, None)
+        shape.GetCanvas().graphrendererogl.stateofthenation()
+        
         self.UpdateStatusBar(shape)
-
+            
+      
     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
         #print "OnEndDragLeft"
         shape = self.GetShape()
 
+        # take care of selection points
+        ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)
+        if not shape.Selected():
+            self.OnLeftClick(x, y, keys, attachment)
+        self.UpdateStatusBar(shape)
+        
         oldpos = getpos(shape) # (int(shape.GetX()), int(shape.GetY()))
         ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)  # super
         newpos = getpos(shape) # (int(shape.GetX()), int(shape.GetY()))
@@ -54,11 +67,23 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         
         self.naughtyref_to_graphrenderer.stage2()
 
+class GraphShapeCanvas(ogl.ShapeCanvas):
+    scrollStepX = 10
+    scrollStepY = 10
+    classnametoshape = {}
 
+    def __init__(self, parent):
+        ogl.ShapeCanvas.__init__(self, parent)
+
+    def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
+        # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
+        self.graphrendererogl.DeselectAllShapes()
+        
 class GraphRendererOgl:
     def __init__(self, graph, oglcanvas):
         self.graph = graph
         self.oglcanvas = oglcanvas
+        self.oglcanvas.graphrendererogl = self
 
         self.radius = 10
         self.arrowAngle = Math.PI()/10
@@ -94,6 +119,44 @@ class GraphRendererOgl:
             node.value.top      = int(point[1])
             node.value.left     = int(point[0])
 
+       
+    def DeselectAllShapes(self):
+        selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
+        if selected:
+            s = selected[0]
+            canvas = s.GetCanvas()
+            dc = wx.ClientDC(canvas)
+            canvas.PrepareDC(dc)
+            s.Select(False, dc)
+            canvas.Refresh(False)   # Need this or else Control points ('handles') leave blank holes      
+
+
+        """
+        shapeList = self.oglcanvas.GetDiagram().GetShapeList()
+
+        def GetCanvasDc(s):
+            canvas = s.GetCanvas()
+            dc = wx.ClientDC(canvas)
+            canvas.PrepareDC(dc)
+            return canvas, dc
+            
+        # If we unselect too early, some of the objects in
+        # shapeList will become invalid (the control points are
+        # shapes too!) and bad things will happen...
+        toUnselect = []
+        for s in shapeList:
+            if s.Selected():
+                toUnselect.append(s)
+
+        if toUnselect:
+            assert len(toUnselect) == 1
+            for s in toUnselect:
+                canvas, dc = GetCanvasDc(s)
+                s.Select(False, dc)
+                
+            canvas, dc = GetCanvasDc(s)
+            canvas.Refresh(False)
+        """
     
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
@@ -108,6 +171,38 @@ class GraphRendererOgl:
             print "UP"
         elif keycode == wx.WXK_DELETE:
             print "DELETE"
+
+            for shape in self.oglcanvas.GetDiagram().GetShapeList():
+                if shape.Selected():
+                    print shape
+
+            #canvas = self
+            #diagram = self.GetDiagram()
+            #
+            #dc = wx.ClientDC(canvas)
+            #canvas.PrepareDC(dc)
+            #
+            #if shape.Selected():
+            #    shape.Select(False, dc)
+            #    canvas.Refresh(False)
+            #
+            ## should do list clone instead, just don't want pointer want true copy of refs
+            #lineList = shape.GetLines()
+            #toDelete = []
+            #for line in shape.GetLines():
+            #    toDelete.append(line)
+            #    
+            #for line in toDelete:
+            #    line.Unlink()
+            #    diagram.RemoveShape(line)            
+            #
+            ## Uml related....
+            #self.umlworkspace.DeleteShape(shape)
+            #
+            #assert shape in self.umlboxshapes
+            #diagram.RemoveShape(shape)
+
+
         elif keycode == wx.WXK_INSERT:
             print "INSERT"
             
@@ -411,6 +506,7 @@ class GraphRendererOgl:
         shape = ogl.RectangleShape( node.value.width, node.value.height )
         shape.AddText(node.value.id)
         setpos(shape, node.value.left, node.value.top)
+        #shape.SetDraggable(True, True)
         self.oglcanvas.AddShape( shape )
         node.shape = shape
         shape.node = node
@@ -513,7 +609,7 @@ class AppFrame(wx.Frame):
 
         self.CreateStatusBar()
 
-        canvas = ogl.ShapeCanvas( self )
+        canvas = GraphShapeCanvas(self) # ogl.ShapeCanvas( self )
         sizer.Add( canvas, 1, wx.GROW )
 
         canvas.SetBackgroundColour( "LIGHT BLUE" ) #

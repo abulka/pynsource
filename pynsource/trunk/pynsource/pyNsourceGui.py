@@ -57,37 +57,49 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
     def OnLeftClick(self, x, y, keys = 0, attachment = 0):
         shape = self.GetShape()
         canvas = shape.GetCanvas()
+
+        canvas.DeselectAllShapes()
+
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
-
-        def GetCanvasDc(s):
-            canvas = s.GetCanvas()
-            dc = wx.ClientDC(canvas)
-            canvas.PrepareDC(dc)
-            return canvas, dc
-
-        if shape.Selected():
-            shape.Select(False, dc)
-            canvas.Refresh(False)
-        else:
-            shapeList = canvas.GetDiagram().GetShapeList()
-            toUnselect = []
-            for s in shapeList:
-                if s.Selected():
-                    # If we unselect it now then some of the objects in
-                    # shapeList will become invalid (the control points are
-                    # shapes too!) and bad things will happen...
-                    toUnselect.append(s)
-
-            shape.Select(True, dc)
-
-            if toUnselect:
-                for s in toUnselect:
-                    canvas, dc = GetCanvasDc(s)
-                    s.Select(False, dc)
-                canvas.Refresh(False)
-
+        shape.Select(True, dc)  # could pass None as dc if you don't want to trigger the OnDrawControlPoints(dc) handler immediately - e.g. if you want to do a complete redraw of everything later anyway
+        #canvas.Refresh(False)   # t/f or don't use - doesn't seem to make a difference
+        
         self.UpdateStatusBar(shape)
+
+        #shape = self.GetShape()
+        #canvas = shape.GetCanvas()
+        #dc = wx.ClientDC(canvas)
+        #canvas.PrepareDC(dc)
+        #
+        #def GetCanvasDc(s):
+        #    canvas = s.GetCanvas()
+        #    dc = wx.ClientDC(canvas)
+        #    canvas.PrepareDC(dc)
+        #    return canvas, dc
+        #
+        #if shape.Selected():
+        #    shape.Select(False, dc)
+        #    canvas.Refresh(False)
+        #else:
+        #    shapeList = canvas.GetDiagram().GetShapeList()
+        #    toUnselect = []
+        #    for s in shapeList:
+        #        if s.Selected():
+        #            # If we unselect it now then some of the objects in
+        #            # shapeList will become invalid (the control points are
+        #            # shapes too!) and bad things will happen...
+        #            toUnselect.append(s)
+        #
+        #    shape.Select(True, dc)
+        #
+        #    if toUnselect:
+        #        for s in toUnselect:
+        #            canvas, dc = GetCanvasDc(s)
+        #            s.Select(False, dc)
+        #        canvas.Refresh(False)
+        #
+        #self.UpdateStatusBar(shape)
 
 
     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
@@ -460,34 +472,45 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             if shape.GetParent() == None:
                 shape.SetCanvas(None)
 
-    def OnLeftClick(self, x, y, keys):
+    def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
         # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
         self.DeselectAllShapes()
 
     def DeselectAllShapes(self):
-        shapeList = self.GetDiagram().GetShapeList()
-
-        def GetCanvasDc(s):
+        selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
+        if selected:
+            assert len(selected) == 1
+            s = selected[0]
             canvas = s.GetCanvas()
-            dc = wx.ClientDC(canvas)        # NEW! handles scrolled situations
-            canvas.PrepareDC(dc)
-            return canvas, dc
             
-        # If we unselect too early, some of the objects in
-        # shapeList will become invalid (the control points are
-        # shapes too!) and bad things will happen...
-        toUnselect = []
-        for s in shapeList:
-            if s.Selected():
-                toUnselect.append(s)
-
-        if toUnselect:
-            for s in toUnselect:
-                canvas, dc = GetCanvasDc(s)
-                s.Select(False, dc)
-                
-            canvas, dc = GetCanvasDc(s)
-            canvas.Refresh(False)
+            dc = wx.ClientDC(canvas)
+            canvas.PrepareDC(dc)
+            s.Select(False, dc)
+            canvas.Refresh(False)   # Need this or else Control points ('handles') leave blank holes
+        
+        #shapeList = self.GetDiagram().GetShapeList()
+        #
+        #def GetCanvasDc(s):
+        #    canvas = s.GetCanvas()
+        #    dc = wx.ClientDC(canvas)        # NEW! handles scrolled situations
+        #    canvas.PrepareDC(dc)
+        #    return canvas, dc
+        #    
+        ## If we unselect too early, some of the objects in
+        ## shapeList will become invalid (the control points are
+        ## shapes too!) and bad things will happen...
+        #toUnselect = []
+        #for s in shapeList:
+        #    if s.Selected():
+        #        toUnselect.append(s)
+        #
+        #if toUnselect:
+        #    for s in toUnselect:
+        #        canvas, dc = GetCanvasDc(s)
+        #        s.Select(False, dc)
+        #        
+        #    canvas, dc = GetCanvasDc(s)
+        #    canvas.Refresh(False)
 
 class Log:
     def WriteText(self, text):
