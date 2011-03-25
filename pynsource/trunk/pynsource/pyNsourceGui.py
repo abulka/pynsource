@@ -1,21 +1,24 @@
 """
-    PyNSource GUI
-    -------------
-    
-    LICENSE: GPL 3
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+PyNSource GUI
+-------------
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+Andy Bulka
+www.andypatterns.com
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+LICENSE: GPL 3
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import wx
@@ -55,6 +58,9 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         self.statbarFrame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)" % (x, y, width, height))
 
     def OnLeftClick(self, x, y, keys = 0, attachment = 0):
+        self._SelectNodeNow(x, y, keys, attachment)
+
+    def _SelectNodeNow(self, x, y, keys = 0, attachment = 0):
         shape = self.GetShape()
         canvas = shape.GetCanvas()
 
@@ -66,41 +72,6 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         #canvas.Refresh(False)   # t/f or don't use - doesn't seem to make a difference
         
         self.UpdateStatusBar(shape)
-
-        #shape = self.GetShape()
-        #canvas = shape.GetCanvas()
-        #dc = wx.ClientDC(canvas)
-        #canvas.PrepareDC(dc)
-        #
-        #def GetCanvasDc(s):
-        #    canvas = s.GetCanvas()
-        #    dc = wx.ClientDC(canvas)
-        #    canvas.PrepareDC(dc)
-        #    return canvas, dc
-        #
-        #if shape.Selected():
-        #    shape.Select(False, dc)
-        #    canvas.Refresh(False)
-        #else:
-        #    shapeList = canvas.GetDiagram().GetShapeList()
-        #    toUnselect = []
-        #    for s in shapeList:
-        #        if s.Selected():
-        #            # If we unselect it now then some of the objects in
-        #            # shapeList will become invalid (the control points are
-        #            # shapes too!) and bad things will happen...
-        #            toUnselect.append(s)
-        #
-        #    shape.Select(True, dc)
-        #
-        #    if toUnselect:
-        #        for s in toUnselect:
-        #            canvas, dc = GetCanvasDc(s)
-        #            s.Select(False, dc)
-        #        canvas.Refresh(False)
-        #
-        #self.UpdateStatusBar(shape)
-
 
     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
         shape = self.GetShape()
@@ -120,18 +91,19 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         if "wxMac" in wx.PlatformInfo:
             shape.GetCanvas().Refresh(False) 
 
-    def OnPopupItemSelected(self, event): 
+    def OnPopupItemSelected(self, event):
         item = self.popupmenu.FindItemById(event.GetId()) 
         text = item.GetText() 
-        #wx.MessageBox("You selected item '%s'" % text)
-        if text == "Delete Node":
+        if text == "Delete Node\tDel":
             self.RightClickDeleteNode()
         
     def OnRightClick(self, x, y, keys, attachment):
+        self._SelectNodeNow(x, y, keys, attachment)
+
         #self.log.WriteText("%s\n" % self.GetShape())
         self.popupmenu = wx.Menu()     # Creating a menu
-        item = self.popupmenu.Append(2011, "Delete Node")
-        self.statbarFrame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        item = self.popupmenu.Append(2011, "Delete Node\tDel")
+        self.statbarFrame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item) # Not sure why but passing item is needed.  Not to find the menu item later, but to avoid crashes?  try two right click deletes followed by main menu edit/delete.  Official Bind 3rd parameter DOCO:  menu source - Sometimes the event originates from a different window than self, but you still want to catch it in self. (For example, a button event delivered to a frame.) By passing the source of the event, the event handling system is able to differentiate between the same event type from different controls.
         item = self.popupmenu.Append(2012, "Cancel")
         self.statbarFrame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
         self.statbarFrame.PopupMenu(self.popupmenu, wx.Point(x,y))
@@ -205,35 +177,6 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             line.Delete()
         shape.Delete()
 
-        """        
-        canvas = self
-        diagram = self.GetDiagram()
-
-        dc = wx.ClientDC(canvas)
-        canvas.PrepareDC(dc)
-        
-        if shape.Selected():
-            shape.Select(False, dc)
-            canvas.Refresh(False)
-
-        # should do list clone instead, just don't want pointer want true copy of refs
-        lineList = shape.GetLines()
-        toDelete = []
-        for line in shape.GetLines():
-            toDelete.append(line)
-            
-        for line in toDelete:
-            line.Unlink()
-            diagram.RemoveShape(line)            
-
-        # Uml related....
-        self.umlworkspace.DeleteShape(shape)
-
-        assert shape in self.umlboxshapes
-        diagram.RemoveShape(shape)
-        """
-        
-        
     def Clear(self):
         self.GetDiagram().DeleteAllShapes()
 
@@ -520,30 +463,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             canvas.PrepareDC(dc)
             s.Select(False, dc)
             canvas.Refresh(False)   # Need this or else Control points ('handles') leave blank holes
-        
-        #shapeList = self.GetDiagram().GetShapeList()
-        #
-        #def GetCanvasDc(s):
-        #    canvas = s.GetCanvas()
-        #    dc = wx.ClientDC(canvas)        # NEW! handles scrolled situations
-        #    canvas.PrepareDC(dc)
-        #    return canvas, dc
-        #    
-        ## If we unselect too early, some of the objects in
-        ## shapeList will become invalid (the control points are
-        ## shapes too!) and bad things will happen...
-        #toUnselect = []
-        #for s in shapeList:
-        #    if s.Selected():
-        #        toUnselect.append(s)
-        #
-        #if toUnselect:
-        #    for s in toUnselect:
-        #        canvas, dc = GetCanvasDc(s)
-        #        s.Select(False, dc)
-        #        
-        #    canvas, dc = GetCanvasDc(s)
-        #    canvas.Refresh(False)
+       
 
 class Log:
     def WriteText(self, text):
