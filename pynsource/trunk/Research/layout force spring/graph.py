@@ -75,12 +75,9 @@ class Graph:
             self.nodes.remove(node)
             if id in self.nodeSet.keys():
                 del self.nodeSet[id]
-        todelete = []
-        for edge in self.edges:
+        for edge in self.edges[:]:
             if edge['source'] == id or edge['target'] == id:
-                todelete.append(edge)
-        for edge in todelete:
-            self.edges.remove(edge)
+                self.edges.remove(edge)
             
     def addEdge(self, source, target):
         # Uniqueness must be ensured by caller
