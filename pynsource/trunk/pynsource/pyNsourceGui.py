@@ -175,6 +175,17 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
 
     def CmdZapShape(self, shape):
+        
+        # Model/Uml related....
+        self.umlworkspace.DeleteShape(shape)
+
+        # View
+        self.DeselectAllShapes()
+        for line in shape.GetLines()[:]:
+            line.Delete()
+        shape.Delete()
+
+        """        
         canvas = self
         diagram = self.GetDiagram()
 
@@ -200,7 +211,9 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
         assert shape in self.umlboxshapes
         diagram.RemoveShape(shape)
-
+        """
+        
+        
     def Clear(self):
         self.GetDiagram().DeleteAllShapes()
 

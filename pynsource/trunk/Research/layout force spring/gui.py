@@ -202,21 +202,19 @@ class GraphRendererOgl:
                 self.graph.deleteNode(shape.node.value.id)
 
                 # view
-                canvas = self.oglcanvas
-                diagram = canvas.GetDiagram()
-                
-                dc = wx.ClientDC(canvas)
-                canvas.PrepareDC(dc)
-                
-                if shape.Selected():
-                    shape.Select(False, dc)
-                    canvas.Refresh(False)
-                
-                if False:
-                    for line in shape.GetLines():
+                self.DeselectAllShapes()
+                for line in shape.GetLines()[:]:
+                    line.Delete()
+                shape.Delete()
+
+                """
+                print shape.GetLines()
+                if True:
+                    for line in shape.GetLines()[:]:
+                        print 'delete', line, 'getlines is now', shape.GetLines()
+                        line.Delete()
                         #line.Unlink()
                         #diagram.RemoveShape(line)
-                        line.Delete()
                 else:                    
                     lineList = shape.GetLines()
                     toDelete = []
@@ -224,12 +222,13 @@ class GraphRendererOgl:
                         toDelete.append(line)
                         
                     for line in toDelete:
+                        print 'delete', line
                         line.Unlink()
                         diagram.RemoveShape(line)                     
                     
                     
                 diagram.RemoveShape(shape)
-
+                """
                 
                 
                 ## should do list clone instead, just don't want pointer want true copy of refs
