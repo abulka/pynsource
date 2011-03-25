@@ -166,6 +166,8 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.save_gdi = []
         wx.EVT_WINDOW_DESTROY(self, self.OnDestroy)
 
+        self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
+
         self.font1 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
 
@@ -174,6 +176,24 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         #self.layout = LayoutBasic(leftmargin=0, topmargin=0, verticalwhitespace=0, horizontalwhitespace=0, maxclassesperline=5)
         self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
 
+    def onKeyPress(self, event):
+        keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
+        #if event.ShiftDown():
+        if keycode == wx.WXK_DOWN:
+            print "DOWN"
+        elif keycode == wx.WXK_RIGHT:
+            print "RIGHT"
+        elif keycode == wx.WXK_LEFT:
+            print "LEFT"
+        elif keycode == wx.WXK_UP:
+            print "UP"
+        elif keycode == wx.WXK_DELETE:
+            print "DELETE"
+            selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
+            if selected:
+                shape = selected[0]
+                self.CmdZapShape(shape)
+                
     def CmdZapShape(self, shape):
         
         # Model/Uml related....
@@ -640,7 +660,7 @@ class MainApp(wx.App):
         menu1.AppendSeparator()
         Add(menu1, "E&xit\tAlt-X", "Exit demo", self.OnButton)
         
-        Add(menu2, "&Delete Class", "Delete Node", self.OnDeleteNode)
+        Add(menu2, "&Delete Class\tDel", "Delete Node", self.OnDeleteNode)
         
         Add(menu3, "&Layout UML", "Layout UML", self.OnLayout)
         Add(menu3, "&Refresh", "Refresh", self.OnRefreshUmlWindow)

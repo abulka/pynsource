@@ -62,12 +62,12 @@ Note re Distutils package installation.  Your source code will be installed into
 Change Log
 
 Version 1.52
-- Can now delete selected nodes from edit menu
+- Can now delete the selected classe from edit menu, or simply use the Del key
 - yUml diagramming (online service for rendering and laying out UML) in both command line tool and GUI
 - Ascii Art UML improved formatting and added tab to GUI
-- Linux (ubuntu/mint 9) compatibility verified - just install wxpython and run from source.  GUI runs ok.
+- Linux (ubuntu/mint 9) compatibility verified - just install wxpython and run from source.  GUI runs ok-ish.
 - File Import Recursively feature removed.  You can already multi select files
-  during import. You can already import repeatedly and incoming classes will
+  during import - and - you can already import repeatedly and incoming classes will
   be added and wired up to existing classes on the workspace.
 - Source code clean up
 
