@@ -68,7 +68,20 @@ class Graph:
     def findNode(self, id):
         node = self.nodeSet.get(id, None)
         return node
-        
+
+    def deleteNode(self, id):
+        node = self.findNode(id)
+        if node:
+            self.nodes.remove(node)
+            if id in self.nodeSet.keys():
+                del self.nodeSet[id]
+        todelete = []
+        for edge in self.edges:
+            if edge['source'] == id or edge['target'] == id:
+                todelete.append(edge)
+        for edge in todelete:
+            self.edges.remove(edge)
+            
     def addEdge(self, source, target):
         # Uniqueness must be ensured by caller
         s = self.addNode(source)

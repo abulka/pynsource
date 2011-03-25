@@ -193,35 +193,60 @@ class GraphRendererOgl:
         elif keycode == wx.WXK_DELETE:
             print "DELETE"
 
-            for shape in self.oglcanvas.GetDiagram().GetShapeList():
-                if shape.Selected():
-                    print shape
+            selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
+            if selected:
+                shape = selected[0]
+                print 'delete', shape.node.value.id
 
-            #canvas = self
-            #diagram = self.GetDiagram()
-            #
-            #dc = wx.ClientDC(canvas)
-            #canvas.PrepareDC(dc)
-            #
-            #if shape.Selected():
-            #    shape.Select(False, dc)
-            #    canvas.Refresh(False)
-            #
-            ## should do list clone instead, just don't want pointer want true copy of refs
-            #lineList = shape.GetLines()
-            #toDelete = []
-            #for line in shape.GetLines():
-            #    toDelete.append(line)
-            #    
-            #for line in toDelete:
-            #    line.Unlink()
-            #    diagram.RemoveShape(line)            
-            #
-            ## Uml related....
-            #self.umlworkspace.DeleteShape(shape)
-            #
-            #assert shape in self.umlboxshapes
-            #diagram.RemoveShape(shape)
+                # model
+                self.graph.deleteNode(shape.node.value.id)
+
+                # view
+                canvas = self.oglcanvas
+                diagram = canvas.GetDiagram()
+                
+                dc = wx.ClientDC(canvas)
+                canvas.PrepareDC(dc)
+                
+                if shape.Selected():
+                    shape.Select(False, dc)
+                    canvas.Refresh(False)
+                
+                if False:
+                    for line in shape.GetLines():
+                        #line.Unlink()
+                        #diagram.RemoveShape(line)
+                        line.Delete()
+                else:                    
+                    lineList = shape.GetLines()
+                    toDelete = []
+                    for line in shape.GetLines():
+                        toDelete.append(line)
+                        
+                    for line in toDelete:
+                        line.Unlink()
+                        diagram.RemoveShape(line)                     
+                    
+                    
+                diagram.RemoveShape(shape)
+
+                
+                
+                ## should do list clone instead, just don't want pointer want true copy of refs
+                #lineList = shape.GetLines()
+                #toDelete = []
+                #for line in shape.GetLines():
+                #    toDelete.append(line)
+                #    
+                #for line in toDelete:
+                #    line.Unlink()
+                #    diagram.RemoveShape(line)            
+                #
+                ## Uml related....
+                #self.umlworkspace.DeleteShape(shape)
+                #
+                #assert shape in self.umlboxshapes
+                #diagram.RemoveShape(shape)
 
 
         elif keycode == wx.WXK_INSERT:
