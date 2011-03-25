@@ -151,34 +151,7 @@ class GraphRendererOgl:
             s.Select(False, dc)
             canvas.Refresh(False)   # Need this or else Control points ('handles') leave blank holes      
 
-
-        """
-        shapeList = self.oglcanvas.GetDiagram().GetShapeList()
-
-        def GetCanvasDc(s):
-            canvas = s.GetCanvas()
-            dc = wx.ClientDC(canvas)
-            canvas.PrepareDC(dc)
-            return canvas, dc
-            
-        # If we unselect too early, some of the objects in
-        # shapeList will become invalid (the control points are
-        # shapes too!) and bad things will happen...
-        toUnselect = []
-        for s in shapeList:
-            if s.Selected():
-                toUnselect.append(s)
-
-        if toUnselect:
-            assert len(toUnselect) == 1
-            for s in toUnselect:
-                canvas, dc = GetCanvasDc(s)
-                s.Select(False, dc)
-                
-            canvas, dc = GetCanvasDc(s)
-            canvas.Refresh(False)
-        """
-    
+   
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
         #if event.ShiftDown():
@@ -230,21 +203,35 @@ class GraphRendererOgl:
             self.popupmenu.Destroy()    # wx.Menu objects need to be explicitly destroyed (e.g. menu.Destroy()) in this situation. Otherwise, they will rack up the USER Objects count on Windows; eventually crashing a program when USER Objects is maxed out. -- U. Artie Eoff  http://wiki.wxpython.org/index.cgi/PopupMenuOnRightClick
         self.popupmenu = wx.Menu()     # Create a menu
         
+        item = self.popupmenu.Append(2015, "Load Graph from text...")
+        frame.Bind(wx.EVT_MENU, self.OnLoadGraphFromText, item)
+        
+        item = self.popupmenu.Append(2017, "Dump Graph to console")
+        frame.Bind(wx.EVT_MENU, self.OnSaveGraphToConsole, item)
+
+        self.popupmenu.AppendSeparator()
+
         item = self.popupmenu.Append(2011, "Load Graph...")
         frame.Bind(wx.EVT_MENU, self.OnLoadGraph, item)
         
-        item = self.popupmenu.Append(2011, "Load Graph from text...")
-        frame.Bind(wx.EVT_MENU, self.OnLoadGraphFromText, item)
-
         item = self.popupmenu.Append(2012, "Save Graph...")
         frame.Bind(wx.EVT_MENU, self.OnSaveGraph, item)
 
         self.popupmenu.AppendSeparator()
 
-        item = self.popupmenu.Append(2014, "Clear")
-        frame.Bind(wx.EVT_MENU, self.OnClear, item)  # must pass item
+        item = self.popupmenu.Append(2016, "Load Test Graph 1")
+        frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph1, item)
+
+        item = self.popupmenu.Append(2018, "Load Test Graph 2")
+        frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph2, item)
+
+        item = self.popupmenu.Append(2019, "Load Test Graph 3")
+        frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph3, item)
 
         self.popupmenu.AppendSeparator()
+
+        item = self.popupmenu.Append(2014, "Clear")
+        frame.Bind(wx.EVT_MENU, self.OnClear, item)  # must pass item
 
         item = self.popupmenu.Append(2013, "Cancel")
         #frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
@@ -252,41 +239,42 @@ class GraphRendererOgl:
         frame.PopupMenu(self.popupmenu, wx.Point(x,y))
 
             
-    def OnSaveGraph(self, event):
-        self.SaveGraph(None)
-        return
+    def OnSaveGraphToConsole(self, event):
+        print self.graph.GraphToString()
 
+    def OnSaveGraph(self, event):
         frame = self.oglcanvas.GetTopLevelParent()
         dlg = wx.FileDialog(parent=frame, message="choose", defaultDir='.',
             defaultFile="", wildcard="*.txt", style=wx.FD_SAVE, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
-            self.SaveGraph(filename)
-            #self.MessageBox("graph saving not implemented yet")
+            
+            fp = open(filename, "w")
+            fp.write(self.graph.GraphToString())
+            fp.close()
+            
         dlg.Destroy()
         
-    def OnLoadGraphFromText(self, event):
-        eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
-        dialog = wx.TextEntryDialog ( None, 'Enter an node/edge persistence strings:', 'Create a new node', eg,  style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
-        if dialog.ShowModal() == wx.ID_OK:
-            txt = dialog.GetValue()
-            self.LoadGraph(txt)
-            
-    def OnLoadGraph(self, event):
-        self.LoadGraph(None)
-        return
-        frame = self.oglcanvas.GetTopLevelParent()
-        dlg = wx.FileDialog(parent=frame, message="choose", defaultDir='.',
-            defaultFile="", wildcard="*.txt", style=wx.OPEN, pos=wx.DefaultPosition)
-        if dlg.ShowModal() == wx.ID_OK:
-            filename = dlg.GetPath()
-            self.LoadGraph(filename)
-            self.MessageBox("graph loading not implemented yet")
-        dlg.Destroy()
-
-    def LoadGraph(self, filedata=""):
-        if not filedata:
-            filedata = """
+    def OnLoadTestGraph1(self, event):
+        filedata = """
+{'type':'node', 'id':'D25', 'x':7, 'y':6, 'width':159, 'height':106}
+{'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
+{'type':'node', 'id':'m1', 'x':171, 'y':9, 'width':139, 'height':92}
+        """
+        self.LoadGraph(filedata)
+        
+    def OnLoadTestGraph2(self, event):
+        filedata = """
+{'type':'node', 'id':'B', 'x':185, 'y':50, 'width':60, 'height':60}
+{'type':'node', 'id':'B1', 'x':25, 'y':160, 'width':160, 'height':60}
+{'type':'node', 'id':'c2', 'x':26, 'y':30, 'width':88, 'height':90}
+{'type':'node', 'id':'c3', 'x':225, 'y':140, 'width':60, 'height':130}
+{'type':'edge', 'id':'B_to_c2', 'source':'B', 'target':'c2'}
+        """
+        self.LoadGraph(filedata)
+        
+    def OnLoadTestGraph3(self, event):
+        filedata = """
 {'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}
 {'type':'node', 'id':'A1', 'x':10, 'y':86, 'width':60, 'height':60}
 {'type':'node', 'id':'A2', 'x':97, 'y':10, 'width':260, 'height':160}
@@ -317,35 +305,33 @@ class GraphRendererOgl:
 {'type':'edge', 'id':'B2_to_c5', 'source':'B2', 'target':'c5'}
 {'type':'edge', 'id':'A_to_c5', 'source':'A', 'target':'c5'}
         """
+        self.LoadGraph(filedata)
 
+    def OnLoadGraphFromText(self, event):
+        eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
+        dialog = wx.TextEntryDialog ( None, 'Enter an node/edge persistence strings:', 'Create a new node', eg,  style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
+        if dialog.ShowModal() == wx.ID_OK:
+            txt = dialog.GetValue()
+            self.LoadGraph(txt)
+            
+    def OnLoadGraph(self, event):
+        frame = self.oglcanvas.GetTopLevelParent()
+        dlg = wx.FileDialog(parent=frame, message="choose", defaultDir='.',
+            defaultFile="", wildcard="*.txt", style=wx.OPEN, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            filename = dlg.GetPath()
+
+            fp = open(filename, "r")
+            s = fp.read()
+            fp.close()
+
+            self.LoadGraph(s)
+        dlg.Destroy()
+
+    def LoadGraph(self, filedata=""):
         self.Clear()
         
-        # load from persistence
-        filedata = filedata.split('\n')
-        for data in filedata:
-            data = data.strip()
-            if not data:
-                continue
-            print data
-            data = eval(data)
-            if data['type'] == 'node':
-                # {'type':'node', 'id':'c5', 'x':230, 'y':174, 'width':60, 'height':120}
-                div = Div(data['id'], data['x'], data['y'], data['width'], data['height'])
-                self.graph.addNode(div)
-            elif data['type'] == 'edge':
-                source_id = data['source']
-                target_id = data['target']
-                # need to find the node corresponding to a div of id whatever
-                # wire together the two divs
-                sourcenode = self.graph.findNode(source_id)
-                targetnode = self.graph.findNode(target_id)
-                if not sourcenode:
-                    print "Couldn't load source from persistence", source_id
-                    continue
-                if not targetnode:
-                    print "Couldn't load target from persistence", target_id
-                    continue
-                self.graph.addEdge(sourcenode.value, targetnode.value)  # addEdge takes div objects as parameters
+        self.graph.LoadGraphFromStrings(filedata)
                 
         # build view from model
         self.draw(tranlatecoords=False)
@@ -354,17 +340,6 @@ class GraphRendererOgl:
         self.oglcanvas.GetDiagram().ShowAll(1) # need this, yes
         self.stateofthenation()
 
-    def SaveGraph(self, filename):
-        nodes = ""
-        edges = ""
-        for node in self.graph.nodes:
-            v = node.value
-            nodes += "{'type':'node', 'id':'%s', 'x':%d, 'y':%d, 'width':%d, 'height':%d}\n" % (v.id, v.left, v.top, v.width, v.height)
-        for edge in self.graph.edges:
-            source = edge['source'].value.id
-            target = edge['target'].value.id
-            edges += "{'type':'edge', 'id':'%s_to_%s', 'source':'%s', 'target':'%s'}\n" % (source, target, source, target)
-        print nodes + edges
 
     def OnClear(self, event):
         self.Clear()
@@ -451,55 +426,6 @@ class GraphRendererOgl:
         self.oglcanvas.PrepareDC(dc)
         node.shape.MoveLinks(dc)
 
-
-
-
-        """
-        fromShape = edge['source'].shape
-        toShape = edge['target'].shape
-        fromShape.AddLine(line, toShape)
-        #line.SetEnds(source[0], source[1], target[0], target[1])
-        
-        self.oglcanvas.GetDiagram().AddShape(line)
-        line.Show(True)
-        """
-
-
-        
-        """
-        - To add a line, use ogl.LineShape().  The exact sequence of calls is
-        tricky, but this seems to work:
-          line = ogl.LineShape()
-          line.MakeControlPoints(2) # has to be at least 2
-          line.SetEnds(x1, y1, x2, y2) # sets the first + last control points
-          line.InsertControlPoint(x, y) # see below
-          line.Initialise()
-          line.SetSplit(True) # for a spline
-          canvas.AddShape(line)
-        The InsertControlPoint() adds an additional point in the list of control
-        points; it is always inserted just before the end (ie (x2, y2) above), so
-        repeatedly calling this "fills in" the line from start to end.
-        """
-
-
-
-
-
-
-
-        #dc = wx.ClientDC(self.oglcanvas)
-        #self.oglcanvas.PrepareDC(dc)
-        #
-        #x, y = node.value.left, node.value.top
-        #
-        ## compensate for the fact that x, y for a ogl shape are the centre of the shape, not the top left
-        #width, height = node.shape.GetBoundingBoxMax()
-        #assert width == node.value.width
-        #assert height == node.value.height
-        #x += width/2
-        #y += height/2
-        #
-        #node.shape.Move(dc, x, y, False)
         
     def Redraw(self):
         
@@ -510,7 +436,7 @@ class GraphRendererOgl:
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
         
-        #for node in self.graph.nodes:
+        #for node in self.graph.nodes:    # TODO am still moveing nodes in the pynsourcegui version?
         #    shape = node.shape
         #    shape.Move(dc, shape.GetX(), shape.GetY())
         diagram.Clear(dc)
@@ -537,51 +463,21 @@ class GraphRendererOgl:
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
         
-        #self.ctx.strokeStyle = 'black'
-        #self.ctx.beginPath()
-        #self.ctx.arc(point[0], point[1], self.radius, 0, Math.PI*2, true)
-        #self.ctx.closePath()
-        #self.ctx.stroke()
        
     def drawEdge(self, edge):
         source = self.translate([edge['source'].layoutPosX, edge['source'].layoutPosY])
         target = self.translate([edge['target'].layoutPosX, edge['target'].layoutPosY])
 
-        #tan = (target[1] - source[1]) / (target[0] - source[0])
-        #theta = Math.atan(tan)
-        #if(source[0] <= target[0]): theta = Math.PI()+theta
-        #source = self.rotate(source, -self.radius, theta)
-        #target = self.rotate(target, self.radius, theta)
-
-        #print "Edge: from (%d, %d) to (%d, %d)" % (source[0], source[1], target[0], target[1])
-         
-        
-        
-        
-        
-          #line = ogl.LineShape()
-          #line.MakeControlPoints(2) # has to be at least 2
-          #line.SetEnds(x1, y1, x2, y2) # sets the first + last control points
-          #line.InsertControlPoint(x, y) # see below
-          #line.Initialise()
-          #line.SetSplit(True) # for a spline
-          #canvas.AddShape(line)        
-        
-        
-        
-        
         line = ogl.LineShape()
         line.SetCanvas(self.oglcanvas)
         line.SetPen(wx.BLACK_PEN)
         line.SetBrush(wx.BLACK_BRUSH)
         line.MakeLineControlPoints(2)
         
-        
         fromShape = edge['source'].shape
         toShape = edge['target'].shape
         fromShape.AddLine(line, toShape)
         #line.SetEnds(fromShape.GetX(), fromShape.GetY(), toShape.GetX(), toShape.GetY())
-        
         
         """
         Getting splines to work is a nightmare
@@ -596,26 +492,6 @@ class GraphRendererOgl:
         self.oglcanvas.GetDiagram().AddShape(line)
         line.Show(True)        
         
-        
-        # draw the edge
-        #self.ctx.strokeStyle = 'grey'
-        #self.ctx.fillStyle = 'grey'
-        #self.ctx.lineWidth = 1.0
-        #self.ctx.beginPath()
-        #self.ctx.moveTo(source[0], source[1])
-        #self.ctx.lineTo(target[0], target[1])
-        #self.ctx.stroke()
-       
-        #self.drawArrowHead(20, self.arrowAngle, theta, source[0], source[1], target[0], target[1])
-
-    def drawArrowHead(self, length, alpha, theta, startx, starty, endx, endy):
-        top = self.rotate([endx, endy], length, theta + alpha)
-        bottom = self.rotate([endx, endy], length, theta - alpha)
-        #self.ctx.beginPath()
-        #self.ctx.moveTo(endx, endy)
-        #self.ctx.lineTo(top[0], top[1])
-        #self.ctx.lineTo(bottom[0], bottom[1])
-        #self.ctx.fill()
 
 class AppFrame(wx.Frame):
     def __init__(self):

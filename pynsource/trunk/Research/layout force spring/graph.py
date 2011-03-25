@@ -86,6 +86,46 @@ class Graph:
         edge = {'source': s, 'target': t}
         self.edges.append(edge)
 
+    def LoadGraphFromStrings(self, filedata):
+        # load from persistence
+        filedata = filedata.split('\n')
+        for data in filedata:
+            data = data.strip()
+            if not data:
+                continue
+            print data
+            data = eval(data)
+            if data['type'] == 'node':
+                # {'type':'node', 'id':'c5', 'x':230, 'y':174, 'width':60, 'height':120}
+                div = Div(data['id'], data['y'], data['x'], data['width'], data['height'])
+                self.addNode(div)
+            elif data['type'] == 'edge':
+                source_id = data['source']
+                target_id = data['target']
+                # need to find the node corresponding to a div of id whatever
+                # wire together the two divs
+                sourcenode = self.findNode(source_id)
+                targetnode = self.findNode(target_id)
+                if not sourcenode:
+                    print "Couldn't load source from persistence", source_id
+                    continue
+                if not targetnode:
+                    print "Couldn't load target from persistence", target_id
+                    continue
+                self.addEdge(sourcenode.value, targetnode.value)  # addEdge takes div objects as parameters
+
+    def GraphToString(self):
+        nodes = ""
+        edges = ""
+        for node in self.nodes:
+            v = node.value
+            nodes += "{'type':'node', 'id':'%s', 'x':%d, 'y':%d, 'width':%d, 'height':%d}\n" % (v.id, v.left, v.top, v.width, v.height)
+        for edge in self.edges:
+            source = edge['source'].value.id
+            target = edge['target'].value.id
+            edges += "{'type':'edge', 'id':'%s_to_%s', 'source':'%s', 'target':'%s'}\n" % (source, target, source, target)
+        return nodes + edges
+
 class GraphNode:
     def __init__(self, value):
         self.value = value
@@ -102,7 +142,7 @@ class Context:
     pass
 
 class Div:
-    def __init__(self, id, top, left, width=60, height=60):
+    def __init__(self, id, top, left, width=60, height=60):  # TODO: top, left should be left, top
         self.id = id
         self.top = top
         self.left = left

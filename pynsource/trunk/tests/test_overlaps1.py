@@ -53,7 +53,22 @@ class MathLibraryTests(unittest.TestCase):
         self.assertEqual(4, numfixed)
 
 
-
-
+    def testMoveLeftPushedBackHorizontally01(self):
+        initial = """
+{'type':'node', 'id':'D25', 'x':6, 'y':7, 'width':159, 'height':106}
+{'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
+{'type':'node', 'id':'m1', 'x':170, 'y':9, 'width':139, 'height':92}
+"""
+        self.g.LoadGraphFromStrings(initial)
+        
+        # move m1 to the left
+        node = self.g.findNode('m1')
+        node.value.left, node.value.top = (150, 9)
+        
+        # assert m1 has been pushed back to the right
+        # assert no overlaps
+        numfixed = self.overlap_remover.remove_overlaps()
+        self.assertEqual(1, numfixed)
+        
 if __name__ == "__main__":
     unittest.main()
