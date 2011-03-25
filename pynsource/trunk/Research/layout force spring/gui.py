@@ -233,8 +233,16 @@ class GraphRendererOgl:
         item = self.popupmenu.Append(2011, "Load Graph...")
         frame.Bind(wx.EVT_MENU, self.OnLoadGraph, item)
         
+        item = self.popupmenu.Append(2011, "Load Graph from text...")
+        frame.Bind(wx.EVT_MENU, self.OnLoadGraphFromText, item)
+
         item = self.popupmenu.Append(2012, "Save Graph...")
         frame.Bind(wx.EVT_MENU, self.OnSaveGraph, item)
+
+        self.popupmenu.AppendSeparator()
+
+        item = self.popupmenu.Append(2014, "Clear")
+        frame.Bind(wx.EVT_MENU, self.OnClear, item)  # must pass item
 
         self.popupmenu.AppendSeparator()
 
@@ -257,6 +265,13 @@ class GraphRendererOgl:
             #self.MessageBox("graph saving not implemented yet")
         dlg.Destroy()
         
+    def OnLoadGraphFromText(self, event):
+        eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
+        dialog = wx.TextEntryDialog ( None, 'Enter an node/edge persistence strings:', 'Create a new node', eg,  style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
+        if dialog.ShowModal() == wx.ID_OK:
+            txt = dialog.GetValue()
+            self.LoadGraph(txt)
+            
     def OnLoadGraph(self, event):
         self.LoadGraph(None)
         return
@@ -269,8 +284,9 @@ class GraphRendererOgl:
             self.MessageBox("graph loading not implemented yet")
         dlg.Destroy()
 
-    def LoadGraph(self, filename):
-        filedata = """
+    def LoadGraph(self, filedata=""):
+        if not filedata:
+            filedata = """
 {'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}
 {'type':'node', 'id':'A1', 'x':10, 'y':86, 'width':60, 'height':60}
 {'type':'node', 'id':'A2', 'x':97, 'y':10, 'width':260, 'height':160}
@@ -302,13 +318,7 @@ class GraphRendererOgl:
 {'type':'edge', 'id':'A_to_c5', 'source':'A', 'target':'c5'}
         """
 
-        # Clear view        
-        self.oglcanvas.GetDiagram().DeleteAllShapes()
-        dc = wx.ClientDC(self.oglcanvas)
-        self.oglcanvas.GetDiagram().Clear(dc)   # only ends up calling dc.Clear() - I wonder if this clears the screen?
-        
-        # clear model
-        self.graph.clear()
+        self.Clear()
         
         # load from persistence
         filedata = filedata.split('\n')
@@ -355,7 +365,19 @@ class GraphRendererOgl:
             target = edge['target'].value.id
             edges += "{'type':'edge', 'id':'%s_to_%s', 'source':'%s', 'target':'%s'}\n" % (source, target, source, target)
         print nodes + edges
-            
+
+    def OnClear(self, event):
+        self.Clear()
+        
+    def Clear(self):
+        # Clear view        
+        self.oglcanvas.GetDiagram().DeleteAllShapes()
+        dc = wx.ClientDC(self.oglcanvas)
+        self.oglcanvas.GetDiagram().Clear(dc)   # only ends up calling dc.Clear() - I wonder if this clears the screen?
+        
+        # clear model
+        self.graph.clear()
+        
             
     def OnWheelZoom(self, event):
         self.stage2()
