@@ -134,6 +134,10 @@ class GraphNode:
         self.layoutPosY = 0
         self.layoutForceX = 0
         self.layoutForceY = 0
+
+    def GetBounds(self):
+        v = self.value
+        return v.left, v.top, v.right, v.bottom
         
     def __str__(self):
         return "NodeDiv %s: x,y (%d, %d) w,h (%d, %d)" % (self.value.id, self.value.left, self.value.top, self.value.width, self.value.height)

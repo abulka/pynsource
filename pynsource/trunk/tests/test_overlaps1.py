@@ -395,7 +395,8 @@ class OverlapTests(unittest.TestCase):
         oldD51pos = (d51.value.left, d51.value.top)
         oldD13pos = (d13.value.left, d13.value.top)
 
-        # assert m1 has been inserted - two pushed right, two pushed down
+        # assert m1 has been inserted - two pushed right, two pushed down, and extra D13 pushed down
+        # because m1 overlaps/attacks D13 (and there is room for D13 to move downwards I guess)
         were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
         self.assertTrue(were_all_overlaps_removed)
         self.assertEqual(6, numfixed)

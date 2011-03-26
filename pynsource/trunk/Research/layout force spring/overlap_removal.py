@@ -20,59 +20,44 @@ class OverlapRemoval:
         
         MARGIN = 5
 
-        def getpermutations(lzt):
+        def GetPermutations(lzt):
             result = []
             for i in range(0, len(lzt)):
                 for j in range(i+1, len(lzt)):
                     result.append((lzt[i], lzt[j]))
             return result
 
-        def GetBounds(node):
-            v = node.value
-            return v.left, v.right, v.top, v.bottom
-        
-        def ContractiveMoveWouldStayInBounds(node, deltaX=0, deltaY=0):
-            assert deltaX >0 or deltaY >0
-            if deltaX:
-                return node.value.left - deltaX > 0
-            if deltaY:
-                return node.value.top - deltaY > 0
-
-        def hit(node1, node2):
-            l =   max(node1.value.left, node2.value.left)
-            r =  min(node1.value.left+node1.value.width, node2.value.left+node2.value.width)
-            t =    max(node1.value.top, node2.value.top)
-            b = min(node1.value.top+node1.value.height, node2.value.top+node2.value.height)
+        def Hit(node1, node2):
+            l = max(node1.value.left,   node2.value.left)
+            r = min(node1.value.right,  node2.value.right)
+            t = max(node1.value.top,    node2.value.top)
+            b = min(node1.value.bottom, node2.value.bottom)
             return (r>l) and (b>t)            
 
-        def amhitting(currnode, ignorenode=None, ignorenodes=[]):
+        def IsHitting(currnode, ignorenode=None, ignorenodes=[]):
             for node in self.graph.nodes:
                 if node == currnode or node == ignorenode or node in ignorenodes:
                     continue
-                if hit(currnode, node):
-                    print "  ! sitting here, %s is hitting %s." % (currnode.value.id, node.value.id)
+                if Hit(currnode, node):
                     return node
-            print "  ! sitting here, %s is NOT hitting  anything." % (currnode.value.id)
             return None
 
-        def ContractiveMoveOk(movingnode, deltaY=0, deltaX=0, ignorenode=None):
-            return ContractiveMoveWouldStayInBounds(movingnode, deltaX=deltaX, deltaY=deltaY) and \
-                    not ContractiveMoveWouldClash(movingnode, deltaX=deltaX, deltaY=deltaY, ignorenode=ignorenode)
+        def MoveLeftOk(movingnode, deltaX, ignorenode=None):
+            return movingnode.value.left - deltaX >= 0 and not MoveWouldHitSomething(movingnode, -deltaX, 0, ignorenode)
+
+        def MoveUpOk(movingnode, deltaY, ignorenode=None):
+            return movingnode.value.top - deltaY >= 0 and not MoveWouldHitSomething(movingnode, 0, -deltaY, ignorenode)
     
-        def MoveWouldClash(movingnode, deltaY=0, deltaX=0, ignorenode=None):
-            l, r, t, b = GetBounds(movingnode)
+        def MoveWouldHitSomething(movingnode, deltaX=0, deltaY=0, ignorenode=None):
+            # delta values can be positive or negative
+            l, t, r, b = movingnode.GetBounds()
             proposednode = GraphNode(Div('temp', top=t+deltaY, left=l+deltaX, width=r-l, height=b-t))
-            return amhitting(proposednode, ignorenodes=[movingnode, ignorenode])
-            
-        def ExpansiveMoveWouldClash(movingnode, deltaY=0, deltaX=0, ignorenode=None):
-            assert deltaX >0 or deltaY >0
-            return MoveWouldClash(movingnode, deltaY, deltaX, ignorenode)
+            return IsHitting(proposednode, ignorenodes=[movingnode, ignorenode])
 
-        def ContractiveMoveWouldClash(movingnode, deltaY=0, deltaX=0, ignorenode=None):
-            assert deltaX >0 or deltaY >0
-            return MoveWouldClash(movingnode, -deltaY, -deltaX, ignorenode)
-
-        def calcbasics(node1, node2):
+        def CalcBasicInfo(node1, node2):
+            """
+            Overlap amounts returned are always positive values
+            """
 
             def whoisonleft(node1, node2):
                 if node1.value.left < node2.value.left:
@@ -88,8 +73,8 @@ class OverlapRemoval:
 
             leftnode, rightnode = whoisonleft(node1, node2)
             topnode, bottomnode = whoisontop(node1, node2)
-            xoverlap_amount = (leftnode.value.left + leftnode.value.width + MARGIN) - rightnode.value.left
-            yoverlap_amount = (topnode.value.top + topnode.value.height + MARGIN) - bottomnode.value.top
+            xoverlap_amount = (leftnode.value.right + MARGIN) - rightnode.value.left
+            yoverlap_amount = (topnode.value.bottom + MARGIN) - bottomnode.value.top
             return leftnode, rightnode, topnode, bottomnode, abs(xoverlap_amount), abs(yoverlap_amount)
 
         def dumpproposal(prop):
@@ -109,16 +94,16 @@ class OverlapRemoval:
 
         def GatherProposals(node1, node2, ignorenodes):
             proposals = []
-            leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = calcbasics(node1, node2)
+            leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = CalcBasicInfo(node1, node2)
                         
             print "Overlap %s/%s by %d/%d  (leftnode is %s  topnode is %s)" % (node1.value.id, node2.value.id, xoverlap_amount, yoverlap_amount, leftnode.value.id, topnode.value.id)
 
-            if ContractiveMoveOk(leftnode, deltaX=xoverlap_amount, ignorenode=rightnode):
+            if MoveLeftOk(leftnode, deltaX=xoverlap_amount, ignorenode=rightnode):
                 proposals.append({'node':leftnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':rightnode})
             else:
                 proposals.append({'node':rightnode, 'xory':'x', 'amount':xoverlap_amount, 'clashnode':leftnode})
                 
-            if ContractiveMoveOk(topnode, deltaY=yoverlap_amount, ignorenode=bottomnode):
+            if MoveUpOk(topnode, deltaY=yoverlap_amount, ignorenode=bottomnode):
                 proposals.append({'node':topnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':bottomnode})
             else:
                 proposals.append({'node':bottomnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':topnode})
@@ -131,20 +116,20 @@ class OverlapRemoval:
         
         def GatherProposal2(lastmovedirection, clashingnode, movingnode):
             proposal = None
-            leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = calcbasics(clashingnode, movingnode)
+            leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = CalcBasicInfo(clashingnode, movingnode)
             # check the axis opposite to that I just moved
             if lastmovedirection == 'x' and (yoverlap_amount < xoverlap_amount):  # check instant y movement possibilities
-                if ((movingnode == topnode) and ContractiveMoveOk(movingnode, deltaY=yoverlap_amount)):
+                if ((movingnode == topnode) and MoveUpOk(movingnode, deltaY=yoverlap_amount)):
                     proposal = {'node':movingnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':clashingnode}
                     
-                if ((movingnode == bottomnode) and not ExpansiveMoveWouldClash(movingnode, deltaY=yoverlap_amount)):
+                if ((movingnode == bottomnode) and not MoveWouldHitSomething(movingnode, deltaY=+yoverlap_amount)):
                     proposal = {'node':movingnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':clashingnode}
                     
             if lastmovedirection == 'y' and (xoverlap_amount < yoverlap_amount):
-                if ((movingnode == leftnode) and ContractiveMoveOk(movingnode, deltaX=xoverlap_amount)):
+                if ((movingnode == leftnode) and MoveLeftOk(movingnode, deltaX=xoverlap_amount)):
                     proposal = {'node':movingnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':clashingnode}
                     
-                if ((movingnode == rightnode) and not ExpansiveMoveWouldClash(movingnode, deltaX=xoverlap_amount)):
+                if ((movingnode == rightnode) and not MoveWouldHitSomething(movingnode, deltaX=+xoverlap_amount)):
                     proposal = {'node':movingnode, 'xory':'x', 'amount':+xoverlap_amount, 'clashnode':clashingnode}
             return proposal
 
@@ -184,8 +169,8 @@ class OverlapRemoval:
             self.gui.stateofthenation()
                     
             foundoverlap = False
-            for node1, node2 in getpermutations(self.graph.nodes):  # a 'round'
-                if hit(node1, node2):
+            for node1, node2 in GetPermutations(self.graph.nodes):  # a 'round'
+                if Hit(node1, node2):
                     foundoverlap = True
                     total_overlaps_found += 1
                     
@@ -202,7 +187,7 @@ class OverlapRemoval:
                     #self.gui.stateofthenation()
                     
                     # Post Move Algorithm - move the same node again, under certain circumstances, despite ignorenodes list
-                    clashingnode = amhitting(movednode)  # What am I clashing with now?
+                    clashingnode = IsHitting(movednode)  # What am I clashing with now?
                     if clashingnode:
                         if ApplyPostMoveMove(lastmovedirection, clashingnode, movednode):
                             total_postmove_fixes += 1
