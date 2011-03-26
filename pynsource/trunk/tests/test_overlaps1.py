@@ -22,7 +22,7 @@ class MathLibraryTests(unittest.TestCase):
         g = self.g
         g.addNode(Div('A', 0, 0, 250, 250))
 
-        numfixed = self.overlap_remover.remove_overlaps()
+        were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
         self.assertEqual(0, numfixed)
 
     def testTwoNode_notoverlapping(self):
@@ -30,7 +30,7 @@ class MathLibraryTests(unittest.TestCase):
         g.addNode(Div('A', 0, 0, 250, 250))
         g.addNode(Div('B', 260, 0, 250, 250))
 
-        numfixed = self.overlap_remover.remove_overlaps()
+        were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
         self.assertEqual(0, numfixed)
 
     def testTwoNode_overlapping(self):
@@ -38,7 +38,7 @@ class MathLibraryTests(unittest.TestCase):
         g.addNode(Div('A', 0, 0, 250, 250))
         g.addNode(Div('B', 200, 0, 250, 250))
 
-        numfixed = self.overlap_remover.remove_overlaps()
+        were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
         self.assertEqual(1, numfixed)
 
     def testOverlapRemoverCreation(self):
@@ -49,7 +49,7 @@ class MathLibraryTests(unittest.TestCase):
         g.addEdge(a, a1)
         g.addEdge(a, a2)
 
-        numfixed = self.overlap_remover.remove_overlaps()
+        were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
         self.assertEqual(4, numfixed)
 
 
@@ -64,11 +64,35 @@ class MathLibraryTests(unittest.TestCase):
         # move m1 to the left
         node = self.g.findNode('m1')
         node.value.left, node.value.top = (150, 9)
+
+        # assert m1 has been pushed back to the right
+        # assert no overlaps
+        were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(1, numfixed)
+        self.assertTrue(node.value.left > self.g.findNode('D25').value.right)
+        self.assertTrue(node.value.top < self.g.findNode('D25').value.bottom)
+
+    def testMoveLeftPushedBackDownRight02(self):
+        initial = """
+{'type':'node', 'id':'D25', 'x':6, 'y':7, 'width':159, 'height':106}
+{'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
+{'type':'node', 'id':'m1', 'x':170, 'y':9, 'width':139, 'height':92}
+"""
+        self.g.LoadGraphFromStrings(initial)
+        
+        # move m1 to the left
+        node = self.g.findNode('m1')
+        node.value.left, node.value.top = (106, 79)
         
         # assert m1 has been pushed back to the right
         # assert no overlaps
-        numfixed = self.overlap_remover.remove_overlaps()
+        were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
+        self.assertTrue(were_all_overlaps_removed)
         self.assertEqual(1, numfixed)
+        
+        self.assertTrue(node.value.left > self.g.findNode('D13').value.right)
+        self.assertTrue(node.value.top > self.g.findNode('D25').value.bottom)
         
 if __name__ == "__main__":
     unittest.main()

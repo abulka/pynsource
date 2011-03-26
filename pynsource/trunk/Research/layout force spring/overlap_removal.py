@@ -14,6 +14,7 @@ class OverlapRemoval:
     def __init__(self, graph, gui):
         self.graph = graph
         self.gui = gui
+        self.stats = {}
         
     def remove_overlaps(self, fix=True):
         
@@ -41,11 +42,11 @@ class OverlapRemoval:
                 return node.value.top - deltaY > 0
 
         def hit(node1, node2):
-            Left =   max(node1.value.left, node2.value.left)
-            Right =  min(node1.value.left+node1.value.width, node2.value.left+node2.value.width)
-            Top =    max(node1.value.top, node2.value.top)
-            Bottom = min(node1.value.top+node1.value.height, node2.value.top+node2.value.height)
-            return (Right>Left) and (Bottom>Top)            
+            l =   max(node1.value.left, node2.value.left)
+            r =  min(node1.value.left+node1.value.width, node2.value.left+node2.value.width)
+            t =    max(node1.value.top, node2.value.top)
+            b = min(node1.value.top+node1.value.height, node2.value.top+node2.value.height)
+            return (r>l) and (b>t)            
 
         def amhitting(currnode, ignorenode=None):
             for node in self.graph.nodes:
@@ -54,7 +55,7 @@ class OverlapRemoval:
                 if hit(currnode, node):
                     print "  ! sitting here, %s is hitting %s." % (currnode.value.id, node.value.id)
                     return node
-            print "  ! sitting here, %s is  n o t  h i t t i n g  anything." % (currnode.value.id)
+            print "  ! sitting here, %s is NOT hitting  anything." % (currnode.value.id)
             return None
 
         def ContractiveMoveOk(movingnode, deltaY=0, deltaX=0, ignorenode=None):
@@ -243,9 +244,17 @@ class OverlapRemoval:
 
         if total_overlaps_found:
             print "Overlaps fixed: %d  total_iterations made: %d  total_postmove_fixes: %d  total_contractive_moves: %d  " % (total_overlaps_found, total_iterations, total_postmove_fixes, total_contractive_moves)
+            were_all_overlaps_removed = not foundoverlap
             if foundoverlap:
                 print "Exiting with overlaps remaining :-("
         else:
+            were_all_overlaps_removed = True
             print "No Overlaps found."
-        return total_overlaps_found
+
+        self.stats['total_overlaps_found'] = total_overlaps_found
+        self.stats['total_iterations'] = total_iterations
+        self.stats['total_postmove_fixes'] = total_postmove_fixes
+        self.stats['total_contractive_moves'] = total_contractive_moves
+
+        return were_all_overlaps_removed, total_overlaps_found
 

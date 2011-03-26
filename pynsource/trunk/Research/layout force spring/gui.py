@@ -42,7 +42,16 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         
         self.UpdateStatusBar(shape)
             
-      
+    def OnDrawOutline(self, dc, x, y, w, h):
+        ogl.ShapeEvtHandler.OnDrawOutline(self, dc, x, y, w, h)
+        shape = self.GetShape()
+        x,y = (x - w/2, y - h/2) # correct to be top corner not centre
+        frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)  - div is %s" % (x, y, w, h, shape.node))
+        
+    def OnDragLeft(self, draw, x, y, keys = 0, attachment = 0):
+        ogl.ShapeEvtHandler.OnDragLeft(self, draw, x, y, keys = 0, attachment = 0)
+        # x, y are the merely the mouse position thus useless for getting to shape x,y - intercept OnDrawOutline instead 
+        
     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
         shape = self.GetShape()
 
@@ -372,9 +381,7 @@ class GraphRendererOgl:
         #time.sleep(1)
 
     def stage2(self):
-        #numfixed = self.remove_overlaps()
-        
-        numfixed = self.overlap_remover.remove_overlaps()
+        were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
         if numfixed:
             self.stateofthenation()
         

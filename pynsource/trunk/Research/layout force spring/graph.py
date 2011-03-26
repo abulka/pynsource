@@ -149,6 +149,13 @@ class Div:
         self.width=width
         self.height=height
     
+    def get_bottom(self):
+        return self.top + self.height
+    def get_right(self):
+        return self.left + self.width
+    bottom = property(get_bottom)
+    right = property(get_right)
+    
 class GraphRendererBasic:
     def __init__(self, element, graph):
         self.element = element
