@@ -10,6 +10,7 @@
 from graph import GraphNode, Div
 
 MARGIN = 5
+MAX_CYCLES = 10
 
 class OverlapRemoval:
     
@@ -40,7 +41,7 @@ class OverlapRemoval:
                 return node
         return None
 
-    def GatherProposals(self, node1, node2, ignorenodes):
+    def GatherProposals(self, node1, node2):
         proposals = []
         leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = self.CalcOverlapAmounts(node1, node2)
                     
@@ -55,16 +56,15 @@ class OverlapRemoval:
             proposals.append({'node':topnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':bottomnode})
         else:
             proposals.append({'node':bottomnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':topnode})
-        print self.dumpproposals(proposals)
+        #print self.dumpproposals(proposals)
         
-        proposals = [p for p in proposals if not p['node'] in ignorenodes]
-        if not proposals:
-            print "  All proposals eliminated - worry about this overlap later"
+        proposals = [p for p in proposals if not p['node'] in self.already_moved_nodes]
         return proposals
     
     def GatherProposal2(self, lastmovedirection, clashingnode, movingnode):
         proposal = None
         leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = self.CalcOverlapAmounts(clashingnode, movingnode)
+        
         # check the axis opposite to that I just moved
         if lastmovedirection == 'x' and (yoverlap_amount < xoverlap_amount):  # check instant y movement possibilities
             if ((movingnode == topnode) and self.MoveUpOk(movingnode, deltaY=yoverlap_amount)):
@@ -109,7 +109,6 @@ class OverlapRemoval:
         
         return leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount
 
-
     def dumpproposal(self, prop):
         return "  moving %s.%s by %s" % (prop['node'].value.id, prop['xory'], prop['amount'])
         
@@ -123,92 +122,104 @@ class OverlapRemoval:
         msg = ""
         for n in ignorenodes:
             msg += " %s," % (n.value.id)
-        print "  ignore list now ", msg
+        #print "  ignore list now ", msg
 
     def ApplyProposal(self, proposal):
-        print self.dumpproposal(proposal)
+        #print self.dumpproposal(proposal)
         if proposal['xory'] == 'x':
             proposal['node'].value.left += proposal['amount']
         else:
             proposal['node'].value.top += proposal['amount']
+        self.already_moved_nodes.append(proposal['node'])
 
     def ApplyMinimalProposal(self, proposals):
         amounts = [abs(p['amount']) for p in proposals]
         lowest_amount = min(amounts)
         proposal = [p for p in proposals if abs(p['amount']) == lowest_amount][0]
         self.ApplyProposal(proposal)
-        return proposal['node'], proposal['amount'], proposal['xory']
+        if proposal['amount'] < 0:
+            self.total_contractive_moves += 1
+        else:
+            self.total_expansive_moves += 1
+        return proposal['node'], proposal['xory']
 
-    def CheckForPostMoveMove(self, lastmovedirection, clashingnode, movednode):
-        proposal = self.GatherProposal2(lastmovedirection, clashingnode, movednode)
-        if proposal:
-            self.ApplyProposal(proposal)
-            print "  * extra correction to %s" % (movednode.value.id)
-            return True
-        return False
+    def PostMoveAlgorithm(self, movednode, lastmovedirection):
+        # Post Move Algorithm - move the same node again, safely (don't introduce oscillations),
+        # under certain circumstances, for aesthetics, despite already_moved_nodes list
+
+        def CheckForPostMoveMove(clashingnode):
+            proposal = self.GatherProposal2(lastmovedirection, clashingnode, movednode)
+            if proposal:
+                self.ApplyProposal(proposal)
+                self.total_postmove_fixes += 1
+                #print "  * extra correction to %s" % (movednode.value.id)
+
+        clashingnode = self.IsHitting(movednode)  # What am I clashing with now?
+        if clashingnode:
+            CheckForPostMoveMove(clashingnode)
         
-    def remove_overlaps(self, fix=True):
-        
-        self.total_iterations = 0
+    def InitStats(self):
         self.total_overlaps_found = 0
         self.total_contractive_moves = 0
+        self.total_expansive_moves = 0
         self.total_postmove_fixes = 0
-        self.ignorenodes = []
-        
-        for i in range(0,10):
-            numfixed_thisround, foundoverlap_thisround = self.RunRemovalCycle()
-            if not foundoverlap_thisround:
-                break  # job done
-            else:
-                if numfixed_thisround == 0:  # found overlaps but none fixed
-                    self.ignorenodes = []  # reset bans
-            
-        if self.total_overlaps_found:
-            print "Overlaps fixed: %d  self.total_iterations made: %d  total_postmove_fixes: %d  total_contractive_moves: %d  " % \
-            (self.total_overlaps_found, self.total_iterations, self.total_postmove_fixes, self.total_contractive_moves)
-            were_all_overlaps_removed = not foundoverlap_thisround
-            if foundoverlap_thisround:
-                print "Exiting with overlaps remaining :-("
-        else:
-            were_all_overlaps_removed = True
-            print "No Overlaps found."
 
+    def SetStats(self, total_iterations):
+        self.stats['total_iterations'] = total_iterations
         self.stats['total_overlaps_found'] = self.total_overlaps_found
-        self.stats['self.total_iterations'] = self.total_iterations
         self.stats['total_postmove_fixes'] = self.total_postmove_fixes
         self.stats['total_contractive_moves'] = self.total_contractive_moves
+        self.stats['total_expansive_moves'] = self.total_expansive_moves
 
-        return were_all_overlaps_removed, self.total_overlaps_found
-
+    def GetStats(self):
+        return self.stats
+    
     def RunRemovalCycle(self):
-        
-        self.total_iterations += 1
-        numfixed_thisround = 0
-        foundoverlap_thisround = False
+        numfixed_thiscycle = 0
+        found_an_overlap_thiscycle = False
 
-        self.gui.stateofthenation()
-                
-        for node1, node2 in self.GetPermutations(self.graph.nodes):  # a 'round'
+        for node1, node2 in self.GetPermutations(self.graph.nodes):  # a 'cycle'
             if self.Hit(node1, node2):
-                foundoverlap_thisround = True
+                found_an_overlap_thiscycle = True
                 self.total_overlaps_found += 1
                 
-                proposals = self.GatherProposals(node1, node2, self.ignorenodes)
+                proposals = self.GatherProposals(node1, node2)
                 if not proposals:
                     continue
                 
-                movednode, movedamount, lastmovedirection = self.ApplyMinimalProposal(proposals)
-                numfixed_thisround += 1
-                self.ignorenodes.append(movednode)
+                lastmovednode, lastmovedirection = self.ApplyMinimalProposal(proposals)
+                numfixed_thiscycle += 1
 
-                if movedamount < 0:
-                    self.total_contractive_moves += 1
-                #self.gui.stateofthenation()
+                self.PostMoveAlgorithm(lastmovednode, lastmovedirection)  # Optional nicety
                 
-                # Post Move Algorithm - move the same node again, under certain circumstances, despite ignorenodes list
-                clashingnode = self.IsHitting(movednode)  # What am I clashing with now?
-                if clashingnode:
-                    if self.CheckForPostMoveMove(lastmovedirection, clashingnode, movednode):
-                        self.total_postmove_fixes += 1
-        return numfixed_thisround, foundoverlap_thisround
+        return numfixed_thiscycle, found_an_overlap_thiscycle
     
+    def RemoveOverlaps(self):     # Main method to call
+        total_iterations = 0
+        self.already_moved_nodes = []
+        self.InitStats()
+        for i in range(0, MAX_CYCLES):
+            total_iterations += 1
+            
+            numfixed_thiscycle, found_an_overlap_thiscycle = self.RunRemovalCycle()
+            
+            if not found_an_overlap_thiscycle:
+                break  # job done
+            else:
+                if numfixed_thiscycle == 0:         # found overlaps but none fixed
+                    self.already_moved_nodes = []   # so reset bans
+                else:
+                    self.gui.stateofthenation()     # refresh gui
+                    
+        if self.total_overlaps_found:
+            were_all_overlaps_removed = not found_an_overlap_thiscycle
+            if found_an_overlap_thiscycle:
+                print "Exiting with overlaps remaining :-("
+        else:
+            were_all_overlaps_removed = True
+            print "No Overlaps found at all."
+
+        self.SetStats(total_iterations)
+
+        return were_all_overlaps_removed, self.total_overlaps_found
+

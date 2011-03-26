@@ -93,7 +93,7 @@ class Graph:
             data = data.strip()
             if not data:
                 continue
-            print data
+            #print data
             data = eval(data)
             if data['type'] == 'node':
                 # {'type':'node', 'id':'c5', 'x':230, 'y':174, 'width':60, 'height':120}

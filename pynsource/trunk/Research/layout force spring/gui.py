@@ -371,7 +371,7 @@ class GraphRendererOgl:
         #time.sleep(1)
 
     def stage2(self):
-        were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
+        were_all_overlaps_removed, numfixed = self.overlap_remover.RemoveOverlaps()
         if numfixed:
             self.stateofthenation()
         
