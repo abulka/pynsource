@@ -28,11 +28,8 @@ class OverlapRemoval:
             return result
 
         def GetBounds(node):
-            left = node.value.left
-            right = node.value.left + node.value.width
-            top = node.value.top
-            bottom = node.value.top + node.value.height
-            return left, right, top, bottom
+            v = node.value
+            return v.left, v.right, v.top, v.bottom
         
         def ContractiveMoveWouldStayInBounds(node, deltaX=0, deltaY=0):
             assert deltaX >0 or deltaY >0
@@ -48,9 +45,9 @@ class OverlapRemoval:
             b = min(node1.value.top+node1.value.height, node2.value.top+node2.value.height)
             return (r>l) and (b>t)            
 
-        def amhitting(currnode, ignorenode=None):
+        def amhitting(currnode, ignorenode=None, ignorenodes=[]):
             for node in self.graph.nodes:
-                if node == currnode or node == ignorenode:
+                if node == currnode or node == ignorenode or node in ignorenodes:
                     continue
                 if hit(currnode, node):
                     print "  ! sitting here, %s is hitting %s." % (currnode.value.id, node.value.id)
@@ -62,59 +59,33 @@ class OverlapRemoval:
             return ContractiveMoveWouldStayInBounds(movingnode, deltaX=deltaX, deltaY=deltaY) and \
                     not ContractiveMoveWouldClash(movingnode, deltaX=deltaX, deltaY=deltaY, ignorenode=ignorenode)
     
-        def ContractiveMoveWouldClash(movingnode, deltaY=0, deltaX=0, ignorenode=None):
-            l, r, t, b = GetBounds(movingnode)  # proposed
-            checkednodesmsg = "node %s we are proposing to move: points are %s/%s/%s/%s " % (movingnode.value.id,(l,t), (r,t), (l,b), (r,b))
+        def MoveWouldClash(movingnode, deltaY=0, deltaX=0, ignorenode=None):
+            l, r, t, b = GetBounds(movingnode)
+            proposednode = GraphNode(Div('temp', top=t+deltaY, left=l+deltaX, width=r-l, height=b-t))
+            return amhitting(proposednode, ignorenodes=[movingnode, ignorenode])
             
-            l -= deltaX
-            r -= deltaX
-            t -= deltaY
-            b -= deltaY
-            proposednode = GraphNode(Div('temp moving proposed', top=t, left=l, width=r-l+1, height=b-t+1))
-            left, right, top, bottom = GetBounds(proposednode)
-            checkednodesmsg += "adjusted to proposed points %s/%s/%s/%s tmpnode %d/%d/%d/%d" % ((l,t), (r,t), (l,b), (r,b), left, right, top, bottom)
-            
-            for node in self.graph.nodes:
-                if node == movingnode or node == ignorenode:
-                    continue
-                if hit(proposednode, node):
-                    print "  ! moving %s by -%d/-%d would hit %s. %s" % (movingnode.value.id, deltaX, deltaY, node.value.id, checkednodesmsg)
-                    return node
-            print "  ! moving %s by -%d/-%d would NOT HIT anything. %s" % (movingnode.value.id, deltaX, deltaY, checkednodesmsg)
-            return None
-
         def ExpansiveMoveWouldClash(movingnode, deltaY=0, deltaX=0, ignorenode=None):
             assert deltaX >0 or deltaY >0
-            l, r, t, b = GetBounds(movingnode)  # proposed
-            checkednodesmsg = "node %s we are proposing to move: points are %s/%s/%s/%s " % (movingnode.value.id,(l,t), (r,t), (l,b), (r,b))
-            proposednode = GraphNode(Div('temp', top=t+deltaY, left=l+deltaX, width=r-l+deltaX+1, height=b-t+deltaY+1))
+            return MoveWouldClash(movingnode, deltaY, deltaX, ignorenode)
 
-            # debug
-            left, right, top, bottom = GetBounds(proposednode)
-            checkednodesmsg += "adjusted to proposed points tmpnode %d/%d/%d/%d" % (left, right, top, bottom)
-
-            for node in self.graph.nodes:
-                if node == movingnode or node == ignorenode:
-                    continue
-                if hit(proposednode, node):
-                    print "  ! expansive moving %s by +%d/+%d would hit %s. %s" % (movingnode.value.id, deltaX, deltaY, node.value.id, checkednodesmsg)
-                    return node
-            print "  ! expansive moving %s by +%d/+%d would NOT HIT anything. %s" % (movingnode.value.id, deltaX, deltaY, checkednodesmsg)
-            return None
-        
-        def whoisonleft(node1, node2):
-            if node1.value.left < node2.value.left:
-                return node1, node2
-            else:
-                return node2, node1
-
-        def whoisontop(node1, node2):
-            if node1.value.top < node2.value.top:
-                return node1, node2
-            else:
-                return node2, node1
+        def ContractiveMoveWouldClash(movingnode, deltaY=0, deltaX=0, ignorenode=None):
+            assert deltaX >0 or deltaY >0
+            return MoveWouldClash(movingnode, -deltaY, -deltaX, ignorenode)
 
         def calcbasics(node1, node2):
+
+            def whoisonleft(node1, node2):
+                if node1.value.left < node2.value.left:
+                    return node1, node2
+                else:
+                    return node2, node1
+    
+            def whoisontop(node1, node2):
+                if node1.value.top < node2.value.top:
+                    return node1, node2
+                else:
+                    return node2, node1
+
             leftnode, rightnode = whoisonleft(node1, node2)
             topnode, bottomnode = whoisontop(node1, node2)
             xoverlap_amount = (leftnode.value.left + leftnode.value.width + MARGIN) - rightnode.value.left
