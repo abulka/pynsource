@@ -53,13 +53,16 @@ class MathLibraryTests(unittest.TestCase):
         self.assertEqual(4, numfixed)
 
 
-    def testMoveLeftPushedBackHorizontally01(self):
+    def _loadinitial1(self):
         initial = """
 {'type':'node', 'id':'D25', 'x':6, 'y':7, 'width':159, 'height':106}
 {'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
 {'type':'node', 'id':'m1', 'x':170, 'y':9, 'width':139, 'height':92}
 """
         self.g.LoadGraphFromStrings(initial)
+
+    def testMoveLeftPushedBackHorizontally01(self):
+        self._loadinitial1()
         
         # move m1 to the left
         node = self.g.findNode('m1')
@@ -74,18 +77,13 @@ class MathLibraryTests(unittest.TestCase):
         self.assertTrue(node.value.top < self.g.findNode('D25').value.bottom)
 
     def testMoveLeftPushedBackDownRight02(self):
-        initial = """
-{'type':'node', 'id':'D25', 'x':6, 'y':7, 'width':159, 'height':106}
-{'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
-{'type':'node', 'id':'m1', 'x':170, 'y':9, 'width':139, 'height':92}
-"""
-        self.g.LoadGraphFromStrings(initial)
+        self._loadinitial1()
         
         # move m1 to the left
         node = self.g.findNode('m1')
         node.value.left, node.value.top = (106, 79)
         
-        # assert m1 has been pushed back to the right
+        # assert m1 has been pushed back to the right but also down
         # assert no overlaps
         were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
         self.assertTrue(were_all_overlaps_removed)
@@ -93,6 +91,29 @@ class MathLibraryTests(unittest.TestCase):
         
         self.assertTrue(node.value.left > self.g.findNode('D13').value.right)
         self.assertTrue(node.value.top > self.g.findNode('D25').value.bottom)
+        
+    def testMoveInsertedVertically1(self):
+        self._loadinitial1()
+        
+        # move m1 to the left
+        node = self.g.findNode('m1')
+        node.value.left, node.value.top = (16,74)
+        
+        # assert m1 has been pushed back to the right but also down
+        # assert no overlaps
+        were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(2, numfixed)
+        
+        #print self.g.GraphToString()
+        
+        self.assertTrue(node.value.top > self.g.findNode('D25').value.bottom)
+        self.assertTrue(node.value.bottom < self.g.findNode('D13').value.top)
+        self.assertTrue(self.g.findNode('D13').value.top > self.g.findNode('D25').value.bottom)
+        self.assertTrue(node.value.left < self.g.findNode('D25').value.right)
+        self.assertTrue(node.value.left < self.g.findNode('D13').value.right)
+        
+        
         
 if __name__ == "__main__":
     unittest.main()
