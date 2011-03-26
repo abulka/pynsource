@@ -50,7 +50,7 @@ class OverlapTests(unittest.TestCase):
         g.addEdge(a, a2)
 
         were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
-        self.assertEqual(4, numfixed)
+        self.assertTrue(were_all_overlaps_removed)
 
     """
     Smarter tests.

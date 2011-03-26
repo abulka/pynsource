@@ -42,40 +42,33 @@ class OverlapRemoval:
                     return node
             return None
 
-        def MoveLeftOk(movingnode, deltaX, ignorenode=None):
-            return movingnode.value.left - deltaX >= 0 and not MoveWouldHitSomething(movingnode, -deltaX, 0, ignorenode)
-
-        def MoveUpOk(movingnode, deltaY, ignorenode=None):
-            return movingnode.value.top - deltaY >= 0 and not MoveWouldHitSomething(movingnode, 0, -deltaY, ignorenode)
-    
         def MoveWouldHitSomething(movingnode, deltaX=0, deltaY=0, ignorenode=None):
             # delta values can be positive or negative
             l, t, r, b = movingnode.GetBounds()
             proposednode = GraphNode(Div('temp', top=t+deltaY, left=l+deltaX, width=r-l, height=b-t))
             return IsHitting(proposednode, ignorenodes=[movingnode, ignorenode])
 
-        def CalcBasicInfo(node1, node2):
-            """
-            Overlap amounts returned are always positive values
-            """
+        def MoveLeftOk(movingnode, deltaX, ignorenode=None):
+            return movingnode.value.left - deltaX >= 0 and not MoveWouldHitSomething(movingnode, -deltaX, 0, ignorenode)
 
-            def whoisonleft(node1, node2):
-                if node1.value.left < node2.value.left:
-                    return node1, node2
-                else:
-                    return node2, node1
+        def MoveUpOk(movingnode, deltaY, ignorenode=None):
+            return movingnode.value.top - deltaY >= 0 and not MoveWouldHitSomething(movingnode, 0, -deltaY, ignorenode)
     
-            def whoisontop(node1, node2):
-                if node1.value.top < node2.value.top:
-                    return node1, node2
-                else:
-                    return node2, node1
+        def SortNodesLrtb(node1, node2):
+            L, R, T, B = 0, 1, 2, 3
+            a = [node1, node2, node1, node2] # guess as to who is l,r,t,b with respect to each other
+            if a[R].value.left < a[L].value.left: a[L], a[R] = a[R], a[L]
+            if a[B].value.top < a[T].value.top:   a[T], a[B] = a[B], a[T]
+            return a[L], a[R], a[T], a[B]
 
-            leftnode, rightnode = whoisonleft(node1, node2)
-            topnode, bottomnode = whoisontop(node1, node2)
-            xoverlap_amount = (leftnode.value.right + MARGIN) - rightnode.value.left
-            yoverlap_amount = (topnode.value.bottom + MARGIN) - bottomnode.value.top
-            return leftnode, rightnode, topnode, bottomnode, abs(xoverlap_amount), abs(yoverlap_amount)
+        def CalcOverlapAmounts(node1, node2):
+            leftnode, rightnode, topnode, bottomnode = SortNodesLrtb(node1, node2)
+            
+            # Overlap amounts returned are always positive values
+            xoverlap_amount = abs(leftnode.value.right + MARGIN - rightnode.value.left)
+            yoverlap_amount = abs(topnode.value.bottom + MARGIN - bottomnode.value.top)
+            
+            return leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount
 
         def dumpproposal(prop):
             return "  moving %s.%s by %s" % (prop['node'].value.id, prop['xory'], prop['amount'])
@@ -94,7 +87,7 @@ class OverlapRemoval:
 
         def GatherProposals(node1, node2, ignorenodes):
             proposals = []
-            leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = CalcBasicInfo(node1, node2)
+            leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = CalcOverlapAmounts(node1, node2)
                         
             print "Overlap %s/%s by %d/%d  (leftnode is %s  topnode is %s)" % (node1.value.id, node2.value.id, xoverlap_amount, yoverlap_amount, leftnode.value.id, topnode.value.id)
 
@@ -116,7 +109,7 @@ class OverlapRemoval:
         
         def GatherProposal2(lastmovedirection, clashingnode, movingnode):
             proposal = None
-            leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = CalcBasicInfo(clashingnode, movingnode)
+            leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = CalcOverlapAmounts(clashingnode, movingnode)
             # check the axis opposite to that I just moved
             if lastmovedirection == 'x' and (yoverlap_amount < xoverlap_amount):  # check instant y movement possibilities
                 if ((movingnode == topnode) and MoveUpOk(movingnode, deltaY=yoverlap_amount)):
