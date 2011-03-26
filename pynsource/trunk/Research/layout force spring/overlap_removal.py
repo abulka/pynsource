@@ -58,10 +58,10 @@ class OverlapRemoval:
             proposals.append({'node':bottomnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':topnode})
         #print self.dumpproposals(proposals)
         
-        proposals = [p for p in proposals if not p['node'] in self.already_moved_nodes]
+        proposals = [p for p in proposals if not p['node'] in self.nodes_already_moved]
         return proposals
     
-    def GatherProposal2(self, lastmovedirection, clashingnode, movingnode):
+    def GatherPostMoveProposal(self, lastmovedirection, clashingnode, movingnode):
         proposal = None
         leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = self.CalcOverlapAmounts(clashingnode, movingnode)
         
@@ -102,11 +102,9 @@ class OverlapRemoval:
 
     def CalcOverlapAmounts(self, node1, node2):
         leftnode, rightnode, topnode, bottomnode = self.SortNodesLrtb(node1, node2)
-        
         # Overlap amounts returned are always positive values
         xoverlap_amount = abs(leftnode.value.right + MARGIN - rightnode.value.left)
         yoverlap_amount = abs(topnode.value.bottom + MARGIN - bottomnode.value.top)
-        
         return leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount
 
     def dumpproposal(self, prop):
@@ -130,7 +128,7 @@ class OverlapRemoval:
             proposal['node'].value.left += proposal['amount']
         else:
             proposal['node'].value.top += proposal['amount']
-        self.already_moved_nodes.append(proposal['node'])
+        self.nodes_already_moved.append(proposal['node'])
 
     def ApplyMinimalProposal(self, proposals):
         amounts = [abs(p['amount']) for p in proposals]
@@ -145,10 +143,10 @@ class OverlapRemoval:
 
     def PostMoveAlgorithm(self, movednode, lastmovedirection):
         # Post Move Algorithm - move the same node again, safely (don't introduce oscillations),
-        # under certain circumstances, for aesthetics, despite already_moved_nodes list
+        # under certain circumstances, for aesthetics, despite nodes_already_moved list
 
         def CheckForPostMoveMove(clashingnode):
-            proposal = self.GatherProposal2(lastmovedirection, clashingnode, movednode)
+            proposal = self.GatherPostMoveProposal(lastmovedirection, clashingnode, movednode)
             if proposal:
                 self.ApplyProposal(proposal)
                 self.total_postmove_fixes += 1
@@ -164,12 +162,17 @@ class OverlapRemoval:
         self.total_expansive_moves = 0
         self.total_postmove_fixes = 0
 
-    def SetStats(self, total_iterations):
-        self.stats['total_iterations'] = total_iterations
+    def SetStats(self, total_cycles, were_all_overlaps_removed):
+        self.stats['warning_msg'] = ""
+        self.stats['total_cycles'] = total_cycles
         self.stats['total_overlaps_found'] = self.total_overlaps_found
         self.stats['total_postmove_fixes'] = self.total_postmove_fixes
         self.stats['total_contractive_moves'] = self.total_contractive_moves
         self.stats['total_expansive_moves'] = self.total_expansive_moves
+        if not were_all_overlaps_removed:
+            self.stats['warning_msg'] = "Exiting with overlaps remaining :-("
+        if self.total_overlaps_found == 0:
+            self.stats['warning_msg'] = "No Overlaps found at all."
 
     def GetStats(self):
         return self.stats
@@ -192,34 +195,30 @@ class OverlapRemoval:
 
                 self.PostMoveAlgorithm(lastmovednode, lastmovedirection)  # Optional nicety
                 
-        return numfixed_thiscycle, found_an_overlap_thiscycle
+        return found_an_overlap_thiscycle, numfixed_thiscycle
     
-    def RemoveOverlaps(self):     # Main method to call
-        total_iterations = 0
-        self.already_moved_nodes = []
+    def ResetBans(self):
+        # Stop oscillation by not moving the same node too much
+        self.nodes_already_moved = []
+        
+    def RemoveOverlaps(self):           # Main method to call
         self.InitStats()
-        for i in range(0, MAX_CYCLES):
-            total_iterations += 1
+        self.ResetBans()
+        for total_cycles in range(1, MAX_CYCLES):
             
-            numfixed_thiscycle, found_an_overlap_thiscycle = self.RunRemovalCycle()
+            found_overlaps, num_overlaps_fixed = self.RunRemovalCycle()
             
-            if not found_an_overlap_thiscycle:
+            if found_overlaps and num_overlaps_fixed == 0:  # found overlaps but none were fixed ! so try resetting bans
+                self.ResetBans()
+                
+            if num_overlaps_fixed > 0:
+                self.gui.stateofthenation()     # refresh gui
+
+            if not found_overlaps:
                 break  # job done
-            else:
-                if numfixed_thiscycle == 0:         # found overlaps but none fixed
-                    self.already_moved_nodes = []   # so reset bans
-                else:
-                    self.gui.stateofthenation()     # refresh gui
                     
-        if self.total_overlaps_found:
-            were_all_overlaps_removed = not found_an_overlap_thiscycle
-            if found_an_overlap_thiscycle:
-                print "Exiting with overlaps remaining :-("
-        else:
-            were_all_overlaps_removed = True
-            print "No Overlaps found at all."
-
-        self.SetStats(total_iterations)
-
-        return were_all_overlaps_removed, self.total_overlaps_found
+        all_overlaps_were_removed = not found_overlaps
+        
+        self.SetStats(total_cycles, all_overlaps_were_removed)
+        return all_overlaps_were_removed
 
