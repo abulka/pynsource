@@ -126,7 +126,7 @@ class OverlapRemoval:
                     proposal = {'node':movingnode, 'xory':'x', 'amount':+xoverlap_amount, 'clashnode':clashingnode}
             return proposal
 
-        def applytrans(proposal):
+        def ApplyProposal(proposal):
             print dumpproposal(proposal)
             if proposal['xory'] == 'x':
                 proposal['node'].value.left += proposal['amount']
@@ -137,13 +137,13 @@ class OverlapRemoval:
             amounts = [abs(p['amount']) for p in proposals]
             lowest_amount = min(amounts)
             proposal = [p for p in proposals if abs(p['amount']) == lowest_amount][0]
-            applytrans(proposal)
+            ApplyProposal(proposal)
             return proposal['node'], proposal['amount'], proposal['xory']
 
-        def ApplyPostMoveMove(lastmovedirection, clashingnode, movednode):
+        def CheckForPostMoveMove(lastmovedirection, clashingnode, movednode):
             proposal = GatherProposal2(lastmovedirection, clashingnode, movednode)
             if proposal:
-                applytrans(proposal)
+                ApplyProposal(proposal)
                 print "  * extra correction to %s" % (movednode.value.id)
                 return True
             return False
@@ -153,18 +153,18 @@ class OverlapRemoval:
         total_contractive_moves = 0
         total_postmove_fixes = 0
         ignorenodes = []
-        numfixedthisround = 0
+        numfixed_thisround = 0
         
         for i in range(0,10):
             total_iterations += 1
-            numfixedthisround = 0
+            numfixed_thisround = 0
 
             self.gui.stateofthenation()
                     
-            foundoverlap = False
+            foundoverlap_thisround = False
             for node1, node2 in GetPermutations(self.graph.nodes):  # a 'round'
                 if Hit(node1, node2):
-                    foundoverlap = True
+                    foundoverlap_thisround = True
                     total_overlaps_found += 1
                     
                     proposals = GatherProposals(node1, node2, ignorenodes)
@@ -174,7 +174,7 @@ class OverlapRemoval:
                     movednode, movedamount, lastmovedirection = ApplyMinimalProposal(proposals)
                     ignorenodes.append(movednode)
 
-                    numfixedthisround += 1
+                    numfixed_thisround += 1
                     if movedamount < 0:
                         total_contractive_moves += 1
                     #self.gui.stateofthenation()
@@ -182,19 +182,19 @@ class OverlapRemoval:
                     # Post Move Algorithm - move the same node again, under certain circumstances, despite ignorenodes list
                     clashingnode = IsHitting(movednode)  # What am I clashing with now?
                     if clashingnode:
-                        if ApplyPostMoveMove(lastmovedirection, clashingnode, movednode):
+                        if CheckForPostMoveMove(lastmovedirection, clashingnode, movednode):
                             total_postmove_fixes += 1
-            if numfixedthisround == 0:
-                if total_iterations > 1:
-                    print "No fixes made last round, clearing bans"
-                ignorenodes = []
-            if not foundoverlap:
-                break  # exit the failsafe for loop, our job is done !
 
+            if not foundoverlap_thisround:
+                break  # job done
+            else:
+                if numfixed_thisround == 0:  # found overlaps but none fixed
+                    ignorenodes = []  # reset bans
+            
         if total_overlaps_found:
             print "Overlaps fixed: %d  total_iterations made: %d  total_postmove_fixes: %d  total_contractive_moves: %d  " % (total_overlaps_found, total_iterations, total_postmove_fixes, total_contractive_moves)
-            were_all_overlaps_removed = not foundoverlap
-            if foundoverlap:
+            were_all_overlaps_removed = not foundoverlap_thisround
+            if foundoverlap_thisround:
                 print "Exiting with overlaps remaining :-("
         else:
             were_all_overlaps_removed = True
