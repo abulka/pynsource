@@ -252,6 +252,28 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureXorder('D25', 'D97', 'm1'))
         self.assertTrue(self._ensureYorder('D98', 'm1'))
         self.assertTrue(self._ensureYorderBottoms('D98', 'D97', 'm1'))
+
+    def test3_2aPushedRefusedButLeftMovedAnyway(self):
+        self._LoadScenario3()
+        
+        # move m1 to the left
+        node = self.g.findNode('m1')
+        node.value.left, node.value.top = (281, 64)
+
+        d97 = self.g.findNode('D97')
+        oldD97pos = (d97.value.left, d97.value.top)
+        
+        # assert m1 has been refused insertion, but left (D97) moved leftwards cos there is room.  m1 snuggled below and to the right.
+        were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(2, numfixed)
+
+        self.assertTrue(self._ensureXorder('D25', 'D97', 'D98'))
+        self.assertTrue(self._ensureXorder('D13', 'D97', 'm1'))
+        self.assertTrue(self._ensureYorder('D25', 'D13'))
+        self.assertTrue(self._ensureYorder('D98', 'm1'))
+        self.assertTrue(self._ensureYorderBottoms('D98', 'D97', 'm1'))
+        self.assertNotEqual(oldD97pos, (d97.value.left, d97.value.top)) # ensure D97 HAS been pushed left
         
     def test3_3InsertedAndTwoPushedRight(self):
         self._LoadScenario3()
@@ -274,18 +296,129 @@ class OverlapTests(unittest.TestCase):
         node = self.g.findNode('m1')
         node.value.left, node.value.top = (91, 64)
         
+        d97 = self.g.findNode('D97')
+        oldD97pos = (d97.value.left, d97.value.top)
+
         # assert m1 has been inserted vertically - one node pushed down, NO nodes pushed right
         were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
         self.assertTrue(were_all_overlaps_removed)
         self.assertEqual(5, numfixed)
 
-        d97 = self.g.findNode('D97')
-        oldD97pos = (d97.value.left, d97.value.top)
         self.assertTrue(self._ensureXorder('D25', 'D97', 'D98'))
         self.assertTrue(self._ensureXorder('m1', 'D97', 'D98'))
         self.assertTrue(self._ensureYorder('D25', 'm1', 'D13'))
         self.assertTrue(self._ensureYorder('D25', 'm1', 'D13'))
         self.assertEqual(oldD97pos, (d97.value.left, d97.value.top)) # ensure D97 hasn't been pushed
-                 
+
+    def test3_5InsertedVerticallyTwoPushedDown(self):
+        self._LoadScenario3()
+        
+        # move m1 to the left
+        node = self.g.findNode('m1')
+        node.value.left, node.value.top = (6, 4)
+        
+        d97 = self.g.findNode('D97')
+        oldD97pos = (d97.value.left, d97.value.top)
+
+        # assert m1 has been inserted vertically - two pushed down
+        were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(2, numfixed)
+
+        self.assertTrue(self._ensureYorder('m1', 'D25', 'D13'))
+        self.assertTrue(self._ensureXorder('m1', 'D97', 'D98'))
+        self.assertTrue(self._ensureXorder('D25', 'D97', 'D98'))
+        self.assertTrue(self._ensureXorder('D13', 'D97', 'D98'))
+        self.assertEqual(oldD97pos, (d97.value.left, d97.value.top)) # ensure D97 hasn't been pushed
+
+    def _LoadScenario4(self):
+        initial = """
+{'type':'node', 'id':'D25', 'x':7, 'y':6, 'width':159, 'height':106}
+{'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
+{'type':'node', 'id':'m1', 'x':6, 'y':214, 'width':139, 'height':92}
+{'type':'node', 'id':'D97', 'x':213, 'y':6, 'width':85, 'height':159}
+{'type':'node', 'id':'D98', 'x':305, 'y':57, 'width':101, 'height':107}
+{'type':'node', 'id':'D50', 'x':149, 'y':184, 'width':242, 'height':112}
+{'type':'node', 'id':'D51', 'x':189, 'y':302, 'width':162, 'height':66}
+"""
+        self.g.LoadGraphFromStrings(initial)  
+
+    def test4_1InsertedTwoPushedRightTwoPushedDown(self):
+        self._LoadScenario4()
+        
+        # move m1 to the left
+        node = self.g.findNode('m1')
+        node.value.left, node.value.top = (136, 99)
+        
+        d97 = self.g.findNode('D97')
+        d98 = self.g.findNode('D98')
+        d50 = self.g.findNode('D50')
+        d51 = self.g.findNode('D51')
+        oldD97pos = (d97.value.left, d97.value.top)
+        oldD98pos = (d98.value.left, d98.value.top)
+        oldD50pos = (d50.value.left, d50.value.top)
+        oldD51pos = (d51.value.left, d51.value.top)
+
+        # assert m1 has been inserted - two pushed right, two pushed down
+        were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(5, numfixed)
+
+        self.assertTrue(self._ensureXorder('D13', 'm1', 'D97', 'D98'))
+        self.assertTrue(self._ensureXorder('D25', 'D97', 'D98'))
+        self.assertTrue(self._ensureYorder('D25', 'D13', 'D50', 'D51'))
+        self.assertTrue(self._ensureYorder('D25', 'm1', 'D50', 'D51'))
+        self.assertTrue(self._ensureYorder('D97', 'D50', 'D51'))
+        self.assertTrue(self._ensureYorder('D98', 'D50', 'D51'))
+        self.assertTrue(self._ensureXorder('D13', 'D50'))
+        self.assertTrue(self._ensureXorder('D13', 'D51'))
+        self.assertNotEqual(oldD97pos, (d97.value.left, d97.value.top)) # ensure D97 HAS been pushed
+        self.assertNotEqual(oldD98pos, (d98.value.left, d98.value.top)) # ensure D98 HAS been pushed
+        self.assertNotEqual(oldD50pos, (d50.value.left, d50.value.top)) # ensure D50 HAS been pushed
+        self.assertNotEqual(oldD51pos, (d51.value.left, d51.value.top)) # ensure D51 HAS been pushed
+
+    def test4_2InsertedTwoPushedRightThreePushedDown(self):
+        self._LoadScenario4()
+        
+        # move m1 to the left
+        node = self.g.findNode('m1')
+        node.value.left, node.value.top = (101, 99)
+        
+        d97 = self.g.findNode('D97')
+        d98 = self.g.findNode('D98')
+        d50 = self.g.findNode('D50')
+        d51 = self.g.findNode('D51')
+        d13 = self.g.findNode('D13')
+        oldD97pos = (d97.value.left, d97.value.top)
+        oldD98pos = (d98.value.left, d98.value.top)
+        oldD50pos = (d50.value.left, d50.value.top)
+        oldD51pos = (d51.value.left, d51.value.top)
+        oldD13pos = (d13.value.left, d13.value.top)
+
+        # assert m1 has been inserted - two pushed right, two pushed down
+        were_all_overlaps_removed, numfixed = self.overlap_remover.remove_overlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(6, numfixed)
+
+        self.assertFalse(self._ensureXorder('D13', 'm1', 'D97', 'D98')) # not true anymore, m1 not pushed to the right so much 
+        self.assertFalse(self._ensureYorder('D25', 'D13', 'D50', 'D51')) # not true anymore,
+        
+        self.assertTrue(self._ensureXorder('D25', 'D97', 'D98'))
+        self.assertTrue(self._ensureXorder('D13', 'D97', 'D98'))
+        self.assertTrue(self._ensureXorder('D13', 'D50'))
+        self.assertTrue(self._ensureXorder('D13', 'D51'))
+        
+        self.assertTrue(self._ensureYorder('D25', 'm1', 'D13', 'D51'))
+        self.assertTrue(self._ensureYorder('D25', 'm1', 'D50', 'D51'))
+        self.assertTrue(self._ensureYorder('D97', 'D50', 'D51'))
+        self.assertTrue(self._ensureYorder('D98', 'D50', 'D51'))
+        self.assertTrue(self._ensureYorderBottoms('D25', 'D97', 'm1', 'D13', 'D50', 'D51'))
+
+        self.assertNotEqual(oldD97pos, (d97.value.left, d97.value.top)) # ensure D97 HAS been pushed
+        self.assertNotEqual(oldD98pos, (d98.value.left, d98.value.top)) # ensure D98 HAS been pushed
+        self.assertNotEqual(oldD50pos, (d50.value.left, d50.value.top)) # ensure D50 HAS been pushed
+        self.assertNotEqual(oldD51pos, (d51.value.left, d51.value.top)) # ensure D51 HAS been pushed
+        self.assertNotEqual(oldD13pos, (d13.value.left, d13.value.top)) # ensure D13 HAS been pushed
+                           
 if __name__ == "__main__":
     unittest.main()
