@@ -109,21 +109,16 @@ class GraphShapeCanvas(ogl.ShapeCanvas):
     def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
         # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
         self.graphrendererogl.DeselectAllShapes()
+
+from coordinate_mapper import CoordinateMapper
         
 class GraphRendererOgl:
     def __init__(self, graph, oglcanvas):
         self.graph = graph
         self.oglcanvas = oglcanvas
         self.oglcanvas.graphrendererogl = self
+        self.coordmapper = CoordinateMapper(self.graph, self.oglcanvas.GetSize())
 
-        self.radius = 10
-
-        width, height = oglcanvas.GetSize()
-        print "oglcanvas.GetSize()", width, height
-        self.factorX = (width/2 ) / (graph.layoutMaxX - graph.layoutMinX)
-        self.factorY = (height/2 ) / (graph.layoutMaxY - graph.layoutMinY)
-        print "layoutMaxMinXY...", graph.layoutMaxX, graph.layoutMinX, graph.layoutMaxY, graph.layoutMinY
-        
         self.oglcanvas.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
         self.oglcanvas.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)
         self.oglcanvas.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
@@ -133,26 +128,12 @@ class GraphRendererOgl:
 
         self.overlap_remover = OverlapRemoval(self.graph, gui=self)
 
-    def translate(self, point):
-        return [
-          (point[0] - self.graph.layoutMinX) * self.factorX + self.radius,
-          (point[1] - self.graph.layoutMinY) * self.factorY + self.radius
-        ]
+    def AllToLayoutCoords(self):
+            self.coordmapper.AllToLayoutCoords()
 
-    def rotate(self, point, length, angle):
-        dx = length * Math.cos(angle)
-        dy = length * Math.sin(angle)
-        return [point[0]+dx, point[1]+dy]
+    def AllToWorldCoords(self):
+            self.coordmapper.AllToWorldCoords()
 
-        
-    def translate_node_coords(self):
-        for node in self.graph.nodes:
-            point = self.translate([node.layoutPosX, node.layoutPosY])
-            print "TRANSLATION", [node.layoutPosX, node.layoutPosY], point
-            node.top  = int(point[1])
-            node.left = int(point[0])
-
-       
     def DeselectAllShapes(self):
         selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
         if selected:
@@ -162,7 +143,6 @@ class GraphRendererOgl:
             canvas.PrepareDC(dc)
             s.Select(False, dc)
             canvas.Refresh(False)   # Need this or else Control points ('handles') leave blank holes      
-
    
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
@@ -364,7 +344,7 @@ class GraphRendererOgl:
         import time
         
         if tranlatecoords:
-            self.translate_node_coords()
+            self.AllToWorldCoords()
 
         for i in range(0, len(self.graph.nodes)):
             self.drawNode(self.graph.nodes[i])
@@ -437,7 +417,7 @@ class GraphRendererOgl:
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
         
-        #for node in self.graph.nodes:    # TODO am still moveing nodes in the pynsourcegui version?
+        #for node in self.graph.nodes:    # TODO am still moving nodes in the pynsourcegui version?
         #    shape = node.shape
         #    shape.Move(dc, shape.GetX(), shape.GetY())
         diagram.Clear(dc)
@@ -445,11 +425,6 @@ class GraphRendererOgl:
 
      
     def drawNode(self, node):
-        #point = self.translate([node.layoutPosX, node.layoutPosY])
-        #node.top      = point[1]
-        #node.left     = point[0]
-               
-        #print node
         shape = ogl.RectangleShape( node.width, node.height )
         shape.AddText(node.id)
         setpos(shape, node.left, node.top)
@@ -463,33 +438,17 @@ class GraphRendererOgl:
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
-        
        
     def drawEdge(self, edge):
-        source = self.translate([edge['source'].layoutPosX, edge['source'].layoutPosY])
-        target = self.translate([edge['target'].layoutPosX, edge['target'].layoutPosY])
-
         line = ogl.LineShape()
         line.SetCanvas(self.oglcanvas)
         line.SetPen(wx.BLACK_PEN)
         line.SetBrush(wx.BLACK_BRUSH)
         line.MakeLineControlPoints(2)
-        
+       
         fromShape = edge['source'].shape
         toShape = edge['target'].shape
         fromShape.AddLine(line, toShape)
-        #line.SetEnds(fromShape.GetX(), fromShape.GetY(), toShape.GetX(), toShape.GetY())
-        
-        """
-        Getting splines to work is a nightmare
-        Seems to reply on there being shape._lineControlPoints which are sometimes zapped by ogl
-        during recalculations etc. which means spline drawing can fail.
-        """
-        #print "GetLineControlPoints", line.GetLineControlPoints()
-        #if line.GetLineControlPoints() >= 2:
-        #    line.SetSpline(True)  # uses GetLineControlPoints - ensure there are at least 2 !
-        
-        
         self.oglcanvas.GetDiagram().AddShape(line)
         line.Show(True)        
         
