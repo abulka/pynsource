@@ -56,7 +56,6 @@ class OverlapRemoval:
             proposals.append({'node':topnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':bottomnode})
         else:
             proposals.append({'node':bottomnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':topnode})
-        #print self.dumpproposals(proposals)
         
         proposals = [p for p in proposals if not p['node'] in self.nodes_already_moved]
         return proposals
@@ -107,23 +106,7 @@ class OverlapRemoval:
         yoverlap_amount = abs(topnode.value.bottom + MARGIN - bottomnode.value.top)
         return leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount
 
-    def dumpproposal(self, prop):
-        return "  moving %s.%s by %s" % (prop['node'].value.id, prop['xory'], prop['amount'])
-        
-    def dumpproposals(self, props):
-        msg = "  Proposals: "
-        for p in props:
-            msg += self.dumpproposal(p)
-        return msg
-        
-    def dumpignorelist(self):
-        msg = ""
-        for n in ignorenodes:
-            msg += " %s," % (n.value.id)
-        #print "  ignore list now ", msg
-
     def ApplyProposal(self, proposal):
-        #print self.dumpproposal(proposal)
         if proposal['xory'] == 'x':
             proposal['node'].value.left += proposal['amount']
         else:

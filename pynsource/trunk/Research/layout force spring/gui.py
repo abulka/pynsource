@@ -4,6 +4,7 @@ import time
 import thread
 
 from graph import *
+from layout_spring import GraphLayoutSpring
 from overlap_removal import OverlapRemoval
 import random
 
@@ -116,7 +117,6 @@ class GraphRendererOgl:
         self.oglcanvas.graphrendererogl = self
 
         self.radius = 10
-        self.arrowAngle = Math.PI()/10
 
         width, height = oglcanvas.GetSize()
         self.factorX = (width/2 ) / (graph.layoutMaxX - graph.layoutMinX)
