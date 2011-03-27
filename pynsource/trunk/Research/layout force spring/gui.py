@@ -147,14 +147,27 @@ class GraphRendererOgl:
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
         #if event.ShiftDown():
+
         if keycode == wx.WXK_DOWN:
             print "DOWN"
-        elif keycode == wx.WXK_RIGHT:
-            print "RIGHT"
-        elif keycode == wx.WXK_LEFT:
-            print "LEFT"
+            self.ReLayout(keep_current_positions=True)
+
         elif keycode == wx.WXK_UP:
             print "UP"
+            self.ReLayout(keep_current_positions=False)
+            
+        elif keycode == wx.WXK_RIGHT:
+            print "RIGHT"
+            self.ReLayout(keep_current_positions=False)
+            self.ReLayout(keep_current_positions=True)
+            self.ReLayout(keep_current_positions=True)
+            self.ReLayout(keep_current_positions=True)
+            self.ReLayout(keep_current_positions=True)
+            self.ReLayout(keep_current_positions=True)
+
+        elif keycode == wx.WXK_LEFT:
+            print "LEFT"
+            
         elif keycode == wx.WXK_DELETE:
             selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
             if selected:
@@ -186,6 +199,19 @@ class GraphRendererOgl:
             
         event.Skip()
 
+    def ReLayout(self, keep_current_positions=False):
+        # layout again
+        print "spring layout again!"
+        self.AllToLayoutCoords()
+
+        layouter = GraphLayoutSpring(self.graph)    # need to keep this around
+        layouter.layout(keep_current_positions)
+        
+        self.AllToWorldCoords()
+        self.stage2() # does overlap removal and stateofthenation
+        #self.stateofthenation()
+        # self.draw() - this recreates everything again!! - should rename
+        
     def OnRightButtonMenu(self, event):   # Menu
 
         x, y = event.GetPosition()
@@ -316,7 +342,7 @@ class GraphRendererOgl:
         self.graph.LoadGraphFromStrings(filedata)
                 
         # build view from model
-        self.draw(tranlatecoords=False)
+        self.draw(translatecoords=False)
         
         # refresh view
         self.oglcanvas.GetDiagram().ShowAll(1) # need this, yes
@@ -340,16 +366,16 @@ class GraphRendererOgl:
         self.stage2()
         print self.overlap_remover.GetStats()
 
-    def stage1(self, tranlatecoords=True):
+    def stage1(self, translatecoords=True):
         import time
         
-        if tranlatecoords:
+        if translatecoords:
             self.AllToWorldCoords()
 
-        for i in range(0, len(self.graph.nodes)):
-            self.drawNode(self.graph.nodes[i])
-        for i in range(0, len(self.graph.edges)):
-            self.drawEdge(self.graph.edges[i])
+        for node in self.graph.nodes:
+            self.drawNode(node)
+        for edge in self.graph.edges:
+            self.drawEdge(edge)
 
         self.Redraw()
         #time.sleep(1)
@@ -367,8 +393,8 @@ class GraphRendererOgl:
         #time.sleep(0.2)
         
         
-    def draw(self, tranlatecoords=True):
-        self.stage1(tranlatecoords=tranlatecoords)
+    def draw(self, translatecoords=True):
+        self.stage1(translatecoords=translatecoords)
         #thread.start_new_thread(self.DoSomeLongTask, ())
 
 

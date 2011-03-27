@@ -16,15 +16,15 @@ class GraphLayoutSpring:
         self.c = 0.01
         self.maxVertexMovement = 0.5
        
-    def layout(self):
-        self.layoutPrepare()
+    def layout(self, keep_current_positions=False):
+        if not keep_current_positions:
+            self.layoutPrepare()
         for i in range(0, self.iterations):
             self.layoutIteration()
         self.layoutCalcBounds()
        
     def layoutPrepare(self):
-        for i in range(0, len(self.graph.nodes)):
-            node = self.graph.nodes[i]
+        for node in self.graph.nodes:
             node.layoutPosX = 0
             node.layoutPosY = 0
             node.layoutForceX = 0
@@ -36,9 +36,9 @@ class GraphLayoutSpring:
         miny = float("inf")
         maxy = float("-inf")
 
-        for i in range(0, len(self.graph.nodes)):
-            x = self.graph.nodes[i].layoutPosX
-            y = self.graph.nodes[i].layoutPosY
+        for node in self.graph.nodes:
+            x = node.layoutPosX
+            y = node.layoutPosY
                                    
             if(x > maxx): maxx = x
             if(x < minx): minx = x

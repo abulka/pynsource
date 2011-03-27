@@ -75,7 +75,7 @@ if __name__ == '__main__':
     r = GraphRendererBasic(g, WorldCanvas(784, 739))
 
     r.AllToWorldCoords()
-    r.draw();
+    r.draw()
 
     # move some shapes in the real world
     a = g.FindNodeById('A')
@@ -84,14 +84,13 @@ if __name__ == '__main__':
     
     # Gonna do another layout (after having just done a world draw) so need to update the layout positions
     r.AllToLayoutCoords()
-    
     print "layout pass 3"
     layouter.layout()
     dump()
 
     # gonna do another draw (after having just done a layout), so need to remap
     r.AllToWorldCoords()
-    r.draw();
+    r.draw()
 
     print 'Done'
 
