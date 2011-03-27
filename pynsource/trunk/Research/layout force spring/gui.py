@@ -179,7 +179,7 @@ class GraphRendererOgl:
                 print 'delete', shape.node.id
 
                 # model
-                self.graph.deleteNode(shape.node.id)
+                self.graph.DeleteNodeById(shape.node.id)
 
                 # view
                 self.DeselectAllShapes()
@@ -192,10 +192,10 @@ class GraphRendererOgl:
             dialog = wx.TextEntryDialog ( None, 'Enter an id string:', 'Create a new node', id )
             if dialog.ShowModal() == wx.ID_OK:
                 id = dialog.GetValue()
-                if self.graph.findNode(id):
+                if self.graph.FindNodeById(id):
                     id += str(random.randint(1,9999))
                 node = GraphNode(id, random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160))
-                node = self.graph.addNode(node)
+                node = self.graph.AddNode(node)
                 self.drawNode(node)
                 node.shape.Show(True)
                 self.stateofthenation()
@@ -350,7 +350,7 @@ class GraphRendererOgl:
         self.oglcanvas.GetDiagram().Clear(dc)   # only ends up calling dc.Clear() - I wonder if this clears the screen?
         
         # clear model
-        self.graph.clear()
+        self.graph.Clear()
         
             
     def OnWheelZoom(self, event):
@@ -518,19 +518,19 @@ class AppFrame(wx.Frame):
         a = GraphNode('A', 0, 0, 250, 250)
         a1 = GraphNode('A1', 0, 0)
         a2 = GraphNode('A2', 0, 0)
-        g.addEdge(a, a1)
-        g.addEdge(a, a2)
+        g.AddEdge(a, a1)
+        g.AddEdge(a, a2)
 
         b = GraphNode('B', 0, 0)
         b1 = GraphNode('B1', 0, 0)
         b2 = GraphNode('B2', 0, 0)
-        g.addEdge(b, b1)
-        g.addEdge(b, b2)
+        g.AddEdge(b, b1)
+        g.AddEdge(b, b2)
 
         b21 = GraphNode('B21', 0, 0)
         b22 = GraphNode('B22', 0, 0, 100, 200)
-        g.addEdge(b2, b21)
-        g.addEdge(b2, b22)
+        g.AddEdge(b2, b21)
+        g.AddEdge(b2, b22)
 
         c = GraphNode('c', 0, 0)
         c1 = GraphNode('c1', 0, 0)
@@ -538,16 +538,16 @@ class AppFrame(wx.Frame):
         c3 = GraphNode('c3', 0, 0)
         c4 = GraphNode('c4', 0, 0)
         c5 = GraphNode('c5', 0, 0, 60, 120)
-        g.addEdge(c, c1)
-        g.addEdge(c, c2)
-        g.addEdge(c, c3)
-        g.addEdge(c, c4)
-        g.addEdge(c, c5)
-        g.addEdge(a, c)
+        g.AddEdge(c, c1)
+        g.AddEdge(c, c2)
+        g.AddEdge(c, c3)
+        g.AddEdge(c, c4)
+        g.AddEdge(c, c5)
+        g.AddEdge(a, c)
         
-        g.addEdge(b2, c)
-        g.addEdge(b2, c5)
-        g.addEdge(a, c5)
+        g.AddEdge(b2, c)
+        g.AddEdge(b2, c5)
+        g.AddEdge(a, c5)
 
         layouter = GraphLayoutSpring(g)
         layouter.layout()

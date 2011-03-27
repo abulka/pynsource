@@ -55,7 +55,7 @@ if __name__ == '__main__':
     
     n1 = GraphNode('A', 0, 0, 200, 200)
     n2 = GraphNode('B', 0, 0, 200, 200)
-    g.addEdge(n1, n2)
+    g.AddEdge(n1, n2)
     
     layouter = GraphLayoutSpring(g)
     layouter.layout()

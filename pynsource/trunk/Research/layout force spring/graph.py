@@ -3,9 +3,9 @@
 
 class Graph:
     def __init__(self):
-        self.clear()
+        self.Clear()
         
-    def clear(self):
+    def Clear(self):
         self.nodeSet = {}
         self.nodes = []
         self.edges = []
@@ -15,18 +15,18 @@ class Graph:
         self.layoutMinY = 0
         self.layoutMaxY = 0
         
-    def addNode(self, node):
-        if not self.findNode(node.id):
+    def AddNode(self, node):
+        if not self.FindNodeById(node.id):
             self.nodeSet[node.id] = node
             self.nodes.append(node)
         return node
 
-    def addEdge(self, source_node, target_node):
+    def AddEdge(self, source_node, target_node):
         # Uniqueness of this edge relationship must be ensured by caller
         
         # If node hasn't been added, then add it now
-        if not self.findNode(source_node.id): self.addNode(source_node)
-        if not self.findNode(target_node.id): self.addNode(target_node)
+        if not self.FindNodeById(source_node.id): self.AddNode(source_node)
+        if not self.FindNodeById(target_node.id): self.AddNode(target_node)
             
         edge = {'source': source_node, 'target': target_node}
         self.edges.append(edge)
@@ -41,16 +41,13 @@ class Graph:
                 self.edges.remove(edge)
 
     # These next methods take id as parameters, not nodes.
-    # TODO Rename these so this is clear.
     
-    def findNode(self, id, autocreate=False):    # FindNodeById
+    def FindNodeById(self, id):
         node = self.nodeSet.get(id, None)
-        #if not node and autocreate:
-        #    node = self.addNode(GraphNode(id, 0, 0))
         return node
 
-    def deleteNode(self, id):                   # DeleteNodeById
-        node = self.findNode(id)
+    def DeleteNodeById(self, id):
+        node = self.FindNodeById(id)
         if node:
             self.DeleteNode(node)
         
@@ -70,19 +67,19 @@ class Graph:
             data = eval(data)
             if data['type'] == 'node':
                 node = GraphNode(data['id'], data['x'], data['y'], data['width'], data['height'])
-                self.addNode(node)
+                self.AddNode(node)
             elif data['type'] == 'edge':
                 source_id = data['source']
                 target_id = data['target']
-                sourcenode = self.findNode(source_id)
-                targetnode = self.findNode(target_id)
+                sourcenode = self.FindNodeById(source_id)
+                targetnode = self.FindNodeById(target_id)
                 if not sourcenode:
                     print "Couldn't load source from persistence", source_id
                     continue
                 if not targetnode:
                     print "Couldn't load target from persistence", target_id
                     continue
-                self.addEdge(sourcenode, targetnode)  # addEdge takes node objects as parameters
+                self.AddEdge(sourcenode, targetnode)  # AddEdge takes node objects as parameters
 
     def GraphToString(self):
         nodes = ""
@@ -125,22 +122,7 @@ class GraphNode:
         
     def __str__(self):
         return "Node %s: x,y (%d, %d) w,h (%d, %d)" % (self.id, self.left, self.top, self.width, self.height)
-        
-#class Div:
-#    def __init__(self, id, top, left, width=60, height=60):  # TODO: top, left should be left, top
-#        self.id = id
-#        self.top = top
-#        self.left = left
-#        self.width=width
-#        self.height=height
-#    
-#    def get_bottom(self):
-#        return self.top + self.height
-#    def get_right(self):
-#        return self.left + self.width
-#    bottom = property(get_bottom)
-#    right = property(get_right)
-    
+   
 
 if __name__ == '__main__':
 
@@ -148,7 +130,7 @@ if __name__ == '__main__':
     
     n1 = GraphNode('A', 0, 0, 200, 200)
     n2 = GraphNode('B', 0, 0, 200, 200)
-    g.addEdge(n1, n2)
+    g.AddEdge(n1, n2)
     
     for node in g.nodes:
         print node, "layout info:", (node.layoutPosX, node.layoutPosY)
@@ -158,7 +140,7 @@ if __name__ == '__main__':
     assert len(g.nodes) == 2
     assert len(g.nodeSet.keys()) == 2
     assert len(g.edges) == 1
-    g.deleteNode('B')
+    g.DeleteNodeById('B')
     assert len(g.nodes) == 1
     assert len(g.nodeSet.keys()) == 1
     assert len(g.edges) == 0
@@ -168,7 +150,7 @@ if __name__ == '__main__':
 {'type':'node', 'id':'c1', 'x':130, 'y':174, 'width':60, 'height':120}
 {'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1'}
     """
-    g.clear()
+    g.Clear()
     assert len(g.nodes) == 0
     assert g.GraphToString().strip() == ""
     

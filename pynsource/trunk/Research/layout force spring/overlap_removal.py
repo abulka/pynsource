@@ -82,6 +82,7 @@ class OverlapRemoval:
 
     def MoveWouldHitSomething(self, movingnode, deltaX=0, deltaY=0, ignorenode=None):
         # delta values can be positive or negative
+        # TODO make this take into account the margin?  Sometimes get very close nodes.
         l, t, r, b = movingnode.GetBounds()
         proposednode = GraphNode('temp', top=t+deltaY, left=l+deltaX, width=r-l, height=b-t)
         return self.IsHitting(proposednode, ignorenodes=[movingnode, ignorenode])
