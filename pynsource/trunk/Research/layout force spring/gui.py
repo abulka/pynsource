@@ -119,9 +119,11 @@ class GraphRendererOgl:
         self.radius = 10
 
         width, height = oglcanvas.GetSize()
+        print "oglcanvas.GetSize()", width, height
         self.factorX = (width/2 ) / (graph.layoutMaxX - graph.layoutMinX)
         self.factorY = (height/2 ) / (graph.layoutMaxY - graph.layoutMinY)
-
+        print "layoutMaxMinXY...", graph.layoutMaxX, graph.layoutMinX, graph.layoutMaxY, graph.layoutMinY
+        
         self.oglcanvas.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
         self.oglcanvas.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)
         self.oglcanvas.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
@@ -146,6 +148,7 @@ class GraphRendererOgl:
     def translate_node_coords(self):
         for node in self.graph.nodes:
             point = self.translate([node.layoutPosX, node.layoutPosY])
+            print "TRANSLATION", [node.layoutPosX, node.layoutPosY], point
             node.top  = int(point[1])
             node.left = int(point[0])
 
