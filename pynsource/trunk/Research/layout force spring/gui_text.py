@@ -19,8 +19,8 @@ class GraphRendererBasic:
     def translate_all_node_coords(self):
         for node in self.graph.nodes:
             point = self.translate([node.layoutPosX, node.layoutPosY])
-            node.value.top      = point[1]
-            node.value.left     = point[0]
+            node.top      = point[1]
+            node.left     = point[0]
 
     def draw(self):
         self.translate_all_node_coords()
@@ -32,8 +32,8 @@ class GraphRendererBasic:
 
     def drawNode(self, node):
         #point = self.translate([node.layoutPosX, node.layoutPosY])
-        #node.value.top      = point[1]
-        #node.value.left     = point[0]
+        #node.top      = point[1]
+        #node.left     = point[0]
               
         print node
        
@@ -49,19 +49,19 @@ if __name__ == '__main__':
 
     from graph import *
     from layout_spring import GraphLayoutSpring
-    from overlap_removal import OverlapRemoval
+    #from overlap_removal import OverlapRemoval
 
     g = Graph()
     
-    n1 = Div('A', 0, 0, 200, 200)
-    n2 = Div('B', 0, 0, 200, 200)
+    n1 = GraphNode('A', 0, 0, 200, 200)
+    n2 = GraphNode('B', 0, 0, 200, 200)
     g.addEdge(n1, n2)
     
     layouter = GraphLayoutSpring(g)
     layouter.layout()
     
     for node in g.nodes:
-        print node.value.id, (node.layoutPosX, node.layoutPosY)
+        print node, "layout info:", (node.layoutPosX, node.layoutPosY)
     
     class Canvas:
         def __init__(self, width, height):

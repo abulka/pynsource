@@ -7,10 +7,10 @@
 # you desire and then run an overlap removal algorithm afterwards which
 # should slightly move the vertices around to remove overlap.
 
-from graph import GraphNode, Div
+from graph import GraphNode
 
 MARGIN = 5
-MAX_CYCLES = 10
+MAX_CYCLES = 20
 
 class OverlapRemoval:
     
@@ -27,10 +27,10 @@ class OverlapRemoval:
         return result
 
     def Hit(self, node1, node2):
-        l = max(node1.value.left,   node2.value.left)
-        r = min(node1.value.right,  node2.value.right)
-        t = max(node1.value.top,    node2.value.top)
-        b = min(node1.value.bottom, node2.value.bottom)
+        l = max(node1.left,   node2.left)
+        r = min(node1.right,  node2.right)
+        t = max(node1.top,    node2.top)
+        b = min(node1.bottom, node2.bottom)
         return (r>l) and (b>t)            
 
     def IsHitting(self, currnode, ignorenode=None, ignorenodes=[]):
@@ -45,7 +45,7 @@ class OverlapRemoval:
         proposals = []
         leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = self.CalcOverlapAmounts(node1, node2)
                     
-        print "Overlap %s/%s by %d/%d  (leftnode is %s  topnode is %s)" % (node1.value.id, node2.value.id, xoverlap_amount, yoverlap_amount, leftnode.value.id, topnode.value.id)
+        print "Overlap %s/%s by %d/%d  (leftnode is %s  topnode is %s)" % (node1.id, node2.id, xoverlap_amount, yoverlap_amount, leftnode.id, topnode.id)
 
         if self.MoveLeftOk(leftnode, deltaX=xoverlap_amount, ignorenode=rightnode):
             proposals.append({'node':leftnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':rightnode})
@@ -83,34 +83,34 @@ class OverlapRemoval:
     def MoveWouldHitSomething(self, movingnode, deltaX=0, deltaY=0, ignorenode=None):
         # delta values can be positive or negative
         l, t, r, b = movingnode.GetBounds()
-        proposednode = GraphNode(Div('temp', top=t+deltaY, left=l+deltaX, width=r-l, height=b-t))
+        proposednode = GraphNode('temp', top=t+deltaY, left=l+deltaX, width=r-l, height=b-t)
         return self.IsHitting(proposednode, ignorenodes=[movingnode, ignorenode])
 
     def MoveLeftOk(self, movingnode, deltaX, ignorenode=None):
-        return movingnode.value.left - deltaX >= 0 and not self.MoveWouldHitSomething(movingnode, -deltaX, 0, ignorenode)
+        return movingnode.left - deltaX >= 0 and not self.MoveWouldHitSomething(movingnode, -deltaX, 0, ignorenode)
 
     def MoveUpOk(self, movingnode, deltaY, ignorenode=None):
-        return movingnode.value.top - deltaY >= 0 and not self.MoveWouldHitSomething(movingnode, 0, -deltaY, ignorenode)
+        return movingnode.top - deltaY >= 0 and not self.MoveWouldHitSomething(movingnode, 0, -deltaY, ignorenode)
 
     def SortNodesLrtb(self, node1, node2):
         L, R, T, B = 0, 1, 2, 3
         a = [node1, node2, node1, node2] # guess as to who is l,r,t,b with respect to each other
-        if a[R].value.left < a[L].value.left: a[L], a[R] = a[R], a[L]
-        if a[B].value.top < a[T].value.top:   a[T], a[B] = a[B], a[T]
+        if a[R].left < a[L].left: a[L], a[R] = a[R], a[L]
+        if a[B].top < a[T].top:   a[T], a[B] = a[B], a[T]
         return a[L], a[R], a[T], a[B]
 
     def CalcOverlapAmounts(self, node1, node2):
         leftnode, rightnode, topnode, bottomnode = self.SortNodesLrtb(node1, node2)
         # Overlap amounts returned are always positive values
-        xoverlap_amount = abs(leftnode.value.right + MARGIN - rightnode.value.left)
-        yoverlap_amount = abs(topnode.value.bottom + MARGIN - bottomnode.value.top)
+        xoverlap_amount = abs(leftnode.right + MARGIN - rightnode.left)
+        yoverlap_amount = abs(topnode.bottom + MARGIN - bottomnode.top)
         return leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount
 
     def ApplyProposal(self, proposal):
         if proposal['xory'] == 'x':
-            proposal['node'].value.left += proposal['amount']
+            proposal['node'].left += proposal['amount']
         else:
-            proposal['node'].value.top += proposal['amount']
+            proposal['node'].top += proposal['amount']
         self.nodes_already_moved.append(proposal['node'])
 
     def ApplyMinimalProposal(self, proposals):
@@ -133,7 +133,7 @@ class OverlapRemoval:
             if proposal:
                 self.ApplyProposal(proposal)
                 self.total_postmove_fixes += 1
-                #print "  * extra correction to %s" % (movednode.value.id)
+                #print "  * extra correction to %s" % (movednode.id)
 
         clashingnode = self.IsHitting(movednode)  # What am I clashing with now?
         if clashingnode:

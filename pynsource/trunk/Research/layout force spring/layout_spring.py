@@ -3,7 +3,7 @@
 # Ported and Adapted from Graph::Layouter::Spring in
 #    http://search.cpan.org/~pasky/Graph-Layderer-0.02/
 
-from graph import GraphNode, Div
+from graph import GraphNode
 import random
 import math
 
@@ -128,14 +128,15 @@ if __name__ == '__main__':
 
     g = Graph()
     
-    n1 = Div('A', 0, 0, 200, 200)
-    n2 = Div('B', 0, 0, 200, 200)
+    n1 = GraphNode('A', 0, 0, 200, 200)
+    n2 = GraphNode('B', 0, 0, 200, 200)
     g.addEdge(n1, n2)
     
     layouter = GraphLayoutSpring(g)
     layouter.layout()
-    
+
     for node in g.nodes:
-        print node.value.id, (node.layoutPosX, node.layoutPosY)
+        print node, "layout info:", (node.layoutPosX, node.layoutPosY)
+    
     
     print 'Done'

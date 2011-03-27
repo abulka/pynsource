@@ -4,7 +4,7 @@ import sys
 sys.path.append("../Research/layout force spring")
 
 from overlap_removal import OverlapRemoval
-from graph import Graph, GraphNode, Div
+from graph import Graph, GraphNode
 import pprint
         
 class OverlapTests(unittest.TestCase):
@@ -23,32 +23,32 @@ class OverlapTests(unittest.TestCase):
 
     def test0_1OneNode(self):
         g = self.g
-        g.addNode(Div('A', 0, 0, 250, 250))
+        g.addNode(GraphNode('A', 0, 0, 250, 250))
 
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
         self.assertEqual(0, self.overlap_remover.GetStats()['total_overlaps_found'])
 
     def test0_2TwoNode_notoverlapping(self):
         g = self.g
-        g.addNode(Div('A', 0, 0, 250, 250))
-        g.addNode(Div('B', 260, 0, 250, 250))
+        g.addNode(GraphNode('A', 0, 0, 250, 250))
+        g.addNode(GraphNode('B', 260, 0, 250, 250))
 
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
         self.assertEqual(0, self.overlap_remover.GetStats()['total_overlaps_found'])
 
     def test0_3TwoNode_overlapping(self):
         g = self.g
-        g.addNode(Div('A', 0, 0, 250, 250))
-        g.addNode(Div('B', 200, 0, 250, 250))
+        g.addNode(GraphNode('A', 0, 0, 250, 250))
+        g.addNode(GraphNode('B', 200, 0, 250, 250))
 
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
         self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
 
     def test0_4OverlapRemoverCreation(self):
         g = self.g
-        a = Div('A', 0, 0, 250, 250)
-        a1 = Div('A1', 0, 0)
-        a2 = Div('A2', 0, 0)
+        a = GraphNode('A', 0, 0, 250, 250)
+        a1 = GraphNode('A1', 0, 0)
+        a2 = GraphNode('A2', 0, 0)
         g.addEdge(a, a1)
         g.addEdge(a, a2)
 
@@ -64,7 +64,7 @@ class OverlapTests(unittest.TestCase):
         nodes = [self.g.findNode(id) for id in args]
         assert len(nodes) >= 2
         for i in range(0,len(nodes)-1):
-            if not nodes[i].value.right < nodes[i+1].value.left:
+            if not nodes[i].right < nodes[i+1].left:
                 return False
         return True
 
@@ -72,7 +72,7 @@ class OverlapTests(unittest.TestCase):
         nodes = [self.g.findNode(id) for id in args]
         assert len(nodes) >= 2
         for i in range(0,len(nodes)-1):
-            if not nodes[i].value.left < nodes[i+1].value.left:
+            if not nodes[i].left < nodes[i+1].left:
                 return False
         return True
 
@@ -80,7 +80,7 @@ class OverlapTests(unittest.TestCase):
         nodes = [self.g.findNode(id) for id in args]
         assert len(nodes) >= 2
         for i in range(0,len(nodes)-1):
-            if not nodes[i].value.bottom < nodes[i+1].value.top:
+            if not nodes[i].bottom < nodes[i+1].top:
                 return False
         return True
 
@@ -88,7 +88,7 @@ class OverlapTests(unittest.TestCase):
         nodes = [self.g.findNode(id) for id in args]
         assert len(nodes) >= 2
         for i in range(0,len(nodes)-1):
-            if not nodes[i].value.bottom < nodes[i+1].value.bottom:
+            if not nodes[i].bottom < nodes[i+1].bottom:
                 return False
         return True
     
@@ -107,36 +107,36 @@ class OverlapTests(unittest.TestCase):
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (150, 9)
+        node.left, node.top = (150, 9)
 
         # assert m1 has been pushed back to the right
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
         self.assertTrue(were_all_overlaps_removed)
         self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
-        self.assertTrue(node.value.left > self.g.findNode('D25').value.right)
-        self.assertTrue(node.value.top < self.g.findNode('D25').value.bottom)
+        self.assertTrue(node.left > self.g.findNode('D25').right)
+        self.assertTrue(node.top < self.g.findNode('D25').bottom)
 
     def test1_2MoveLeftPushedBackDownRight02(self):
         self._LoadScenario1()
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (106, 79)
+        node.left, node.top = (106, 79)
         
         # assert m1 has been pushed back to the right but also down
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
         self.assertTrue(were_all_overlaps_removed)
         self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
         
-        self.assertTrue(node.value.left > self.g.findNode('D13').value.right)
-        self.assertTrue(node.value.top > self.g.findNode('D25').value.bottom)
+        self.assertTrue(node.left > self.g.findNode('D13').right)
+        self.assertTrue(node.top > self.g.findNode('D25').bottom)
         
     def test1_3MoveInsertedVertically1(self):
         self._LoadScenario1()
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (16,74)
+        node.left, node.top = (16,74)
         
         # assert m1 has been squeezed in between the two existing
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
@@ -144,18 +144,18 @@ class OverlapTests(unittest.TestCase):
         self.assertEqual(2, self.overlap_remover.GetStats()['total_overlaps_found'])
         
         #print self.g.GraphToString()
-        self.assertTrue(node.value.top > self.g.findNode('D25').value.bottom)
-        self.assertTrue(node.value.bottom < self.g.findNode('D13').value.top)
-        self.assertTrue(self.g.findNode('D13').value.top > self.g.findNode('D25').value.bottom)
-        self.assertTrue(node.value.left < self.g.findNode('D25').value.right)
-        self.assertTrue(node.value.left < self.g.findNode('D13').value.right)
+        self.assertTrue(node.top > self.g.findNode('D25').bottom)
+        self.assertTrue(node.bottom < self.g.findNode('D13').top)
+        self.assertTrue(self.g.findNode('D13').top > self.g.findNode('D25').bottom)
+        self.assertTrue(node.left < self.g.findNode('D25').right)
+        self.assertTrue(node.left < self.g.findNode('D13').right)
         
     def test1_4MovePushedVertically2(self):
         self._LoadScenario1()
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (6,154)
+        node.left, node.top = (6,154)
         
         # assert m1 has been pushed vertically underneath the other two nodes
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
@@ -164,8 +164,8 @@ class OverlapTests(unittest.TestCase):
 
         self.assertTrue(self._ensureYorder('D25', 'D13', 'm1'))
         
-        self.assertTrue(node.value.left < self.g.findNode('D25').value.right)
-        self.assertTrue(node.value.left < self.g.findNode('D13').value.right)
+        self.assertTrue(node.left < self.g.findNode('D25').right)
+        self.assertTrue(node.left < self.g.findNode('D13').right)
         
         
     def _LoadScenario2(self):
@@ -182,7 +182,7 @@ class OverlapTests(unittest.TestCase):
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (121,14)
+        node.left, node.top = (121,14)
         
         # assert m1 has been inserted and node to the right pushed right
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
@@ -197,7 +197,7 @@ class OverlapTests(unittest.TestCase):
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (96, 114)
+        node.left, node.top = (96, 114)
         
         # assert m1 has been pushed down and right nicely and snugly
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
@@ -228,7 +228,7 @@ class OverlapTests(unittest.TestCase):
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (266, 9)
+        node.left, node.top = (266, 9)
         
         # assert m1 has been pushed between two nodes, horizontally.  Both left and right nodes moved left and right respectively.
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
@@ -244,7 +244,7 @@ class OverlapTests(unittest.TestCase):
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (226, 14)
+        node.left, node.top = (226, 14)
         
         # assert m1 has been not been inserted - refused and snuggled instead
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
@@ -261,10 +261,10 @@ class OverlapTests(unittest.TestCase):
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (281, 64)
+        node.left, node.top = (281, 64)
 
         d97 = self.g.findNode('D97')
-        oldD97pos = (d97.value.left, d97.value.top)
+        oldD97pos = (d97.left, d97.top)
         
         # assert m1 has been refused insertion, but left (D97) moved leftwards cos there is room.  m1 snuggled below and to the right.
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
@@ -276,14 +276,14 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureYorder('D25', 'D13'))
         self.assertTrue(self._ensureYorder('D98', 'm1'))
         self.assertTrue(self._ensureYorderBottoms('D98', 'D97', 'm1'))
-        self.assertNotEqual(oldD97pos, (d97.value.left, d97.value.top)) # ensure D97 HAS been pushed left
+        self.assertNotEqual(oldD97pos, (d97.left, d97.top)) # ensure D97 HAS been pushed left
         
     def test3_3InsertedAndTwoPushedRight(self):
         self._LoadScenario3()
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (146, 9)
+        node.left, node.top = (146, 9)
         
         # assert m1 has been inserted - and two nodes pushed right
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
@@ -297,10 +297,10 @@ class OverlapTests(unittest.TestCase):
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (91, 64)
+        node.left, node.top = (91, 64)
         
         d97 = self.g.findNode('D97')
-        oldD97pos = (d97.value.left, d97.value.top)
+        oldD97pos = (d97.left, d97.top)
 
         # assert m1 has been inserted vertically - one node pushed down, NO nodes pushed right
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
@@ -311,17 +311,17 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureXorder('m1', 'D97', 'D98'))
         self.assertTrue(self._ensureYorder('D25', 'm1', 'D13'))
         self.assertTrue(self._ensureYorder('D25', 'm1', 'D13'))
-        self.assertEqual(oldD97pos, (d97.value.left, d97.value.top)) # ensure D97 hasn't been pushed
+        self.assertEqual(oldD97pos, (d97.left, d97.top)) # ensure D97 hasn't been pushed
 
     def test3_5InsertedVerticallyTwoPushedDown(self):
         self._LoadScenario3()
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (6, 4)
+        node.left, node.top = (6, 4)
         
         d97 = self.g.findNode('D97')
-        oldD97pos = (d97.value.left, d97.value.top)
+        oldD97pos = (d97.left, d97.top)
 
         # assert m1 has been inserted vertically - two pushed down
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
@@ -332,7 +332,7 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureXorder('m1', 'D97', 'D98'))
         self.assertTrue(self._ensureXorder('D25', 'D97', 'D98'))
         self.assertTrue(self._ensureXorder('D13', 'D97', 'D98'))
-        self.assertEqual(oldD97pos, (d97.value.left, d97.value.top)) # ensure D97 hasn't been pushed
+        self.assertEqual(oldD97pos, (d97.left, d97.top)) # ensure D97 hasn't been pushed
 
     def _LoadScenario4(self):
         initial = """
@@ -351,16 +351,16 @@ class OverlapTests(unittest.TestCase):
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (136, 99)
+        node.left, node.top = (136, 99)
         
         d97 = self.g.findNode('D97')
         d98 = self.g.findNode('D98')
         d50 = self.g.findNode('D50')
         d51 = self.g.findNode('D51')
-        oldD97pos = (d97.value.left, d97.value.top)
-        oldD98pos = (d98.value.left, d98.value.top)
-        oldD50pos = (d50.value.left, d50.value.top)
-        oldD51pos = (d51.value.left, d51.value.top)
+        oldD97pos = (d97.left, d97.top)
+        oldD98pos = (d98.left, d98.top)
+        oldD50pos = (d50.left, d50.top)
+        oldD51pos = (d51.left, d51.top)
 
         # assert m1 has been inserted - two pushed right, two pushed down
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
@@ -375,28 +375,28 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureYorder('D98', 'D50', 'D51'))
         self.assertTrue(self._ensureXorder('D13', 'D50'))
         self.assertTrue(self._ensureXorder('D13', 'D51'))
-        self.assertNotEqual(oldD97pos, (d97.value.left, d97.value.top)) # ensure D97 HAS been pushed
-        self.assertNotEqual(oldD98pos, (d98.value.left, d98.value.top)) # ensure D98 HAS been pushed
-        self.assertNotEqual(oldD50pos, (d50.value.left, d50.value.top)) # ensure D50 HAS been pushed
-        self.assertNotEqual(oldD51pos, (d51.value.left, d51.value.top)) # ensure D51 HAS been pushed
+        self.assertNotEqual(oldD97pos, (d97.left, d97.top)) # ensure D97 HAS been pushed
+        self.assertNotEqual(oldD98pos, (d98.left, d98.top)) # ensure D98 HAS been pushed
+        self.assertNotEqual(oldD50pos, (d50.left, d50.top)) # ensure D50 HAS been pushed
+        self.assertNotEqual(oldD51pos, (d51.left, d51.top)) # ensure D51 HAS been pushed
 
     def test4_2InsertedTwoPushedRightThreePushedDown(self):
         self._LoadScenario4()
         
         # move m1 to the left
         node = self.g.findNode('m1')
-        node.value.left, node.value.top = (101, 99)
+        node.left, node.top = (101, 99)
         
         d97 = self.g.findNode('D97')
         d98 = self.g.findNode('D98')
         d50 = self.g.findNode('D50')
         d51 = self.g.findNode('D51')
         d13 = self.g.findNode('D13')
-        oldD97pos = (d97.value.left, d97.value.top)
-        oldD98pos = (d98.value.left, d98.value.top)
-        oldD50pos = (d50.value.left, d50.value.top)
-        oldD51pos = (d51.value.left, d51.value.top)
-        oldD13pos = (d13.value.left, d13.value.top)
+        oldD97pos = (d97.left, d97.top)
+        oldD98pos = (d98.left, d98.top)
+        oldD50pos = (d50.left, d50.top)
+        oldD51pos = (d51.left, d51.top)
+        oldD13pos = (d13.left, d13.top)
 
         # assert m1 has been inserted - two pushed right, two pushed down, and extra D13 pushed down
         # because m1 overlaps/attacks D13 (and there is room for D13 to move downwards I guess)
@@ -418,11 +418,61 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureYorder('D98', 'D50', 'D51'))
         self.assertTrue(self._ensureYorderBottoms('D25', 'D97', 'm1', 'D13', 'D50', 'D51'))
 
-        self.assertNotEqual(oldD97pos, (d97.value.left, d97.value.top)) # ensure D97 HAS been pushed
-        self.assertNotEqual(oldD98pos, (d98.value.left, d98.value.top)) # ensure D98 HAS been pushed
-        self.assertNotEqual(oldD50pos, (d50.value.left, d50.value.top)) # ensure D50 HAS been pushed
-        self.assertNotEqual(oldD51pos, (d51.value.left, d51.value.top)) # ensure D51 HAS been pushed
-        self.assertNotEqual(oldD13pos, (d13.value.left, d13.value.top)) # ensure D13 HAS been pushed
+        self.assertNotEqual(oldD97pos, (d97.left, d97.top)) # ensure D97 HAS been pushed
+        self.assertNotEqual(oldD98pos, (d98.left, d98.top)) # ensure D98 HAS been pushed
+        self.assertNotEqual(oldD50pos, (d50.left, d50.top)) # ensure D50 HAS been pushed
+        self.assertNotEqual(oldD51pos, (d51.left, d51.top)) # ensure D51 HAS been pushed
+        self.assertNotEqual(oldD13pos, (d13.left, d13.top)) # ensure D13 HAS been pushed
 
+    def _LoadScenario5_stress(self):
+        initial = """
+{'type':'node', 'id':'A', 'x':230, 'y':118, 'width':250, 'height':250}
+{'type':'node', 'id':'A1', 'x':252, 'y':10, 'width':60, 'height':60}
+{'type':'node', 'id':'A2', 'x':143, 'y':48, 'width':60, 'height':60}
+{'type':'node', 'id':'B', 'x':87, 'y':245, 'width':60, 'height':60}
+{'type':'node', 'id':'B1', 'x':10, 'y':199, 'width':60, 'height':60}
+{'type':'node', 'id':'B2', 'x':190, 'y':253, 'width':60, 'height':60}
+{'type':'node', 'id':'B21', 'x':262, 'y':161, 'width':60, 'height':60}
+{'type':'node', 'id':'B22', 'x':139, 'y':351, 'width':100, 'height':200}
+{'type':'node', 'id':'c', 'x':301, 'y':259, 'width':60, 'height':60}
+{'type':'node', 'id':'c1', 'x':261, 'y':372, 'width':60, 'height':60}
+{'type':'node', 'id':'c2', 'x':395, 'y':201, 'width':60, 'height':60}
+{'type':'node', 'id':'c3', 'x':402, 'y':302, 'width':60, 'height':60}
+{'type':'node', 'id':'c4', 'x':338, 'y':379, 'width':60, 'height':60}
+{'type':'node', 'id':'c5', 'x':244, 'y':207, 'width':60, 'height':120}
+{'type':'node', 'id':'BIG1', 'x':0, 'y':0, 'width':300, 'height':200}
+{'type':'node', 'id':'BIG2', 'x':1, 'y':1, 'width':300, 'height':200}
+{'type':'node', 'id':'BIG3', 'x':2, 'y':2, 'width':300, 'height':200}
+{'type':'edge', 'id':'A_to_A1', 'source':'A', 'target':'A1'}
+{'type':'edge', 'id':'A_to_A2', 'source':'A', 'target':'A2'}
+{'type':'edge', 'id':'B_to_B1', 'source':'B', 'target':'B1'}
+{'type':'edge', 'id':'B_to_B2', 'source':'B', 'target':'B2'}
+{'type':'edge', 'id':'B2_to_B21', 'source':'B2', 'target':'B21'}
+{'type':'edge', 'id':'B2_to_B22', 'source':'B2', 'target':'B22'}
+{'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1'}
+{'type':'edge', 'id':'c_to_c2', 'source':'c', 'target':'c2'}
+{'type':'edge', 'id':'c_to_c3', 'source':'c', 'target':'c3'}
+{'type':'edge', 'id':'c_to_c4', 'source':'c', 'target':'c4'}
+{'type':'edge', 'id':'c_to_c5', 'source':'c', 'target':'c5'}
+{'type':'edge', 'id':'A_to_c', 'source':'A', 'target':'c'}
+{'type':'edge', 'id':'B2_to_c', 'source':'B2', 'target':'c'}
+{'type':'edge', 'id':'B2_to_c5', 'source':'B2', 'target':'c5'}
+{'type':'edge', 'id':'A_to_c5', 'source':'A', 'target':'c5'}
+"""
+        self.g.LoadGraphFromStrings(initial)
+        
+    def testStress1(self):
+        
+        for i in range(10):
+            self._LoadScenario5_stress()
+            print "Stress Iteration", i
+            were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+            self.assertTrue(were_all_overlaps_removed)
+            
+            self.g.clear()
+        
+        
+
+        
 if __name__ == "__main__":
     unittest.main()

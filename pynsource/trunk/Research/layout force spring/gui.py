@@ -30,7 +30,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         x, y = getpos(shape)
         width, height = shape.GetBoundingBoxMax()
         frame = self.oglcanvas.GetTopLevelParent()
-        frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)  - div is %s" % (x, y, width, height, shape.node))
+        frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)  -  GraphNode is %s" % (x, y, width, height, shape.node))
 
     def OnLeftClick(self, x, y, keys = 0, attachment = 0):
         #print "OnLeftClick"
@@ -47,7 +47,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         ogl.ShapeEvtHandler.OnDrawOutline(self, dc, x, y, w, h)
         shape = self.GetShape()
         x,y = (x - w/2, y - h/2) # correct to be top corner not centre
-        frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)  - div is %s" % (x, y, w, h, shape.node))
+        frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)  -  GraphNode is %s" % (x, y, w, h, shape.node))
         
     def OnDragLeft(self, draw, x, y, keys = 0, attachment = 0):
         ogl.ShapeEvtHandler.OnDragLeft(self, draw, x, y, keys = 0, attachment = 0)
@@ -65,10 +65,10 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)  # super
         newpos = getpos(shape) # (int(shape.GetX()), int(shape.GetY()))
 
-        print shape.node.value.id, "moved from", oldpos, "to", newpos
+        print shape.node.id, "moved from", oldpos, "to", newpos
         
-        # Adjust the Div to match the shape x,y
-        shape.node.value.left, shape.node.value.top = newpos
+        # Adjust the GraphNode to match the shape x,y
+        shape.node.left, shape.node.top = newpos
 
         self.UpdateStatusBar(shape)
 
@@ -85,10 +85,10 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         
         width, height = shape.GetBoundingBoxMin()
         print shape.node, "resized to", width, height
-        #print shape.node.value.id, shape.node.value.left, shape.node.value.top, "resized to", width, height
-        # Adjust the Div to match the shape x,y
-        shape.node.value.width, shape.node.value.height = width, height
-        shape.node.value.left, shape.node.value.top = getpos(shape)
+        #print shape.node.id, shape.node.left, shape.node.top, "resized to", width, height
+        # Adjust the GraphNode to match the shape x,y
+        shape.node.width, shape.node.height = width, height
+        shape.node.left, shape.node.top = getpos(shape)
         
         self.UpdateStatusBar(self.GetShape())
 
@@ -146,8 +146,8 @@ class GraphRendererOgl:
     def translate_node_coords(self):
         for node in self.graph.nodes:
             point = self.translate([node.layoutPosX, node.layoutPosY])
-            node.value.top      = int(point[1])
-            node.value.left     = int(point[0])
+            node.top  = int(point[1])
+            node.left = int(point[0])
 
        
     def DeselectAllShapes(self):
@@ -176,10 +176,10 @@ class GraphRendererOgl:
             selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
             if selected:
                 shape = selected[0]
-                print 'delete', shape.node.value.id
+                print 'delete', shape.node.id
 
                 # model
-                self.graph.deleteNode(shape.node.value.id)
+                self.graph.deleteNode(shape.node.id)
 
                 # view
                 self.DeselectAllShapes()
@@ -194,8 +194,8 @@ class GraphRendererOgl:
                 id = dialog.GetValue()
                 if self.graph.findNode(id):
                     id += str(random.randint(1,9999))
-                div = Div(id, random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160))
-                node = self.graph.addNode(div)
+                node = GraphNode(id, random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160))
+                node = self.graph.addNode(node)
                 self.drawNode(node)
                 node.shape.Show(True)
                 self.stateofthenation()
@@ -355,6 +355,7 @@ class GraphRendererOgl:
             
     def OnWheelZoom(self, event):
         self.stage2()
+        print self.overlap_remover.GetStats()
 
     def stage1(self, tranlatecoords=True):
         import time
@@ -416,7 +417,7 @@ class GraphRendererOgl:
         assert node.shape
         
         # Don't need to use node.shape.Move(dc, x, y, False)
-        setpos(node.shape, node.value.left, node.value.top)
+        setpos(node.shape, node.left, node.top)
 
         # But you DO need to use a dc to adjust the links
         dc = wx.ClientDC(self.oglcanvas)
@@ -442,13 +443,13 @@ class GraphRendererOgl:
      
     def drawNode(self, node):
         #point = self.translate([node.layoutPosX, node.layoutPosY])
-        #node.value.top      = point[1]
-        #node.value.left     = point[0]
+        #node.top      = point[1]
+        #node.left     = point[0]
                
         #print node
-        shape = ogl.RectangleShape( node.value.width, node.value.height )
-        shape.AddText(node.value.id)
-        setpos(shape, node.value.left, node.value.top)
+        shape = ogl.RectangleShape( node.width, node.height )
+        shape.AddText(node.id)
+        setpos(shape, node.left, node.top)
         #shape.SetDraggable(True, True)
         self.oglcanvas.AddShape( shape )
         node.shape = shape
@@ -514,29 +515,29 @@ class AppFrame(wx.Frame):
         
         g = Graph()
         
-        a = Div('A', 0, 0, 250, 250)
-        a1 = Div('A1', 0, 0)
-        a2 = Div('A2', 0, 0)
+        a = GraphNode('A', 0, 0, 250, 250)
+        a1 = GraphNode('A1', 0, 0)
+        a2 = GraphNode('A2', 0, 0)
         g.addEdge(a, a1)
         g.addEdge(a, a2)
 
-        b = Div('B', 0, 0)
-        b1 = Div('B1', 0, 0)
-        b2 = Div('B2', 0, 0)
+        b = GraphNode('B', 0, 0)
+        b1 = GraphNode('B1', 0, 0)
+        b2 = GraphNode('B2', 0, 0)
         g.addEdge(b, b1)
         g.addEdge(b, b2)
 
-        b21 = Div('B21', 0, 0)
-        b22 = Div('B22', 0, 0, 100, 200)
+        b21 = GraphNode('B21', 0, 0)
+        b22 = GraphNode('B22', 0, 0, 100, 200)
         g.addEdge(b2, b21)
         g.addEdge(b2, b22)
 
-        c = Div('c', 0, 0)
-        c1 = Div('c1', 0, 0)
-        c2 = Div('c2', 0, 0)
-        c3 = Div('c3', 0, 0)
-        c4 = Div('c4', 0, 0)
-        c5 = Div('c5', 0, 0, 60, 120)
+        c = GraphNode('c', 0, 0)
+        c1 = GraphNode('c1', 0, 0)
+        c2 = GraphNode('c2', 0, 0)
+        c3 = GraphNode('c3', 0, 0)
+        c4 = GraphNode('c4', 0, 0)
+        c5 = GraphNode('c5', 0, 0, 60, 120)
         g.addEdge(c, c1)
         g.addEdge(c, c2)
         g.addEdge(c, c3)
@@ -552,7 +553,7 @@ class AppFrame(wx.Frame):
         layouter.layout()
         
         for node in g.nodes:
-            print node.value.id, (node.layoutPosX, node.layoutPosY)
+            print node.id, (node.layoutPosX, node.layoutPosY)
         
         ## ==========================================
         
