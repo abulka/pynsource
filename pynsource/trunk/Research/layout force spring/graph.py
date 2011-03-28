@@ -104,8 +104,8 @@ class GraphNode:
         
         self.top = top
         self.left = left
-        self.width=width
-        self.height=height
+        self.width = width
+        self.height = height
 
         self.layoutPosX = 0
         self.layoutPosY = 0
