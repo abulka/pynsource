@@ -471,8 +471,54 @@ class OverlapTests(unittest.TestCase):
             
             self.g.Clear()
         
-        
+    def _LoadScenario6_linecrossing(self):
+        initial = """
+{'type':'node', 'id':'A', 'x':13, 'y':12, 'width':84, 'height':126}
+{'type':'node', 'id':'B', 'x':122, 'y':11, 'width':157, 'height':79}
+{'type':'node', 'id':'C', 'x':8, 'y':292, 'width':194, 'height':91}
+{'type':'node', 'id':'m1', 'x':102, 'y':95, 'width':123, 'height':144}
+{'type':'edge', 'id':'A_to_B', 'source':'A', 'target':'B'}
+{'type':'edge', 'id':'A_to_C', 'source':'A', 'target':'C'}
+"""        
+        self.g.LoadGraphFromStrings(initial)
 
+    def test6_1LineCrossingNotNeeded(self):
+        self._LoadScenario6_linecrossing()
+        
+        # move m1 to the left
+        node = self.g.FindNodeById('m1')
+        node.left, node.top = (49, 48)
+        
+        # assert m1 has been repulsed and snuggeled
+        were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
+
+        self.assertTrue(self._ensureXorder('A', 'B'))
+        self.assertTrue(self._ensureXorder('A', 'm1'))
+        self.assertTrue(self._ensureYorder('A', 'C'))
+        self.assertTrue(self._ensureYorder('B', 'm1', 'C'))
+        self.assertFalse(self._ensureYorder('A', 'm1', 'C')) # don't want this otherwise the line from A to C would be crossed
+        
+    def test6_2LineCrossingAvoided(self):
+        self._LoadScenario6_linecrossing()
+        
+        # move m1 to the left
+        node = self.g.FindNodeById('m1')
+        #node.left, node.top = (9, 103) # A is to the left of A
+        node.left, node.top = (24, 98)  # m1 is to the left of A - a bit easier to solve
+        
+        # assert m1 has been repulsed and snuggeled, and line not crossed - same results as ABOVE
+        were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
+
+        self.assertTrue(self._ensureXorder('A', 'B'))
+        self.assertTrue(self._ensureXorder('A', 'm1'))
+        self.assertTrue(self._ensureYorder('A', 'C'))
+        self.assertTrue(self._ensureYorder('B', 'm1', 'C'))
+        self.assertFalse(self._ensureYorder('A', 'm1', 'C')) # don't want this otherwise the line from A to C would be crossed
+                
         
 if __name__ == "__main__":
     unittest.main()

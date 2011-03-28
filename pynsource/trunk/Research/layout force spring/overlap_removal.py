@@ -116,9 +116,25 @@ class OverlapRemoval:
         self.nodes_already_moved.append(proposal['node'])
 
     def ApplyMinimalProposal(self, proposals):
+        proposals = self.ShowLineCrossings(proposals)
+        print self.dumpproposals(proposals)
+
+        crossings = [p['linecrossings'] for p in proposals]
+        lowest_crossings = min(crossings)
+        proposal222 = [p for p in proposals if abs(p['linecrossings']) == lowest_crossings][0]
+        print "proposal222", self.dumpproposal(proposal222)
+
         amounts = [abs(p['amount']) for p in proposals]
         lowest_amount = min(amounts)
-        proposal = [p for p in proposals if abs(p['amount']) == lowest_amount][0]
+        proposal111 = [p for p in proposals if abs(p['amount']) == lowest_amount][0]
+        print "proposal111", self.dumpproposal(proposal111)
+        
+        # choose between proposal111 and proposal222
+        if proposal111['linecrossings'] > 0 and proposal222['linecrossings'] == 0:
+            proposal = proposal222
+        else:
+            proposal = proposal111
+        
         self.ApplyProposal(proposal)
         if proposal['amount'] < 0:
             self.total_contractive_moves += 1
@@ -126,6 +142,61 @@ class OverlapRemoval:
             self.total_expansive_moves += 1
         return proposal['node'], proposal['xory']
 
+
+
+    def ShowLineCrossings(self, proposals):
+        """
+        we have the tech so that a node can be fed a line and it will report the crossing points, if any
+        
+        so for any node that is about to be moved, we want to know how many lines it crosses
+        so we need to find all the lines on the workspace, and feed them into the node's proposed position
+        and report the number of lines it crosses and the number of cross points for each of those crosses.
+        
+        to find the lines on the workspace we loop through the edges array
+        from each edge we need the points of the line, which can be derived from the centre of each node to the other centre
+        """
+    
+        print self.dumpproposals(proposals)
+        newproposals = []
+        for proposal in proposals:
+            
+            # build the proposed node
+            l, t, r, b = proposal['node'].GetBounds()
+            if proposal['xory'] == 'x':
+                deltaX = proposal['amount']
+                deltaY = 0
+            else:
+                deltaX = 0
+                deltaY = proposal['amount']
+            proposednode = GraphNode('temp', top=t+deltaY, left=l+deltaX, width=r-l, height=b-t)
+
+            total_crossing = []
+            for edge in self.graph.edges:
+                line_start_point = edge['source'].centre_point
+                line_end_point = edge['target'].centre_point
+                if edge['source'] == proposednode or edge['target'] == proposednode:
+                    continue
+                crossings = proposednode.CalcLineIntersections(line_start_point, line_end_point)
+                if crossings:
+                    print "%s crosses edge %s_%s at %s" % (self.dumpproposal(proposal), edge['source'].id, edge['target'].id, crossings)
+                    total_crossing.extend(crossings)
+                
+            proposal['linecrossings'] = len(total_crossing)
+            newproposals.append(proposal)
+            
+        return newproposals
+
+    def dumpproposal(self, prop):
+        return "  moving %s.%s by %s crossings %d" % (prop['node'].id, prop['xory'], prop['amount'], prop.get('linecrossings', -1))
+        
+    def dumpproposals(self, props):
+        msg = "  Proposals: "
+        for p in props:
+            msg += self.dumpproposal(p)
+        return msg
+    
+    
+    
     def PostMoveAlgorithm(self, movednode, lastmovedirection):
         # Post Move Algorithm - move the same node again, safely (don't introduce oscillations),
         # under certain circumstances, for aesthetics, despite nodes_already_moved list

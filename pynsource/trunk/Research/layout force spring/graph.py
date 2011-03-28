@@ -137,7 +137,9 @@ class GraphNode:
     def CalcLineIntersections(self, line_start_point, line_end_point):
         result = []
         for nodeline in self.lines:
-            result.append(FindLineIntersection(line_start_point, line_end_point, nodeline[0], nodeline[1]))
+            point = FindLineIntersection(line_start_point, line_end_point, nodeline[0], nodeline[1])
+            if point:
+                result.append( (int(point[0]), int(point[1])) )
     
         # trim out duplicated and Nones
         def remove_duplicates(lzt):
@@ -148,6 +150,11 @@ class GraphNode:
         result = remove_duplicates(result)
         return result
 
+    def get_centre_point(self):
+        return ((self.left+self.width/2), (self.top+self.height/2))
+        
+    centre_point = property(get_centre_point)
+    
     def __str__(self):
         return "Node %s: x,y (%d, %d) w,h (%d, %d)" % (self.id, self.left, self.top, self.width, self.height)
    
@@ -190,10 +197,10 @@ if __name__ == '__main__':
     # Line intersection tests
     
     res = FindLineIntersection((0,0), (200,200), (10,10), (10,50))
-    assert res == [10.0, 10.0]
+    assert res == [10, 10]
     
     res = FindLineIntersection((0,30), (200,30), (10,10), (10,50))
-    assert res == [10.0, 30.0]
+    assert res == [10, 30]
     
     node = GraphNode("A", 10, 10, 30, 40)
     assert len(node.lines) == 4
@@ -208,12 +215,12 @@ if __name__ == '__main__':
     
     res = node.CalcLineIntersections((0, 0), (200, 200))
     assert len(res) == 2
-    assert [10.0, 10.0] in res
-    assert [40.0, 40.0] in res
+    assert (10, 10) in res
+    assert (40, 40) in res
     
     res = node.CalcLineIntersections((20, 0), (20, 1000))
     assert len(res) == 2
-    assert [20.0, 10.0] in res
-    assert [20.0, 50.0] in res
+    assert (20, 10) in res
+    assert (20, 50) in res
     
     print "Done, tests passed"

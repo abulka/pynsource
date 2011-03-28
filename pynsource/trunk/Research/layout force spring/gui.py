@@ -111,7 +111,9 @@ class GraphShapeCanvas(ogl.ShapeCanvas):
         self.graphrendererogl.DeselectAllShapes()
 
 from coordinate_mapper import CoordinateMapper
-        
+
+UNIT_TESTING_MODE = True
+
 class GraphRendererOgl:
     def __init__(self, graph, oglcanvas):
         self.graph = graph
@@ -128,7 +130,10 @@ class GraphRendererOgl:
         self.need_abort = False
         self.new_edge_from = None
 
-        self.overlap_remover = OverlapRemoval(self.graph, margin=50, gui=self)
+        if UNIT_TESTING_MODE:
+            self.overlap_remover = OverlapRemoval(self.graph, margin=5, gui=self)
+        else:
+            self.overlap_remover = OverlapRemoval(self.graph, margin=50, gui=self)
 
     def AllToLayoutCoords(self):
             self.coordmapper.AllToLayoutCoords()
