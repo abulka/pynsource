@@ -16,7 +16,7 @@ class OverlapTests(unittest.TestCase):
                 pass
 
         self.g = Graph()
-        self.overlap_remover = OverlapRemoval(self.g, gui=FakeGui())
+        self.overlap_remover = OverlapRemoval(self.g, margin=5, gui=FakeGui())
 
     def tearDown(self):
         pprint.pprint(self.overlap_remover.GetStats())

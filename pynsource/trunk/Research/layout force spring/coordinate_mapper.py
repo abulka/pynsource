@@ -1,26 +1,33 @@
 # CoordinateMapper
 
 class CoordinateMapper:
-    def __init__(self, graph, world_size):
+    def __init__(self, graph, world_size, scale=2):
         self.graph = graph
         self.world_size = world_size
         self.radius = 10
+        self.scale = scale
         self.Recalibrate()
 
-    def Recalibrate(self, new_world_size=None):
+    def Recalibrate(self, new_world_size=None, scale=None):
         if new_world_size:
             self.world_size = new_world_size
+        if scale:
+            self.scale = scale
 
         ww, wh = self.world_size                # world width, world height
         
         lw = self.graph.layoutMaxX - self.graph.layoutMinX  # layout width
         lh = self.graph.layoutMaxY - self.graph.layoutMinY  # layout height
         
-        assert lw
-        assert lh
+        #assert lw
+        #assert lh
+        if lw == 0:
+            lw = 0.0001
+        if lh == 0:
+            lh = 0.0001
         
-        self.factorX = ww/2/lw
-        self.factorY = wh/2/lh
+        self.factorX = ww/self.scale/lw
+        self.factorY = wh/self.scale/lh
             
     def LayoutToWorld(self, point):
         return [

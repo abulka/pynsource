@@ -14,9 +14,10 @@ MAX_CYCLES = 20
 
 class OverlapRemoval:
     
-    def __init__(self, graph, gui):
+    def __init__(self, graph, margin=MARGIN, gui=None):
         self.graph = graph
         self.gui = gui
+        self.margin = margin
         self.stats = {}
         
     def GetPermutations(self, lzt):
@@ -45,7 +46,7 @@ class OverlapRemoval:
         proposals = []
         leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = self.CalcOverlapAmounts(node1, node2)
                     
-        print "Overlap %s/%s by %d/%d  (leftnode is %s  topnode is %s)" % (node1.id, node2.id, xoverlap_amount, yoverlap_amount, leftnode.id, topnode.id)
+        #print "Overlap %s/%s by %d/%d  (leftnode is %s  topnode is %s)" % (node1.id, node2.id, xoverlap_amount, yoverlap_amount, leftnode.id, topnode.id)
 
         if self.MoveLeftOk(leftnode, deltaX=xoverlap_amount, ignorenode=rightnode):
             proposals.append({'node':leftnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':rightnode})
@@ -103,8 +104,8 @@ class OverlapRemoval:
     def CalcOverlapAmounts(self, node1, node2):
         leftnode, rightnode, topnode, bottomnode = self.SortNodesLrtb(node1, node2)
         # Overlap amounts returned are always positive values
-        xoverlap_amount = abs(leftnode.right + MARGIN - rightnode.left)
-        yoverlap_amount = abs(topnode.bottom + MARGIN - bottomnode.top)
+        xoverlap_amount = abs(leftnode.right + self.margin - rightnode.left)
+        yoverlap_amount = abs(topnode.bottom + self.margin - bottomnode.top)
         return leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount
 
     def ApplyProposal(self, proposal):
@@ -196,7 +197,8 @@ class OverlapRemoval:
                 self.ResetBans()
                 
             if num_overlaps_fixed > 0:
-                self.gui.stateofthenation()     # refresh gui
+                if self.gui:
+                    self.gui.stateofthenation()     # refresh gui
 
             if not found_overlaps:
                 break  # job done
@@ -206,3 +208,10 @@ class OverlapRemoval:
         self.SetStats(total_cycles, all_overlaps_were_removed)
         return all_overlaps_were_removed
 
+    def CountOverlaps(self):
+        count = 0
+        for node1, node2 in self.GetPermutations(self.graph.nodes):
+            if self.Hit(node1, node2):
+                count += 1
+        return count
+        

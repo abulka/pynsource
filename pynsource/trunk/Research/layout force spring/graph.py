@@ -21,7 +21,7 @@ class Graph:
             self.nodes.append(node)
         return node
 
-    def AddEdge(self, source_node, target_node):
+    def AddEdge(self, source_node, target_node, weight=None):
         # Uniqueness of this edge relationship must be ensured by caller
         
         # If node hasn't been added, then add it now
@@ -29,6 +29,8 @@ class Graph:
         if not self.FindNodeById(target_node.id): self.AddNode(target_node)
             
         edge = {'source': source_node, 'target': target_node}
+        if weight:
+            edge['weight'] = weight
         self.edges.append(edge)
 
     def DeleteNode(self, node):
@@ -56,7 +58,7 @@ class Graph:
     def LoadGraphFromStrings(self, filedata):
         # load from persistence
         # nodes look like:     {'type':'node', 'id':'c5', 'x':230, 'y':174, 'width':60, 'height':120}
-        # edges look like:     {'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1'}
+        # edges look like:     {'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1', 'weight':1}  weight >= 1
         
         filedata = filedata.split('\n')
         for data in filedata:
@@ -79,7 +81,8 @@ class Graph:
                 if not targetnode:
                     print "Couldn't load target from persistence", target_id
                     continue
-                self.AddEdge(sourcenode, targetnode)  # AddEdge takes node objects as parameters
+                weight = data.get('weight', None)
+                self.AddEdge(sourcenode, targetnode, weight)  # AddEdge takes node objects as parameters
 
     def GraphToString(self):
         nodes = ""

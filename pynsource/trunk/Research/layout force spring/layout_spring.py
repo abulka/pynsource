@@ -8,19 +8,23 @@ import random
 import math
 
 class GraphLayoutSpring:
-    def __init__(self, graph):
+    def __init__(self, graph, gui=None):
         self.graph = graph
         self.iterations = 500
         self.maxRepulsiveForceDistance = 6
         self.k = 2
         self.c = 0.01
         self.maxVertexMovement = 0.5
+        self.gui = gui
        
     def layout(self, keep_current_positions=False):
         if not keep_current_positions:
             self.layoutPrepare()
         for i in range(0, self.iterations):
             self.layoutIteration()
+            if self.gui:
+                self.layoutCalcBounds()
+                self.gui.stateofthespring()     # refresh gui
         self.layoutCalcBounds()
        
     def layoutPrepare(self):

@@ -122,11 +122,12 @@ class GraphRendererOgl:
         self.oglcanvas.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
         self.oglcanvas.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)
         self.oglcanvas.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
+        self.oglcanvas.Bind(wx.EVT_SIZE, self.OnResizeFrame)
         
         self.popupmenu = None
         self.need_abort = False
 
-        self.overlap_remover = OverlapRemoval(self.graph, gui=self)
+        self.overlap_remover = OverlapRemoval(self.graph, margin=50, gui=self)
 
     def AllToLayoutCoords(self):
             self.coordmapper.AllToLayoutCoords()
@@ -143,6 +144,11 @@ class GraphRendererOgl:
             canvas.PrepareDC(dc)
             s.Select(False, dc)
             canvas.Refresh(False)   # Need this or else Control points ('handles') leave blank holes      
+
+    def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
+        frame = self.oglcanvas.GetTopLevelParent()
+        print "frame resize", frame.GetClientSize()
+        self.coordmapper.Recalibrate(frame.GetClientSize()) # may need to call self.CalcVirtSize() if scrolled window
    
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
@@ -150,23 +156,79 @@ class GraphRendererOgl:
 
         if keycode == wx.WXK_DOWN:
             print "DOWN"
-            self.ReLayout(keep_current_positions=True)
+            self.ReLayout(keep_current_positions=True, gui=self)
 
         elif keycode == wx.WXK_UP:
             print "UP"
-            self.ReLayout(keep_current_positions=False)
+            self.ReLayout(keep_current_positions=False, gui=self)
             
         elif keycode == wx.WXK_RIGHT:
+            """
             print "RIGHT"
             self.ReLayout(keep_current_positions=False)
             self.ReLayout(keep_current_positions=True)
             self.ReLayout(keep_current_positions=True)
             self.ReLayout(keep_current_positions=True)
             self.ReLayout(keep_current_positions=True)
-            self.ReLayout(keep_current_positions=True)
-
+            self.ReLayout(keep_current_positions=True, gui=self)
+            """
+            self.ChangeScale(-0.2)
+            
         elif keycode == wx.WXK_LEFT:
+            self.ChangeScale(0.2)
+            
+            """            
             print "LEFT"
+            if event.ShiftDown():
+                scale_before = 1
+                scale_after = 1
+            if event.ControlDown():
+                scale_before = 2
+                scale_after = 1
+            if event.ControlDown() and event.ShiftDown():
+                scale_before = 2
+                scale_after = 2
+            else:
+                scale_before = 1
+                scale_after = 2
+            
+            self.stage2() # does overlap removal and stateofthenation
+
+            def layoutandwatchat():
+                self.coordmapper.Recalibrate(scale=scale_before)
+                self.AllToLayoutCoords()
+                layouter = GraphLayoutSpring(self.graph, gui=self)    # should keep this around
+                layouter.layout(keep_current_positions=True)
+            def layoutat():
+                self.coordmapper.Recalibrate(scale=scale_before)
+                self.AllToLayoutCoords()
+                self.coordmapper.Recalibrate(scale=scale_after)  # watch at different res
+                layouter = GraphLayoutSpring(self.graph, gui=self)    # should keep this around
+                layouter.layout(keep_current_positions=True)
+            def renderat():
+                for i in range(20, 1, -1):
+                    scale = i/10.0
+                    self.coordmapper.Recalibrate(scale=scale)
+                    self.AllToWorldCoords()
+                    numoverlaps = self.overlap_remover.CountOverlaps()
+                    print "Num Overlaps at scale", scale, numoverlaps
+                    self.stage2() # does overlap removal and stateofthenation
+                    time.sleep(0.2)
+                    if numoverlaps < 2:
+                        break
+                    
+                #self.coordmapper.Recalibrate(scale=scale_after)
+                #self.AllToWorldCoords()
+                #print "Num Overlaps at scale", scale_after, self.overlap_remover.CountOverlaps()
+                #
+                #self.stage2() # does overlap removal and stateofthenation
+
+            layoutandwatchat()
+            #layoutat()
+            renderat()
+            self.coordmapper.Recalibrate(scale=scale_after)
+            """
+            
             
         elif keycode == wx.WXK_DELETE:
             selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
@@ -199,12 +261,28 @@ class GraphRendererOgl:
             
         event.Skip()
 
-    def ReLayout(self, keep_current_positions=False):
+    def stateofthespring(self):
+        self.coordmapper.Recalibrate()
+        self.AllToWorldCoords()
+        self.stateofthenation() # DON'T do overlap removal or it will get mad!
+
+    def ChangeScale(self, delta):
+        self.coordmapper.Recalibrate(scale=self.coordmapper.scale+delta)
+        self.AllToWorldCoords()
+        numoverlaps = self.overlap_remover.CountOverlaps()
+        print "Num Overlaps at scale", self.coordmapper.scale, numoverlaps
+        
+        saveit = self.overlap_remover.gui
+        self.overlap_remover.gui = None
+        self.stage2() # does overlap removal and stateofthenation
+        self.overlap_remover.gui = saveit
+        
+    def ReLayout(self, keep_current_positions=False, gui=None):
         # layout again
         print "spring layout again!"
         self.AllToLayoutCoords()
 
-        layouter = GraphLayoutSpring(self.graph)    # need to keep this around
+        layouter = GraphLayoutSpring(self.graph, gui)    # should keep this around
         layouter.layout(keep_current_positions)
         
         self.AllToWorldCoords()
