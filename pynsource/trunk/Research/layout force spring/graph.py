@@ -96,14 +96,16 @@ class Graph:
             edges += "{'type':'edge', 'id':'%s_to_%s', 'source':'%s', 'target':'%s'}\n" % (source, target, source, target)
         return nodes + edges
 
+from line_intersection import FindLineIntersection
+
 class GraphNode:
     def __init__(self, id, left, top, width=60, height=60):
         #self.value = value
         
         self.id = id
         
-        self.top = top
         self.left = left
+        self.top = top
         self.width = width
         self.height = height
 
@@ -123,7 +125,29 @@ class GraphNode:
 
     def GetBounds(self):
         return self.left, self.top, self.right, self.bottom
+
+    def get_lines(self):
+        return [((self.left, self.top), (self.right, self.top)),
+                ((self.right, self.top), (self.right, self.bottom)),
+                ((self.right, self.bottom), (self.left, self.bottom)),
+                ((self.left, self.bottom), (self.left, self.top))]
+
+    lines = property(get_lines)
         
+    def CalcLineIntersections(self, line_start_point, line_end_point):
+        result = []
+        for nodeline in self.lines:
+            result.append(FindLineIntersection(line_start_point, line_end_point, nodeline[0], nodeline[1]))
+    
+        # trim out duplicated and Nones
+        def remove_duplicates(lzt):
+            d = {}
+            for x in lzt: d[tuple(x)]=x
+            return d.values()
+        result = [r for r in result if r != None]
+        result = remove_duplicates(result)
+        return result
+
     def __str__(self):
         return "Node %s: x,y (%d, %d) w,h (%d, %d)" % (self.id, self.left, self.top, self.width, self.height)
    
@@ -162,5 +186,34 @@ if __name__ == '__main__':
     for node in g.nodes:
         print node, "layout info:", (node.layoutPosX, node.layoutPosY)
     assert g.GraphToString().strip() == filedata.strip()
+
+    # Line intersection tests
     
-    print 'Done'
+    res = FindLineIntersection((0,0), (200,200), (10,10), (10,50))
+    assert res == [10.0, 10.0]
+    
+    res = FindLineIntersection((0,30), (200,30), (10,10), (10,50))
+    assert res == [10.0, 30.0]
+    
+    node = GraphNode("A", 10, 10, 30, 40)
+    assert len(node.lines) == 4
+    assert (10,10) in node.lines[0]
+    assert (40,10) in node.lines[0]
+    assert (40,10) in node.lines[1]
+    assert (40,50) in node.lines[1]
+    assert (40,50) in node.lines[2]
+    assert (10,50) in node.lines[2]
+    assert (10,50) in node.lines[3]
+    assert (10,10) in node.lines[3]
+    
+    res = node.CalcLineIntersections((0, 0), (200, 200))
+    assert len(res) == 2
+    assert [10.0, 10.0] in res
+    assert [40.0, 40.0] in res
+    
+    res = node.CalcLineIntersections((20, 0), (20, 1000))
+    assert len(res) == 2
+    assert [20.0, 10.0] in res
+    assert [20.0, 50.0] in res
+    
+    print "Done, tests passed"
