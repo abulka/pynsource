@@ -32,6 +32,7 @@ class Graph:
         if weight:
             edge['weight'] = weight
         self.edges.append(edge)
+        return edge
 
     def DeleteNode(self, node):
         if node:

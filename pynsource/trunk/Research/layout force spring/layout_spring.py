@@ -22,7 +22,7 @@ class GraphLayoutSpring:
             self.layoutPrepare()
         for i in range(0, self.iterations):
             self.layoutIteration()
-            if self.gui:
+            if self.gui and i%10==0:
                 self.layoutCalcBounds()
                 self.gui.stateofthespring()     # refresh gui
         self.layoutCalcBounds()
@@ -62,13 +62,11 @@ class GraphLayoutSpring:
                 node2 = self.graph.nodes[j]
                 self.layoutRepulsive(node1, node2)
         # Forces on nodes due to edge attractions
-        for i in range(0, len(self.graph.edges)):
-            edge = self.graph.edges[i]
+        for edge in self.graph.edges:
             self.layoutAttractive(edge)
                
         # Move by the given force
-        for i in range(0, len(self.graph.nodes)):
-            node = self.graph.nodes[i];
+        for node in self.graph.nodes:
             xmove = self.c * node.layoutForceX
             ymove = self.c * node.layoutForceY
 
