@@ -117,17 +117,17 @@ class OverlapRemoval:
 
     def ApplyMinimalProposal(self, proposals):
         proposals = self.ShowLineCrossings(proposals)
-        print self.dumpproposals(proposals)
+        #print self.dumpproposals(proposals)
 
         crossings = [p['linecrossings'] for p in proposals]
         lowest_crossings = min(crossings)
         proposal222 = [p for p in proposals if abs(p['linecrossings']) == lowest_crossings][0]
-        print "proposal222", self.dumpproposal(proposal222)
+        #print "proposal222", self.dumpproposal(proposal222)
 
         amounts = [abs(p['amount']) for p in proposals]
         lowest_amount = min(amounts)
         proposal111 = [p for p in proposals if abs(p['amount']) == lowest_amount][0]
-        print "proposal111", self.dumpproposal(proposal111)
+        #print "proposal111", self.dumpproposal(proposal111)
         
         # choose between proposal111 and proposal222
         if proposal111['linecrossings'] > 0 and proposal222['linecrossings'] == 0:
@@ -156,7 +156,7 @@ class OverlapRemoval:
         from each edge we need the points of the line, which can be derived from the centre of each node to the other centre
         """
     
-        print self.dumpproposals(proposals)
+        #print self.dumpproposals(proposals)
         newproposals = []
         for proposal in proposals:
             
@@ -178,7 +178,7 @@ class OverlapRemoval:
                     continue
                 crossings = proposednode.CalcLineIntersections(line_start_point, line_end_point)
                 if crossings:
-                    print "%s crosses edge %s_%s at %s" % (self.dumpproposal(proposal), edge['source'].id, edge['target'].id, crossings)
+                    #print "%s crosses edge %s_%s at %s" % (self.dumpproposal(proposal), edge['source'].id, edge['target'].id, crossings)
                     total_crossing.extend(crossings)
                 
             proposal['linecrossings'] = len(total_crossing)

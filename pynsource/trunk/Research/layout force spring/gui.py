@@ -124,6 +124,7 @@ class GraphRendererOgl:
         self.oglcanvas.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
         self.oglcanvas.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)
         self.oglcanvas.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
+        self.oglcanvas.Bind(wx.EVT_CHAR, self.onKeyChar)
         self.oglcanvas.Bind(wx.EVT_SIZE, self.OnResizeFrame)
         
         self.popupmenu = None
@@ -189,6 +190,9 @@ class GraphRendererOgl:
         keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
         #if event.ShiftDown():
         #if event.ControlDown():
+        #print keycode
+        #print chr(keycode)
+        #print ord('L')
 
         if keycode == wx.WXK_DOWN:
             self.ReLayout(keep_current_positions=True, gui=self)
@@ -209,13 +213,62 @@ class GraphRendererOgl:
         elif keycode == wx.WXK_INSERT:
             self.InsertNewNode()
 
-        elif chr(keycode) == '1':
+        event.Skip()
+
+    def onKeyChar(self, event):
+        if event.GetKeyCode() >= 256:
+            event.Skip()
+            return
+        
+        keycode = chr(event.GetKeyCode())
+
+        if keycode == '1':
             self.NewEdgeMarkFrom()
 
-        elif chr(keycode) == '2':
+        elif keycode == '2':
             self.NewEdgeMarkTo()
             
+        elif keycode == 'l':
+            print self.CountLineCrossingsAll()
+
+        elif keycode == 'x' or keycode == 'X':
+            self.coordmapper.Recalibrate(scale=1.4)
+            #if keycode == 'X':
+            self.ReLayout(keep_current_positions=False, gui=self)
+            self.ReLayout(keep_current_positions=True, gui=self)
+            self.ReLayout(keep_current_positions=True, gui=self)
+            self.ReLayout(keep_current_positions=True, gui=self)
+            self.coordmapper.Recalibrate(scale=3.2)
+            for i in range(15):
+                crossings = self.CountLineCrossingsAll()
+                num = crossings['ALL']
+                print num
+                if num == 0 or num/2 <= 1:
+                    self.AllToWorldCoords()
+                    self.stage2() # does overlap removal and stateofthenation
+                    break
+                #self.ReLayout(keep_current_positions=True, gui=self)
+                self.ChangeScale(-0.2)
+
         event.Skip()
+
+    def CountLineCrossingsAll(self):
+        result = {}
+        allcount = 0
+        for node in self.graph.nodes:
+            total_crossing = []
+            for edge in self.graph.edges:
+                line_start_point = edge['source'].centre_point
+                line_end_point = edge['target'].centre_point
+                if edge['source'] == node or edge['target'] == node:
+                    continue
+                crossings = node.CalcLineIntersections(line_start_point, line_end_point)
+                if crossings:
+                    total_crossing.extend(crossings)
+            result[node.id] = len(total_crossing)
+            allcount += len(total_crossing)
+        result['ALL'] = allcount
+        return result
 
     def NewEdgeMarkFrom(self):
         selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
