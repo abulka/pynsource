@@ -231,24 +231,44 @@ class GraphRendererOgl:
         elif keycode == 'l':
             print self.CountLineCrossingsAll()
 
-        elif keycode == 'x' or keycode == 'X':
+        elif keycode in ['x', 'X', 'z', 'Z']:
+            
+            use_overlaps_not_linecrossing = keycode in ['Z','z']
+            
+            self.AllToLayoutCoords()
             self.coordmapper.Recalibrate(scale=1.4)
-            #if keycode == 'X':
-            self.ReLayout(keep_current_positions=False, gui=self)
-            self.ReLayout(keep_current_positions=True, gui=self)
-            self.ReLayout(keep_current_positions=True, gui=self)
-            self.ReLayout(keep_current_positions=True, gui=self)
+            layouter = GraphLayoutSpring(self.graph, gui=self)    # should keep this around
+            
+            if keycode in ['X','Z']:
+                layouter.layout(keep_current_positions=False)
+            layouter.layout(keep_current_positions=True)
+            layouter.layout(keep_current_positions=True)
+            layouter.layout(keep_current_positions=True)
+            
             self.coordmapper.Recalibrate(scale=3.2)
             for i in range(15):
-                crossings = self.CountLineCrossingsAll()
-                num = crossings['ALL']
-                print num
-                if num == 0 or num/2 <= 1:
-                    self.AllToWorldCoords()
-                    self.stage2() # does overlap removal and stateofthenation
-                    break
-                #self.ReLayout(keep_current_positions=True, gui=self)
                 self.ChangeScale(-0.2)
+                self.AllToWorldCoords()
+                
+                # see how many overlap the expansion fixes
+                numoverlaps = self.overlap_remover.CountOverlaps()
+
+                # see how many line crossings the expansion fixes (after removin overlaps)
+                self.overlap_remover.RemoveOverlaps()
+                #self.stateofthenation()
+                crossings = self.CountLineCrossingsAll()['ALL']/2
+                
+                print "at scale %.1f there are %d line crossings and node overlaps %d " % (self.coordmapper.scale, crossings, numoverlaps)
+                if use_overlaps_not_linecrossing and numoverlaps <= 0:
+                    print "ok aborting expansion since num overlaps!! <= 1"
+                    break
+                    
+                if not use_overlaps_not_linecrossing and crossings <= 0:
+                    print "ok aborting expansion since crossings <= 1"
+                    break
+
+            self.stage2() # does overlap removal and stateofthenation
+            print "scale ended up as ", self.coordmapper.scale
 
         event.Skip()
 
@@ -347,7 +367,7 @@ class GraphRendererOgl:
         self.coordmapper.Recalibrate(scale=self.coordmapper.scale+delta)
         self.AllToWorldCoords()
         numoverlaps = self.overlap_remover.CountOverlaps()
-        print "Num Overlaps at scale", self.coordmapper.scale, numoverlaps
+        #print "Num Node Overlaps at scale", self.coordmapper.scale, numoverlaps
         
         saveit = self.overlap_remover.gui
         self.overlap_remover.gui = None
