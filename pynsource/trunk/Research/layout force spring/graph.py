@@ -96,6 +96,30 @@ class Graph:
             edges += "{'type':'edge', 'id':'%s_to_%s', 'source':'%s', 'target':'%s'}\n" % (source, target, source, target)
         return nodes + edges
 
+    def GetMementoOfLayoutPoints(self):
+        memento = {}
+        for node in self.nodes:
+            memento[node.id] = (node.layoutPosX, node.layoutPosY)
+        return memento
+
+    def GetMementoOfPositions(self):
+        memento = {}
+        for node in self.nodes:
+            memento[node.id] = (node.left, node.top)
+        return memento
+
+    @classmethod
+    def MementosEqual(self, memento1, memento2, tolerance=5):
+        for id, point in memento1.items():
+            point2 = memento2.get(id, None)
+            #if tolerance == 0.01:
+            #    print "point %s diff %f greater than %f = %s" % (point, abs(point[0] - point2[0]), tolerance, abs(point[0] - point2[0]) > tolerance)
+            if abs(point[0] - point2[0]) > tolerance or abs(point[1] - point2[1]) > tolerance:
+                return False
+        return True
+    
+
+            
 from line_intersection import FindLineIntersection
 
 class GraphNode:

@@ -3,7 +3,7 @@
 # Ported and Adapted from Graph::Layouter::Spring in
 #    http://search.cpan.org/~pasky/Graph-Layderer-0.02/
 
-from graph import GraphNode
+from graph import Graph, GraphNode
 import random
 import math
 
@@ -20,11 +20,38 @@ class GraphLayoutSpring:
     def layout(self, keep_current_positions=False):
         if not keep_current_positions:
             self.layoutPrepare()
+
+        memento1 = self.graph.GetMementoOfLayoutPoints()
+        break_pending = 0
+        
         for i in range(0, self.iterations):
             self.layoutIteration()
+
             if self.gui and i%10==0:
                 self.layoutCalcBounds()
                 self.gui.stateofthespring()     # refresh gui
+
+            #"""
+            #Possible optimisation.
+            
+            memento2 = self.graph.GetMementoOfLayoutPoints()
+            #print "memento1", memento1
+            #print "memento2", memento2
+            
+            if Graph.MementosEqual(memento1, memento2, 0.01):
+                break_pending += 1
+                #print "mementos about equal - rare, perhaps break", break_pending
+                print "!",
+                if break_pending > 150:
+                    print "break"
+                    break
+            else:
+                break_pending = 0
+                print ".",
+            memento1 = memento2
+            #"""
+        #print
+        
         self.layoutCalcBounds()
        
     def layoutPrepare(self):

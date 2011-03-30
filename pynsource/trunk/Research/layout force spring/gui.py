@@ -259,7 +259,7 @@ class GraphRendererOgl:
                 crossings = self.CountLineCrossingsAll()['ALL']/2
                 
                 print "at scale %.1f there are %d line crossings and node overlaps %d " % (self.coordmapper.scale, crossings, numoverlaps)
-                if use_overlaps_not_linecrossing and numoverlaps <= 0:
+                if use_overlaps_not_linecrossing and numoverlaps <= 3:
                     print "ok aborting expansion since num overlaps!! <= 1"
                     break
                     
@@ -269,6 +269,57 @@ class GraphRendererOgl:
 
             self.stage2() # does overlap removal and stateofthenation
             print "scale ended up as ", self.coordmapper.scale
+
+        elif keycode in ['b', 'B']:
+            
+            # Blackboard
+            
+            #def MementosEqual_OLD(memento1, memento2):
+            #    g1, g2 = Graph(), Graph()
+            #    g1.LoadGraphFromStrings(memento1)
+            #    g2.LoadGraphFromStrings(memento2)
+            #    for n1 in g1.nodes:
+            #        n2 = g2.FindNodeById(n1.id)
+            #        if abs(n1.left - n2.left) > 10 or abs(n1.top - n2.top) > 10:
+            #            # significant node movement difference
+            #            print "OLD significant node movement difference at %s" % n1.id
+            #            return False
+            #    return True
+                
+            
+            layouter = GraphLayoutSpring(self.graph, gui=self)
+
+            # layout a few times
+            self.AllToLayoutCoords()
+            #memento1_OLD = self.graph.GraphToString()
+            memento1 = self.graph.GetMementoOfPositions()
+            
+            if keycode == 'B':
+                layouter.layout(keep_current_positions=False)
+            else:
+                layouter.layout(keep_current_positions=True)
+
+            for i in range(15):            
+                self.AllToWorldCoords()
+                #memento2_OLD = self.graph.GraphToString()
+                memento2 = self.graph.GetMementoOfPositions()
+                
+                #if MementosEqual_OLD(memento1_OLD, memento2_OLD) <> MementosEqual(memento1, memento2):
+                #    print "WARNING - memento routines logic don't match!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                
+                if Graph.MementosEqual(memento1, memento2):
+                    print i, "World Position Mementos Equal - break"
+                    break
+                else:
+                    print i, "keep trying"
+                    layouter.layout(keep_current_positions=True)
+
+                layouter.layout(keep_current_positions=True)
+                memento1 = memento2
+                #memento1_OLD = memento2_OLD
+            
+            self.AllToWorldCoords()
+            self.stage2() # does overlap removal and stateofthenation
 
         event.Skip()
 
