@@ -17,7 +17,7 @@ class GraphLayoutSpring:
         self.maxVertexMovement = 0.5
         self.gui = gui
        
-    def layout(self, keep_current_positions=False):
+    def layout(self, keep_current_positions=False, optimise=True):
         if not keep_current_positions:
             self.layoutPrepare()
 
@@ -31,27 +31,26 @@ class GraphLayoutSpring:
                 self.layoutCalcBounds()
                 self.gui.stateofthespring()     # refresh gui
 
-            #"""
-            #Possible optimisation.
+                #Possible optimisation.
             
-            memento2 = self.graph.GetMementoOfLayoutPoints()
-            #print "memento1", memento1
-            #print "memento2", memento2
-            
-            if Graph.MementosEqual(memento1, memento2, 0.01):
-                break_pending += 1
-                #print "mementos about equal - rare, perhaps break", break_pending
-                print "!",
-                if break_pending > 150:
-                    print "break"
-                    break
-            else:
-                break_pending = 0
-                print ".",
-            memento1 = memento2
-            #"""
+                if optimise:
+                    memento2 = self.graph.GetMementoOfLayoutPoints()
+                    #print "memento1", memento1
+                    #print "memento2", memento2
+                    
+                    if Graph.MementosEqual(memento1, memento2, 0.01):
+                        break_pending += 1
+                        #print "mementos about equal - rare, perhaps break", break_pending
+                        print "!",
+                        if break_pending > 6:
+                            print "break"
+                            break
+                    else:
+                        break_pending = 0
+                        print ".",
+                    memento1 = memento2
+
         #print
-        
         self.layoutCalcBounds()
        
     def layoutPrepare(self):

@@ -130,6 +130,7 @@ class GraphRendererOgl:
         self.popupmenu = None
         self.need_abort = False
         self.new_edge_from = None
+        self.working = False
 
         if UNIT_TESTING_MODE:
             self.overlap_remover = OverlapRemoval(self.graph, margin=5, gui=self)
@@ -195,17 +196,39 @@ class GraphRendererOgl:
         #print ord('L')
 
         if keycode == wx.WXK_DOWN:
-            self.ReLayout(keep_current_positions=True, gui=self)
+            if self.working: return
+            self.working = True
+            optimise = not event.ShiftDown()
+            self.ReLayout(keep_current_positions=True, gui=self, optimise=optimise)
+            self.working = False
 
         elif keycode == wx.WXK_UP:
+            if self.working: return
+            self.working = True
             print "keep_current_positions=False"
-            self.ReLayout(keep_current_positions=False, gui=self)
+            optimise = not event.ShiftDown()
+            self.ReLayout(keep_current_positions=False, gui=self, optimise=optimise)
+            self.working = False
             
         elif keycode == wx.WXK_RIGHT:
-            self.ChangeScale(-0.2)
+            if self.working: return
+            self.working = True
+            if self.coordmapper.scale > 0.8:
+                self.ChangeScale(-0.2)
+                print "expansion ", self.coordmapper.scale
+            else:
+                print "Max expansion prevented.", self.coordmapper.scale
+            self.working = False
             
         elif keycode == wx.WXK_LEFT:
-            self.ChangeScale(0.2)
+            if self.working: return
+            self.working = True
+            if self.coordmapper.scale < 3:
+                self.ChangeScale(0.2)
+                print "contraction ", self.coordmapper.scale
+            else:
+                print "Min expansion thwarted.", self.coordmapper.scale
+            self.working = False
             
         elif keycode == wx.WXK_DELETE:
             self.DeleteSelectedNode()
@@ -232,6 +255,8 @@ class GraphRendererOgl:
             print self.CountLineCrossingsAll()
 
         elif keycode in ['x', 'X', 'z', 'Z']:
+            if self.working: return
+            self.working = True
             
             use_overlaps_not_linecrossing = keycode in ['Z','z']
             
@@ -263,35 +288,27 @@ class GraphRendererOgl:
                     print "ok aborting expansion since num overlaps!! <= 1"
                     break
                     
-                if not use_overlaps_not_linecrossing and crossings <= 0:
-                    print "ok aborting expansion since crossings <= 1"
+                if not use_overlaps_not_linecrossing and crossings == 0 or self.coordmapper.scale < 1.4:
+                    if self.coordmapper.scale < 1.4:
+                        print "ok aborting expansion gone too far, with line-shape overlaps remaining. :-("
+                    else:
+                        print "ok finished expansion since crossings == 0 :-)"
                     break
 
             self.stage2() # does overlap removal and stateofthenation
             print "scale ended up as ", self.coordmapper.scale
+            self.working = False
 
         elif keycode in ['b', 'B']:
+            if self.working: return
+            self.working = True
             
             # Blackboard
-            
-            #def MementosEqual_OLD(memento1, memento2):
-            #    g1, g2 = Graph(), Graph()
-            #    g1.LoadGraphFromStrings(memento1)
-            #    g2.LoadGraphFromStrings(memento2)
-            #    for n1 in g1.nodes:
-            #        n2 = g2.FindNodeById(n1.id)
-            #        if abs(n1.left - n2.left) > 10 or abs(n1.top - n2.top) > 10:
-            #            # significant node movement difference
-            #            print "OLD significant node movement difference at %s" % n1.id
-            #            return False
-            #    return True
-                
             
             layouter = GraphLayoutSpring(self.graph, gui=self)
 
             # layout a few times
             self.AllToLayoutCoords()
-            #memento1_OLD = self.graph.GraphToString()
             memento1 = self.graph.GetMementoOfPositions()
             
             if keycode == 'B':
@@ -301,11 +318,7 @@ class GraphRendererOgl:
 
             for i in range(15):            
                 self.AllToWorldCoords()
-                #memento2_OLD = self.graph.GraphToString()
                 memento2 = self.graph.GetMementoOfPositions()
-                
-                #if MementosEqual_OLD(memento1_OLD, memento2_OLD) <> MementosEqual(memento1, memento2):
-                #    print "WARNING - memento routines logic don't match!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                 
                 if Graph.MementosEqual(memento1, memento2):
                     print i, "World Position Mementos Equal - break"
@@ -316,11 +329,12 @@ class GraphRendererOgl:
 
                 layouter.layout(keep_current_positions=True)
                 memento1 = memento2
-                #memento1_OLD = memento2_OLD
             
             self.AllToWorldCoords()
             self.stage2() # does overlap removal and stateofthenation
 
+            self.working = False
+            
         event.Skip()
 
     def CountLineCrossingsAll(self):
@@ -425,13 +439,13 @@ class GraphRendererOgl:
         self.stage2(force_stateofthenation=True) # does overlap removal and stateofthenation
         self.overlap_remover.gui = saveit
         
-    def ReLayout(self, keep_current_positions=False, gui=None):
+    def ReLayout(self, keep_current_positions=False, gui=None, optimise=True):
         # layout again
         #print "spring layout again!"
         self.AllToLayoutCoords()
 
         layouter = GraphLayoutSpring(self.graph, gui)    # should keep this around
-        layouter.layout(keep_current_positions)
+        layouter.layout(keep_current_positions, optimise=optimise)
         
         self.AllToWorldCoords()
         self.stage2() # does overlap removal and stateofthenation
