@@ -245,16 +245,39 @@ class GraphRendererOgl:
         
         keycode = chr(event.GetKeyCode())
 
-        if keycode == '1':
+        if keycode == 'q':
             self.NewEdgeMarkFrom()
 
-        elif keycode == '2':
+        elif keycode == 'w':
             self.NewEdgeMarkTo()
             
-        elif keycode == 'l':
-            print self.CountLineCrossingsAll()
+        if keycode in ['1','2','3']:
+            if not self.mementos:
+                return
+            
+            if self.working: return
+            self.working = True
+            
+            for i, memento in enumerate(self.mementos):
+                print "Memento %d has info %d %d" % (i, memento[0], memento[1])
+                
+            i = ord(keycode) - ord('1')
+            memento = self.mementos[i][2]
+
+            self.graph.RestoreWorldPositions(memento)
+            self.stateofthenation()
+            #self.stage2(force_stateofthenation=True) # does overlap removal and stateofthenation
+            #                # Need true because overlaps have by definition been removed already
+            #                # from the memento, and stage2() doesn't redraw unless overlaps have
+            #                # been actually calculated to have been removed.
+
+            self.working = False
 
         elif keycode in ['x', 'X', 'z', 'Z']:
+            """
+            x = layout a few times to untangle then scale up till line-shape crossings low
+            z = layout a few times to untangle then scale up till natural shape overlaps low (don't apply overlap removal till end)
+            """
             if self.working: return
             self.working = True
             
@@ -299,11 +322,17 @@ class GraphRendererOgl:
             print "scale ended up as ", self.coordmapper.scale
             self.working = False
 
-        elif keycode in ['b', 'B']:
+        elif keycode in ['c', 'C']:
+            """
+            Relayout till nothing seems to move anymore in real world coordingate
+            Stay at same scale
+            
+            POSSIBLY integrate this algorithm into a lower level.
+            Yeah I've also added a touch of this behaviour to the spring layout too,
+            operating on layout coords.  Spring Layout itself drops out early if nothing changing.
+            """
             if self.working: return
             self.working = True
-            
-            # Blackboard
             
             layouter = GraphLayoutSpring(self.graph, gui=self)
 
@@ -316,24 +345,94 @@ class GraphRendererOgl:
             else:
                 layouter.layout(keep_current_positions=True)
 
-            for i in range(15):            
+            for i in range(1, 15):            
                 self.AllToWorldCoords()
                 memento2 = self.graph.GetMementoOfPositions()
                 
                 if Graph.MementosEqual(memento1, memento2):
-                    print i, "World Position Mementos Equal - break"
+                    print "Layout %d World Position Mementos Equal - break" % i
                     break
                 else:
-                    print i, "keep trying"
+                    print "Layout %d World Positions in flux - keep trying" % i
                     layouter.layout(keep_current_positions=True)
 
-                layouter.layout(keep_current_positions=True)
+                #layouter.layout(keep_current_positions=True)
                 memento1 = memento2
             
             self.AllToWorldCoords()
             self.stage2() # does overlap removal and stateofthenation
 
             self.working = False
+
+        elif keycode in ['b', 'B']:
+            if self.working: return
+            self.working = True
+            
+            """
+            Blackboard
+            Rerun layout several times, remembering each as a memento.  Then pick the best.
+            """
+            self.AllToLayoutCoords()
+            layouter = GraphLayoutSpring(self.graph, gui=None)
+            self.mementos = []
+            
+            # layout a few times
+            for i in range(3):
+                layouter.layout(keep_current_positions=False)
+                layouter.layout(keep_current_positions=True)
+                layouter.layout(keep_current_positions=True)
+                
+                #self.coordmapper.Recalibrate()  # don't need this unless scale changed, so - no.
+                self.AllToWorldCoords()  # need this if gui animation off
+                
+                # optional - if you want to take into account a post overlap removal situation
+                self.overlap_remover.RemoveOverlaps()
+                
+                memento = self.graph.GetMementoOfPositions()
+                num_line_shape_crossings = self.CountLineCrossingsAll()['ALL']/2
+                num_line_line_crossings = 0 # TODO
+                
+                self.mementos.append((num_line_line_crossings, num_line_shape_crossings, memento))
+                
+                self.stateofthenation()
+                wx.SafeYield()
+                
+            
+            self.mementos.sort()  # should sort by 1st item in tuple, followed by next item in tuple etc. - perfect!
+
+            # preview each result
+            #for i, result in enumerate(self.mementos):
+            #    self.graph.RestoreWorldPositions(result[2])
+            #    self.stage2() # does overlap removal and stateofthenation
+            #    print "preview of result", i, "num_line_shape_crossings", result[1]
+            #    wx.SafeYield()
+            #    time.sleep(0.5)
+                
+            #line_shape_crossings = [r[2] for r in results]
+            #lowest_amount = min(line_shape_crossings)
+            #memento = [r[0] for r in results if r[2] == lowest_amount][0]
+
+            time.sleep(0.5)
+            bestmemento = self.mementos[0][2]
+            self.graph.RestoreWorldPositions(bestmemento)
+            self.stateofthenation()
+            self.AllToLayoutCoords() # just in case you choose to scale next
+            
+            self.working = False
+            
+        elif keycode == 'l':
+            print self.CountLineCrossingsAll()
+
+        elif keycode in ['?',]:
+            print "-"*50
+            print "scale", self.coordmapper.scale
+            
+            #self.AllToWorldCoords()
+            crossings = self.CountLineCrossingsAll()['ALL']/2
+            print "number of lines crossing shapes", crossings
+            
+            print "number of shape overlaps", self.overlap_remover.CountOverlaps()
+            
             
         event.Skip()
 

@@ -118,7 +118,10 @@ class Graph:
                 return False
         return True
     
-
+    def RestoreWorldPositions(self, memento):
+        for id, point in memento.items():
+            node = self.FindNodeById(id)
+            node.left, node.top = point
             
 from line_intersection import FindLineIntersection
 
