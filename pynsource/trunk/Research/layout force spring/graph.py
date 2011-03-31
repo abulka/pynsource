@@ -1,6 +1,9 @@
 # graph / node abstraction
 # for use by spring layout and overlap removeal
 
+from line_intersection import FindLineIntersection
+from permutations import getpermutations
+
 class Graph:
     def __init__(self):
         self.Clear()
@@ -122,8 +125,58 @@ class Graph:
         for id, point in memento.items():
             node = self.FindNodeById(id)
             node.left, node.top = point
+
+    def CountLineCrossingsAll(self):
+        result = {}
+        allcount = 0
+        for node in self.nodes:
+            total_crossing = []
+            for edge in self.edges:
+                line_start_point = edge['source'].centre_point
+                line_end_point = edge['target'].centre_point
+                if edge['source'] == node or edge['target'] == node:
+                    continue
+                crossings = node.CalcLineIntersections(line_start_point, line_end_point)
+                if crossings:
+                    total_crossing.extend(crossings)
+            result[node.id] = len(total_crossing)
+            allcount += len(total_crossing)
+        result['ALL'] = allcount
+        return result
+
+    def CountLineOverLineIntersections(self, ignore_crossingpoints_inside_nodes=True):
+        
+        def PointInsideANode(point):
+            for node in self.nodes:
+                if node.ContainsPoint(point):
+                    return node
+            return None
+        
+        result = []
+        for edge1, edge2 in getpermutations(self.edges):
+            line_start_point = edge1['source'].centre_point
+            line_end_point = edge2['target'].centre_point
+            point = FindLineIntersection(edge1['source'].centre_point, edge1['target'].centre_point,
+                                         edge2['source'].centre_point, edge2['target'].centre_point)
+            if point:
+                point = (int(point[0]), int(point[1]))
+                if (ignore_crossingpoints_inside_nodes and not PointInsideANode(point)) and \
+                    point not in [edge1['source'].centre_point,  edge1['target'].centre_point,
+                                  edge2['source'].centre_point, edge2['target'].centre_point]:
+                    #print edge1, edge2
+                    #print "%s/%s line crosses line %s/%s" % (edge1['source'].id, edge1['target'].id,
+                    #                                         edge2['source'].id, edge2['target'].id)
+                    result.append( point )
+    
+        # trim out duplicated and Nones
+        def remove_duplicates(lzt):
+            d = {}
+            for x in lzt: d[tuple(x)]=x
+            return d.values()
+        result = [r for r in result if r != None]
+        result = remove_duplicates(result)
+        return result
             
-from line_intersection import FindLineIntersection
 
 class GraphNode:
     def __init__(self, id, left, top, width=60, height=60):
@@ -182,6 +235,9 @@ class GraphNode:
         
     centre_point = property(get_centre_point)
     
+    def ContainsPoint(self, point):
+        return point[0] >= self.left and point[0] <= self.right and point[1] >= self.top and point[1] <= self.bottom
+        
     def __str__(self):
         return "Node %s: x,y (%d, %d) w,h (%d, %d)" % (self.id, self.left, self.top, self.width, self.height)
    

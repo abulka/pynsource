@@ -304,7 +304,7 @@ class GraphRendererOgl:
                 # see how many line crossings the expansion fixes (after removin overlaps)
                 self.overlap_remover.RemoveOverlaps()
                 #self.stateofthenation()
-                crossings = self.CountLineCrossingsAll()['ALL']/2
+                crossings = self.graph.CountLineCrossingsAll()['ALL']/2
                 
                 print "at scale %.1f there are %d line crossings and node overlaps %d " % (self.coordmapper.scale, crossings, numoverlaps)
                 if use_overlaps_not_linecrossing and numoverlaps <= 3:
@@ -340,7 +340,7 @@ class GraphRendererOgl:
             self.AllToLayoutCoords()
             memento1 = self.graph.GetMementoOfPositions()
             
-            if keycode == 'B':
+            if keycode == 'C':
                 layouter.layout(keep_current_positions=False)
             else:
                 layouter.layout(keep_current_positions=True)
@@ -389,8 +389,8 @@ class GraphRendererOgl:
                 self.overlap_remover.RemoveOverlaps()
                 
                 memento = self.graph.GetMementoOfPositions()
-                num_line_shape_crossings = self.CountLineCrossingsAll()['ALL']/2
-                num_line_line_crossings = 0 # TODO
+                num_line_shape_crossings = self.graph.CountLineCrossingsAll()['ALL']/2
+                num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
                 
                 self.mementos.append((num_line_line_crossings, num_line_shape_crossings, memento))
                 
@@ -421,38 +421,21 @@ class GraphRendererOgl:
             self.working = False
             
         elif keycode == 'l':
-            print self.CountLineCrossingsAll()
+            print self.graph.CountLineCrossingsAll()
 
         elif keycode in ['?',]:
             print "-"*50
             print "scale", self.coordmapper.scale
             
             #self.AllToWorldCoords()
-            crossings = self.CountLineCrossingsAll()['ALL']/2
+            crossings = self.graph.CountLineCrossingsAll()['ALL']/2
             print "number of lines crossing shapes", crossings
             
             print "number of shape overlaps", self.overlap_remover.CountOverlaps()
             
+            print "number of Line Over Line Intersections", len(self.graph.CountLineOverLineIntersections())
             
         event.Skip()
-
-    def CountLineCrossingsAll(self):
-        result = {}
-        allcount = 0
-        for node in self.graph.nodes:
-            total_crossing = []
-            for edge in self.graph.edges:
-                line_start_point = edge['source'].centre_point
-                line_end_point = edge['target'].centre_point
-                if edge['source'] == node or edge['target'] == node:
-                    continue
-                crossings = node.CalcLineIntersections(line_start_point, line_end_point)
-                if crossings:
-                    total_crossing.extend(crossings)
-            result[node.id] = len(total_crossing)
-            allcount += len(total_crossing)
-        result['ALL'] = allcount
-        return result
 
     def NewEdgeMarkFrom(self):
         selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
