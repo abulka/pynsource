@@ -131,6 +131,7 @@ class GraphRendererOgl:
         self.need_abort = False
         self.new_edge_from = None
         self.working = False
+        self.mementos = None
 
         if UNIT_TESTING_MODE:
             self.overlap_remover = OverlapRemoval(self.graph, margin=5, gui=self)
@@ -214,7 +215,7 @@ class GraphRendererOgl:
             if self.working: return
             self.working = True
             if self.coordmapper.scale > 0.8:
-                self.ChangeScale(-0.2)
+                self.ChangeScale(-0.2, remap_world_to_layout=event.ShiftDown())
                 print "expansion ", self.coordmapper.scale
             else:
                 print "Max expansion prevented.", self.coordmapper.scale
@@ -224,7 +225,7 @@ class GraphRendererOgl:
             if self.working: return
             self.working = True
             if self.coordmapper.scale < 3:
-                self.ChangeScale(0.2)
+                self.ChangeScale(0.2, remap_world_to_layout=event.ShiftDown())
                 print "contraction ", self.coordmapper.scale
             else:
                 print "Min expansion thwarted.", self.coordmapper.scale
@@ -259,9 +260,11 @@ class GraphRendererOgl:
             self.working = True
             
             todisplay = ord(keycode) - ord('1')
-            memento = self.mementos[todisplay][4]
-
             if todisplay < len(self.mementos):
+                memento = self.mementos[todisplay][4]
+                scale = self.mementos[todisplay][2]
+                self.coordmapper.Recalibrate(scale=scale)
+                print "restoring scale", scale, "bu I don't see much point since memento is world coords"
                 self.graph.RestoreWorldPositions(memento)
                 self.stateofthenation()
             else:
@@ -272,7 +275,7 @@ class GraphRendererOgl:
                 msg = ""
                 if i == todisplay:
                     msg = " <---"
-                print "Memento %d has info l-l %d l-n %d scale %.1f bounds %d %s" % (i, memento[0], memento[1], memento[2], memento[3], msg)
+                print "Memento %d has info l-l %d l-n %d scale %.1f bounds %d %s" % (i+1, memento[0], memento[1], memento[2], memento[3], msg)
 
             self.working = False
 
@@ -352,18 +355,21 @@ class GraphRendererOgl:
             self.AllToLayoutCoords()
             layouter = GraphLayoutSpring(self.graph, gui=None)
             self.mementos = []
+            save_scale = self.coordmapper.scale
 
             # Generate a few totally fresh layout variations
             for i in range(3):
                 layouter.layout(keep_current_positions=False)
                 
                 #self.coordmapper.Recalibrate()  # don't need this unless scale changed, so - no.
+                self.coordmapper.Recalibrate(scale=save_scale)
                 self.AllToWorldCoords()  # need this if gui animation off
                 self.overlap_remover.RemoveOverlaps()  # you DO want to take into account a post overlap removal situation
                 num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
                 
                 for use_overlaps_not_linecrossing in [True, False]:
                     scale, num_node_node_overlaps, num_line_node_crossings = self.ScaleUpMadly(use_overlaps_not_linecrossing)
+                    assert scale == self.coordmapper.scale
 
                     memento = self.graph.GetMementoOfPositions()
 
@@ -426,15 +432,11 @@ class GraphRendererOgl:
 
         elif keycode in ['?',]:
             print "-"*50
+            print "# line-line intersections", len(self.graph.CountLineOverLineIntersections())
+            print "# node-node overlaps (post overlap removal always ~ 0)", self.overlap_remover.CountOverlaps()
+            print "# line-node crossings", self.graph.CountLineOverShapeCrossings()['ALL']/2
             print "scale", self.coordmapper.scale
-            
-            #self.AllToWorldCoords()
-            crossings = self.graph.CountLineOverShapeCrossings()['ALL']/2
-            print "number of lines crossing shapes", crossings
-            
-            print "number of shape overlaps", self.overlap_remover.CountOverlaps()
-            
-            print "number of Line Over Line Intersections", len(self.graph.CountLineOverLineIntersections())
+            print "bounds ?"
             
         event.Skip()
 
@@ -507,8 +509,13 @@ class GraphRendererOgl:
         self.stateofthenation()
 
     def OnWheelZoom(self, event):
+        if self.working: return
+        self.working = True
+
         self.stage2()
         print self.overlap_remover.GetStats()
+
+        self.working = False
 
     def draw(self, translatecoords=True):
         self.stage1(translatecoords=translatecoords)
@@ -545,7 +552,9 @@ class GraphRendererOgl:
         self.AllToWorldCoords()
         self.stateofthenation() # DON'T do overlap removal or it will get mad!
 
-    def ChangeScale(self, delta):
+    def ChangeScale(self, delta, remap_world_to_layout=False):
+        if remap_world_to_layout:
+            self.AllToLayoutCoords()    # Experimental - probably needed when 
         self.coordmapper.Recalibrate(scale=self.coordmapper.scale+delta)
         self.AllToWorldCoords()
         numoverlaps = self.overlap_remover.CountOverlaps()
