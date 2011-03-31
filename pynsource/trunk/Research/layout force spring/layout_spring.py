@@ -10,7 +10,7 @@ import math
 class GraphLayoutSpring:
     def __init__(self, graph, gui=None):
         self.graph = graph
-        self.iterations = 500
+        self.iterations = 3000
         self.maxRepulsiveForceDistance = 6
         self.k = 2
         self.c = 0.01
@@ -27,27 +27,21 @@ class GraphLayoutSpring:
         for i in range(0, self.iterations):
             self.layoutIteration()
 
-            if self.gui and i%10==0:
+            if self.gui and i%20==0:
                 self.layoutCalcBounds()
                 self.gui.stateofthespring()     # refresh gui
 
-                #Possible optimisation.
-            
                 if optimise:
                     memento2 = self.graph.GetMementoOfLayoutPoints()
-                    #print "memento1", memento1
-                    #print "memento2", memento2
-                    
                     if Graph.MementosEqual(memento1, memento2, 0.01):
                         break_pending += 1
-                        #print "mementos about equal - rare, perhaps break", break_pending
-                        print "!",
-                        if break_pending > 6:
+                        #print "!",
+                        if break_pending > 5:
                             print "break"
                             break
                     else:
                         break_pending = 0
-                        print ".",
+                        #print ".",
                     memento1 = memento2
 
         #print
