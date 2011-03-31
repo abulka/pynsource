@@ -126,7 +126,7 @@ class Graph:
             node = self.FindNodeById(id)
             node.left, node.top = point
 
-    def CountLineCrossingsAll(self):
+    def CountLineOverShapeCrossings(self):
         result = {}
         allcount = 0
         for node in self.nodes:
@@ -163,25 +163,19 @@ class Graph:
                 if (ignore_crossingpoints_inside_nodes and not PointInsideANode(point)) and \
                     point not in [edge1['source'].centre_point,  edge1['target'].centre_point,
                                   edge2['source'].centre_point, edge2['target'].centre_point]:
-                    #print edge1, edge2
-                    #print "%s/%s line crosses line %s/%s" % (edge1['source'].id, edge1['target'].id,
-                    #                                         edge2['source'].id, edge2['target'].id)
                     result.append( point )
     
-        # trim out duplicated and Nones
+        # trim out duplicates
         def remove_duplicates(lzt):
             d = {}
             for x in lzt: d[tuple(x)]=x
             return d.values()
-        result = [r for r in result if r != None]
         result = remove_duplicates(result)
         return result
             
 
 class GraphNode:
     def __init__(self, id, left, top, width=60, height=60):
-        #self.value = value
-        
         self.id = id
         
         self.left = left

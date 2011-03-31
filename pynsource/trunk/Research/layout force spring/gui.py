@@ -266,10 +266,6 @@ class GraphRendererOgl:
 
             self.graph.RestoreWorldPositions(memento)
             self.stateofthenation()
-            #self.stage2(force_stateofthenation=True) # does overlap removal and stateofthenation
-            #                # Need true because overlaps have by definition been removed already
-            #                # from the memento, and stage2() doesn't redraw unless overlaps have
-            #                # been actually calculated to have been removed.
 
             self.working = False
 
@@ -304,7 +300,7 @@ class GraphRendererOgl:
                 # see how many line crossings the expansion fixes (after removin overlaps)
                 self.overlap_remover.RemoveOverlaps()
                 #self.stateofthenation()
-                crossings = self.graph.CountLineCrossingsAll()['ALL']/2
+                crossings = self.graph.CountLineOverShapeCrossings()['ALL']/2
                 
                 print "at scale %.1f there are %d line crossings and node overlaps %d " % (self.coordmapper.scale, crossings, numoverlaps)
                 if use_overlaps_not_linecrossing and numoverlaps <= 3:
@@ -380,7 +376,7 @@ class GraphRendererOgl:
             for i in range(3):
                 layouter.layout(keep_current_positions=False)
                 layouter.layout(keep_current_positions=True)
-                layouter.layout(keep_current_positions=True)
+                #layouter.layout(keep_current_positions=True)
                 
                 #self.coordmapper.Recalibrate()  # don't need this unless scale changed, so - no.
                 self.AllToWorldCoords()  # need this if gui animation off
@@ -389,30 +385,18 @@ class GraphRendererOgl:
                 self.overlap_remover.RemoveOverlaps()
                 
                 memento = self.graph.GetMementoOfPositions()
-                num_line_shape_crossings = self.graph.CountLineCrossingsAll()['ALL']/2
+                num_line_shape_crossings = self.graph.CountLineOverShapeCrossings()['ALL']/2
                 num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
                 
                 self.mementos.append((num_line_line_crossings, num_line_shape_crossings, memento))
                 
-                self.stateofthenation()
-                wx.SafeYield()
+                #self.stateofthenation()
+                #wx.SafeYield()
                 
             
             self.mementos.sort()  # should sort by 1st item in tuple, followed by next item in tuple etc. - perfect!
 
-            # preview each result
-            #for i, result in enumerate(self.mementos):
-            #    self.graph.RestoreWorldPositions(result[2])
-            #    self.stage2() # does overlap removal and stateofthenation
-            #    print "preview of result", i, "num_line_shape_crossings", result[1]
-            #    wx.SafeYield()
-            #    time.sleep(0.5)
-                
-            #line_shape_crossings = [r[2] for r in results]
-            #lowest_amount = min(line_shape_crossings)
-            #memento = [r[0] for r in results if r[2] == lowest_amount][0]
-
-            time.sleep(0.5)
+            #time.sleep(0.5)
             bestmemento = self.mementos[0][2]
             self.graph.RestoreWorldPositions(bestmemento)
             self.stateofthenation()
@@ -421,14 +405,14 @@ class GraphRendererOgl:
             self.working = False
             
         elif keycode == 'l':
-            print self.graph.CountLineCrossingsAll()
+            print self.graph.CountLineOverShapeCrossings()
 
         elif keycode in ['?',]:
             print "-"*50
             print "scale", self.coordmapper.scale
             
             #self.AllToWorldCoords()
-            crossings = self.graph.CountLineCrossingsAll()['ALL']/2
+            crossings = self.graph.CountLineOverShapeCrossings()['ALL']/2
             print "number of lines crossing shapes", crossings
             
             print "number of shape overlaps", self.overlap_remover.CountOverlaps()
