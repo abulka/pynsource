@@ -263,40 +263,47 @@ class GraphRendererOgl:
             todisplay = ord(keycode) - ord('1')
             if todisplay < len(self.mementos):
                 self.DisplayMemento(self.mementos[todisplay][5], self.mementos[todisplay][3])
+                self.DumpMementos(todisplay)
+                self.DumpStatus()
             else:
-                print "No such memento", todisplay
-
-            self.DumpMementos(todisplay)
-            self.DumpStatus()
+                print "No such memento", todisplay-1
 
             self.working = False
 
-        elif keycode in ['x', 'X', 'z', 'Z']:
+        elif keycode in ['x', 'X', 'z', 'Z', 'c', 'C']:
             """
-            x = layout a few times to untangle then scale up till line-node crossings low
-            z = layout a few times to untangle then scale up till natural node overlaps low (don't apply overlap removal till end)
+            layout to untangle then scale up repeatedly till strategy met
             """
             if self.working: return
             self.working = True
 
             if keycode in ['Z','z']:
                 strategy = ":reduce pre overlap removal NN overlaps"
-            else:
+            elif keycode in ['X','x']:
+                strategy = ":reduce post overlap removal LN crossings"
+            elif keycode in ['C','c']:
                 strategy = ":reduce post overlap removal LN and LL crossings"
-                #strategy = ":reduce post overlap removal LN crossings"
 
             b = LayoutBlackboard(graph=self.graph, controller=self)
-            b.LayoutThenPickBestScale(scramble=keycode in ['X','Z'], strategy=strategy)
+            b.LayoutThenPickBestScale(scramble=keycode in ['Z','X','C'], strategy=strategy)
 
             self.working = False
             
-
-        elif keycode in ['c', 'C']:
+        elif keycode in ['e',]:
             if self.working: return
             self.working = True
             
             b = LayoutBlackboard(graph=self.graph, controller=self)
-            b.LayoutRepeatedly(scramble=keycode == 'C')
+            b.Experiment1()
+            
+            self.working = False
+
+        elif keycode in ['r', 'R']:
+            if self.working: return
+            self.working = True
+            
+            b = LayoutBlackboard(graph=self.graph, controller=self)
+            b.LayoutLoopTillNoChange(scramble=keycode == 'R')
             
             self.working = False
 
@@ -321,7 +328,7 @@ class GraphRendererOgl:
         print "-"*50
         print "# line-line intersections", len(self.graph.CountLineOverLineIntersections())
         print "# node-node overlaps (post overlap removal always ~ 0)", self.overlap_remover.CountOverlaps()
-        print "# line-node crossings", self.graph.CountLineOverNodeCrossings()['ALL']/2
+        print "# line-node crossings", self.graph.CountLineOverNodeCrossings()['ALL']/2 #, self.graph.CountLineOverNodeCrossings()
         print "scale", self.coordmapper.scale
         print "bounds ?"
         

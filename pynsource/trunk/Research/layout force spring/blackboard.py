@@ -22,35 +22,37 @@ class LayoutBlackboard:
         self.controller.AllToLayoutCoords()    # doesn't matter what scale the layout starts with
         layouter = GraphLayoutSpring(self.graph, gui=None)
         self.controller.mementos = []
-        
         oriscale = self.controller.coordmapper.scale
 
-        # Generate a few totally fresh layout variations
+        def addmemento(res):
+            num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = res
+
+            if num_node_node_overlaps == None and num_line_node_crossings == None:   # tangled graph
+                num_node_node_overlaps = 99
+                num_line_node_crossings = 77
+            
+            self.controller.mementos.append((\
+                num_line_line_crossings,
+                num_node_node_overlaps,
+                num_line_node_crossings,
+                self.controller.coordmapper.scale,
+                88,
+                self.graph.GetMementoOfPositions()))
+
+        # Generate several totally fresh layout variations
         for i in range(numlayouts):
+            
+            # Do a layout 
             layouter.layout(keep_current_positions=False)
             
-            # Do a layout and expand directly to the original scale, and calc vitals stats
-            #self.coordmapper.Recalibrate(scale=oriscale) # need this if scale changed
-            #scale, num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = \
-            #    self.LayoutAndGetVitalStats()
+            # Expand directly to the original scale, and calc vitals stats
+            res = self.GetVitalStats(scale=oriscale, animate=False)
+            addmemento(res)
             
-            #self.AllToWorldCoords()  # need this if gui animation off
-            #self.overlap_remover.RemoveOverlaps()  # you DO want to take into account a post overlap removal situation
-            #num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
-            #num_line_node_crossings = self.graph.CountLineOverNodeCrossings()['ALL']/2    # ignore? 
-            
-            scale, num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = \
-                self.ScaleUpMadly(strategy=":reduce post overlap removal LN crossings")
-            memento = self.graph.GetMementoOfPositions()
-            self.controller.mementos.append((num_line_line_crossings,
-                                  num_node_node_overlaps,
-                                  num_line_node_crossings,
-                                  scale,
-                                  88,
-                                  memento))
+            # Expand progressively from small to large scale, and calc vitals stats
+            res = self.ScaleUpMadly(strategy=":reduce post overlap removal LN crossings")
+            addmemento(res)
                 
-            #self.stateofthenation()
-            #wx.SafeYield()
         
         self.controller.DumpMementos()
         print "sort"
@@ -62,8 +64,7 @@ class LayoutBlackboard:
 
     def LayoutThenPickBestScale(self, strategy=None, scramble=False, animate_at_scale=None):
         """
-        x = layout a few times to untangle then scale up till line-node crossings low
-        z = layout a few times to untangle then scale up till natural node overlaps low (don't apply overlap removal till end)
+        layout to untangle then scale up repeatedly till strategy met
         """
         self.controller.AllToLayoutCoords()  # doesn't matter what scale the layout starts with
         
@@ -76,7 +77,43 @@ class LayoutBlackboard:
         self.ScaleUpMadly(strategy, animate=True)
         self.controller.stateofthenation()
 
-    def LayoutRepeatedly(self, maxtimes=10, scramble=True):
+    def Experiment1(self):
+        """
+        Post layout, if there are LL crossings then graph is tangled.
+        
+        Want to test if this holds true for all scales
+        (don't do any overlap removal of course cos this may introduce LN's)
+        """
+        MAX_SCALE = 1.4
+        SCALE_STEP = 0.2
+        SCALE_START = 3.2
+
+        self.controller.AllToLayoutCoords()  # doesn't matter what scale the layout starts with
+        layouter = GraphLayoutSpring(self.graph, gui=self.controller)  # TODO gui = controller - yuk
+        layouter.layout(keep_current_positions=False)
+
+        initial_num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
+        if initial_num_line_line_crossings > 0:
+            print "Tangled", initial_num_line_line_crossings
+        else:
+            print "Not Tangled", initial_num_line_line_crossings
+            
+        self.controller.coordmapper.Recalibrate(scale=SCALE_START)
+        for i in range(8):
+            self.controller.coordmapper.Recalibrate(scale=self.controller.coordmapper.scale - SCALE_STEP)
+            self.controller.AllToWorldCoords()
+    
+            self.controller.stateofthenation()
+            
+            # see how many INITIAL, PRE OVERLAP REMOVAL line-line crossings there are.
+            num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
+            print 'LL crossings', num_line_line_crossings
+            if num_line_line_crossings <> initial_num_line_line_crossings:
+                print "AXIOM FAILED !!!!"
+        
+        
+            
+    def LayoutLoopTillNoChange(self, maxtimes=10, scramble=True):
         """
         Relayout till nothing seems to move anymore in real world coordinates.
         Stay at same scale. DEFUNCT - integrated this algorithm into the lower
@@ -108,6 +145,8 @@ class LayoutBlackboard:
         
     def ScaleUpMadly(self, strategy, animate=False):
         """
+        No layout performed, assuming we are working off juicy post layout coords
+        
         Leaves the scale at max level it got to - doesn't restore scale
 
         strategy = ":reduce pre overlap removal NN overlaps"
@@ -143,36 +182,13 @@ class LayoutBlackboard:
         
         self.controller.coordmapper.Recalibrate(scale=SCALE_START)
         for i in range(15):
-            self.controller.coordmapper.Recalibrate(scale=self.controller.coordmapper.scale - SCALE_STEP)
-            self.controller.AllToWorldCoords()
+            num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = \
+                self.GetVitalStats(scale=self.controller.coordmapper.scale - SCALE_STEP, animate=animate)
 
-            if animate:
-                self.controller.stateofthenation()
-            
-            """Pre Overlap Removal"""
-            
-            # see how many INITIAL, PRE OVERLAP REMOVAL line-line crossings there are.
-            num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
-            if num_line_line_crossings > 0:
+            if num_node_node_overlaps == None and num_line_node_crossings == None:
                 print "Mad: Aborting - no point since found %d tangled, post spring layout LL crossings!" % num_line_line_crossings
                 break
-
-            # see how many INITIAL, PRE OVERLAP REMOVAL node-node overlaps the expansion fixes
-            num_node_node_overlaps = self.controller.overlap_remover.CountOverlaps()
-
-            """Remove Overlaps (NN)"""
-            self.controller.overlap_remover.RemoveOverlaps(watch_removals=False)
-
-            """Post Overlap Removal"""
-
-            # How many LN reduced (or perhaps increased) after expansion & post removing NN overlaps
-            num_line_node_crossings = self.graph.CountLineOverNodeCrossings()['ALL']/2
             
-            # How many LL reduced (or perhaps increased) after expansion & post removing NN overlaps
-            num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
-
-            print "Mad: At scale %.1f LL %d NN %d LN %d" % (self.controller.coordmapper.scale, num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings)
-        
             if strategy == ":reduce pre overlap removal NN overlaps":
                 if num_node_node_overlaps <= NODE_NODE:
                     print "Mad: Aborting expansion since num NN overlaps <= %d" % NODE_NODE
@@ -188,11 +204,6 @@ class LayoutBlackboard:
             else:
                 assert False, "Mad: unknown strategy"
     
-            # Never accept LN crossings introduced as a result of expansion
-            #if num_line_node_crossings > 0:
-            #    print "Mad: Warning - introduced LN crossings as a result of expansion, expanding more..."
-            #    continue  # risky since we avoid MAX_SCALE check
-            
             if self.controller.coordmapper.scale < MAX_SCALE:
                 print "Mad: Aborting expansion - gone too far."
                 break
@@ -203,16 +214,44 @@ class LayoutBlackboard:
             self.controller.stateofthenation()
         #self.stage2() # does overlap removal and stateofthenation
         
-        return self.controller.coordmapper.scale, num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings
+        return num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings
 
-    def LayoutAndGetVitalStats(self, scale, animate=False):
+    def GetVitalStats(self, scale, animate=False):
         """
-        Do a layout and expand directly to the original scale, and calc vitals stats
+        No layout performed, assuming we are working off juicy post layout coords
+        Expand directly to the original scale, and calc vitals stats
         Same as ScaleUpMadly except only one scale made
         """
         
-        # TODO
+        self.controller.coordmapper.Recalibrate(scale=scale)
+        self.controller.AllToWorldCoords()
+
+        if animate:
+            self.controller.stateofthenation()
         
-        return self.controller.coordmapper.scale, num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings
+        """Pre Overlap Removal"""
+        
+        # see how many INITIAL, PRE OVERLAP REMOVAL line-line crossings there are.
+        num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
+        if num_line_line_crossings > 0:
+            return num_line_line_crossings, None, None      # graph is tangled, don't proceed
+
+        # see how many INITIAL, PRE OVERLAP REMOVAL node-node overlaps the expansion fixes
+        num_node_node_overlaps = self.controller.overlap_remover.CountOverlaps()
+
+        """Remove Overlaps (NN)"""
+        self.controller.overlap_remover.RemoveOverlaps(watch_removals=False)
+
+        """Post Overlap Removal"""
+
+        # How many LN reduced (or perhaps increased) after expansion & post removing NN overlaps
+        num_line_node_crossings = self.graph.CountLineOverNodeCrossings()['ALL']/2
+        
+        # How many LL reduced (or perhaps increased) after expansion & post removing NN overlaps
+        num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
+
+        print "Mad: At scale %.1f LL %d NN %d LN %d" % (self.controller.coordmapper.scale, num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings)
+    
+        return num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings
 
         
