@@ -216,20 +216,24 @@ class GraphRendererOgl:
             if self.working: return
             self.working = True
             if self.coordmapper.scale > 0.8:
-                self.ChangeScale(-0.2, remap_world_to_layout=event.ShiftDown())
+                self.ChangeScale(-0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
                 print "expansion ", self.coordmapper.scale
             else:
                 print "Max expansion prevented.", self.coordmapper.scale
+            print "LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_crossingpoints_inside_nodes=True)), \
+                                                len(self.graph.CountLineOverLineIntersections(ignore_crossingpoints_inside_nodes=False)))
             self.working = False
             
         elif keycode == wx.WXK_LEFT:
             if self.working: return
             self.working = True
             if self.coordmapper.scale < 3:
-                self.ChangeScale(0.2, remap_world_to_layout=event.ShiftDown())
+                self.ChangeScale(0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
                 print "contraction ", self.coordmapper.scale
             else:
                 print "Min expansion thwarted.", self.coordmapper.scale
+            print "LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_crossingpoints_inside_nodes=True)), \
+                                                len(self.graph.CountLineOverLineIntersections(ignore_crossingpoints_inside_nodes=False)))
             self.working = False
             
         elif keycode == wx.WXK_DELETE:
@@ -431,7 +435,7 @@ class GraphRendererOgl:
         self.AllToWorldCoords()
         self.stateofthenation() # DON'T do overlap removal or it will get mad!
 
-    def ChangeScale(self, delta, remap_world_to_layout=False):
+    def ChangeScale(self, delta, remap_world_to_layout=False, removeoverlaps=True):
         if remap_world_to_layout:
             self.AllToLayoutCoords()    # Experimental - only needed when you've done world coord changes 
         self.coordmapper.Recalibrate(scale=self.coordmapper.scale+delta)
@@ -445,7 +449,10 @@ class GraphRendererOgl:
         #self.stage2(force_stateofthenation=True) # does overlap removal and stateofthenation
         #self.overlap_remover.gui = saveit
 
-        self.stage2(force_stateofthenation=True, watch_removals=False) # does overlap removal and stateofthenation
+        if removeoverlaps:
+            self.stage2(force_stateofthenation=True, watch_removals=False) # does overlap removal and stateofthenation
+        else:
+            self.stateofthenation()
         
     def ReLayout(self, keep_current_positions=False, gui=None, optimise=True):
         # layout again

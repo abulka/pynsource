@@ -83,6 +83,12 @@ class LayoutBlackboard:
         
         Want to test if this holds true for all scales
         (don't do any overlap removal of course cos this may introduce LN's)
+        
+        Note calling
+          CountLineOverLineIntersections
+        with
+          ignore_crossingpoints_inside_nodes=False
+        means node height/width ignored, thus should represent the true layout lines, (after a scale of course).
         """
         MAX_SCALE = 1.4
         SCALE_STEP = 0.2
@@ -92,7 +98,7 @@ class LayoutBlackboard:
         layouter = GraphLayoutSpring(self.graph, gui=self.controller)  # TODO gui = controller - yuk
         layouter.layout(keep_current_positions=False)
 
-        initial_num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
+        initial_num_line_line_crossings = len(self.graph.CountLineOverLineIntersections(ignore_crossingpoints_inside_nodes=False))  # node height/width ignored
         if initial_num_line_line_crossings > 0:
             print "Tangled", initial_num_line_line_crossings
         else:
@@ -106,10 +112,10 @@ class LayoutBlackboard:
             self.controller.stateofthenation()
             
             # see how many INITIAL, PRE OVERLAP REMOVAL line-line crossings there are.
-            num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
-            print 'LL crossings', num_line_line_crossings
+            num_line_line_crossings = len(self.graph.CountLineOverLineIntersections(ignore_crossingpoints_inside_nodes=False))
+            print 'LL raw crossings', num_line_line_crossings
             if num_line_line_crossings <> initial_num_line_line_crossings:
-                print "AXIOM FAILED !!!!"
+                print "AXIOM FAILED !!!! ori LL raw %d --> post scale LL raw %d" % (initial_num_line_line_crossings, num_line_line_crossings)
         
         
             

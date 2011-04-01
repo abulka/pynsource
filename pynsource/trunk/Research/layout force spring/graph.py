@@ -152,6 +152,10 @@ class Graph:
                     return node
             return None
         
+        def PointInCentreOfNode(point, edge1, edge2):
+            return point in [edge1['source'].centre_point,  edge1['target'].centre_point,
+                             edge2['source'].centre_point, edge2['target'].centre_point]
+        
         result = []
         for edge1, edge2 in getpermutations(self.edges):
             line_start_point = edge1['source'].centre_point
@@ -160,10 +164,13 @@ class Graph:
                                          edge2['source'].centre_point, edge2['target'].centre_point)
             if point:
                 point = (int(point[0]), int(point[1]))
-                if (ignore_crossingpoints_inside_nodes and not PointInsideANode(point)) and \
-                    point not in [edge1['source'].centre_point,  edge1['target'].centre_point,
-                                  edge2['source'].centre_point, edge2['target'].centre_point]:
-                    result.append( point )
+                
+                # We have a crossing
+                if ignore_crossingpoints_inside_nodes and PointInsideANode(point):
+                    continue
+                if PointInCentreOfNode(point, edge1, edge2):
+                    continue
+                result.append( point )
     
         # trim out duplicates
         def remove_duplicates(lzt):
