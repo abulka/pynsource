@@ -144,7 +144,21 @@ class Graph:
         result['ALL'] = allcount
         return result
 
-    def CountLineOverLineIntersections(self, ignore_crossingpoints_inside_nodes=True):
+    def CountLineOverLineIntersections(self, ignore_nodes=False):
+        """
+        Counts line crossings are counted in the world coordinate system.
+        
+        Parameter 'ignore_nodes' - means node height/width ignored, thus we are
+        focussing on just the lines themselves. The number of LL (and LL raw -
+        ignoring nodes width/height) can change as you scale up and down.
+
+        Note: there are potentially line crossings (in world coordinates) even
+        immediately after a layout. Even LL raw. Such is the nature of the
+        layout->world coordinate scaling. After all the initial layout->world
+        scale is to some arbitrary scale anyway - no scale is immune from
+        removing LL overlaps - though... LL raw can reduce to 0 after sufficient
+        scaling expansion.
+        """
         
         def PointInsideANode(point):
             for node in self.nodes:
@@ -166,7 +180,7 @@ class Graph:
                 point = (int(point[0]), int(point[1]))
                 
                 # We have a crossing
-                if ignore_crossingpoints_inside_nodes and PointInsideANode(point):
+                if not ignore_nodes and PointInsideANode(point):
                     continue
                 if PointInCentreOfNode(point, edge1, edge2):
                     continue

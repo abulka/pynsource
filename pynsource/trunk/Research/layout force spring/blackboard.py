@@ -79,16 +79,17 @@ class LayoutBlackboard:
 
     def Experiment1(self):
         """
-        Post layout, if there are LL crossings then graph is tangled.
+        Disproves the potential theorem that there are no line crossings
+        (in world coordinates) immediately after a layout.  There may be.
         
-        Want to test if this holds true for all scales
-        (don't do any overlap removal of course cos this may introduce LN's)
+        Post layout, if there are LL crossings - this does not prove the graph
+        is tangled. Scaling layout->world may have introduced these LL (or LL
+        raw - ignoring nodes width/height) crossings.
         
-        Note calling
-          CountLineOverLineIntersections
-        with
-          ignore_crossingpoints_inside_nodes=False
-        means node height/width ignored, thus should represent the true layout lines, (after a scale of course).
+        This experiment: Want to test if LL raw stays the same true for all scales.
+        Turns out that it does not.  And it may start at non zero too (depending on the graph and the scale at which you start this experiment at).
+
+        We don't do any overlap removal here of course - cos this may introduce LLs
         """
         MAX_SCALE = 1.4
         SCALE_STEP = 0.2
@@ -98,7 +99,7 @@ class LayoutBlackboard:
         layouter = GraphLayoutSpring(self.graph, gui=self.controller)  # TODO gui = controller - yuk
         layouter.layout(keep_current_positions=False)
 
-        initial_num_line_line_crossings = len(self.graph.CountLineOverLineIntersections(ignore_crossingpoints_inside_nodes=False))  # node height/width ignored
+        initial_num_line_line_crossings = len(self.graph.CountLineOverLineIntersections(ignore_nodes=True))  # node height/width ignored
         if initial_num_line_line_crossings > 0:
             print "Tangled", initial_num_line_line_crossings
         else:
@@ -112,7 +113,7 @@ class LayoutBlackboard:
             self.controller.stateofthenation()
             
             # see how many INITIAL, PRE OVERLAP REMOVAL line-line crossings there are.
-            num_line_line_crossings = len(self.graph.CountLineOverLineIntersections(ignore_crossingpoints_inside_nodes=False))
+            num_line_line_crossings = len(self.graph.CountLineOverLineIntersections(ignore_nodes=True))
             print 'LL raw crossings', num_line_line_crossings
             if num_line_line_crossings <> initial_num_line_line_crossings:
                 print "AXIOM FAILED !!!! ori LL raw %d --> post scale LL raw %d" % (initial_num_line_line_crossings, num_line_line_crossings)

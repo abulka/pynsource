@@ -220,8 +220,8 @@ class GraphRendererOgl:
                 print "expansion ", self.coordmapper.scale
             else:
                 print "Max expansion prevented.", self.coordmapper.scale
-            print "LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_crossingpoints_inside_nodes=True)), \
-                                                len(self.graph.CountLineOverLineIntersections(ignore_crossingpoints_inside_nodes=False)))
+            print "LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_nodes=False)), \
+                                                len(self.graph.CountLineOverLineIntersections(ignore_nodes=True)))
             self.working = False
             
         elif keycode == wx.WXK_LEFT:
@@ -232,8 +232,8 @@ class GraphRendererOgl:
                 print "contraction ", self.coordmapper.scale
             else:
                 print "Min expansion thwarted.", self.coordmapper.scale
-            print "LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_crossingpoints_inside_nodes=True)), \
-                                                len(self.graph.CountLineOverLineIntersections(ignore_crossingpoints_inside_nodes=False)))
+            print "LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_nodes=False)), \
+                                                len(self.graph.CountLineOverLineIntersections(ignore_nodes=True)))
             self.working = False
             
         elif keycode == wx.WXK_DELETE:
@@ -270,7 +270,7 @@ class GraphRendererOgl:
                 self.DumpMementos(todisplay)
                 self.DumpStatus()
             else:
-                print "No such memento", todisplay-1
+                print "No such memento", todisplay+1
 
             self.working = False
 
