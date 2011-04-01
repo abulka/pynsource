@@ -257,7 +257,7 @@ class OverlapRemoval:
         # Stop oscillation by not moving the same node too much
         self.nodes_already_moved = []
         
-    def RemoveOverlaps(self):           # Main method to call
+    def RemoveOverlaps(self, watch_removals=True):           # Main method to call
         self.InitStats()
         self.ResetBans()
         for total_cycles in range(1, MAX_CYCLES):
@@ -268,7 +268,7 @@ class OverlapRemoval:
                 self.ResetBans()
                 
             if num_overlaps_fixed > 0:
-                if self.gui:
+                if self.gui and watch_removals:
                     self.gui.stateofthenation()     # refresh gui
 
             if not found_overlaps:

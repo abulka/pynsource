@@ -126,7 +126,7 @@ class Graph:
             node = self.FindNodeById(id)
             node.left, node.top = point
 
-    def CountLineOverShapeCrossings(self):
+    def CountLineOverNodeCrossings(self):
         result = {}
         allcount = 0
         for node in self.nodes:

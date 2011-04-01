@@ -261,44 +261,38 @@ class GraphRendererOgl:
             
             todisplay = ord(keycode) - ord('1')
             if todisplay < len(self.mementos):
-                memento = self.mementos[todisplay][4]
-                scale = self.mementos[todisplay][2]
-                self.coordmapper.Recalibrate(scale=scale)
-                print "restoring scale", scale, "bu I don't see much point since memento is world coords"
-                self.graph.RestoreWorldPositions(memento)
-                self.stateofthenation()
+                self.DisplayMemento(self.mementos[todisplay][5], self.mementos[todisplay][3])
             else:
                 print "No such memento", todisplay
 
-            print '-'*80
-            for i, memento in enumerate(self.mementos):
-                msg = ""
-                if i == todisplay:
-                    msg = " <---"
-                print "Memento %d has info l-l %d l-n %d scale %.1f bounds %d %s" % (i+1, memento[0], memento[1], memento[2], memento[3], msg)
+            self.DumpMementos(todisplay)
+            self.DumpStatus()
 
             self.working = False
 
         elif keycode in ['x', 'X', 'z', 'Z']:
             """
-            x = layout a few times to untangle then scale up till line-shape crossings low
-            z = layout a few times to untangle then scale up till natural shape overlaps low (don't apply overlap removal till end)
+            x = layout a few times to untangle then scale up till line-node crossings low
+            z = layout a few times to untangle then scale up till natural node overlaps low (don't apply overlap removal till end)
             """
             if self.working: return
             self.working = True
             
-            use_overlaps_not_linecrossing = keycode in ['Z','z']
+            self.AllToLayoutCoords()  # doesn't matter what scale layout starts with
             
-            self.AllToLayoutCoords()
+            # Scale up just for watching...
             self.coordmapper.Recalibrate(scale=1.4)
             layouter = GraphLayoutSpring(self.graph, gui=self)    # should keep this around
             
-            if keycode in ['X','Z']:
-                layouter.layout(keep_current_positions=False)
-            else:
-                layouter.layout(keep_current_positions=True)
+            scramble = keycode in ['X','Z']
+            layouter.layout(keep_current_positions=not scramble)
 
-            scale, num_node_node_overlaps, num_line_node_crossings = self.ScaleUpMadly(use_overlaps_not_linecrossing)
+            if keycode in ['Z','z']:
+                strategy = ":reduce pre overlap removal NN overlaps"
+            else:
+                strategy = ":reduce post overlap removal LN and LL crossings"
+                #strategy = ":reduce post overlap removal LN crossings"
+            self.ScaleUpMadly(strategy)
             
             self.working = False
             
@@ -351,127 +345,176 @@ class GraphRendererOgl:
             """
             Blackboard
             Rerun layout several times, remembering each as a memento.  Then pick the best.
+            
+            First layout memento (pre ScaleUpMadly() should be at ?? scale OR PERHAPS
+            WE DONT NEED TO REMEMBER THIS ONE AS IT GETS COVERED IN THE ScaleUpMadly() ANYWAY.
+            
+            Coordinate scaling runs 3.2 to max within ScaleUpMadly()
+            Finish at the scale chosen by this routine
             """
             self.AllToLayoutCoords()
             layouter = GraphLayoutSpring(self.graph, gui=None)
             self.mementos = []
-            save_scale = self.coordmapper.scale
+            #save_scale = self.coordmapper.scale
 
             # Generate a few totally fresh layout variations
             for i in range(3):
                 layouter.layout(keep_current_positions=False)
                 
-                #self.coordmapper.Recalibrate()  # don't need this unless scale changed, so - no.
-                self.coordmapper.Recalibrate(scale=save_scale)
-                self.AllToWorldCoords()  # need this if gui animation off
-                self.overlap_remover.RemoveOverlaps()  # you DO want to take into account a post overlap removal situation
-                num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
+                #self.coordmapper.Recalibrate(scale=save_scale) # need this if scale changed
+                #self.AllToWorldCoords()  # need this if gui animation off
+                #self.overlap_remover.RemoveOverlaps()  # you DO want to take into account a post overlap removal situation
+                #num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
+                #num_line_node_crossings = self.graph.CountLineOverNodeCrossings()['ALL']/2    # ignore? 
                 
-                for use_overlaps_not_linecrossing in [True, False]:
-                    scale, num_node_node_overlaps, num_line_node_crossings = self.ScaleUpMadly(use_overlaps_not_linecrossing)
-                    assert scale == self.coordmapper.scale
-
-                    memento = self.graph.GetMementoOfPositions()
-
-                    # ignore? line-node (otherwise known as line-shape) RENAME!!!! 
-                    #num_line_shape_crossings = self.graph.CountLineOverShapeCrossings()['ALL']/2
-                    #num_line_node_crossings
+                scale, num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = \
+                    self.ScaleUpMadly(strategy=":reduce post overlap removal LN crossings")
+                memento = self.graph.GetMementoOfPositions()
+                self.mementos.append((num_line_line_crossings,
+                                      num_node_node_overlaps,
+                                      num_line_node_crossings,
+                                      scale,
+                                      88,
+                                      memento))
                     
-                    self.mementos.append((num_line_line_crossings, num_node_node_overlaps, scale, 8, memento))
-                
-            self.coordmapper.Recalibrate(scale=3.2)
-            
                 #self.stateofthenation()
                 #wx.SafeYield()
-
-
             
-            ## Generate a few totally fresh layout variations
-            #for i in range(3):
-            #    layouter.layout(keep_current_positions=False)
-            #    
-            #    #self.coordmapper.Recalibrate()  # don't need this unless scale changed, so - no.
-            #    self.AllToWorldCoords()  # need this if gui animation off
-            #    
-            #    # optional - if you want to take into account a post overlap removal situation
-            #    self.overlap_remover.RemoveOverlaps()
-            #    
-            #    memento = self.graph.GetMementoOfPositions()
-            #    num_line_shape_crossings = self.graph.CountLineOverShapeCrossings()['ALL']/2
-            #    num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
-            #    
-            #    self.mementos.append((num_line_line_crossings, num_line_shape_crossings, self.coordmapper.scale, 9, memento))
-            #    
-            #    #self.stateofthenation()
-            #    #wx.SafeYield()
-                
-            # play with scale
-            #for memento in self.mementos[:]:
-            #    print memento[0]
-            #    num_line_line_crossings = memento[0]  # this should be the same at any scale, so just repeat
-            #    
-            #    for use_overlaps_not_linecrossing in [True, False]:
-            #        print use_overlaps_not_linecrossing
-            #        self.graph.RestoreWorldPositions(memento[4])
-            #        scale, num_node_node_overlaps, num_line_node_crossings = self.ScaleUpMadly(use_overlaps_not_linecrossing)
-            #        self.mementos.append((num_line_line_crossings, num_node_node_overlaps, scale, 8, memento[4]))
-
-            
+            self.DumpMementos()
+            print "sort"
             self.mementos.sort()  # should sort by 1st item in tuple, followed by next item in tuple etc. - perfect!
-
-            #time.sleep(0.5)
-            bestmemento = self.mementos[0][4]
-            self.graph.RestoreWorldPositions(bestmemento)
-            self.stateofthenation()
-            self.AllToLayoutCoords() # just in case you choose to scale next
+            self.DumpMementos()
             
+            self.DisplayMemento(self.mementos[0][5], self.mementos[0][3])
+
             self.working = False
             
         elif keycode == 'l':
-            print self.graph.CountLineOverShapeCrossings()
+            print self.graph.CountLineOverNodeCrossings()
 
         elif keycode in ['?',]:
-            print "-"*50
-            print "# line-line intersections", len(self.graph.CountLineOverLineIntersections())
-            print "# node-node overlaps (post overlap removal always ~ 0)", self.overlap_remover.CountOverlaps()
-            print "# line-node crossings", self.graph.CountLineOverShapeCrossings()['ALL']/2
-            print "scale", self.coordmapper.scale
-            print "bounds ?"
+            self.DumpStatus()
             
         event.Skip()
 
+    def DumpStatus(self):
+        print "-"*50
+        print "# line-line intersections", len(self.graph.CountLineOverLineIntersections())
+        print "# node-node overlaps (post overlap removal always ~ 0)", self.overlap_remover.CountOverlaps()
+        print "# line-node crossings", self.graph.CountLineOverNodeCrossings()['ALL']/2
+        print "scale", self.coordmapper.scale
+        print "bounds ?"
+        
+    def DisplayMemento(self, memento, scale):
+        self.graph.RestoreWorldPositions(memento)
+        self.stateofthenation()
 
-
-    def ScaleUpMadly(self, use_overlaps_not_linecrossing):
-        self.coordmapper.Recalibrate(scale=3.2)
-        for i in range(15):
-            self.ChangeScale(-0.2)
-            self.AllToWorldCoords()
+        # Unecessary, but just in case you choose to <- or -> "scale from layout" next
+        self.coordmapper.Recalibrate(scale=scale)
+        self.AllToLayoutCoords() 
             
-            # see how many overlap the expansion fixes
+        
+    def DumpMementos(self, current_i=-1):
+        print '-'*80
+        for i, memento in enumerate(self.mementos):
+            msg = ""
+            if i == current_i:
+                msg = " <---"
+            print "Memento %d has info LL %d NN %d LN %d scale %.1f bounds %d %s" % (i+1, memento[0], memento[1], memento[2], memento[3], memento[4], msg)
+
+    def ScaleUpMadly(self, strategy):
+        """
+        Leaves the scale at max level it got to - doesn't restore scale
+
+        strategy = ":reduce pre overlap removal NN overlaps"
+        strategy = ":reduce post overlap removal LN crossings"
+        
+        Operates repeatedly on the layout coords, so ignores anything you
+        have done since, like world coord overlap removal.
+
+        Running overlap removal at different scales can remove or introduce
+        LL and LN crossings (but by definition, no NN overlaps ;-)
+        
+        After AllToWorldCoords() we are getting a picture of the pure layout result
+        
+        Calling self.coordmapper.Recalibrate(scale) before AllToWorldCoords() simply
+        expands or contracts the appearance of the world view nodes
+        
+        After AllToWorldCoords(), looking at pure layout result there will typically be
+         -- LL == 0, unless the spring layout couldn't untangle itself, that is.
+         *- NN many, scaling up helps reduce (running overlap remover removes totally)
+         -- LN many, scaling up helps reduce (running overlap remover may make it better or worse)
+        
+        After RemoveOverlaps()
+         *- LL == 0
+         -- NN == 0, unless algorithm failed
+         *- LN some
+         
+         Note: * indicates the things we are looping and testing
+        """
+        NODE_NODE = 3
+        MAX_SCALE = 1.4
+        SCALE_STEP = 0.2
+        SCALE_START = 3.2
+        
+        self.coordmapper.Recalibrate(scale=SCALE_START)
+        for i in range(15):
+            self.coordmapper.Recalibrate(scale=self.coordmapper.scale - SCALE_STEP)
+            self.AllToWorldCoords()
+
+            """Pre Overlap Removal"""
+            
+            # see how many INITIAL, PRE OVERLAP REMOVAL line-line crossings there are.
+            num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
+            if num_line_line_crossings > 0:
+                print "Mad: Aborting - no point since found %d tangled, post spring layout LL crossings!" % num_line_line_crossings
+                break
+
+            # see how many INITIAL, PRE OVERLAP REMOVAL node-node overlaps the expansion fixes
             num_node_node_overlaps = self.overlap_remover.CountOverlaps()
 
-            # see how many line num_line_node_crossings the expansion fixes (after removing overlaps)
-            self.overlap_remover.RemoveOverlaps()
-            #self.stateofthenation()
-            num_line_node_crossings = self.graph.CountLineOverShapeCrossings()['ALL']/2
-            
-            print "at scale %.1f there are %d line num_line_node_crossings and node overlaps %d " % (self.coordmapper.scale, num_line_node_crossings, num_node_node_overlaps)
-            if use_overlaps_not_linecrossing and num_node_node_overlaps <= 3:
-                print "ok aborting expansion since num overlaps!! <= 1"
-                break
-                
-            if not use_overlaps_not_linecrossing and num_line_node_crossings == 0 or self.coordmapper.scale < 1.4:
-                if self.coordmapper.scale < 1.4:
-                    print "ok aborting expansion gone too far, with line-shape overlaps remaining. :-("
-                else:
-                    print "ok finished expansion since num_line_node_crossings == 0 :-)"
-                break
+            """Remove Overlaps (NN)"""
+            self.overlap_remover.RemoveOverlaps(watch_removals=False)
 
-        self.stage2() # does overlap removal and stateofthenation
-        print "scale ended up as ", self.coordmapper.scale
+            """Post Overlap Removal"""
+
+            # How many LN reduced (or perhaps increased) after expansion & post removing NN overlaps
+            num_line_node_crossings = self.graph.CountLineOverNodeCrossings()['ALL']/2
+            
+            # How many LL reduced (or perhaps increased) after expansion & post removing NN overlaps
+            num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
+
+            print "Mad: At scale %.1f LL %d NN %d LN %d" % (self.coordmapper.scale, num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings)
         
-        return self.coordmapper.scale, num_node_node_overlaps, num_line_node_crossings
+            if strategy == ":reduce pre overlap removal NN overlaps":
+                if num_node_node_overlaps <= NODE_NODE:
+                    print "Mad: Aborting expansion since num NN overlaps <= %d" % NODE_NODE
+                    break
+            elif strategy == ":reduce post overlap removal LN crossings":
+                if num_line_node_crossings == 0:
+                    print "Mad: Finished expansion since LN crossings == 0 :-)"
+                    break
+            elif strategy == ":reduce post overlap removal LN and LL crossings":
+                if num_line_node_crossings == 0 and num_line_node_crossings == 0:
+                    print "Mad: Finished expansion since LN and LL crossings == 0 :-)"
+                    break
+            else:
+                assert False, "Mad: unknown strategy"
+    
+            # Never accept LN crossings introduced as a result of expansion
+            #if num_line_node_crossings > 0:
+            #    print "Mad: Warning - introduced LN crossings as a result of expansion, expanding more..."
+            #    continue  # risky since we avoid MAX_SCALE check
+            
+            if self.coordmapper.scale < MAX_SCALE:
+                print "Mad: Aborting expansion - gone too far."
+                break
+    
+        print "Mad: End - scale ended up as ", self.coordmapper.scale
+
+        #self.stage2() # does overlap removal and stateofthenation
+        
+        return self.coordmapper.scale, num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings
 
 
     def NewEdgeMarkFrom(self):
@@ -512,8 +555,11 @@ class GraphRendererOgl:
         if self.working: return
         self.working = True
 
-        self.stage2()
-        print self.overlap_remover.GetStats()
+        if event.GetWheelRotation() < 0:
+            self.stage2()
+            print self.overlap_remover.GetStats()
+        else:
+            self.stateofthenation()
 
         self.working = False
 
@@ -535,8 +581,8 @@ class GraphRendererOgl:
         self.Redraw()
         #time.sleep(1)
 
-    def stage2(self, force_stateofthenation=False):
-        self.overlap_remover.RemoveOverlaps()
+    def stage2(self, force_stateofthenation=False, watch_removals=True):
+        self.overlap_remover.RemoveOverlaps(watch_removals=watch_removals)
         if self.overlap_remover.GetStats()['total_overlaps_found'] > 0 or force_stateofthenation:
             self.stateofthenation()
         
@@ -554,16 +600,19 @@ class GraphRendererOgl:
 
     def ChangeScale(self, delta, remap_world_to_layout=False):
         if remap_world_to_layout:
-            self.AllToLayoutCoords()    # Experimental - probably needed when 
+            self.AllToLayoutCoords()    # Experimental - only needed when you've done world coord changes 
         self.coordmapper.Recalibrate(scale=self.coordmapper.scale+delta)
         self.AllToWorldCoords()
         numoverlaps = self.overlap_remover.CountOverlaps()
         #print "Num Node Overlaps at scale", self.coordmapper.scale, numoverlaps
         
-        saveit = self.overlap_remover.gui
-        self.overlap_remover.gui = None
-        self.stage2(force_stateofthenation=True) # does overlap removal and stateofthenation
-        self.overlap_remover.gui = saveit
+        
+        #saveit = self.overlap_remover.gui
+        #self.overlap_remover.gui = None
+        #self.stage2(force_stateofthenation=True) # does overlap removal and stateofthenation
+        #self.overlap_remover.gui = saveit
+
+        self.stage2(force_stateofthenation=True, watch_removals=False) # does overlap removal and stateofthenation
         
     def ReLayout(self, keep_current_positions=False, gui=None, optimise=True):
         # layout again
