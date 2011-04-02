@@ -21,23 +21,23 @@ class LayoutBlackboard:
         """
         self.controller.AllToLayoutCoords()    # doesn't matter what scale the layout starts with
         layouter = GraphLayoutSpring(self.graph, gui=None)
-        self.controller.mementos = []
+        self.controller.snapshot_mgr.Clear()
         oriscale = self.controller.coordmapper.scale
 
-        def addmemento(res):
+        def ThinkAndAddSnapshot(res):
             num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = res
 
-            if num_node_node_overlaps == None and num_line_node_crossings == None:   # tangled graph
-                num_node_node_overlaps = 99
-                num_line_node_crossings = 77
+            # Calculate a layout score, lower the better?
+            score = 0
             
-            self.controller.mementos.append((\
-                num_line_line_crossings,
-                num_node_node_overlaps,
-                num_line_node_crossings,
-                self.controller.coordmapper.scale,
-                88,
-                self.graph.GetMementoOfPositions()))
+            self.controller.snapshot_mgr.AddSnapshot(\
+                layout_score=score,
+                LL=num_line_line_crossings,
+                NN=num_node_node_overlaps,
+                LN=num_line_node_crossings,
+                scale=self.controller.coordmapper.scale,
+                bounds=88,
+                graph_memento=self.graph.GetMementoOfPositions())
 
         # Generate several totally fresh layout variations
         for i in range(numlayouts):
@@ -47,19 +47,18 @@ class LayoutBlackboard:
             
             # Expand directly to the original scale, and calc vitals stats
             res = self.GetVitalStats(scale=oriscale, animate=False)
-            addmemento(res)
+            ThinkAndAddSnapshot(res)
             
             # Expand progressively from small to large scale, and calc vitals stats
             res = self.ScaleUpMadly(strategy=":reduce post overlap removal LN crossings")
-            addmemento(res)
+            ThinkAndAddSnapshot(res)
                 
         
-        self.controller.DumpMementos()
-        print "sort"
-        self.controller.mementos.sort()  # should sort by 1st item in tuple, followed by next item in tuple etc. - perfect!
-        self.controller.DumpMementos()
+        self.controller.snapshot_mgr.DumpSnapshots(label='Unsorted')
+        self.controller.snapshot_mgr.Sort()
+        #self.controller.snapshot_mgr.DumpSnapshots('Sorted')
         
-        self.controller.DisplayMemento(self.controller.mementos[0][5], self.controller.mementos[0][3])
+        self.controller.snapshot_mgr.Restore(0)
 
 
     def LayoutThenPickBestScale(self, strategy=None, scramble=False, animate_at_scale=None):

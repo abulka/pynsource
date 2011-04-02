@@ -112,6 +112,7 @@ class GraphShapeCanvas(ogl.ShapeCanvas):
         self.graphrendererogl.DeselectAllShapes()
 
 from coordinate_mapper import CoordinateMapper
+from snapshots import GraphSnapshotMgr
 
 UNIT_TESTING_MODE = True
 
@@ -132,7 +133,7 @@ class GraphRendererOgl:
         self.need_abort = False
         self.new_edge_from = None
         self.working = False
-        self.mementos = None
+        self.snapshot_mgr = GraphSnapshotMgr(graph=self.graph, controller=self)
 
         if UNIT_TESTING_MODE:
             self.overlap_remover = OverlapRemoval(self.graph, margin=5, gui=self)
@@ -258,19 +259,11 @@ class GraphRendererOgl:
             self.NewEdgeMarkTo()
             
         if keycode in ['1','2','3','4','5','6','7','8','9','0']:
-            if not self.mementos:
-                return
-            
             if self.working: return
             self.working = True
-            
+
             todisplay = ord(keycode) - ord('1')
-            if todisplay < len(self.mementos):
-                self.DisplayMemento(self.mementos[todisplay][5], self.mementos[todisplay][3])
-                self.DumpMementos(todisplay)
-                self.DumpStatus()
-            else:
-                print "No such memento", todisplay+1
+            self.snapshot_mgr.Restore(todisplay)
 
             self.working = False
 
@@ -336,24 +329,6 @@ class GraphRendererOgl:
         print "scale", self.coordmapper.scale
         print "bounds ?"
         
-    def DisplayMemento(self, memento, scale):
-        self.graph.RestoreWorldPositions(memento)
-        self.stateofthenation()
-
-        # Unecessary, but just in case you choose to <- or -> "scale from layout" next
-        self.coordmapper.Recalibrate(scale=scale)
-        self.AllToLayoutCoords() 
-            
-        
-    def DumpMementos(self, current_i=-1):
-        print '-'*80
-        for i, memento in enumerate(self.mementos):
-            msg = ""
-            if i == current_i:
-                msg = " <---"
-            print "Memento %d has info LL %d NN %d LN %d scale %.1f bounds %d %s" % (i+1, memento[0], memento[1], memento[2], memento[3], memento[4], msg)
-
-
     def NewEdgeMarkFrom(self):
         selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
         if not selected:
