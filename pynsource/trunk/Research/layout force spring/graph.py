@@ -136,7 +136,7 @@ class Graph:
                 line_end_point = edge['target'].centre_point
                 if edge['source'] == node or edge['target'] == node:
                     continue
-                crossings = node.CalcLineIntersections(line_start_point, line_end_point)
+                crossings = node.CalcLineIntersectionPoints(line_start_point, line_end_point)
                 if crossings:
                     total_crossing.extend(crossings)
             result[node.id] = len(total_crossing)
@@ -207,6 +207,19 @@ class Graph:
         for node in self.nodes:
             node.previous_left, node.previous_top = node.left, node.top  # for animation
 
+    def ProposedNodeHitsWhatLines(self, proposednode, movingnode):
+        """
+        A node is fed a line and it will report the crossing points, if any
+        """
+        total_crossings = []
+        edges = [edge for edge in self.edges if not (edge['source'] == movingnode or edge['target'] == movingnode)]
+        for edge in edges:
+            crossings = proposednode.CalcLineIntersectionPoints(edge['source'].centre_point, edge['target'].centre_point)
+            if crossings:
+                print "%s would cross edge %s_%s crossings: %s" % (movingnode.id, edge['source'].id, edge['target'].id, crossings)
+                total_crossings.extend(crossings)
+        return total_crossings
+        
 class GraphNode:
     def __init__(self, id, left, top, width=60, height=60):
         self.id = id
@@ -244,7 +257,7 @@ class GraphNode:
 
     lines = property(get_lines)
         
-    def CalcLineIntersections(self, line_start_point, line_end_point):
+    def CalcLineIntersectionPoints(self, line_start_point, line_end_point):
         result = []
         for nodeline in self.lines:
             point = FindLineIntersection(line_start_point, line_end_point, nodeline[0], nodeline[1])
@@ -326,12 +339,12 @@ if __name__ == '__main__':
     assert (10,50) in node.lines[3]
     assert (10,10) in node.lines[3]
     
-    res = node.CalcLineIntersections((0, 0), (200, 200))
+    res = node.CalcLineIntersectionPoints((0, 0), (200, 200))
     assert len(res) == 2
     assert (10, 10) in res
     assert (40, 40) in res
     
-    res = node.CalcLineIntersections((20, 0), (20, 1000))
+    res = node.CalcLineIntersectionPoints((20, 0), (20, 1000))
     assert len(res) == 2
     assert (20, 10) in res
     assert (20, 50) in res

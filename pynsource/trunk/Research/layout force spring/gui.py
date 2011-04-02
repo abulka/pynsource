@@ -331,7 +331,7 @@ class GraphRendererOgl:
 
         elif keycode in ['b', 'B']:
             b = LayoutBlackboard(graph=self.graph, controller=self)
-            b.LayoutMultipleChooseBest(3)
+            b.LayoutMultipleChooseBest(4)
             
         elif keycode in ['?',]:
             self.DumpStatus()
@@ -366,7 +366,7 @@ class GraphRendererOgl:
 
     def stage2(self, force_stateofthenation=False, watch_removals=True):
         self.graph.SaveOldPositionsForAnimationPurposes()
-        watch_removals = False
+        watch_removals = False  # added this when I turned animation on.
         
         self.overlap_remover.RemoveOverlaps(watch_removals=watch_removals)
         if self.overlap_remover.GetStats()['total_overlaps_found'] > 0 or force_stateofthenation:
@@ -377,18 +377,7 @@ class GraphRendererOgl:
             from animation import GeneratePoints
             
             for node in self.graph.nodes:
-                node.anilist = GeneratePoints((node.previous_left, node.previous_top), (node.left, node.top))
-
-            def RedrawFast():
-                diagram = self.oglcanvas.GetDiagram()
-                canvas = self.oglcanvas
-                assert canvas == diagram.GetCanvas()
-        
-                dc = wx.ClientDC(canvas)
-                canvas.PrepareDC(dc)
-                
-                #diagram.Clear(dc)
-                diagram.Redraw(dc)
+                node.anilist = GeneratePoints((node.previous_left, node.previous_top), (node.left, node.top), steps=5)
 
             dc = wx.ClientDC(self.oglcanvas)
             self.oglcanvas.PrepareDC(dc)
@@ -396,34 +385,11 @@ class GraphRendererOgl:
                 for node in self.graph.nodes:
                     point = node.anilist.pop(0)
                     x, y = point
-                    #node.shape.Move(dc, x, y, True)
+                    #node.shape.Move(dc, x, y, True) # don't do this or it will flicker
                     setpos(node.shape, x, y)
                     node.shape.MoveLinks(dc)
                     self.Redraw(clear=False)
                 self.Redraw()
-            #for node in self.graph.nodes:
-            #    node.shape.MoveLinks(dc)
-            #self.Redraw()
-                
-            # NOT A BAD COMPROMISE - GOOD                
-            #dc = wx.ClientDC(self.oglcanvas)
-            #self.oglcanvas.PrepareDC(dc)
-            #for i in range(len(self.graph.nodes[0].anilist)):
-            #    for node in self.graph.nodes:
-            #        point = node.anilist.pop(0)
-            #        x, y = point
-            #        #node.shape.Move(dc, x, y, True)
-            #        setpos(node.shape, x, y)
-            #        node.shape.MoveLinks(dc)
-            #        RedrawFast()
-            #    self.Redraw()
-                
-            #for node in self.graph.nodes:
-            #    while node.anilist:
-            #        point = node.anilist.pop(0)
-            #        self.AdjustShapePosition(node, point)
-            #        self.Redraw()
-            #        wx.SafeYield()
             
         else:
             for node in self.graph.nodes:
@@ -540,17 +506,19 @@ class GraphRendererOgl:
 
         self.popupmenu.AppendSeparator()
 
-        item = self.popupmenu.Append(2016, "Load Test Graph 1")
-        frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph1, item)
+        imp = wx.Menu()
+        item = imp.Append(2021, "Load Test Graph 1"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph1, item)
+        item = imp.Append(2022, "Load Test Graph 2"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph2, item)
+        item = imp.Append(2023, "Load Test Graph 3"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph3, item)
+        item = imp.Append(2024, "Load Test Graph 4"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph4, item)
+        item = imp.Append(2025, "Load Test Graph 6 (line overlaps)"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph6, item)
+        item = imp.Append(2026, "Load Test Graph 7"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph7, item)
+        self.popupmenu.AppendMenu(-1, 'Unit Test Graphs', imp)
 
-        item = self.popupmenu.Append(2018, "Load Test Graph 2")
-        frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph2, item)
-
-        item = self.popupmenu.Append(2019, "Load Test Graph 3")
-        frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph3, item)
-
-        item = self.popupmenu.Append(2020, "Load Test Graph 4")
-        frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph4, item)
+        imp = wx.Menu()
+        item = imp.Append(2031, "Spring 2"); frame.Bind(wx.EVT_MENU, self.OnLoadSpring2, item)
+        item = imp.Append(2032, "Spring 3"); frame.Bind(wx.EVT_MENU, self.OnLoadSpring3, item)
+        self.popupmenu.AppendMenu(-1, 'Other Test Graphs', imp)
 
         self.popupmenu.AppendSeparator()
 
@@ -561,6 +529,30 @@ class GraphRendererOgl:
         #frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
         
         frame.PopupMenu(self.popupmenu, wx.Point(x,y))
+
+    def OnLoadTestGraph1(self, event):
+        self.LoadGraph(TEST_GRAPH1)
+        
+    def OnLoadTestGraph2(self, event):
+        self.LoadGraph(TEST_GRAPH2)
+        
+    def OnLoadTestGraph3(self, event):
+        self.LoadGraph(TEST_GRAPH3)
+
+    def OnLoadTestGraph4(self, event):
+        self.LoadGraph(TEST_GRAPH4)
+
+    def OnLoadTestGraph6(self, event):
+        self.LoadGraph(TEST_GRAPH6)
+
+    def OnLoadTestGraph7(self, event):
+        self.LoadGraph(TEST_GRAPH7)
+
+    def OnLoadSpring2(self, event):
+        self.LoadGraph(GRAPH_SPRING2)
+
+    def OnLoadSpring3(self, event):
+        self.LoadGraph(GRAPH_SPRING3)
 
     def OnSaveGraphToConsole(self, event):
         print self.graph.GraphToString()
@@ -577,18 +569,6 @@ class GraphRendererOgl:
             fp.close()
         dlg.Destroy()
         
-    def OnLoadTestGraph1(self, event):
-        self.LoadGraph(TEST_GRAPH1)
-        
-    def OnLoadTestGraph2(self, event):
-        self.LoadGraph(TEST_GRAPH2)
-        
-    def OnLoadTestGraph3(self, event):
-        self.LoadGraph(TEST_GRAPH3)
-
-    def OnLoadTestGraph4(self, event):
-        self.LoadGraph(TEST_GRAPH4)
-
     def OnLoadGraphFromText(self, event):
         eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
         dialog = wx.TextEntryDialog ( None, 'Enter an node/edge persistence strings:', 'Create a new node', eg,  style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )

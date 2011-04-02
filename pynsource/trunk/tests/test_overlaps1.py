@@ -519,6 +519,58 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureYorder('B', 'm1', 'C'))
         self.assertFalse(self._ensureYorder('A', 'm1', 'C')) # don't want this otherwise the line from A to C would be crossed
                 
+
+    def _LoadScenario7(self):
+        initial = """
+{'type':'node', 'id':'A', 'x':10, 'y':10, 'width':250, 'height':250}
+{'type':'node', 'id':'c', 'x':265, 'y':90, 'width':60, 'height':60}
+{'type':'node', 'id':'m1', 'x':265, 'y':15, 'width':60, 'height':60}
+{'type':'edge', 'id':'c_to_m1', 'source':'c', 'target':'m1'}
+{'type':'edge', 'id':'A_to_c', 'source':'A', 'target':'c'}
+"""
+        self.g.LoadGraphFromStrings(initial)
         
+    def test7_1DontJumpTooFarY(self):
+        
+        self._LoadScenario7()
+
+        # move m1 to the left
+        node = self.g.FindNodeById('m1')
+        node.left, node.top = (240, 15)
+        
+        # assert m1 has been pushed to the right.  don't see why edges should make any difference
+        # initially found m1 was being pushed way too far down in the Y direction!
+        
+        were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
+
+        self.assertTrue(self._ensureXorder('A', 'm1'))
+        self.assertTrue(self._ensureXorder('A', 'c'))
+        self.assertTrue(self._ensureYorder('m1', 'c'))
+
+        self.assertFalse(self._ensureYorder('A', 'm1')) # don't want this huge Y jump
+
+    def test7_2DontJumpTooFarY(self):
+        
+        self._LoadScenario7()
+
+        # move m1 to the left
+        node = self.g.FindNodeById('m1')
+        node.left, node.top = (235, 120)
+        
+        # assert m1 has been pushed to the right and down snugly
+        # not pushed way too far down in the Y direction!
+        
+        were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
+
+        self.assertTrue(self._ensureXorder('A', 'm1'))
+        self.assertTrue(self._ensureXorder('A', 'c'))
+        self.assertTrue(self._ensureYorder('c', 'm1'))  # ensure m1 is snuggled below c
+
+        self.assertFalse(self._ensureYorder('A', 'm1')) # don't want this huge Y jump
+
 if __name__ == "__main__":
     unittest.main()

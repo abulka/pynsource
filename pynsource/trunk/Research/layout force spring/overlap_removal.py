@@ -116,22 +116,30 @@ class OverlapRemoval:
         self.nodes_already_moved.append(proposal['node'])
 
     def ApplyMinimalProposal(self, proposals):
-        proposals = self.ShowLineCrossings(proposals)
-        #print self.dumpproposals(proposals)
+        check_for_line_crossings = False
 
-        crossings = [p['linecrossings'] for p in proposals]
-        lowest_crossings = min(crossings)
-        proposal222 = [p for p in proposals if abs(p['linecrossings']) == lowest_crossings][0]
-        #print "proposal222", self.dumpproposal(proposal222)
+        proposals = self.CheckForLineCrossings(proposals)  # informational only
+        print self.dumpproposals(proposals)
+            
+        if check_for_line_crossings:
+            # proposal222 is the proposal with the lowest line crossings - hmmmm - DOESN'T THIS NARROW THE FIELD A BIT MUCH?
+            crossings = [p['linecrossings'] for p in proposals]
+            lowest_crossings = min(crossings)
+            proposal222 = [p for p in proposals if abs(p['linecrossings']) == lowest_crossings][0]
+            #print "proposal222", self.dumpproposal(proposal222)
 
+        # proposal111 is the proposal with the lowest movement - traditional
         amounts = [abs(p['amount']) for p in proposals]
         lowest_amount = min(amounts)
         proposal111 = [p for p in proposals if abs(p['amount']) == lowest_amount][0]
         #print "proposal111", self.dumpproposal(proposal111)
         
-        # choose between proposal111 and proposal222
-        if proposal111['linecrossings'] > 0 and proposal222['linecrossings'] == 0:
-            proposal = proposal222
+        if check_for_line_crossings:
+            # choose between proposal111 and proposal222
+            if proposal111['linecrossings'] > 0 and proposal222['linecrossings'] == 0:
+                proposal = proposal222
+            else:
+                proposal = proposal111
         else:
             proposal = proposal111
         
@@ -142,48 +150,21 @@ class OverlapRemoval:
             self.total_expansive_moves += 1
         return proposal['node'], proposal['xory']
 
-
-
-    def ShowLineCrossings(self, proposals):
-        """
-        we have the tech so that a node can be fed a line and it will report the crossing points, if any
-        
-        so for any node that is about to be moved, we want to know how many lines it crosses
-        so we need to find all the lines on the workspace, and feed them into the node's proposed position
-        and report the number of lines it crosses and the number of cross points for each of those crosses.
-        
-        to find the lines on the workspace we loop through the edges array
-        from each edge we need the points of the line, which can be derived from the centre of each node to the other centre
-        """
-    
-        #print self.dumpproposals(proposals)
+    def CheckForLineCrossings(self, proposals):
+        # Amend proposals list with line crossing info.
         newproposals = []
         for proposal in proposals:
-            
             # build the proposed node
             l, t, r, b = proposal['node'].GetBounds()
             if proposal['xory'] == 'x':
-                deltaX = proposal['amount']
-                deltaY = 0
+                deltaX, deltaY = proposal['amount'], 0
             else:
-                deltaX = 0
-                deltaY = proposal['amount']
+                deltaX, deltaY = 0, proposal['amount']
             proposednode = GraphNode('temp', top=t+deltaY, left=l+deltaX, width=r-l, height=b-t)
 
-            total_crossing = []
-            for edge in self.graph.edges:
-                line_start_point = edge['source'].centre_point
-                line_end_point = edge['target'].centre_point
-                if edge['source'] == proposednode or edge['target'] == proposednode:
-                    continue
-                crossings = proposednode.CalcLineIntersections(line_start_point, line_end_point)
-                if crossings:
-                    #print "%s crosses edge %s_%s at %s" % (self.dumpproposal(proposal), edge['source'].id, edge['target'].id, crossings)
-                    total_crossing.extend(crossings)
-                
-            proposal['linecrossings'] = len(total_crossing)
+            crossings = self.graph.ProposedNodeHitsWhatLines(proposednode, movingnode=proposal['node'])
+            proposal['linecrossings'] = len(crossings)
             newproposals.append(proposal)
-            
         return newproposals
 
     def dumpproposal(self, prop):

@@ -51,10 +51,15 @@ class LayoutBlackboard:
             res = self.GetVitalStats(scale=oriscale, animate=False)
             ThinkAndAddSnapshot(res)
             
+            if res[0] == 0 and res[2] <= 0:     # LL crossings solved and LN reasonable, so optimise and break - save time
+                break
+
             # Expand progressively from small to large scale, and calc vitals stats
             res = self.ScaleUpMadly(strategy=":reduce post overlap removal LN crossings")
             ThinkAndAddSnapshot(res)
                 
+            if res[0] == 0 and res[2] <= 0:     # LL crossings solved and LN reasonable, so optimise and break - save time
+                break
         
         #self.controller.snapshot_mgr.DumpSnapshots(label='Unsorted')
         self.controller.snapshot_mgr.Sort()             # this does the thinking!

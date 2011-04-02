@@ -82,5 +82,6 @@ class GraphSnapshotMgr:
         dictionary.
         """
         b = self.snapshots
-        self.snapshots = sorted(b, key=lambda d: (d['LN'], d['LL'], d['bounds_area_simple'], -d['scale'], d['NN_pre_OR']))
+        #self.snapshots = sorted(b, key=lambda d: (d['LN'], d['LL'], d['bounds_area_simple'], -d['scale'], d['NN_pre_OR']))
+        self.snapshots = sorted(b, key=lambda d: (d['LL'], d['LN'], d['bounds_area_simple'], -d['scale'], d['NN_pre_OR']))
 

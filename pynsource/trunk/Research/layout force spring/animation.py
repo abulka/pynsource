@@ -8,7 +8,7 @@ def easeInOut(minValue, maxValue, totalSteps, actualStep, powr):
     stepp = minValue+(math.pow(((1.0 / totalSteps) * actualStep), powr) * delta)
     return math.ceil(stepp)
     
-def doValChangeMem(startval, endval, steps, intervals_failsafe=200, powr=0.15):
+def doValChangeMem(startval, endval, steps, intervals_failsafe=200, powr=0.35):
     result = []
     actStep = 0
     for i in range(intervals_failsafe):

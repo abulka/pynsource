@@ -51,8 +51,8 @@ class GraphLayoutSpring:
        
     def layoutPrepare(self):
         for node in self.graph.nodes:
-            node.layoutPosX = 0
-            node.layoutPosY = 0
+            node.layoutPosX = 0 # zero is better than random
+            node.layoutPosY = 0 # zero is better than random
             node.layoutForceX = 0
             node.layoutForceY = 0
        
