@@ -27,18 +27,19 @@ class GraphLayoutSpring:
         for i in range(0, self.iterations):
             self.layoutIteration()
 
-            if i%20==0:
+            if i%50==0:
                 if self.gui:
                     self.layoutCalcBounds()         # this is the only time you need to call this explicitly since are in the MIDDLE of a layout and about to visualise
                     self.gui.stateofthespring()     # refresh gui
 
+            if i%20==0:
                 if optimise:
                     memento2 = self.graph.GetMementoOfLayoutPoints()
                     if Graph.MementosEqual(memento1, memento2, 0.01):
                         break_pending += 1
                         #print "!",
                         if break_pending > 5:
-                            print "break"
+                            #print "break"
                             break
                     else:
                         break_pending = 0

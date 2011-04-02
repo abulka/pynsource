@@ -1,13 +1,19 @@
+# Gui for testing Layout
+
 import wx
 import wx.lib.ogl as ogl
 import time
 import thread
-
+import random
 from graph import *
 from layout_spring import GraphLayoutSpring
 from overlap_removal import OverlapRemoval
-import random
 from blackboard import LayoutBlackboard
+from coordinate_mapper import CoordinateMapper
+from snapshots import GraphSnapshotMgr
+from data_testgraphs import *
+
+UNIT_TESTING_MODE = True
 
 def setpos(shape, x, y):
     width, height = shape.GetBoundingBoxMax()
@@ -18,7 +24,6 @@ def getpos(shape):
     x = shape.GetX()
     y = shape.GetY()
     return (x - width/2, y - height/2)
-
 
 class MyEvtHandler(ogl.ShapeEvtHandler):
     def __init__(self, log, oglcanvas):
@@ -97,7 +102,6 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         time.sleep(0.2)
         
         shape.GetCanvas().graphrendererogl.stage2()
-
         
 class GraphShapeCanvas(ogl.ShapeCanvas):
     scrollStepX = 10
@@ -110,11 +114,6 @@ class GraphShapeCanvas(ogl.ShapeCanvas):
     def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
         # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
         self.graphrendererogl.DeselectAllShapes()
-
-from coordinate_mapper import CoordinateMapper
-from snapshots import GraphSnapshotMgr
-
-UNIT_TESTING_MODE = True
 
 class GraphRendererOgl:
     def __init__(self, graph, oglcanvas):
@@ -146,6 +145,11 @@ class GraphRendererOgl:
     def AllToWorldCoords(self):
             self.coordmapper.AllToWorldCoords()
 
+    def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
+        frame = self.oglcanvas.GetTopLevelParent()
+        print "frame resize", frame.GetClientSize()
+        self.coordmapper.Recalibrate(frame.GetClientSize()) # may need to call self.CalcVirtSize() if scrolled window
+   
     def DeselectAllShapes(self):
         selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
         if selected:
@@ -185,150 +189,6 @@ class GraphRendererOgl:
                 line.Delete()
             shape.Delete()
 
-    def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
-        frame = self.oglcanvas.GetTopLevelParent()
-        print "frame resize", frame.GetClientSize()
-        self.coordmapper.Recalibrate(frame.GetClientSize()) # may need to call self.CalcVirtSize() if scrolled window
-   
-    def onKeyPress(self, event):
-        keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
-        #if event.ShiftDown():
-        #if event.ControlDown():
-        #print keycode
-        #print chr(keycode)
-        #print ord('L')
-
-        if keycode == wx.WXK_DOWN:
-            if self.working: return
-            self.working = True
-            optimise = not event.ShiftDown()
-            self.ReLayout(keep_current_positions=True, gui=self, optimise=optimise)
-            self.working = False
-
-        elif keycode == wx.WXK_UP:
-            if self.working: return
-            self.working = True
-            print "keep_current_positions=False"
-            optimise = not event.ShiftDown()
-            self.ReLayout(keep_current_positions=False, gui=self, optimise=optimise)
-            self.working = False
-            
-        elif keycode == wx.WXK_RIGHT:
-            if self.working: return
-            self.working = True
-            if self.coordmapper.scale > 0.8:
-                self.ChangeScale(-0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
-                print "expansion ", self.coordmapper.scale
-            else:
-                print "Max expansion prevented.", self.coordmapper.scale
-            print "LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_nodes=False)), \
-                                                len(self.graph.CountLineOverLineIntersections(ignore_nodes=True)))
-            self.working = False
-            
-        elif keycode == wx.WXK_LEFT:
-            if self.working: return
-            self.working = True
-            if self.coordmapper.scale < 3:
-                self.ChangeScale(0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
-                print "contraction ", self.coordmapper.scale
-            else:
-                print "Min expansion thwarted.", self.coordmapper.scale
-            print "LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_nodes=False)), \
-                                                len(self.graph.CountLineOverLineIntersections(ignore_nodes=True)))
-            self.working = False
-            
-        elif keycode == wx.WXK_DELETE:
-            self.DeleteSelectedNode()
-
-        elif keycode == wx.WXK_INSERT:
-            self.InsertNewNode()
-
-        event.Skip()
-
-    def onKeyChar(self, event):
-        if event.GetKeyCode() >= 256:
-            event.Skip()
-            return
-        
-        keycode = chr(event.GetKeyCode())
-
-        if keycode == 'q':
-            self.NewEdgeMarkFrom()
-
-        elif keycode == 'w':
-            self.NewEdgeMarkTo()
-            
-        if keycode in ['1','2','3','4','5','6','7','8','9','0']:
-            if self.working: return
-            self.working = True
-
-            todisplay = ord(keycode) - ord('1')
-            self.snapshot_mgr.Restore(todisplay)
-
-            self.working = False
-
-        elif keycode in ['x', 'X', 'z', 'Z', 'c', 'C']:
-            """
-            layout to untangle then scale up repeatedly till strategy met
-            """
-            if self.working: return
-            self.working = True
-
-            if keycode in ['Z','z']:
-                strategy = ":reduce pre overlap removal NN overlaps"
-            elif keycode in ['X','x']:
-                strategy = ":reduce post overlap removal LN crossings"
-            elif keycode in ['C','c']:
-                strategy = ":reduce post overlap removal LN and LL crossings"
-
-            b = LayoutBlackboard(graph=self.graph, controller=self)
-            b.LayoutThenPickBestScale(scramble=keycode in ['Z','X','C'], strategy=strategy)
-
-            self.working = False
-            
-        elif keycode in ['e',]:
-            if self.working: return
-            self.working = True
-            
-            b = LayoutBlackboard(graph=self.graph, controller=self)
-            b.Experiment1()
-            
-            self.working = False
-
-        elif keycode in ['r', 'R']:
-            if self.working: return
-            self.working = True
-            
-            b = LayoutBlackboard(graph=self.graph, controller=self)
-            b.LayoutLoopTillNoChange(scramble=keycode == 'R')
-            
-            self.working = False
-
-        elif keycode in ['b', 'B']:
-            if self.working: return
-            self.working = True
-
-            b = LayoutBlackboard(graph=self.graph, controller=self)
-            b.LayoutMultipleChooseBest(3)
-            
-            self.working = False
-            
-        elif keycode == 'l':
-            print self.graph.CountLineOverNodeCrossings()
-
-        elif keycode in ['?',]:
-            self.DumpStatus()
-            
-        event.Skip()
-
-    def DumpStatus(self):
-        #print "-"*50
-        print "scale", self.coordmapper.scale
-        print "line-line intersections", len(self.graph.CountLineOverLineIntersections())
-        print "node-node overlaps", self.overlap_remover.CountOverlaps()
-        print "line-node crossings", self.graph.CountLineOverNodeCrossings()['ALL']/2 #, self.graph.CountLineOverNodeCrossings()
-        print "bounds", self.graph.GetBounds()
-        
     def NewEdgeMarkFrom(self):
         selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
         if not selected:
@@ -375,6 +235,118 @@ class GraphRendererOgl:
 
         self.working = False
 
+    def onKeyPress(self, event):
+        keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
+
+        if self.working:
+            event.Skip()
+            return
+        self.working = True
+
+        if keycode == wx.WXK_DOWN:
+            optimise = not event.ShiftDown()
+            self.ReLayout(keep_current_positions=True, gui=self, optimise=optimise)
+
+        elif keycode == wx.WXK_UP:
+            optimise = not event.ShiftDown()
+            self.ReLayout(keep_current_positions=False, gui=self, optimise=optimise)
+            
+        elif keycode == wx.WXK_RIGHT:
+            if self.coordmapper.scale > 0.8:
+                self.ChangeScale(-0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
+                print "expansion ", self.coordmapper.scale
+            else:
+                print "Max expansion prevented.", self.coordmapper.scale
+            print "LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_nodes=False)), \
+                                                len(self.graph.CountLineOverLineIntersections(ignore_nodes=True)))
+            
+        elif keycode == wx.WXK_LEFT:
+            if self.coordmapper.scale < 3:
+                self.ChangeScale(0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
+                print "contraction ", self.coordmapper.scale
+            else:
+                print "Min expansion thwarted.", self.coordmapper.scale
+            print "LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_nodes=False)), \
+                                                len(self.graph.CountLineOverLineIntersections(ignore_nodes=True)))
+            
+        elif keycode == wx.WXK_DELETE:
+            self.DeleteSelectedNode()
+
+        elif keycode == wx.WXK_INSERT:
+            self.InsertNewNode()
+
+        self.working = False
+        event.Skip()
+
+    def onKeyChar(self, event):
+        if event.GetKeyCode() >= 256:
+            event.Skip()
+            return
+        if self.working:
+            event.Skip()
+            return
+        self.working = True
+        
+        keycode = chr(event.GetKeyCode())
+
+        if keycode == 'q':
+            self.NewEdgeMarkFrom()
+
+        elif keycode == 'w':
+            self.NewEdgeMarkTo()
+            
+        elif keycode == '(':
+            self.snapshot_mgr.QuickSave(slot=1)
+            
+        elif keycode == ')':
+            self.snapshot_mgr.QuickSave(slot=2)
+
+        elif keycode == '9':
+            self.snapshot_mgr.QuickRestore(slot=1)
+
+        elif keycode == '0':
+            self.snapshot_mgr.QuickRestore(slot=2)
+
+        elif keycode in ['1','2','3','4','5','6','7','8']:
+            todisplay = ord(keycode) - ord('1')
+            self.snapshot_mgr.Restore(todisplay)
+
+        elif keycode in ['x', 'X', 'z', 'Z', 'c', 'C']:
+            if keycode in ['Z','z']:
+                strategy = ":reduce pre overlap removal NN overlaps"
+            elif keycode in ['X','x']:
+                strategy = ":reduce post overlap removal LN crossings"
+            elif keycode in ['C','c']:
+                strategy = ":reduce post overlap removal LN and LL crossings"
+            b = LayoutBlackboard(graph=self.graph, controller=self)
+            b.LayoutThenPickBestScale(scramble=keycode in ['Z','X','C'], strategy=strategy)
+            
+        elif keycode in ['e',]:
+            b = LayoutBlackboard(graph=self.graph, controller=self)
+            b.Experiment1()
+
+        elif keycode in ['r', 'R']:
+            b = LayoutBlackboard(graph=self.graph, controller=self)
+            b.LayoutLoopTillNoChange(scramble=keycode == 'R')
+
+        elif keycode in ['b', 'B']:
+            b = LayoutBlackboard(graph=self.graph, controller=self)
+            b.LayoutMultipleChooseBest(3)
+            
+        elif keycode in ['?',]:
+            self.DumpStatus()
+            
+        self.working = False
+        event.Skip()
+
+    def DumpStatus(self):
+        #print "-"*50
+        print "scale", self.coordmapper.scale
+        print "line-line intersections", len(self.graph.CountLineOverLineIntersections())
+        print "node-node overlaps", self.overlap_remover.CountOverlaps()
+        print "line-node crossings", self.graph.CountLineOverNodeCrossings()['ALL']/2 #, self.graph.CountLineOverNodeCrossings()
+        print "bounds", self.graph.GetBounds()
+        
     def draw(self, translatecoords=True):
         self.stage1(translatecoords=translatecoords)
         #thread.start_new_thread(self.DoSomeLongTask, ())
@@ -391,7 +363,6 @@ class GraphRendererOgl:
             self.createEdgeShape(edge)
 
         self.Redraw()
-        #time.sleep(1)
 
     def stage2(self, force_stateofthenation=False, watch_removals=True):
         self.overlap_remover.RemoveOverlaps(watch_removals=watch_removals)
@@ -403,7 +374,6 @@ class GraphRendererOgl:
             self.AdjustShapePosition(node)
         self.Redraw()
         wx.SafeYield()
-        #time.sleep(0.2)
         
     def stateofthespring(self):
         self.coordmapper.Recalibrate()
@@ -416,22 +386,12 @@ class GraphRendererOgl:
         self.coordmapper.Recalibrate(scale=self.coordmapper.scale+delta)
         self.AllToWorldCoords()
         numoverlaps = self.overlap_remover.CountOverlaps()
-        #print "Num Node Overlaps at scale", self.coordmapper.scale, numoverlaps
-        
-        
-        #saveit = self.overlap_remover.gui
-        #self.overlap_remover.gui = None
-        #self.stage2(force_stateofthenation=True) # does overlap removal and stateofthenation
-        #self.overlap_remover.gui = saveit
-
         if removeoverlaps:
             self.stage2(force_stateofthenation=True, watch_removals=False) # does overlap removal and stateofthenation
         else:
             self.stateofthenation()
         
     def ReLayout(self, keep_current_positions=False, gui=None, optimise=True):
-        # layout again
-        #print "spring layout again!"
         self.AllToLayoutCoords()
 
         layouter = GraphLayoutSpring(self.graph, gui)    # should keep this around
@@ -439,7 +399,59 @@ class GraphRendererOgl:
         
         self.AllToWorldCoords()
         self.stage2() # does overlap removal and stateofthenation
-        #self.stateofthenation()
+        
+    def AdjustShapePosition(self, node):
+        assert node.shape
+        
+        # Don't need to use node.shape.Move(dc, x, y, False)
+        setpos(node.shape, node.left, node.top)
+
+        # But you DO need to use a dc to adjust the links
+        dc = wx.ClientDC(self.oglcanvas)
+        self.oglcanvas.PrepareDC(dc)
+        node.shape.MoveLinks(dc)
+        
+    def Redraw(self):
+        diagram = self.oglcanvas.GetDiagram()
+        canvas = self.oglcanvas
+        assert canvas == diagram.GetCanvas()
+
+        dc = wx.ClientDC(canvas)
+        canvas.PrepareDC(dc)
+        
+        #for node in self.graph.nodes:    # TODO am still moving nodes in the pynsourcegui version?
+        #    shape = node.shape
+        #    shape.Move(dc, shape.GetX(), shape.GetY())
+        diagram.Clear(dc)
+        diagram.Redraw(dc)
+     
+    def createNodeShape(self, node):
+        shape = ogl.RectangleShape( node.width, node.height )
+        shape.AddText(node.id)
+        setpos(shape, node.left, node.top)
+        #shape.SetDraggable(True, True)
+        self.oglcanvas.AddShape( shape )
+        node.shape = shape
+        shape.node = node
+        
+        # wire in the event handler for the new shape
+        evthandler = MyEvtHandler(None, self.oglcanvas)
+        evthandler.SetShape(shape)
+        evthandler.SetPreviousHandler(shape.GetEventHandler())
+        shape.SetEventHandler(evthandler)
+       
+    def createEdgeShape(self, edge):
+        line = ogl.LineShape()
+        line.SetCanvas(self.oglcanvas)
+        line.SetPen(wx.BLACK_PEN)
+        line.SetBrush(wx.BLACK_BRUSH)
+        line.MakeLineControlPoints(2)
+       
+        fromShape = edge['source'].shape
+        toShape = edge['target'].shape
+        fromShape.AddLine(line, toShape)
+        self.oglcanvas.GetDiagram().AddShape(line)
+        line.Show(True)
         
     def OnRightButtonMenu(self, event):   # Menu
         x, y = event.GetPosition()
@@ -487,7 +499,6 @@ class GraphRendererOgl:
         
         frame.PopupMenu(self.popupmenu, wx.Point(x,y))
 
-            
     def OnSaveGraphToConsole(self, event):
         print self.graph.GraphToString()
 
@@ -501,47 +512,19 @@ class GraphRendererOgl:
             fp = open(filename, "w")
             fp.write(self.graph.GraphToString())
             fp.close()
-            
         dlg.Destroy()
         
     def OnLoadTestGraph1(self, event):
-        filedata = """
-{'type':'node', 'id':'D25', 'x':7, 'y':6, 'width':159, 'height':106}
-{'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
-{'type':'node', 'id':'m1', 'x':171, 'y':9, 'width':139, 'height':92}
-        """
-        self.LoadGraph(filedata)
+        self.LoadGraph(TEST_GRAPH1)
         
     def OnLoadTestGraph2(self, event):
-        filedata = """
-{'type':'node', 'id':'D25', 'x':7, 'y':6, 'width':159, 'height':106}
-{'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
-{'type':'node', 'id':'m1', 'x':146, 'y':179, 'width':139, 'height':92}
-{'type':'node', 'id':'D97', 'x':213, 'y':6, 'width':85, 'height':159}
-        """
-        self.LoadGraph(filedata)
+        self.LoadGraph(TEST_GRAPH2)
         
     def OnLoadTestGraph3(self, event):
-        filedata = """
-{'type':'node', 'id':'D25', 'x':7, 'y':6, 'width':159, 'height':106}
-{'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
-{'type':'node', 'id':'m1', 'x':246, 'y':179, 'width':139, 'height':92}
-{'type':'node', 'id':'D97', 'x':213, 'y':6, 'width':85, 'height':159}
-{'type':'node', 'id':'D98', 'x':340, 'y':7, 'width':101, 'height':107}
-        """
-        self.LoadGraph(filedata)
+        self.LoadGraph(TEST_GRAPH3)
 
     def OnLoadTestGraph4(self, event):
-        filedata = """
-{'type':'node', 'id':'D25', 'x':7, 'y':6, 'width':159, 'height':106}
-{'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
-{'type':'node', 'id':'m1', 'x':6, 'y':214, 'width':139, 'height':92}
-{'type':'node', 'id':'D97', 'x':213, 'y':6, 'width':85, 'height':159}
-{'type':'node', 'id':'D98', 'x':305, 'y':57, 'width':101, 'height':107}
-{'type':'node', 'id':'D50', 'x':149, 'y':184, 'width':242, 'height':112}
-{'type':'node', 'id':'D51', 'x':189, 'y':302, 'width':162, 'height':66}
-        """
-        self.LoadGraph(filedata)
+        self.LoadGraph(TEST_GRAPH4)
 
     def OnLoadGraphFromText(self, event):
         eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
@@ -611,62 +594,7 @@ class GraphRendererOgl:
         print "Done."
         """
         
-        
-    def AdjustShapePosition(self, node):
-        assert node.shape
-        
-        # Don't need to use node.shape.Move(dc, x, y, False)
-        setpos(node.shape, node.left, node.top)
-
-        # But you DO need to use a dc to adjust the links
-        dc = wx.ClientDC(self.oglcanvas)
-        self.oglcanvas.PrepareDC(dc)
-        node.shape.MoveLinks(dc)
-
-        
-    def Redraw(self):
-        
-        diagram = self.oglcanvas.GetDiagram()
-        canvas = self.oglcanvas
-        assert canvas == diagram.GetCanvas()
-
-        dc = wx.ClientDC(canvas)
-        canvas.PrepareDC(dc)
-        
-        #for node in self.graph.nodes:    # TODO am still moving nodes in the pynsourcegui version?
-        #    shape = node.shape
-        #    shape.Move(dc, shape.GetX(), shape.GetY())
-        diagram.Clear(dc)
-        diagram.Redraw(dc)
-
-     
-    def createNodeShape(self, node):
-        shape = ogl.RectangleShape( node.width, node.height )
-        shape.AddText(node.id)
-        setpos(shape, node.left, node.top)
-        #shape.SetDraggable(True, True)
-        self.oglcanvas.AddShape( shape )
-        node.shape = shape
-        shape.node = node
-        
-        # wire in the event handler for the new shape
-        evthandler = MyEvtHandler(None, self.oglcanvas)
-        evthandler.SetShape(shape)
-        evthandler.SetPreviousHandler(shape.GetEventHandler())
-        shape.SetEventHandler(evthandler)
-       
-    def createEdgeShape(self, edge):
-        line = ogl.LineShape()
-        line.SetCanvas(self.oglcanvas)
-        line.SetPen(wx.BLACK_PEN)
-        line.SetBrush(wx.BLACK_BRUSH)
-        line.MakeLineControlPoints(2)
-       
-        fromShape = edge['source'].shape
-        toShape = edge['target'].shape
-        fromShape.AddLine(line, toShape)
-        self.oglcanvas.GetDiagram().AddShape(line)
-        line.Show(True)        
+ 
         
 
 class AppFrame(wx.Frame):

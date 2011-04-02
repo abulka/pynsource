@@ -211,21 +211,21 @@ class LayoutBlackboard:
 
             if strategy == ":reduce pre overlap removal NN overlaps":
                 if num_node_node_overlaps <= ACCEPTABLE_NODE_NODE_PRE_REMOVAL:
-                    print "Mad: Aborting expansion since num NN overlaps <= %d" % ACCEPTABLE_NODE_NODE_PRE_REMOVAL
+                    #print "Mad: Aborting expansion since num NN overlaps <= %d" % ACCEPTABLE_NODE_NODE_PRE_REMOVAL
                     break
             elif strategy == ":reduce post overlap removal LN crossings":
                 if num_line_node_crossings == 0:
-                    print "Mad: Finished expansion since LN crossings == 0 :-)"
+                    #print "Mad: Finished expansion since LN crossings == 0 :-)"
                     break
             elif strategy == ":reduce post overlap removal LN and LL crossings":
                 if num_line_node_crossings == 0 and num_line_node_crossings == 0:
-                    print "Mad: Finished expansion since LN and LL crossings == 0 :-)"
+                    #print "Mad: Finished expansion since LN and LL crossings == 0 :-)"
                     break
             else:
                 assert False, "Mad: unknown strategy"
     
             if self.controller.coordmapper.scale < MAX_SCALE:
-                print "Mad: Aborting expansion - gone too far.", self.controller.coordmapper.scale
+                #print "Mad: Aborting expansion - gone too far.", self.controller.coordmapper.scale
                 break
     
         if animate:
@@ -269,7 +269,7 @@ class LayoutBlackboard:
         # How many LL reduced (or perhaps increased) after expansion & post removing NN overlaps
         num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
 
-        print "GetVitalStats: At scale %.1f NN_pre %d LN %d LL %d" % (self.controller.coordmapper.scale, num_node_node_overlaps, num_line_node_crossings, num_line_line_crossings)
+        #print "GetVitalStats: At scale %.1f NN_pre %d LN %d LL %d" % (self.controller.coordmapper.scale, num_node_node_overlaps, num_line_node_crossings, num_line_line_crossings)
     
         return num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings
 

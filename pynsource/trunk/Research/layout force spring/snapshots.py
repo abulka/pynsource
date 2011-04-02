@@ -7,6 +7,23 @@ class GraphSnapshotMgr:
         self.graph = graph
         self.controller = controller
         self.Clear()
+        self.quick_save_slots = {}
+
+    def Clear(self):
+        self.snapshots = []
+
+    def QuickSave(self, slot=1):
+        snapshot = self.AddSnapshot(layout_score=-1, LL=-1, NN=-1, LN=-1,
+                    scale=self.controller.coordmapper.scale,
+                    bounds=(-1,-1), bounds_area_simple=-1,
+                    graph_memento=self.graph.GetMementoOfPositions(),
+                    quicksave=True)
+        self.quick_save_slots['slot'+`slot`] = snapshot
+    
+    def QuickRestore(self, slot=1):
+        snapshot = self.quick_save_slots.get('slot'+`slot`, None)
+        if snapshot:
+            self.RestoreGraph(snapshot['memento'], snapshot['scale'])
 
     def Restore(self, snapshot_number):
         # snapshot_number is 0 array based
@@ -39,10 +56,7 @@ class GraphSnapshotMgr:
             print msg
         print '-'*len(header)
 
-    def Clear(self):
-        self.snapshots = []
-
-    def AddSnapshot(self, layout_score, LL, NN, LN, scale, bounds, bounds_area_simple, graph_memento):
+    def AddSnapshot(self, layout_score, LL, NN, LN, scale, bounds, bounds_area_simple, graph_memento, quicksave=False):
         
         snapshot = {
             'layout_score':layout_score,  # not used yet
@@ -55,7 +69,10 @@ class GraphSnapshotMgr:
             '_original_add_index':len(self.snapshots)+1,
             'memento':graph_memento}
         
-        self.snapshots.append(snapshot)
+        if quicksave:
+            return snapshot
+        else:
+            self.snapshots.append(snapshot)
         
     def Sort(self):
         """
