@@ -365,15 +365,29 @@ class GraphRendererOgl:
         self.Redraw()
 
     def stage2(self, force_stateofthenation=False, watch_removals=True):
+        self.graph.SaveOldPositionsForAnimationPurposes()
+        watch_removals = False
+        
         self.overlap_remover.RemoveOverlaps(watch_removals=watch_removals)
         if self.overlap_remover.GetStats()['total_overlaps_found'] > 0 or force_stateofthenation:
-            self.stateofthenation()
+            self.stateofthenation(animate=True)
         
-    def stateofthenation(self):
-        for node in self.graph.nodes:
-            self.AdjustShapePosition(node)
-        self.Redraw()
-        wx.SafeYield()
+    def stateofthenation(self, animate=False):
+        if animate:
+            from animation import GeneratePoints
+            for node in self.graph.nodes:
+                node.anilist = GeneratePoints((node.previous_left, node.previous_top), (node.left, node.top))
+            for node in self.graph.nodes:
+                while node.anilist:
+                    point = node.anilist.pop(0)
+                    self.AdjustShapePosition(node, point)
+                    self.Redraw()
+                    wx.SafeYield()
+        else:
+            for node in self.graph.nodes:
+                self.AdjustShapePosition(node)
+            self.Redraw()
+            wx.SafeYield()
         
     def stateofthespring(self):
         self.coordmapper.Recalibrate()
@@ -400,11 +414,16 @@ class GraphRendererOgl:
         self.AllToWorldCoords()
         self.stage2() # does overlap removal and stateofthenation
         
-    def AdjustShapePosition(self, node):
+    def AdjustShapePosition(self, node, point=None):
         assert node.shape
         
+        if point:
+            x, y = point
+        else:
+            x, y = node.left, node.top
+            
         # Don't need to use node.shape.Move(dc, x, y, False)
-        setpos(node.shape, node.left, node.top)
+        setpos(node.shape, x, y)
 
         # But you DO need to use a dc to adjust the links
         dc = wx.ClientDC(self.oglcanvas)

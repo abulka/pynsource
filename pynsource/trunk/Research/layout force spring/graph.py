@@ -203,6 +203,9 @@ class Graph:
 
         return (maxx, maxy)
         
+    def SaveOldPositionsForAnimationPurposes(self):
+        for node in self.nodes:
+            node.previous_left, node.previous_top = node.left, node.top  # for animation
 
 class GraphNode:
     def __init__(self, id, left, top, width=60, height=60):
@@ -217,6 +220,9 @@ class GraphNode:
         self.layoutPosY = 0
         self.layoutForceX = 0
         self.layoutForceY = 0
+
+        self.previous_left = left
+        self.previous_top = top
 
     def get_bottom(self):
         return self.top + self.height
