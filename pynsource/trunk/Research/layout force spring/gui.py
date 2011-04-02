@@ -375,14 +375,56 @@ class GraphRendererOgl:
     def stateofthenation(self, animate=False):
         if animate:
             from animation import GeneratePoints
+            
             for node in self.graph.nodes:
                 node.anilist = GeneratePoints((node.previous_left, node.previous_top), (node.left, node.top))
-            for node in self.graph.nodes:
-                while node.anilist:
+
+            def RedrawFast():
+                diagram = self.oglcanvas.GetDiagram()
+                canvas = self.oglcanvas
+                assert canvas == diagram.GetCanvas()
+        
+                dc = wx.ClientDC(canvas)
+                canvas.PrepareDC(dc)
+                
+                #diagram.Clear(dc)
+                diagram.Redraw(dc)
+
+            dc = wx.ClientDC(self.oglcanvas)
+            self.oglcanvas.PrepareDC(dc)
+            for i in range(len(self.graph.nodes[0].anilist)):
+                for node in self.graph.nodes:
                     point = node.anilist.pop(0)
-                    self.AdjustShapePosition(node, point)
-                    self.Redraw()
-                    wx.SafeYield()
+                    x, y = point
+                    #node.shape.Move(dc, x, y, True)
+                    setpos(node.shape, x, y)
+                    node.shape.MoveLinks(dc)
+                    self.Redraw(clear=False)
+                self.Redraw()
+            #for node in self.graph.nodes:
+            #    node.shape.MoveLinks(dc)
+            #self.Redraw()
+                
+            # NOT A BAD COMPROMISE - GOOD                
+            #dc = wx.ClientDC(self.oglcanvas)
+            #self.oglcanvas.PrepareDC(dc)
+            #for i in range(len(self.graph.nodes[0].anilist)):
+            #    for node in self.graph.nodes:
+            #        point = node.anilist.pop(0)
+            #        x, y = point
+            #        #node.shape.Move(dc, x, y, True)
+            #        setpos(node.shape, x, y)
+            #        node.shape.MoveLinks(dc)
+            #        RedrawFast()
+            #    self.Redraw()
+                
+            #for node in self.graph.nodes:
+            #    while node.anilist:
+            #        point = node.anilist.pop(0)
+            #        self.AdjustShapePosition(node, point)
+            #        self.Redraw()
+            #        wx.SafeYield()
+            
         else:
             for node in self.graph.nodes:
                 self.AdjustShapePosition(node)
@@ -430,7 +472,7 @@ class GraphRendererOgl:
         self.oglcanvas.PrepareDC(dc)
         node.shape.MoveLinks(dc)
         
-    def Redraw(self):
+    def Redraw(self, clear=True):
         diagram = self.oglcanvas.GetDiagram()
         canvas = self.oglcanvas
         assert canvas == diagram.GetCanvas()
@@ -441,7 +483,9 @@ class GraphRendererOgl:
         #for node in self.graph.nodes:    # TODO am still moving nodes in the pynsourcegui version?
         #    shape = node.shape
         #    shape.Move(dc, shape.GetX(), shape.GetY())
-        diagram.Clear(dc)
+        
+        if clear:
+            diagram.Clear(dc)
         diagram.Redraw(dc)
      
     def createNodeShape(self, node):

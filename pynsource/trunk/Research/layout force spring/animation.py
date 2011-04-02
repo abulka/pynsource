@@ -8,7 +8,7 @@ def easeInOut(minValue, maxValue, totalSteps, actualStep, powr):
     stepp = minValue+(math.pow(((1.0 / totalSteps) * actualStep), powr) * delta)
     return math.ceil(stepp)
     
-def doValChangeMem(startval, endval, steps, intervals_failsafe=200, powr=0.5):
+def doValChangeMem(startval, endval, steps, intervals_failsafe=200, powr=0.15):
     result = []
     actStep = 0
     for i in range(intervals_failsafe):
@@ -19,7 +19,7 @@ def doValChangeMem(startval, endval, steps, intervals_failsafe=200, powr=0.5):
             break
     return result
 
-def GeneratePoints(point1, point2, steps=12):
+def GeneratePoints(point1, point2, steps=8):
     X, Y = 0, 1
     xs = doValChangeMem(startval=point1[X], endval=point2[X], steps=steps)
     ys = doValChangeMem(startval=point1[Y], endval=point2[Y], steps=steps)
