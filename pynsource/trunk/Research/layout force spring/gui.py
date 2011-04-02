@@ -322,12 +322,12 @@ class GraphRendererOgl:
         event.Skip()
 
     def DumpStatus(self):
-        print "-"*50
-        print "# line-line intersections", len(self.graph.CountLineOverLineIntersections())
-        print "# node-node overlaps (post overlap removal always ~ 0)", self.overlap_remover.CountOverlaps()
-        print "# line-node crossings", self.graph.CountLineOverNodeCrossings()['ALL']/2 #, self.graph.CountLineOverNodeCrossings()
+        #print "-"*50
         print "scale", self.coordmapper.scale
-        print "bounds ?"
+        print "line-line intersections", len(self.graph.CountLineOverLineIntersections())
+        print "node-node overlaps", self.overlap_remover.CountOverlaps()
+        print "line-node crossings", self.graph.CountLineOverNodeCrossings()['ALL']/2 #, self.graph.CountLineOverNodeCrossings()
+        print "bounds", self.graph.GetBounds()
         
     def NewEdgeMarkFrom(self):
         selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]

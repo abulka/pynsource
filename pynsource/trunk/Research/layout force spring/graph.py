@@ -194,6 +194,15 @@ class Graph:
         result = remove_duplicates(result)
         return result
             
+    def GetBounds(self):
+        maxx = 0
+        maxy = 0
+        for node in self.nodes:
+            maxx = max(node.left, maxx)
+            maxy = max(node.top, maxy)
+
+        return (maxx, maxy)
+        
 
 class GraphNode:
     def __init__(self, id, left, top, width=60, height=60):

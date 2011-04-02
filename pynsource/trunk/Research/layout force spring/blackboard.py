@@ -27,8 +27,9 @@ class LayoutBlackboard:
         def ThinkAndAddSnapshot(res):
             num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = res
 
-            # Calculate a layout score, lower the better?
+            # Calculate a layout score, lower the better?  Not used yet.
             score = 0
+            bounds = self.graph.GetBounds()
             
             self.controller.snapshot_mgr.AddSnapshot(\
                 layout_score=score,
@@ -36,7 +37,8 @@ class LayoutBlackboard:
                 NN=num_node_node_overlaps,
                 LN=num_line_node_crossings,
                 scale=self.controller.coordmapper.scale,
-                bounds=88,
+                bounds=bounds,
+                bounds_area_simple=bounds[0]*bounds[1]/10000,
                 graph_memento=self.graph.GetMementoOfPositions())
 
         # Generate several totally fresh layout variations
@@ -54,8 +56,8 @@ class LayoutBlackboard:
             ThinkAndAddSnapshot(res)
                 
         
-        self.controller.snapshot_mgr.DumpSnapshots(label='Unsorted')
-        self.controller.snapshot_mgr.Sort()
+        #self.controller.snapshot_mgr.DumpSnapshots(label='Unsorted')
+        self.controller.snapshot_mgr.Sort()             # this does the thinking!
         #self.controller.snapshot_mgr.DumpSnapshots('Sorted')
         
         self.controller.snapshot_mgr.Restore(0)

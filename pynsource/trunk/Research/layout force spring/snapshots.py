@@ -33,7 +33,7 @@ class GraphSnapshotMgr:
         print header
         for i, snapshot in enumerate(self.snapshots):
             msg = "Snapshot %d [%d] " % ((i+1), snapshot['_original_add_index'])
-            msg += "Layout score %(layout_score)2d   LL %(LL)2d   NN pre %(NN)2d   LN %(LN)2d   scale %(scale).1f   bounds %(bounds)d" % snapshot
+            msg += "LL %(LL)2d   NN pre rm overlaps %(NN_pre_OR)2d   LN %(LN)2d   scale %(scale).1f   bounds %(bounds_area_simple)2d  %(bounds)s" % snapshot
             if current_snapshot_index <> None and i == current_snapshot_index:
                 msg += " <---"
             print msg
@@ -42,22 +42,28 @@ class GraphSnapshotMgr:
     def Clear(self):
         self.snapshots = []
 
-    def AddSnapshot(self, layout_score, LL, NN, LN, scale, bounds, graph_memento):
+    def AddSnapshot(self, layout_score, LL, NN, LN, scale, bounds, bounds_area_simple, graph_memento):
         
         snapshot = {
-            'layout_score':layout_score,
+            'layout_score':layout_score,  # not used yet
             'LL':LL,
-            'NN':NN,
+            'NN_pre_OR':NN,
             'LN':LN,
             'scale':scale,
             'bounds':bounds,
+            'bounds_area_simple':bounds_area_simple,
             '_original_add_index':len(self.snapshots)+1,
             'memento':graph_memento}
         
         self.snapshots.append(snapshot)
         
     def Sort(self):
-        #self.snapshots.sort()  # should sort by 1st item in tuple, followed by next item in tuple etc. - perfect!
+        """
+        blackboard now sorting smarter because I have converted snapshots to
+        dictionary format and thus can control which elements to sort by and
+        whether to maximise or minimise any particular key in that snapshot
+        dictionary.
+        """
         b = self.snapshots
-        self.snapshots = sorted(b, key=lambda d: (d['LN'], -d['scale']))        
+        self.snapshots = sorted(b, key=lambda d: (d['LN'], d['LL'], d['bounds_area_simple'], -d['scale'], d['NN_pre_OR']))
 
