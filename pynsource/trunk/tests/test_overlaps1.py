@@ -6,7 +6,8 @@ sys.path.append("../Research/layout force spring")
 from overlap_removal import OverlapRemoval
 from graph import Graph, GraphNode
 import pprint
-        
+from data_testgraphs import *
+
 class OverlapTests(unittest.TestCase):
 
     def setUp(self):
@@ -95,12 +96,7 @@ class OverlapTests(unittest.TestCase):
 
 
     def _LoadScenario1(self):
-        initial = """
-{'type':'node', 'id':'D25', 'x':6, 'y':7, 'width':159, 'height':106}
-{'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
-{'type':'node', 'id':'m1', 'x':170, 'y':9, 'width':139, 'height':92}
-"""
-        self.g.LoadGraphFromStrings(initial)
+        self.g.LoadGraphFromStrings(TEST_GRAPH1)
 
     def test1_1MoveLeftPushedBackHorizontally01(self):
         self._LoadScenario1()
@@ -169,13 +165,7 @@ class OverlapTests(unittest.TestCase):
         
         
     def _LoadScenario2(self):
-        initial = """
-{'type':'node', 'id':'D25', 'x':7, 'y':6, 'width':159, 'height':106}
-{'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
-{'type':'node', 'id':'m1', 'x':146, 'y':179, 'width':139, 'height':92}
-{'type':'node', 'id':'D97', 'x':213, 'y':6, 'width':85, 'height':159}
-"""
-        self.g.LoadGraphFromStrings(initial)        
+        self.g.LoadGraphFromStrings(TEST_GRAPH2)        
         
     def test2_1InsertAndPushedRightHorizontally(self):
         self._LoadScenario2()
@@ -214,14 +204,7 @@ class OverlapTests(unittest.TestCase):
 
 
     def _LoadScenario3(self):
-        initial = """
-{'type':'node', 'id':'D25', 'x':7, 'y':6, 'width':159, 'height':106}
-{'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
-{'type':'node', 'id':'m1', 'x':246, 'y':179, 'width':139, 'height':92}
-{'type':'node', 'id':'D97', 'x':213, 'y':6, 'width':85, 'height':159}
-{'type':'node', 'id':'D98', 'x':340, 'y':7, 'width':101, 'height':107}
-"""
-        self.g.LoadGraphFromStrings(initial)  
+        self.g.LoadGraphFromStrings(TEST_GRAPH3)  
         
     def test3_1PushedBetweenLeftAndRight(self):
         self._LoadScenario3()
@@ -334,17 +317,70 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureXorder('D13', 'D97', 'D98'))
         self.assertEqual(oldD97pos, (d97.left, d97.top)) # ensure D97 hasn't been pushed
 
+    def _LoadScenario3a(self):
+        self.g.LoadGraphFromStrings(TEST_GRAPH3A)
+
+    def test3a_1PushedLeft(self):
+        self._LoadScenario3a()
+        
+        node = self.g.FindNodeById('m1')
+        node.left, node.top = (246, 9)
+        
+        # move m1 to the right, should be pushed back to the left
+        were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
+
+        self.assertTrue(self._ensureXorder('D25', 'm1', 'D97'))
+        self.assertTrue(self._ensureXorder('D13', 'm1', 'D97'))
+        self.assertTrue(self._ensureYorder('D25', 'D13'))
+        self.assertTrue(self._ensureYorder('m1', 'D13'))
+        self.assertTrue(self._ensureYorder('m1', 'D98'))
+        self.assertTrue(self._ensureYorder('D97', 'D98'))
+
+        self.assertFalse(self._ensureYorder('D25', 'm1'))  # don't want this
+        self.assertFalse(self._ensureYorder('D97', 'm1'))  # don't want this
+        
+    def test3a_2PushedLeftD97DoesntMove(self):
+        self._LoadScenario3a()
+        
+        d97 = self.g.FindNodeById('D97')
+        oldD97pos = (d97.left, d97.top)
+
+        node = self.g.FindNodeById('m1')
+        node.left, node.top = (261, 104)
+        
+        # move m1 to the right, should be pushed back to the left.  D97 shouldn't move!
+        were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
+
+        self.assertTrue(self._ensureXorder('D25', 'm1', 'D97'))
+        self.assertTrue(self._ensureXorder('D25', 'm1', 'D98'))
+        self.assertTrue(self._ensureXorderLefts('D25', 'm1', 'D98', 'D97'))
+
+        self.assertEqual(oldD97pos, (d97.left, d97.top)) # ensure D97 hasn't been pushed
+
+    def test3a_3PushedLeftNotFlyingUpY(self):
+        self._LoadScenario3a()
+        
+        node = self.g.FindNodeById('m1')
+        node.left, node.top = (216, 164)
+        
+        # move m1 to the right, should be pushed back to the left.  Not flown up Y.
+        # note that the top of m1 is > top of D98 to trigger this test.
+        were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
+
+        self.assertTrue(self._ensureXorder('D25', 'm1', 'D97'))
+        self.assertTrue(self._ensureXorder('D25', 'm1', 'D98'))
+        self.assertTrue(self._ensureYorder('D25', 'm1'))
+        self.assertFalse(self._ensureYorder('m1', 'D98'))   # don't want this
+
+
     def _LoadScenario4(self):
-        initial = """
-{'type':'node', 'id':'D25', 'x':7, 'y':6, 'width':159, 'height':106}
-{'type':'node', 'id':'D13', 'x':6, 'y':119, 'width':119, 'height':73}
-{'type':'node', 'id':'m1', 'x':6, 'y':214, 'width':139, 'height':92}
-{'type':'node', 'id':'D97', 'x':213, 'y':6, 'width':85, 'height':159}
-{'type':'node', 'id':'D98', 'x':305, 'y':57, 'width':101, 'height':107}
-{'type':'node', 'id':'D50', 'x':149, 'y':184, 'width':242, 'height':112}
-{'type':'node', 'id':'D51', 'x':189, 'y':302, 'width':162, 'height':66}
-"""
-        self.g.LoadGraphFromStrings(initial)  
+        self.g.LoadGraphFromStrings(TEST_GRAPH4)  
 
     def test4_1InsertedTwoPushedRightTwoPushedDown(self):
         self._LoadScenario4()
@@ -425,41 +461,7 @@ class OverlapTests(unittest.TestCase):
         self.assertNotEqual(oldD13pos, (d13.left, d13.top)) # ensure D13 HAS been pushed
 
     def _LoadScenario5_stress(self):
-        initial = """
-{'type':'node', 'id':'A', 'x':230, 'y':118, 'width':250, 'height':250}
-{'type':'node', 'id':'A1', 'x':252, 'y':10, 'width':60, 'height':60}
-{'type':'node', 'id':'A2', 'x':143, 'y':48, 'width':60, 'height':60}
-{'type':'node', 'id':'B', 'x':87, 'y':245, 'width':60, 'height':60}
-{'type':'node', 'id':'B1', 'x':10, 'y':199, 'width':60, 'height':60}
-{'type':'node', 'id':'B2', 'x':190, 'y':253, 'width':60, 'height':60}
-{'type':'node', 'id':'B21', 'x':262, 'y':161, 'width':60, 'height':60}
-{'type':'node', 'id':'B22', 'x':139, 'y':351, 'width':100, 'height':200}
-{'type':'node', 'id':'c', 'x':301, 'y':259, 'width':60, 'height':60}
-{'type':'node', 'id':'c1', 'x':261, 'y':372, 'width':60, 'height':60}
-{'type':'node', 'id':'c2', 'x':395, 'y':201, 'width':60, 'height':60}
-{'type':'node', 'id':'c3', 'x':402, 'y':302, 'width':60, 'height':60}
-{'type':'node', 'id':'c4', 'x':338, 'y':379, 'width':60, 'height':60}
-{'type':'node', 'id':'c5', 'x':244, 'y':207, 'width':60, 'height':120}
-{'type':'node', 'id':'BIG1', 'x':0, 'y':0, 'width':300, 'height':200}
-{'type':'node', 'id':'BIG2', 'x':1, 'y':1, 'width':300, 'height':200}
-{'type':'node', 'id':'BIG3', 'x':2, 'y':2, 'width':300, 'height':200}
-{'type':'edge', 'id':'A_to_A1', 'source':'A', 'target':'A1'}
-{'type':'edge', 'id':'A_to_A2', 'source':'A', 'target':'A2'}
-{'type':'edge', 'id':'B_to_B1', 'source':'B', 'target':'B1'}
-{'type':'edge', 'id':'B_to_B2', 'source':'B', 'target':'B2'}
-{'type':'edge', 'id':'B2_to_B21', 'source':'B2', 'target':'B21'}
-{'type':'edge', 'id':'B2_to_B22', 'source':'B2', 'target':'B22'}
-{'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1'}
-{'type':'edge', 'id':'c_to_c2', 'source':'c', 'target':'c2'}
-{'type':'edge', 'id':'c_to_c3', 'source':'c', 'target':'c3'}
-{'type':'edge', 'id':'c_to_c4', 'source':'c', 'target':'c4'}
-{'type':'edge', 'id':'c_to_c5', 'source':'c', 'target':'c5'}
-{'type':'edge', 'id':'A_to_c', 'source':'A', 'target':'c'}
-{'type':'edge', 'id':'B2_to_c', 'source':'B2', 'target':'c'}
-{'type':'edge', 'id':'B2_to_c5', 'source':'B2', 'target':'c5'}
-{'type':'edge', 'id':'A_to_c5', 'source':'A', 'target':'c5'}
-"""
-        self.g.LoadGraphFromStrings(initial)
+        self.g.LoadGraphFromStrings(TEST_GRAPH5_STRESS)
         
     def testStress1(self):
         
@@ -472,15 +474,7 @@ class OverlapTests(unittest.TestCase):
             self.g.Clear()
         
     def _LoadScenario6_linecrossing(self):
-        initial = """
-{'type':'node', 'id':'A', 'x':13, 'y':12, 'width':84, 'height':126}
-{'type':'node', 'id':'B', 'x':122, 'y':11, 'width':157, 'height':79}
-{'type':'node', 'id':'C', 'x':8, 'y':292, 'width':194, 'height':91}
-{'type':'node', 'id':'m1', 'x':102, 'y':95, 'width':123, 'height':144}
-{'type':'edge', 'id':'A_to_B', 'source':'A', 'target':'B'}
-{'type':'edge', 'id':'A_to_C', 'source':'A', 'target':'C'}
-"""        
-        self.g.LoadGraphFromStrings(initial)
+        self.g.LoadGraphFromStrings(TEST_GRAPH6)
 
     def test6_1LineCrossingNotNeeded(self):
         self._LoadScenario6_linecrossing()
@@ -500,7 +494,7 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureYorder('B', 'm1', 'C'))
         self.assertFalse(self._ensureYorder('A', 'm1', 'C')) # don't want this otherwise the line from A to C would be crossed
         
-    def test6_2LineCrossingAvoided(self):
+    def OFFLINE_test6_2LineCrossingAvoided(self):
         self._LoadScenario6_linecrossing()
         
         # move m1 to the left
@@ -521,14 +515,7 @@ class OverlapTests(unittest.TestCase):
                 
 
     def _LoadScenario7(self):
-        initial = """
-{'type':'node', 'id':'A', 'x':10, 'y':10, 'width':250, 'height':250}
-{'type':'node', 'id':'c', 'x':265, 'y':90, 'width':60, 'height':60}
-{'type':'node', 'id':'m1', 'x':265, 'y':15, 'width':60, 'height':60}
-{'type':'edge', 'id':'c_to_m1', 'source':'c', 'target':'m1'}
-{'type':'edge', 'id':'A_to_c', 'source':'A', 'target':'c'}
-"""
-        self.g.LoadGraphFromStrings(initial)
+        self.g.LoadGraphFromStrings(TEST_GRAPH7)
         
     def test7_1DontJumpTooFarY(self):
         

@@ -510,6 +510,7 @@ class GraphRendererOgl:
         item = imp.Append(2021, "Load Test Graph 1"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph1, item)
         item = imp.Append(2022, "Load Test Graph 2"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph2, item)
         item = imp.Append(2023, "Load Test Graph 3"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph3, item)
+        item = imp.Append(2023, "Load Test Graph 3a"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph3a, item)
         item = imp.Append(2024, "Load Test Graph 4"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph4, item)
         item = imp.Append(2025, "Load Test Graph 6 (line overlaps)"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph6, item)
         item = imp.Append(2026, "Load Test Graph 7"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph7, item)
@@ -538,6 +539,9 @@ class GraphRendererOgl:
         
     def OnLoadTestGraph3(self, event):
         self.LoadGraph(TEST_GRAPH3)
+
+    def OnLoadTestGraph3a(self, event):
+        self.LoadGraph(TEST_GRAPH3A)
 
     def OnLoadTestGraph4(self, event):
         self.LoadGraph(TEST_GRAPH4)
