@@ -110,7 +110,13 @@ class OverlapRemoval:
             proposal['node'].left += proposal['amount']
         else:
             proposal['node'].top += proposal['amount']
+
         self.nodes_already_moved.append(proposal['node'])
+
+        if proposal['amount'] < 0:
+            self.total_contractive_moves += 1
+        else:
+            self.total_expansive_moves += 1
 
     def ApplyMinimalProposal(self, proposals):
         check_for_line_crossings = False
@@ -141,12 +147,18 @@ class OverlapRemoval:
             proposal = proposal111
         
         self.ApplyProposal(proposal)
-        if proposal['amount'] < 0:
-            self.total_contractive_moves += 1
-        else:
-            self.total_expansive_moves += 1
-        return proposal['node'], proposal['xory']
+        lastmovednode, lastmovedirection = proposal['node'], proposal['xory']
+        self.PostMoveAlgorithm(lastmovednode, lastmovedirection)  # Optional nicety
 
+    def ProposeRemovalsAndApply(self, node1, node2):
+        # Return the number of overlaps removed
+        proposals = self.GatherProposals(node1, node2)
+        if not proposals:
+            return 0
+        
+        self.ApplyMinimalProposal(proposals)
+        return 1
+    
     def MoveWouldHitSomething(self, movingnode, deltaX=0, deltaY=0, ignorenode=None):
         # delta values can be positive or negative
         # TODO make this take into account the margin?  Sometimes get very close nodes.
@@ -221,14 +233,7 @@ class OverlapRemoval:
                 found_an_overlap_thiscycle = True
                 self.total_overlaps_found += 1
                 
-                proposals = self.GatherProposals(node1, node2)
-                if not proposals:
-                    continue
-                
-                lastmovednode, lastmovedirection = self.ApplyMinimalProposal(proposals)
-                numfixed_thiscycle += 1
-
-                self.PostMoveAlgorithm(lastmovednode, lastmovedirection)  # Optional nicety
+                numfixed_thiscycle += self.ProposeRemovalsAndApply(node1, node2)
                 
         return found_an_overlap_thiscycle, numfixed_thiscycle
     
