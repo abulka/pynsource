@@ -20,7 +20,8 @@ class OverlapTests(unittest.TestCase):
         self.overlap_remover = OverlapRemoval(self.g, margin=5, gui=FakeGui())
 
     def tearDown(self):
-        pprint.pprint(self.overlap_remover.GetStats())
+        #pprint.pprint(self.overlap_remover.GetStats())
+        pass
 
     def test0_1OneNode(self):
         g = self.g
@@ -341,7 +342,7 @@ class OverlapTests(unittest.TestCase):
         self.assertFalse(self._ensureYorder('D25', 'm1'))  # don't want this
         self.assertFalse(self._ensureYorder('D97', 'm1'))  # don't want this
         
-    def OFFLINE_test3A_2PushedLeftD97DoesntMove(self):
+    def test3A_2PushedLeftD97DoesntMove(self):
         self._LoadScenario3a()
         
         d97 = self.g.FindNodeById('D97')
@@ -353,7 +354,6 @@ class OverlapTests(unittest.TestCase):
         # move m1 to the right, should be pushed back to the left.  D97 shouldn't move!
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
         self.assertTrue(were_all_overlaps_removed)
-        self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
 
         self.assertTrue(self._ensureXorder('D25', 'm1', 'D97'))
         self.assertTrue(self._ensureXorder('D25', 'm1', 'D98'))
@@ -416,7 +416,7 @@ class OverlapTests(unittest.TestCase):
         self.assertNotEqual(oldD50pos, (d50.left, d50.top)) # ensure D50 HAS been pushed
         self.assertNotEqual(oldD51pos, (d51.left, d51.top)) # ensure D51 HAS been pushed
 
-    def test4_2InsertedTwoPushedRightThreePushedDown(self):
+    def test4_2InsertedTwoNotPushedRightThreePushedDown(self):
         self._LoadScenario4()
         
         # move m1 to the left
@@ -434,11 +434,12 @@ class OverlapTests(unittest.TestCase):
         oldD51pos = (d51.left, d51.top)
         oldD13pos = (d13.left, d13.top)
 
-        # assert m1 has been inserted - two pushed right, two pushed down, and extra D13 pushed down
+        # assert m1 has been inserted - two NOT pushed right, two pushed down, and extra D13 pushed down
         # because m1 overlaps/attacks D13 (and there is room for D13 to move downwards I guess)
+        #
+        # An earlier version of this test allowed D97 and D98 to be pushed to the right.  I changed this.
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
         self.assertTrue(were_all_overlaps_removed)
-        self.assertEqual(6, self.overlap_remover.GetStats()['total_overlaps_found'])
 
         self.assertFalse(self._ensureXorder('D13', 'm1', 'D97', 'D98')) # not true anymore, m1 not pushed to the right so much 
         self.assertFalse(self._ensureYorder('D25', 'D13', 'D50', 'D51')) # not true anymore,
@@ -454,8 +455,8 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureYorder('D98', 'D50', 'D51'))
         self.assertTrue(self._ensureYorderBottoms('D25', 'D97', 'm1', 'D13', 'D50', 'D51'))
 
-        self.assertNotEqual(oldD97pos, (d97.left, d97.top)) # ensure D97 HAS been pushed
-        self.assertNotEqual(oldD98pos, (d98.left, d98.top)) # ensure D98 HAS been pushed
+        self.assertEqual(oldD97pos, (d97.left, d97.top)) # ensure D97 HAS NOT been pushed
+        self.assertEqual(oldD98pos, (d98.left, d98.top)) # ensure D98 HAS NOT been pushed
         self.assertNotEqual(oldD50pos, (d50.left, d50.top)) # ensure D50 HAS been pushed
         self.assertNotEqual(oldD51pos, (d51.left, d51.top)) # ensure D51 HAS been pushed
         self.assertNotEqual(oldD13pos, (d13.left, d13.top)) # ensure D13 HAS been pushed
@@ -467,12 +468,43 @@ class OverlapTests(unittest.TestCase):
         
         for i in range(10):
             self._LoadScenario5_stress()
-            print "Stress Iteration", i
+            print i,
             were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
             self.assertTrue(were_all_overlaps_removed)
             
             self.g.Clear()
+        print
         
+    def testStress2_InitialBoot(self):
+        """
+        This is the slowest stress test because it runs the spring layout several times.
+        """
+        
+        from layout_spring import GraphLayoutSpring
+        from coordinate_mapper import CoordinateMapper
+        
+        self.g.LoadGraphFromStrings(GRAPH_INITIALBOOT)    # load the scenario ourselves
+        layouter = GraphLayoutSpring(self.g)
+        coordmapper = CoordinateMapper(self.g, (800,800))
+
+        def AllToLayoutCoords():
+            coordmapper.AllToLayoutCoords()
+    
+        def AllToWorldCoords():
+            coordmapper.AllToWorldCoords()
+
+        for i in range(8):
+            print i,
+            
+            AllToLayoutCoords()
+            layouter.layout(keep_current_positions=False)
+            AllToWorldCoords()
+            
+            were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+            self.assertTrue(were_all_overlaps_removed)
+        print
+            
+
     def _LoadScenario6_linecrossing(self):
         self.g.LoadGraphFromStrings(TEST_GRAPH6)
 
@@ -558,6 +590,12 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureYorder('c', 'm1'))  # ensure m1 is snuggled below c
 
         self.assertFalse(self._ensureYorder('A', 'm1')) # don't want this huge Y jump
+
+# Suite only needed for my alltests.py test running master
+def suite():
+    suite1 = unittest.makeSuite(OverlapTests, 'test')
+    alltests = unittest.TestSuite((suite1, ))
+    return alltests
 
 if __name__ == "__main__":
     unittest.main()

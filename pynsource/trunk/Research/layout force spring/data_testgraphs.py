@@ -91,6 +91,38 @@ TEST_GRAPH7 = """
 {'type':'edge', 'id':'A_to_c', 'source':'A', 'target':'c'}
 """
 
+GRAPH_INITIALBOOT = """
+{'type':'node', 'id':'A', 'x':106, 'y':278, 'width':250, 'height':250}
+{'type':'node', 'id':'A1', 'x':18, 'y':338, 'width':60, 'height':60}
+{'type':'node', 'id':'A2', 'x':10, 'y':230, 'width':60, 'height':60}
+{'type':'node', 'id':'B', 'x':317, 'y':89, 'width':60, 'height':60}
+{'type':'node', 'id':'B1', 'x':347, 'y':10, 'width':60, 'height':60}
+{'type':'node', 'id':'B2', 'x':276, 'y':179, 'width':60, 'height':60}
+{'type':'node', 'id':'B21', 'x':183, 'y':122, 'width':60, 'height':60}
+{'type':'node', 'id':'B22', 'x':402, 'y':171, 'width':100, 'height':200}
+{'type':'node', 'id':'c', 'x':246, 'y':288, 'width':60, 'height':60}
+{'type':'node', 'id':'c1', 'x':182, 'y':368, 'width':60, 'height':60}
+{'type':'node', 'id':'c2', 'x':364, 'y':268, 'width':60, 'height':60}
+{'type':'node', 'id':'c3', 'x':359, 'y':334, 'width':60, 'height':60}
+{'type':'node', 'id':'c4', 'x':275, 'y':379, 'width':60, 'height':60}
+{'type':'node', 'id':'c5', 'x':186, 'y':226, 'width':60, 'height':120}
+{'type':'edge', 'id':'A_to_A1', 'source':'A', 'target':'A1'}
+{'type':'edge', 'id':'A_to_A2', 'source':'A', 'target':'A2'}
+{'type':'edge', 'id':'B_to_B1', 'source':'B', 'target':'B1'}
+{'type':'edge', 'id':'B_to_B2', 'source':'B', 'target':'B2'}
+{'type':'edge', 'id':'B2_to_B21', 'source':'B2', 'target':'B21'}
+{'type':'edge', 'id':'B2_to_B22', 'source':'B2', 'target':'B22'}
+{'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1'}
+{'type':'edge', 'id':'c_to_c2', 'source':'c', 'target':'c2'}
+{'type':'edge', 'id':'c_to_c3', 'source':'c', 'target':'c3'}
+{'type':'edge', 'id':'c_to_c4', 'source':'c', 'target':'c4'}
+{'type':'edge', 'id':'c_to_c5', 'source':'c', 'target':'c5'}
+{'type':'edge', 'id':'A_to_c', 'source':'A', 'target':'c'}
+{'type':'edge', 'id':'B2_to_c', 'source':'B2', 'target':'c'}
+{'type':'edge', 'id':'B2_to_c5', 'source':'B2', 'target':'c5'}
+{'type':'edge', 'id':'A_to_c5', 'source':'A', 'target':'c5'}
+"""
+
 GRAPH_SPRING2 = """
 {'type':'node', 'id':'A', 'x':111, 'y':304, 'width':160, 'height':52}
 {'type':'node', 'id':'A1', 'x':10, 'y':249, 'width':160, 'height':160}

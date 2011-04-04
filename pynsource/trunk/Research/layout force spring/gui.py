@@ -365,12 +365,15 @@ class GraphRendererOgl:
         self.Redraw()
 
     def stage2(self, force_stateofthenation=False, watch_removals=True):
-        self.graph.SaveOldPositionsForAnimationPurposes()
-        watch_removals = False  # added this when I turned animation on.
+        ANIMATION = False
+        
+        if ANIMATION:
+            self.graph.SaveOldPositionsForAnimationPurposes()
+            watch_removals = False  # added this when I turned animation on.
         
         self.overlap_remover.RemoveOverlaps(watch_removals=watch_removals)
         if self.overlap_remover.GetStats()['total_overlaps_found'] > 0 or force_stateofthenation:
-            self.stateofthenation(animate=True)
+            self.stateofthenation(animate=ANIMATION)
         
     def stateofthenation(self, animate=False):
         if animate:
@@ -519,6 +522,8 @@ class GraphRendererOgl:
         imp = wx.Menu()
         item = imp.Append(2031, "Spring 2"); frame.Bind(wx.EVT_MENU, self.OnLoadSpring2, item)
         item = imp.Append(2032, "Spring 3"); frame.Bind(wx.EVT_MENU, self.OnLoadSpring3, item)
+        imp.AppendSeparator()
+        item = imp.Append(2033, "Initial Boot"); frame.Bind(wx.EVT_MENU, self.OnLoadInitialBoot, item)
         self.popupmenu.AppendMenu(-1, 'Other Test Graphs', imp)
 
         self.popupmenu.AppendSeparator()
@@ -558,6 +563,9 @@ class GraphRendererOgl:
     def OnLoadSpring3(self, event):
         self.LoadGraph(GRAPH_SPRING3)
 
+    def OnLoadInitialBoot(self, event):
+        self.LoadGraph(GRAPH_INITIALBOOT)
+ 
     def OnSaveGraphToConsole(self, event):
         print self.graph.GraphToString()
 
@@ -705,8 +713,8 @@ class AppFrame(wx.Frame):
         layouter = GraphLayoutSpring(g)
         layouter.layout()
         
-        for node in g.nodes:
-            print node.id, (node.layoutPosX, node.layoutPosY)
+        #for node in g.nodes:
+        #    print node.id, (node.layoutPosX, node.layoutPosY)
         
         ## ==========================================
         
