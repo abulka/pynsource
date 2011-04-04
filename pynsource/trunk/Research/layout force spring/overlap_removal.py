@@ -53,14 +53,18 @@ class OverlapRemoval:
         return result
 
     def dumpproposal(self, prop, doing=False):
-        #return "  moving %s.%s by %s crossings %d" % (prop['node'].id, prop['xory'], prop['amount'], prop.get('linecrossings', -1))
         if doing:
             msg = "Moving"
         else:
             msg = "to move"
         if prop == None:
             return "-- None --"
-        return "  %s %s.%s by %s %s" % (msg, prop['node'].id, prop['xory'], prop['amount'], prop.get('destdeltaxy', ''))
+        linecrossings = prop.get('linecrossings', 0)
+        if linecrossings == 0:
+            linecrossings_msg = ""
+        else:
+            linecrossings_msg = "~%d~" % linecrossings
+        return "  %s %s.%s by %s %s %s" % (msg, prop['node'].id, prop['xory'], prop['amount'], prop.get('destdeltaxy', ''), linecrossings_msg)
         
     def dumpproposals(self, props):
         msg = "  Proposals: "
@@ -157,7 +161,7 @@ class OverlapRemoval:
     def ApplyProposal(self, proposal):
         node = proposal['node']
         assert node.id <> 'temp'
-        #print 'APPLYING PROPOSAL: ', self.dumpproposal(proposal, doing=True)
+        print 'APPLYING PROPOSAL: ', self.dumpproposal(proposal, doing=True)
         
         x,y = 0,0
         if proposal['xory'] == 'xy':
@@ -185,19 +189,31 @@ class OverlapRemoval:
         decision making.  Then find any corresponding "combo xy" move and use it instead.
         Corresponding means if initial_proposal is an x move look for an xy
         move with the same x amount.
+        
+        Warning, lambda sorting on e.g. p['xory'] == 'xy' turns out to be a True
+        which is a 1 which means it is DE-prioritised compared to 0. A little
+        counter intuitive.
         """
         initial_proposal = sorted(proposals, key=lambda p: (abs(p['amount']), p['xory'] == 'xy'))[0]
         if initial_proposal['xory'] == 'x':
             xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destdeltaxy'][0] == initial_proposal['amount']]
         else:
             xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destdeltaxy'][1] == initial_proposal['amount']]
+
         if xy_proposals:
-            proposal = xy_proposals[0]
+            proposal = xy_proposals[0]  # transform our initial_proposal to its matching postmove xy
         else:
-            proposal = initial_proposal
-        """
-        TODO - how to use the p['linecrossings'] information?
-        """
+            """
+            If there are no ways to transform our initial minimal movement into
+            a xy proposal, then try some simple line crossing avoidance logic.
+            Note there may still be some xy's around so deprioritise them.
+            """
+            least_line_crossing_proposal = sorted(proposals, key=lambda p: (p['linecrossings'], abs(p['amount']), p['xory'] == 'xy'))[0]
+
+            #proposal = initial_proposal
+            proposal = least_line_crossing_proposal
+
+        print self.dumpproposals(proposals)
         self.ApplyProposal(proposal)
 
     def ProposeRemovalsAndApply(self, node1, node2):
@@ -208,7 +224,6 @@ class OverlapRemoval:
         proposals = self.AddPostMoveProposals(proposals)
         proposals = self.CheckForLineCrossings(proposals)  # informational only
         
-        #print self.dumpproposals(proposals)
         self.ApplyBestProposal(proposals)
         return 1
     

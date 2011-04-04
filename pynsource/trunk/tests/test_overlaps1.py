@@ -526,7 +526,7 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureYorder('B', 'm1', 'C'))
         self.assertFalse(self._ensureYorder('A', 'm1', 'C')) # don't want this otherwise the line from A to C would be crossed
         
-    def OFFLINE_test6_2LineCrossingAvoided(self):
+    def test6_2LineCrossingAvoided(self):
         self._LoadScenario6_linecrossing()
         
         # move m1 to the left
@@ -534,7 +534,7 @@ class OverlapTests(unittest.TestCase):
         #node.left, node.top = (9, 103) # A is to the left of A
         node.left, node.top = (24, 98)  # m1 is to the left of A - a bit easier to solve
         
-        # assert m1 has been repulsed and snuggeled, and line not crossed - same results as ABOVE
+        # assert m1 has been repulsed and snuggled, and line not crossed - same results as ABOVE
         were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
         self.assertTrue(were_all_overlaps_removed)
         self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
@@ -545,6 +545,24 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureYorder('B', 'm1', 'C'))
         self.assertFalse(self._ensureYorder('A', 'm1', 'C')) # don't want this otherwise the line from A to C would be crossed
                 
+    def test6_3LineCrossingAvoidedGoSnug(self):
+        self._LoadScenario6_linecrossing()
+        
+        # move m1 to down and left, crossing the line
+        node = self.g.FindNodeById('m1')
+        node.left, node.top = (79, 163)
+        
+        # assert m1 has been repulsed up and to the right, snuggled, and line not crossed
+        were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+        self.assertTrue(were_all_overlaps_removed)
+        self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
+
+        self.assertTrue(self._ensureXorder('A', 'B'))
+        self.assertTrue(self._ensureXorder('A', 'm1'))
+        self.assertFalse(self._ensureXorder('C', 'm1'))  # don't want this
+        self.assertTrue(self._ensureYorder('m1', 'C'))
+        self.assertTrue(self._ensureYorder('A', 'C'))
+
 
     def _LoadScenario7(self):
         self.g.LoadGraphFromStrings(TEST_GRAPH7)
