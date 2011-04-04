@@ -60,7 +60,7 @@ class OverlapRemoval:
             msg = "to move"
         if prop == None:
             return "-- None --"
-        return "  %s %s.%s by %s %s" % (msg, prop['node'].id, prop['xory'], prop['amount'], prop.get('destpoint', ''))
+        return "  %s %s.%s by %s %s" % (msg, prop['node'].id, prop['xory'], prop['amount'], prop.get('destdeltaxy', ''))
         
     def dumpproposals(self, props):
         msg = "  Proposals: "
@@ -75,14 +75,14 @@ class OverlapRemoval:
         #print "Overlap %s/%s by %d/%d  (leftnode is %s  topnode is %s)" % (node1.id, node2.id, xoverlap_amount, yoverlap_amount, leftnode.id, topnode.id)
 
         if self.MoveLeftOk(leftnode, deltaX=xoverlap_amount, ignorenode=rightnode):
-            proposals.append({'node':leftnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':rightnode})
+            proposals.append({'node':leftnode, 'xory':'x', 'amount':-xoverlap_amount})
         else:
-            proposals.append({'node':rightnode, 'xory':'x', 'amount':xoverlap_amount, 'clashnode':leftnode})
+            proposals.append({'node':rightnode, 'xory':'x', 'amount':xoverlap_amount})
             
         if self.MoveUpOk(topnode, deltaY=yoverlap_amount, ignorenode=bottomnode):
-            proposals.append({'node':topnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':bottomnode})
+            proposals.append({'node':topnode, 'xory':'y', 'amount':-yoverlap_amount})
         else:
-            proposals.append({'node':bottomnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':topnode})
+            proposals.append({'node':bottomnode, 'xory':'y', 'amount':yoverlap_amount})
         
         proposals = [p for p in proposals if not p['node'] in self.nodes_already_moved]
         return proposals
@@ -94,84 +94,84 @@ class OverlapRemoval:
         # check the axis opposite to that I just moved
         if lastmovedirection == 'x' and (yoverlap_amount < xoverlap_amount):  # check instant y movement possibilities
             if ((movingnode == topnode) and self.MoveUpOk(movingnode, deltaY=yoverlap_amount, ignorenode=ignorenode)):
-                proposal = {'node':movingnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':clashingnode}
+                proposal = {'node':movingnode, 'xory':'y', 'amount':-yoverlap_amount}
                 
             if ((movingnode == bottomnode) and not self.MoveWouldHitSomething(movingnode, deltaY=+yoverlap_amount, ignorenode=ignorenode)):
-                proposal = {'node':movingnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':clashingnode}
+                proposal = {'node':movingnode, 'xory':'y', 'amount':yoverlap_amount}
                 
         if lastmovedirection == 'y' and (xoverlap_amount < yoverlap_amount):
             if ((movingnode == leftnode) and self.MoveLeftOk(movingnode, deltaX=xoverlap_amount, ignorenode=ignorenode)):
-                proposal = {'node':movingnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':clashingnode}
+                proposal = {'node':movingnode, 'xory':'x', 'amount':-xoverlap_amount}
                 
             if ((movingnode == rightnode) and not self.MoveWouldHitSomething(movingnode, deltaX=+xoverlap_amount, ignorenode=ignorenode)):
-                proposal = {'node':movingnode, 'xory':'x', 'amount':+xoverlap_amount, 'clashnode':clashingnode}
+                proposal = {'node':movingnode, 'xory':'x', 'amount':+xoverlap_amount}
         return proposal
     
     def AddPostMoveProposals(self, proposals):
         """
-        Post Move Algorithm - move the same node again, safely (don't introduce oscillations),
-        under certain circumstances, for aesthetics, despite nodes_already_moved list
+        Post Move Algorithm - propose moving the same node again, safely (don't
+        introduce oscillations), under certain circumstances (if proposal is a
+        clash), for aesthetics.
         """
         extra_proposals = []
         for proposal in proposals:
-            #print "AddPostMoveProposals considering", self.dumpproposal(proposal)
-            
+            assert proposal['xory'] != 'xy'   # should not be encountering these, should be generating them here!
             movednode, lastmovedirection = proposal['node'], proposal['xory']
 
-            if proposal['xory'] == 'x':
-                deltaX, deltaY = proposal['amount'], 0
-            else:
-                deltaX, deltaY = 0, proposal['amount']
+            deltaX, deltaY = self.ExtractDeltaXyFromProposal(proposal)
             clashingnode = self.MoveWouldHitSomething(movednode, deltaX, deltaY)   # can avoid building the proposed node here... but not later
-            
-            #print "AddPostMoveProposals Clash?   %s clashing with %s" % (movednode.id, clashingnode)
             if not clashingnode:
                 continue
             
-            # build the proposed node
-            l, t, r, b = proposal['node'].GetBounds()
-            if proposal['xory'] == 'x':
-                deltaX, deltaY = proposal['amount'], 0
-            else:
-                deltaX, deltaY = 0, proposal['amount']
-            proposednode = GraphNode('temp', top=t+deltaY, left=l+deltaX, width=r-l, height=b-t)
-            
+            proposednode = self.BuildProposedNode(proposal)
             extra_proposal = self.GatherPostMoveProposal(lastmovedirection, clashingnode, proposednode, ignorenode=movednode) # use proposednode not movednode of course
-            #print "AddPostMoveProposals extra_proposal", self.dumpproposal(extra_proposal)
             if extra_proposal:
                 x,y = (-1,-1)
-
                 if proposal['xory'] == 'x':        x = proposal['amount']
                 if proposal['xory'] == 'y':        y = proposal['amount']
-
                 if extra_proposal['xory'] == 'x':  x = extra_proposal['amount']
                 if extra_proposal['xory'] == 'y':  y = extra_proposal['amount']
-                
                 assert x != -1
                 assert y != -1
-                
-                extra_proposal['node'] = movednode      # stop it from being 'temp'
-                extra_proposal['xory'] = 'xy'
-                extra_proposal['amount'] = int(math.hypot(x,y))
-                extra_proposal['destpoint'] = (x,y)
-                extra_proposals.append(extra_proposal)
+                extra_proposals.append( self.BuildProposalXY(movednode, x, y) )
         proposals.extend(extra_proposals)
         return proposals
     
-    def ApplyProposal(self, proposal):
-        #print 'APPLYING PROPOSAL: ', self.dumpproposal(proposal, doing=True)
-        assert proposal['node'].id <> 'temp'
-        
+    def ExtractDeltaXyFromProposal(self, proposal):
         if proposal['xory'] == 'xy':
-            proposal['node'].left += proposal['destpoint'][0]
-            proposal['node'].top += proposal['destpoint'][1]
+            deltaX, deltaY = proposal['destdeltaxy']
         elif proposal['xory'] == 'x':
-            proposal['node'].left += proposal['amount']
-        else:
-            proposal['node'].top += proposal['amount']
+            deltaX, deltaY = proposal['amount'], 0
+        elif proposal['xory'] == 'y':
+            deltaX, deltaY = 0, proposal['amount']
+        return deltaX, deltaY
+    
+    def BuildProposalXY(self, node, deltaX, deltaY):
+        return {'node':node, 'xory':'xy', 'amount': int(math.hypot(deltaX,deltaY)), 'destdeltaxy':(deltaX,deltaY)}
         
-        self.nodes_already_moved.append(proposal['node'])
-
+    def BuildProposedNode(self, proposal):
+        l, t, r, b = proposal['node'].GetBounds()
+        deltaX, deltaY = self.ExtractDeltaXyFromProposal(proposal)
+        return GraphNode('temp', top=t+deltaY, left=l+deltaX, width=r-l, height=b-t)
+    
+    def ApplyProposal(self, proposal):
+        node = proposal['node']
+        assert node.id <> 'temp'
+        #print 'APPLYING PROPOSAL: ', self.dumpproposal(proposal, doing=True)
+        
+        x,y = 0,0
+        if proposal['xory'] == 'xy':
+            x,y = proposal['destdeltaxy']
+        elif proposal['xory'] == 'x':
+            x = proposal['amount']
+        else:
+            y = proposal['amount']
+        
+        node.left += x
+        node.top += y
+        self.BanNode(node)
+        
+        # Update Stats
         if proposal['amount'] < 0:
             self.total_contractive_moves += 1
         else:
@@ -188,9 +188,9 @@ class OverlapRemoval:
         """
         initial_proposal = sorted(proposals, key=lambda p: (abs(p['amount']), p['xory'] == 'xy'))[0]
         if initial_proposal['xory'] == 'x':
-            xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destpoint'][0] == initial_proposal['amount']]
+            xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destdeltaxy'][0] == initial_proposal['amount']]
         else:
-            xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destpoint'][1] == initial_proposal['amount']]
+            xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destdeltaxy'][1] == initial_proposal['amount']]
         if xy_proposals:
             proposal = xy_proposals[0]
         else:
@@ -212,12 +212,9 @@ class OverlapRemoval:
         self.ApplyBestProposal(proposals)
         return 1
     
-    def MoveWouldHitSomething(self, movingnode, deltaX=0, deltaY=0, ignorenode=None, ignorenodes=[]):
+    def MoveWouldHitSomething(self, movingnode, deltaX=0, deltaY=0, ignorenode=None, ignorenodes=[]):   # TODO make this take into account the margin?  Sometimes get very close nodes.
         # delta values can be positive or negative
-        # TODO make this take into account the margin?  Sometimes get very close nodes.
-        l, t, r, b = movingnode.GetBounds()
-        proposednode = GraphNode('temp', top=t+deltaY, left=l+deltaX, width=r-l, height=b-t)
-        
+        proposednode = self.BuildProposedNode(self.BuildProposalXY(movingnode, deltaX, deltaY))
         ignorelist = ignorenodes[:]    # ensure you don't mess with incoming parameter, make a copy. This took a while to debug!
         ignorelist.extend([movingnode, ignorenode])
         return self.IsHitting(proposednode, ignorenodes=ignorelist)
@@ -249,14 +246,7 @@ class OverlapRemoval:
         # Amend proposals list with line crossing info.
         newproposals = []
         for proposal in proposals:
-            # build the proposed node
-            l, t, r, b = proposal['node'].GetBounds()
-            if proposal['xory'] == 'x':
-                deltaX, deltaY = proposal['amount'], 0
-            else:
-                deltaX, deltaY = 0, proposal['amount']
-            proposednode = GraphNode('temp', top=t+deltaY, left=l+deltaX, width=r-l, height=b-t)
-
+            proposednode = self.BuildProposedNode(proposal)
             crossings = self.graph.ProposedNodeHitsWhatLines(proposednode, movingnode=proposal['node'])
             proposal['linecrossings'] = len(crossings)
             newproposals.append(proposal)
@@ -283,7 +273,14 @@ class OverlapRemoval:
     def GetStats(self):
         return self.stats
 
-    def RunRemovalCycle(self):  # NEW
+    def BanNode(self, node):
+        self.nodes_already_moved.append(node)
+
+    def ResetBans(self):
+        # Stop oscillation by not moving the same node too much
+        self.nodes_already_moved = []
+        
+    def RunRemovalCycle(self):
         numfixed_thiscycle = 0
         found_an_overlap_thiscycle = False
     
@@ -296,10 +293,6 @@ class OverlapRemoval:
                 
         return found_an_overlap_thiscycle, numfixed_thiscycle
     
-    def ResetBans(self):
-        # Stop oscillation by not moving the same node too much
-        self.nodes_already_moved = []
-        
     def RemoveOverlaps(self, watch_removals=True):           # Main method to call
         self.InitStats()
         self.ResetBans()
@@ -322,7 +315,7 @@ class OverlapRemoval:
         self.SetStats(total_cycles, all_overlaps_were_removed)
         return all_overlaps_were_removed
 
-    def CountOverlaps(self):
+    def CountOverlaps(self):           # Main method to call
         count = 0
         for node1, node2 in self.GetPermutations(self.graph.nodes):
             if self.Hit(node1, node2):
