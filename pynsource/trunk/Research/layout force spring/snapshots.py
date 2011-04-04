@@ -74,14 +74,8 @@ class GraphSnapshotMgr:
         else:
             self.snapshots.append(snapshot)
         
-    def Sort(self):
-        """
-        blackboard now sorting smarter because I have converted snapshots to
-        dictionary format and thus can control which elements to sort by and
-        whether to maximise or minimise any particular key in that snapshot
-        dictionary.
-        """
-        b = self.snapshots
-        #self.snapshots = sorted(b, key=lambda d: (d['LN'], d['LL'], d['bounds_area_simple'], -d['scale'], d['NN_pre_OR']))
-        self.snapshots = sorted(b, key=lambda d: (d['LL'], d['LN'], d['bounds_area_simple'], -d['scale'], d['NN_pre_OR']))
-
+    def Sort(self, f=None):
+        if f:
+            self.snapshots = sorted(self.snapshots, key=f)
+        else:
+            self.snapshots = sorted(self.snapshots)  # default sorting of some sort on a dict

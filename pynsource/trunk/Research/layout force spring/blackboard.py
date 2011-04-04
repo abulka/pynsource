@@ -62,7 +62,21 @@ class LayoutBlackboard:
                 break
         
         #self.controller.snapshot_mgr.DumpSnapshots(label='Unsorted')
-        self.controller.snapshot_mgr.Sort()             # this does the thinking!
+            
+        """
+        blackboard now sorting smarter because I have converted snapshots to
+        dictionary format and thus can control which elements to sort by and
+        whether to maximise or minimise any particular key in that snapshot
+        dictionary.
+        """
+        def sortfunc(d):
+            # this does the thinking!
+          return (d['LL'], d['LN'], d['bounds_area_simple'], -d['scale'], d['NN_pre_OR'])        
+
+        #self.controller.snapshot_mgr.Sort()
+        self.controller.snapshot_mgr.Sort(sortfunc)  # this does the thinking!
+        #self.controller.snapshot_mgr.Sort(lambda d: (d['scale'], -d['LL'], -d['LN']))   # pick biggest with most line crossings! - Ha ha          
+        
         #self.controller.snapshot_mgr.DumpSnapshots('Sorted')
         
         self.controller.snapshot_mgr.Restore(0)
