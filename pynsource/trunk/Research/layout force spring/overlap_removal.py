@@ -215,28 +215,47 @@ class OverlapRemoval:
         self.PostMoveAlgorithm(lastmovednode, lastmovedirection)  # Optional nicety
 
     def ApplyBestProposal(self, proposals):
+        vers = 3
         
-        # OLD - WORKS BEST
-        amounts = [abs(p['amount']) for p in proposals if p['xory'] <> 'xy']  # skip new type entries
-        lowest_amount = min(amounts)
-        proposal111 = [p for p in proposals if abs(p['amount']) == lowest_amount][0]
-        proposal = proposal111
-        self.ApplyProposal(proposal)
-        lastmovednode, lastmovedirection = proposal['node'], proposal['xory']
-        self.PostMoveAlgorithm(lastmovednode, lastmovedirection)  # Optional nicety
+        if vers == 1:
+            # OLD - WORKS BEST
+            amounts = [abs(p['amount']) for p in proposals if p['xory'] <> 'xy']  # skip new type entries
+            lowest_amount = min(amounts)
+            proposal111 = [p for p in proposals if abs(p['amount']) == lowest_amount][0]
+            proposal = proposal111
+            self.ApplyProposal(proposal)
+            lastmovednode, lastmovedirection = proposal['node'], proposal['xory']
+            self.PostMoveAlgorithm(lastmovednode, lastmovedirection)  # Optional nicety
+        elif vers == 2:
+            # WORKS - view lookahead and start to use sorting
+            proposals = sorted(proposals, key=lambda p: (abs(p['amount']), p['xory'] == 'xy'))
+            proposal = proposals[0]
+            self.ApplyProposal(proposal)
+            lastmovednode, lastmovedirection = proposal['node'], proposal['xory']
+            self.PostMoveAlgorithm(lastmovednode, lastmovedirection)  # Optional nicety
+        elif vers == 3:
+            # NEW - not calling PostMoveAlgorithm() but deriving it up front - what we want
 
-        # WORKS - ALMOST AS GOOD
-        #proposals = sorted(proposals, key=lambda p: (p['amount'], p['xory'] == 'xy'))
-        #proposal = proposals[0]
-        #self.ApplyProposal(proposal)
-        #lastmovednode, lastmovedirection = proposal['node'], proposal['xory']
-        #self.PostMoveAlgorithm(lastmovednode, lastmovedirection)  # Optional nicety
-
-        # NEW - getting there but more unit test failures
-        ##proposals = sorted(proposals, key=lambda p: (p['xory'] <> 'xy', p['amount']))
-        #proposals = sorted(proposals, key=lambda p: (p['amount']))
-        #proposal = proposals[0]
-        #self.ApplyProposal(proposal)
+            # Ignore xy moves for initial decision
+            initial_proposal = sorted(proposals, key=lambda p: (abs(p['amount']), p['xory'] == 'xy'))[0]
+            
+            # Now find a corresponding xy move and use it instead.  Corresponding means if
+            # initial_proposal is an x move look for an xy move with the same x.
+            if initial_proposal['xory'] == 'x':
+                xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destpoint'][0] == initial_proposal['amount']]
+            else:
+                xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destpoint'][1] == initial_proposal['amount']]
+            if xy_proposals:
+                proposal = xy_proposals[0]
+            else:
+                proposal = initial_proposal
+            self.ApplyProposal(proposal)
+        else:
+            pass
+            # EXPERIMENTAL
+            #proposals = sorted(proposals, key=lambda p: (abs(p['amount'])))
+            #proposal = proposals[0]
+            #self.ApplyProposal(proposal)
 
     def ProposeRemovalsAndApply(self, node1, node2):
         # Return the number of overlaps removed

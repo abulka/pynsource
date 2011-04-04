@@ -320,7 +320,7 @@ class OverlapTests(unittest.TestCase):
     def _LoadScenario3a(self):
         self.g.LoadGraphFromStrings(TEST_GRAPH3A)
 
-    def test3a_1PushedLeft(self):
+    def test3A_1PushedLeft(self):
         self._LoadScenario3a()
         
         node = self.g.FindNodeById('m1')
@@ -341,7 +341,7 @@ class OverlapTests(unittest.TestCase):
         self.assertFalse(self._ensureYorder('D25', 'm1'))  # don't want this
         self.assertFalse(self._ensureYorder('D97', 'm1'))  # don't want this
         
-    def test3a_2PushedLeftD97DoesntMove(self):
+    def OFFLINE_test3A_2PushedLeftD97DoesntMove(self):
         self._LoadScenario3a()
         
         d97 = self.g.FindNodeById('D97')
@@ -361,7 +361,7 @@ class OverlapTests(unittest.TestCase):
 
         self.assertEqual(oldD97pos, (d97.left, d97.top)) # ensure D97 hasn't been pushed
 
-    def test3a_3PushedLeftNotFlyingUpY(self):
+    def test3A_3PushedLeftNotFlyingUpY(self):
         self._LoadScenario3a()
         
         node = self.g.FindNodeById('m1')
