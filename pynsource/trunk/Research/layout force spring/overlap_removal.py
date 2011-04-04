@@ -12,7 +12,6 @@ import math
 
 MARGIN = 5
 MAX_CYCLES = 20
-GOODREV_215 = True
 
 class OverlapRemoval:
     
@@ -88,67 +87,34 @@ class OverlapRemoval:
         proposals = [p for p in proposals if not p['node'] in self.nodes_already_moved]
         return proposals
     
-    def GatherPostMoveProposal(self, lastmovedirection, clashingnode, movingnode):
+    def GatherPostMoveProposal(self, lastmovedirection, clashingnode, movingnode, ignorenode=None):
         proposal = None
         leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = self.CalcOverlapAmounts(clashingnode, movingnode)
         
         # check the axis opposite to that I just moved
         if lastmovedirection == 'x' and (yoverlap_amount < xoverlap_amount):  # check instant y movement possibilities
-            if ((movingnode == topnode) and self.MoveUpOk(movingnode, deltaY=yoverlap_amount)):
+            if ((movingnode == topnode) and self.MoveUpOk(movingnode, deltaY=yoverlap_amount, ignorenode=ignorenode)):
                 proposal = {'node':movingnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':clashingnode}
                 
-            if ((movingnode == bottomnode) and not self.MoveWouldHitSomething(movingnode, deltaY=+yoverlap_amount)):
+            if ((movingnode == bottomnode) and not self.MoveWouldHitSomething(movingnode, deltaY=+yoverlap_amount, ignorenode=ignorenode)):
                 proposal = {'node':movingnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':clashingnode}
                 
         if lastmovedirection == 'y' and (xoverlap_amount < yoverlap_amount):
-            if ((movingnode == leftnode) and self.MoveLeftOk(movingnode, deltaX=xoverlap_amount)):
+            if ((movingnode == leftnode) and self.MoveLeftOk(movingnode, deltaX=xoverlap_amount, ignorenode=ignorenode)):
                 proposal = {'node':movingnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':clashingnode}
                 
-            if ((movingnode == rightnode) and not self.MoveWouldHitSomething(movingnode, deltaX=+xoverlap_amount)):
+            if ((movingnode == rightnode) and not self.MoveWouldHitSomething(movingnode, deltaX=+xoverlap_amount, ignorenode=ignorenode)):
                 proposal = {'node':movingnode, 'xory':'x', 'amount':+xoverlap_amount, 'clashnode':clashingnode}
         return proposal
-
-    #def GatherPostMoveProposal(self, lastmovedirection, clashingnode, movingnode, ignorenode=None):
-    #    proposal = None
-    #    leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = self.CalcOverlapAmounts(clashingnode, movingnode)
-    #    
-    #    # check the axis opposite to that I just moved
-    #    if lastmovedirection == 'x' and (yoverlap_amount < xoverlap_amount):  # check instant y movement possibilities
-    #        if ((movingnode == topnode) and self.MoveUpOk(movingnode, deltaY=yoverlap_amount, ignorenode=ignorenode)):
-    #            proposal = {'node':movingnode, 'xory':'y', 'amount':-yoverlap_amount, 'clashnode':clashingnode}
-    #            
-    #        if ((movingnode == bottomnode) and not self.MoveWouldHitSomething(movingnode, deltaY=+yoverlap_amount, ignorenode=ignorenode)):
-    #            proposal = {'node':movingnode, 'xory':'y', 'amount':yoverlap_amount, 'clashnode':clashingnode}
-    #            
-    #    if lastmovedirection == 'y' and (xoverlap_amount < yoverlap_amount):
-    #        if ((movingnode == leftnode) and self.MoveLeftOk(movingnode, deltaX=xoverlap_amount, ignorenode=ignorenode)):
-    #            proposal = {'node':movingnode, 'xory':'x', 'amount':-xoverlap_amount, 'clashnode':clashingnode}
-    #            
-    #        if ((movingnode == rightnode) and not self.MoveWouldHitSomething(movingnode, deltaX=+xoverlap_amount, ignorenode=ignorenode)):
-    #            proposal = {'node':movingnode, 'xory':'x', 'amount':+xoverlap_amount, 'clashnode':clashingnode}
-    #    return proposal
     
-    def PostMoveAlgorithm(self, movednode, lastmovedirection):
-        # Post Move Algorithm - move the same node again, safely (don't introduce oscillations),
-        # under certain circumstances, for aesthetics, despite nodes_already_moved list
-
-        def CheckForPostMoveMove(clashingnode):
-            proposal = self.GatherPostMoveProposal(lastmovedirection, clashingnode, movednode)
-            if proposal:
-                #print "  Post move Proposal:", self.dumpproposal(proposal)
-                self.ApplyProposal(proposal)
-                self.total_postmove_fixes += 1
-                #print "  * extra correction to %s" % (movednode.id)
-
-        clashingnode = self.IsHitting(movednode)  # What am I clashing with now?
-        if clashingnode:
-            CheckForPostMoveMove(clashingnode)
-
     def AddPostMoveProposals(self, proposals):
-        assert False
+        """
+        Post Move Algorithm - move the same node again, safely (don't introduce oscillations),
+        under certain circumstances, for aesthetics, despite nodes_already_moved list
+        """
         extra_proposals = []
         for proposal in proposals:
-            print "AddPostMoveProposals considering", self.dumpproposal(proposal)
+            #print "AddPostMoveProposals considering", self.dumpproposal(proposal)
             
             movednode, lastmovedirection = proposal['node'], proposal['xory']
 
@@ -158,7 +124,7 @@ class OverlapRemoval:
                 deltaX, deltaY = 0, proposal['amount']
             clashingnode = self.MoveWouldHitSomething(movednode, deltaX, deltaY)   # can avoid building the proposed node here... but not later
             
-            print "AddPostMoveProposals Clash?   %s clashing with %s" % (movednode.id, clashingnode)
+            #print "AddPostMoveProposals Clash?   %s clashing with %s" % (movednode.id, clashingnode)
             if not clashingnode:
                 continue
             
@@ -171,7 +137,7 @@ class OverlapRemoval:
             proposednode = GraphNode('temp', top=t+deltaY, left=l+deltaX, width=r-l, height=b-t)
             
             extra_proposal = self.GatherPostMoveProposal(lastmovedirection, clashingnode, proposednode, ignorenode=movednode) # use proposednode not movednode of course
-            print "AddPostMoveProposals extra_proposal", self.dumpproposal(extra_proposal)
+            #print "AddPostMoveProposals extra_proposal", self.dumpproposal(extra_proposal)
             if extra_proposal:
                 x,y = (-1,-1)
 
@@ -213,105 +179,37 @@ class OverlapRemoval:
             if proposal['xory'] == 'xy':
                 self.total_postmove_fixes += 1
 
-    def ApplyMinimalProposal(self, proposals):
-        check_for_line_crossings = False
-
-        #proposals = self.CheckForLineCrossings(proposals)  # informational only
-        #print self.dumpproposals(proposals)
-            
-        if check_for_line_crossings:
-            # proposal222 is the proposal with the lowest line crossings - hmmmm - DOESN'T THIS NARROW THE FIELD A BIT MUCH?
-            crossings = [p['linecrossings'] for p in proposals]
-            lowest_crossings = min(crossings)
-            proposal222 = [p for p in proposals if abs(p['linecrossings']) == lowest_crossings][0]
-            #print "proposal222", self.dumpproposal(proposal222)
-
-        # proposal111 is the proposal with the lowest movement - traditional
-        if GOODREV_215:
-            amounts = [abs(p['amount']) for p in proposals]
-        else:
-            amounts = [abs(p['amount']) for p in proposals if p['xory'] <> 'xy']  # skip new type entries
-        lowest_amount = min(amounts)
-        proposal111 = [p for p in proposals if abs(p['amount']) == lowest_amount][0]
-        #print "proposal111", self.dumpproposal(proposal111)
-        
-        if check_for_line_crossings:
-            # choose between proposal111 and proposal222
-            if proposal111['linecrossings'] > 0 and proposal222['linecrossings'] == 0:
-                proposal = proposal222
-            else:
-                proposal = proposal111
-        else:
-            proposal = proposal111
-        
-        self.ApplyProposal(proposal)
-        
-        if GOODREV_215:
-            if proposal['amount'] < 0:
-                self.total_contractive_moves += 1
-            else:
-                self.total_expansive_moves += 1
-            return proposal['node'], proposal['xory']
-        else:
-            lastmovednode, lastmovedirection = proposal['node'], proposal['xory']
-            self.PostMoveAlgorithm(lastmovednode, lastmovedirection)  # Optional nicety            
-
     def ApplyBestProposal(self, proposals):
-        assert False
-        vers = 1
-        
-        if vers == 1:
-            # OLD - WORKS BEST
-            amounts = [abs(p['amount']) for p in proposals if p['xory'] <> 'xy']  # skip new type entries
-            lowest_amount = min(amounts)
-            proposal111 = [p for p in proposals if abs(p['amount']) == lowest_amount][0]
-            proposal = proposal111
-            self.ApplyProposal(proposal)
-            lastmovednode, lastmovedirection = proposal['node'], proposal['xory']
-            self.PostMoveAlgorithm(lastmovednode, lastmovedirection)  # Optional nicety
-        elif vers == 2:
-            # WORKS - view lookahead and start to use sorting
-            proposals = sorted(proposals, key=lambda p: (abs(p['amount']), p['xory'] == 'xy'))
-            proposal = proposals[0]
-            self.ApplyProposal(proposal)
-            lastmovednode, lastmovedirection = proposal['node'], proposal['xory']
-            self.PostMoveAlgorithm(lastmovednode, lastmovedirection)  # Optional nicety
-        elif vers == 3:
-            # NEW - not calling PostMoveAlgorithm() but deriving it up front - what we want
-
-            # Ignore xy moves for initial decision
-            initial_proposal = sorted(proposals, key=lambda p: (abs(p['amount']), p['xory'] == 'xy'))[0]
-            
-            # Now find a corresponding xy move and use it instead.  Corresponding means if
-            # initial_proposal is an x move look for an xy move with the same x.
-            if initial_proposal['xory'] == 'x':
-                xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destpoint'][0] == initial_proposal['amount']]
-            else:
-                xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destpoint'][1] == initial_proposal['amount']]
-            if xy_proposals:
-                proposal = xy_proposals[0]
-            else:
-                proposal = initial_proposal
-            self.ApplyProposal(proposal)
+        """
+        Ignore PostMoveAlgorithm generated "combo xy" proposals for initial
+        decision making.  Then find any corresponding "combo xy" move and use it instead.
+        Corresponding means if initial_proposal is an x move look for an xy
+        move with the same x amount.
+        """
+        initial_proposal = sorted(proposals, key=lambda p: (abs(p['amount']), p['xory'] == 'xy'))[0]
+        if initial_proposal['xory'] == 'x':
+            xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destpoint'][0] == initial_proposal['amount']]
         else:
-            # EXPERIMENTAL
-            #proposals = sorted(proposals, key=lambda p: (abs(p['amount'])))
-            #proposal = proposals[0]
-            #self.ApplyProposal(proposal)
-            pass
+            xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destpoint'][1] == initial_proposal['amount']]
+        if xy_proposals:
+            proposal = xy_proposals[0]
+        else:
+            proposal = initial_proposal
+        """
+        TODO - how to use the p['linecrossings'] information?
+        """
+        self.ApplyProposal(proposal)
 
     def ProposeRemovalsAndApply(self, node1, node2):
         # Return the number of overlaps removed
         proposals = self.GatherProposals(node1, node2)
         if not proposals:
             return 0
-
-        #print "BEFORE POST MOVE PROPOSALS WE HAVE", self.dumpproposals(proposals)
-        #proposals = self.AddPostMoveProposals(proposals)
+        proposals = self.AddPostMoveProposals(proposals)
+        proposals = self.CheckForLineCrossings(proposals)  # informational only
+        
         #print self.dumpproposals(proposals)
-                
-        self.ApplyMinimalProposal(proposals)
-        #self.ApplyBestProposal(proposals)
+        self.ApplyBestProposal(proposals)
         return 1
     
     def MoveWouldHitSomething(self, movingnode, deltaX=0, deltaY=0, ignorenode=None, ignorenodes=[]):
@@ -348,7 +246,6 @@ class OverlapRemoval:
         return leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount
 
     def CheckForLineCrossings(self, proposals):
-        assert False
         # Amend proposals list with line crossing info.
         newproposals = []
         for proposal in proposals:
@@ -386,38 +283,18 @@ class OverlapRemoval:
     def GetStats(self):
         return self.stats
 
-    def RunRemovalCycle(self):
+    def RunRemovalCycle(self):  # NEW
         numfixed_thiscycle = 0
         found_an_overlap_thiscycle = False
-
+    
         for node1, node2 in self.GetPermutations(self.graph.nodes):  # a 'cycle'
             if self.Hit(node1, node2):
                 found_an_overlap_thiscycle = True
                 self.total_overlaps_found += 1
                 
-                proposals = self.GatherProposals(node1, node2)
-                if not proposals:
-                    continue
-                
-                lastmovednode, lastmovedirection = self.ApplyMinimalProposal(proposals)
-                numfixed_thiscycle += 1
-
-                self.PostMoveAlgorithm(lastmovednode, lastmovedirection)  # Optional nicety
+                numfixed_thiscycle += self.ProposeRemovalsAndApply(node1, node2)
                 
         return found_an_overlap_thiscycle, numfixed_thiscycle
-    
-    #def RunRemovalCycle(self):
-    #    numfixed_thiscycle = 0
-    #    found_an_overlap_thiscycle = False
-    #
-    #    for node1, node2 in self.GetPermutations(self.graph.nodes):  # a 'cycle'
-    #        if self.Hit(node1, node2):
-    #            found_an_overlap_thiscycle = True
-    #            self.total_overlaps_found += 1
-    #            
-    #            numfixed_thiscycle += self.ProposeRemovalsAndApply(node1, node2)
-    #            
-    #    return found_an_overlap_thiscycle, numfixed_thiscycle
     
     def ResetBans(self):
         # Stop oscillation by not moving the same node too much

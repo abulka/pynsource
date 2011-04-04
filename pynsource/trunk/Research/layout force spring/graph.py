@@ -216,7 +216,7 @@ class Graph:
         for edge in edges:
             crossings = proposednode.CalcLineIntersectionPoints(edge['source'].centre_point, edge['target'].centre_point)
             if crossings:
-                print "%s would cross edge %s_%s crossings: %s" % (movingnode.id, edge['source'].id, edge['target'].id, crossings)
+                #print "%s would cross edge %s_%s crossings: %s" % (movingnode.id, edge['source'].id, edge['target'].id, crossings)
                 total_crossings.extend(crossings)
         return total_crossings
         
