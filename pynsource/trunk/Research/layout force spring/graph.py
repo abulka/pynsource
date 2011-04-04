@@ -211,14 +211,16 @@ class Graph:
         """
         A node is fed a line and it will report the crossing points, if any
         """
-        total_crossings = []
+        found_crossing_points = []
+        found_edges = []
         edges = [edge for edge in self.edges if not (edge['source'] == movingnode or edge['target'] == movingnode)]
         for edge in edges:
             crossings = proposednode.CalcLineIntersectionPoints(edge['source'].centre_point, edge['target'].centre_point)
             if crossings:
                 #print "%s would cross edge %s_%s crossings: %s" % (movingnode.id, edge['source'].id, edge['target'].id, crossings)
-                total_crossings.extend(crossings)
-        return total_crossings
+                found_crossing_points.extend(crossings)
+                found_edges.append(edge)
+        return found_crossing_points, found_edges
         
 class GraphNode:
     def __init__(self, id, left, top, width=60, height=60):
