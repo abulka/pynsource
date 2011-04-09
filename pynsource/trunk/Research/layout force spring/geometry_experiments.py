@@ -85,10 +85,28 @@ def CalcEdgeBounds(a, c, vertical_edge_aware=True):
     def a_on_left():
         return a_centre[X] < c_centre[X]
         
-    # assumes a is on top and c below and there is an edge between each of their centres
     a_centre = a.get_centre_point()
     c_centre = c.get_centre_point()
 
+    # assumes a is on top and c below and there is an edge between each of their
+    # centres. If not, swap to make it so.
+    if a_centre[Y] > c_centre[Y]:
+        a,c = c,a
+        a_centre,c_centre = c_centre,a_centre
+
+    # if edge is exactly horizontal....
+    # hmmmm
+    if ydiff() == 0:
+        if a.right  < c.left:
+            who_is_on_left = a
+        else:
+            who_is_on_left = c
+        l = a.right
+        t = a_centre[Y] - 1
+        r = c.left
+        b = a_centre[Y] + 1
+        return (l, t, r, b)        
+    
     # step 1 - figure out top angle, which is the same whether c is to the left or to the right
     opposite = xdiff()
     adjacent = ydiff()
@@ -133,6 +151,12 @@ if __name__ == "__main__":
     print res
     assert [str(round(f,2)) for f in res ] == ['2.8', '4.0', '3.6', '6.0']
     
+    # Handle feeding in swapped around parameters - algorithm should be
+    # resilient and figure out who is on top
+    res = CalcEdgeBounds(c,a)
+    print res
+    assert [str(round(f,2)) for f in res ] == ['2.8', '4.0', '3.6', '6.0']
+    
     # Node A is above and to the left of node C
     a = Node('A', 2, 0, 4, 4)
     c = Node('C', 0, 6, 4, 2)
@@ -150,5 +174,27 @@ if __name__ == "__main__":
     res = CalcEdgeBounds(a,c,)
     print res
     assert [str(round(f,2)) for f in res ] == ['1.0', '4.0', '3.0', '6.0']
+
+    # More cases - nodes side by side
+    
+    # two nodes side by side case 1, a slightly higer than c
+    a = Node('A', 0, 0, 4, 4)
+    c = Node('C', 6, 1, 4, 4)
+    res = CalcEdgeBounds(a,c,vertical_edge_aware=False)
+    print res
+    #assert [str(round(f,2)) for f in res ] == ['4.0', '1.8', '6.0', '2.2']  # 1.8 and 2.2 are guesses
+
+    # two nodes side by side case 2, c slightly higer than a - just swap params to test
+    res = CalcEdgeBounds(c,a,vertical_edge_aware=False)
+    print res
+    #assert [str(round(f,2)) for f in res ] == ['4.0', '1.8', '6.0', '2.2']  # 1.8 and 2.2 are guesses
+
+    # Tricky edge case - two nodes exactly side by side, edge is horizontal
+    a = Node('A', 0, 0, 4, 4)
+    c = Node('C', 6, 0, 4, 4)
+    res = CalcEdgeBounds(a,c,vertical_edge_aware=False)
+    print res
+    # would otherwise be (4, 2, 6, 2) with both y's the same
+    assert [str(round(f,2)) for f in res ] == ['4.0', '1.0', '6.0', '3.0']
     
     print "done"

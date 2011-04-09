@@ -117,6 +117,9 @@ class OverlapRemoval:
         introduce oscillations), under certain circumstances (if proposal is a
         clash), for aesthetics.
         """
+        AVOID_LINES = False
+        SIMPLE_CALC = True
+        
         extra_proposals = []
         for proposal in proposals:
             assert proposal['xory'] != 'xy'   # should not be encountering these, should be generating them here!
@@ -125,23 +128,31 @@ class OverlapRemoval:
             deltaX, deltaY = self.ExtractDeltaXyFromProposal(proposal)
             clashingnode = self.MoveWouldHitSomething(movednode, deltaX, deltaY)   # builds a propsed node - # TODO refactor all this so we build proposed node ONCE not 3 times !
             if not clashingnode:
-                #continue
                 
-                # now check for a line crossing clash - that might qualify as well.
-                proposednode = self.BuildProposedNode(proposal)
-                crossings, edges = self.graph.ProposedNodeHitsWhatLines(proposednode, movingnode=proposal['node'])
-                if crossings:
-                    print "Hey - opportunity to build a xy due to line crossing!", crossings, [edge['source'].id + "_" +  edge['target'].id for edge in edges]
-                    # but can't since GatherPostMoveProposal relies on there being a clashingnode
-                    # hey so build one!  a fake one that takes the bounds of the line ;-)
-                    edge = edges[0]                         # TODO - a bit random - there could be more edges
-                    l,t = edge['source'].centre_point       # TODO - node will be too big - need to clip off source and target node areas
-                    r,b = edge['target'].centre_point       # TODO - might be the other way around
-                    clashingnode = GraphNode('temp_clash', top=t, left=l, width=r-l, height=b-t)
-                    print "built fake clashingnode", clashingnode
-                    #continue
-                else:
+                if not AVOID_LINES:
                     continue
+                else:
+                    # now check for a line crossing clash - that might qualify as well.
+                    proposednode = self.BuildProposedNode(proposal)
+                    crossings, edges = self.graph.ProposedNodeHitsWhatLines(proposednode, movingnode=proposal['node'])
+                    if crossings:
+                        print "Hey - opportunity to build a xy due to line crossing!", crossings, [edge['source'].id + "_" +  edge['target'].id for edge in edges]
+                        # but can't since GatherPostMoveProposal relies on there being a clashingnode
+                        # hey so build one!  a fake one that takes the bounds of the line ;-)
+                        edge = edges[0]                         # TODO - a bit random - there could be more edges
+                        
+                        if SIMPLE_CALC:
+                            l,t = edge['source'].centre_point       # TODO - node will be too big - need to clip off source and target node areas
+                            r,b = edge['target'].centre_point       # TODO - might be the other way around
+                        else:
+                            from geometry_experiments import CalcEdgeBounds                        
+                            (l, t, r, b) = CalcEdgeBounds(edge['source'], edge['target'])
+
+                        clashingnode = GraphNode('temp_clash', top=t, left=l, width=r-l, height=b-t)
+                        print "built fake clashingnode", clashingnode
+                        #continue
+                    else:
+                        continue
             
             proposednode = self.BuildProposedNode(proposal)
             extra_proposal = self.GatherPostMoveProposal(lastmovedirection, clashingnode, proposednode, ignorenode=movednode) # use proposednode not movednode of course
