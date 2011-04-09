@@ -68,7 +68,7 @@ trying to find.  In this case, we only care about angle A.
 
 """
 
-def CalcEdgeBounds(a, c):
+def CalcEdgeBounds(a, c, vertical_edge_aware=True):
     X,Y = 0,1
     def xdiff():
         return float(c_centre[X] - a_centre[X])
@@ -109,6 +109,14 @@ def CalcEdgeBounds(a, c):
         l = a_centre[X]-opposite3
         r = a_centre[X]-opposite2
     
+    # Repair tricky edge case - edge is exactly vertical, nodes centres exactly above each other
+    # create a sensible bounds that has a little bit of width
+    def x_are_equal():
+        return abs(l-r) <= 0.001 
+    if vertical_edge_aware and x_are_equal():
+        l -= 1
+        r += 1
+        
     t = a.bottom
     b = c.top
 
@@ -121,7 +129,6 @@ if __name__ == "__main__":
     # assumes A and C are connected with an edge
     a = Node('A', 0, 0, 4, 4)
     c = Node('C', 2, 6, 4, 2)
-    
     res = CalcEdgeBounds(a,c)
     print res
     assert [str(round(f,2)) for f in res ] == ['2.8', '4.0', '3.6', '6.0']
@@ -129,9 +136,19 @@ if __name__ == "__main__":
     # Node A is above and to the left of node C
     a = Node('A', 2, 0, 4, 4)
     c = Node('C', 0, 6, 4, 2)
-    
     res = CalcEdgeBounds(a,c)
     print res
     assert [str(round(f,2)) for f in res ] == ['2.4', '4.0', '3.2', '6.0']
+
+    # Tricky edge case - edge is exactly vertical, nodes centres exactly above each other
+    a = Node('A', 0, 0, 4, 4)
+    c = Node('C', 0, 6, 4, 4)
+    res = CalcEdgeBounds(a,c,vertical_edge_aware=False)
+    print res
+    assert [str(round(f,2)) for f in res ] == ['2.0', '4.0', '2.0', '6.0']
+
+    res = CalcEdgeBounds(a,c,)
+    print res
+    assert [str(round(f,2)) for f in res ] == ['1.0', '4.0', '3.0', '6.0']
     
     print "done"
