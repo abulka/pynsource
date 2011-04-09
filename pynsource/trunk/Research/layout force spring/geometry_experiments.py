@@ -32,34 +32,106 @@ class Node:
     def get_centre_point(self):
         return ((self.left+self.width/2), (self.top+self.height/2))
 
-def CalcTopOfEdge(a, c):
+"""
 
-    def TrigCalc1(opposite, adjacent):
-        return round(180-(90+math.degrees(math.atan(float(opposite)/float(adjacent)))), 1)
+Algorithm Purpose: to find points marked @
+The key is figuring out angle A, using adj and opp
+Then using angle A, feed in different adj lengths to work out all the needed
+opposite lengths opp2 and opp3
 
-    def TrigCalc2(adjacent, angle):
-        deg = angle * math.pi/180
-        o = round(deg*float(adjacent), 1)
-        return o
 
-    # assumes a is on top and c below and there is an edge between them going from
-    # each of their centres
+  +------------+
+  | a          |
+  |            |
+  |     +      |                 |  |
+  |     |\     |                 |  |
+  |     |A\    |                 |  | adiff
+  |     |  \   |                 |  |
+  +-----+---@--+                 |  |
+        |opp2\            ydiff  |
+    adj |     `.                 |
+        |       \                |
+        +----+---@----------+    |  |
+        | opp3    \       c |    |  | cdiff
+        |    |     \        |    |  |
+        +----+------+       |    |  |
+             | opp          |
+             |              |
+             +--------------+
+
+
+            xdiff
+        ..............
+        
+Note opposite and adjacent are relative terms - relative to the angle you are
+trying to find.  In this case, we only care about angle A.
+
+"""
+
+def CalcEdgeBounds(a, c):
+    X,Y = 0,1
+    def xdiff():
+        return float(c_centre[X] - a_centre[X])
+    def ydiff():
+        return float(c_centre[Y] - a_centre[Y])
+    def adiff():
+        return float(a.bottom - a_centre[Y])
+    def cdiff():
+        return float(c_centre[Y] - c.top)
+    def arctan(n):
+        return abs(math.degrees(math.atan(n)))  # my version returns degrees
+    def tan(deg):
+        return math.tan(math.radians(deg))  # my version takes degrees as param
+    def a_on_left():
+        return a_centre[X] < c_centre[X]
+        
+    # assumes a is on top and c below and there is an edge between each of their centres
     a_centre = a.get_centre_point()
     c_centre = c.get_centre_point()
+
+    # step 1 - figure out top angle, which is the same whether c is to the left or to the right
+    opposite = xdiff()
+    adjacent = ydiff()
+    angleA = arctan(opposite/adjacent)
     
-    # step 1
-    opposite = c_centre[1]-a_centre[1]
-    adjacent = c_centre[0]-c.left
-    alpha_angle = TrigCalc1(opposite, adjacent)
+    # step 2 - using angle, use adjacent length to give opposite length thus x we want
+    adjacent2 = adiff()
+    opposite2 = adjacent2 * tan(angleA)
+
+    # step 3 - using angle, use long adjacent length to give opposite length thus x we want
+    adjacent3 = ydiff() - cdiff()
+    opposite3 = adjacent3 * tan(angleA)
+
+    if a_on_left():
+        l = a_centre[X]+opposite2
+        r = a_centre[X]+opposite3
+    else:
+        l = a_centre[X]-opposite3
+        r = a_centre[X]-opposite2
     
-    # step 2
-    adjacent = a.bottom-a_centre[1]
-    opposite = TrigCalc2(adjacent, alpha_angle)
+    t = a.bottom
+    b = c.top
 
-    return (a_centre[0]+opposite, a.bottom)
+    return (l, t, r, b)
 
-a = Node('A', 0, 0, 4, 4)
-c = Node('C', 2, 6, 4, 2)
-print CalcTopOfEdge(a, c)  # assumes A and C are connected with an edge
 
-print "done"
+if __name__ == "__main__":
+
+    # Node A is above and to the right of node C
+    # assumes A and C are connected with an edge
+    a = Node('A', 0, 0, 4, 4)
+    c = Node('C', 2, 6, 4, 2)
+    
+    res = CalcEdgeBounds(a,c)
+    print res
+    assert [str(round(f,2)) for f in res ] == ['2.8', '4.0', '3.6', '6.0']
+    
+    # Node A is above and to the left of node C
+    a = Node('A', 2, 0, 4, 4)
+    c = Node('C', 0, 6, 4, 2)
+    
+    res = CalcEdgeBounds(a,c)
+    print res
+    assert [str(round(f,2)) for f in res ] == ['2.4', '4.0', '3.2', '6.0']
+    
+    print "done"
