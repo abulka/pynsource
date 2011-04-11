@@ -21,6 +21,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import random
 import wx
 import wx.lib.ogl as ogl
 from wx import Frame
@@ -46,16 +47,17 @@ def getpos(shape):
 
     
 class MyEvtHandler(ogl.ShapeEvtHandler):
-    def __init__(self, log, frame):
+    def __init__(self, log, frame, shapecanvas):
         ogl.ShapeEvtHandler.__init__(self)
         self.log = log
-        self.statbarFrame = frame
+        self.frame = frame              # these are arbitrary initialisations
+        self.shapecanvas = shapecanvas  # these are arbitrary initialisations
 
     def UpdateStatusBar(self, shape):
         x, y = shape.GetX(), shape.GetY()
         x, y = getpos(shape)
         width, height = shape.GetBoundingBoxMax()
-        self.statbarFrame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)" % (x, y, width, height))
+        self.frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)" % (x, y, width, height))
 
     def OnLeftClick(self, x, y, keys = 0, attachment = 0):
         self._SelectNodeNow(x, y, keys, attachment)
@@ -75,9 +77,18 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
 
     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
         shape = self.GetShape()
-        ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)
+        oldpos = getpos(shape)
+        ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment) # super
         if not shape.Selected():
             self.OnLeftClick(x, y, keys, attachment)
+        newpos = getpos(shape)
+        try:
+            print shape.node.id, "moved from", oldpos, "to", newpos
+            # Adjust the GraphNode to match the shape x,y
+            shape.node.left, shape.node.top = newpos
+        except:
+            print "no node model attached to this shape!"
+            
         self.UpdateStatusBar(shape)
 
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
@@ -103,10 +114,10 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         #self.log.WriteText("%s\n" % self.GetShape())
         self.popupmenu = wx.Menu()     # Creating a menu
         item = self.popupmenu.Append(2011, "Delete Node\tDel")
-        self.statbarFrame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item) # Not sure why but passing item is needed.  Not to find the menu item later, but to avoid crashes?  try two right click deletes followed by main menu edit/delete.  Official Bind 3rd parameter DOCO:  menu source - Sometimes the event originates from a different window than self, but you still want to catch it in self. (For example, a button event delivered to a frame.) By passing the source of the event, the event handling system is able to differentiate between the same event type from different controls.
+        self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item) # Not sure why but passing item is needed.  Not to find the menu item later, but to avoid crashes?  try two right click deletes followed by main menu edit/delete.  Official Bind 3rd parameter DOCO:  menu source - Sometimes the event originates from a different window than self, but you still want to catch it in self. (For example, a button event delivered to a frame.) By passing the source of the event, the event handling system is able to differentiate between the same event type from different controls.
         item = self.popupmenu.Append(2012, "Cancel")
-        self.statbarFrame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
-        self.statbarFrame.PopupMenu(self.popupmenu, wx.Point(x,y))
+        self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
 
     def RightClickDeleteNode(self):
         self.GetShape().GetCanvas().CmdZapShape(self.GetShape())
@@ -139,6 +150,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         wx.EVT_WINDOW_DESTROY(self, self.OnDestroy)
 
         self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
+        self.working = False
 
         self.font1 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
@@ -148,9 +160,21 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         #self.layout = LayoutBasic(leftmargin=0, topmargin=0, verticalwhitespace=0, horizontalwhitespace=0, maxclassesperline=5)
         self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
 
+    def stateofthenation(self):
+        for node in self.umlworkspace.graph.nodes:
+            self.AdjustShapePosition(node)
+        self.Redraw()
+        wx.SafeYield()
+        
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
         #if event.ShiftDown():
+
+        if self.working:
+            event.Skip()
+            return
+        self.working = True
+
         if keycode == wx.WXK_DOWN:
             print "DOWN"
         elif keycode == wx.WXK_RIGHT:
@@ -159,13 +183,28 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             print "LEFT"
         elif keycode == wx.WXK_UP:
             print "UP"
+        elif keycode == wx.WXK_INSERT:
+            self.CmdInsertNewNode()
         elif keycode == wx.WXK_DELETE:
             print "DELETE"
             selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
             if selected:
                 shape = selected[0]
                 self.CmdZapShape(shape)
+        self.working = False
+        event.Skip()
                 
+    def CmdInsertNewNode(self):
+        id = 'D' + str(random.randint(1,99))
+        dialog = wx.TextEntryDialog ( None, 'Enter an id string:', 'Create a new node', id )
+        if dialog.ShowModal() == wx.ID_OK:
+            id = dialog.GetValue()
+            node = self.umlworkspace.AddNode(id)
+            self.createNodeShape(node)
+            node.shape.Show(True)
+            self.stateofthenation()
+        dialog.Destroy()
+
     def CmdZapShape(self, shape):
         
         # Model/Uml related....
@@ -431,13 +470,60 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.GetDiagram().AddShape(shape)
         shape.Show(True)
 
-        evthandler = MyEvtHandler(self.log, self.frame)
+        evthandler = MyEvtHandler(self.log, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
 
         return shape
+    
+    def createNodeShape(self, node):     # FROM SPRING LAYOUT
+        shape = ogl.RectangleShape( node.width, node.height )
+        shape.AddText(node.id)
+        setpos(shape, node.left, node.top)
+        #shape.SetDraggable(True, True)
+        self.AddShape( shape )
+        node.shape = shape
+        shape.node = node
+        
+        # wire in the event handler for the new shape
+        evthandler = MyEvtHandler(None, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
+        evthandler.SetShape(shape)
+        evthandler.SetPreviousHandler(shape.GetEventHandler())
+        shape.SetEventHandler(evthandler)
 
+    def AdjustShapePosition(self, node, point=None):   # FROM SPRING LAYOUT
+        assert node.shape
+        
+        if point:
+            x, y = point
+        else:
+            x, y = node.left, node.top
+            
+        # Don't need to use node.shape.Move(dc, x, y, False)
+        setpos(node.shape, x, y)
+
+        # But you DO need to use a dc to adjust the links
+        dc = wx.ClientDC(self)
+        self.PrepareDC(dc)
+        node.shape.MoveLinks(dc)
+        
+    def Redraw(self, clear=True):        # FROM SPRING LAYOUT
+        diagram = self.GetDiagram()
+        canvas = self
+        assert canvas == diagram.GetCanvas()
+
+        dc = wx.ClientDC(canvas)
+        canvas.PrepareDC(dc)
+        
+        #for node in self.graph.nodes:    # TODO am still moving nodes in the pynsourcegui version?
+        #    shape = node.shape
+        #    shape.Move(dc, shape.GetX(), shape.GetY())
+        
+        if clear:
+            diagram.Clear(dc)
+        diagram.Redraw(dc)
+        
     def get_umlboxshapes(self):
         return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]
 
@@ -538,13 +624,35 @@ class MainApp(wx.App):
 
         self.frame.Show(True)
         wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
+        
+        self.popupmenu = None
+        self.umlwin.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)
 
-        # Debug bootstrap
+        # Debug bootstrap  --------------------------------------
         #self.frame.SetSize((1024,768))
         self.umlwin.Go(files=[os.path.abspath( __file__ )])
         self.umlwin.RedrawEverything()
-        
+
+        self.umlwin.umlworkspace.BuildGraphFromUmlWorkspace()
+
+        # END Debug bootstrap --------------------------------------
         return True
+
+    def OnRightButtonMenu(self, event):   # Menu
+        x, y = event.GetPosition()
+        
+        if self.popupmenu:
+            self.popupmenu.Destroy()    # wx.Menu objects need to be explicitly destroyed (e.g. menu.Destroy()) in this situation. Otherwise, they will rack up the USER Objects count on Windows; eventually crashing a program when USER Objects is maxed out. -- U. Artie Eoff  http://wiki.wxpython.org/index.cgi/PopupMenuOnRightClick
+        self.popupmenu = wx.Menu()     # Create a menu
+        
+        item = self.popupmenu.Append(wx.NewId(), "BuildGraphFromUmlWorkspace")
+        self.frame.Bind(wx.EVT_MENU, self.OnBuildGraphFromUmlWorkspace, item)
+
+        self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
+        
+    def OnBuildGraphFromUmlWorkspace(self, event):
+        #self.MessageBox("OnBuildGraphFromUmlWorkspace")
+        self.umlwin.umlworkspace.BuildGraphFromUmlWorkspace()
 
     def OnTabPageChanged(self, event):
         if event.GetSelection() == 0:  # ogl

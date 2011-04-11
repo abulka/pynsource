@@ -2,8 +2,14 @@
 # holds shapes too, though Shape is not interrogated except for 'GetBoundingBoxMax()'
 # meaning stubs could be used
 
+import random
+import sys
+sys.path.append("../Research/layout force spring")
+from graph import Graph, GraphNode
+
 class UmlWorkspace:
     def __init__(self):
+        self.graph = Graph()
         self.Clear()
         
     def Clear(self):
@@ -42,5 +48,16 @@ class UmlWorkspace:
         pprint(self.associations_composition)
         print "======================"
 
-
+    def BuildGraphFromUmlWorkspace(self):
+        print self.graph
+        for node in self.graph.nodes:
+            print node
+        
+    def AddNode(self, id):
+        if self.graph.FindNodeById(id):
+            id += str(random.randint(1,9999))
+        node = GraphNode(id, random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160))
+        node = self.graph.AddNode(node)
+        return node
+        
 
