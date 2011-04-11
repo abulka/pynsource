@@ -1,0 +1,75 @@
+import unittest
+
+import sys
+sys.path.append("../Research/layout force spring")
+
+from overlap_removal import OverlapRemoval
+from graph import Graph, GraphNode
+import pprint
+from data_testgraphs import *
+
+class OverlapTests(unittest.TestCase):
+
+    def setUp(self):
+
+        class FakeGui:
+            def stateofthenation(self):
+                pass
+
+        self.g = Graph()
+        self.overlap_remover = OverlapRemoval(self.g, margin=5, gui=FakeGui())
+
+    def tearDown(self):
+        pass
+
+    def testStress1(self):
+        
+
+        for i in range(10):
+            self.g.LoadGraphFromStrings(TEST_GRAPH5_STRESS)
+            print i,
+            were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+            self.assertTrue(were_all_overlaps_removed)
+            
+            self.g.Clear()
+        print
+        
+    def testStress2_InitialBoot(self):
+        """
+        This is the slowest stress test because it runs the spring layout several times.
+        """
+        
+        from layout_spring import GraphLayoutSpring
+        from coordinate_mapper import CoordinateMapper
+        
+        self.g.LoadGraphFromStrings(GRAPH_INITIALBOOT)    # load the scenario ourselves
+        
+        layouter = GraphLayoutSpring(self.g)
+        coordmapper = CoordinateMapper(self.g, (800,800))
+
+        def AllToLayoutCoords():
+            coordmapper.AllToLayoutCoords()
+    
+        def AllToWorldCoords():
+            coordmapper.AllToWorldCoords()
+
+        for i in range(8):
+            print i,
+            
+            AllToLayoutCoords()
+            layouter.layout(keep_current_positions=False)
+            AllToWorldCoords()
+            
+            were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+            self.assertTrue(were_all_overlaps_removed)
+        print
+            
+
+# Suite only needed for my alltests.py test running master
+def suite():
+    suite1 = unittest.makeSuite(OverlapTests, 'test')
+    alltests = unittest.TestSuite((suite1, ))
+    return alltests
+
+if __name__ == "__main__":
+    unittest.main()

@@ -219,21 +219,20 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(were_all_overlaps_removed)
         self.assertEqual(2, self.overlap_remover.GetStats()['total_overlaps_found'])
         
-        # Older squeeze behaviour
-        #self.assertTrue(self._ensureXorder('D25', 'D97', 'm1', 'D98'))
-        #self.assertTrue(self._ensureYorder('D25', 'D13'))
-        #self.assertTrue(self._ensureYorderBottoms('D25', 'D97', 'D13'))
+        GatherSnugProposals_ON = True      # see method ProposeRemovalsAndApply() in overlap_removal.py
+        
+        if GatherSnugProposals_ON:
+            # Newer snug behaviour
+            self.assertTrue(self._ensureXorder('D25', 'D97', 'D98'))
+            self.assertTrue(self._ensureYorder('D98', 'm1'))
+            self.assertTrue(self._ensureYorder('D97', 'm1'))
+            self.assertTrue(self._ensureYorder('D25', 'm1'))
+        else:            
+            # Older squeeze behaviour
+            self.assertTrue(self._ensureXorder('D25', 'D97', 'm1', 'D98'))
+            self.assertTrue(self._ensureYorder('D25', 'D13'))
+            self.assertTrue(self._ensureYorderBottoms('D25', 'D97', 'D13'))
 
-        # Newer snug behaviour
-        #self.assertTrue(self._ensureXorder('D25', 'D97', 'm1'))
-        #self.assertTrue(self._ensureXorder('D25', 'D97', '98'))
-        #self.assertTrue(self._ensureYorder('98', 'm1'))
-
-        # Even newer snug behaviour
-        self.assertTrue(self._ensureXorder('D25', 'D97', 'D98'))
-        self.assertTrue(self._ensureYorder('D98', 'm1'))
-        self.assertTrue(self._ensureYorder('D97', 'm1'))
-        self.assertTrue(self._ensureYorder('D25', 'm1'))
 
     def test3_2PushedBetweenLeftAndRightRefused(self):
         self._LoadScenario3()
@@ -472,50 +471,6 @@ class OverlapTests(unittest.TestCase):
         self.assertNotEqual(oldD50pos, (d50.left, d50.top)) # ensure D50 HAS been pushed
         self.assertNotEqual(oldD51pos, (d51.left, d51.top)) # ensure D51 HAS been pushed
         self.assertNotEqual(oldD13pos, (d13.left, d13.top)) # ensure D13 HAS been pushed
-
-    def _LoadScenario5_stress(self):
-        self.g.LoadGraphFromStrings(TEST_GRAPH5_STRESS)
-        
-    def TOO_SLOW_testStress1(self):
-        
-        for i in range(10):
-            self._LoadScenario5_stress()
-            print i,
-            were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
-            self.assertTrue(were_all_overlaps_removed)
-            
-            self.g.Clear()
-        print
-        
-    def TOO_SLOW_testStress2_InitialBoot(self):
-        """
-        This is the slowest stress test because it runs the spring layout several times.
-        """
-        
-        from layout_spring import GraphLayoutSpring
-        from coordinate_mapper import CoordinateMapper
-        
-        self.g.LoadGraphFromStrings(GRAPH_INITIALBOOT)    # load the scenario ourselves
-        layouter = GraphLayoutSpring(self.g)
-        coordmapper = CoordinateMapper(self.g, (800,800))
-
-        def AllToLayoutCoords():
-            coordmapper.AllToLayoutCoords()
-    
-        def AllToWorldCoords():
-            coordmapper.AllToWorldCoords()
-
-        for i in range(8):
-            print i,
-            
-            AllToLayoutCoords()
-            layouter.layout(keep_current_positions=False)
-            AllToWorldCoords()
-            
-            were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
-            self.assertTrue(were_all_overlaps_removed)
-        print
-            
 
     def _LoadScenario6_linecrossing(self):
         self.g.LoadGraphFromStrings(TEST_GRAPH6)

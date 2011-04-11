@@ -73,80 +73,81 @@ class OverlapRemoval:
             msg += self.dumpproposal(p)
         return msg
 
-    def MoveLeftThenVerticallyOk(self, movingnode, deltaX, ignorenode=None):
-        if not self.MoveLeftStillOnscreen(movingnode, deltaX):
-            return None, False
-
-        existing_hits_on_right = [node for node in self.GetAllHits(movingnode) if node.left > movingnode.left]
-        ignorelist = existing_hits_on_right
-        ignorelist.extend([movingnode, ignorenode])
-
-        proposednode = self.BuildProposedNode(self.BuildProposalXY(movingnode, -deltaX, 0))  # Move left
-        clashingnode = self.IsHitting(proposednode, ignorenodes=ignorelist)
-        if not clashingnode:
-            return None, False
-
-        leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = self.CalcOverlapAmounts(proposednode, clashingnode)
-        if clashingnode == bottomnode:
-            yoverlap_amount = -yoverlap_amount
-        proposednode2 = self.BuildProposedNode(self.BuildProposalXY(proposednode, 0, yoverlap_amount))  # then Vertically
-        if proposednode2.top < 0 or proposednode2.left < 0:
-            return None, False
-        clashingnode2 = self.IsHitting(proposednode2, ignorenodes=ignorelist)
-        if not clashingnode2:
-            "xy movement ok"
-            proposal = self.BuildProposalXY(movingnode, -deltaX, yoverlap_amount)
-            return proposal, True
-
-        return None, False
-    
-    def MoveUpThenSidewaysOk(self, movingnode, deltaY, ignorenode=None):
-        if not self.MoveUpStillOnscreen(movingnode, deltaY):
-            return None, False
-        existing_hits_on_bottom = [node for node in self.GetAllHits(movingnode) if node.top > movingnode.top]
-        ignorelist = existing_hits_on_bottom
-        ignorelist.extend([movingnode, ignorenode])
-
-        proposednode = self.BuildProposedNode(self.BuildProposalXY(movingnode, 0, -deltaY))   # Move Up
-        clashingnode = self.IsHitting(proposednode, ignorenodes=ignorelist)
-        if not clashingnode:
-            return None, False
-
-        leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = self.CalcOverlapAmounts(proposednode, clashingnode)
-        if clashingnode == rightnode:
-            xoverlap_amount = -xoverlap_amount
-        proposednode2 = self.BuildProposedNode(self.BuildProposalXY(proposednode, xoverlap_amount, 0))  # then Sideways
-        if proposednode2.top < 0 or proposednode2.left < 0:
-            return None, False
-        clashingnode2 = self.IsHitting(proposednode2, ignorenodes=ignorelist)
-        if not clashingnode2:
-            "xy movement ok"
-            proposal = self.BuildProposalXY(movingnode, xoverlap_amount, -deltaY)
-            return proposal, True
-
-        return None, False
-
     def GatherSnugProposals(self, node1, node2):
         proposals = []
+
+        def MoveLeftThenVerticallyOk(movingnode, deltaX, ignorenode=None):
+            if not self.MoveLeftStillOnscreen(movingnode, deltaX):
+                return None, False
+    
+            existing_hits_on_right = [node for node in self.GetAllHits(movingnode) if node.left > movingnode.left]
+            ignorelist = existing_hits_on_right
+            ignorelist.extend([movingnode, ignorenode])
+    
+            proposednode = self.BuildProposedNode(self.BuildProposalXY(movingnode, -deltaX, 0))  # Move left
+            clashingnode = self.IsHitting(proposednode, ignorenodes=ignorelist)
+            if not clashingnode:
+                return None, False
+    
+            leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = self.CalcOverlapAmounts(proposednode, clashingnode)
+            if clashingnode == bottomnode:
+                yoverlap_amount = -yoverlap_amount
+            proposednode2 = self.BuildProposedNode(self.BuildProposalXY(proposednode, 0, yoverlap_amount))  # then Vertically
+            if proposednode2.top < 0 or proposednode2.left < 0:
+                return None, False
+            clashingnode2 = self.IsHitting(proposednode2, ignorenodes=ignorelist)
+            if not clashingnode2:
+                "xy movement ok"
+                proposal = self.BuildProposalXY(movingnode, -deltaX, yoverlap_amount)
+                return proposal, True
+    
+            return None, False
+        
+        def MoveUpThenSidewaysOk(movingnode, deltaY, ignorenode=None):
+            if not self.MoveUpStillOnscreen(movingnode, deltaY):
+                return None, False
+            existing_hits_on_bottom = [node for node in self.GetAllHits(movingnode) if node.top > movingnode.top]
+            ignorelist = existing_hits_on_bottom
+            ignorelist.extend([movingnode, ignorenode])
+    
+            proposednode = self.BuildProposedNode(self.BuildProposalXY(movingnode, 0, -deltaY))   # Move Up
+            clashingnode = self.IsHitting(proposednode, ignorenodes=ignorelist)
+            if not clashingnode:
+                return None, False
+    
+            leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = self.CalcOverlapAmounts(proposednode, clashingnode)
+            if clashingnode == rightnode:
+                xoverlap_amount = -xoverlap_amount
+            proposednode2 = self.BuildProposedNode(self.BuildProposalXY(proposednode, xoverlap_amount, 0))  # then Sideways
+            if proposednode2.top < 0 or proposednode2.left < 0:
+                return None, False
+            clashingnode2 = self.IsHitting(proposednode2, ignorenodes=ignorelist)
+            if not clashingnode2:
+                "xy movement ok"
+                proposal = self.BuildProposalXY(movingnode, xoverlap_amount, -deltaY)
+                return proposal, True
+    
+            return None, False
+
 
         leftnode, rightnode, topnode, bottomnode, xoverlap_amount, yoverlap_amount = self.CalcOverlapAmounts(node1, node2)
         xoverlap_amountQ = leftnode.width + rightnode.width - xoverlap_amount + self.margin + self.margin
         yoverlap_amountQ = topnode.height + bottomnode.height - yoverlap_amount + self.margin + self.margin
 
         # Lookahead
-        proposal, ok = self.MoveUpThenSidewaysOk(topnode, deltaY=yoverlap_amount, ignorenode=bottomnode)
+        proposal, ok = MoveUpThenSidewaysOk(topnode, deltaY=yoverlap_amount, ignorenode=bottomnode)
         if ok:
             proposals.append(proposal)
 
-        proposal, ok = self.MoveUpThenSidewaysOk(bottomnode, deltaY=yoverlap_amountQ, ignorenode=topnode)
+        proposal, ok = MoveUpThenSidewaysOk(bottomnode, deltaY=yoverlap_amountQ, ignorenode=topnode)
         if ok:
             proposals.append(proposal)
 
-        proposal, ok = self.MoveLeftThenVerticallyOk(leftnode, deltaX=xoverlap_amount, ignorenode=rightnode)
+        proposal, ok = MoveLeftThenVerticallyOk(leftnode, deltaX=xoverlap_amount, ignorenode=rightnode)
         if ok:
             proposals.append(proposal)
 
-        proposal, ok = self.MoveLeftThenVerticallyOk(rightnode, deltaX=xoverlap_amountQ, ignorenode=leftnode)
+        proposal, ok = MoveLeftThenVerticallyOk(rightnode, deltaX=xoverlap_amountQ, ignorenode=leftnode)
         if ok:
             proposals.append(proposal)
 
