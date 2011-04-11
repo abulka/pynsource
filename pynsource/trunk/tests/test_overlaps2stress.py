@@ -32,7 +32,6 @@ class OverlapTests(unittest.TestCase):
             self.assertTrue(were_all_overlaps_removed)
             
             self.g.Clear()
-        print
         
     def testStress2_InitialBoot(self):
         """
@@ -62,7 +61,6 @@ class OverlapTests(unittest.TestCase):
             
             were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
             self.assertTrue(were_all_overlaps_removed)
-        print
             
 
 # Suite only needed for my alltests.py test running master

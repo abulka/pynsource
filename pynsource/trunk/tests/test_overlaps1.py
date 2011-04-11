@@ -3,7 +3,7 @@ import unittest
 import sys
 sys.path.append("../Research/layout force spring")
 
-from overlap_removal import OverlapRemoval
+from overlap_removal import OverlapRemoval, LINE_NODE_OVERLAP_REMOVAL_ENABLED
 from graph import Graph, GraphNode
 import pprint
 from data_testgraphs import *
@@ -476,6 +476,11 @@ class OverlapTests(unittest.TestCase):
         self.g.LoadGraphFromStrings(TEST_GRAPH6)
 
     def test6_1LineCrossingNotNeeded(self):
+        
+        if not LINE_NODE_OVERLAP_REMOVAL_ENABLED:
+            print "Test passed (disabled)",
+            return
+
         self._LoadScenario6_linecrossing()
         
         # move m1 to the left
@@ -494,6 +499,11 @@ class OverlapTests(unittest.TestCase):
         self.assertFalse(self._ensureYorder('A', 'm1', 'C')) # don't want this otherwise the line from A to C would be crossed
         
     def test6_2LineCrossingAvoided(self):
+
+        if not LINE_NODE_OVERLAP_REMOVAL_ENABLED:
+            print "Test passed (disabled)",
+            return
+
         self._LoadScenario6_linecrossing()
         
         # move m1 to the left
@@ -515,6 +525,11 @@ class OverlapTests(unittest.TestCase):
         self.assertEqual(0, len(crossings))
                 
     def test6_3LineCrossingAvoidedGoSnug(self):
+
+        if not LINE_NODE_OVERLAP_REMOVAL_ENABLED:
+            print "Test passed (disabled)",
+            return
+
         self._LoadScenario6_linecrossing()
         
         # move m1 to down and left, crossing the line
