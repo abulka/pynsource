@@ -475,7 +475,7 @@ class OverlapTests(unittest.TestCase):
     def _LoadScenario6_linecrossing(self):
         self.g.LoadGraphFromStrings(TEST_GRAPH6)
 
-    def OFFLINE_test6_1LineCrossingNotNeeded(self):
+    def test6_1LineCrossingNotNeeded(self):
         self._LoadScenario6_linecrossing()
         
         # move m1 to the left
@@ -514,7 +514,7 @@ class OverlapTests(unittest.TestCase):
         crossings = node.CalcLineIntersectionPoints(line_start_point, line_end_point)
         self.assertEqual(0, len(crossings))
                 
-    def OFFLINE_test6_3LineCrossingAvoidedGoSnug(self):
+    def test6_3LineCrossingAvoidedGoSnug(self):
         self._LoadScenario6_linecrossing()
         
         # move m1 to down and left, crossing the line

@@ -50,8 +50,10 @@ class Node:
         return ((self.left+self.width/2), (self.top+self.height/2))
 
 
-def CalcEdgeBounds2(a, c, vertical_edge_aware=True):
+def CalcEdgeBounds(a, c, vertical_edge_aware=True):
     """
+    BEST
+    
     Want to find where the line between a and c crosses the bounds of node 
     a and c and build a bounds rectangle from those points - of the taken up by the edge.
     The edge is outside and between the two nodes.
@@ -82,11 +84,12 @@ def CalcEdgeBounds2(a, c, vertical_edge_aware=True):
     return point1[X], point1[Y], point2[X], point2[Y], 
 
 
-def CalcEdgeBounds3(crossings):
+def CalcEdgeBounds_FromCrossingPoints(crossings):
     """
-    Want to find where the line between a and c crosses the bounds of node 
-    a and c and build a bounds rectangle from those points - of the taken up by the edge.
-    The edge is outside and between the two nodes.
+    UNUSED
+    
+    Makes a very tiny bounds sometimes, often unsuitable for avoiding edges
+    because want to avoid the whole edge not just a portion of the edge.
     """
     X,Y = 0,1
     point1 = list(crossings[0])
@@ -114,12 +117,9 @@ def CalcEdgeBounds3(crossings):
     return point1[X], point1[Y], point2[X], point2[Y], 
 
 
-
-
-
-
-
 """
+DEFUNCT TECHNIQUE - Here for historical purposes only.
+
 Algorithm Purpose: to find points marked @
 The key is figuring out angle A, using adj and opp
 Then using angle A, feed in different adj lengths to work out all the needed
@@ -154,7 +154,8 @@ trying to find.  In this case, we only care about angle A.
 
 """
 
-def CalcEdgeBounds(a, c, vertical_edge_aware=True):
+def CalcEdgeBounds_USING_TRIG(a, c, vertical_edge_aware=True):
+    # ABANDONED as my smarter CalcEdgeBounds() method does this and more, in less code!
     X,Y = 0,1
     def xdiff():
         return float(c_centre[X] - a_centre[X])
@@ -233,67 +234,69 @@ if __name__ == "__main__":
     # assumes A and C are connected with an edge
     a = Node('A', 0, 0, 4, 4)
     c = Node('C', 2, 6, 4, 2)
-    res = CalcEdgeBounds(a,c)
+    res = CalcEdgeBounds_USING_TRIG(a,c)
     print res
     assert [str(round(f,2)) for f in res ] == ['2.8', '4.0', '3.6', '6.0']
-    CalcEdgeBounds2(a,c)
+    CalcEdgeBounds(a,c)
     
     # Handle feeding in swapped around parameters - algorithm should be
     # resilient and figure out who is on top
-    res = CalcEdgeBounds(c,a)
+    res = CalcEdgeBounds_USING_TRIG(c,a)
     print res
     assert [str(round(f,2)) for f in res ] == ['2.8', '4.0', '3.6', '6.0']
-    CalcEdgeBounds2(c,a)
+    CalcEdgeBounds(c,a)
     
     # Node A is above and to the right of node C
     a = Node('A', 2, 0, 4, 4)
     c = Node('C', 0, 6, 4, 2)
-    res = CalcEdgeBounds(a,c)
+    res = CalcEdgeBounds_USING_TRIG(a,c)
     print res
     assert [str(round(f,2)) for f in res ] == ['2.4', '4.0', '3.2', '6.0']
-    CalcEdgeBounds2(a,c)
+    CalcEdgeBounds(a,c)
 
     # Tricky edge case - edge is exactly vertical, nodes centres exactly above each other
     a = Node('A', 0, 0, 4, 4)
     c = Node('C', 0, 6, 4, 4)
-    res = CalcEdgeBounds(a,c,vertical_edge_aware=False)
+    res = CalcEdgeBounds_USING_TRIG(a,c,vertical_edge_aware=False)
     print res
     assert [str(round(f,2)) for f in res ] == ['2.0', '4.0', '2.0', '6.0']
-    CalcEdgeBounds2(a,c)
+    CalcEdgeBounds(a,c)
 
-    res = CalcEdgeBounds(a,c,)
+    res = CalcEdgeBounds_USING_TRIG(a,c,)
     print res
     assert [str(round(f,2)) for f in res ] == ['1.0', '4.0', '3.0', '6.0']
-    CalcEdgeBounds2(a,c)
+    CalcEdgeBounds(a,c)
 
     # More cases - nodes side by side
     
-    # two nodes side by side case 1, a slightly higer than c
+    # two nodes side by side case 1, a slightly higer than c - TRIG version not
+    # handling this yet, abandoned as CalcEdgeBounds() handles it nicely.
     a = Node('A', 0, 0, 4, 4)
     c = Node('C', 6, 1, 4, 4)
-    res = CalcEdgeBounds(a,c,vertical_edge_aware=False)
+    res = CalcEdgeBounds_USING_TRIG(a,c,vertical_edge_aware=False)
     print res
     #assert [str(round(f,2)) for f in res ] == ['4.0', '1.8', '6.0', '2.2']  # 1.8 and 2.2 are guesses
-    CalcEdgeBounds2(a,c)
+    CalcEdgeBounds(a,c)
 
-    # two nodes side by side case 2, c slightly higer than a - just swap params to test
-    res = CalcEdgeBounds(c,a,vertical_edge_aware=False)
+    # two nodes side by side case 2, c slightly higer than a - just swap params to test -  - TRIG version not
+    # handling this yet, abandoned as CalcEdgeBounds() handles it nicely.
+    res = CalcEdgeBounds_USING_TRIG(c,a,vertical_edge_aware=False)
     print res
     #assert [str(round(f,2)) for f in res ] == ['4.0', '1.8', '6.0', '2.2']  # 1.8 and 2.2 are guesses
-    CalcEdgeBounds2(c,a)
+    CalcEdgeBounds(c,a)
 
     # Tricky edge case - two nodes exactly side by side, edge is horizontal
     a = Node('A', 0, 0, 4, 4)
     c = Node('C', 6, 0, 4, 4)
-    res = CalcEdgeBounds(a,c,vertical_edge_aware=False)
+    res = CalcEdgeBounds_USING_TRIG(a,c,vertical_edge_aware=False)
     print res
     # would otherwise be (4, 2, 6, 2) with both y's the same
     assert [str(round(f,2)) for f in res ] == ['4.0', '1.0', '6.0', '3.0']
-    CalcEdgeBounds2(a,c)
+    CalcEdgeBounds(a,c)
 
     a = Node('A', 0, 0, 4, 4)
     c = Node('C', 6, 3, 4, 2)
-    CalcEdgeBounds2(a,c)
+    CalcEdgeBounds(a,c)
     
     print "-"*80
         
