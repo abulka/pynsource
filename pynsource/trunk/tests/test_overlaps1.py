@@ -493,7 +493,7 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureYorder('B', 'm1', 'C'))
         self.assertFalse(self._ensureYorder('A', 'm1', 'C')) # don't want this otherwise the line from A to C would be crossed
         
-    def OFFLINE_test6_2LineCrossingAvoided(self):
+    def test6_2LineCrossingAvoided(self):
         self._LoadScenario6_linecrossing()
         
         # move m1 to the left
