@@ -61,14 +61,13 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         
     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
         shape = self.GetShape()
+        oldpos = getpos(shape) # (int(shape.GetX()), int(shape.GetY()))
 
         # take care of selection points
-        ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)
+        ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)  # super
         if not shape.Selected():
             self.OnLeftClick(x, y, keys, attachment)
         
-        oldpos = getpos(shape) # (int(shape.GetX()), int(shape.GetY()))
-        ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)  # super
         newpos = getpos(shape) # (int(shape.GetX()), int(shape.GetY()))
 
         print shape.node.id, "moved from", oldpos, "to", newpos
