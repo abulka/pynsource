@@ -1,0 +1,5 @@
+{'type':'node', 'id':'B1', 'x':117, 'y':217, 'width':56, 'height':106}
+{'type':'node', 'id':'B2', 'x':398, 'y':304, 'width':64, 'height':132}
+{'type':'node', 'id':'A', 'x':117, 'y':327, 'width':206, 'height':136}
+{'type':'node', 'id':'m1', 'x':201, 'y':262, 'width':62, 'height':60}
+{'type':'node', 'id':'D42', 'x':268, 'y':208, 'width':54, 'height':114}

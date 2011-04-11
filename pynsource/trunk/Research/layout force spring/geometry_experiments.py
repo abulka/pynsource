@@ -1,4 +1,5 @@
 import math
+from line_intersection import FindLineIntersection
 
 class Node:
     def __init__(self, id, left, top, width=60, height=60):
@@ -29,11 +30,96 @@ class Node:
 
     lines = property(get_lines)
 
+    def CalcLineIntersectionPoints(self, line_start_point, line_end_point):
+        result = []
+        for nodeline in self.lines:
+            point = FindLineIntersection(line_start_point, line_end_point, nodeline[0], nodeline[1])
+            if point:
+                result.append( (int(point[0]), int(point[1])) )
+    
+        # trim out duplicated and Nones
+        def remove_duplicates(lzt):
+            d = {}
+            for x in lzt: d[tuple(x)]=x
+            return d.values()
+        result = [r for r in result if r != None]
+        result = remove_duplicates(result)
+        return result
+
     def get_centre_point(self):
         return ((self.left+self.width/2), (self.top+self.height/2))
 
-"""
 
+def CalcEdgeBounds2(a, c, vertical_edge_aware=True):
+    """
+    Want to find where the line between a and c crosses the bounds of node 
+    a and c and build a bounds rectangle from those points - of the taken up by the edge.
+    The edge is outside and between the two nodes.
+    """
+    X,Y = 0,1
+    point1 = list(a.CalcLineIntersectionPoints(a.get_centre_point(), c.get_centre_point())[0])
+    point2 = list(c.CalcLineIntersectionPoints(a.get_centre_point(), c.get_centre_point())[0])
+    
+    # Adjust coords so that l,r in the correct order
+    if point2[X] < point1[X]:
+        point1, point2 = point2, point1
+        
+    # Adjust coords so that t,b in the correct order
+    if point1[Y] > point2[Y]:
+        point1[Y], point2[Y] = point2[Y], point1[Y]
+        
+    # Check for pure vertical lines
+    if point1[X] == point2[X]:
+        point1[X] -= 1
+        point2[X] += 1
+        
+    # Check for pure horizontal lines
+    if point1[Y] == point2[Y]:
+        point1[Y] -= 1
+        point2[Y] += 1
+    
+    print point1, point2
+    return point1[X], point1[Y], point2[X], point2[Y], 
+
+
+def CalcEdgeBounds3(crossings):
+    """
+    Want to find where the line between a and c crosses the bounds of node 
+    a and c and build a bounds rectangle from those points - of the taken up by the edge.
+    The edge is outside and between the two nodes.
+    """
+    X,Y = 0,1
+    point1 = list(crossings[0])
+    point2 = list(crossings[1])
+    
+    # Adjust coords so that l,r in the correct order
+    if point2[X] < point1[X]:
+        point1, point2 = point2, point1
+        
+    # Adjust coords so that t,b in the correct order
+    if point1[Y] > point2[Y]:
+        point1[Y], point2[Y] = point2[Y], point1[Y]
+        
+    # Check for pure vertical lines
+    if point1[X] == point2[X]:
+        point1[X] -= 1
+        point2[X] += 1
+        
+    # Check for pure horizontal lines
+    if point1[Y] == point2[Y]:
+        point1[Y] -= 1
+        point2[Y] += 1
+    
+    print point1, point2
+    return point1[X], point1[Y], point2[X], point2[Y], 
+
+
+
+
+
+
+
+"""
 Algorithm Purpose: to find points marked @
 The key is figuring out angle A, using adj and opp
 Then using angle A, feed in different adj lengths to work out all the needed
@@ -143,26 +229,29 @@ def CalcEdgeBounds(a, c, vertical_edge_aware=True):
 
 if __name__ == "__main__":
 
-    # Node A is above and to the right of node C
+    # Node A is above and to the left of node C
     # assumes A and C are connected with an edge
     a = Node('A', 0, 0, 4, 4)
     c = Node('C', 2, 6, 4, 2)
     res = CalcEdgeBounds(a,c)
     print res
     assert [str(round(f,2)) for f in res ] == ['2.8', '4.0', '3.6', '6.0']
+    CalcEdgeBounds2(a,c)
     
     # Handle feeding in swapped around parameters - algorithm should be
     # resilient and figure out who is on top
     res = CalcEdgeBounds(c,a)
     print res
     assert [str(round(f,2)) for f in res ] == ['2.8', '4.0', '3.6', '6.0']
+    CalcEdgeBounds2(c,a)
     
-    # Node A is above and to the left of node C
+    # Node A is above and to the right of node C
     a = Node('A', 2, 0, 4, 4)
     c = Node('C', 0, 6, 4, 2)
     res = CalcEdgeBounds(a,c)
     print res
     assert [str(round(f,2)) for f in res ] == ['2.4', '4.0', '3.2', '6.0']
+    CalcEdgeBounds2(a,c)
 
     # Tricky edge case - edge is exactly vertical, nodes centres exactly above each other
     a = Node('A', 0, 0, 4, 4)
@@ -170,10 +259,12 @@ if __name__ == "__main__":
     res = CalcEdgeBounds(a,c,vertical_edge_aware=False)
     print res
     assert [str(round(f,2)) for f in res ] == ['2.0', '4.0', '2.0', '6.0']
+    CalcEdgeBounds2(a,c)
 
     res = CalcEdgeBounds(a,c,)
     print res
     assert [str(round(f,2)) for f in res ] == ['1.0', '4.0', '3.0', '6.0']
+    CalcEdgeBounds2(a,c)
 
     # More cases - nodes side by side
     
@@ -183,11 +274,13 @@ if __name__ == "__main__":
     res = CalcEdgeBounds(a,c,vertical_edge_aware=False)
     print res
     #assert [str(round(f,2)) for f in res ] == ['4.0', '1.8', '6.0', '2.2']  # 1.8 and 2.2 are guesses
+    CalcEdgeBounds2(a,c)
 
     # two nodes side by side case 2, c slightly higer than a - just swap params to test
     res = CalcEdgeBounds(c,a,vertical_edge_aware=False)
     print res
     #assert [str(round(f,2)) for f in res ] == ['4.0', '1.8', '6.0', '2.2']  # 1.8 and 2.2 are guesses
+    CalcEdgeBounds2(c,a)
 
     # Tricky edge case - two nodes exactly side by side, edge is horizontal
     a = Node('A', 0, 0, 4, 4)
@@ -196,5 +289,12 @@ if __name__ == "__main__":
     print res
     # would otherwise be (4, 2, 6, 2) with both y's the same
     assert [str(round(f,2)) for f in res ] == ['4.0', '1.0', '6.0', '3.0']
+    CalcEdgeBounds2(a,c)
+
+    a = Node('A', 0, 0, 4, 4)
+    c = Node('C', 6, 3, 4, 2)
+    CalcEdgeBounds2(a,c)
     
+    print "-"*80
+        
     print "done"

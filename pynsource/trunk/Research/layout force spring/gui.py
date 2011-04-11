@@ -81,7 +81,11 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         wx.SafeYield()
         time.sleep(0.2)
         
-        shape.GetCanvas().graphrendererogl.stage2()
+        KEY_SHIFT, KEY_CTRL = 1, 2
+        if keys & KEY_SHIFT:
+            shape.GetCanvas().graphrendererogl.stateofthenation()
+        else:
+            shape.GetCanvas().graphrendererogl.stage2()
 
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
         shape = self.GetShape()
@@ -114,6 +118,15 @@ class GraphShapeCanvas(ogl.ShapeCanvas):
     def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
         # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
         self.graphrendererogl.DeselectAllShapes()
+
+    def OnMouseEvent(self, evt):
+        ogl.ShapeCanvas.OnMouseEvent(self, evt)
+        if evt.ShiftDown():
+            dc = wx.ClientDC(self)
+            self.PrepareDC(dc)
+            x, y = evt.GetLogicalPosition(dc)
+            frame = self.GetTopLevelParent()
+            frame.SetStatusText("Pos: (%d,%d)" % (x, y))
 
 class GraphRendererOgl:
     def __init__(self, graph, oglcanvas):
@@ -513,10 +526,11 @@ class GraphRendererOgl:
         item = imp.Append(2021, "Load Test Graph 1"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph1, item)
         item = imp.Append(2022, "Load Test Graph 2"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph2, item)
         item = imp.Append(2023, "Load Test Graph 3"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph3, item)
-        item = imp.Append(2023, "Load Test Graph 3a"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph3a, item)
+        item = imp.Append(2043, "Load Test Graph 3a"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph3a, item)
         item = imp.Append(2024, "Load Test Graph 4"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph4, item)
         item = imp.Append(2025, "Load Test Graph 6 (line overlaps)"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph6, item)
         item = imp.Append(2026, "Load Test Graph 7"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph7, item)
+        item = imp.Append(2046, "Load Test Graph 8 (up snug)"); frame.Bind(wx.EVT_MENU, self.OnLoadTestGraph8, item)
         self.popupmenu.AppendMenu(-1, 'Unit Test Graphs', imp)
 
         imp = wx.Menu()
@@ -556,6 +570,9 @@ class GraphRendererOgl:
 
     def OnLoadTestGraph7(self, event):
         self.LoadGraph(TEST_GRAPH7)
+
+    def OnLoadTestGraph8(self, event):
+        self.LoadGraph(TEST_GRAPH8)
 
     def OnLoadSpring2(self, event):
         self.LoadGraph(GRAPH_SPRING2)

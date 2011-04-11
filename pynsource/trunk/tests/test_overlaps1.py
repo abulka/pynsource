@@ -219,9 +219,21 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(were_all_overlaps_removed)
         self.assertEqual(2, self.overlap_remover.GetStats()['total_overlaps_found'])
         
-        self.assertTrue(self._ensureXorder('D25', 'D97', 'm1', 'D98'))
-        self.assertTrue(self._ensureYorder('D25', 'D13'))
-        self.assertTrue(self._ensureYorderBottoms('D25', 'D97', 'D13'))
+        # Older squeeze behaviour
+        #self.assertTrue(self._ensureXorder('D25', 'D97', 'm1', 'D98'))
+        #self.assertTrue(self._ensureYorder('D25', 'D13'))
+        #self.assertTrue(self._ensureYorderBottoms('D25', 'D97', 'D13'))
+
+        # Newer snug behaviour
+        #self.assertTrue(self._ensureXorder('D25', 'D97', 'm1'))
+        #self.assertTrue(self._ensureXorder('D25', 'D97', '98'))
+        #self.assertTrue(self._ensureYorder('98', 'm1'))
+
+        # Even newer snug behaviour
+        self.assertTrue(self._ensureXorder('D25', 'D97', 'D98'))
+        self.assertTrue(self._ensureYorder('D98', 'm1'))
+        self.assertTrue(self._ensureYorder('D97', 'm1'))
+        self.assertTrue(self._ensureYorder('D25', 'm1'))
 
     def test3_2PushedBetweenLeftAndRightRefused(self):
         self._LoadScenario3()
@@ -464,7 +476,7 @@ class OverlapTests(unittest.TestCase):
     def _LoadScenario5_stress(self):
         self.g.LoadGraphFromStrings(TEST_GRAPH5_STRESS)
         
-    def testStress1(self):
+    def TOO_SLOW_testStress1(self):
         
         for i in range(10):
             self._LoadScenario5_stress()
@@ -475,7 +487,7 @@ class OverlapTests(unittest.TestCase):
             self.g.Clear()
         print
         
-    def testStress2_InitialBoot(self):
+    def TOO_SLOW_testStress2_InitialBoot(self):
         """
         This is the slowest stress test because it runs the spring layout several times.
         """
@@ -508,7 +520,7 @@ class OverlapTests(unittest.TestCase):
     def _LoadScenario6_linecrossing(self):
         self.g.LoadGraphFromStrings(TEST_GRAPH6)
 
-    def test6_1LineCrossingNotNeeded(self):
+    def OFFLINE_test6_1LineCrossingNotNeeded(self):
         self._LoadScenario6_linecrossing()
         
         # move m1 to the left
@@ -526,7 +538,7 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureYorder('B', 'm1', 'C'))
         self.assertFalse(self._ensureYorder('A', 'm1', 'C')) # don't want this otherwise the line from A to C would be crossed
         
-    def test6_2LineCrossingAvoided(self):
+    def OFFLINE_test6_2LineCrossingAvoided(self):
         self._LoadScenario6_linecrossing()
         
         # move m1 to the left
@@ -539,13 +551,15 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(were_all_overlaps_removed)
         self.assertEqual(1, self.overlap_remover.GetStats()['total_overlaps_found'])
 
-        self.assertTrue(self._ensureXorder('A', 'B'))
         self.assertTrue(self._ensureXorder('A', 'm1'))
-        self.assertTrue(self._ensureYorder('A', 'C'))
-        self.assertTrue(self._ensureYorder('B', 'm1', 'C'))
-        self.assertFalse(self._ensureYorder('A', 'm1', 'C')) # don't want this otherwise the line from A to C would be crossed
+
+        # ensure m1 not crossing any lines
+        line_start_point = self.g.FindNodeById('A').centre_point
+        line_end_point = self.g.FindNodeById('C').centre_point
+        crossings = node.CalcLineIntersectionPoints(line_start_point, line_end_point)
+        self.assertEqual(0, len(crossings))
                 
-    def test6_3LineCrossingAvoidedGoSnug(self):
+    def OFFLINE_test6_3LineCrossingAvoidedGoSnug(self):
         self._LoadScenario6_linecrossing()
         
         # move m1 to down and left, crossing the line
@@ -608,6 +622,87 @@ class OverlapTests(unittest.TestCase):
         self.assertTrue(self._ensureYorder('c', 'm1'))  # ensure m1 is snuggled below c
 
         self.assertFalse(self._ensureYorder('A', 'm1')) # don't want this huge Y jump
+
+    def _LoadScenario8(self):
+        self.g.LoadGraphFromStrings(TEST_GRAPH8)
+
+    def test8_1JumpUpAndSnuggleB1PushedOk(self):
+        
+        self._LoadScenario8()
+
+        b1 = self.g.FindNodeById('B1')
+        a = self.g.FindNodeById('A')
+        oldB1pos = (b1.left, b1.top)
+        oldApos = (a.left, a.top)
+
+        # move m1 to the left
+        node = self.g.FindNodeById('m1')
+        node.left, node.top = (64, 75)
+        
+        # assert m1 has been pushed up and to the right. Ok for B1 to be pushed a little left 
+        
+        were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+        self.assertTrue(were_all_overlaps_removed)
+
+        self.assertTrue(self._ensureXorder('B1', 'm1', 'B2'))
+        self.assertTrue(self._ensureYorder('B1', 'A'))
+        self.assertTrue(self._ensureYorder('B2', 'A'))
+
+        self.assertEqual(oldApos, (a.left,a.top)) # ensure A HAS NOT been pushed
+        self.assertNotEqual(oldB1pos, (b1.left, b1.top)) # ok if B1 HAS been pushed
+
+    def test8_2JumpUpAndSnuggle(self):
+        
+        self._LoadScenario8()
+
+        b1 = self.g.FindNodeById('B1')
+        a = self.g.FindNodeById('A')
+        oldB1pos = (b1.left, b1.top)
+        oldApos = (a.left, a.top)
+
+        # move m1 to the left
+        node = self.g.FindNodeById('m1')
+        node.left, node.top = (34, 75)
+        
+        # assert m1 has been pushed up and to the right. We used to have it so
+        # moving y up was not an option for m1 so A got pushed down instead. 
+        
+        were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+        self.assertTrue(were_all_overlaps_removed)
+
+        self.assertTrue(self._ensureXorder('B1', 'm1', 'B2'))
+        self.assertTrue(self._ensureYorder('B1', 'A'))
+        self.assertTrue(self._ensureYorder('B2', 'A'))
+
+        self.assertEqual(oldApos, (a.left,a.top)) # ensure A HAS NOT been pushed
+        self.assertEqual(oldB1pos, (b1.left, b1.top)) # ensure B1 HAS NOT been pushed
+        
+    def test8_3JumpUpAndSnuggle(self):
+        
+        self._LoadScenario8()
+
+        b2 = self.g.FindNodeById('B2')
+        a = self.g.FindNodeById('A')
+        oldB2pos = (b2.left, b2.top)
+        oldApos = (a.left, a.top)
+
+        # move m1 to the left
+        node = self.g.FindNodeById('m1')
+        node.left, node.top = (114, 75)
+        
+        # assert m1 has been pushed up and to the left. We used to have it so
+        # moving y up was not an option for m1 so A got pushed down instead. 
+        
+        were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+        self.assertTrue(were_all_overlaps_removed)
+
+        self.assertTrue(self._ensureXorder('B1', 'm1', 'B2'))
+        self.assertTrue(self._ensureYorder('B1', 'A'))
+        self.assertTrue(self._ensureYorder('B2', 'A'))
+
+        self.assertEqual(oldApos, (a.left,a.top)) # ensure A HAS NOT been pushed
+        self.assertEqual(oldB2pos, (b2.left, b2.top)) # ensure B2 HAS NOT been pushed
+
 
 # Suite only needed for my alltests.py test running master
 def suite():

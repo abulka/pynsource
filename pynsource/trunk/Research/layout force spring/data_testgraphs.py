@@ -91,6 +91,13 @@ TEST_GRAPH7 = """
 {'type':'edge', 'id':'A_to_c', 'source':'A', 'target':'c'}
 """
 
+TEST_GRAPH8 = """
+{'type':'node', 'id':'B1', 'x':17, 'y':17, 'width':56, 'height':106}
+{'type':'node', 'id':'B2', 'x':164, 'y':9, 'width':52, 'height':112}
+{'type':'node', 'id':'A', 'x':17, 'y':127, 'width':206, 'height':136}
+{'type':'node', 'id':'m1', 'x':84, 'y':40, 'width':62, 'height':60}
+"""
+
 GRAPH_INITIALBOOT = """
 {'type':'node', 'id':'A', 'x':106, 'y':278, 'width':250, 'height':250}
 {'type':'node', 'id':'A1', 'x':18, 'y':338, 'width':60, 'height':60}

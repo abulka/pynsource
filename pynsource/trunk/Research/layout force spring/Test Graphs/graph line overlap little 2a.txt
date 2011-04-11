@@ -1,0 +1,8 @@
+{'type':'node', 'id':'A', 'x':115, 'y':270, 'width':250, 'height':250}
+{'type':'node', 'id':'c', 'x':370, 'y':220, 'width':60, 'height':60}
+{'type':'node', 'id':'c3', 'x':376, 'y':337, 'width':60, 'height':60}
+{'type':'node', 'id':'c5', 'x':75, 'y':135, 'width':60, 'height':120}
+{'type':'edge', 'id':'c_to_c3', 'source':'c', 'target':'c3'}
+{'type':'edge', 'id':'c_to_c5', 'source':'c', 'target':'c5'}
+{'type':'edge', 'id':'A_to_c', 'source':'A', 'target':'c'}
+{'type':'edge', 'id':'A_to_c5', 'source':'A', 'target':'c5'}
