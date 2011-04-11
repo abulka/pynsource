@@ -415,24 +415,40 @@ class OverlapRemoval:
         return proposals
     
     def ApplyBestProposal(self, proposals):
+
+        def UpgradeSingleMoveToCombo(proposal, ignoreNegatives=False):
+            # Note to qualify for upgrade, a combo's x or a y dimension must match the single move x or y
+            if ignoreNegatives:
+                f = abs
+            else:
+                f = lambda n : n  # do nothing
+            if proposal['xory'] == 'x':
+                xy_proposals = [p for p in proposals if p['xory'] == 'xy' and f(p['destdeltaxy'][0]) == f(proposal['amount'])]
+            else:
+                xy_proposals = [p for p in proposals if p['xory'] == 'xy' and f(p['destdeltaxy'][1]) == f(proposal['amount'])]
+            if xy_proposals:
+                return xy_proposals[0]  # transform our initial_proposal to its matching postmove xy
+            return None
+            
         """
-        Ignore PostMoveAlgorithm generated "combo xy" proposals for initial
-        decision making.  Then find any corresponding "combo xy" move and use it instead.
-        Corresponding means if initial_proposal is an x move look for an xy
-        move with the same x amount.
-        
-        Warning, lambda sorting on e.g. p['xory'] == 'xy' turns out to be a True
+        Ignore the PostInitialMoveProposals() "combo xy" proposals for initial
+        decision making - go instead by simple, single moves that minimise travel.
+
+        Warning re lambda sorting on e.g. p['xory'] == 'xy' turns out to be a True
         which is a 1 which means it is DE-prioritised compared to 0. A little
         counter intuitive.
         """
+        final_proposal = None
         initial_proposal = sorted(proposals, key=lambda p: (abs(p['amount']), p['xory'] == 'xy'))[0]
-        if initial_proposal['xory'] == 'x':
-            xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destdeltaxy'][0] == initial_proposal['amount']]
-        else:
-            xy_proposals = [p for p in proposals if p['xory'] == 'xy' and p['destdeltaxy'][1] == initial_proposal['amount']]
-
-        if xy_proposals:
-            proposal = xy_proposals[0]  # transform our initial_proposal to its matching postmove xy
+        
+        """
+        Then find any corresponding "combo xy" move and use it instead.
+        Corresponding means if initial_proposal is an x move look for an xy
+        move with the same x amount.
+        """
+        upgrade = UpgradeSingleMoveToCombo(initial_proposal)
+        if upgrade:
+            proposal = upgrade
         else:
             """
             If there are no ways to transform our initial minimal movement into
@@ -446,16 +462,13 @@ class OverlapRemoval:
                 proposal = initial_proposal
 
             """
-            Favour snug moves if we haven't found a snug one yet.
+            Look for snug moves if we haven't found a combo xy move yet.
             If there is the same x or y move amount which is an xy move then choose it
             """
             if proposal['xory'] <> 'xy':
-                if proposal['xory'] == 'x':
-                    xy_proposals = [p for p in proposals if p['xory'] == 'xy' and abs(p['destdeltaxy'][0]) == abs(proposal['amount'])]
-                else:
-                    xy_proposals = [p for p in proposals if p['xory'] == 'xy' and abs(p['destdeltaxy'][1]) == abs(proposal['amount'])]
-                if xy_proposals:
-                    proposal = xy_proposals[0]
+                upgrade = UpgradeSingleMoveToCombo(proposal, ignoreNegatives=True)
+                if upgrade:
+                    proposal = upgrade
 
         print self.dumpproposals(proposals)
         self.ApplyProposal(proposal)
