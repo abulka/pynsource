@@ -163,7 +163,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
     def stateofthenation(self):
         for node in self.umlworkspace.graph.nodes:
             self.AdjustShapePosition(node)
-        self.Redraw()
+        self.Redraw222()
         wx.SafeYield()
         
     def onKeyPress(self, event):
@@ -226,14 +226,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         
         self.umlworkspace.Clear()
 
-    def _Process(self, filepath):
-        print '_Process', filepath
-
-        p = PySourceAsJava()
-        p.optionModuleAsClass = 0
-        p.verbose = 0
-        p.Parse(filepath)
-
+    def ConvertParseModelToUmlModel(self, p):
         for classname, classentry in p.classlist.items():
             #print 'CLASS', classname, classentry
 
@@ -252,70 +245,71 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
                     self.umlworkspace.associations_generalisation.append((classname, parentclass))
 
-            # Build the UML shape
-            #
             if classname not in self.umlworkspace.classnametoshape:
-                if not IMAGENODES:
-                    shape = DividedShape(width=100, height=150, canvas=self)
-                else:
-                    F = 'Research\\wx doco\\Images\\SPLASHSCREEN.BMP'
-                    # wx.ImageFromBitmap(bitmap) and wx.BitmapFromImage(image)
-                    shape = ogl.BitmapShape()
-                    img = wx.Image(F, wx.BITMAP_TYPE_ANY)
-                    bmp = wx.BitmapFromImage(img)
-                    shape.SetBitmap(bmp)
-
-                pos = (50,50)
-                maxWidth = 10 #padding
-                #if not self.showAttributes: classAttrs = [' ']
-                #if not self.showMethods: classMeths = [' ']
-                className = classname
                 classAttrs = [ attrobj.attrname for attrobj in classentry.attrs ]
                 classMeths = classentry.defs
+                node = self.umlworkspace.AddNode(classname, classAttrs, classMeths)
 
-
-                regionName, maxWidth, nameHeight = self.newRegion(
-                      self.font1, 'class_name', [className], maxWidth)
-                regionAttribs, maxWidth, attribsHeight = self.newRegion(
-                      self.font2, 'attributes', classAttrs, maxWidth)
-                regionMeths, maxWidth, methsHeight = self.newRegion(
-                      self.font2, 'methods', classMeths, maxWidth)
-
-                totHeight = nameHeight + attribsHeight + methsHeight
-
-                regionName.SetProportions(0.0, 1.0*(nameHeight/float(totHeight)))
-                regionAttribs.SetProportions(0.0, 1.0*(attribsHeight/float(totHeight)))
-                regionMeths.SetProportions(0.0, 1.0*(methsHeight/float(totHeight)))
-
-                regionName.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
-                shape.region1 = regionName  # Andy added, for later external reference to classname from just having the shap instance.
-
-                shape.AddRegion(regionName)
-                shape.AddRegion(regionAttribs)
-                shape.AddRegion(regionMeths)
-
-                shape.SetSize(maxWidth + 10, totHeight + 10)
-
-                if not IMAGENODES:
-                    shape.SetRegionSizes()
-
-                dsBrush = wx.Brush("WHEAT", wx.SOLID)
-                ds = self.MyAddShape(shape, pos[0], pos[1], wx.BLACK_PEN, dsBrush, '') # get back instance - but already had it...
-
-                if not IMAGENODES:
-                    shape.FlushText()
-
-                # Record the name to shape map so that we can wire up the links later.
-                self.umlworkspace.classnametoshape[classname] = ds
-                
-                # New
-                node = self.umlworkspace.AddNode(classname)
-                node.top, node.left = getpos(ds)
-                node.shape = ds
-                shape.node = node
-
+                shape = self.BuildUmlShape(node)
+                self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             else:
                 print 'Skipping', classname, 'already built shape...'
+            
+    def BuildUmlShape(self, node):
+
+        if not IMAGENODES:
+            shape = DividedShape(width=100, height=150, canvas=self)
+        else:
+            #print os.path.dirname( os.path.abspath( __file__ ) )
+            #print os.path.relpath( __file__ )
+            F = 'Research\\wx doco\\Images\\SPLASHSCREEN.BMP'
+            # wx.ImageFromBitmap(bitmap) and wx.BitmapFromImage(image)
+            shape = ogl.BitmapShape()
+            img = wx.Image(F, wx.BITMAP_TYPE_ANY)
+            bmp = wx.BitmapFromImage(img)
+            shape.SetBitmap(bmp)
+
+        pos = (50,50)
+        maxWidth = 10 #padding
+        #if not self.showAttributes: classAttrs = [' ']
+        #if not self.showMethods: classMeths = [' ']
+
+        regionName, maxWidth, nameHeight = self.newRegion(
+              self.font1, 'class_name', [node.id], maxWidth)
+        regionAttribs, maxWidth, attribsHeight = self.newRegion(
+              self.font2, 'attributes', node.attrs, maxWidth)
+        regionMeths, maxWidth, methsHeight = self.newRegion(
+              self.font2, 'methods', node.meths, maxWidth)
+
+        totHeight = nameHeight + attribsHeight + methsHeight
+
+        regionName.SetProportions(0.0, 1.0*(nameHeight/float(totHeight)))
+        regionAttribs.SetProportions(0.0, 1.0*(attribsHeight/float(totHeight)))
+        regionMeths.SetProportions(0.0, 1.0*(methsHeight/float(totHeight)))
+
+        regionName.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
+        shape.region1 = regionName  # Andy added, for later external reference to classname from just having the shap instance.
+
+        shape.AddRegion(regionName)
+        shape.AddRegion(regionAttribs)
+        shape.AddRegion(regionMeths)
+
+        shape.SetSize(maxWidth + 10, totHeight + 10)
+
+        if not IMAGENODES:
+            shape.SetRegionSizes()
+
+        dsBrush = wx.Brush("WHEAT", wx.SOLID)
+        self.DecorateShape(shape, pos[0], pos[1], wx.BLACK_PEN, dsBrush, '')
+        
+        if not IMAGENODES:
+            shape.FlushText()
+
+        # New
+        node.top, node.left = getpos(shape)
+        node.shape = shape
+        shape.node = node
+        return shape
 
     def _BuildAuxClasses(self, classestocreate=None):
             if not classestocreate:
@@ -323,13 +317,13 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             for classname in classestocreate:
                 rRectBrush = wx.Brush("MEDIUM TURQUOISE", wx.SOLID)
                 dsBrush = wx.Brush("WHEAT", wx.SOLID)
-                ds = self.MyAddShape(DividedShapeSmall(100, 30, self), 50, 145, wx.BLACK_PEN, dsBrush, '')
-                ds.BuildRegions(canvas=self)  # build the one region
-                ds.SetCentreResize(0)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
-                ds.region1.SetText(classname)
-                ds.ReformatRegions()
+                shape = self.DecorateShape(DividedShapeSmall(100, 30, self), 50, 145, wx.BLACK_PEN, dsBrush, '')
+                shape.BuildRegions(canvas=self)  # build the one region
+                shape.SetCentreResize(0)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
+                shape.region1.SetText(classname)
+                shape.ReformatRegions()
                 # Record the name to shape map so that we can wire up the links later.
-                self.umlworkspace.classnametoshape[classname] = ds
+                self.umlworkspace.classnametoshape[classname] = shape
 
     def Go(self, files=None, path=None):
 
@@ -338,23 +332,14 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
         if files:
             for f in files:
-                self._Process(f)    # Build a shape with all attrs and methods, and prepare association dict
-
-        if path:
-            param = path
-            globbed = []
-            files = glob.glob(param)
-            globbed += files
-            #print 'parsing', globbed
-
-            for directory in globbed:
-                if '*' in directory or '.' in directory:
-                    filepath = directory
-                else:
-                    filepath = os.path.join(directory, "*.py")
-                globbed2 = glob.glob(filepath)
-                for f in globbed2:
-                    self._Process(f)    # Build a shape with all attrs and methods, and prepare association dict
+                # Parse, then build a umlworkspace model of nodes and and
+                # association dicts/arrays, then build the uml shape with all
+                # attrs and methods
+                p = PySourceAsJava()
+                p.optionModuleAsClass = 0
+                p.verbose = 0
+                p.Parse(f)
+                self.ConvertParseModelToUmlModel(p)
 
         self.DrawAssocLines(self.umlworkspace.associations_generalisation, ogl.ARROW_ARROW)
         self.DrawAssocLines(self.umlworkspace.associations_composition, ogl.ARROW_FILLED_CIRCLE)
@@ -458,7 +443,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         canvas = self
         canvas.SetSize(canvas.GetVirtualSize())
 
-    def MyAddShape(self, shape, x, y, pen, brush, text):
+    def DecorateShape(self, shape, x, y, pen, brush, text):
         # Composites have to be moved for all children to get in place
         if isinstance(shape, ogl.CompositeShape):
             dc = wx.ClientDC(self)
@@ -515,11 +500,11 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.PrepareDC(dc)
         node.shape.MoveLinks(dc)
         
-    def Redraw(self, clear=True):        # FROM SPRING LAYOUT
+    def Redraw222(self, clear=True):        # FROM SPRING LAYOUT
         diagram = self.GetDiagram()
         canvas = self
         assert canvas == diagram.GetCanvas()
-
+    
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
         
@@ -637,7 +622,8 @@ class MainApp(wx.App):
 
         # Debug bootstrap  --------------------------------------
         #self.frame.SetSize((1024,768))
-        self.umlwin.Go(files=[os.path.abspath( __file__ )])
+        #self.umlwin.Go(files=[os.path.abspath( __file__ )])
+        self.umlwin.Go(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
         self.umlwin.RedrawEverything()
 
         self.umlwin.umlworkspace.BuildGraphFromUmlWorkspace()

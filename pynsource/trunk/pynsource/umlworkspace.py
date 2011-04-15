@@ -7,6 +7,12 @@ import sys
 sys.path.append("../Research/layout force spring")
 from graph import Graph, GraphNode
 
+class UmlNode(GraphNode):
+    def __init__(self, id, left, top, width=60, height=60, attrs=[], meths=[]):
+        GraphNode.__init__(self, id, left, top, width=60, height=60)
+        self.attrs = attrs
+        self.meths = meths
+        
 class UmlWorkspace:
     def __init__(self):
         self.graph = Graph()
@@ -15,6 +21,7 @@ class UmlWorkspace:
     def Clear(self):
         self.classnametoshape = {}             # dict of classname => shape entries
         self.ClearAssociations()
+        self.graph.Clear()
 
     def ClearAssociations(self):
         self.associations_generalisation = []  # list of (classname, parentclassname) tuples
@@ -53,10 +60,11 @@ class UmlWorkspace:
         for node in self.graph.nodes:
             print node
         
-    def AddNode(self, id):
+    def AddNode(self, id, attrs, meths):
         if self.graph.FindNodeById(id):
             id += str(random.randint(1,9999))
-        node = GraphNode(id, random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160))
+        t,l,w,h = random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160)
+        node = UmlNode(id, t, l, w, h, attrs=attrs, meths=meths)
         node = self.graph.AddNode(node)
         return node
         
