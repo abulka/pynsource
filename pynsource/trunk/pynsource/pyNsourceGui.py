@@ -227,6 +227,14 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.umlworkspace.Clear()
 
     def ConvertParseModelToUmlModel(self, p):
+        
+        def BuildEdgeModel(association_tuples, edge_label):
+            for fromClassname, toClassname in association_tuples:
+                from_node = self.umlworkspace.AddUmlNode(fromClassname)
+                to_node = self.umlworkspace.AddUmlNode(toClassname)
+                edge = self.umlworkspace.graph.AddEdge(from_node, to_node)
+                edge['uml_edge_type'] = edge_label
+            
         for classname, classentry in p.classlist.items():
             #print 'CLASS', classname, classentry
 
@@ -245,86 +253,13 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
                     self.umlworkspace.associations_generalisation.append((classname, parentclass))
 
-            if classname not in self.umlworkspace.classnametoshape:
-                classAttrs = [ attrobj.attrname for attrobj in classentry.attrs ]
-                classMeths = classentry.defs
-                node = self.umlworkspace.AddNode(classname, classAttrs, classMeths)
+            classAttrs = [ attrobj.attrname for attrobj in classentry.attrs ]
+            classMeths = classentry.defs
+            node = self.umlworkspace.AddUmlNode(classname, classAttrs, classMeths)
 
-                shape = self.BuildUmlShape(node)
-                self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
-            else:
-                print 'Skipping', classname, 'already built shape...'
-            
-    def BuildUmlShape(self, node):
-
-        if not IMAGENODES:
-            shape = DividedShape(width=100, height=150, canvas=self)
-        else:
-            #print os.path.dirname( os.path.abspath( __file__ ) )
-            #print os.path.relpath( __file__ )
-            F = 'Research\\wx doco\\Images\\SPLASHSCREEN.BMP'
-            # wx.ImageFromBitmap(bitmap) and wx.BitmapFromImage(image)
-            shape = ogl.BitmapShape()
-            img = wx.Image(F, wx.BITMAP_TYPE_ANY)
-            bmp = wx.BitmapFromImage(img)
-            shape.SetBitmap(bmp)
-
-        pos = (50,50)
-        maxWidth = 10 #padding
-        #if not self.showAttributes: classAttrs = [' ']
-        #if not self.showMethods: classMeths = [' ']
-
-        regionName, maxWidth, nameHeight = self.newRegion(
-              self.font1, 'class_name', [node.id], maxWidth)
-        regionAttribs, maxWidth, attribsHeight = self.newRegion(
-              self.font2, 'attributes', node.attrs, maxWidth)
-        regionMeths, maxWidth, methsHeight = self.newRegion(
-              self.font2, 'methods', node.meths, maxWidth)
-
-        totHeight = nameHeight + attribsHeight + methsHeight
-
-        regionName.SetProportions(0.0, 1.0*(nameHeight/float(totHeight)))
-        regionAttribs.SetProportions(0.0, 1.0*(attribsHeight/float(totHeight)))
-        regionMeths.SetProportions(0.0, 1.0*(methsHeight/float(totHeight)))
-
-        regionName.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
-        shape.region1 = regionName  # Andy added, for later external reference to classname from just having the shap instance.
-
-        shape.AddRegion(regionName)
-        shape.AddRegion(regionAttribs)
-        shape.AddRegion(regionMeths)
-
-        shape.SetSize(maxWidth + 10, totHeight + 10)
-
-        if not IMAGENODES:
-            shape.SetRegionSizes()
-
-        dsBrush = wx.Brush("WHEAT", wx.SOLID)
-        self.DecorateShape(shape, pos[0], pos[1], wx.BLACK_PEN, dsBrush, '')
-        
-        if not IMAGENODES:
-            shape.FlushText()
-
-        # New
-        node.top, node.left = getpos(shape)
-        node.shape = shape
-        shape.node = node
-        return shape
-
-    def _BuildAuxClasses(self, classestocreate=None):
-            if not classestocreate:
-                classestocreate = ('variant', 'unittest', 'list', 'object', 'dict')  # should add more classes and add them to a jar file to avoid namespace pollution.
-            for classname in classestocreate:
-                rRectBrush = wx.Brush("MEDIUM TURQUOISE", wx.SOLID)
-                dsBrush = wx.Brush("WHEAT", wx.SOLID)
-                shape = self.DecorateShape(DividedShapeSmall(100, 30, self), 50, 145, wx.BLACK_PEN, dsBrush, '')
-                shape.BuildRegions(canvas=self)  # build the one region
-                shape.SetCentreResize(0)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
-                shape.region1.SetText(classname)
-                shape.ReformatRegions()
-                # Record the name to shape map so that we can wire up the links later.
-                self.umlworkspace.classnametoshape[classname] = shape
-
+        BuildEdgeModel(self.umlworkspace.associations_generalisation, 'generalisation')
+        BuildEdgeModel(self.umlworkspace.associations_composition, 'composition')
+  
     def Go(self, files=None, path=None):
 
         # these are tuples between class names.
@@ -332,43 +267,120 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
         if files:
             for f in files:
-                # Parse, then build a umlworkspace model of nodes and and
-                # association dicts/arrays, then build the uml shape with all
-                # attrs and methods
                 p = PySourceAsJava()
                 p.optionModuleAsClass = 0
                 p.verbose = 0
                 p.Parse(f)
                 self.ConvertParseModelToUmlModel(p)
 
-        self.DrawAssocLines(self.umlworkspace.associations_generalisation, ogl.ARROW_ARROW)
-        self.DrawAssocLines(self.umlworkspace.associations_composition, ogl.ARROW_FILLED_CIRCLE)
+        self.stage1()
 
         # Layout
         self.LayoutAndPositionShapes()
+              
+    def CreateUmlShape(self, node):
 
-    def DrawAssocLines(self, associations, arrowtype):
-        for fromClassname, toClassname in associations:
-            #print 'DrawAssocLines', fromClassname, toClassname
+        if len(node.attrs) == 0 and len(node.meths) == 0:
+            rRectBrush = wx.Brush("MEDIUM TURQUOISE", wx.SOLID)
+            dsBrush = wx.Brush("WHEAT", wx.SOLID)
+            shape = self.DecorateShape(DividedShapeSmall(100, 30, self), 50, 145, wx.BLACK_PEN, dsBrush, '')
+            shape.BuildRegions(canvas=self)  # build the one region
+            shape.SetCentreResize(0)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
+            shape.region1.SetText(node.classname)
+            shape.ReformatRegions()
+        else:
+            if not IMAGENODES:
+                shape = DividedShape(width=100, height=150, canvas=self)
+            else:
+                #print os.path.dirname( os.path.abspath( __file__ ) )
+                #print os.path.relpath( __file__ )
+                F = 'Research\\wx doco\\Images\\SPLASHSCREEN.BMP'
+                # wx.ImageFromBitmap(bitmap) and wx.BitmapFromImage(image)
+                shape = ogl.BitmapShape()
+                img = wx.Image(F, wx.BITMAP_TYPE_ANY)
+                bmp = wx.BitmapFromImage(img)
+                shape.SetBitmap(bmp)
+    
+            pos = (50,50)
+            maxWidth = 10 #padding
+            #if not self.showAttributes: classAttrs = [' ']
+            #if not self.showMethods: classMeths = [' ']
+    
+            regionName, maxWidth, nameHeight = self.newRegion(
+                  self.font1, 'class_name', [node.classname], maxWidth)
+            regionAttribs, maxWidth, attribsHeight = self.newRegion(
+                  self.font2, 'attributes', node.attrs, maxWidth)
+            regionMeths, maxWidth, methsHeight = self.newRegion(
+                  self.font2, 'methods', node.meths, maxWidth)
+    
+            totHeight = nameHeight + attribsHeight + methsHeight
+    
+            regionName.SetProportions(0.0, 1.0*(nameHeight/float(totHeight)))
+            regionAttribs.SetProportions(0.0, 1.0*(attribsHeight/float(totHeight)))
+            regionMeths.SetProportions(0.0, 1.0*(methsHeight/float(totHeight)))
+    
+            regionName.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
+            shape.region1 = regionName  # Andy added, for later external reference to classname from just having the shap instance.
+    
+            shape.AddRegion(regionName)
+            shape.AddRegion(regionAttribs)
+            shape.AddRegion(regionMeths)
+    
+            shape.SetSize(maxWidth + 10, totHeight + 10)
+    
+            if not IMAGENODES:
+                shape.SetRegionSizes()
+    
+            dsBrush = wx.Brush("WHEAT", wx.SOLID)
+            self.DecorateShape(shape, pos[0], pos[1], wx.BLACK_PEN, dsBrush, '')
+            
+            if not IMAGENODES:
+                shape.FlushText()
 
-            if fromClassname not in self.umlworkspace.classnametoshape:
-                self._BuildAuxClasses(classestocreate=[fromClassname]) # Emergency creation of some unknown class.
-            fromShape = self.umlworkspace.classnametoshape[fromClassname]
+        # New
+        node.top, node.left = getpos(shape)
+        node.shape = shape
+        shape.node = node
+        return shape
 
-            if toClassname not in self.umlworkspace.classnametoshape:
-                self._BuildAuxClasses(classestocreate=[toClassname]) # Emergency creation of some unknown class.
-            toShape = self.umlworkspace.classnametoshape[toClassname]
+    def CreateUmlEdge(self, edge):
+        fromShape = edge['source'].shape
+        toShape = edge['target'].shape
+        
+        edge_label = edge.get('uml_edge_type', '')
+        if edge_label == 'generalisation':
+            arrowtype = ogl.ARROW_ARROW
+        elif edge_label == 'composition':
+            arrowtype = ogl.ARROW_FILLED_CIRCLE
+        else:
+            arrowtype = None
 
-            line = ogl.LineShape()
-            line.SetCanvas(self)
-            line.SetPen(wx.BLACK_PEN)
-            line.SetBrush(wx.BLACK_BRUSH)
+        line = ogl.LineShape()
+        line.SetCanvas(self)
+        line.SetPen(wx.BLACK_PEN)
+        line.SetBrush(wx.BLACK_BRUSH)
+        if arrowtype:
             line.AddArrow(arrowtype)
-            line.MakeLineControlPoints(2)
-            fromShape.AddLine(line, toShape)
-            self.GetDiagram().AddShape(line)
-            line.Show(True)
+        line.MakeLineControlPoints(2)
 
+        fromShape.AddLine(line, toShape)
+        self.GetDiagram().AddShape(line)
+        line.Show(True)
+
+    def stage1(self, translatecoords=True):         # FROM SPRING LAYOUT
+        #if translatecoords:
+        #    self.AllToWorldCoords()
+
+        for node in self.umlworkspace.graph.nodes:
+            shape = self.CreateUmlShape(node)
+            print 'created shape for node', node.id
+            self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+            
+        for edge in self.umlworkspace.graph.edges:
+            self.CreateUmlEdge(edge)
+
+        #self.Redraw222()
+        
     def RedrawEverything(self):
         diagram = self.GetDiagram()
         canvas = self

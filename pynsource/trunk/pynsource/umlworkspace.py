@@ -12,7 +12,13 @@ class UmlNode(GraphNode):
         GraphNode.__init__(self, id, left, top, width=60, height=60)
         self.attrs = attrs
         self.meths = meths
-        
+
+    def get_id(self):
+        return self.id
+    def set_id(self, val):
+        self.id = val
+    classname = property(get_id, set_id)
+    
 class UmlWorkspace:
     def __init__(self):
         self.graph = Graph()
@@ -60,11 +66,22 @@ class UmlWorkspace:
         for node in self.graph.nodes:
             print node
         
-    def AddNode(self, id, attrs, meths):
+    def AddUmlNode(self, id, attrs=[], meths=[]):
+        node = self.graph.FindNodeById(id)
+        if node:
+            # could merge the nodes and their attributes etc. ?
+            print 'Skipping', node.classname, 'already built shape...'
+            return node
+        t,l,w,h = random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160)
+        node = UmlNode(id, t, l, w, h, attrs=attrs, meths=meths)
+        node = self.graph.AddNode(node)
+        return node
+
+    def AddNode(self, id):
         if self.graph.FindNodeById(id):
             id += str(random.randint(1,9999))
         t,l,w,h = random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160)
-        node = UmlNode(id, t, l, w, h, attrs=attrs, meths=meths)
+        node = GraphNode(id, t, l, w, h)
         node = self.graph.AddNode(node)
         return node
         
