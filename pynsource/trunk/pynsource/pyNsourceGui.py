@@ -129,6 +129,11 @@ from gen_java import PySourceAsJava
 from umlworkspace import UmlWorkspace
 from layout_basic import LayoutBasic
 
+from layout_spring import GraphLayoutSpring
+from overlap_removal import OverlapRemoval
+#from blackboard import LayoutBlackboard
+from coordinate_mapper import CoordinateMapper
+
 class UmlShapeCanvas(ogl.ShapeCanvas):
     scrollStepX = 10
     scrollStepY = 10
@@ -149,6 +154,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.save_gdi = []
         wx.EVT_WINDOW_DESTROY(self, self.OnDestroy)
 
+        self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
         self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
         self.working = False
 
@@ -160,12 +166,16 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         #self.layout = LayoutBasic(leftmargin=0, topmargin=0, verticalwhitespace=0, horizontalwhitespace=0, maxclassesperline=5)
         self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
 
-    def stateofthenation(self):
-        for node in self.umlworkspace.graph.nodes:
-            self.AdjustShapePosition(node)
-        self.Redraw222()
-        wx.SafeYield()
-        
+        self.coordmapper = CoordinateMapper(self.umlworkspace.graph, self.GetSize())
+        self.layouter = GraphLayoutSpring(self.umlworkspace.graph, gui=self)
+        self.overlap_remover = OverlapRemoval(self.umlworkspace.graph, margin=50, gui=self)
+    
+    def AllToLayoutCoords(self):
+        self.coordmapper.AllToLayoutCoords()
+
+    def AllToWorldCoords(self):
+        self.coordmapper.AllToWorldCoords()
+
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
         #if event.ShiftDown():
@@ -280,6 +290,24 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
               
     def CreateUmlShape(self, node):
 
+        def newRegion(font, name, textLst, maxWidth, totHeight = 10):
+            # Taken from Boa, but put into the canvas class instead of the scrolled window class.
+            region = ogl.ShapeRegion()
+            dc = wx.ClientDC(self)  # self is the canvas
+            dc.SetFont(font)
+    
+            for text in textLst:
+                w, h = dc.GetTextExtent(text)
+                if w > maxWidth: maxWidth = w
+                totHeight = totHeight + h + 0 # interline padding
+    
+            region.SetFont(font)
+            region.SetText('\n'.join(textLst))
+            #region._text = string.join(textLst, '\n')
+            region.SetName(name)
+    
+            return region, maxWidth, totHeight
+
         if len(node.attrs) == 0 and len(node.meths) == 0:
             rRectBrush = wx.Brush("MEDIUM TURQUOISE", wx.SOLID)
             dsBrush = wx.Brush("WHEAT", wx.SOLID)
@@ -306,12 +334,9 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             #if not self.showAttributes: classAttrs = [' ']
             #if not self.showMethods: classMeths = [' ']
     
-            regionName, maxWidth, nameHeight = self.newRegion(
-                  self.font1, 'class_name', [node.classname], maxWidth)
-            regionAttribs, maxWidth, attribsHeight = self.newRegion(
-                  self.font2, 'attributes', node.attrs, maxWidth)
-            regionMeths, maxWidth, methsHeight = self.newRegion(
-                  self.font2, 'methods', node.meths, maxWidth)
+            regionName, maxWidth, nameHeight = newRegion(self.font1, 'class_name', [node.classname], maxWidth)
+            regionAttribs, maxWidth, attribsHeight = newRegion(self.font2, 'attributes', node.attrs, maxWidth)
+            regionMeths, maxWidth, methsHeight = newRegion(self.font2, 'methods', node.meths, maxWidth)
     
             totHeight = nameHeight + attribsHeight + methsHeight
     
@@ -339,6 +364,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
         # New
         node.top, node.left = getpos(shape)
+        node.width, node.height = shape.GetBoundingBoxMax()
         node.shape = shape
         shape.node = node
         return shape
@@ -367,6 +393,18 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.GetDiagram().AddShape(line)
         line.Show(True)
 
+    def OnWheelZoom(self, event):
+        if self.working: return
+        self.working = True
+
+        if event.GetWheelRotation() < 0:
+            self.stage2()
+            print self.overlap_remover.GetStats()
+        else:
+            self.stateofthenation()
+
+        self.working = False
+        
     def stage1(self, translatecoords=True):         # FROM SPRING LAYOUT
         #if translatecoords:
         #    self.AllToWorldCoords()
@@ -380,7 +418,29 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             self.CreateUmlEdge(edge)
 
         #self.Redraw222()
+
+    def stage2(self, force_stateofthenation=False, watch_removals=True):
+        ANIMATION = False
         
+        #if ANIMATION:
+        #    self.graph.SaveOldPositionsForAnimationPurposes()
+        #    watch_removals = False  # added this when I turned animation on.
+        
+        self.overlap_remover.RemoveOverlaps(watch_removals=watch_removals)
+        if self.overlap_remover.GetStats()['total_overlaps_found'] > 0 or force_stateofthenation:
+            self.stateofthenation(animate=ANIMATION)
+
+    def stateofthenation(self, animate=False):
+        for node in self.umlworkspace.graph.nodes:
+            self.AdjustShapePosition(node)
+        self.Redraw222()
+        wx.SafeYield()
+
+    def stateofthespring(self):
+        self.coordmapper.Recalibrate()
+        self.AllToWorldCoords()
+        self.stateofthenation() # DON'T do overlap removal or it will get mad!
+                
     def RedrawEverything(self):
         diagram = self.GetDiagram()
         canvas = self
@@ -402,27 +462,16 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.frame.SetSize((oldSize[0]+1,oldSize[1]+1))
         self.frame.SetSize(oldSize)
 
-    def newRegion(self, font, name, textLst, maxWidth, totHeight = 10):
-        # Taken from Boa, but put into the canvas class instead of the scrolled window class.
-        region = ogl.ShapeRegion()
-        dc = wx.ClientDC(self)  # self is the canvas
-        dc.SetFont(font)
-
-        for text in textLst:
-            w, h = dc.GetTextExtent(text)
-            if w > maxWidth: maxWidth = w
-            totHeight = totHeight + h + 0 # interline padding
-
-        region.SetFont(font)
-        region.SetText('\n'.join(textLst))
-        #region._text = string.join(textLst, '\n')
-        region.SetName(name)
-
-        return region, maxWidth, totHeight
-
+    def ReLayout(self, keep_current_positions=False, gui=None, optimise=True):
+        self.AllToLayoutCoords()
+        self.layouter.layout(keep_current_positions, optimise=optimise)
+        self.AllToWorldCoords()
+        self.stage2() # does overlap removal and stateofthenation
     
     def LayoutAndPositionShapes(self):
-
+        self.ReLayout()
+        return
+    
         positions, shapeslist, newdiagramsize = self.layout.Layout(self.umlworkspace, self.umlboxshapes)
         print "Layout positions", positions
         
