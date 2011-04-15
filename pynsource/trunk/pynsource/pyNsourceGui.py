@@ -307,6 +307,13 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
                 # Record the name to shape map so that we can wire up the links later.
                 self.umlworkspace.classnametoshape[classname] = ds
+                
+                # New
+                node = self.umlworkspace.AddNode(classname)
+                node.top, node.left = getpos(ds)
+                node.shape = ds
+                shape.node = node
+
             else:
                 print 'Skipping', classname, 'already built shape...'
 
