@@ -130,9 +130,9 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
 
         #self.log.WriteText("%s\n" % self.GetShape())
         self.popupmenu = wx.Menu()     # Creating a menu
-        item = self.popupmenu.Append(2011, "Delete Node\tDel")
+        item = self.popupmenu.Append(wx.NewId(), "Delete Node\tDel")
         self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item) # Not sure why but passing item is needed.  Not to find the menu item later, but to avoid crashes?  try two right click deletes followed by main menu edit/delete.  Official Bind 3rd parameter DOCO:  menu source - Sometimes the event originates from a different window than self, but you still want to catch it in self. (For example, a button event delivered to a frame.) By passing the source of the event, the event handling system is able to differentiate between the same event type from different controls.
-        item = self.popupmenu.Append(2012, "Cancel")
+        item = self.popupmenu.Append(wx.NewId(), "Cancel")
         self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
         self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
 
@@ -146,9 +146,10 @@ from gen_java import PySourceAsJava
 from umlworkspace import UmlWorkspace
 from layout_basic import LayoutBasic
 
+from snapshots import GraphSnapshotMgr
 from layout_spring import GraphLayoutSpring
 from overlap_removal import OverlapRemoval
-#from blackboard import LayoutBlackboard
+from blackboard import LayoutBlackboard
 from coordinate_mapper import CoordinateMapper
 
 class UmlShapeCanvas(ogl.ShapeCanvas):
@@ -173,6 +174,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
         self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
+        self.Bind(wx.EVT_CHAR, self.onKeyChar)
         self.working = False
 
         self.font1 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
@@ -183,6 +185,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         #self.layout = LayoutBasic(leftmargin=0, topmargin=0, verticalwhitespace=0, horizontalwhitespace=0, maxclassesperline=5)
         self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
 
+        self.snapshot_mgr = GraphSnapshotMgr(graph=self.umlworkspace.graph, controller=self)
         self.coordmapper = CoordinateMapper(self.umlworkspace.graph, self.GetSize())
         self.layouter = GraphLayoutSpring(self.umlworkspace.graph, gui=self)
         self.overlap_remover = OverlapRemoval(self.umlworkspace.graph, margin=50, gui=self)
@@ -234,6 +237,54 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
                 self.CmdZapShape(shape)
         self.working = False
         event.Skip()
+
+    def onKeyChar(self, event):
+        if event.GetKeyCode() >= 256:
+            event.Skip()
+            return
+        if self.working:
+            event.Skip()
+            return
+        self.working = True
+        
+        keycode = chr(event.GetKeyCode())
+
+        if keycode == 'q':
+            self.NewEdgeMarkFrom()
+
+        elif keycode == 'w':
+            self.NewEdgeMarkTo()
+            
+        elif keycode == '(':
+            self.snapshot_mgr.QuickSave(slot=1)
+            
+        elif keycode == ')':
+            self.snapshot_mgr.QuickSave(slot=2)
+
+        elif keycode == '9':
+            self.snapshot_mgr.QuickRestore(slot=1)
+
+        elif keycode == '0':
+            self.snapshot_mgr.QuickRestore(slot=2)
+
+        elif keycode in ['1','2','3','4','5','6','7','8']:
+            todisplay = ord(keycode) - ord('1')
+            self.snapshot_mgr.Restore(todisplay)
+
+        elif keycode in ['b', 'B']:
+            b = LayoutBlackboard(graph=self.umlworkspace.graph, controller=self)
+            b.LayoutMultipleChooseBest(4)
+            
+        self.working = False
+        event.Skip()
+
+    def DumpStatus(self):
+        #print "-"*50
+        print "scale", self.coordmapper.scale
+        print "line-line intersections", len(self.umlworkspace.graph.CountLineOverLineIntersections())
+        print "node-node overlaps", self.overlap_remover.CountOverlaps()
+        print "line-node crossings", self.umlworkspace.graph.CountLineOverNodeCrossings()['ALL']/2 #, self.graph.CountLineOverNodeCrossings()
+        print "bounds", self.umlworkspace.graph.GetBounds()
                 
     def CmdInsertNewNode(self):
         id = 'D' + str(random.randint(1,99))
@@ -266,6 +317,43 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.save_gdi = []
         
         self.umlworkspace.Clear()
+
+
+    def NewEdgeMarkFrom(self):
+        selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
+        if not selected:
+            print "Please select a node"
+            return
+        
+        self.new_edge_from = selected[0].node
+        print "From", self.new_edge_from.id
+
+    def NewEdgeMarkTo(self):
+        selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
+        if not selected:
+            print "Please select a node"
+            return
+        
+        tonode = selected[0].node
+        print "To", tonode.id
+        
+        if self.new_edge_from == None:
+            print "Please set from node first"
+            return
+        
+        if self.new_edge_from.id == tonode.id:
+            print "Can't link to self"
+            return
+        
+        if not self.umlworkspace.graph.FindNodeById(self.new_edge_from.id):
+            print "From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id
+            return
+        
+        edge = self.umlworkspace.graph.AddEdge(self.new_edge_from, tonode, weight=None)
+        self.CreateUmlEdge(edge)
+        self.stateofthenation()
+
+
 
     def ConvertParseModelToUmlModel(self, p):
         
@@ -736,8 +824,8 @@ class MainApp(wx.App):
         return True
 
     def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
-        self.umlwin.coordmapper.Recalibrate(self.frame.GetClientSize()) # may need to call self.CalcVirtSize() if scrolled window
-        #self.coordmapper.Recalibrate(self.frame.CalcVirtSize())
+        self.umlwin.coordmapper.Recalibrate(self.frame.GetClientSize()) # may need to call self.GetVirtualSize() if scrolled window
+        #self.umlwin.coordmapper.Recalibrate(self.umlwin.GetVirtualSize())
 
     def OnRightButtonMenu(self, event):   # Menu
         x, y = event.GetPosition()
@@ -778,11 +866,30 @@ class MainApp(wx.App):
         dlg.Destroy()
         
     def OnLoadGraphFromText(self, event):
-        eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
-        dialog = wx.TextEntryDialog ( None, 'Enter an node/edge persistence strings:', 'Create a new node', eg,  style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
+        #dlg = wx.TextEntryDialog(
+        #        self.frame, 'What is your favorite programming language?',
+        #        'Eh??', 'Python')
+        #
+        #dlg.SetValue("Python is the best!")
+        #
+        #if dlg.ShowModal() == wx.ID_OK:
+        #    print('You entered: %s\n' % dlg.GetValue())
+        #
+        #dlg.Destroy()
+        #
+        #
+        #dialog = wx.TextEntryDialog(None, "What kind of text would you like to enter?","Text Entry", "Default Value", style=wx.OK|wx.CANCEL)
+        #if dialog.ShowModal() == wx.ID_OK:
+        #    print "You entered: %s" % dialog.GetValue()
+        #dialog.Destroy()
+    
+        #eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
+        dialog = wx.TextEntryDialog (parent=self.frame, message='Enter node/edge persistence strings:', caption='Load Graph From Text', defaultValue="hi", style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
         if dialog.ShowModal() == wx.ID_OK:
             txt = dialog.GetValue()
+            print txt
             self.LoadGraph(txt)
+        dialog.Destroy()
             
     def OnLoadGraph(self, event):
         dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
@@ -827,11 +934,11 @@ class MainApp(wx.App):
         menu3 = wx.Menu()
         menu4 = wx.Menu()
 
-        self.next_menu_id = 200
+        self.next_menu_id = wx.NewId()
         def Add(menu, s1, s2, func):
             menu.Append(self.next_menu_id, s1, s2)
             wx.EVT_MENU(self, self.next_menu_id, func)
-            self.next_menu_id +=1
+            self.next_menu_id = wx.NewId()
 
         Add(menu1, "File &Import...\tCtrl-I", "Import Python Source Files", self.FileImport)
         Add(menu1, "File &Import yUml...\tCtrl-O", "Import Python Source Files", self.FileImport2)

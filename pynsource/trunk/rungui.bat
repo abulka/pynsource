@@ -1,1 +1,2 @@
-python pynsource\pynsourcegui.py
+cd pynsource
+python pynsourcegui.py

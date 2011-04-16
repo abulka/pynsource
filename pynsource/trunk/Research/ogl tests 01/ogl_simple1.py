@@ -30,7 +30,15 @@ class AppFrame(wx.Frame):
         self.SetAutoLayout(1)
         self.Show(1)
 
+        # test TextEntryDialog
+        dlg = wx.TextEntryDialog(
+                self, 'What is your favorite programming language?',
+                'Eh??', 'Python')
+        dlg.SetValue("Python is the best!")
+        if dlg.ShowModal() == wx.ID_OK:
+            print('You entered: %s\n' % dlg.GetValue())
 
+        dlg.Destroy()
 
 app = wx.PySimpleApp()
 ogl.OGLInitialize()
