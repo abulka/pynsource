@@ -92,8 +92,25 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         self.UpdateStatusBar(shape)
 
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
+        shape = self.GetShape()
+
+        # super        
         ogl.ShapeEvtHandler.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
+        
+        width, height = shape.GetBoundingBoxMin()
+        print shape.node, "resized to", width, height
+        #print shape.node.id, shape.node.left, shape.node.top, "resized to", width, height
+        # Adjust the GraphNode to match the shape x,y
+        shape.node.width, shape.node.height = width, height
+        shape.node.left, shape.node.top = getpos(shape)
+        
         self.UpdateStatusBar(self.GetShape())
+
+        #wx.SafeYield()
+        #time.sleep(0.2)
+        
+        shape.GetCanvas().stage2()
+        
 
     def OnMovePost(self, dc, x, y, oldX, oldY, display):
         shape = self.GetShape()
@@ -705,6 +722,7 @@ class MainApp(wx.App):
         
         self.popupmenu = None
         self.umlwin.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)
+        self.Bind(wx.EVT_SIZE, self.OnResizeFrame)
 
         # Debug bootstrap  --------------------------------------
         #self.frame.SetSize((1024,768))
@@ -716,6 +734,10 @@ class MainApp(wx.App):
 
         # END Debug bootstrap --------------------------------------
         return True
+
+    def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
+        self.umlwin.coordmapper.Recalibrate(self.frame.GetClientSize()) # may need to call self.CalcVirtSize() if scrolled window
+        #self.coordmapper.Recalibrate(self.frame.CalcVirtSize())
 
     def OnRightButtonMenu(self, event):   # Menu
         x, y = event.GetPosition()
