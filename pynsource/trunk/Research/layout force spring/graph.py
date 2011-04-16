@@ -72,8 +72,9 @@ class Graph:
             #print data
             data = eval(data)
             if data['type'] == 'node':
-                node = GraphNode(data['id'], data['x'], data['y'], data['width'], data['height'])
+                node = self.NotifyCreateNewNode(data['id'], data['x'], data['y'], data['width'], data['height'])
                 self.AddNode(node)
+                self.NotifyOfNodeCreateFromPersistence(node, data)
             elif data['type'] == 'edge':
                 source_id = data['source']
                 target_id = data['target']
@@ -86,19 +87,39 @@ class Graph:
                     print "Couldn't load target from persistence", target_id
                     continue
                 weight = data.get('weight', None)
-                self.AddEdge(sourcenode, targetnode, weight)  # AddEdge takes node objects as parameters
+                edge = self.AddEdge(sourcenode, targetnode, weight)  # AddEdge takes node objects as parameters
+                self.NotifyOfEdgeCreateFromPersistence(edge, data)
 
     def GraphToString(self):
         nodes = ""
         edges = ""
         for node in self.nodes:
-            nodes += "{'type':'node', 'id':'%s', 'x':%d, 'y':%d, 'width':%d, 'height':%d}\n" % (node.id, node.left, node.top, node.width, node.height)
+            subclass_persistence_str = self.NotifyOfNodeBeingPersisted(node)
+            str = "{'type':'node', 'id':'%s', 'x':%d, 'y':%d, 'width':%d, 'height':%d%s}\n" % (node.id, node.left, node.top, node.width, node.height, subclass_persistence_str)
+            nodes += str
         for edge in self.edges:
             source = edge['source'].id
             target = edge['target'].id
-            edges += "{'type':'edge', 'id':'%s_to_%s', 'source':'%s', 'target':'%s'}\n" % (source, target, source, target)
+            subclass_persistence_str = self.NotifyOfEdgeBeingPersisted(edge)
+            str = "{'type':'edge', 'id':'%s_to_%s', 'source':'%s', 'target':'%s'%s}\n" % (source, target, source, target, subclass_persistence_str)
+            edges += str
         return nodes + edges
 
+    def NotifyCreateNewNode(self, id, l, t, w, h):
+        return GraphNode(id, l, t, w, h) # subclasses to override, opportunity to create different instance type
+    
+    def NotifyOfNodeBeingPersisted(self, node):
+        return ""  # subclasses to override, opportunity to inject additional persistence dict info
+
+    def NotifyOfEdgeBeingPersisted(self, edge):
+        return ""  # subclasses to override, opportunity to inject additional persistence dict info
+    
+    def NotifyOfNodeCreateFromPersistence(self, node, data):
+        pass    # subclasses to override, opportunity to add attributes to node, by ref
+
+    def NotifyOfEdgeCreateFromPersistence(self, edge, data):
+        pass    # subclasses to override, opportunity to add attributes to edge, by ref
+    
     def GetMementoOfLayoutPoints(self):
         memento = {}
         for node in self.nodes:

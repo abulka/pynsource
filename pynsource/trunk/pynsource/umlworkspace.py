@@ -7,6 +7,32 @@ import sys
 sys.path.append("../Research/layout force spring")
 from graph import Graph, GraphNode
 
+class UmlGraph(Graph):
+
+    def NotifyCreateNewNode(self, id, l, t, w, h):
+        # subclasses overriding, opportunity to create different instance type
+        return UmlNode(id, l, t, w, h)
+
+    def NotifyOfNodeBeingPersisted(self, node):
+        # subclass overriding, opportunity to inject additional persistence dict info
+        return ", 'attrs':'%s', 'meths':'%s'" % ('|'.join(node.attrs), '|'.join(node.meths))
+
+    def NotifyOfEdgeBeingPersisted(self, edge):
+        # subclass overriding, opportunity to inject additional persistence dict info
+        return ", 'uml_edge_type':'%s'" % (edge['uml_edge_type'])
+
+    def NotifyOfNodeCreateFromPersistence(self, node, data):
+        # subclass overriding, opportunity to add attributes to node
+        if data.get('attrs', ""):
+            node.attrs = data['attrs'].split('|')
+        if data.get('meths', ""):
+            node.meths = data['meths'].split('|')
+
+    def NotifyOfEdgeCreateFromPersistence(self, edge, data):
+        # subclass overriding, opportunity to add attributes to edge
+        if data.get('uml_edge_type', ""):
+            edge['uml_edge_type'] = data['uml_edge_type']
+    
 class UmlNode(GraphNode):
     def __init__(self, id, left, top, width=60, height=60, attrs=[], meths=[]):
         GraphNode.__init__(self, id, left, top, width=60, height=60)
@@ -21,7 +47,7 @@ class UmlNode(GraphNode):
     
 class UmlWorkspace:
     def __init__(self):
-        self.graph = Graph()
+        self.graph = UmlGraph()
         self.Clear()
         
     def Clear(self):

@@ -178,21 +178,35 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
-        #if event.ShiftDown():
 
         if self.working:
             event.Skip()
             return
         self.working = True
 
+
         if keycode == wx.WXK_DOWN:
-            print "DOWN"
-        elif keycode == wx.WXK_RIGHT:
-            print "RIGHT"
-        elif keycode == wx.WXK_LEFT:
-            print "LEFT"
+            optimise = not event.ShiftDown()
+            self.ReLayout(keep_current_positions=True, gui=self, optimise=optimise)
+
         elif keycode == wx.WXK_UP:
-            print "UP"
+            optimise = not event.ShiftDown()
+            self.ReLayout(keep_current_positions=False, gui=self, optimise=optimise)
+            
+        elif keycode == wx.WXK_RIGHT:
+            if self.coordmapper.scale > 0.8:
+                self.ChangeScale(-0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
+                print "expansion ", self.coordmapper.scale
+            else:
+                print "Max expansion prevented.", self.coordmapper.scale
+            
+        elif keycode == wx.WXK_LEFT:
+            if self.coordmapper.scale < 3:
+                self.ChangeScale(0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
+                print "contraction ", self.coordmapper.scale
+            else:
+                print "Min expansion thwarted.", self.coordmapper.scale
+
         elif keycode == wx.WXK_INSERT:
             self.CmdInsertNewNode()
         elif keycode == wx.WXK_DELETE:
@@ -404,6 +418,17 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             self.stateofthenation()
 
         self.working = False
+        
+    def ChangeScale(self, delta, remap_world_to_layout=False, removeoverlaps=True):
+        if remap_world_to_layout:
+            self.AllToLayoutCoords()    # Experimental - only needed when you've done world coord changes 
+        self.coordmapper.Recalibrate(scale=self.coordmapper.scale+delta)
+        self.AllToWorldCoords()
+        numoverlaps = self.overlap_remover.CountOverlaps()
+        if removeoverlaps:
+            self.stage2(force_stateofthenation=True, watch_removals=False) # does overlap removal and stateofthenation
+        else:
+            self.stateofthenation()
         
     def stage1(self, translatecoords=True):         # FROM SPRING LAYOUT
         #if translatecoords:
@@ -699,6 +724,14 @@ class MainApp(wx.App):
             self.popupmenu.Destroy()    # wx.Menu objects need to be explicitly destroyed (e.g. menu.Destroy()) in this situation. Otherwise, they will rack up the USER Objects count on Windows; eventually crashing a program when USER Objects is maxed out. -- U. Artie Eoff  http://wiki.wxpython.org/index.cgi/PopupMenuOnRightClick
         self.popupmenu = wx.Menu()     # Create a menu
         
+        item = self.popupmenu.Append(wx.NewId(), "Load Graph from text...")
+        self.frame.Bind(wx.EVT_MENU, self.OnLoadGraphFromText, item)
+        
+        item = self.popupmenu.Append(wx.NewId(), "Dump Graph to console")
+        self.frame.Bind(wx.EVT_MENU, self.OnSaveGraphToConsole, item)
+
+        self.popupmenu.AppendSeparator()
+
         item = self.popupmenu.Append(wx.NewId(), "BuildGraphFromUmlWorkspace")
         self.frame.Bind(wx.EVT_MENU, self.OnBuildGraphFromUmlWorkspace, item)
 
@@ -708,6 +741,52 @@ class MainApp(wx.App):
         #self.MessageBox("OnBuildGraphFromUmlWorkspace")
         self.umlwin.umlworkspace.BuildGraphFromUmlWorkspace()
 
+    def OnSaveGraphToConsole(self, event):
+        print self.umlwin.umlworkspace.graph.GraphToString()
+
+    def OnSaveGraph(self, event):
+        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
+            defaultFile="", wildcard="*.txt", style=wx.FD_SAVE, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            filename = dlg.GetPath()
+            
+            fp = open(filename, "w")
+            fp.write(self.umlwin.umlworkspace.graph.GraphToString())
+            fp.close()
+        dlg.Destroy()
+        
+    def OnLoadGraphFromText(self, event):
+        eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
+        dialog = wx.TextEntryDialog ( None, 'Enter an node/edge persistence strings:', 'Create a new node', eg,  style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
+        if dialog.ShowModal() == wx.ID_OK:
+            txt = dialog.GetValue()
+            self.LoadGraph(txt)
+            
+    def OnLoadGraph(self, event):
+        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
+            defaultFile="", wildcard="*.txt", style=wx.OPEN, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            filename = dlg.GetPath()
+
+            fp = open(filename, "r")
+            s = fp.read()
+            fp.close()
+
+            self.LoadGraph(s)
+        dlg.Destroy()
+
+    def LoadGraph(self, filedata=""):
+        self.umlwin.Clear()
+        
+        self.umlwin.umlworkspace.graph.LoadGraphFromStrings(filedata)
+                
+        # build view from model
+        self.umlwin.stage1(translatecoords=False)
+        
+        # refresh view
+        self.umlwin.GetDiagram().ShowAll(1) # need this, yes
+        self.umlwin.stateofthenation()
+        
     def OnTabPageChanged(self, event):
         if event.GetSelection() == 0:  # ogl
             pass
