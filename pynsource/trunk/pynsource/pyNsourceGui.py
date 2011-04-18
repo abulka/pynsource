@@ -409,9 +409,24 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
               
     def CreateUmlShape(self, node):
 
+        if IMAGENODES:
+            #print os.path.dirname( os.path.abspath( __file__ ) )
+            #print os.path.relpath( __file__ )
+            F = 'Research\\wx doco\\Images\\SPLASHSCREEN.BMP'
+            # wx.ImageFromBitmap(bitmap) and wx.BitmapFromImage(image)
+            shape = ogl.BitmapShape()
+            img = wx.Image(F, wx.BITMAP_TYPE_ANY)
+            bmp = wx.BitmapFromImage(img)
+            shape.SetBitmap(bmp)
+            
+            
         def newRegion(font, name, textLst, maxWidth, totHeight = 10):
             # Taken from Boa, but put into the canvas class instead of the scrolled window class.
             region = ogl.ShapeRegion()
+            
+            if len(textLst) == 0:
+                return region, maxWidth, 0
+                
             dc = wx.ClientDC(self)  # self is the canvas
             dc.SetFont(font)
     
@@ -422,71 +437,102 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
     
             region.SetFont(font)
             region.SetText('\n'.join(textLst))
-            #region._text = string.join(textLst, '\n')
             region.SetName(name)
     
             return region, maxWidth, totHeight
 
-        if len(node.attrs) == 0 and len(node.meths) == 0:
-            rRectBrush = wx.Brush("MEDIUM TURQUOISE", wx.SOLID)
-            dsBrush = wx.Brush("WHEAT", wx.SOLID)
-            shape = self.DecorateShape(DividedShapeSmall(100, 30, self), 50, 145, wx.BLACK_PEN, dsBrush, '')
-            shape.BuildRegions(canvas=self)  # build the one region
-            shape.SetCentreResize(0)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
-            shape.region1.SetText(node.classname)
-            shape.ReformatRegions()
-        else:
-            if not IMAGENODES:
-                shape = DividedShape(width=100, height=150, canvas=self)
-            else:
-                #print os.path.dirname( os.path.abspath( __file__ ) )
-                #print os.path.relpath( __file__ )
-                F = 'Research\\wx doco\\Images\\SPLASHSCREEN.BMP'
-                # wx.ImageFromBitmap(bitmap) and wx.BitmapFromImage(image)
-                shape = ogl.BitmapShape()
-                img = wx.Image(F, wx.BITMAP_TYPE_ANY)
-                bmp = wx.BitmapFromImage(img)
-                shape.SetBitmap(bmp)
-    
-            pos = (50,50)
-            maxWidth = 10 #padding
-            #if not self.showAttributes: classAttrs = [' ']
-            #if not self.showMethods: classMeths = [' ']
-    
-            regionName, maxWidth, nameHeight = newRegion(self.font1, 'class_name', [node.classname], maxWidth)
-            regionAttribs, maxWidth, attribsHeight = newRegion(self.font2, 'attributes', node.attrs, maxWidth)
-            regionMeths, maxWidth, methsHeight = newRegion(self.font2, 'methods', node.meths, maxWidth)
-    
-            totHeight = nameHeight + attribsHeight + methsHeight
-    
-            regionName.SetProportions(0.0, 1.0*(nameHeight/float(totHeight)))
-            regionAttribs.SetProportions(0.0, 1.0*(attribsHeight/float(totHeight)))
-            regionMeths.SetProportions(0.0, 1.0*(methsHeight/float(totHeight)))
-    
-            regionName.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
-            shape.region1 = regionName  # Andy added, for later external reference to classname from just having the shap instance.
-    
-            shape.AddRegion(regionName)
-            shape.AddRegion(regionAttribs)
-            shape.AddRegion(regionMeths)
-    
-            shape.SetSize(maxWidth + 10, totHeight + 10)
-    
-            if not IMAGENODES:
-                shape.SetRegionSizes()
-    
-            dsBrush = wx.Brush("WHEAT", wx.SOLID)
-            self.DecorateShape(shape, pos[0], pos[1], wx.BLACK_PEN, dsBrush, '')
-            
-            if not IMAGENODES:
-                shape.FlushText()
+        shape = DividedShape(width=100, height=150, canvas=self)
 
-        # New
-        node.top, node.left = getpos(shape)
+        pos = (node.left, node.top)
+        maxWidth = 10 # min node width, grows as we update it with text widths
+        
+        """
+        Future: Perhaps be able to show regions or not. Might need to totally
+        reconstruct the shape.
+        """
+        #if not self.showAttributes: classAttrs = [' ']
+        #if not self.showMethods: classMeths = [' ']
+
+        # Create each region.  If height returned is 0 this means don't create this region.
+        regionName, maxWidth, nameHeight = newRegion(self.font1, 'class_name', [node.classname], maxWidth)
+        regionAttribs, maxWidth, attribsHeight = newRegion(self.font2, 'attributes', node.attrs, maxWidth)
+        regionMeths, maxWidth, methsHeight = newRegion(self.font2, 'methods', node.meths, maxWidth)
+
+        # Work out total height of shape
+        totHeight = nameHeight + attribsHeight + methsHeight
+
+        # Set regions to be a proportion of the total height of shape
+        regionName.SetProportions(0.0, 1.0*(nameHeight/float(totHeight)))
+        regionAttribs.SetProportions(0.0, 1.0*(attribsHeight/float(totHeight)))
+        regionMeths.SetProportions(0.0, 1.0*(methsHeight/float(totHeight)))
+
+        # Add regions to the shape
+        shape.AddRegion(regionName)
+        if attribsHeight:   # Dont' make a region unless we have to
+            shape.AddRegion(regionAttribs)
+        if methsHeight:     # Dont' make a region unless we have to
+            shape.AddRegion(regionMeths)
+
+        shape.SetSize(maxWidth + 10, totHeight + 10)
+        shape.SetCentreResize(False)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
+
+        regionName.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
+        shape.region1 = regionName  # Andy added, for later external reference to classname from just having the shape instance.
+        dsBrush = wx.Brush("WHEAT", wx.SOLID)
+        
+        # TODO: Should merge decorate shape into here....
+        self.DecorateShape(shape, pos[0], pos[1], wx.BLACK_PEN, dsBrush, '')
+        
+        if not IMAGENODES:
+            shape.FlushText()
+
+        # Don't set the node left,top here as the shape needs to conform to the node.
+        # On the other hand the node needs to conform to the shape's width,height.
         node.width, node.height = shape.GetBoundingBoxMax()
         node.shape = shape
         shape.node = node
         return shape
+
+    def DecorateShape(self, shape, x, y, pen, brush, text):
+        # Composites have to be moved for all children to get in place
+        if isinstance(shape, ogl.CompositeShape):
+            dc = wx.ClientDC(self)
+            self.PrepareDC(dc)
+            shape.Move(dc, x, y)  # do we need all this here?
+        else:
+            shape.SetDraggable(True, True)
+        shape.SetCanvas(self)
+        shape.SetX(x)
+        shape.SetY(y)
+        if pen:    shape.SetPen(pen)
+        if brush:  shape.SetBrush(brush)
+        if text:
+            for line in text.split('\n'):
+                shape.AddText(line)
+        self.GetDiagram().AddShape(shape)
+        shape.Show(True)
+
+        evthandler = MyEvtHandler(self.log, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
+        evthandler.SetShape(shape)
+        evthandler.SetPreviousHandler(shape.GetEventHandler())
+        shape.SetEventHandler(evthandler)
+
+        return shape
+    
+    def createNodeShape(self, node):     # FROM SPRING LAYOUT
+        shape = ogl.RectangleShape( node.width, node.height )
+        shape.AddText(node.id)
+        setpos(shape, node.left, node.top)
+        #shape.SetDraggable(True, True)
+        self.AddShape( shape )
+        node.shape = shape
+        shape.node = node
+        
+        # wire in the event handler for the new shape
+        evthandler = MyEvtHandler(None, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
+        evthandler.SetShape(shape)
+        evthandler.SetPreviousHandler(shape.GetEventHandler())
+        shape.SetEventHandler(evthandler)
 
     def CreateUmlEdge(self, edge):
         fromShape = edge['source'].shape
@@ -536,8 +582,8 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             self.stateofthenation()
         
     def stage1(self, translatecoords=True):         # FROM SPRING LAYOUT
-        #if translatecoords:
-        #    self.AllToWorldCoords()
+        if translatecoords:
+            self.AllToWorldCoords()
 
         for node in self.umlworkspace.graph.nodes:
             shape = self.CreateUmlShape(node)
@@ -547,7 +593,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         for edge in self.umlworkspace.graph.edges:
             self.CreateUmlEdge(edge)
 
-        #self.Redraw222()
+        self.Redraw222()
 
     def stage2(self, force_stateofthenation=False, watch_removals=True):
         ANIMATION = False
@@ -634,46 +680,6 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         canvas = self
         canvas.SetSize(canvas.GetVirtualSize())
 
-    def DecorateShape(self, shape, x, y, pen, brush, text):
-        # Composites have to be moved for all children to get in place
-        if isinstance(shape, ogl.CompositeShape):
-            dc = wx.ClientDC(self)
-            self.PrepareDC(dc)
-            shape.Move(dc, x, y)
-        else:
-            shape.SetDraggable(True, True)
-        shape.SetCanvas(self)
-        shape.SetX(x)
-        shape.SetY(y)
-        if pen:    shape.SetPen(pen)
-        if brush:  shape.SetBrush(brush)
-        if text:
-            for line in text.split('\n'):
-                shape.AddText(line)
-        self.GetDiagram().AddShape(shape)
-        shape.Show(True)
-
-        evthandler = MyEvtHandler(self.log, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
-        evthandler.SetShape(shape)
-        evthandler.SetPreviousHandler(shape.GetEventHandler())
-        shape.SetEventHandler(evthandler)
-
-        return shape
-    
-    def createNodeShape(self, node):     # FROM SPRING LAYOUT
-        shape = ogl.RectangleShape( node.width, node.height )
-        shape.AddText(node.id)
-        setpos(shape, node.left, node.top)
-        #shape.SetDraggable(True, True)
-        self.AddShape( shape )
-        node.shape = shape
-        shape.node = node
-        
-        # wire in the event handler for the new shape
-        evthandler = MyEvtHandler(None, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
-        evthandler.SetShape(shape)
-        evthandler.SetPreviousHandler(shape.GetEventHandler())
-        shape.SetEventHandler(evthandler)
 
     def AdjustShapePosition(self, node, point=None):   # FROM SPRING LAYOUT
         assert node.shape
@@ -826,7 +832,8 @@ class MainApp(wx.App):
     def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
         self.umlwin.coordmapper.Recalibrate(self.frame.GetClientSize()) # may need to call self.GetVirtualSize() if scrolled window
         #self.umlwin.coordmapper.Recalibrate(self.umlwin.GetVirtualSize())
-
+        event.Skip()
+        
     def OnRightButtonMenu(self, event):   # Menu
         x, y = event.GetPosition()
         
@@ -866,25 +873,8 @@ class MainApp(wx.App):
         dlg.Destroy()
         
     def OnLoadGraphFromText(self, event):
-        #dlg = wx.TextEntryDialog(
-        #        self.frame, 'What is your favorite programming language?',
-        #        'Eh??', 'Python')
-        #
-        #dlg.SetValue("Python is the best!")
-        #
-        #if dlg.ShowModal() == wx.ID_OK:
-        #    print('You entered: %s\n' % dlg.GetValue())
-        #
-        #dlg.Destroy()
-        #
-        #
-        #dialog = wx.TextEntryDialog(None, "What kind of text would you like to enter?","Text Entry", "Default Value", style=wx.OK|wx.CANCEL)
-        #if dialog.ShowModal() == wx.ID_OK:
-        #    print "You entered: %s" % dialog.GetValue()
-        #dialog.Destroy()
-    
-        #eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
-        dialog = wx.TextEntryDialog (parent=self.frame, message='Enter node/edge persistence strings:', caption='Load Graph From Text', defaultValue="hi", style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
+        eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
+        dialog = wx.TextEntryDialog (parent=self.frame, message='Enter node/edge persistence strings:', caption='Load Graph From Text', defaultValue=eg, style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
         if dialog.ShowModal() == wx.ID_OK:
             txt = dialog.GetValue()
             print txt
