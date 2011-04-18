@@ -274,6 +274,9 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         elif keycode in ['b', 'B']:
             b = LayoutBlackboard(graph=self.umlworkspace.graph, controller=self)
             b.LayoutMultipleChooseBest(4)
+
+        elif keycode in ['l', 'L']:
+            self.CmdLayout()
             
         self.working = False
         event.Skip()
@@ -586,14 +589,11 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             if node.shape:
                 self._ZapShape(node.shape)
                 node.shape = None
-                print 'node', node.id, 'cleared of shape'
 
         # Create fresh visualisation
         for node in self.umlworkspace.graph.nodes:
-            print 'node', node.id, 'shape is', node.shape
             assert not node.shape
             shape = self.CreateUmlShape(node)
-            print 'created shape for node', node.id
             self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             
         for edge in self.umlworkspace.graph.edges:
@@ -643,6 +643,14 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         oldSize = self.frame.GetSize()
         self.frame.SetSize((oldSize[0]+1,oldSize[1]+1))
         self.frame.SetSize(oldSize)
+
+    def CmdLayout(self):
+        if self.GetDiagram().GetCount() == 0:
+            #self.frame.MessageBox("Nothing to layout.  Import a python source file first.")
+            return
+        
+        self.LayoutAndPositionShapes()
+        self.RedrawEverything()
 
     def ReLayout(self, keep_current_positions=False, gui=None, optimise=True):
         self.AllToLayoutCoords()
@@ -827,11 +835,10 @@ class MainApp(wx.App):
         # Debug bootstrap  --------------------------------------
         #self.frame.SetSize((1024,768))
         #self.umlwin.Go(files=[os.path.abspath( __file__ )])
+        
         self.umlwin.Go(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
         self.umlwin.RedrawEverything()
-
-        self.umlwin.umlworkspace.Dump()
-
+        #self.umlwin.umlworkspace.Dump()
         # END Debug bootstrap --------------------------------------
         return True
 
@@ -855,6 +862,14 @@ class MainApp(wx.App):
 
         self.popupmenu.AppendSeparator()
 
+        item = self.popupmenu.Append(wx.NewId(), "Load Graph...")
+        self.frame.Bind(wx.EVT_MENU, self.OnLoadGraph, item)
+
+        item = self.popupmenu.Append(wx.NewId(), "Save Graph...")
+        self.frame.Bind(wx.EVT_MENU, self.OnSaveGraph, item)
+
+        self.popupmenu.AppendSeparator()
+
         item = self.popupmenu.Append(wx.NewId(), "DumpUmlWorkspace")
         self.frame.Bind(wx.EVT_MENU, self.OnDumpUmlWorkspace, item)
 
@@ -870,7 +885,7 @@ class MainApp(wx.App):
         print self.umlwin.umlworkspace.graph.GraphToString()
 
     def OnSaveGraph(self, event):
-        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
+        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.\\saved uml workspaces',
             defaultFile="", wildcard="*.txt", style=wx.FD_SAVE, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
@@ -890,7 +905,7 @@ class MainApp(wx.App):
         dialog.Destroy()
             
     def OnLoadGraph(self, event):
-        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
+        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.\\saved uml workspaces',
             defaultFile="", wildcard="*.txt", style=wx.OPEN, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
@@ -950,7 +965,7 @@ class MainApp(wx.App):
         
         Add(menu2, "&Delete Class\tDel", "Delete Node", self.OnDeleteNode)
         
-        Add(menu3, "&Layout UML", "Layout UML", self.OnLayout)
+        Add(menu3, "&Layout UML\tL", "Layout UML", self.OnLayout)
         Add(menu3, "&Refresh", "Refresh", self.OnRefreshUmlWindow)
         
         Add(menu4, "&Help...", "Help", self.OnHelp)
@@ -1099,13 +1114,8 @@ class MainApp(wx.App):
                 self.umlwin.CmdZapShape(shape)
 
     def OnLayout(self, event):
-        if self.umlwin.GetDiagram().GetCount() == 0:
-            self.MessageBox("Nothing to layout.  Import a python source file first.")
-            return
+        self.umlwin.CmdLayout()
         
-        self.umlwin.LayoutAndPositionShapes()
-        self.umlwin.RedrawEverything()
-
     def OnRefreshUmlWindow(self, event):
         self.umlwin.RedrawEverything()
 

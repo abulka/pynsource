@@ -69,6 +69,8 @@ class Graph:
             data = data.strip()
             if not data:
                 continue
+            if data[0] == '#':
+                continue
             #print data
             data = eval(data)
             if data['type'] == 'node':

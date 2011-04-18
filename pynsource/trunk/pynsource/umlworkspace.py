@@ -99,7 +99,7 @@ class UmlWorkspace:
         node = self.graph.FindNodeById(id)
         if node:
             # could merge the nodes and their attributes etc. ?
-            print 'Skipping', node.classname, 'already built shape...'
+            #print 'Skipping', node.classname, 'already built shape...'
             return node
         t,l,w,h = random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160)
         node = UmlNode(id, t, l, w, h, attrs=attrs, meths=meths)
