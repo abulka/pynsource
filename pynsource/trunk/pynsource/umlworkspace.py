@@ -38,6 +38,7 @@ class UmlNode(GraphNode):
         GraphNode.__init__(self, id, left, top, width=60, height=60)
         self.attrs = attrs
         self.meths = meths
+        self.shape = None
 
     def get_id(self):
         return self.id
@@ -66,6 +67,9 @@ class UmlWorkspace:
                 print 'found class to delete: ', classname
                 break
 
+        self.graph.DeleteNodeById(shape.node.id)
+        print 'delete node shape.node.id', shape.node.id
+
         del self.classnametoshape[classname]
         """
         Too hard to remove the classname from these structures since these are tuples
@@ -77,21 +81,20 @@ class UmlWorkspace:
         #    self.associations_composition.remove(shape)
 
     def Dump(self):
-        # Debug
+        def line(ch='-'):
+            return ch*70
         from pprint import pprint
-        print "="*80, "DUMP UML KNOWLEDGE: classnametoshape"
+        print line('*'), "DUMP UML KNOWLEDGE: classnametoshape"
         pprint(self.classnametoshape)
-        print "="*80, "associations_generalisation (class, parent)"
+        print line(), "associations_generalisation (class, parent)"
         pprint(self.associations_generalisation)
-        print "="*80, "associations_composition (to, from)"
+        print line(), "associations_composition (to, from)"
         pprint(self.associations_composition)
-        print "======================"
-
-    def BuildGraphFromUmlWorkspace(self):
-        print self.graph
+        print line('='), self.graph
         for node in self.graph.nodes:
-            print node
-        
+            pprint(node)
+        print line('-')
+
     def AddUmlNode(self, id, attrs=[], meths=[]):
         node = self.graph.FindNodeById(id)
         if node:
@@ -103,7 +106,7 @@ class UmlWorkspace:
         node = self.graph.AddNode(node)
         return node
 
-    def AddNode(self, id):
+    def AddSimpleNode(self, id):
         if self.graph.FindNodeById(id):
             id += str(random.randint(1,9999))
         t,l,w,h = random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160)

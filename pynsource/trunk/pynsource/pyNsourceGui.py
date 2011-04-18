@@ -291,7 +291,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         dialog = wx.TextEntryDialog ( None, 'Enter an id string:', 'Create a new node', id )
         if dialog.ShowModal() == wx.ID_OK:
             id = dialog.GetValue()
-            node = self.umlworkspace.AddNode(id)
+            node = self.umlworkspace.AddSimpleNode(id)
             self.createNodeShape(node)
             node.shape.Show(True)
             self.stateofthenation()
@@ -301,7 +301,10 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         
         # Model/Uml related....
         self.umlworkspace.DeleteShape(shape)
-
+        # Delete View
+        self._ZapShape(shape)
+        
+    def _ZapShape(self, shape):
         # View
         self.DeselectAllShapes()
         for line in shape.GetLines()[:]:
@@ -392,7 +395,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
     def Go(self, files=None, path=None):
 
         # these are tuples between class names.
-        self.umlworkspace.ClearAssociations()
+        self.umlworkspace.ClearAssociations()       # WHY DO WE WANT TO DESTROY THIS VALUABLE INFO?
 
         if files:
             for f in files:
@@ -578,7 +581,17 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         if translatecoords:
             self.AllToWorldCoords()
 
+        # Clear existing visualisation
         for node in self.umlworkspace.graph.nodes:
+            if node.shape:
+                self._ZapShape(node.shape)
+                node.shape = None
+                print 'node', node.id, 'cleared of shape'
+
+        # Create fresh visualisation
+        for node in self.umlworkspace.graph.nodes:
+            print 'node', node.id, 'shape is', node.shape
+            assert not node.shape
             shape = self.CreateUmlShape(node)
             print 'created shape for node', node.id
             self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
@@ -817,7 +830,7 @@ class MainApp(wx.App):
         self.umlwin.Go(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
         self.umlwin.RedrawEverything()
 
-        self.umlwin.umlworkspace.BuildGraphFromUmlWorkspace()
+        self.umlwin.umlworkspace.Dump()
 
         # END Debug bootstrap --------------------------------------
         return True
@@ -842,14 +855,16 @@ class MainApp(wx.App):
 
         self.popupmenu.AppendSeparator()
 
-        item = self.popupmenu.Append(wx.NewId(), "BuildGraphFromUmlWorkspace")
-        self.frame.Bind(wx.EVT_MENU, self.OnBuildGraphFromUmlWorkspace, item)
+        item = self.popupmenu.Append(wx.NewId(), "DumpUmlWorkspace")
+        self.frame.Bind(wx.EVT_MENU, self.OnDumpUmlWorkspace, item)
 
         self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
         
-    def OnBuildGraphFromUmlWorkspace(self, event):
+    def OnDumpUmlWorkspace(self, event):
         #self.MessageBox("OnBuildGraphFromUmlWorkspace")
-        self.umlwin.umlworkspace.BuildGraphFromUmlWorkspace()
+        self.umlwin.umlworkspace.Dump()
+        for shape in self.umlwin.umlboxshapes:
+            print 'shape', shape, shape.node.classname
 
     def OnSaveGraphToConsole(self, event):
         print self.umlwin.umlworkspace.graph.GraphToString()
