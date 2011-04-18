@@ -410,14 +410,27 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
     def CreateUmlShape(self, node):
 
         if IMAGENODES:
-            #print os.path.dirname( os.path.abspath( __file__ ) )
-            #print os.path.relpath( __file__ )
-            F = 'Research\\wx doco\\Images\\SPLASHSCREEN.BMP'
+            curr_dir = os.path.dirname( os.path.abspath( __file__ ) )
+            F = os.path.join(curr_dir, '..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP')
             # wx.ImageFromBitmap(bitmap) and wx.BitmapFromImage(image)
             shape = ogl.BitmapShape()
             img = wx.Image(F, wx.BITMAP_TYPE_ANY)
             bmp = wx.BitmapFromImage(img)
             shape.SetBitmap(bmp)
+
+            self.GetDiagram().AddShape(shape)
+            shape.Show(True)
+    
+            evthandler = MyEvtHandler(self.log, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
+            evthandler.SetShape(shape)
+            evthandler.SetPreviousHandler(shape.GetEventHandler())
+            shape.SetEventHandler(evthandler)
+
+            setpos(shape, node.left, node.top)
+            node.width, node.height = shape.GetBoundingBoxMax()
+            node.shape = shape
+            shape.node = node
+            return shape
             
             
         def newRegion(font, name, textLst, maxWidth, totHeight = 10):
@@ -441,9 +454,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
     
             return region, maxWidth, totHeight
 
-        shape = DividedShape(width=100, height=150, canvas=self)
-
-        pos = (node.left, node.top)
+        shape = DividedShape(width=99, height=98, canvas=self)
         maxWidth = 10 # min node width, grows as we update it with text widths
         
         """
@@ -478,13 +489,20 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
         regionName.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
         shape.region1 = regionName  # Andy added, for later external reference to classname from just having the shape instance.
-        dsBrush = wx.Brush("WHEAT", wx.SOLID)
         
-        # TODO: Should merge decorate shape into here....
-        self.DecorateShape(shape, pos[0], pos[1], wx.BLACK_PEN, dsBrush, '')
+        shape.SetDraggable(True, True)
+        shape.SetCanvas(self)
+        shape.SetPen(wx.BLACK_PEN)   # Controls the color of the border of the shape
+        shape.SetBrush(wx.Brush("WHEAT", wx.SOLID))
+        self.GetDiagram().AddShape(shape)
+        shape.Show(True)
+
+        evthandler = MyEvtHandler(self.log, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
+        evthandler.SetShape(shape)
+        evthandler.SetPreviousHandler(shape.GetEventHandler())
+        shape.SetEventHandler(evthandler)
         
-        if not IMAGENODES:
-            shape.FlushText()
+        shape.FlushText()
 
         # Don't set the node left,top here as the shape needs to conform to the node.
         # On the other hand the node needs to conform to the shape's width,height.
@@ -493,31 +511,6 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         shape.node = node
         return shape
 
-    def DecorateShape(self, shape, x, y, pen, brush, text):
-        # Composites have to be moved for all children to get in place
-        if isinstance(shape, ogl.CompositeShape):
-            dc = wx.ClientDC(self)
-            self.PrepareDC(dc)
-            shape.Move(dc, x, y)  # do we need all this here?
-        else:
-            shape.SetDraggable(True, True)
-        shape.SetCanvas(self)
-        shape.SetX(x)
-        shape.SetY(y)
-        if pen:    shape.SetPen(pen)
-        if brush:  shape.SetBrush(brush)
-        if text:
-            for line in text.split('\n'):
-                shape.AddText(line)
-        self.GetDiagram().AddShape(shape)
-        shape.Show(True)
-
-        evthandler = MyEvtHandler(self.log, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
-        evthandler.SetShape(shape)
-        evthandler.SetPreviousHandler(shape.GetEventHandler())
-        shape.SetEventHandler(evthandler)
-
-        return shape
     
     def createNodeShape(self, node):     # FROM SPRING LAYOUT
         shape = ogl.RectangleShape( node.width, node.height )
