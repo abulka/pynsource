@@ -447,7 +447,7 @@ if __name__ == '__main__':
     #runTest(None, None, None)
     #app.MainLoop()
 
-    class MyApp(wx.App):
+    class MyApp1(wx.App):
         def OnInit(self):
             frame = wx.Frame(None, -1, "Hello from wxPython")
             p = runTest(frame, frame, None)
@@ -459,7 +459,34 @@ if __name__ == '__main__':
             p.ed.EmptyUndoBuffer()
 
             return True
-    
+
+    class MiniFrame(wx.MiniFrame):
+        def __init__(self):
+            wx.MiniFrame.__init__(self, None, -1, 'Mini Frame', size=(300, 100))
+                     
+    class MyApp(wx.App):
+        def OnInit(self):
+            frame = wx.Frame(None, -1, "Hello from wxPython")
+            frame2 = wx.Frame(frame, -1, "Hello from wxPython")
+            #frame2 = MiniFrame()
+            p = runTest(frame2, frame2, None)
+            frame.Show(True)
+            frame2.Show(True)
+            frame.SetSize((1024,768))
+            frame2.SetSize((800,600))
+            style = frame2.GetWindowStyle()
+            #frame2.SetWindowStyleFlag(style | wx.STAY_ON_TOP) #wx.DEFAULT_FRAME_STYLE | wx.FRAME_TOOL_WINDOW | wx.FRAME_FLOAT_ON_PARENT) #wx.STAY_ON_TOP | 
+            frame2.SetWindowStyleFlag(wx.DEFAULT_DIALOG_STYLE) #wx.FRAME_FLOAT_ON_PARENT) #wx.DEFAULT_FRAME_STYLE | wx.FRAME_TOOL_WINDOW | wx.FRAME_FLOAT_ON_PARENT) #wx.STAY_ON_TOP | 
+            self.SetTopWindow(frame)
+
+            dlg = wx.MessageDialog(frame, 'Is this the coolest thing ever!', 'MessageDialog', wx.YES_NO | wx.ICON_QUESTION)
+            result = dlg.Show()
+            #dlg.Destroy()
+
+            p.ed.SetText(demoText + open(r'..\..\pynsource\printframework.py').read())
+            p.ed.EmptyUndoBuffer()
+
+            return True    
     app = MyApp(0)
     app.MainLoop()
 
