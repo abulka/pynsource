@@ -33,6 +33,18 @@ class FramePyIdea_gen ( wx.Frame ):
 		self.m_menuItem8 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Show Source", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu5.AppendItem( self.m_menuItem8 )
 		
+		self.m_menuItem2 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Add Pane", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menu5.AppendItem( self.m_menuItem2 )
+		
+		self.m_menuItem3 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Fold1", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menu5.AppendItem( self.m_menuItem3 )
+		
+		self.m_menuItem4 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Fold All", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menu5.AppendItem( self.m_menuItem4 )
+		
+		self.m_menuItem5 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Hier", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menu5.AppendItem( self.m_menuItem5 )
+		
 		self.m_menubar4.Append( self.m_menu5, u"Debug" ) 
 		
 		self.SetMenuBar( self.m_menubar4 )
@@ -49,6 +61,10 @@ class FramePyIdea_gen ( wx.Frame ):
 		
 		# Connect Events
 		self.Bind( wx.EVT_MENU, self.OnShowSource, id = self.m_menuItem8.GetId() )
+		self.Bind( wx.EVT_MENU, self.OnAddPane, id = self.m_menuItem2.GetId() )
+		self.Bind( wx.EVT_MENU, self.OnFold1, id = self.m_menuItem3.GetId() )
+		self.Bind( wx.EVT_MENU, self.OnFoldAll, id = self.m_menuItem4.GetId() )
+		self.Bind( wx.EVT_MENU, self.OnHier, id = self.m_menuItem5.GetId() )
 	
 	def __del__( self ):
 		self.m_mgr.UnInit()
@@ -57,6 +73,18 @@ class FramePyIdea_gen ( wx.Frame ):
 	
 	# Virtual event handlers, overide them in your derived class
 	def OnShowSource( self, event ):
+		event.Skip()
+	
+	def OnAddPane( self, event ):
+		event.Skip()
+	
+	def OnFold1( self, event ):
+		event.Skip()
+	
+	def OnFoldAll( self, event ):
+		event.Skip()
+	
+	def OnHier( self, event ):
 		event.Skip()
 	
 
