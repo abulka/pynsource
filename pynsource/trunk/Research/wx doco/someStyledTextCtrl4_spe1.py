@@ -137,6 +137,7 @@ class Editor(stc.StyledTextCtrl):
         return root
     
     def selectNode(self,node):
+        print "clciked!!!"
         """If a tree item is right clicked select the corresponding code"""
         self.GotoLine(node.start)
         self.SetSelection(

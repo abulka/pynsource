@@ -3,7 +3,7 @@
 import wx
 from fbpyn1_gen import FramePyIdea_gen
 import wx.lib.ogl as ogl
-
+import wx.stc as stc
 
 class Node:
     def __init__(self,level,start,end,text,parent=None,styles=[]):
@@ -17,7 +17,7 @@ class Node:
         self.children   = []
         
 class FramePyIdea(FramePyIdea_gen):
-    def OnShowSource( self, event ):
+    def OnShowPane( self, event ):
         #print frame.m_mgr.GetAllPanes()
         #print frame.m_mgr.GetPane('pane_code')
         frame.m_mgr.RestorePane( frame.m_mgr.GetPane('pane_code') )
@@ -27,14 +27,25 @@ class FramePyIdea(FramePyIdea_gen):
         #frame.m_mgr.AddPane( frame.m_code, wx.aui.AuiPaneInfo() .Name( u"pane_code" ).Right() .Caption( u"Source Code" ).MaximizeButton( False ).MinimizeButton( False ).PinButton( True ).Dock().Resizable().FloatingSize( wx.DefaultSize ).DockFixed( False ) )
         frame.m_mgr.Update()
 
-    def OnAddPane( self, event ):
+    def addpane(self, dofloat=False):
         from fbpyn1_scintilla import PythonSTC
         from random import randint
         m_code2 = PythonSTC(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL)
-        self.m_mgr.AddPane( m_code2, wx.aui.AuiPaneInfo() .Name( u"pane_code"+`randint(1,1000)` ).Right() .Caption( u"Source Code"+`randint(1,1000)` ).MaximizeButton( False ).MinimizeButton( False ).PinButton( True ).Dock().Resizable().FloatingSize( wx.DefaultSize ).DockFixed( False ) )
-        m_code2.SetText(open(r'fbpyn1_scintilla.py').read())
+        if dofloat:
+            self.m_mgr.AddPane( m_code2, wx.aui.AuiPaneInfo() .Name( u"pane_code"+`randint(1,1000)` ).Right() .Caption( u"Source Code"+`randint(1,1000)` ).MaximizeButton( False ).MinimizeButton( False ).PinButton( True ).Float().Resizable().FloatingPosition((350,100)).FloatingSize( (350,500) ).DockFixed( False ) )
+        else:
+            self.m_mgr.AddPane( m_code2, wx.aui.AuiPaneInfo() .Name( u"pane_code"+`randint(1,1000)` ).Right() .Caption( u"Source Code"+`randint(1,1000)` ).MaximizeButton( False ).MinimizeButton( False ).PinButton( True ).Dock().Resizable().FloatingSize( wx.DefaultSize ).DockFixed( False ) )
+        m_code2.SetText(open(r'fbpyn1.py').read())
+        m_code2.Colourise(0, m_code2.GetTextLength()) #make sure everything is lexed. or use (0, -1)
+        self.andycollapsetodefs(m_code2)
         frame.m_mgr.Update()
-
+        
+    def OnAddPane( self, event ):
+        self.addpane()
+        
+    def OnAddPaneFloat( self, event ):
+        self.addpane(True)
+                
     def OnFold1( self, event ):
         frame.m_code.ToggleFold(frame.m_code.GetCurrentLine())
         for i in range(0, 30):
@@ -43,31 +54,29 @@ class FramePyIdea(FramePyIdea_gen):
     def OnFoldAll( self, event ):
         frame.m_code.FoldAll()
 
-
     def OnHier(self, event):
-   #---hierarchy
-        frame.m_code.Colourise(0, frame.m_code.GetTextLength()) #make sure everything is lexed
-        
-        root = self.getHierarchy()
-        #self.appendChildren(self.root,self.hierarchy)
-        self.appendChildren(None,root)  # Andy version
+        self.andycollapsetodefs(frame.m_code)
     
-    def appendChildren(self,wxParent,nodeParent):
+    def andycollapsetodefs(self, ed):
+        root = self.getHierarchy(ed)
+        self.appendChildren(None,root,ed)  # Andy version
+        
+    def appendChildren(self,wxParent,nodeParent,ed):
         for nodeItem in nodeParent.children:
             #wxItem    = self.AppendItem(wxParent,nodeItem.text.strip())
             #self.SetPyData(wxItem,nodeItem)
-            print nodeItem.text.strip()
+            #print nodeItem.text.strip()
             #self.appendChildren(wxItem,nodeItem)        
-            self.appendChildren(None,nodeItem)
+            self.appendChildren(None,nodeItem,ed)
             
             if "def " in nodeItem.text.strip():
                 #print "start", nodeItem.start, "level", nodeItem.level
-                if frame.m_code.GetFoldExpanded(nodeItem.start): 
-                    frame.m_code.ToggleFold(nodeItem.start)
+                if ed.GetFoldExpanded(nodeItem.start): 
+                    ed.ToggleFold(nodeItem.start)
         
-    def getHierarchy(self):
+    def getHierarchy(self, ed):
         import wx.stc as stc
-        self = frame.m_code
+        self = ed
         #[(level,line,text,parent,[children]),]
         n               = self.GetLineCount()+1
         prevNode = root = Node(level=0,start=0,end=n,text='root',parent=None)
@@ -157,9 +166,15 @@ app = MyApp()
 #app = wx.App()
 ogl.OGLInitialize()
 frame = FramePyIdea(None)
+
+# line numbers in the margin
+frame.m_code.SetMarginType(1, stc.STC_MARGIN_NUMBER)
+frame.m_code.SetMarginWidth(1, 25) # set width of margin
+    
 frame.m_code.SetText(open(r'fbpyn1_gen.py').read())
 frame.m_code.EmptyUndoBuffer()
 frame.Show()
+frame.m_code.Colourise(0, -1)
 
 frame.canvas.SetBackgroundColour( "LIGHT BLUE" )
 # Optional - add a shape
