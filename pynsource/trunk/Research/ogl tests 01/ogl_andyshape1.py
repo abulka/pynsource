@@ -91,6 +91,13 @@ class AppFrame(wx.Frame):
         setpos(shape,11, 111)
         canvas.AddShape( shape )
 
+        shape = ogl.EllipseShape(120,70)
+        setpos(shape, 81, 150)
+        shape.SetBrush(wx.Brush("WHEAT", wx.TRANSPARENT))
+        shape.AddText("<<Pattern>>")
+        shape.AddText("Observer")
+        shape.SetPen(wx.Pen(wx.Colour(0, 0, 0), 1, wx.DOT))
+        canvas.AddShape( shape )
         
         
         diagram.ShowAll( 1 )
