@@ -30,7 +30,7 @@ class FramePyIdea(FramePyIdea_gen):
     def addpane(self, dofloat=False):
         from fbpyn1_scintilla import PythonSTC
         from random import randint
-        m_code2 = PythonSTC(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL)
+        m_code2 = PythonSTC(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.WANTS_CHARS)
         if dofloat:
             self.m_mgr.AddPane( m_code2, wx.aui.AuiPaneInfo() .Name( u"pane_code"+`randint(1,1000)` ).Right() .Caption( u"Source Code"+`randint(1,1000)` ).MaximizeButton( False ).MinimizeButton( False ).PinButton( True ).Float().Resizable().FloatingPosition((350,100)).FloatingSize( (350,500) ).DockFixed( False ) )
         else:
@@ -38,6 +38,7 @@ class FramePyIdea(FramePyIdea_gen):
         m_code2.SetText(open(r'fbpyn1.py').read())
         m_code2.Colourise(0, m_code2.GetTextLength()) #make sure everything is lexed. or use (0, -1)
         self.andycollapsetodefs(m_code2)
+        m_code2.SetReadOnly(False)
         frame.m_mgr.Update()
         
     def OnAddPane( self, event ):

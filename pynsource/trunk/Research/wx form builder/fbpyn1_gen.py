@@ -25,7 +25,7 @@ class FramePyIdea_gen ( wx.Frame ):
 		self.m_mgr = wx.aui.AuiManager()
 		self.m_mgr.SetManagedWindow( self )
 		
-		self.m_code = PythonSTC(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL)
+		self.m_code = PythonSTC(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.WANTS_CHARS)
 		self.m_mgr.AddPane( self.m_code, wx.aui.AuiPaneInfo() .Name( u"pane_code" ).Right() .Caption( u"Source Code" ).MaximizeButton( False ).MinimizeButton( False ).PinButton( True ).Dock().Resizable().FloatingSize( wx.DefaultSize ).DockFixed( False ) )
 		
 		self.m_menubar4 = wx.MenuBar( 0 )
@@ -60,24 +60,24 @@ class FramePyIdea_gen ( wx.Frame ):
 		self.m_menubar4.Append( self.m_menu2, u"File" ) 
 		
 		self.m_menu6 = wx.Menu()
-		self.m_menuItem26 = wx.MenuItem( self.m_menu6, wx.ID_ANY, u"Add Class..."+ u"\t" + u"Ins", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem26 = wx.MenuItem( self.m_menu6, wx.ID_ANY, u"Add Class..."+ u"\t" + u"Ctrl+Ins", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu6.AppendItem( self.m_menuItem26 )
 		
-		self.m_menuItem14 = wx.MenuItem( self.m_menu6, wx.ID_ANY, u"Delete Class"+ u"\t" + u"Del", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem14 = wx.MenuItem( self.m_menu6, wx.ID_ANY, u"Delete Class"+ u"\t" + u"Ctrl+Del", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu6.AppendItem( self.m_menuItem14 )
 		
 		self.m_menu6.AppendSeparator()
 		
-		self.m_menuItem29 = wx.MenuItem( self.m_menu6, wx.ID_ANY, u"Class Properties..."+ u"\t" + u"a", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem29 = wx.MenuItem( self.m_menu6, wx.ID_ANY, u"Class Properties..."+ u"\t" + u"Ctrl+T", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu6.AppendItem( self.m_menuItem29 )
 		
-		self.m_menuItem28 = wx.MenuItem( self.m_menu6, wx.ID_ANY, u"Class Source Code..."+ u"\t" + u"s", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem28 = wx.MenuItem( self.m_menu6, wx.ID_ANY, u"Class Source Code..."+ u"\t" + u"Ctrl+E", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu6.AppendItem( self.m_menuItem28 )
 		
 		self.m_menubar4.Append( self.m_menu6, u"Edit" ) 
 		
 		self.m_menu7 = wx.Menu()
-		self.m_menuItem81 = wx.MenuItem( self.m_menu7, wx.ID_ANY, u"Layout"+ u"\t" + u"L", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem81 = wx.MenuItem( self.m_menu7, wx.ID_ANY, u"Layout"+ u"\t" + u"Ctrl+L", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu7.AppendItem( self.m_menuItem81 )
 		
 		self.m_menuItem35 = wx.MenuItem( self.m_menu7, wx.ID_ANY, u"Layout Optimal (slower)", wx.EmptyString, wx.ITEM_NORMAL )
@@ -85,11 +85,11 @@ class FramePyIdea_gen ( wx.Frame ):
 		
 		self.m_menu7.AppendSeparator()
 		
-		self.m_menuItem30 = wx.MenuItem( self.m_menu7, wx.ID_ANY, u"Increase Node Spread"+ u"\t" + u"x", wx.EmptyString, wx.ITEM_NORMAL )
-		self.m_menu7.AppendItem( self.m_menuItem30 )
-		
-		self.m_menuItem31 = wx.MenuItem( self.m_menu7, wx.ID_ANY, u"Decrease Node Spread"+ u"\t" + u"z", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem31 = wx.MenuItem( self.m_menu7, wx.ID_ANY, u"Decrease Node Spread"+ u"\t" + u"Ctrl+1", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu7.AppendItem( self.m_menuItem31 )
+		
+		self.m_menuItem30 = wx.MenuItem( self.m_menu7, wx.ID_ANY, u"Increase Node Spread"+ u"\t" + u"Ctrl+2", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menu7.AppendItem( self.m_menuItem30 )
 		
 		self.m_menu7.AppendSeparator()
 		
@@ -106,7 +106,7 @@ class FramePyIdea_gen ( wx.Frame ):
 		
 		self.m_menu7.AppendSeparator()
 		
-		self.m_menuItem7 = wx.MenuItem( self.m_menu7, wx.ID_ANY, u"Redraw Screen"+ u"\t" + u"r", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem7 = wx.MenuItem( self.m_menu7, wx.ID_ANY, u"Redraw Screen"+ u"\t" + u"Ctrl+R", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu7.AppendItem( self.m_menuItem7 )
 		
 		self.m_menubar4.Append( self.m_menu7, u"View" ) 
