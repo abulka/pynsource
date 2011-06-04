@@ -1,20 +1,17 @@
 #!/usr/bin/env python
 
-from hexappmodel import ModelA
+from hexappmodel import Thing
 
 class PersistenceMock:
     def Save(self, model):
         pass
     
     def Load(self):
-        model = ModelA(self)
-        model.info = "mock info"
-        return model
+        pass
       
-
 class PersistenceMock2:
     def __init__(self):
-        self.savedmodel = [ModelA("100"), ModelA("101")]
+        self.savedmodel = [Thing("100"), Thing("101")]
         
     def SaveAll(self, model):
         self.savedmodel = model

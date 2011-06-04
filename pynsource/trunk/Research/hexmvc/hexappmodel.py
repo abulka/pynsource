@@ -2,10 +2,10 @@
 
 class App:
     def __init__(self, persistence):
-        self.modelmgr = ModelMgr(self, persistence)
+        self.model = Model(self, persistence)
         
     def New(self):
-        self.modelmgr.Clear()
+        self.model.Clear()
 
     def Load(self):
         cmd = CmdLoadModel(self)
@@ -15,20 +15,22 @@ class App:
         cmd = CmdSaveModel(self)
         cmd.Execute()
 
-    def CreateA(self, info):
-        cmd = CmdCreateA(self)
+    def CreateThing(self, info):
+        cmd = CmdCreateThing(self)
         cmd.info = info
         cmd.Execute()
         return cmd.result
 
-    def CmdAddInfoToA(self, a, info):
-        cmd = CmdAddInfoToA(self)
+    def AddInfoToThing(self, a, info):
+        cmd = CmdAddInfoToThing(self)
         cmd.a = a
         cmd.info = info
         cmd.Execute()
 
-    def GetA(self, n):
-        return self.modelmgr.model[n]
+    def GetThing(self, n):
+        return self.model.things[n]
+
+
 
 
 class Cmd:
@@ -37,42 +39,47 @@ class Cmd:
 
 class CmdLoadModel(Cmd):
     def Execute(self):
-        self.app.modelmgr.LoadAll()
+        self.app.model.LoadAll()
 
 class CmdSaveModel(Cmd):
     def Execute(self):
-        self.app.modelmgr.SaveAll()
+        self.app.model.SaveAll()
 
-class CmdCreateA(Cmd):
+class CmdCreateThing(Cmd):
     def Execute(self):
-        self.result = ModelA(self.info)
-        self.app.modelmgr.model.append(self.result)
+        self.result = Thing(self.info)
+        self.app.model.things.append(self.result)
 
-class CmdAddInfoToA(Cmd):
+class CmdAddInfoToThing(Cmd):
     def Execute(self):
         self.a.Do(self.info)
 
 
 
-class ModelMgr:        
+
+class Model:        
     def __init__(self, app, persistence):
         self.app = app
         self.persistence = persistence
+        self.things = []
         self.Clear()
 
     def __str__(self):
-        return str([str(m) for m in self.model])
+        return str([str(t) for t in self.things])
 
+    def __len__(self):
+        return len(self.things)
+        
     def Clear(self):
-        self.model = []
+        self.things = []
         
     def LoadAll(self):
-        self.model = self.persistence.LoadAll()
+        self.things = self.persistence.LoadAll()
 
     def SaveAll(self):
-        self.persistence.SaveAll(self.model)
+        self.persistence.SaveAll(self.things)
 
-class ModelA:
+class Thing:
     def __init__(self, info):
         self.info = info
         
