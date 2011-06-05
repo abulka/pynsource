@@ -17,7 +17,7 @@ import wx.aui
 class HexMvcGuiFrame1 ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"HexMvc Gui 1", pos = wx.DefaultPosition, size = wx.Size( 500,396 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"HexMvc Gui 1", pos = wx.DefaultPosition, size = wx.Size( 514,396 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		self.m_mgr = wx.aui.AuiManager()
@@ -52,16 +52,35 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		self.m_button3 = wx.Button( self.m_panel1, wx.ID_ANY, u"Dump Model", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer3.Add( self.m_button3, 0, wx.ALL, 5 )
 		
-		self.m_button9 = wx.Button( self.m_panel1, wx.ID_ANY, u"Dump Clear", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button9 = wx.Button( self.m_panel1, wx.ID_ANY, u"Clear", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer3.Add( self.m_button9, 0, wx.ALL, 5 )
 		
-		self.m_button4 = wx.Button( self.m_panel1, wx.ID_ANY, u"Misc1", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button4 = wx.Button( self.m_panel1, wx.ID_ANY, u"Add Junk Text", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer3.Add( self.m_button4, 0, wx.ALL, 5 )
 		
 		self.m_button5 = wx.Button( self.m_panel1, wx.ID_ANY, u"MessageBox", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer3.Add( self.m_button5, 0, wx.ALL, 5 )
 		
+		
+		bSizer3.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_button10 = wx.Button( self.m_panel1, wx.ID_ANY, u"Start Server", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer3.Add( self.m_button10, 0, wx.ALL, 5 )
+		
 		bSizer1.Add( bSizer3, 1, wx.EXPAND, 5 )
+		
+		bSizer5 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_button11 = wx.Button( self.m_panel1, wx.ID_ANY, u"Background Task 1", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer5.Add( self.m_button11, 0, wx.ALL, 5 )
+		
+		self.m_button12 = wx.Button( self.m_panel1, wx.ID_ANY, u"Stop", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer5.Add( self.m_button12, 0, wx.ALL, 5 )
+		
+		self.m_gauge1 = wx.Gauge( self.m_panel1, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
+		bSizer5.Add( self.m_gauge1, 0, wx.ALL, 5 )
+		
+		bSizer1.Add( bSizer5, 1, wx.EXPAND, 5 )
 		
 		bSizer4 = wx.BoxSizer( wx.HORIZONTAL )
 		
@@ -102,8 +121,11 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.FileLoad, id = self.m_menuItem2.GetId() )
 		self.m_button3.Bind( wx.EVT_BUTTON, self.DumpModel )
 		self.m_button9.Bind( wx.EVT_BUTTON, self.DumpClear )
-		self.m_button4.Bind( wx.EVT_BUTTON, self.Misc1 )
+		self.m_button4.Bind( wx.EVT_BUTTON, self.AddJunkText )
 		self.m_button5.Bind( wx.EVT_BUTTON, self.MiscMessageBox )
+		self.m_button10.Bind( wx.EVT_BUTTON, self.StartServer )
+		self.m_button11.Bind( wx.EVT_BUTTON, self.BackgroundTask1 )
+		self.m_button12.Bind( wx.EVT_BUTTON, self.StopBackgroundTask1 )
 		self.m_button6.Bind( wx.EVT_BUTTON, self.FileNew )
 		self.m_button7.Bind( wx.EVT_BUTTON, self.FileLoad )
 	
@@ -125,10 +147,19 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 	def DumpClear( self, event ):
 		event.Skip()
 	
-	def Misc1( self, event ):
+	def AddJunkText( self, event ):
 		event.Skip()
 	
 	def MiscMessageBox( self, event ):
+		event.Skip()
+	
+	def StartServer( self, event ):
+		event.Skip()
+	
+	def BackgroundTask1( self, event ):
+		event.Skip()
+	
+	def StopBackgroundTask1( self, event ):
 		event.Skip()
 	
 	

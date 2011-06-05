@@ -13,7 +13,7 @@
 <preference-set id="testPlans">
 <preference-set id="HexMvc">
   <string id="command_line"></string>
-  <string relative="url" id="directory">Research/hexmvc/tests/</string>
+  <string relative="url" id="directory">Research/hexmvc/tests</string>
   <string id="language">Python - unittest</string>
 </preference-set>
 <preference-set id="Layout Only">
