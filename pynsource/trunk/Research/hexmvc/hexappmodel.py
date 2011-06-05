@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 class App:
-    def __init__(self, persistence):
+    def __init__(self, persistence, server):
         self.model = Model(self, persistence)
+        self.server = server
         
     def New(self):
         self.model.Clear()
@@ -30,6 +31,10 @@ class App:
     def GetThing(self, n):
         return self.model.things[n]
 
+    def StartServer(self):
+        cmd = CmdStartServer(self)
+        cmd.server = self.server
+        cmd.Execute()
 
 
 
@@ -54,6 +59,9 @@ class CmdAddInfoToThing(Cmd):
     def Execute(self):
         self.a.Do(self.info)
 
+class CmdStartServer(Cmd):
+    def Execute(self):
+        self.server.StartServer()
 
 
 

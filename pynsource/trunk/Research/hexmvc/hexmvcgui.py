@@ -8,11 +8,12 @@ import thread, time
 
 from hexappmodel import App, Thing
 from hexpersistence import PersistenceMock, PersistenceMock2
+from hexserver import Server1
 
 class MyFrame(HexMvcGuiFrame1):
     def __init__( self, parent ):
         HexMvcGuiFrame1.__init__( self, parent )
-        self.app = App(PersistenceMock2())
+        self.app = App(PersistenceMock2(), Server1())
         self.need_abort = False
         
     def DumpModel( self, event ):
@@ -71,17 +72,8 @@ class MyFrame(HexMvcGuiFrame1):
         self._DoSomeLongTask2()
 
     def StartServer( self, event ):
-        thread.start_new_thread(self._DoSomeLongTask2, ())
-        
-    def _DoSomeLongTask2(self):
-        from bottle import route, run
-        
-        @route('/:name')
-        def index(name='World'):
-            return '<b>Hello %s!</b>' % name
-        
-        run(host='localhost', port=8080)
-        # nothing runs after this point
+        self.app.StartServer()
+
         
 wxapp = wx.App(redirect=False)
 frame = MyFrame(None)
