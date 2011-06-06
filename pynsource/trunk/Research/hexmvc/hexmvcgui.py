@@ -13,9 +13,17 @@ from hexserver import Server1
 class MyFrame(HexMvcGuiFrame1):
     def __init__( self, parent ):
         HexMvcGuiFrame1.__init__( self, parent )
-        self.app = App(PersistenceMock2(), Server1())
         self.need_abort = False
+        wx.CallAfter(self.Andy, "hi")
         
+    def Andy(self, msg):
+        print msg + " Andy"
+        #self.app.server.StartServer()
+        
+    def SetApp(self, app):
+        self.app = app
+        print "app has been set"
+
     def DumpModel( self, event ):
         self._DumpModel()
 
@@ -74,10 +82,27 @@ class MyFrame(HexMvcGuiFrame1):
     def StartServer( self, event ):
         self.app.StartServer()
 
-        
-wxapp = wx.App(redirect=False)
-frame = MyFrame(None)
-frame.Show()
-#frame.SetSize((400,400))
-wxapp.MainLoop()
-print "DONE - AFTER THE WX MAIN LOOP"
+#wxapp = wx.App(redirect=False)
+#frame = MyFrame(None)
+#
+#app = App(persistence=PersistenceMock2(), server=Server1(), gui=frame)
+#
+#frame.Show()
+##frame.SetSize((400,400))
+#wxapp.MainLoop()
+#print "DONE - AFTER THE WX MAIN LOOP"
+
+
+class MyApp(wx.App):
+    def OnInit(self):
+        print "OnInit"
+        frame = MyFrame(parent=None)
+        frame.Show()
+        self.myframe = frame
+        return True  # Return a success flag
+
+#myapp = MyApp(redirect=False)
+#print "myapp created"
+#app = App(persistence=PersistenceMock2(), server=Server1(), gui=myapp.myframe)
+#myapp.MainLoop()
+#print "DONE - AFTER THE WX MAIN LOOP"

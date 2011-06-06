@@ -1,9 +1,17 @@
 #!/usr/bin/env python
 
 class App:
-    def __init__(self, persistence, server):
+    def __init__(self, persistence, server, gui):
         self.model = Model(self, persistence)
         self.server = server
+        self.gui = gui
+        
+        server.SetApp(self)
+        persistence.SetApp(self)
+        gui.SetApp(self)
+        
+    def Boot(self):
+        self.server.StartServer()
         
     def New(self):
         self.model.Clear()

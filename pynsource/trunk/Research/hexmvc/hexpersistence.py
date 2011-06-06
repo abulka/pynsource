@@ -13,6 +13,9 @@ class PersistenceMock2:
     def __init__(self):
         self.savedmodel = [Thing("100"), Thing("101")]
         
+    def SetApp(self, app):
+        self.app = app
+    
     def SaveAll(self, model):
         self.savedmodel = model
     

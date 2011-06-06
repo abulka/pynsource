@@ -2,10 +2,14 @@ from bottle import route, run, template, request
 import thread
 
 class Server1:
+    def SetApp(self, app):
+        self.app = app
+        
     def StartServer(self):
         thread.start_new_thread(self._DoSomeLongTask2, ())
         
     def _DoSomeLongTask2(self):
+        print "starting server thread..."
         
         @route('/hello')
         @route('/hello/:name')
@@ -18,15 +22,19 @@ class Server1:
 
         @route('/ajax_info1')
         def ajax_info1():
-            print "ajax request"
+            #print "ajax request"
             try:
                 if request.is_ajax:
-                    return 'This is an AJAX request'
+                    return 'This is an AJAX request, model length is %d' % len(self.app.model)
                 else:
                     return 'This is a normal request'
-            except:
-                print "some exception"
-                return 'AJAX some exception!!'
+            except Exception as inst:
+                print "Exception!," + type(inst)     # the exception instance
+                print inst           # __str__ allows args to printed directly
+                #print inst.args      # arguments stored in .args
+                #print traceback.print_exc()
+
+                return 'AJAX some exception!!!'
                 
         @route('/:name')
         def index(name='World'):
@@ -37,6 +45,14 @@ class Server1:
         # nothing runs after this point
         
 if __name__ == "__main__":
+    class MockModel:
+        def __len__(self):
+            return 999
+    class MockApp:
+        def __init__(self):
+            self.model = MockModel()
+            
     s = Server1()
+    s.SetApp(MockApp())
     s._DoSomeLongTask2()
     
