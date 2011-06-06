@@ -1,24 +1,11 @@
-#!/usr/bin/env python
-
 import wx
 from hexmvcgui_gen import HexMvcGuiFrame1
 import thread, time
-
-# BOOT WIRING
-
-from hexappmodel import App, Thing
-from hexpersistence import PersistenceMock, PersistenceMock2
-from hexserver import Server1
 
 class MyFrame(HexMvcGuiFrame1):
     def __init__( self, parent ):
         HexMvcGuiFrame1.__init__( self, parent )
         self.need_abort = False
-        wx.CallAfter(self.Andy, "hi")
-        
-    def Andy(self, msg):
-        print msg + " Andy"
-        #self.app.server.StartServer()
         
     def SetApp(self, app):
         self.app = app
@@ -77,32 +64,14 @@ class MyFrame(HexMvcGuiFrame1):
         print "Done Background Task."
         self.m_gauge1.Value = 0
 
-        self._DoSomeLongTask2()
-
     def StartServer( self, event ):
         self.app.StartServer()
 
-#wxapp = wx.App(redirect=False)
-#frame = MyFrame(None)
-#
-#app = App(persistence=PersistenceMock2(), server=Server1(), gui=frame)
-#
-#frame.Show()
-##frame.SetSize((400,400))
-#wxapp.MainLoop()
-#print "DONE - AFTER THE WX MAIN LOOP"
 
-
-class MyApp(wx.App):
+class MyWxApp(wx.App):
     def OnInit(self):
-        print "OnInit"
         frame = MyFrame(parent=None)
         frame.Show()
         self.myframe = frame
-        return True  # Return a success flag
-
-#myapp = MyApp(redirect=False)
-#print "myapp created"
-#app = App(persistence=PersistenceMock2(), server=Server1(), gui=myapp.myframe)
-#myapp.MainLoop()
-#print "DONE - AFTER THE WX MAIN LOOP"
+        return True
+    

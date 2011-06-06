@@ -14,13 +14,24 @@ class HexMvcTests(unittest.TestCase):
             def __init__(self):
                 self.savedmodel = [Thing("fred"), Thing("sam")]
                 
+            def SetApp(self, app):
+                self.app = app
+                
             def SaveAll(self, model):
                 self.savedmodel = model
             
             def LoadAll(self):
                 return self.savedmodel
-            
-        self.app = App(PersistenceMock3())
+
+        class GuiMock:
+            def SetApp(self, app):
+                self.app = app
+                
+        class ServerMock:
+            def SetApp(self, app):
+                self.app = app
+                
+        self.app = App(PersistenceMock3(), ServerMock(), GuiMock())
 
     def tearDown(self):
         pass

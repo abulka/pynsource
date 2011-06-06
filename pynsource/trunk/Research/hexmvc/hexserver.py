@@ -6,9 +6,9 @@ class Server1:
         self.app = app
         
     def StartServer(self):
-        thread.start_new_thread(self._DoSomeLongTask2, ())
+        thread.start_new_thread(self._Serve, ())
         
-    def _DoSomeLongTask2(self):
+    def _Serve(self):
         print "starting server thread..."
         
         @route('/hello')
@@ -54,5 +54,5 @@ if __name__ == "__main__":
             
     s = Server1()
     s.SetApp(MockApp())
-    s._DoSomeLongTask2()
+    s._Serve()
     
