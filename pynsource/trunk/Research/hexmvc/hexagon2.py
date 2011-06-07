@@ -11,16 +11,13 @@ wxapp = MyWxApp(redirect=False)
 gui = wxapp.myframe  # arguably too wx based to be a true adapter, but as long
                      # as we call nothing wx specific, it acts as an adapter ok.
 # Create Server
-server = Server1()
+server = Server1(host='localhost', port=8081)
 
 # Create Persistence
 persistence = PersistenceMock2()
 
 # Create Core Hexagon App and inject adapters
 app = App(persistence, server, gui)
-
-# Start server
-#wx.CallAfter(app.server.StartServer)
 wx.CallAfter(app.Boot)
 
 # Start Gui

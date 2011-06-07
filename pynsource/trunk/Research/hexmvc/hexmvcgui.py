@@ -6,11 +6,24 @@ class MyFrame(HexMvcGuiFrame1):
     def __init__( self, parent ):
         HexMvcGuiFrame1.__init__( self, parent )
         self.need_abort = False
-        
+
     def SetApp(self, app):
         self.app = app
         print "app has been set"
-
+        self._InitHyperlinks()
+        
+    def _InitHyperlinks(self):
+        def seturl(obj):
+            obj.SetURL(self.app.GetUrlOrigin() + obj.GetLabel())
+            obj.SetToolTip(wx.ToolTip(obj.GetLabel()))
+        seturl(self.m_hyperlink1)
+        seturl(self.m_hyperlink2)
+        seturl(self.m_hyperlink3)
+        seturl(self.m_hyperlink4)
+        seturl(self.m_hyperlink5)
+        seturl(self.m_hyperlink6)
+        seturl(self.m_hyperlink8)
+        
     def DumpModel( self, event ):
         self._DumpModel()
 
@@ -67,9 +80,10 @@ class MyFrame(HexMvcGuiFrame1):
     def StartServer( self, event ):
         self.app.StartServer()
 
-
-class MyWxApp(wx.App):
+import wx.lib.mixins.inspection  # Ctrl-Alt-I 
+class MyWxApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnInit(self):
+        self.Init()  # initialize the inspection tool
         frame = MyFrame(parent=None)
         frame.Show()
         self.myframe = frame

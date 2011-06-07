@@ -17,7 +17,7 @@ import wx.aui
 class HexMvcGuiFrame1 ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"HexMvc Gui 1", pos = wx.DefaultPosition, size = wx.Size( 514,396 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"HexMvc Gui 1", pos = wx.DefaultPosition, size = wx.Size( 514,413 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		self.m_mgr = wx.aui.AuiManager()
@@ -44,8 +44,12 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		
 		bSizer1 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_textCtrl1 = wx.TextCtrl( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		bSizer1.Add( self.m_textCtrl1, 2, wx.ALL|wx.EXPAND, 5 )
+		self.m_textCtrl1 = wx.TextCtrl( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( -1,80 ), wx.TE_MULTILINE )
+		bSizer1.Add( self.m_textCtrl1, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		bSizer6 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		bSizer7 = wx.BoxSizer( wx.VERTICAL )
 		
 		bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
 		
@@ -61,13 +65,7 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		self.m_button5 = wx.Button( self.m_panel1, wx.ID_ANY, u"MessageBox", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer3.Add( self.m_button5, 0, wx.ALL, 5 )
 		
-		
-		bSizer3.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
-		
-		self.m_button10 = wx.Button( self.m_panel1, wx.ID_ANY, u"Start Server", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer3.Add( self.m_button10, 0, wx.ALL, 5 )
-		
-		bSizer1.Add( bSizer3, 1, wx.EXPAND, 5 )
+		bSizer7.Add( bSizer3, 0, 0, 5 )
 		
 		bSizer5 = wx.BoxSizer( wx.HORIZONTAL )
 		
@@ -80,7 +78,7 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		self.m_gauge1 = wx.Gauge( self.m_panel1, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
 		bSizer5.Add( self.m_gauge1, 0, wx.ALL, 5 )
 		
-		bSizer1.Add( bSizer5, 1, wx.EXPAND, 5 )
+		bSizer7.Add( bSizer5, 1, wx.EXPAND, 5 )
 		
 		bSizer4 = wx.BoxSizer( wx.HORIZONTAL )
 		
@@ -93,11 +91,11 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		self.m_button8 = wx.Button( self.m_panel1, wx.ID_ANY, u"Save", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer4.Add( self.m_button8, 0, wx.ALL, 5 )
 		
-		bSizer1.Add( bSizer4, 1, wx.EXPAND, 5 )
+		bSizer7.Add( bSizer4, 1, wx.EXPAND, 5 )
 		
 		m_listBox1Choices = []
 		self.m_listBox1 = wx.ListBox( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_listBox1Choices, 0 )
-		bSizer1.Add( self.m_listBox1, 2, wx.ALL, 5 )
+		bSizer7.Add( self.m_listBox1, 2, wx.ALL, 5 )
 		
 		bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
 		
@@ -107,7 +105,36 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		self.m_button2 = wx.Button( self.m_panel1, wx.ID_ANY, u"Delete Thing", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer2.Add( self.m_button2, 0, wx.ALL, 5 )
 		
-		bSizer1.Add( bSizer2, 1, wx.EXPAND, 5 )
+		bSizer7.Add( bSizer2, 1, wx.EXPAND, 5 )
+		
+		bSizer6.Add( bSizer7, 1, 0, 5 )
+		
+		bSizer8 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_hyperlink1 = wx.HyperlinkCtrl( self.m_panel1, wx.ID_ANY, u"/", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
+		bSizer8.Add( self.m_hyperlink1, 0, wx.ALL, 5 )
+		
+		self.m_hyperlink2 = wx.HyperlinkCtrl( self.m_panel1, wx.ID_ANY, u"/aa", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
+		bSizer8.Add( self.m_hyperlink2, 0, wx.ALL, 5 )
+		
+		self.m_hyperlink3 = wx.HyperlinkCtrl( self.m_panel1, wx.ID_ANY, u"/hello", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
+		bSizer8.Add( self.m_hyperlink3, 0, wx.ALL, 5 )
+		
+		self.m_hyperlink4 = wx.HyperlinkCtrl( self.m_panel1, wx.ID_ANY, u"/hello/man", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
+		bSizer8.Add( self.m_hyperlink4, 0, wx.ALL, 5 )
+		
+		self.m_hyperlink5 = wx.HyperlinkCtrl( self.m_panel1, wx.ID_ANY, u"/ajax", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
+		bSizer8.Add( self.m_hyperlink5, 0, wx.ALL, 5 )
+		
+		self.m_hyperlink6 = wx.HyperlinkCtrl( self.m_panel1, wx.ID_ANY, u"/ajax_info1", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
+		bSizer8.Add( self.m_hyperlink6, 0, wx.ALL, 5 )
+		
+		self.m_hyperlink8 = wx.HyperlinkCtrl( self.m_panel1, wx.ID_ANY, u"/xml", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
+		bSizer8.Add( self.m_hyperlink8, 0, wx.ALL, 5 )
+		
+		bSizer6.Add( bSizer8, 0, 0, 5 )
+		
+		bSizer1.Add( bSizer6, 1, wx.EXPAND, 5 )
 		
 		self.m_panel1.SetSizer( bSizer1 )
 		self.m_panel1.Layout()
@@ -123,7 +150,6 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		self.m_button9.Bind( wx.EVT_BUTTON, self.DumpClear )
 		self.m_button4.Bind( wx.EVT_BUTTON, self.AddJunkText )
 		self.m_button5.Bind( wx.EVT_BUTTON, self.MiscMessageBox )
-		self.m_button10.Bind( wx.EVT_BUTTON, self.StartServer )
 		self.m_button11.Bind( wx.EVT_BUTTON, self.BackgroundTask1 )
 		self.m_button12.Bind( wx.EVT_BUTTON, self.StopBackgroundTask1 )
 		self.m_button6.Bind( wx.EVT_BUTTON, self.FileNew )
@@ -151,9 +177,6 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		event.Skip()
 	
 	def MiscMessageBox( self, event ):
-		event.Skip()
-	
-	def StartServer( self, event ):
 		event.Skip()
 	
 	def BackgroundTask1( self, event ):

@@ -13,6 +13,12 @@ class App:
     def Boot(self):
         self.server.StartServer()
         
+    def GetUrlOrigin(self):
+        return self.server.GetUrlOrigin()
+        
+    def GetModelSize(self):
+        return len(self.model)
+        
     def New(self):
         self.model.Clear()
 

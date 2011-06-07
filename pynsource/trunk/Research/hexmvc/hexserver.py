@@ -2,8 +2,15 @@ from bottle import route, run, template, request
 import thread
 
 class Server1:
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
+        
     def SetApp(self, app):
         self.app = app
+        
+    def GetUrlOrigin(self):
+        return "http://%s:%s" % (self.host, self.port)
         
     def StartServer(self):
         thread.start_new_thread(self._Serve, ())
@@ -11,6 +18,15 @@ class Server1:
     def _Serve(self):
         print "starting server thread..."
         
+        @route('/')
+        def index():
+            return "G'day"
+
+        @route('/xml')
+        def xml():
+            response.content_type = 'xml/application'
+            return "<a>blah</a>"
+
         @route('/hello')
         @route('/hello/:name')
         def hello(name='World'):
@@ -25,7 +41,7 @@ class Server1:
             #print "ajax request"
             try:
                 if request.is_ajax:
-                    return 'This is an AJAX request, model length is %d' % len(self.app.model)
+                    return 'This is an AJAX request, model length is %d' % self.app.GetModelSize()
                 else:
                     return 'This is a normal request'
             except Exception as inst:
@@ -41,7 +57,7 @@ class Server1:
             return '<b>Hello %s!</b>' % name
 
     
-        run(host='localhost', port=8081)
+        run(host=self.host, port=self.port)
         # nothing runs after this point
         
 if __name__ == "__main__":
@@ -51,8 +67,10 @@ if __name__ == "__main__":
     class MockApp:
         def __init__(self):
             self.model = MockModel()
-            
-    s = Server1()
+        def GetModelSize(self):
+            return len(self.model)
+        
+    s = Server1(host='localhost', port=8082)
     s.SetApp(MockApp())
     s._Serve()
     
