@@ -1,7 +1,7 @@
 <html>
 <head>
-    <title>BargePoller</title>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <title>Andy Ajax Polling</title>
+    <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript" charset="utf-8"></script>
 
     <style type="text/css" media="screen">
       body{ background:#000;color:#fff;font-size:.9em; }
@@ -16,17 +16,16 @@
         /* Simple helper to add a div.
         type is the name of a CSS class (old/new/error).
         msg is the contents of the div */
-        $("#messages").append(
+        $("#messages").prepend(
             "<div class='msg "+ type +"'>"+ msg +"</div>"
         );
     }
 
     function waitForMsg(){
-        /* This requests the url "msgsrv.php"
-        When it complete (or errors)*/
+        /* This requests the url when it complete (or errors)*/
         $.ajax({
             type: "GET",
-            url: "http://localhost:8080/ajax_info1",
+            url: window.location.origin+"/ajax_info1",
 
             async: true, /* If set to non-async, browser shows page as "Loading.."*/
             cache: false,
@@ -56,7 +55,7 @@
 <body>
     <div id="messages">
         <div class="msg old">
-            BargePoll message requester!
+            Andy's ajax call logger
         </div>
     </div>
 </body>
