@@ -1,6 +1,7 @@
 import wx
 from hexmvcgui_gen import HexMvcGuiFrame1
 import thread, time
+import random
 
 class MyFrame(HexMvcGuiFrame1):
     def __init__( self, parent ):
@@ -54,6 +55,30 @@ class MyFrame(HexMvcGuiFrame1):
         self.m_textCtrl1.AppendText(str(self.app.model))
         for thing in self.app.model.things:
             self.m_listBox1.Append(str(thing), thing)
+
+    def AddThing( self, event ):
+        thing = self.app.CreateThing(str(random.randint(0,99999)))
+        self.m_listBox1.Append(str(thing), thing)        
+    
+    def DeleteThing( self, event ):
+        if self.m_listBox1.IsEmpty():
+            return
+        index = self.m_listBox1.GetSelection()
+        thing = self.m_listBox1.GetClientData(index) # see ItemContainer methods http://www.wxpython.org/docs/api/wx.ItemContainer-class.html
+        self.app.DeleteThing(thing)
+
+    def NotifyOfModelChange(self, event, thing):
+        if event == 'delete':
+            index = self.m_listBox1.FindString(str(thing))
+            if index != wx.NOT_FOUND:
+                self.m_listBox1.Delete(index)
+                self._RepairSelection(index)
+
+    def _RepairSelection(self, index):
+        if self.m_listBox1.IsEmpty():
+            return
+        index = max(0, index-1)
+        self.m_listBox1.SetSelection(index)
 
     def BackgroundTask1( self, event ):
         self.need_abort = False

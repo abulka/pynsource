@@ -24,8 +24,12 @@ class HexMvcTests(unittest.TestCase):
                 return self.savedmodel
 
         class GuiMock:
+            def __init__(self):
+                self._trace_notifycalls = 0
             def SetApp(self, app):
                 self.app = app
+            def NotifyOfModelChange(self, event, thing):
+                self._trace_notifycalls += 1
                 
         class ServerMock:
             def SetApp(self, app):
@@ -70,7 +74,14 @@ class HexMvcTests(unittest.TestCase):
         self.assertEqual('A-mary', str(app.GetThing(0)))
         self.assertEqual('A-elizabeth', str(app.GetThing(1)))
 
+    def test_CreateDelete(self):
+        app = self.app
+        thing = app.CreateThing("mary")
+        self.assertEqual(1, len(app.model))
+        app.DeleteThing(thing)
+        self.assertEqual(0, len(app.model))
 
+        self.assertEqual(1, app.gui._trace_notifycalls)
 
 # Utility
 

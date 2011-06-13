@@ -36,6 +36,11 @@ class App:
         cmd.Execute()
         return cmd.result
 
+    def DeleteThing(self, thing):
+        cmd = CmdDeleteThing(self)
+        cmd.thing = thing
+        cmd.Execute()
+
     def AddInfoToThing(self, a, info):
         cmd = CmdAddInfoToThing(self)
         cmd.a = a
@@ -68,6 +73,11 @@ class CmdCreateThing(Cmd):
     def Execute(self):
         self.result = Thing(self.info)
         self.app.model.things.append(self.result)
+
+class CmdDeleteThing(Cmd):
+    def Execute(self):
+        self.app.gui.NotifyOfModelChange("delete", self.thing)
+        self.app.model.things.remove(self.thing)
 
 class CmdAddInfoToThing(Cmd):
     def Execute(self):

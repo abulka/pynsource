@@ -154,6 +154,8 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		self.m_button12.Bind( wx.EVT_BUTTON, self.StopBackgroundTask1 )
 		self.m_button6.Bind( wx.EVT_BUTTON, self.FileNew )
 		self.m_button7.Bind( wx.EVT_BUTTON, self.FileLoad )
+		self.m_button1.Bind( wx.EVT_BUTTON, self.AddThing )
+		self.m_button2.Bind( wx.EVT_BUTTON, self.DeleteThing )
 	
 	def __del__( self ):
 		self.m_mgr.UnInit()
@@ -186,5 +188,11 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		event.Skip()
 	
 	
+	
+	def AddThing( self, event ):
+		event.Skip()
+	
+	def DeleteThing( self, event ):
+		event.Skip()
 	
 
