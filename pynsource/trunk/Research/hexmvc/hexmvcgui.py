@@ -63,12 +63,38 @@ class MyFrame(HexMvcGuiFrame1):
         thing = self.m_listBox1.GetClientData(index) # see ItemContainer methods http://www.wxpython.org/docs/api/wx.ItemContainer-class.html
         self.app.DeleteThing(thing)
 
+    def AddInfoToThing( self, event ):
+        if self.m_listBox1.IsEmpty():
+            return
+        index = self.m_listBox1.GetSelection()
+        if index == wx.NOT_FOUND:
+            return
+        thing = self.m_listBox1.GetClientData(index) # see ItemContainer methods http://www.wxpython.org/docs/api/wx.ItemContainer-class.html
+        self.app.AddInfoToThing(thing, "Z")
+        
+    def _FindClientData(self, control, clientData):
+        """
+        Listboxes etc. don't support finding via clientData
+        so I wrote this.
+        """
+        for i in range(0, self.m_listBox1.GetCount()):
+            if self.m_listBox1.GetClientData(i) == clientData:
+                return i
+        return wx.NOT_FOUND
+
     def NotifyOfModelChange(self, event, thing):
         if event == 'delete':
-            index = self.m_listBox1.FindString(str(thing))
+            index = self._FindClientData(self.m_listBox1, thing)
+            #index = self.m_listBox1.FindString(str(thing))
             if index != wx.NOT_FOUND:
                 self.m_listBox1.Delete(index)
                 self._RepairSelection(index)
+        if event == 'update':
+            index = self._FindClientData(self.m_listBox1, thing)
+            #index = self.m_listBox1.FindString(str(thing))
+            if index != wx.NOT_FOUND:
+                self.m_listBox1.SetString(index, str(thing))  # Maybe .Set() does both at the same time?
+                self.m_listBox1.SetClientData(index, thing)
         elif event == 'loadall':
             self.m_listBox1.Clear()
             for thing in self.app.model.things:

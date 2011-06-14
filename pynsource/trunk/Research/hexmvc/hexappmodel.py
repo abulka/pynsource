@@ -2,7 +2,7 @@
 
 class App:
     def __init__(self, persistence, server, gui):
-        self.model = Model(self, persistence)
+        self.model = Model(persistence)
         self.server = server
         self.gui = gui
         
@@ -42,9 +42,9 @@ class App:
         cmd.thing = thing
         cmd.Execute()
 
-    def AddInfoToThing(self, a, info):
+    def AddInfoToThing(self, thing, info):
         cmd = CmdAddInfoToThing(self)
-        cmd.a = a
+        cmd.thing = thing
         cmd.info = info
         cmd.Execute()
 
@@ -88,7 +88,8 @@ class CmdDeleteThing(Cmd):
 
 class CmdAddInfoToThing(Cmd):
     def Execute(self):
-        self.a.Do(self.info)
+        self.thing.AddInfo(self.info)
+        self.app.gui.NotifyOfModelChange("update", self.thing)
 
 class CmdStartServer(Cmd):
     def Execute(self):
@@ -97,8 +98,7 @@ class CmdStartServer(Cmd):
 
 
 class Model:        
-    def __init__(self, app, persistence):
-        self.app = app
+    def __init__(self, persistence):
         self.persistence = persistence
         self.things = []
         self.Clear()
@@ -125,5 +125,5 @@ class Thing:
     def __str__(self):
         return "A-" + self.info
 
-    def Do(self, msg):
+    def AddInfo(self, msg):
         self.info += " " + msg

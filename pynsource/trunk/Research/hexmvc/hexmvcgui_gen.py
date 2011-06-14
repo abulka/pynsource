@@ -105,6 +105,9 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		self.m_button2 = wx.Button( self.m_panel1, wx.ID_ANY, u"Delete Thing", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer2.Add( self.m_button2, 0, wx.ALL, 5 )
 		
+		self.m_button121 = wx.Button( self.m_panel1, wx.ID_ANY, u"Add Info To Thing", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer2.Add( self.m_button121, 0, wx.ALL, 5 )
+		
 		bSizer7.Add( bSizer2, 1, wx.EXPAND, 5 )
 		
 		bSizer6.Add( bSizer7, 1, 0, 5 )
@@ -156,6 +159,7 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		self.m_button7.Bind( wx.EVT_BUTTON, self.FileLoad )
 		self.m_button1.Bind( wx.EVT_BUTTON, self.AddThing )
 		self.m_button2.Bind( wx.EVT_BUTTON, self.DeleteThing )
+		self.m_button121.Bind( wx.EVT_BUTTON, self.AddInfoToThing )
 	
 	def __del__( self ):
 		self.m_mgr.UnInit()
@@ -193,6 +197,9 @@ class HexMvcGuiFrame1 ( wx.Frame ):
 		event.Skip()
 	
 	def DeleteThing( self, event ):
+		event.Skip()
+	
+	def AddInfoToThing( self, event ):
 		event.Skip()
 	
 
