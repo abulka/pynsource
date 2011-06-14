@@ -20,7 +20,8 @@ class App:
         return len(self.model)
         
     def New(self):
-        self.model.Clear()
+        cmd = CmdNew(self)
+        cmd.Execute()
 
     def Load(self):
         cmd = CmdLoadModel(self)
@@ -61,9 +62,15 @@ class Cmd:
     def __init__(self, app):
         self.app = app
 
+class CmdNew(Cmd):
+    def Execute(self):
+        self.app.model.Clear()
+        self.app.gui.NotifyOfModelChange("clear", None)
+
 class CmdLoadModel(Cmd):
     def Execute(self):
         self.app.model.LoadAll()
+        self.app.gui.NotifyOfModelChange("loadall", None)
 
 class CmdSaveModel(Cmd):
     def Execute(self):

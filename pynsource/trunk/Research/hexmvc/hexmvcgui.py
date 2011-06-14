@@ -34,28 +34,24 @@ class MyFrame(HexMvcGuiFrame1):
     def AddJunkText( self, event ):
         self._AddJunkText()
         
-    def MiscMessageBox( self, event ):
-        wx.MessageBox("hi there")
-
-    def FileLoad( self, event ):        
-        self.app.Load()
-        self._DumpModel()
-
-    def FileNew( self, event ):        
-        self.app.New()
-        self._DumpModel()
-        
     def _AddJunkText(self):
         self.m_textCtrl1.AppendText("asdasdasd ")
+
+    def MiscMessageBox( self, event ):
+        wx.MessageBox("hi there")
 
     def _IncrGuage(self):
         self.m_gauge1.Value += 1
 
     def _DumpModel(self):
         self.m_textCtrl1.AppendText(str(self.app.model))
-        for thing in self.app.model.things:
-            self.m_listBox1.Append(str(thing), thing)
 
+    def FileLoad( self, event ):        
+        self.app.Load()
+
+    def FileNew( self, event ):        
+        self.app.New()
+        
     def AddThing( self, event ):
         thing = self.app.CreateThing(str(random.randint(0,99999)))
         self.m_listBox1.Append(str(thing), thing)        
@@ -73,6 +69,12 @@ class MyFrame(HexMvcGuiFrame1):
             if index != wx.NOT_FOUND:
                 self.m_listBox1.Delete(index)
                 self._RepairSelection(index)
+        elif event == 'loadall':
+            self.m_listBox1.Clear()
+            for thing in self.app.model.things:
+                self.m_listBox1.Append(str(thing), thing)
+        elif event == 'clear':
+            self.m_listBox1.Clear()
 
     def _RepairSelection(self, index):
         if self.m_listBox1.IsEmpty():
