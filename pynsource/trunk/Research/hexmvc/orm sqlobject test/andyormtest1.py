@@ -1,4 +1,5 @@
 # http://www.andypatterns.com/index.php/blog/object_relational_mapping_pattern_-_using_sqlobj/
+# http://www.ibm.com/developerworks/opensource/library/os-pythonsqlo/
 
 from sqlobject import *
 from sqlobject.sqlite import builder; SQLiteConnection = builder()
