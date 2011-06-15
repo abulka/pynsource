@@ -1,6 +1,6 @@
-# HEXMVC BOOT WIRING
+# HEXMVC BOOT WIRING v2 - assumes app and model in the same import module
 
-from hexappmodel import App, Thing
+from hexappmodel import App
 from hexpersistence import PersistenceMock2
 from hexserver import Server1
 from hexmvcgui import MyWxApp

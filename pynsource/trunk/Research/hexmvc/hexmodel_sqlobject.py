@@ -14,6 +14,9 @@ class Model(SQLObject):
     def __len__(self):
         return len(self.things)
         
+    def SetApp(self, app):
+        self.app = app
+        
     def Clear(self):
         for thing in self.things:
             Thing.delete(thing.id)
@@ -25,6 +28,12 @@ class Model(SQLObject):
     def SaveAll(self):
         #self.persistence.SaveAll(self.things)
         pass
+
+    def CreateThing(self, info):
+        return Thing(info=info, model=self)
+
+    def DeleteThing(self, thing):
+        Thing.delete(thing.id)
 
 class Thing(SQLObject):
     info = StringCol(length=50)
