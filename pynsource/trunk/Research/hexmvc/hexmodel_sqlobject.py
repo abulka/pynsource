@@ -50,7 +50,8 @@ class Thing(SQLObject):
         
 if __name__ == "__main__":
     from sqlobject.sqlite import builder; SQLiteConnection = builder()
-    conn = SQLiteConnection('hexpersistence_sqlobject.db', debug=False)
+    #conn = SQLiteConnection('hexpersistence_sqlobject.db', debug=False)
+    conn = SQLiteConnection('hexmodel_sqlobject.db', debug=False)
     sqlhub.processConnection = conn
 
     init = raw_input("Create from scratch? (y/n) ")

@@ -28,8 +28,23 @@ else:
     SQLiteConnection = builder()
     conn = SQLiteConnection('hexmodel_sqlobject.db', debug=False)
     sqlhub.processConnection = conn
-    from hexmodel_sqlobject import Model
-    model = Model.get(1)
+    from hexmodel_sqlobject import Model, Thing
+    try:
+        model = Model.get(1)
+        thing = Thing.get(1)
+    except:
+        print "Oops - possible no database - creating..."
+        Model.dropTable(True)
+        Model.createTable()
+        Thing.dropTable(True)
+        Thing.createTable()
+
+        model = Model()    
+        thing1 = Thing(info="mary", model=model)
+        thing2 = Thing(info="fred", model=model)
+        
+        model = Model.get(1)
+        
     persistence = None
     
 # Create Core Hexagon App and inject adapters
