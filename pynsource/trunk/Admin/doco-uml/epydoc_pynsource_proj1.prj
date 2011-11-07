@@ -1,0 +1,50 @@
+(dp0
+S'show_imports'
+p1
+I0
+sS'prj_name'
+p2
+S'pynsource doco'
+p3
+sS'docformat'
+p4
+S'epytext'
+p5
+sS'inheritance'
+p6
+S'grouped'
+p7
+sS'help'
+p8
+NsS'modules'
+p9
+(VF:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/pynsource/core_parser.py
+p10
+VF:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/pynsource/gen_asciiart.py
+p11
+VF:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/pynsource/gen_base.py
+p12
+VF:/Documents/AndyTabletXp2/Documents and Settings/Andy/My Documents/Software Development/aa python/pyNsource/pynsource/gen_delphi.py
+p13
+tp14
+sS'private'
+p15
+I1
+sS'prj_url'
+p16
+NsS'introspect_or_parse'
+p17
+S'both'
+p18
+sS'frames'
+p19
+I1
+sS'css'
+p20
+S'default'
+p21
+sS'target'
+p22
+S'C:/Users/Andy/Desktop/try'
+p23
+s.
