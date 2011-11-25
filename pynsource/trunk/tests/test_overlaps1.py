@@ -1,11 +1,13 @@
 import unittest
 
 import sys
-sys.path.append("../Research/layout force spring")
+sys.path.append("../pynsource")
 
-from overlap_removal import OverlapRemoval, LINE_NODE_OVERLAP_REMOVAL_ENABLED
-from graph import Graph, GraphNode
+from layout.overlap_removal import OverlapRemoval, LINE_NODE_OVERLAP_REMOVAL_ENABLED
+from layout.graph import Graph, GraphNode
 import pprint
+
+sys.path.append("../Research/layout force spring")
 from data_testgraphs import *
 
 class OverlapTests(unittest.TestCase):

@@ -1,11 +1,13 @@
 import unittest
 
 import sys
-sys.path.append("../Research/layout force spring")
 
-from overlap_removal import OverlapRemoval
-from graph import Graph, GraphNode
+sys.path.append("../pynsource")
+from layout.overlap_removal import OverlapRemoval
+from layout.graph import Graph, GraphNode
 import pprint
+
+sys.path.append("../Research/layout force spring")
 from data_testgraphs import *
 
 class OverlapTests(unittest.TestCase):
@@ -38,8 +40,8 @@ class OverlapTests(unittest.TestCase):
         This is the slowest stress test because it runs the spring layout several times.
         """
         
-        from layout_spring import GraphLayoutSpring
-        from coordinate_mapper import CoordinateMapper
+        from layout.layout_spring import GraphLayoutSpring
+        from layout.coordinate_mapper import CoordinateMapper
         
         self.g.LoadGraphFromStrings(GRAPH_INITIALBOOT)    # load the scenario ourselves
         
