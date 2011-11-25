@@ -146,11 +146,17 @@ from gen_java import PySourceAsJava
 from umlworkspace import UmlWorkspace
 from layout_basic import LayoutBasic
 
-from snapshots import GraphSnapshotMgr
-from layout_spring import GraphLayoutSpring
-from overlap_removal import OverlapRemoval
-from blackboard import LayoutBlackboard
-from coordinate_mapper import CoordinateMapper
+from layout.snapshots import GraphSnapshotMgr
+from layout.layout_spring import GraphLayoutSpring
+from layout.overlap_removal import OverlapRemoval
+from layout.blackboard import LayoutBlackboard
+from layout.coordinate_mapper import CoordinateMapper
+
+#from snapshots import GraphSnapshotMgr
+#from layout_spring import GraphLayoutSpring
+#from overlap_removal import OverlapRemoval
+#from blackboard import LayoutBlackboard
+#from coordinate_mapper import CoordinateMapper
 
 class UmlShapeCanvas(ogl.ShapeCanvas):
     scrollStepX = 10

@@ -5,12 +5,23 @@ import wx.lib.ogl as ogl
 import time
 import thread
 import random
-from graph import *
-from layout_spring import GraphLayoutSpring
-from overlap_removal import OverlapRemoval
-from blackboard import LayoutBlackboard
-from coordinate_mapper import CoordinateMapper
-from snapshots import GraphSnapshotMgr
+
+#from graph import *
+#from layout_spring import GraphLayoutSpring
+#from overlap_removal import OverlapRemoval
+#from blackboard import LayoutBlackboard
+#from coordinate_mapper import CoordinateMapper
+#from snapshots import GraphSnapshotMgr
+#from data_testgraphs import *
+
+import sys
+sys.path.append("../../pynsource/")
+from layout.graph import *
+from layout.layout_spring import GraphLayoutSpring
+from layout.overlap_removal import OverlapRemoval
+from layout.blackboard import LayoutBlackboard
+from layout.coordinate_mapper import CoordinateMapper
+from layout.snapshots import GraphSnapshotMgr
 from data_testgraphs import *
 
 UNIT_TESTING_MODE = True

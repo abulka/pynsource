@@ -4,8 +4,9 @@
 
 import random
 import sys
-sys.path.append("../Research/layout force spring")
-from graph import Graph, GraphNode
+#sys.path.append("../Research/layout force spring")
+#from graph import Graph, GraphNode
+from layout.graph import Graph, GraphNode
 
 class UmlGraph(Graph):
 
