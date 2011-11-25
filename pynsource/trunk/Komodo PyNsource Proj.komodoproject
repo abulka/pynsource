@@ -23,7 +23,7 @@
 </preference-set>
 <preference-set id="Main Tests">
   <string id="command_line"></string>
-  <string relative="url" id="directory">tests</string>
+  <string relative="url" id="directory">tests/</string>
   <string id="language">Python - unittest</string>
 </preference-set>
 </preference-set>

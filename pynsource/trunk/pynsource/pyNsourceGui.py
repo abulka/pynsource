@@ -144,7 +144,8 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
 import sys, glob
 from gen_java import PySourceAsJava
 from umlworkspace import UmlWorkspace
-from layout_basic import LayoutBasic
+
+from layout.layout_basic import LayoutBasic
 
 from layout.snapshots import GraphSnapshotMgr
 from layout.layout_spring import GraphLayoutSpring
