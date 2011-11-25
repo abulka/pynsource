@@ -215,6 +215,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             self.ReLayout(keep_current_positions=False, gui=self, optimise=optimise)
             
         elif keycode == wx.WXK_RIGHT:
+            #self.CmdExpandLayout()
             if self.coordmapper.scale > 0.8:
                 self.ChangeScale(-0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
                 print "expansion ", self.coordmapper.scale
@@ -256,25 +257,12 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         elif keycode == 'w':
             self.NewEdgeMarkTo()
             
-        elif keycode == '(':
-            self.snapshot_mgr.QuickSave(slot=1)
-            
-        elif keycode == ')':
-            self.snapshot_mgr.QuickSave(slot=2)
-
-        elif keycode == '9':
-            self.snapshot_mgr.QuickRestore(slot=1)
-
-        elif keycode == '0':
-            self.snapshot_mgr.QuickRestore(slot=2)
-
         elif keycode in ['1','2','3','4','5','6','7','8']:
             todisplay = ord(keycode) - ord('1')
             self.snapshot_mgr.Restore(todisplay)
 
         elif keycode in ['b', 'B']:
-            b = LayoutBlackboard(graph=self.umlworkspace.graph, controller=self)
-            b.LayoutMultipleChooseBest(4)
+            self.CmdDeepLayout()
 
         elif keycode in ['l', 'L']:
             self.CmdLayout()
@@ -289,7 +277,19 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         print "node-node overlaps", self.overlap_remover.CountOverlaps()
         print "line-node crossings", self.umlworkspace.graph.CountLineOverNodeCrossings()['ALL']/2 #, self.graph.CountLineOverNodeCrossings()
         print "bounds", self.umlworkspace.graph.GetBounds()
-                
+
+    def CmdExpandLayout(self):
+        pass
+    
+    def CmdRememberLayout1(self):
+        self.snapshot_mgr.QuickSave(slot=1)
+    def CmdRememberLayout2(self):
+        self.snapshot_mgr.QuickSave(slot=2)
+    def CmdRestoreLayout1(self):
+        self.snapshot_mgr.QuickRestore(slot=1)
+    def CmdRestoreLayout2(self):
+        self.snapshot_mgr.QuickRestore(slot=2)
+
     def CmdInsertNewNode(self):
         id = 'D' + str(random.randint(1,99))
         dialog = wx.TextEntryDialog ( None, 'Enter an id string:', 'Create a new node', id )
@@ -653,6 +653,10 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.LayoutAndPositionShapes()
         self.RedrawEverything()
 
+    def CmdDeepLayout(self):
+        b = LayoutBlackboard(graph=self.umlworkspace.graph, controller=self)
+        b.LayoutMultipleChooseBest(4)
+
     def ReLayout(self, keep_current_positions=False, gui=None, optimise=True):
         self.AllToLayoutCoords()
         self.layouter.layout(keep_current_positions, optimise=optimise)
@@ -960,6 +964,9 @@ class MainApp(wx.App):
         menu1.AppendSeparator()
         Add(menu1, "&Clear\tCtrl-N", "Clear Diagram", self.FileNew)
         menu1.AppendSeparator()
+        Add(menu1, "File &Open...\tCtrl-O", "Load UML Diagram...", self.OnLoadGraph)
+        Add(menu1, "File &Save As...\tCtrl-S", "Save UML Diagram...", self.OnSaveGraph)
+        menu1.AppendSeparator()
         Add(menu1, "File &Print / Preview...\tCtrl-P", "Print", self.FilePrint)
         menu1.AppendSeparator()
         Add(menu1, "E&xit\tAlt-X", "Exit demo", self.OnButton)
@@ -967,6 +974,16 @@ class MainApp(wx.App):
         Add(menu2, "&Delete Class\tDel", "Delete Node", self.OnDeleteNode)
         
         Add(menu3, "&Layout UML\tL", "Layout UML", self.OnLayout)
+        Add(menu3, "&Deep Layout UML (slow)\tB", "Deep Layout UML (slow)", self.OnDeepLayout)
+        menu3.AppendSeparator()
+        Add(menu3, "&Remember Layout into memory slot 1\tShift-9", "Remember Layout 1", self.OnRememberLayout1)
+        Add(menu3, "&Remember Layout into memory slot 2\tShift-0", "Remember Layout 2", self.OnRememberLayout2)
+        Add(menu3, "&Restore Layout 1\t9", "Restore Layout 1", self.OnRestoreLayout1)
+        Add(menu3, "&Restore Layout 2\t0", "Restore Layout 2", self.OnRestoreLayout2)
+        #menu3.AppendSeparator()
+        #Add(menu3, "&Expand Layout\t->", "Expand Layout", self.OnExpandLayout)
+        menu3.AppendSeparator()
+        
         Add(menu3, "&Refresh", "Refresh", self.OnRefreshUmlWindow)
         
         Add(menu4, "&Help...", "Help", self.OnHelp)
@@ -980,6 +997,17 @@ class MainApp(wx.App):
         menuBar.Append(menu3, "&Layout")
         menuBar.Append(menu4, "&Help")
         self.frame.SetMenuBar(menuBar)
+        
+    def OnExpandLayout(self, event):
+        self.CmdExpandLayout()
+    def OnRememberLayout1(self, event):
+        self.umlwin.CmdRememberLayout1()
+    def OnRememberLayout2(self, event):
+        self.umlwin.CmdRememberLayout2()
+    def OnRestoreLayout1(self, event):
+        self.umlwin.CmdRestoreLayout1()
+    def OnRestoreLayout2(self, event):
+        self.umlwin.CmdRestoreLayout2()
         
     def FileImport(self, event):
         self.notebook.SetSelection(0)
@@ -1116,7 +1144,11 @@ class MainApp(wx.App):
 
     def OnLayout(self, event):
         self.umlwin.CmdLayout()
-        
+
+    def OnDeepLayout(self, event):
+        self.umlwin.CmdDeepLayout()
+
+
     def OnRefreshUmlWindow(self, event):
         self.umlwin.RedrawEverything()
 
