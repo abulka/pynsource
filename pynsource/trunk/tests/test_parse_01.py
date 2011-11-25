@@ -4,8 +4,8 @@
 import unittest
 
 import sys
-if not '..'in sys.path: sys.path.append('..')
-from pynsource.gen_asciiart import PySourceAsText
+sys.path.append("../pynsource")
+from generate_code.gen_asciiart import PySourceAsText
 
 
 class TestCase01(unittest.TestCase):

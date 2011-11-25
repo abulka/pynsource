@@ -142,7 +142,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
 
 
 import sys, glob
-from gen_java import PySourceAsJava
+from generate_code.gen_java import PySourceAsJava
 from umlworkspace import UmlWorkspace
 
 from layout.layout_basic import LayoutBasic
@@ -152,12 +152,6 @@ from layout.layout_spring import GraphLayoutSpring
 from layout.overlap_removal import OverlapRemoval
 from layout.blackboard import LayoutBlackboard
 from layout.coordinate_mapper import CoordinateMapper
-
-#from snapshots import GraphSnapshotMgr
-#from layout_spring import GraphLayoutSpring
-#from overlap_removal import OverlapRemoval
-#from blackboard import LayoutBlackboard
-#from coordinate_mapper import CoordinateMapper
 
 class UmlShapeCanvas(ogl.ShapeCanvas):
     scrollStepX = 10
@@ -1002,7 +996,7 @@ class MainApp(wx.App):
             print 'Import - Done.'
 
     def FileImport2(self, event):
-        from gen_yuml import PySourceAsYuml
+        from generate_code.gen_yuml import PySourceAsYuml
         import urllib
         
         self.notebook.SetSelection(1)
@@ -1034,7 +1028,7 @@ class MainApp(wx.App):
             print 'Import - Done.'
 
     def FileImport3(self, event):
-        from gen_asciiart import PySourceAsText
+        from generate_code.gen_asciiart import PySourceAsText
         import urllib
         
         self.notebook.SetSelection(2)

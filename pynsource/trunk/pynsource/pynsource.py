@@ -2,10 +2,10 @@
 
 import os
 #from core_parser import *
-from gen_asciiart import CmdLinePythonToAsciiArt
-from gen_yuml import CmdLinePythonToYuml
-from gen_delphi import CmdLinePythonToDelphi
-from gen_java import CmdLinePythonToJava
+from generate_code.gen_asciiart import CmdLinePythonToAsciiArt
+from generate_code.gen_yuml import CmdLinePythonToYuml
+from generate_code.gen_delphi import CmdLinePythonToDelphi
+from generate_code.gen_java import CmdLinePythonToJava
 import messages
 
 def test():
