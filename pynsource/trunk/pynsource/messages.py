@@ -2,6 +2,8 @@
 
 WEB_VERSION_CHECK_URL = "http://www.atug.com/downloads/pynsource-latest.txt"
 WEB_PYNSOURCE_HOME_URL = "http://www.andypatterns.com/index.php/products/pynsource/"
+PYNSOURCE_CONFIG_FILE = "pynsource.ini"
+PYNSOURCE_CONFIG_DIR = "PyNSource"
 
 ABOUT_MSG = """
 PyNSource GUI
@@ -37,7 +39,7 @@ To draw lines between classes: Select the first class, hit 'q', select the secon
 
 Use -> (right arrow) to expand the layout spacing and <- (left arrow) to contract.  Or use the MouseWheel.  Laying out lots of classes does better with an increased layout spacing, but takes up more room.
 
-After a Deep Layout, there may be layout variants that you can access by pressing 1, 2 ... 8.
+After a (possibly slow) 'Optimal' Layout, there may be layout variants that you can access by pressing 1, 2 ... 8 in order of perfection.
 """
 
 HELP_COMMAND_LINE_USAGE = """

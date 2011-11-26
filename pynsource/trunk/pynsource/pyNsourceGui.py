@@ -25,6 +25,8 @@ import random
 import wx
 import wx.lib.ogl as ogl
 from wx import Frame
+from wx import StandardPaths
+import shelve
 import os, stat
 from messages import *
 from gui_umlshapes import *
@@ -854,6 +856,8 @@ class MainApp(wx.App):
         #self.umlwin.Bind(wx.EVT_SET_FOCUS, self.onFocus)  # attempt at making mousewheel auto scroll the workspace
         #self.frame.Bind(wx.EVT_SET_FOCUS, self.onFocus)   # attempt at making mousewheel auto scroll the workspace
         
+        self.InitConfig()
+
         # Debug bootstrap  --------------------------------------
         #self.frame.SetSize((1024,768))
         #self.umlwin.Go(files=[os.path.abspath( __file__ )])
@@ -867,6 +871,26 @@ class MainApp(wx.App):
     #def onFocus(self, event):   # attempt at making mousewheel auto scroll the workspace
     #    self.umlwin.SetFocus()  # attempt at making mousewheel auto scroll the workspace
         
+    def InitConfig(self):
+        config_dir = os.path.join(wx.StandardPaths.Get().GetUserConfigDir(), PYNSOURCE_CONFIG_DIR)
+        try:
+            os.makedirs(config_dir)
+        except OSError:
+            pass        
+        self.user_config_file = os.path.join(config_dir, PYNSOURCE_CONFIG_FILE)
+        print "Pynsource config file", self.user_config_file
+        
+        #shelf = shelve.open(self.user_config_file)
+        #shelf["users"] = ["David", "Abraham"]
+        #shelf.sync() # Save
+        
+        from configobj import ConfigObj # easy_install configobj
+        self.config = ConfigObj(self.user_config_file) # doco at http://www.voidspace.org.uk/python/configobj.html
+        print self.config
+        self.config['keyword1'] = 100
+        self.config['keyword2'] = "hi there"
+        self.config.write()
+
     def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
         self.umlwin.coordmapper.Recalibrate(self.frame.GetClientSize()) # may need to call self.GetVirtualSize() if scrolled window
         #self.umlwin.coordmapper.Recalibrate(self.umlwin.GetVirtualSize())
@@ -930,10 +954,15 @@ class MainApp(wx.App):
         dialog.Destroy()
             
     def OnLoadGraph(self, event):
-        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.\\saved uml workspaces',
+        thisdir = self.config.get('LastDirFileOpen', '.\\saved uml workspaces') # remember dir path
+        
+        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir=thisdir,
             defaultFile="", wildcard="*.txt", style=wx.OPEN, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
+
+            self.config['LastDirFileOpen'] = dlg.GetDirectory()  # remember dir path
+            self.config.write()
 
             fp = open(filename, "r")
             s = fp.read()
@@ -1039,11 +1068,16 @@ class MainApp(wx.App):
         
     def FileImport(self, event):
         self.notebook.SetSelection(0)
-        thisdir = os.getcwd() # remember dir path
+        
+        thisdir = self.config.get('LastDirFileImport', os.getcwd()) # remember dir path
+        
         dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir=thisdir,
             defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
-            os.chdir(dlg.GetDirectory())  # remember dir path
+            
+            self.config['LastDirFileImport'] = dlg.GetDirectory()  # remember dir path
+            self.config.write()
+            
             filenames = dlg.GetPaths()
             print 'Importing...'
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
