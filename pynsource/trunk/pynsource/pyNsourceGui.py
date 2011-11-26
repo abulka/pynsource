@@ -206,28 +206,19 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.working = True
 
 
-        if keycode == wx.WXK_DOWN:
-            optimise = not event.ShiftDown()
-            self.ReLayout(keep_current_positions=True, gui=self, optimise=optimise)
-
-        elif keycode == wx.WXK_UP:
-            optimise = not event.ShiftDown()
-            self.ReLayout(keep_current_positions=False, gui=self, optimise=optimise)
+        #if keycode == wx.WXK_DOWN:
+        #    optimise = not event.ShiftDown()
+        #    self.ReLayout(keep_current_positions=True, gui=self, optimise=optimise)
+        #
+        #elif keycode == wx.WXK_UP:
+        #    optimise = not event.ShiftDown()
+        #    self.ReLayout(keep_current_positions=False, gui=self, optimise=optimise)
             
-        elif keycode == wx.WXK_RIGHT:
-            #self.CmdExpandLayout()
-            if self.coordmapper.scale > 0.8:
-                self.ChangeScale(-0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
-                print "expansion ", self.coordmapper.scale
-            else:
-                print "Max expansion prevented.", self.coordmapper.scale
+        if keycode == wx.WXK_RIGHT:
+            self.cmdLayoutExpand(event)
             
         elif keycode == wx.WXK_LEFT:
-            if self.coordmapper.scale < 3:
-                self.ChangeScale(0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
-                print "contraction ", self.coordmapper.scale
-            else:
-                print "Min expansion thwarted.", self.coordmapper.scale
+            self.cmdLayoutContract(event)
 
         elif keycode == wx.WXK_INSERT:
             self.CmdInsertNewNode()
@@ -239,6 +230,20 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
                 self.CmdZapShape(shape)
         self.working = False
         event.Skip()
+
+    def cmdLayoutExpand(self, event):
+        if self.coordmapper.scale > 0.8:
+            self.ChangeScale(-0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
+            print "expansion ", self.coordmapper.scale
+        else:
+            print "Max expansion prevented.", self.coordmapper.scale
+
+    def cmdLayoutContract(self, event):
+        if self.coordmapper.scale < 3:
+            self.ChangeScale(0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
+            print "contraction ", self.coordmapper.scale
+        else:
+            print "Min expansion thwarted.", self.coordmapper.scale
 
     def onKeyChar(self, event):
         if event.GetKeyCode() >= 256:
@@ -278,9 +283,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         print "line-node crossings", self.umlworkspace.graph.CountLineOverNodeCrossings()['ALL']/2 #, self.graph.CountLineOverNodeCrossings()
         print "bounds", self.umlworkspace.graph.GetBounds()
 
-    def CmdExpandLayout(self):
-        pass
-    
+  
     def CmdRememberLayout1(self):
         self.snapshot_mgr.QuickSave(slot=1)
     def CmdRememberLayout2(self):
@@ -563,6 +566,17 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.working = True
 
         if event.GetWheelRotation() < 0:
+            self.cmdLayoutExpand(event)
+        else:
+            self.cmdLayoutContract(event)
+
+        self.working = False
+
+    def OnWheelZoom_OverlapRemoval_Defunct(self, event):
+        if self.working: return
+        self.working = True
+
+        if event.GetWheelRotation() < 0:
             self.stage2()
             print self.overlap_remover.GetStats()
         else:
@@ -837,6 +851,9 @@ class MainApp(wx.App):
         self.umlwin.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)
         self.Bind(wx.EVT_SIZE, self.OnResizeFrame)
 
+        #self.umlwin.Bind(wx.EVT_SET_FOCUS, self.onFocus)  # attempt at making mousewheel auto scroll the workspace
+        #self.frame.Bind(wx.EVT_SET_FOCUS, self.onFocus)   # attempt at making mousewheel auto scroll the workspace
+        
         # Debug bootstrap  --------------------------------------
         #self.frame.SetSize((1024,768))
         #self.umlwin.Go(files=[os.path.abspath( __file__ )])
@@ -847,6 +864,9 @@ class MainApp(wx.App):
         # END Debug bootstrap --------------------------------------
         return True
 
+    #def onFocus(self, event):   # attempt at making mousewheel auto scroll the workspace
+    #    self.umlwin.SetFocus()  # attempt at making mousewheel auto scroll the workspace
+        
     def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
         self.umlwin.coordmapper.Recalibrate(self.frame.GetClientSize()) # may need to call self.GetVirtualSize() if scrolled window
         #self.umlwin.coordmapper.Recalibrate(self.umlwin.GetVirtualSize())
@@ -977,8 +997,9 @@ class MainApp(wx.App):
         Add(menu3, "&Deep Layout UML (slow)\tB", "Deep Layout UML (slow)", self.OnDeepLayout)
         menu3.AppendSeparator()
         Add(menu3, "&Remember Layout into memory slot 1\tShift-9", "Remember Layout 1", self.OnRememberLayout1)
-        Add(menu3, "&Remember Layout into memory slot 2\tShift-0", "Remember Layout 2", self.OnRememberLayout2)
         Add(menu3, "&Restore Layout 1\t9", "Restore Layout 1", self.OnRestoreLayout1)
+        menu3.AppendSeparator()
+        Add(menu3, "&Remember Layout into memory slot 2\tShift-0", "Remember Layout 2", self.OnRememberLayout2)
         Add(menu3, "&Restore Layout 2\t0", "Restore Layout 2", self.OnRestoreLayout2)
         #menu3.AppendSeparator()
         #Add(menu3, "&Expand Layout\t->", "Expand Layout", self.OnExpandLayout)
@@ -998,8 +1019,6 @@ class MainApp(wx.App):
         menuBar.Append(menu4, "&Help")
         self.frame.SetMenuBar(menuBar)
         
-    def OnExpandLayout(self, event):
-        self.CmdExpandLayout()
     def OnRememberLayout1(self, event):
         self.umlwin.CmdRememberLayout1()
     def OnRememberLayout2(self, event):
