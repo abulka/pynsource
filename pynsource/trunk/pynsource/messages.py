@@ -35,7 +35,7 @@ You can import repeatedly and incoming classes will be added and wired up to exi
 You cannot add new classes in the GUI, this is just a reverse engineering tool.  You can however delete uncessesary classes by pressing Del.
 To draw lines between classes: Select the first class, hit 'q', select the second class, hit 'w'.
 
-Use -> (right arrow) to expand the layout spacing and <- (left arrow) to contract.  Laying out lots of classes does better with an increased layout spacing, but takes up more room.
+Use -> (right arrow) to expand the layout spacing and <- (left arrow) to contract.  Or use the MouseWheel.  Laying out lots of classes does better with an increased layout spacing, but takes up more room.
 
 After a Deep Layout, there may be layout variants that you can access by pressing 1, 2 ... 8.
 """

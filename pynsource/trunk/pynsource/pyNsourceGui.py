@@ -974,6 +974,7 @@ class MainApp(wx.App):
         menu1 = wx.Menu()
         menu2 = wx.Menu()
         menu3 = wx.Menu()
+        menu3sub = wx.Menu()
         menu4 = wx.Menu()
 
         self.next_menu_id = wx.NewId()
@@ -982,34 +983,38 @@ class MainApp(wx.App):
             wx.EVT_MENU(self, self.next_menu_id, func)
             self.next_menu_id = wx.NewId()
 
-        Add(menu1, "File &Import...\tCtrl-I", "Import Python Source Files", self.FileImport)
-        Add(menu1, "File &Import yUml...\tCtrl-O", "Import Python Source Files", self.FileImport2)
-        Add(menu1, "File &Import Ascii Art...\tCtrl-J", "Import Python Source Files", self.FileImport3)
-        menu1.AppendSeparator()
-        Add(menu1, "&Clear\tCtrl-N", "Clear Diagram", self.FileNew)
-        menu1.AppendSeparator()
+        def AddSubMenu(menu, submenu, s):
+            menu.AppendMenu(self.next_menu_id, s, submenu)
+            self.next_menu_id = wx.NewId()
+
+        Add(menu1, "&New\tCtrl-N", "New Diagram", self.FileNew)
         Add(menu1, "File &Open...\tCtrl-O", "Load UML Diagram...", self.OnLoadGraph)
         Add(menu1, "File &Save As...\tCtrl-S", "Save UML Diagram...", self.OnSaveGraph)
+        menu1.AppendSeparator()
+        Add(menu1, "File &Import...\tCtrl-I", "Import Python Source Files", self.FileImport)
+        Add(menu1, "File &Import yUml...\tCtrl-Y", "Import Python Source Files", self.FileImport2)
+        Add(menu1, "File &Import Ascii Art...\tCtrl-J", "Import Python Source Files", self.FileImport3)
         menu1.AppendSeparator()
         Add(menu1, "File &Print / Preview...\tCtrl-P", "Print", self.FilePrint)
         menu1.AppendSeparator()
         Add(menu1, "E&xit\tAlt-X", "Exit demo", self.OnButton)
         
         Add(menu2, "&Delete Class\tDel", "Delete Node", self.OnDeleteNode)
+        Add(menu2, "&Refresh", "Refresh", self.OnRefreshUmlWindow)
         
         Add(menu3, "&Layout UML\tL", "Layout UML", self.OnLayout)
-        Add(menu3, "&Deep Layout UML (slow)\tB", "Deep Layout UML (slow)", self.OnDeepLayout)
+        Add(menu3, "&Layout UML Optimal(slow)\tB", "Deep Layout UML (slow)", self.OnDeepLayout)
         menu3.AppendSeparator()
-        Add(menu3, "&Remember Layout into memory slot 1\tShift-9", "Remember Layout 1", self.OnRememberLayout1)
-        Add(menu3, "&Restore Layout 1\t9", "Restore Layout 1", self.OnRestoreLayout1)
-        menu3.AppendSeparator()
-        Add(menu3, "&Remember Layout into memory slot 2\tShift-0", "Remember Layout 2", self.OnRememberLayout2)
-        Add(menu3, "&Restore Layout 2\t0", "Restore Layout 2", self.OnRestoreLayout2)
+        Add(menu3sub, "&Remember Layout into memory slot 1\tShift-9", "Remember Layout 1", self.OnRememberLayout1)
+        Add(menu3sub, "&Restore Layout 1\t9", "Restore Layout 1", self.OnRestoreLayout1)
+        menu3sub.AppendSeparator()
+        Add(menu3sub, "&Remember Layout into memory slot 2\tShift-0", "Remember Layout 2", self.OnRememberLayout2)
+        Add(menu3sub, "&Restore Layout 2\t0", "Restore Layout 2", self.OnRestoreLayout2)
+        AddSubMenu(menu3, menu3sub, "Snapshots")
         #menu3.AppendSeparator()
         #Add(menu3, "&Expand Layout\t->", "Expand Layout", self.OnExpandLayout)
         menu3.AppendSeparator()
         
-        Add(menu3, "&Refresh", "Refresh", self.OnRefreshUmlWindow)
         
         Add(menu4, "&Help...", "Help", self.OnHelp)
         Add(menu4, "&Visit PyNSource Website...", "PyNSource Website", self.OnVisitWebsite)
@@ -1034,9 +1039,11 @@ class MainApp(wx.App):
         
     def FileImport(self, event):
         self.notebook.SetSelection(0)
-        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
+        thisdir = os.getcwd() # remember dir path
+        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir=thisdir,
             defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
+            os.chdir(dlg.GetDirectory())  # remember dir path
             filenames = dlg.GetPaths()
             print 'Importing...'
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
