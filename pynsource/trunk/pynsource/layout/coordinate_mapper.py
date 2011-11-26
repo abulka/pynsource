@@ -48,6 +48,7 @@ class CoordinateMapper:
     def AllToWorldCoords(self):
         for node in self.graph.nodes:
             node.left, node.top = self.LayoutToWorld([node.layoutPosX, node.layoutPosY])
+            assert node.left < 20000, "Insane x values being generated"
 
 
 if __name__ == '__main__':

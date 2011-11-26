@@ -949,6 +949,10 @@ class MainApp(wx.App):
                 
         # build view from model
         self.umlwin.stage1(translatecoords=False)
+
+        # set layout coords to be in sync with world, so that if expand scale things will work
+        self.umlwin.coordmapper.Recalibrate()
+        self.umlwin.AllToLayoutCoords()
         
         # refresh view
         self.umlwin.GetDiagram().ShowAll(1) # need this, yes

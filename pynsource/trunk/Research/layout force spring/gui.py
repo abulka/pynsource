@@ -629,6 +629,10 @@ class GraphRendererOgl:
                 
         # build view from model
         self.draw(translatecoords=False)
+
+        # set layout coords to be in sync with world, so that if expand scale things will work
+        self.coordmapper.Recalibrate()
+        self.AllToLayoutCoords()
         
         # refresh view
         self.oglcanvas.GetDiagram().ShowAll(1) # need this, yes
