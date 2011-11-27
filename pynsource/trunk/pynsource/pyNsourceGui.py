@@ -300,8 +300,14 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         dialog = wx.TextEntryDialog ( None, 'Enter an id string:', 'Create a new node', id )
         if dialog.ShowModal() == wx.ID_OK:
             id = dialog.GetValue()
-            node = self.umlworkspace.AddSimpleNode(id)
-            self.createNodeShape(node)
+            
+            #node = self.umlworkspace.AddSimpleNode(id)
+            #self.createNodeShape(node)
+            
+            node = self.umlworkspace.AddUmlNode(id, ['a','b'], ['c','d'])
+            shape = self.CreateUmlShape(node)
+            self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+            
             node.shape.Show(True)
             self.stateofthenation()
         dialog.Destroy()
@@ -362,6 +368,8 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             return
         
         edge = self.umlworkspace.graph.AddEdge(self.new_edge_from, tonode, weight=None)
+        edge['uml_edge_type'] = ''
+        #edge['uml_edge_type'] = 'composition'
         self.CreateUmlEdge(edge)
         self.stateofthenation()
 
