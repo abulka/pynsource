@@ -4,18 +4,25 @@ WEB_VERSION_CHECK_URL = "http://www.atug.com/downloads/pynsource-latest.txt"
 WEB_PYNSOURCE_HOME_URL = "http://www.andypatterns.com/index.php/products/pynsource/"
 PYNSOURCE_CONFIG_FILE = "pynsource.ini"
 PYNSOURCE_CONFIG_DIR = "PyNSource"
-
+ABOUT_AUTHOR = "(c) Andy Bulka 2004-2011"
+ABOUT_APPNAME = "PyNSource"
+ABOUT_LICENSE = "License: GPL 3 (free software)"
 ABOUT_MSG = """
-PyNSource GUI
+PyNSource is a UML modelling tool for Python source code.
 
-Version %s
-
-A GUI front end to the python code scanner PyNSource that generates UML diagrams from Python Source code.
-
-(c) Andy Bulka 2004-2011
-http://www.andypatterns.com/index.php/products/pynsource/
-
-License: GPL 3 (free software).
+Reverse engineer python source code into either a UML diagram or into an Ascii Art attempt at UML - and paste it into your source code!
+"""
+ABOUT_FEATURES = """
+Resilient: doesn't import the python files, thus will never get "stuck" when syntax is wrong.
+Fast
+Free
+Recognises inheritance and composition  relationships
+Recognises ocurrences of self.somevar as UML fields (no other UML tool does this for python)
+Detects the cardinality of associations e.g. one to one or 1..*  etc
+Optionally treat modules as classes - creating a pseudo class for each module - module variables and functions are  treated as attributes and methods of a class
+Has been developed using unit tests (supplied) so that you can trust it just that little bit more ;-)
+Can generate UML Ascii-art :-)
+Can generate Java and Delphi code skeletons (out of your python code) so that you can import those into a proper UML tool.
 """
 
 WEB_UPDATE_MSG = """

@@ -295,17 +295,70 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
     def CmdRestoreLayout2(self):
         self.snapshot_mgr.QuickRestore(slot=2)
 
+
     def CmdInsertNewNode(self):
+        
+        SIMPLE = True
+        
+        class NodeUserEdit(wx.Dialog):
+            
+            def __init__(self, parent, title):
+                super(NodeUserEdit, self).__init__(parent=parent, 
+                    title=title, size=(250, 200))
+        
+                panel = wx.Panel(self)
+                vbox = wx.BoxSizer(wx.VERTICAL)
+
+                #self.info_classname = wx.TextCtrl(panel, flag=wx.LEFT, border=5)
+                #self.info_attrs = wx.TextCtrl(panel, flag=wx.LEFT, border=5)
+                #self.info_methods = wx.TextCtrl(panel, flag=wx.LEFT, border=5)
+
+                sb = wx.StaticBox(panel, label='Classname')
+                sbs = wx.StaticBoxSizer(sb, orient=wx.VERTICAL)        
+                sbs.Add(wx.RadioButton(panel, label='256 Colors', style=wx.RB_GROUP))
+                sbs.Add(wx.RadioButton(panel, label='16 Colors'))
+                sbs.Add(wx.RadioButton(panel, label='2 Colors'))
+                
+                hbox1 = wx.BoxSizer(wx.HORIZONTAL)        
+                hbox1.Add(wx.RadioButton(panel, label='Custom'))
+                hbox1.Add(wx.TextCtrl(panel), flag=wx.LEFT, border=5)
+                hbox1.Add(wx.TextCtrl(panel), flag=wx.LEFT, border=5)
+                hbox1.Add(wx.TextCtrl(panel), flag=wx.LEFT, border=5)
+                sbs.Add(hbox1)
+                
+                panel.SetSizer(sbs)
+               
+                hbox2 = wx.BoxSizer(wx.HORIZONTAL)
+                okButton = wx.Button(self, wx.ID_OK)
+                closeButton = wx.Button(self, wx.ID_CANCEL)
+                hbox2.Add(okButton)
+                hbox2.Add(closeButton, flag=wx.LEFT, border=5)
+        
+                vbox.Add(panel, proportion=1, flag=wx.ALL|wx.EXPAND, border=5)
+                vbox.Add(hbox2, flag= wx.ALIGN_CENTER|wx.TOP|wx.BOTTOM, border=10)
+        
+                self.SetSizer(vbox)
+                
+                #okButton.Bind(wx.EVT_BUTTON, self.OnClose)
+                #closeButton.Bind(wx.EVT_BUTTON, self.OnClose)
+                
+            def OnClose(self, e):
+                self.Destroy()        
+        
         id = 'D' + str(random.randint(1,99))
-        dialog = wx.TextEntryDialog ( None, 'Enter an id string:', 'Create a new node', id )
+        
+        if SIMPLE:
+            dialog = wx.TextEntryDialog ( None, 'Enter an id string:', 'Create a new node', id )
+        else:
+            dialog = NodeUserEdit(None, title='Edit UML Node')
+        
         if dialog.ShowModal() == wx.ID_OK:
+            wx.MessageBox("got wx.ID_OK")
+
             id = dialog.GetValue()
             
-            #node = self.umlworkspace.AddSimpleNode(id)
-            #self.createNodeShape(node)
-            
-            node = self.umlworkspace.AddUmlNode(id, ['a','b'], ['c','d'])
-            shape = self.CreateUmlShape(node)
+            node = self.umlworkspace.AddUmlNode(id, ['a','b'], ['c','d'])       # was self.umlworkspace.AddSimpleNode(id)
+            shape = self.CreateUmlShape(node)                                   # was self.createNodeShape(node)
             self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             
             node.shape.Show(True)
@@ -1184,7 +1237,25 @@ class MainApp(wx.App):
         frame.Show(True)
 
     def OnAbout(self, event):
-        self.MessageBox(ABOUT_MSG.strip() %  APP_VERSION)
+        #self.MessageBox(ABOUT_MSG.strip() %  APP_VERSION)
+        
+        from wx.lib.wordwrap import wordwrap
+        info = wx.AboutDialogInfo()
+        #info.SetIcon(wx.Icon('Images\\img_uml01.png', wx.BITMAP_TYPE_PNG))
+        info.SetName(ABOUT_APPNAME)
+        info.SetVersion(str(APP_VERSION))
+        #info.SetDescription(ABOUT_MSG)
+        info.Description = wordwrap(ABOUT_MSG, 350, wx.ClientDC(self.frame))
+        info.SetCopyright(ABOUT_AUTHOR)
+        #info.SetWebSite(WEB_PYNSOURCE_HOME_URL)
+        info.WebSite = (WEB_PYNSOURCE_HOME_URL, "Home Page")
+        info.SetLicence(ABOUT_LICENSE)
+        #info.AddDeveloper(ABOUT_AUTHOR)
+        #info.AddDocWriter(ABOUT_FEATURES)
+        #info.AddArtist('Blah')
+        #info.AddTranslator('Blah')
+
+        wx.AboutBox(info)
 
     def OnVisitWebsite(self, event):
         import webbrowser
