@@ -295,70 +295,34 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
     def CmdRestoreLayout2(self):
         self.snapshot_mgr.QuickRestore(slot=2)
 
+    def CmdInsertNewNode_OLD_SIMPLE(self):
+        id = 'D' + str(random.randint(1,99))
+        dialog = wx.TextEntryDialog ( None, 'Enter an id string:', 'Create a new node', id )
+        if dialog.ShowModal() == wx.ID_OK:
+            id = dialog.GetValue()
+            node = self.umlworkspace.AddUmlNode(id, ['a','b'], ['c','d'])
+            shape = self.CreateUmlShape(node)
+            self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+            node.shape.Show(True)
+            self.stateofthenation()
+        dialog.Destroy()
 
     def CmdInsertNewNode(self):
-        
-        SIMPLE = True
-        
-        class NodeUserEdit(wx.Dialog):
-            
-            def __init__(self, parent, title):
-                super(NodeUserEdit, self).__init__(parent=parent, 
-                    title=title, size=(250, 200))
-        
-                panel = wx.Panel(self)
-                vbox = wx.BoxSizer(wx.VERTICAL)
+        from dialogs.DialogUmlNodeEdit import DialogUmlNodeEdit
+        dialog = DialogUmlNodeEdit(None)
 
-                #self.info_classname = wx.TextCtrl(panel, flag=wx.LEFT, border=5)
-                #self.info_attrs = wx.TextCtrl(panel, flag=wx.LEFT, border=5)
-                #self.info_methods = wx.TextCtrl(panel, flag=wx.LEFT, border=5)
+        dialog.txtClassName.Value = 'D' + str(random.randint(1,99))
+        dialog.txtAttrs.Value = "aa\nbb\nccc"
 
-                sb = wx.StaticBox(panel, label='Classname')
-                sbs = wx.StaticBoxSizer(sb, orient=wx.VERTICAL)        
-                sbs.Add(wx.RadioButton(panel, label='256 Colors', style=wx.RB_GROUP))
-                sbs.Add(wx.RadioButton(panel, label='16 Colors'))
-                sbs.Add(wx.RadioButton(panel, label='2 Colors'))
-                
-                hbox1 = wx.BoxSizer(wx.HORIZONTAL)        
-                hbox1.Add(wx.RadioButton(panel, label='Custom'))
-                hbox1.Add(wx.TextCtrl(panel), flag=wx.LEFT, border=5)
-                hbox1.Add(wx.TextCtrl(panel), flag=wx.LEFT, border=5)
-                hbox1.Add(wx.TextCtrl(panel), flag=wx.LEFT, border=5)
-                sbs.Add(hbox1)
-                
-                panel.SetSizer(sbs)
-               
-                hbox2 = wx.BoxSizer(wx.HORIZONTAL)
-                okButton = wx.Button(self, wx.ID_OK)
-                closeButton = wx.Button(self, wx.ID_CANCEL)
-                hbox2.Add(okButton)
-                hbox2.Add(closeButton, flag=wx.LEFT, border=5)
-        
-                vbox.Add(panel, proportion=1, flag=wx.ALL|wx.EXPAND, border=5)
-                vbox.Add(hbox2, flag= wx.ALIGN_CENTER|wx.TOP|wx.BOTTOM, border=10)
-        
-                self.SetSizer(vbox)
-                
-                #okButton.Bind(wx.EVT_BUTTON, self.OnClose)
-                #closeButton.Bind(wx.EVT_BUTTON, self.OnClose)
-                
-            def OnClose(self, e):
-                self.Destroy()        
-        
-        id = 'D' + str(random.randint(1,99))
-        
-        if SIMPLE:
-            dialog = wx.TextEntryDialog ( None, 'Enter an id string:', 'Create a new node', id )
-        else:
-            dialog = NodeUserEdit(None, title='Edit UML Node')
-        
         if dialog.ShowModal() == wx.ID_OK:
-            wx.MessageBox("got wx.ID_OK")
+            #wx.MessageBox("got wx.ID_OK")
 
-            id = dialog.GetValue()
+            id = dialog.txtClassName.Value
+            attrs = dialog.txtAttrs.Value.split('\n')
+            methods = dialog.txtMethods.Value.split('\n')
             
-            node = self.umlworkspace.AddUmlNode(id, ['a','b'], ['c','d'])       # was self.umlworkspace.AddSimpleNode(id)
-            shape = self.CreateUmlShape(node)                                   # was self.createNodeShape(node)
+            node = self.umlworkspace.AddUmlNode(id, attrs, methods)
+            shape = self.CreateUmlShape(node)
             self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             
             node.shape.Show(True)
