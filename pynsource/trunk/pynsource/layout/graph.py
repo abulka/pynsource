@@ -18,6 +18,15 @@ class Graph:
         self.layoutMinY = 0
         self.layoutMaxY = 0
         
+    def RenameNode(self, node, new_id):
+        found_node = self.FindNodeById(node.id)
+        assert found_node == node
+        assert found_node.id == node.id
+
+        del self.nodeSet[node.id]
+        node.id = new_id
+        self.nodeSet[node.id] = node
+
     def AddNode(self, node):
         if not self.FindNodeById(node.id):
             self.nodeSet[node.id] = node

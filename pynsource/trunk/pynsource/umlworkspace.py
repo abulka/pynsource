@@ -59,15 +59,13 @@ class UmlWorkspace:
         self.associations_generalisation = []  # list of (classname, parentclassname) tuples
         self.associations_composition = []     # list of (rhs, lhs) tuples
         
-    def DeleteShape(self, shape):
-        classnames = self.classnametoshape.keys()
-        for classname in classnames:
-            if self.classnametoshape[classname] == shape:
-                print 'found class to delete: ', classname
-                break
+    def DeleteShape(self, shape, deleteNodeToo=True):
+        classname = (classname for classname,shaperef in self.classnametoshape.items() if shaperef==shape).next()  # see http://johnstachurski.net/lectures/generators.html on how generators work, which can be built from list comprehension syntax
+        print 'found class to delete: ', classname
 
-        self.graph.DeleteNodeById(shape.node.id)
-        print 'delete node shape.node.id', shape.node.id
+        if deleteNodeToo:
+            self.graph.DeleteNodeById(shape.node.id)
+            print 'deleted node shape.node.id', shape.node.id
 
         del self.classnametoshape[classname]
         """
@@ -89,9 +87,17 @@ class UmlWorkspace:
         pprint(self.associations_generalisation)
         print line(), "associations_composition (to, from)"
         pprint(self.associations_composition)
-        print line('='), self.graph
+        print line('='), "GRAPH Model", self.graph
         for node in self.graph.nodes:
-            pprint(node)
+            print node
+        print line('-')
+        for edge in self.graph.edges:
+            source = edge['source'].id
+            target = edge['target'].id
+            edgetype = edge['uml_edge_type']
+            print "from %15s --> %15s  (%s)" % (source, target, edgetype)
+        print line('-'), 'graph.nodeSet is'
+        pprint(self.graph.nodeSet.keys())
         print line('-')
 
     def AddUmlNode(self, id, attrs=[], meths=[]):

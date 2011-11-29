@@ -141,6 +141,8 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
     def RightClickDeleteNode(self):
         self.GetShape().GetCanvas().CmdZapShape(self.GetShape())
 
+    def OnLeftDoubleClick(self, x, y, keys, attachment):
+        self.GetShape().GetCanvas().CmdEditShape(self.GetShape())
 
 
 import sys, glob
@@ -274,6 +276,9 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         elif keycode in ['l', 'L']:
             self.CmdLayout()
             
+        elif keycode in ['d', 'D']:
+            self.umlworkspace.Dump()
+        
         self.working = False
         event.Skip()
 
@@ -300,8 +305,8 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         dialog = wx.TextEntryDialog ( None, 'Enter an id string:', 'Create a new node', id )
         if dialog.ShowModal() == wx.ID_OK:
             id = dialog.GetValue()
-            node = self.umlworkspace.AddUmlNode(id, ['a','b'], ['c','d'])
-            shape = self.CreateUmlShape(node)
+            node = self.umlworkspace.AddSimpleNode(id)
+            shape = self.createNodeShape(node)
             self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             node.shape.Show(True)
             self.stateofthenation()
@@ -329,10 +334,10 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             self.stateofthenation()
         dialog.Destroy()
 
-    def CmdZapShape(self, shape):
+    def CmdZapShape(self, shape, deleteNodeToo=True):
         
         # Model/Uml related....
-        self.umlworkspace.DeleteShape(shape)
+        self.umlworkspace.DeleteShape(shape, deleteNodeToo)
         # Delete View
         self._ZapShape(shape)
         
@@ -563,6 +568,25 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
+
+    def CmdEditShape(self, shape):
+        node = shape.node
+        #print "aaaaaaaaaa", node.id, node.attrs, node.meths
+         
+        self.umlworkspace.graph.RenameNode(node, node.id + 'a') # change
+
+        self.CmdZapShape(shape, deleteNodeToo=False)
+        
+        shape = self.CreateUmlShape(node)
+        self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+
+        # Hmmm - how does new shape get hooked up if the line mapping uses old name!??
+        for edge in self.umlworkspace.graph.edges:
+            self.CreateUmlEdge(edge)
+            
+        node.shape.Show(True)
+        self.stateofthenation()
+        
 
     def CreateUmlEdge(self, edge):
         fromShape = edge['source'].shape
