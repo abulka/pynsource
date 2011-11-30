@@ -68,12 +68,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         shape = self.GetShape()
         canvas = shape.GetCanvas()
 
-        canvas.DeselectAllShapes()
-
-        dc = wx.ClientDC(canvas)
-        canvas.PrepareDC(dc)
-        shape.Select(True, dc)  # could pass None as dc if you don't want to trigger the OnDrawControlPoints(dc) handler immediately - e.g. if you want to do a complete redraw of everything later anyway
-        #canvas.Refresh(False)   # t/f or don't use - doesn't seem to make a difference
+        canvas.SelectNodeNow(shape)
         
         self.UpdateStatusBar(shape)
 
@@ -92,6 +87,14 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
             print "no node model attached to this shape!"
             
         self.UpdateStatusBar(shape)
+
+        # Invoke overlap removal (unless hold down shift key)
+        KEY_SHIFT = 1
+        if keys & KEY_SHIFT:
+            #shape.GetCanvas().stateofthenation()   # do we need this?  did quite well without it before
+            pass
+        else:
+            shape.GetCanvas().stage2()
 
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
         shape = self.GetShape()
@@ -306,7 +309,10 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         returns id, attrs, methods as lists of strings
         """
         from dialogs.DialogUmlNodeEdit import DialogUmlNodeEdit
-        dialog = DialogUmlNodeEdit(None)
+        class EditDialog(DialogUmlNodeEdit):
+            def OnClassNameEnter( self, event ):
+                self.EndModal(wx.ID_OK) 
+        dialog = EditDialog(None)
 
         dialog.txtClassName.Value, dialog.txtAttrs.Value, dialog.txtMethods.Value = id, "\n".join(attrs), "\n".join(methods)
         if dialog.ShowModal() == wx.ID_OK:
@@ -345,13 +351,22 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         result, id, attrs, methods = self.DisplayDialogUmlNodeEdit(id='D' + str(random.randint(1,99)),
                                             attrs=['attribute 1', 'attribute 2', 'attribute 3'],
                                             methods=['method A', 'method B', 'method C', 'method D'])
+
         if result:
+            # Ensure unique name
+            while self.umlworkspace.graph.FindNodeById(id):
+                id += '2'
+
             node = self.umlworkspace.AddUmlNode(id, attrs, methods)
             shape = self.CreateUmlShape(node)
             self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             
             node.shape.Show(True)
-            self.stateofthenation()
+            
+            #self.stateofthenation() # if want simple refresh
+            self.stage2() # if want overlap removal
+            
+            self.SelectNodeNow(node.shape)
 
     def CmdEditShape(self, shape):
         node = shape.node
@@ -373,7 +388,24 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
                 
             node.shape.Show(True)
             self.stateofthenation()
+
+            # TODO Why doesn't this select the node?
+            #self.SelectNodeNow(node.shape)
+            #self.stateofthenation()
+
         
+    def SelectNodeNow(self, shape):
+        canvas = shape.GetCanvas()
+
+        canvas.DeselectAllShapes()
+
+        dc = wx.ClientDC(canvas)
+        canvas.PrepareDC(dc)
+        shape.Select(True, dc)  # could pass None as dc if you don't want to trigger the OnDrawControlPoints(dc) handler immediately - e.g. if you want to do a complete redraw of everything later anyway
+        #canvas.Refresh(False)   # t/f or don't use - doesn't seem to make a difference
+        
+        #self.UpdateStatusBar(shape)  # only available in the shape evt handler (this method used to live there...)
+
     def CmdZapShape(self, shape, deleteNodeToo=True):
         # Model/Uml related....
         self.umlworkspace.DeleteShape(shape, deleteNodeToo)

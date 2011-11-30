@@ -33,7 +33,7 @@ class DialogUmlNodeEdit ( wx.Dialog ):
 		
 		bSizer12.Add( self.m_staticText1, 0, wx.ALL, 5 )
 		
-		self.txtClassName = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.txtClassName = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER )
 		bSizer12.Add( self.txtClassName, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
 		
 		bSizer11.Add( bSizer12, 0, wx.EXPAND, 5 )
@@ -81,8 +81,16 @@ class DialogUmlNodeEdit ( wx.Dialog ):
 		self.Layout()
 		
 		self.Centre( wx.BOTH )
+		
+		# Connect Events
+		self.txtClassName.Bind( wx.EVT_TEXT_ENTER, self.OnClassNameEnter )
 	
 	def __del__( self ):
 		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def OnClassNameEnter( self, event ):
+		event.Skip()
 	
 
