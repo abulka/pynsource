@@ -295,7 +295,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
         elif keycode in ['b', 'B']:
             self.CmdDeepLayout()
-
+                
         elif keycode in ['l', 'L']:
             self.CmdLayout()
             
@@ -808,8 +808,13 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.RedrawEverything()
 
     def CmdDeepLayout(self):
-        b = LayoutBlackboard(graph=self.umlworkspace.graph, controller=self)
-        b.LayoutMultipleChooseBest(4)
+        wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
+        wx.SafeYield()
+        try:
+            b = LayoutBlackboard(graph=self.umlworkspace.graph, controller=self)
+            b.LayoutMultipleChooseBest(4)
+        finally:
+            wx.EndBusyCursor()
 
     def ReLayout(self, keep_current_positions=False, gui=None, optimise=True):
         self.AllToLayoutCoords()
@@ -1276,6 +1281,9 @@ class MainApp(wx.App):
             print 'Import - Done.'
 
     def FileImport3(self, event):
+        self.model_to_ascii()
+        return
+    
         from generate_code.gen_asciiart import PySourceAsText
         import urllib
         
@@ -1303,6 +1311,73 @@ class MainApp(wx.App):
             wx.EndBusyCursor()
             print 'Import - Done.'
 
+    def model_to_ascii(self):
+        import time
+
+        class model_to_ascii_builder:
+            def __init__(self):
+                self.result = ""
+
+            #def Line(self):
+            #    self.result +=  '-'*20   +'\n'
+            #
+            #def DumpClassNameAndGeneralisations(self):
+            #    self.Line()
+            #    if self.classentry.ismodulenotrealclass:
+            #        self.result +=  '%s  (file)\n' % (self.aclass,)
+            #    else:
+            #        self.result +=  '%s  --------|> %s\n' % (self.node.id, self.classentry.classesinheritsfrom)
+            #    self.Line()
+    
+            def main(self, graph):
+                def line(ch='-'):
+                    return ch*70 + "\n"
+                
+                s = line('=')
+                s += " GRAPH Model %s\n" % graph
+                for node in graph.nodes:
+                    s += "%s\n" % node
+                s += line('-')
+                for edge in graph.edges:
+                    source = edge['source'].id
+                    target = edge['target'].id
+                    edgetype = edge['uml_edge_type']
+                    s += "from %15s --> %15s  (%s)\n" % (source, target, edgetype)
+                s += "\n" + line('-') + ' graph.nodeSet is\n'
+                s += "%s\n" % graph.nodeSet.keys()
+                s += line('-')
+                return s
+            
+                #for node in self.umlwin.umlworkspace.graph.nodes:
+                #    self.node = node
+                #
+                #    self.DumpClassNameAndGeneralisations()
+                #    self.classentry = self.classlist[self.aclass]
+                #
+                #    self._DumpClassNameAndGeneralisations()
+                #    self._DumpAttributes()
+                #    self._Line()
+                #    self._DumpMethods()
+                #    self._Line()
+                #    self._DumpCompositeExtraFooter()
+                #    self._DumpClassFooter()
+
+
+
+                return self.result
+            
+        wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
+        m = model_to_ascii_builder()
+        try:
+            wx.SafeYield()
+            time.sleep(0.2)
+            s = m.main(self.umlwin.umlworkspace.graph)
+            self.notebook.SetSelection(2)            
+            self.multiText.SetValue(str(s))
+            self.multiText.ShowPosition(0)
+        finally:
+            wx.EndBusyCursor()
+            
     def FileNew(self, event):
         self.umlwin.Clear()
         
