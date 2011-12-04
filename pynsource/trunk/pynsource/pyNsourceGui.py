@@ -66,10 +66,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
 
     def _SelectNodeNow(self, x, y, keys = 0, attachment = 0):
         shape = self.GetShape()
-        canvas = shape.GetCanvas()
-
-        canvas.SelectNodeNow(shape)
-        
+        shape.GetCanvas().SelectNodeNow(shape)
         self.UpdateStatusBar(shape)
 
     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
@@ -129,22 +126,37 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         text = item.GetText() 
         if text == "Delete Node\tDel":
             self.RightClickDeleteNode()
+        elif text == "Properties...":
+            self.NodeProperties()
         
     def OnRightClick(self, x, y, keys, attachment):
         self._SelectNodeNow(x, y, keys, attachment)
 
         #self.log.WriteText("%s\n" % self.GetShape())
         self.popupmenu = wx.Menu()     # Creating a menu
-        item = self.popupmenu.Append(wx.NewId(), "Delete Node\tDel")
+        
+        item = self.popupmenu.Append(wx.NewId(), "Properties...")
+        self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+
+        self.popupmenu.AppendSeparator()
+
+        item = self.popupmenu.Append(wx.NewId(), "Delete Class\tDel")
         self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item) # Not sure why but passing item is needed.  Not to find the menu item later, but to avoid crashes?  try two right click deletes followed by main menu edit/delete.  Official Bind 3rd parameter DOCO:  menu source - Sometimes the event originates from a different window than self, but you still want to catch it in self. (For example, a button event delivered to a frame.) By passing the source of the event, the event handling system is able to differentiate between the same event type from different controls.
+
+        self.popupmenu.AppendSeparator()
+        
         item = self.popupmenu.Append(wx.NewId(), "Cancel")
         self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        
         self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
 
     def RightClickDeleteNode(self):
         self.GetShape().GetCanvas().CmdZapShape(self.GetShape())
 
     def OnLeftDoubleClick(self, x, y, keys, attachment):
+        self.GetShape().GetCanvas().CmdEditShape(self.GetShape())
+
+    def NodeProperties(self):
         self.GetShape().GetCanvas().CmdEditShape(self.GetShape())
 
 
@@ -968,7 +980,7 @@ class MainApp(wx.App):
         wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
         
         self.popupmenu = None
-        self.umlwin.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)
+        self.umlwin.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)  # WARNING: takes over all righclick events - need to event.skip() to let through things to MyEvtHandler 
         self.Bind(wx.EVT_SIZE, self.OnResizeFrame)
 
         #self.umlwin.Bind(wx.EVT_SET_FOCUS, self.onFocus)  # attempt at making mousewheel auto scroll the workspace
@@ -1016,6 +1028,14 @@ class MainApp(wx.App):
         
     def OnRightButtonMenu(self, event):   # Menu
         x, y = event.GetPosition()
+
+        # Since our binding of wx.EVT_RIGHT_DOWN to here takes over all right click events
+        # we have to manually figure out if we have clicked on shape 
+        # then allow natural shape node menu to kick in via MyEvtHandler (defined above)
+        hit_which_shapes = [s for s in self.umlwin.GetDiagram().GetShapeList() if s.HitTest(x,y)]
+        if hit_which_shapes:
+            event.Skip()
+            return
         
         if self.popupmenu:
             self.popupmenu.Destroy()    # wx.Menu objects need to be explicitly destroyed (e.g. menu.Destroy()) in this situation. Otherwise, they will rack up the USER Objects count on Windows; eventually crashing a program when USER Objects is maxed out. -- U. Artie Eoff  http://wiki.wxpython.org/index.cgi/PopupMenuOnRightClick
@@ -1026,21 +1046,22 @@ class MainApp(wx.App):
         
         item = self.popupmenu.Append(wx.NewId(), "Dump Graph to console")
         self.frame.Bind(wx.EVT_MENU, self.OnSaveGraphToConsole, item)
-
+        
         self.popupmenu.AppendSeparator()
-
+        
         item = self.popupmenu.Append(wx.NewId(), "Load Graph...")
         self.frame.Bind(wx.EVT_MENU, self.OnLoadGraph, item)
-
+        
         item = self.popupmenu.Append(wx.NewId(), "Save Graph...")
         self.frame.Bind(wx.EVT_MENU, self.OnSaveGraph, item)
-
+        
         self.popupmenu.AppendSeparator()
-
+        
         item = self.popupmenu.Append(wx.NewId(), "DumpUmlWorkspace")
         self.frame.Bind(wx.EVT_MENU, self.OnDumpUmlWorkspace, item)
-
+        
         self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
+        
         
     def OnDumpUmlWorkspace(self, event):
         #self.MessageBox("OnBuildGraphFromUmlWorkspace")
