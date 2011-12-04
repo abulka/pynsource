@@ -124,7 +124,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
     def OnPopupItemSelected(self, event):
         item = self.popupmenu.FindItemById(event.GetId()) 
         text = item.GetText() 
-        if text == "Delete Node\tDel":
+        if text == "Delete Class\tDel":
             self.RightClickDeleteNode()
         elif text == "Properties...":
             self.NodeProperties()
@@ -1041,6 +1041,11 @@ class MainApp(wx.App):
             self.popupmenu.Destroy()    # wx.Menu objects need to be explicitly destroyed (e.g. menu.Destroy()) in this situation. Otherwise, they will rack up the USER Objects count on Windows; eventually crashing a program when USER Objects is maxed out. -- U. Artie Eoff  http://wiki.wxpython.org/index.cgi/PopupMenuOnRightClick
         self.popupmenu = wx.Menu()     # Create a menu
         
+        item = self.popupmenu.Append(wx.NewId(), "Insert Class...")
+        self.frame.Bind(wx.EVT_MENU, self.OnInsertClass, item)
+
+        self.popupmenu.AppendSeparator()
+
         item = self.popupmenu.Append(wx.NewId(), "Load Graph from text...")
         self.frame.Bind(wx.EVT_MENU, self.OnLoadGraphFromText, item)
         
@@ -1062,6 +1067,9 @@ class MainApp(wx.App):
         
         self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
         
+        
+    def OnInsertClass(self, event):
+        self.umlwin.CmdInsertNewNode()
         
     def OnDumpUmlWorkspace(self, event):
         #self.MessageBox("OnBuildGraphFromUmlWorkspace")
@@ -1168,6 +1176,7 @@ class MainApp(wx.App):
         Add(menu1, "E&xit\tAlt-X", "Exit demo", self.OnButton)
         
         Add(menu2, "&Delete Class\tDel", "Delete Node", self.OnDeleteNode)
+        Add(menu2, "&Insert Class...\tIns", "Insert Node...", self.OnInsertNode)
         Add(menu2, "&Refresh", "Refresh", self.OnRefreshUmlWindow)
         
         Add(menu3, "&Layout UML\tL", "Layout UML", self.OnLayout)
@@ -1363,6 +1372,9 @@ class MainApp(wx.App):
             if shape.Selected():
                 self.umlwin.CmdZapShape(shape)
 
+    def OnInsertNode(self, event):
+        self.umlwin.CmdInsertNewNode()
+        
     def OnLayout(self, event):
         self.umlwin.CmdLayout()
 

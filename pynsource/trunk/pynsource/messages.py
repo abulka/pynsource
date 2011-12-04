@@ -41,7 +41,7 @@ Import a python file and it will be reverse engineered and represented as UML.
 Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.
 You can import repeatedly and incoming classes will be added and wired up to existing classes on the workspace.
 
-You cannot add new classes in the GUI, this is just a reverse engineering tool.  You can however delete uncessesary classes by pressing Del.
+Whilst this is mainly a reverse engineering tool, you can add new classes by pressing Ins.  You can also delete uncessesary classes by pressing Del.
 To draw lines between classes: Select the first class, hit 'q', select the second class, hit 'w'.
 
 Use -> (right arrow) to expand the layout spacing and <- (left arrow) to contract.  Or use the MouseWheel.  Laying out lots of classes does better with an increased layout spacing, but takes up more room.
