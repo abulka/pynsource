@@ -128,6 +128,10 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
             self.RightClickDeleteNode()
         elif text == "Properties...":
             self.NodeProperties()
+        elif text == "Begin - Draw Line from this class\tq":
+            self.GetShape().GetCanvas().NewEdgeMarkFrom()
+        elif text == "End - Draw Line to this class\tw":
+            self.GetShape().GetCanvas().NewEdgeMarkTo()
         
     def OnRightClick(self, x, y, keys, attachment):
         self._SelectNodeNow(x, y, keys, attachment)
@@ -135,18 +139,22 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         #self.log.WriteText("%s\n" % self.GetShape())
         self.popupmenu = wx.Menu()     # Creating a menu
         
-        item = self.popupmenu.Append(wx.NewId(), "Properties...")
-        self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
-
+        def MakeMenuItem(menu, msg):
+            item = menu.Append(wx.NewId(), msg)
+            self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)  # Not sure why but passing item is needed.  Not to find the menu item later, but to avoid crashes?  try two right click deletes followed by main menu edit/delete.  Official Bind 3rd parameter DOCO:  menu source - Sometimes the event originates from a different window than self, but you still want to catch it in self. (For example, a button event delivered to a frame.) By passing the source of the event, the event handling system is able to differentiate between the same event type from different controls.
+            
+        MakeMenuItem(self.popupmenu, "Properties...")
         self.popupmenu.AppendSeparator()
 
-        item = self.popupmenu.Append(wx.NewId(), "Delete Class\tDel")
-        self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item) # Not sure why but passing item is needed.  Not to find the menu item later, but to avoid crashes?  try two right click deletes followed by main menu edit/delete.  Official Bind 3rd parameter DOCO:  menu source - Sometimes the event originates from a different window than self, but you still want to catch it in self. (For example, a button event delivered to a frame.) By passing the source of the event, the event handling system is able to differentiate between the same event type from different controls.
-
-        self.popupmenu.AppendSeparator()
+        menu_sub = wx.Menu()
+        MakeMenuItem(menu_sub, "Begin - Draw Line from this class\tq")
+        MakeMenuItem(menu_sub, "End - Draw Line to this class\tw")
+        self.popupmenu.AppendMenu(wx.NewId(), "Draw Line", menu_sub)
         
-        item = self.popupmenu.Append(wx.NewId(), "Cancel")
-        self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        self.popupmenu.AppendSeparator()
+        MakeMenuItem(self.popupmenu, "Delete Class\tDel")
+        self.popupmenu.AppendSeparator()
+        MakeMenuItem(self.popupmenu, "Cancel")
         
         self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
 
