@@ -1316,81 +1316,91 @@ class MainApp(wx.App):
     def model_to_ascii(self):
         import time
 
+        class NodeWidthCalc:
+            def __init__(self, node):
+                self.node = node
+                self.maxlen = 0
+            def _scan(self, lzt):
+                for line in lzt:
+                    if len(line) > self.maxlen:
+                        self.maxlen = len(line)
+            def calc(self):
+                self.maxlen = len(self.node.id)
+                self._scan(self.node.attrs)
+                self._scan(self.node.meths)
+                return self.maxlen
+
         class model_to_ascii_builder:
             def __init__(self):
                 self.result = ""
+                self.pending_composition_line_output = []
+                #self.alternating_lines = False
+
+            def line(self, ch='-', n=30, top_bottom=False):
+                CORNER = "+"
+                SIDE = "|"
+                if top_bottom:
+                    s = CORNER + ch*n + CORNER
+                else:
+                    s = SIDE + ch*n + SIDE
+                return s + "\n"
+
+            def top_or_bottom_line(self, maxwidth):
+                return self.line(n=maxwidth, top_bottom=True)
+
+            def attrs_or_meths(self, lzt, maxwidth):
+                result = self.line(n=maxwidth)
+                for entry in lzt:
+                    result += "| %-*s |" % (maxwidth -2, entry)
+                    if self.pending_composition_line_output: # and self.alternating_lines:
+                        edge = self.pending_composition_line_output.pop()
+                        result += "  ---->  [ %s ]" % (edge)
+                    #self.alternating_lines = not self.alternating_lines
+                    result += "\n"
+                return result
+
+            def removeDuplates(self, lzt):
+                # workaround a bug in pynsource where duplicate edges are recorded - to be fixed.  For now remove duplicates.
+                return list(set(lzt))
+
+            def CalcRelations(self, node, graph):
+                rels_composition = self.removeDuplates([edge['source'].id for edge in graph.edges if edge['target'].id == node.id and edge['uml_edge_type'] == 'composition'])
+                rels_generalisation = self.removeDuplates([edge['target'].id for edge in graph.edges if edge['source'].id == node.id and edge['uml_edge_type'] == 'generalisation'])
+                return rels_composition, rels_generalisation
 
             def main(self, graph):
-
-                def line(ch='-', n=30, top_bottom=False):
-                    CORNER = "+"
-                    SIDE = "|"
-                    if top_bottom:
-                        s = CORNER + ch*n + CORNER
-                    else:
-                        s = SIDE + ch*n + SIDE
-                    return s + "\n"
                 
-                class NodeWidthCalc:
-                    def __init__(self, node):
-                        self.node = node
-                        self.maxlen = 0
-                    def _scan(self, lzt):
-                        for line in lzt:
-                            if len(line) > self.maxlen:
-                                self.maxlen = len(line)
-                    def calc(self):
-                        self.maxlen = len(self.node.id)
-                        self._scan(node.attrs)
-                        self._scan(node.meths)
-                        return self.maxlen
+                """
+                Should work out the inheritance chain up front and then process the nodes in that order
+                That way the inheritance can be drawn top down (assuming single inheritance).
+                """
                 
-                def top_or_bottom_line(maxwidth):
-                    return line(n=maxwidth, top_bottom=True)
-
-                def attrs_or_meths(lzt, maxwidth):
-                    result = line(n=maxwidth)
-                    for entry in lzt:
-                        result  += "| %-*s |\n" % (maxwidth -2, entry)
-                    return result
-                    
                 s = ""
                 for node in graph.nodes:
                     maxwidth = NodeWidthCalc(node).calc() + 2
 
-                    def removeDuplates(lzt):
-                        # workaround a bug in pynsource where duplicate edges are recorded - to be fixed.  For now remove duplicates.
-                        return list(set(lzt))
-                        
-                    rels_composition = removeDuplates([edge['source'].id for edge in graph.edges if edge['target'].id == node.id and edge['uml_edge_type'] == 'composition'])
-                    rels_generalisation = removeDuplates([edge['target'].id for edge in graph.edges if edge['source'].id == node.id and edge['uml_edge_type'] == 'generalisation'])
-                    
+                    rels_composition, rels_generalisation = self.CalcRelations(node, graph)
+                
                     if rels_generalisation:
                         parents = []
                         for klass in rels_generalisation:
                             parents += "[ " + klass + " ]"
                         s += "".join(parents).center(maxwidth, " ") + "\n"
-                        s += "\n"
-                        s += " ^ ".center(maxwidth, " ") + "\n"
-                        s += "/ \\".center(maxwidth, " ") + "\n"
-                        s += "---".center(maxwidth, " ") + "\n"
+                        s += " . ".center(maxwidth, " ") + "\n"
+                        s += "/_\\".center(maxwidth, " ") + "\n"
                         s += " | ".center(maxwidth, " ") + "\n"
                         s += " | ".center(maxwidth, " ") + "\n"
-                    
-                    s += top_or_bottom_line(maxwidth)
-                    s += '|%s|' % node.id.center(maxwidth, " ")
-                    
-                    if rels_composition:
-                        s += " ---> "
-                    for klass in rels_composition:
-                        s += "[ " + klass + " ]  "
-                    s += "\n"
+
+                    s += self.top_or_bottom_line(maxwidth)
+                    s += '|%s|' % node.id.center(maxwidth, " ") + "\n"
+
+                    self.pending_composition_line_output.extend(rels_composition)
 
                     if node.attrs:
-                        s += attrs_or_meths(node.attrs, maxwidth)
+                        s += self.attrs_or_meths(node.attrs, maxwidth)
                     if node.meths:
-                        s += attrs_or_meths(node.meths, maxwidth)
-                    s += top_or_bottom_line(maxwidth)
+                        s += self.attrs_or_meths(node.meths, maxwidth)
+                    s += self.top_or_bottom_line(maxwidth)
                     s += "\n"
 
                 return s
