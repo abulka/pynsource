@@ -965,6 +965,8 @@ class MainApp(wx.App):
             self.notebook.AddPage(self.yuml, "yUml")
             self.notebook.AddPage(self.asciiart, "Ascii Art")
     
+            # Modify my own page http://www.andypatterns.com/index.php/products/pynsource/asciiart/
+            # Some other ideas here http://c2.com/cgi/wiki?UmlAsciiArt 
             self.multiText = wx.TextCtrl(self.asciiart, -1,
             "Use the file menu to import python source code "
             "and generate UML ascii art here.\n\n"
@@ -975,7 +977,7 @@ class MainApp(wx.App):
             bsizer = wx.BoxSizer()
             bsizer.Add(self.multiText, 1, wx.EXPAND)
             self.asciiart.SetSizerAndFit(bsizer)
-            self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))
+            self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))   # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
             
             self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabPageChanged)
             
@@ -1318,53 +1320,81 @@ class MainApp(wx.App):
             def __init__(self):
                 self.result = ""
 
-            #def Line(self):
-            #    self.result +=  '-'*20   +'\n'
-            #
-            #def DumpClassNameAndGeneralisations(self):
-            #    self.Line()
-            #    if self.classentry.ismodulenotrealclass:
-            #        self.result +=  '%s  (file)\n' % (self.aclass,)
-            #    else:
-            #        self.result +=  '%s  --------|> %s\n' % (self.node.id, self.classentry.classesinheritsfrom)
-            #    self.Line()
-    
             def main(self, graph):
-                def line(ch='-'):
-                    return ch*70 + "\n"
+
+                def line(ch='-', n=30, top_bottom=False):
+                    CORNER = "+"
+                    SIDE = "|"
+                    if top_bottom:
+                        s = CORNER + ch*n + CORNER
+                    else:
+                        s = SIDE + ch*n + SIDE
+                    return s + "\n"
                 
-                s = line('=')
-                s += " GRAPH Model %s\n" % graph
+                class NodeWidthCalc:
+                    def __init__(self, node):
+                        self.node = node
+                        self.maxlen = 0
+                    def _scan(self, lzt):
+                        for line in lzt:
+                            if len(line) > self.maxlen:
+                                self.maxlen = len(line)
+                    def calc(self):
+                        self.maxlen = len(self.node.id)
+                        self._scan(node.attrs)
+                        self._scan(node.meths)
+                        return self.maxlen
+                
+                def top_or_bottom_line(maxwidth):
+                    return line(n=maxwidth, top_bottom=True)
+
+                def attrs_or_meths(lzt, maxwidth):
+                    result = line(n=maxwidth)
+                    for entry in lzt:
+                        result  += "| %-*s |\n" % (maxwidth -2, entry)
+                    return result
+                    
+                s = ""
                 for node in graph.nodes:
-                    s += "%s\n" % node
-                s += line('-')
-                for edge in graph.edges:
-                    source = edge['source'].id
-                    target = edge['target'].id
-                    edgetype = edge['uml_edge_type']
-                    s += "from %15s --> %15s  (%s)\n" % (source, target, edgetype)
-                s += "\n" + line('-') + ' graph.nodeSet is\n'
-                s += "%s\n" % graph.nodeSet.keys()
-                s += line('-')
+                    maxwidth = NodeWidthCalc(node).calc() + 2
+
+                    def removeDuplates(lzt):
+                        # workaround a bug in pynsource where duplicate edges are recorded - to be fixed.  For now remove duplicates.
+                        return list(set(lzt))
+                        
+                    rels_composition = removeDuplates([edge['source'].id for edge in graph.edges if edge['target'].id == node.id and edge['uml_edge_type'] == 'composition'])
+                    rels_generalisation = removeDuplates([edge['target'].id for edge in graph.edges if edge['source'].id == node.id and edge['uml_edge_type'] == 'generalisation'])
+                    
+                    if rels_generalisation:
+                        parents = []
+                        for klass in rels_generalisation:
+                            parents += "[ " + klass + " ]"
+                        s += "".join(parents).center(maxwidth, " ") + "\n"
+                        s += "\n"
+                        s += " ^ ".center(maxwidth, " ") + "\n"
+                        s += "/ \\".center(maxwidth, " ") + "\n"
+                        s += "---".center(maxwidth, " ") + "\n"
+                        s += " | ".center(maxwidth, " ") + "\n"
+                        s += " | ".center(maxwidth, " ") + "\n"
+                    
+                    s += top_or_bottom_line(maxwidth)
+                    s += '|%s|' % node.id.center(maxwidth, " ")
+                    
+                    if rels_composition:
+                        s += " ---> "
+                    for klass in rels_composition:
+                        s += "[ " + klass + " ]  "
+                    s += "\n"
+
+                    if node.attrs:
+                        s += attrs_or_meths(node.attrs, maxwidth)
+                    if node.meths:
+                        s += attrs_or_meths(node.meths, maxwidth)
+                    s += top_or_bottom_line(maxwidth)
+                    s += "\n"
+
                 return s
-            
-                #for node in self.umlwin.umlworkspace.graph.nodes:
-                #    self.node = node
-                #
-                #    self.DumpClassNameAndGeneralisations()
-                #    self.classentry = self.classlist[self.aclass]
-                #
-                #    self._DumpClassNameAndGeneralisations()
-                #    self._DumpAttributes()
-                #    self._Line()
-                #    self._DumpMethods()
-                #    self._Line()
-                #    self._DumpCompositeExtraFooter()
-                #    self._DumpClassFooter()
-
-
-
-                return self.result
+                #return self.result
             
         wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
         m = model_to_ascii_builder()
