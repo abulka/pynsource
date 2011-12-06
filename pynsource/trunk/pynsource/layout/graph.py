@@ -55,6 +55,86 @@ class Graph:
             if edge['source'].id == node.id or edge['target'].id == node.id:
                 self.edges.remove(edge)
 
+    # Special getter which sorts nodes
+    
+    @property
+    def nodes_sorted_by_generalisation(self):
+        #return self.nodes
+    
+        result = []
+        
+        # setup temporary parent and child relationship attributes based on generalisation
+        for node in self.nodes:
+            node.parents = []
+            node.children = []
+            
+        for edge in self.edges:
+            if edge.has_key('uml_edge_type') and edge['uml_edge_type'] == 'generalisation':
+                parent = edge['target']
+                child = edge['source']
+                child.parents.append(parent)
+                parent.children.append(child)
+                
+        #parentless_nodes = [node for node in self.nodes if not node.parents]
+        #for node in parentless_nodes:
+        #    result.append(node)
+        #    if node.children:
+        #        result.append(node.children[0])
+        #        if node.children[0].children:
+        #            result.append(node.children[0].children[0])
+
+        #def process_descendants(node):
+        #    result = []
+        #    if node.children:
+        #        result.append(node.children[0])
+        #        result.extend(process_descendants(node.children[0]))
+        #    return result
+        
+        #def process_descendants(node):
+        #    result = []
+        #    # Sort so prioritise nodes with children, thus more likely to have generalisation trees on lhs of ascii tab in notebook
+        #    result.extend(sorted(node.children[:], key=lambda node: node.children == []))
+        #    for child in node.children:
+        #        result.extend(process_descendants(child))
+        #    return result
+
+        def num_descendant_levels(node):
+            if not node.children:
+                return 0
+            count = 1
+            child_level_counts = []
+            for n in node.children:
+                child_level_counts.append( num_descendant_levels(n) )
+            count += max(child_level_counts)
+            return count
+
+        def process_descendants(node):
+            result = []
+            #print "="*20
+            #for n in node.children:
+            #    print n.id, num_descendant_levels(n)
+            #print "SO.................."
+            #print [n.id for n in sorted(node.children[:], key=lambda node: num_descendant_levels(node))]
+            # Sort so prioritise nodes with children, thus more likely to have generalisation trees on lhs of ascii tab in notebook
+            kids = sorted(node.children[:], key=lambda node: -num_descendant_levels(node))
+            result.extend(kids)
+            #print "result", [n.id for n in result]
+            for child in kids:
+                result.extend(process_descendants(child))
+            return result
+
+        parentless_nodes = [node for node in self.nodes if not node.parents]
+        for node in parentless_nodes:
+            result.append(node)
+            result.extend(process_descendants(node))
+                    
+        # remove parent / child knowledge attributes
+        for node in self.nodes:
+            del node.parents
+            del node.children
+        
+        return result
+    
     # These next methods take id as parameters, not nodes.
     
     def FindNodeById(self, id):
@@ -327,10 +407,10 @@ if __name__ == '__main__':
     n2 = GraphNode('B', 0, 0, 200, 200)
     g.AddEdge(n1, n2)
     
-    for node in g.nodes:
-        print node, "layout info:", (node.layoutPosX, node.layoutPosY)
+    #for node in g.nodes:
+    #    print node, "layout info:", (node.layoutPosX, node.layoutPosY)
 
-    print g.GraphToString().strip()
+    #print g.GraphToString().strip()
 
     assert len(g.nodes) == 2
     assert len(g.nodeSet.keys()) == 2
@@ -350,8 +430,8 @@ if __name__ == '__main__':
     assert g.GraphToString().strip() == ""
     
     g.LoadGraphFromStrings(filedata)
-    for node in g.nodes:
-        print node, "layout info:", (node.layoutPosX, node.layoutPosY)
+    #for node in g.nodes:
+    #    print node, "layout info:", (node.layoutPosX, node.layoutPosY)
     assert g.GraphToString().strip() == filedata.strip()
 
     # Line intersection tests
@@ -383,4 +463,120 @@ if __name__ == '__main__':
     assert (20, 10) in res
     assert (20, 50) in res
     
+    
+    """
+    TESTS re generalisation sort order
+    
+    The idea is to present the nodes in an order that is conducive to ascii
+    display.  Those children nodes with the most children are prioritised
+    so that they will end up along the left side of the page and thereby connected
+    to the parent above with a generalisation ascii line.
+    """
+    
+    # C --|> B --|> A
+    g = Graph()
+    c = GraphNode('C', 0, 0, 200, 200)
+    b = GraphNode('B', 0, 0, 200, 200) # parent of C
+    a = GraphNode('A', 0, 0, 200, 200) # parent of B
+    # add out of order
+    g.AddNode(b)
+    g.AddNode(c)
+    g.AddNode(a)
+    g.AddEdge(c, b)['uml_edge_type'] = 'generalisation'
+    g.AddEdge(b, a)['uml_edge_type'] = 'generalisation'
+    nodelist_normal = [node.id for node in g.nodes]
+    nodelist_sorted = [node.id for node in g.nodes_sorted_by_generalisation]
+    nodelist_sorted_expected = ['A', 'B', 'C']
+    #print "nodelist_normal", nodelist_normal
+    #print "nodelist_sorted_expected", nodelist_sorted_expected
+    #print "nodelist_sorted", nodelist_sorted
+    assert nodelist_sorted_expected == nodelist_sorted
+
+    # D --|> C --|> B --|> A
+    d = GraphNode('D', 0, 0, 200, 200)
+    g.AddNode(d)
+    g.AddEdge(d, c)['uml_edge_type'] = 'generalisation'
+    nodelist_sorted = [node.id for node in g.nodes_sorted_by_generalisation]
+    nodelist_sorted_expected = ['A', 'B', 'C', 'D']
+    assert nodelist_sorted_expected == nodelist_sorted
+
+    # E node not connected to anything
+    e = GraphNode('E', 0, 0, 200, 200)
+    g.AddNode(e)
+    nodelist_sorted = [node.id for node in g.nodes_sorted_by_generalisation]
+    nodelist_sorted_expected = ['A', 'B', 'C', 'D', 'E']
+    assert nodelist_sorted_expected == nodelist_sorted
+
+    # D --|> C --|> B --|> A
+    # E
+    # C2 --|> B
+    c2 = GraphNode('C2', 0, 0, 200, 200)
+    g.AddNode(c2)
+    g.AddEdge(c2, b)['uml_edge_type'] = 'generalisation'
+    nodelist_sorted = [node.id for node in g.nodes_sorted_by_generalisation]
+    nodelist_sorted_expected = ['A', 'B', 'C', 'C2', 'D', 'E']
+    assert nodelist_sorted_expected == nodelist_sorted
+
+    # START AGAIN - more tests, ensure children nodes with children themselves, are prioritised
+    
+    # C2,C --|> B
+    # B,B2 --|> A
+    g = Graph()
+    c = GraphNode('C', 0, 0, 200, 200)
+    c2 = GraphNode('C2', 0, 0, 200, 200)
+    b = GraphNode('B', 0, 0, 200, 200)
+    b2 = GraphNode('B2', 0, 0, 200, 200)
+    a = GraphNode('A', 0, 0, 200, 200)
+    # add out of order
+    g.AddNode(b2)
+    g.AddNode(b)
+    g.AddNode(c)
+    g.AddNode(c2)
+    g.AddNode(a)
+    g.AddEdge(c, b)['uml_edge_type'] = 'generalisation'
+    g.AddEdge(c2, b)['uml_edge_type'] = 'generalisation'
+    g.AddEdge(b2, a)['uml_edge_type'] = 'generalisation'
+    g.AddEdge(b, a)['uml_edge_type'] = 'generalisation'
+    nodelist_normal = [node.id for node in g.nodes]
+    nodelist_sorted = [node.id for node in g.nodes_sorted_by_generalisation]
+    nodelist_sorted_expected = ['A', 'B', 'B2', 'C', 'C2']
+    nodelist_sorted_expected2 = ['A', 'B', 'B2', 'C2', 'C']
+    #print "nodelist_normal", nodelist_normal
+    #print "nodelist_sorted_expected", nodelist_sorted_expected
+    #print "nodelist_sorted", nodelist_sorted
+    assert nodelist_sorted_expected == nodelist_sorted or \
+            nodelist_sorted_expected2 == nodelist_sorted
+
+    # START AGAIN - more tests, ensure children nodes with children themselves, are prioritised
+    # and furthermore, children with the most descendants are prioritised even more.
+    
+    # B,B1 --|> A
+    # C --|> B
+    g = Graph()
+    c = GraphNode('C', 0, 0, 200, 200)
+    b = GraphNode('B', 0, 0, 200, 200)
+    b1 = GraphNode('B1', 0, 0, 200, 200)
+    a = GraphNode('A', 0, 0, 200, 200)
+    c2 = GraphNode('C2', 0, 0, 200, 200)
+    d = GraphNode('D', 0, 0, 200, 200)
+    # add out of order
+    g.AddNode(b1)
+    g.AddNode(b)
+    g.AddNode(a)
+    g.AddNode(c)
+    g.AddNode(c2)
+    g.AddNode(d)
+    g.AddEdge(c2, b1)['uml_edge_type'] = 'generalisation'
+    g.AddEdge(d, c)['uml_edge_type'] = 'generalisation'
+    g.AddEdge(c, b)['uml_edge_type'] = 'generalisation'
+    g.AddEdge(b1, a)['uml_edge_type'] = 'generalisation'
+    g.AddEdge(b, a)['uml_edge_type'] = 'generalisation'
+    nodelist_normal = [node.id for node in g.nodes]
+    nodelist_sorted = [node.id for node in g.nodes_sorted_by_generalisation]
+    nodelist_sorted_expected = ['A', 'B', 'B1', 'C', 'D', 'C2']
+    #print "nodelist_normal", nodelist_normal
+    #print "nodelist_sorted_expected", nodelist_sorted_expected
+    #print "nodelist_sorted", nodelist_sorted
+    assert nodelist_sorted_expected == nodelist_sorted
+
     print "Done, tests passed"
