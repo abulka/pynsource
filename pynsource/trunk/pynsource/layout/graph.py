@@ -59,44 +59,12 @@ class Graph:
     
     @property
     def nodes_sorted_by_generalisation(self):
-        #return self.nodes
-    
-        result = []
-        
-        # setup temporary parent and child relationship attributes based on generalisation
-        for node in self.nodes:
-            node.parents = []
-            node.children = []
-            
-        for edge in self.edges:
-            if edge.has_key('uml_edge_type') and edge['uml_edge_type'] == 'generalisation':
-                parent = edge['target']
-                child = edge['source']
-                child.parents.append(parent)
-                parent.children.append(child)
-                
-        #parentless_nodes = [node for node in self.nodes if not node.parents]
-        #for node in parentless_nodes:
-        #    result.append(node)
-        #    if node.children:
-        #        result.append(node.children[0])
-        #        if node.children[0].children:
-        #            result.append(node.children[0].children[0])
-
-        #def process_descendants(node):
-        #    result = []
-        #    if node.children:
-        #        result.append(node.children[0])
-        #        result.extend(process_descendants(node.children[0]))
-        #    return result
-        
-        #def process_descendants(node):
-        #    result = []
-        #    # Sort so prioritise nodes with children, thus more likely to have generalisation trees on lhs of ascii tab in notebook
-        #    result.extend(sorted(node.children[:], key=lambda node: node.children == []))
-        #    for child in node.children:
-        #        result.extend(process_descendants(child))
-        #    return result
+        """
+        The idea is to present the nodes in an order that is conducive to ascii
+        display.  Those children nodes with the most children are prioritised
+        so that they will end up along the left side of the page and thereby connected
+        to the parent above with a generalisation ascii line.
+        """
 
         def num_descendant_levels(node):
             if not node.children:
@@ -110,29 +78,41 @@ class Graph:
 
         def process_descendants(node):
             result = []
-            #print "="*20
-            #for n in node.children:
-            #    print n.id, num_descendant_levels(n)
-            #print "SO.................."
-            #print [n.id for n in sorted(node.children[:], key=lambda node: num_descendant_levels(node))]
-            # Sort so prioritise nodes with children, thus more likely to have generalisation trees on lhs of ascii tab in notebook
             kids = sorted(node.children[:], key=lambda node: -num_descendant_levels(node))
             result.extend(kids)
-            #print "result", [n.id for n in result]
             for child in kids:
                 result.extend(process_descendants(child))
             return result
 
-        parentless_nodes = [node for node in self.nodes if not node.parents]
-        for node in parentless_nodes:
-            result.append(node)
-            result.extend(process_descendants(node))
-                    
-        # remove parent / child knowledge attributes
-        for node in self.nodes:
-            del node.parents
-            del node.children
-        
+        def setup_temporary_parent_child_relationships():
+            # setup temporary parent and child relationship attributes based on generalisation
+            for node in self.nodes:
+                node.parents = []
+                node.children = []
+            for edge in self.edges:
+                if edge.has_key('uml_edge_type') and edge['uml_edge_type'] == 'generalisation':
+                    parent = edge['target']
+                    child = edge['source']
+                    child.parents.append(parent)
+                    parent.children.append(child)
+
+        def del_temporary_parent_child_relationships():
+            # remove parent / child knowledge attributes
+            for node in self.nodes:
+                del node.parents
+                del node.children
+            
+        def order_the_nodes():                
+            result = []
+            parentless_nodes = [node for node in self.nodes if not node.parents]
+            for node in parentless_nodes:
+                result.append(node)
+                result.extend(process_descendants(node))
+            return result
+
+        setup_temporary_parent_child_relationships()
+        result = order_the_nodes()
+        del_temporary_parent_child_relationships()                    
         return result
     
     # These next methods take id as parameters, not nodes.
@@ -466,11 +446,6 @@ if __name__ == '__main__':
     
     """
     TESTS re generalisation sort order
-    
-    The idea is to present the nodes in an order that is conducive to ascii
-    display.  Those children nodes with the most children are prioritised
-    so that they will end up along the left side of the page and thereby connected
-    to the parent above with a generalisation ascii line.
     """
     
     # C --|> B --|> A
