@@ -2,52 +2,50 @@ class AsciiWorkspace:
     def __init__(self, margin=3):
         self.contents = ""
         self.margin = margin
-        self.Init()
+        self._Init()
         
-    def ResetColumns(self):
-        self.contents += "\n".join(self.curr) + "\n"
-        self.Init()
-
-    def Init(self):
+    def _Init(self):
         self.curr = []
         self.curr_height = 0
         self.curr_width = 0
         
+    def _CalcMargin(self):
+        if not self.curr:
+            return 0
+        else:
+            return self.margin
+
+    def _ExpandAndPad(self, height, maxwidth):
+        height_difference = height - self.curr_height
+        if height_difference > 0:
+            for row in range(height_difference):
+                self.curr.append(" "*self.curr_width)
+            self.curr_height = height
+
+    # Public Methods
+    
+    def Flush(self):
+        self.contents += "\n".join(self.curr) + "\n"
+        self._Init()
+
     def AddColumn(self, str):
         lines = str.split("\n")
         
         maxwidth = max([len(line) for line in lines])
         height = len(lines)
-        
-        if not self.curr:
-            margin = 0
-        else:
-            margin = self.margin
 
-        height_difference = height - self.curr_height
-        #print "height_difference", height_difference
-        if height_difference > 0:
-            # Need to expand num entries in curr and pad accordingly
-            for row in range(height_difference):
-                #print row
-                self.curr.append(" "*self.curr_width)
-            self.curr_height = height
+        margin = self._CalcMargin()
+
+        self._ExpandAndPad(height, maxwidth)
                 
         for row in range(height):
             self.curr[row] += "%s%-*s" % (margin*" ", maxwidth, lines[row])
         
         self.curr_width += maxwidth
 
-        
-        #if not self.curr:
-        #    margin = 0
-        #    for row in range(height):
-        #        self.curr.append("")
-        #else:
-        #    margin = self.margin
-        #        
-        #for row in range(height-1):
-        #    self.curr[row] += "%s%-*s" % (margin*" ", maxwidth, lines[row])
+    @property
+    def Contents(self):
+        return self.contents
             
     
 if __name__ == '__main__':
@@ -70,11 +68,11 @@ if __name__ == '__main__':
     s += "this is the third set of info\n"
     s += "which is back in column 1 again"
 
-    w.ResetColumns()
+    w.Flush()
     w.AddColumn(s)
 
-    w.ResetColumns()
-    print w.contents
+    w.Flush()
+    print w.Contents
     
     print "done"
     
