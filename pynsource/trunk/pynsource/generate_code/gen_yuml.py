@@ -124,7 +124,7 @@ class PySourceAsYuml(ReportGenerator):
 
             """
             
-            #TODO handle modules (but first debug method scanning, which is not under unit test see unittests_parse06.py )
+            # TODO handle modules (but first debug method scanning, which is not under unit test see unittests_parse06.py )
             
             if self.classentry.ismodulenotrealclass:
                 continue
@@ -161,7 +161,7 @@ class PySourceAsYuml(ReportGenerator):
                 defs += adef + "()"
                 
             if self.classentry.classesinheritsfrom:
-                parentclass = self.classentry.classesinheritsfrom[0]  #TODO don't throw away all the inherited classes - just grab 0 for now
+                parentclass = self.classentry.classesinheritsfrom[0]  # TODO don't throw away all the inherited classes - just grab 0 for now
                 self.AddYuml(parentclass, "^", self.aclass, attrs, defs)
             else:
                 parentclass = ""

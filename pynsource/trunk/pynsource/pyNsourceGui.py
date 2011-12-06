@@ -480,6 +480,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             return
         
         edge = self.umlworkspace.graph.AddEdge(self.new_edge_from, tonode, weight=None)
+        # TODO should also arguably add to umlworkspace's associations_composition or associations_generalisation list (or create a new one for unlabelled associations like the one we are creating here)
         edge['uml_edge_type'] = ''
         #edge['uml_edge_type'] = 'composition'
         self.CreateUmlEdge(edge)
@@ -501,6 +502,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             # owns all those other classes.
             
             for attr, otherclass in classentry.classdependencytuples:
+                # TODO possible place the duplicate entries are being introduced?
                 self.umlworkspace.associations_composition.append((otherclass, classname))  # reverse direction so round black arrows look ok
 
             # Generalisations
