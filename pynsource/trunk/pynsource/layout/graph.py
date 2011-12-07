@@ -105,13 +105,16 @@ class Graph:
         def order_the_nodes():                
             result = []
             parentless_nodes = [node for node in self.nodes if not node.parents]
+            parentless_nodes = sorted(parentless_nodes[:], key=lambda node: -num_descendant_levels(node)) # put childless roots last
             for node in parentless_nodes:
                 result.append(node)
                 result.extend(process_descendants(node))
             return result
 
+        assert len(set(self.nodes)) == len(self.nodes), [node.id for node in self.nodes]        # ensure no duplicates exist
         setup_temporary_parent_child_relationships()
         result = order_the_nodes()
+        assert len(set(result)) == len(result), [node.id for node in result]        # ensure no duplicates exist
         #del_temporary_parent_child_relationships()                    
         return result
     

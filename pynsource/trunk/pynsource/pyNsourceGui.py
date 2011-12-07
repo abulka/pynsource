@@ -504,6 +504,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             for attr, otherclass in classentry.classdependencytuples:
                 # TODO possible place the duplicate entries are being introduced?
                 self.umlworkspace.associations_composition.append((otherclass, classname))  # reverse direction so round black arrows look ok
+                assert len(set(self.umlworkspace.associations_composition)) == len(self.umlworkspace.associations_composition), self.umlworkspace.associations_composition        # ensure no duplicates exist
 
             # Generalisations
             if classentry.classesinheritsfrom:
@@ -513,6 +514,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
                         parentclass = parentclass.split('.')[0] # take the lhs
 
                     self.umlworkspace.associations_generalisation.append((classname, parentclass))
+                    assert len(set(self.umlworkspace.associations_generalisation)) == len(self.umlworkspace.associations_generalisation), self.umlworkspace.associations_generalisation        # ensure no duplicates exist
 
             classAttrs = [ attrobj.attrname for attrobj in classentry.attrs ]
             classMeths = classentry.defs
@@ -1019,6 +1021,9 @@ class MainApp(wx.App):
             s = fp.read()
             fp.close()
             self.LoadGraph(s)
+        def bootstrap04():
+            self.umlwin.Go(files=[os.path.abspath( "pyNsourceGui.py" )])
+            self.umlwin.RedrawEverything()
         bootstrap03()
         # END Debug bootstrap --------------------------------------
         
@@ -1387,6 +1392,7 @@ class MainApp(wx.App):
                     [ (format_str, node, child_node), ...etc... ]
                 Note that child_node is usually None and only has a value if format_str is 'root_with_children' (child_node is a lookahead)
                 """
+                assert len(set(nodes)) == len(nodes), [node.id for node in nodes]        # ensure no duplicates exist
                 curr_parent = None
                 first_child = True
                 result = []
@@ -1427,11 +1433,21 @@ class MainApp(wx.App):
                 """
                 print [(format_info, node.id, child_node) for format_info,node, child_node in self.AddAsciiCrLfInfo(graph.nodes_sorted_by_generalisation)]
 
+                NUM_ROOTS_PER_LINE = 3
+                root_counter = 0
                 s = ""
                 for format_directive,node,child_node in self.AddAsciiCrLfInfo(graph.nodes_sorted_by_generalisation):
 
                     if s:
-                        if format_directive == 'root' or format_directive == 'root_with_children':
+                        if format_directive == 'root':
+                            w.AddColumn(s)
+                            if root_counter == 0:
+                                w.Flush()
+                                root_counter = NUM_ROOTS_PER_LINE
+                            else:
+                                root_counter -= 1
+                            s = "\n\n\n"
+                        elif format_directive == 'root_with_children':
                             w.AddColumn(s)
                             w.Flush()
                             s = "\n\n\n"
