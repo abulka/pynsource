@@ -1005,14 +1005,23 @@ class MainApp(wx.App):
         
         self.InitConfig()
 
-        # Debug bootstrap  --------------------------------------
-        #self.frame.SetSize((1024,768))
-        #self.umlwin.Go(files=[os.path.abspath( __file__ )])
-        
-        self.umlwin.Go(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
-        self.umlwin.RedrawEverything()
-        #self.umlwin.umlworkspace.Dump()
+        # Debug bootstraps  --------------------------------------
+        def bootstrap01():
+            self.frame.SetSize((1024,768))
+            self.umlwin.Go(files=[os.path.abspath( __file__ )])
+        def bootstrap02():
+            self.umlwin.Go(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
+            self.umlwin.RedrawEverything()
+            #self.umlwin.umlworkspace.Dump()
+        def bootstrap03():
+            filename = os.path.abspath( "saved uml workspaces/uml05.txt" )
+            fp = open(filename, "r")
+            s = fp.read()
+            fp.close()
+            self.LoadGraph(s)
+        bootstrap03()
         # END Debug bootstrap --------------------------------------
+        
         return True
 
     #def onFocus(self, event):   # attempt at making mousewheel auto scroll the workspace
@@ -1370,6 +1379,26 @@ class MainApp(wx.App):
                 rels_generalisation = self.removeDuplates([edge['target'].id for edge in graph.edges if edge['source'].id == node.id and edge['uml_edge_type'] == 'generalisation'])
                 return rels_composition, rels_generalisation
 
+            def AddAsciiCrLfInfo(self, nodes):
+                curr_parent = None
+                first_child = True
+                result = []
+                for node in nodes:
+                    if node.parents and node.parents[0].id == curr_parent:
+                        if first_child:
+                            result.append(('first_child', node))
+                            first_child = False
+                        else:
+                            result.append(('tab', node))
+                    else:
+                        curr_parent = node.id
+                        first_child = True
+                        if node.children:
+                            result.append(('root_with_children', node))
+                        else:
+                            result.append(('root', node))
+                return result
+
             def main(self, graph):
                 from asciiworkspace import AsciiWorkspace
                 w = AsciiWorkspace()
@@ -1378,18 +1407,40 @@ class MainApp(wx.App):
                 Should work out the inheritance chain up front and then process the nodes in that order
                 That way the inheritance can be drawn top down (assuming single inheritance).
                 """
-                
-                for node in graph.nodes:
-                    s = ""
-                    maxwidth = NodeWidthCalc(node).calc() + 2
+                print [(format_info, node.id) for format_info,node in self.AddAsciiCrLfInfo(graph.nodes_sorted_by_generalisation)]
 
+                s = ""
+                #for node in graph.nodes:
+                for format_directive,node in self.AddAsciiCrLfInfo(graph.nodes_sorted_by_generalisation):
+
+                    if s:
+                        if format_directive == 'root' or format_directive == 'root_with_children':
+                            w.AddColumn(s)
+                            w.Flush()
+                            s = "\n\n"
+                        elif format_directive == 'first_child':
+                            w.AddColumn(s)
+                            w.Flush()
+                            s = ""
+                        else:
+                            w.AddColumn(s)
+                            s = ""
+
+                    maxwidth = NodeWidthCalc(node).calc()
+                    #if format_directive == 'root_with_children':
+                    #    childwidth = NodeWidthCalc(child_node).calc()
+                    #    if childwidth > maxwidth:
+                    #        maxwidth = childwidth
+                    maxwidth += 2
+                    
                     rels_composition, rels_generalisation = self.CalcRelations(node, graph)
                 
                     if rels_generalisation:
                         parents = []
-                        for klass in rels_generalisation:
-                            parents += "[ " + klass + " ]"
-                        s += "".join(parents).center(maxwidth, " ") + "\n"
+                        if format_directive == 'tab':
+                            for klass in rels_generalisation:
+                                parents += "[ " + klass + " ]"
+                            s += "".join(parents).center(maxwidth, " ") + "\n"
                         s += " . ".center(maxwidth, " ") + "\n"
                         s += "/_\\".center(maxwidth, " ") + "\n"
                         s += " | ".center(maxwidth, " ") + "\n"
@@ -1404,11 +1455,10 @@ class MainApp(wx.App):
                         s += self.attrs_or_meths(node.attrs, maxwidth)
                     if node.meths:
                         s += self.attrs_or_meths(node.meths, maxwidth)
-                    s += self.top_or_bottom_line(maxwidth)
-                    s += "\n"
-                    print "ssssssssssssss\n", s
-                    w.AddColumn(s)
-                    
+
+                    s += self.top_or_bottom_line(maxwidth).rstrip()
+
+                w.AddColumn(s)
                 w.Flush()
                 return w.contents
                 

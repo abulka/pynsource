@@ -112,7 +112,7 @@ class Graph:
 
         setup_temporary_parent_child_relationships()
         result = order_the_nodes()
-        del_temporary_parent_child_relationships()                    
+        #del_temporary_parent_child_relationships()                    
         return result
     
     # These next methods take id as parameters, not nodes.
