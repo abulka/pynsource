@@ -1380,44 +1380,61 @@ class MainApp(wx.App):
                 return rels_composition, rels_generalisation
 
             def AddAsciiCrLfInfo(self, nodes):
+                """
+                Takes a list of nodes returned from
+                    graph.nodes_sorted_by_generalisation
+                and adds extra information to them, turning the list into a list of tuples.
+                    [ (format_str, node, child_node), ...etc... ]
+                Note that child_node is usually None and only has a value if format_str is 'root_with_children' (child_node is a lookahead)
+                """
                 curr_parent = None
                 first_child = True
                 result = []
-                for node in nodes:
+                for i in range(len(nodes)):
+                    node = nodes[i]
                     if node.parents and node.parents[0].id == curr_parent:
                         if first_child:
-                            result.append(('first_child', node))
+                            result.append(('first_child', node, None))
                             first_child = False
                         else:
-                            result.append(('tab', node))
+                            result.append(('tab', node, None))
                     else:
                         curr_parent = node.id
                         first_child = True
                         if node.children:
-                            result.append(('root_with_children', node))
+                            assert i+1 < len(nodes)     # if have a root with children then expect list to be long enough to contain those children
+                            child_node = nodes[i+1]
+                            result.append(('root_with_children', node, child_node))
                         else:
-                            result.append(('root', node))
+                            result.append(('root', node, None))
                 return result
+
+            def EnsureRootAsWideAsChild(self, maxwidth, format_directive, child_node):
+                # Ensure root with children is as least as wide as the first child
+                if format_directive == 'root_with_children':
+                    childwidth = NodeWidthCalc(child_node).calc()
+                    if childwidth > maxwidth:
+                        maxwidth = childwidth
+                return maxwidth
 
             def main(self, graph):
                 from asciiworkspace import AsciiWorkspace
-                w = AsciiWorkspace()
+                w = AsciiWorkspace(margin=7)
                 
                 """
                 Should work out the inheritance chain up front and then process the nodes in that order
                 That way the inheritance can be drawn top down (assuming single inheritance).
                 """
-                print [(format_info, node.id) for format_info,node in self.AddAsciiCrLfInfo(graph.nodes_sorted_by_generalisation)]
+                print [(format_info, node.id, child_node) for format_info,node, child_node in self.AddAsciiCrLfInfo(graph.nodes_sorted_by_generalisation)]
 
                 s = ""
-                #for node in graph.nodes:
-                for format_directive,node in self.AddAsciiCrLfInfo(graph.nodes_sorted_by_generalisation):
+                for format_directive,node,child_node in self.AddAsciiCrLfInfo(graph.nodes_sorted_by_generalisation):
 
                     if s:
                         if format_directive == 'root' or format_directive == 'root_with_children':
                             w.AddColumn(s)
                             w.Flush()
-                            s = "\n\n"
+                            s = "\n\n\n"
                         elif format_directive == 'first_child':
                             w.AddColumn(s)
                             w.Flush()
@@ -1427,10 +1444,7 @@ class MainApp(wx.App):
                             s = ""
 
                     maxwidth = NodeWidthCalc(node).calc()
-                    #if format_directive == 'root_with_children':
-                    #    childwidth = NodeWidthCalc(child_node).calc()
-                    #    if childwidth > maxwidth:
-                    #        maxwidth = childwidth
+                    maxwidth = self.EnsureRootAsWideAsChild(maxwidth, format_directive, child_node)
                     maxwidth += 2
                     
                     rels_composition, rels_generalisation = self.CalcRelations(node, graph)
