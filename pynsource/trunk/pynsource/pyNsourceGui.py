@@ -975,7 +975,7 @@ class MainApp(wx.App):
             "Optionally join up your asci art UML using a tool like "
             "e.g Java Ascii Versatile Editor http://www.jave.de/\n\n"
             "Idea: Paste your UML Ascii art into your source code as comments!\n\n",
-            style=wx.TE_MULTILINE)
+            style=wx.TE_MULTILINE|wx.HSCROLL)
             bsizer = wx.BoxSizer()
             bsizer.Add(self.multiText, 1, wx.EXPAND)
             self.asciiart.SetSizerAndFit(bsizer)
@@ -1371,14 +1371,16 @@ class MainApp(wx.App):
                 return rels_composition, rels_generalisation
 
             def main(self, graph):
+                from asciiworkspace import AsciiWorkspace
+                w = AsciiWorkspace()
                 
                 """
                 Should work out the inheritance chain up front and then process the nodes in that order
                 That way the inheritance can be drawn top down (assuming single inheritance).
                 """
                 
-                s = ""
                 for node in graph.nodes:
+                    s = ""
                     maxwidth = NodeWidthCalc(node).calc() + 2
 
                     rels_composition, rels_generalisation = self.CalcRelations(node, graph)
@@ -1404,9 +1406,12 @@ class MainApp(wx.App):
                         s += self.attrs_or_meths(node.meths, maxwidth)
                     s += self.top_or_bottom_line(maxwidth)
                     s += "\n"
-
-                return s
-                #return self.result
+                    print "ssssssssssssss\n", s
+                    w.AddColumn(s)
+                    
+                w.Flush()
+                return w.contents
+                
             
         wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
         m = model_to_ascii_builder()

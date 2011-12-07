@@ -1,13 +1,13 @@
 class AsciiWorkspace:
     def __init__(self, margin=3):
-        self.contents = ""
+        self.contents = ""    # TODO rename _contents
         self.margin = margin
         self._Init()
         
     def _Init(self):
-        self.curr = []
-        self.curr_height = 0
-        self.curr_width = 0
+        self.curr = []         # TODO rename megarow
+        self.curr_height = 0   # TODO rename megarow_height
+        self.curr_width = 0    # TODO rename megarow_indent
         
     def _CalcMargin(self):
         if not self.curr:
@@ -15,13 +15,30 @@ class AsciiWorkspace:
         else:
             return self.margin
 
-    def _ExpandAndPad(self, height, maxwidth):
-        height_difference = height - self.curr_height
-        if height_difference > 0:
-            for row in range(height_difference):
-                self.curr.append(" "*self.curr_width)
-            self.curr_height = height
+    def _Pad1(self, incoming_height, incoming_maxwidth, margin):
+        """
+        pad upto existing megarow_height, using incoming_maxwidth spaces
+        """
+        assert incoming_height <= self.curr_height
+        for row in range(incoming_height, self.curr_height):
+            self.curr[row] += (" "*incoming_maxwidth + margin*" ")
 
+    def _ExpandAndPad2(self, incoming_height, incoming_maxwidth):
+        """
+        expand past existing megarow_height, using megarow_indent spaces
+        """
+        did_expand = False
+        if incoming_height > self.curr_height:
+            for row in range(incoming_height - self.curr_height):
+                self.curr.append(" "*self.curr_width)
+            did_expand = True
+            self.curr_height = incoming_height
+        return did_expand
+
+    def _Add(self, lines, height, maxwidth, margin):
+        for row in range(height):
+            self.curr[row] += "%s%-*s" % (margin*" ", maxwidth, lines[row])
+        
     # Public Methods
     
     def Flush(self):
@@ -33,15 +50,14 @@ class AsciiWorkspace:
         
         maxwidth = max([len(line) for line in lines])
         height = len(lines)
-
         margin = self._CalcMargin()
 
-        self._ExpandAndPad(height, maxwidth)
+        did_expand = self._ExpandAndPad2(height, maxwidth)
+        self._Add(lines, height, maxwidth, margin)
+        if not did_expand:
+            self._Pad1(height, maxwidth, margin)
                 
-        for row in range(height):
-            self.curr[row] += "%s%-*s" % (margin*" ", maxwidth, lines[row])
-        
-        self.curr_width += maxwidth
+        self.curr_width += maxwidth+margin
 
     @property
     def Contents(self):
@@ -74,5 +90,26 @@ if __name__ == '__main__':
     w.Flush()
     print w.Contents
     
+    print "="*50
+
+    w = AsciiWorkspace()
+
+    s = "aaaaaaaaaaaaa\n"
+    s += "bbbbbbbbbbbbb"
+    w.AddColumn(s)
+
+    s = "ccccccc\n"
+    s += "dddddddd"
+    w.AddColumn(s)
+    
+    s = "eeeeeeeeeeeeeee\n"
+    s += "fffffffffffffffff\n"
+    s += "ggggggggggggggggg\n"
+    s += "hhhhhhhhhhhhhhhhh"
+    w.AddColumn(s)
+
+    w.Flush()
+    print w.Contents
+
     print "done"
     
