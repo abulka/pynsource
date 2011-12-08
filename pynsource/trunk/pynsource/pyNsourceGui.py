@@ -1408,7 +1408,7 @@ class MainApp(wx.App):
                 Note that child_node is usually None and only has a value if format_str is 'root_with_children' (child_node is a lookahead)
                 """
 
-                def CalcTuple(node, msg):
+                def CalcTuple(node, msg, i, nodes):
                     if node.children:
                         assert i+1 < len(nodes)     # if have a root with children then expect list to be long enough to contain those children
                         child_node = nodes[i+1]
@@ -1422,21 +1422,29 @@ class MainApp(wx.App):
                 result = []
                 for i in range(len(nodes)):
                     node = nodes[i]
+                    
+                    # THIS LOGIC NEEDS REVISING !!!!
+                    
                     if node.parents and node.parents[0].id == curr_parent:
                         if first_child:
-                            result.append(('first_child', node, None))
+                            #result.append(('first_child', node, None))
+                            result.append(CalcTuple(node, 'first_child', i, nodes))
                             first_child = False
                         else:
                             result.append(('tab', node, None))
                     else:
+                        if curr_parent == None:
+                            result.append(CalcTuple(node, 'root', i, nodes))
+                        else:
+                            result.append(CalcTuple(node, 'first_child', i, nodes))
                         curr_parent = node.id
                         first_child = True
-                        result.append(CalcTuple(node, 'root'))
                 return result
 
             def EnsureRootAsWideAsChild(self, maxwidth, format_directive, child_node):
                 # Ensure root with children is as least as wide as the first child
-                if format_directive == 'root_with_children':
+                #if format_directive == 'root_with_children':
+                if '_with_children' in format_directive:
                     childwidth = NodeWidthCalc(child_node).calc()
                     if childwidth > maxwidth:
                         maxwidth = childwidth
@@ -1470,7 +1478,13 @@ class MainApp(wx.App):
                             w.AddColumn(s)
                             w.Flush()
                             s = "\n\n\n"
+                            #s = ""
                         elif format_directive == 'first_child':
+                            w.AddColumn(s)
+                            w.Flush()
+                            s = ""
+                        elif format_directive == 'first_child_with_children':
+                            print "*******************"
                             w.AddColumn(s)
                             w.Flush()
                             s = ""
