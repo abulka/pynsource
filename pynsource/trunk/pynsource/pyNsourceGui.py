@@ -496,20 +496,16 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
                 edge['uml_edge_type'] = edge_label
             
         def AddGeneralisation(classname, parentclass):
-            # TODO possible place the duplicate entries are being introduced?
             if (classname, parentclass) in self.umlworkspace.associations_generalisation:
                 print "DUPLICATE Generalisation skipped when ConvertParseModelToUmlModel", (classname, parentclass)
-            else:
-                self.umlworkspace.associations_generalisation.append((classname, parentclass))
-            assert len(set(self.umlworkspace.associations_generalisation)) == len(self.umlworkspace.associations_generalisation), self.umlworkspace.associations_generalisation        # ensure no duplicates exist
+                return
+            self.umlworkspace.associations_generalisation.append((classname, parentclass))
 
         def AddDependency(otherclass, classname):
-            # TODO possible place the duplicate entries are being introduced?
             if (otherclass, classname) in self.umlworkspace.associations_composition:
                 print "DUPLICATE Dependency skipped when ConvertParseModelToUmlModel", (otherclass, classname)
-            else:
-                self.umlworkspace.associations_composition.append((otherclass, classname))  # reverse direction so round black arrows look ok
-            assert len(set(self.umlworkspace.associations_composition)) == len(self.umlworkspace.associations_composition), self.umlworkspace.associations_composition        # ensure no duplicates exist
+                return
+            self.umlworkspace.associations_composition.append((otherclass, classname))  # reverse direction so round black arrows look ok
 
         for classname, classentry in p.classlist.items():
             """
@@ -533,6 +529,10 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             classAttrs = [ attrobj.attrname for attrobj in classentry.attrs ]
             classMeths = classentry.defs
             node = self.umlworkspace.AddUmlNode(classname, classAttrs, classMeths)
+
+        # ensure no duplicate relationships exist
+        assert len(set(self.umlworkspace.associations_composition)) == len(self.umlworkspace.associations_composition), self.umlworkspace.associations_composition        # ensure no duplicates exist
+        assert len(set(self.umlworkspace.associations_generalisation)) == len(self.umlworkspace.associations_generalisation), self.umlworkspace.associations_generalisation        # ensure no duplicates exist
 
         BuildEdgeModel(self.umlworkspace.associations_generalisation, 'generalisation')
         BuildEdgeModel(self.umlworkspace.associations_composition, 'composition')
@@ -1407,6 +1407,15 @@ class MainApp(wx.App):
                     [ (format_str, node, child_node), ...etc... ]
                 Note that child_node is usually None and only has a value if format_str is 'root_with_children' (child_node is a lookahead)
                 """
+
+                def CalcTuple(node, msg):
+                    if node.children:
+                        assert i+1 < len(nodes)     # if have a root with children then expect list to be long enough to contain those children
+                        child_node = nodes[i+1]
+                        return (msg+'_with_children', node, child_node)
+                    else:
+                        return (msg, node, None)
+
                 assert len(set(nodes)) == len(nodes), [node.id for node in nodes]        # ensure no duplicates exist
                 curr_parent = None
                 first_child = True
@@ -1422,12 +1431,7 @@ class MainApp(wx.App):
                     else:
                         curr_parent = node.id
                         first_child = True
-                        if node.children:
-                            assert i+1 < len(nodes)     # if have a root with children then expect list to be long enough to contain those children
-                            child_node = nodes[i+1]
-                            result.append(('root_with_children', node, child_node))
-                        else:
-                            result.append(('root', node, None))
+                        result.append(CalcTuple(node, 'root'))
                 return result
 
             def EnsureRootAsWideAsChild(self, maxwidth, format_directive, child_node):
