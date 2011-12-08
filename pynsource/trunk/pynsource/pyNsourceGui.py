@@ -1398,64 +1398,6 @@ class MainApp(wx.App):
                 rels_generalisation = self.removeDuplates([edge['target'].id for edge in graph.edges if edge['source'].id == node.id and edge.get('uml_edge_type', '') == 'generalisation'])
                 return rels_composition, rels_generalisation
 
-            #def AddAsciiCrLfInfo(self, nodes):
-            #    # TODO move this to graphy.py and del the temp parent/child attributes
-            #    """
-            #    Takes a list of nodes returned from
-            #        graph.nodes_sorted_by_generalisation
-            #    and adds extra information to them, turning the list into a list of tuples.
-            #        [ (format_str, node, child_node), ...etc... ]
-            #    Note that child_node is usually None and only has a value if format_str is 'root_with_children' (child_node is a lookahead)
-            #    """
-            #
-            #    def CalcTuple(node, msg, i, nodes):
-            #        if node.children:
-            #            assert i+1 < len(nodes)     # if have a root with children then expect list to be long enough to contain those children
-            #            child_node = nodes[i+1]
-            #            return (msg+'_with_children', node, child_node)
-            #        else:
-            #            return (msg, node, None)
-            #
-            #    assert len(set(nodes)) == len(nodes), [node.id for node in nodes]        # ensure no duplicates exist
-            #
-            #    def isroot(node):
-            #        return node.parents == []
-            #        
-            #    curr_root = None
-            #    encountered_first_child = False
-            #    result = []
-            #    for node in nodes:
-            #        if isroot(node):
-            #            result.append('root', node)
-            #            curr_root = node
-            #            encountered_first_child = False
-            #        else:
-            #            # either first child of current root (and will possibly become a subroot)
-            #            # or second/third/etc child of current root
-            #            # or first child of a new subroot, which is a subroot
-            #            if not encountered_first_child:
-            #                result.append('first_child', node)
-            #                encountered_first_child = True
-            #            else:
-            #                result.append('tab', node)
-            #                encountered_first_child = True
-            #                
-            #        if node.parents and node.parents[0].id == curr_parent:
-            #            if first_child:
-            #                #result.append(('first_child', node, None))
-            #                result.append(CalcTuple(node, 'first_child', i, nodes))
-            #                first_child = False
-            #            else:
-            #                result.append(('tab', node, None))
-            #        else:
-            #            if curr_parent == None:
-            #                result.append(CalcTuple(node, 'root', i, nodes))
-            #            else:
-            #                result.append(CalcTuple(node, 'first_child', i, nodes))
-            #            curr_parent = node.id
-            #            first_child = True
-            #    return result
-
             #def EnsureRootAsWideAsChild(self, maxwidth, format_directive, child_node):
             #    # Ensure root with children is as least as wide as the first child
             #    #if format_directive == 'root_with_children':
@@ -1464,6 +1406,12 @@ class MainApp(wx.App):
             #        if childwidth > maxwidth:
             #            maxwidth = childwidth
             #    return maxwidth
+
+            def list_parents(self, rels_generalisation):
+                parents = []
+                for klass in rels_generalisation:
+                    parents += "[ " + klass + " ]"
+                return parents
 
             def main(self, graph):
                 from asciiworkspace import AsciiWorkspace
@@ -1512,15 +1460,14 @@ class MainApp(wx.App):
                     rels_composition, rels_generalisation = self.CalcRelations(node, graph)
                 
                     if rels_generalisation:
-                        parents = []
                         if annotation == 'tab':
-                            for klass in rels_generalisation:
-                                parents += "[ " + klass + " ]"
-                            s += "".join(parents).center(maxwidth, " ") + "\n"
+                            s += "".join(self.list_parents(rels_generalisation)).center(maxwidth, " ") + "\n"
                         s += " . ".center(maxwidth, " ") + "\n"
                         s += "/_\\".center(maxwidth, " ") + "\n"
                         s += " | ".center(maxwidth, " ") + "\n"
                         s += " | ".center(maxwidth, " ") + "\n"
+                        if annotation != 'tab':
+                            s += " | ".center(maxwidth, " ") + "\n"     # draw extra line to match the 'tab' case where parents are listed, so that child nodes line up horizontally
 
                     s += self.top_or_bottom_line(maxwidth)
                     s += '|%s|' % node.id.center(maxwidth, " ") + "\n"
