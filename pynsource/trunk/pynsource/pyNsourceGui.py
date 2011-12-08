@@ -495,16 +495,32 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
                 edge = self.umlworkspace.graph.AddEdge(from_node, to_node)
                 edge['uml_edge_type'] = edge_label
             
-        for classname, classentry in p.classlist.items():
-            #print 'CLASS', classname, classentry
+        def AddGeneralisation(classname, parentclass):
+            # TODO possible place the duplicate entries are being introduced?
+            if (classname, parentclass) in self.umlworkspace.associations_generalisation:
+                print "DUPLICATE Generalisation skipped when ConvertParseModelToUmlModel", (classname, parentclass)
+            else:
+                self.umlworkspace.associations_generalisation.append((classname, parentclass))
+            assert len(set(self.umlworkspace.associations_generalisation)) == len(self.umlworkspace.associations_generalisation), self.umlworkspace.associations_generalisation        # ensure no duplicates exist
 
-            # These are a list of (attr, otherclass) however they imply that THIS class
-            # owns all those other classes.
-            
-            for attr, otherclass in classentry.classdependencytuples:
-                # TODO possible place the duplicate entries are being introduced?
+        def AddDependency(otherclass, classname):
+            # TODO possible place the duplicate entries are being introduced?
+            if (otherclass, classname) in self.umlworkspace.associations_composition:
+                print "DUPLICATE Dependency skipped when ConvertParseModelToUmlModel", (otherclass, classname)
+            else:
                 self.umlworkspace.associations_composition.append((otherclass, classname))  # reverse direction so round black arrows look ok
-                assert len(set(self.umlworkspace.associations_composition)) == len(self.umlworkspace.associations_composition), self.umlworkspace.associations_composition        # ensure no duplicates exist
+            assert len(set(self.umlworkspace.associations_composition)) == len(self.umlworkspace.associations_composition), self.umlworkspace.associations_composition        # ensure no duplicates exist
+
+        for classname, classentry in p.classlist.items():
+            """
+            These are a list of (attr, otherclass) however they imply that THIS class
+            owns all those other classes.
+            """
+            #print 'CLASS', classname, classentry
+            
+            # Composition / Dependencies
+            for attr, otherclass in classentry.classdependencytuples:
+                AddDependency(otherclass, classname)
 
             # Generalisations
             if classentry.classesinheritsfrom:
@@ -512,9 +528,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
                     if parentclass.find('.') <> -1:         # fix names like "unittest.TestCase" into "unittest"
                         parentclass = parentclass.split('.')[0] # take the lhs
-
-                    self.umlworkspace.associations_generalisation.append((classname, parentclass))
-                    assert len(set(self.umlworkspace.associations_generalisation)) == len(self.umlworkspace.associations_generalisation), self.umlworkspace.associations_generalisation        # ensure no duplicates exist
+                    AddGeneralisation(classname, parentclass)
 
             classAttrs = [ attrobj.attrname for attrobj in classentry.attrs ]
             classMeths = classentry.defs
@@ -1024,6 +1038,9 @@ class MainApp(wx.App):
         def bootstrap04():
             self.umlwin.Go(files=[os.path.abspath( "pyNsourceGui.py" )])
             self.umlwin.RedrawEverything()
+        def bootstrap05():
+            self.umlwin.Go(files=[os.path.abspath("printframework.py"), os.path.abspath("png.py")])
+            self.umlwin.RedrawEverything()
         bootstrap03()
         # END Debug bootstrap --------------------------------------
         
@@ -1039,15 +1056,11 @@ class MainApp(wx.App):
         except OSError:
             pass        
         self.user_config_file = os.path.join(config_dir, PYNSOURCE_CONFIG_FILE)
-        print "Pynsource config file", self.user_config_file
-        
-        #shelf = shelve.open(self.user_config_file)
-        #shelf["users"] = ["David", "Abraham"]
-        #shelf.sync() # Save
+        #print "Pynsource config file", self.user_config_file
         
         from configobj import ConfigObj # easy_install configobj
         self.config = ConfigObj(self.user_config_file) # doco at http://www.voidspace.org.uk/python/configobj.html
-        print self.config
+        #print self.config
         self.config['keyword1'] = 100
         self.config['keyword2'] = "hi there"
         self.config.write()
@@ -1380,11 +1393,13 @@ class MainApp(wx.App):
                 return list(set(lzt))
 
             def CalcRelations(self, node, graph):
-                rels_composition = self.removeDuplates([edge['source'].id for edge in graph.edges if edge['target'].id == node.id and edge['uml_edge_type'] == 'composition'])
-                rels_generalisation = self.removeDuplates([edge['target'].id for edge in graph.edges if edge['source'].id == node.id and edge['uml_edge_type'] == 'generalisation'])
+                rels_composition = self.removeDuplates([edge['source'].id for edge in graph.edges if edge['target'].id == node.id and edge.get('uml_edge_type', '') != 'generalisation'])
+                #rels_composition = self.removeDuplates([edge['source'].id for edge in graph.edges if edge['target'].id == node.id and edge.get('uml_edge_type', '') == 'composition'])
+                rels_generalisation = self.removeDuplates([edge['target'].id for edge in graph.edges if edge['source'].id == node.id and edge.get('uml_edge_type', '') == 'generalisation'])
                 return rels_composition, rels_generalisation
 
             def AddAsciiCrLfInfo(self, nodes):
+                # TODO move this to graphy.py and del the temp parent/child attributes
                 """
                 Takes a list of nodes returned from
                     graph.nodes_sorted_by_generalisation

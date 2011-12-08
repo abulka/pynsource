@@ -34,7 +34,14 @@ class Graph:
         return node
 
     def AddEdge(self, source_node, target_node, weight=None):
-        # Uniqueness of this edge relationship must be ensured by caller
+        # Uniqueness of this edge relationship must be ensured by caller!
+        #
+        # Cannot add duplicate protection here, since there are call chains like:
+        # LoadGraphFromStrings -> AddEdge -> NotifyOfEdgeCreateFromPersistence
+        #     -> subclasses of this graph intercept NotifyOfEdgeCreateFromPersistence
+        #        and add extra attributes to the edge, thus potentially making it
+        #        the same or different to another existing edge.  We simply cannot
+        #        tell at this point.
         
         # If node hasn't been added, then add it now
         if not self.FindNodeById(source_node.id): self.AddNode(source_node)
@@ -93,8 +100,10 @@ class Graph:
                 if edge.has_key('uml_edge_type') and edge['uml_edge_type'] == 'generalisation':
                     parent = edge['target']
                     child = edge['source']
-                    child.parents.append(parent)
-                    parent.children.append(child)
+                    if parent not in child.parents:
+                        child.parents.append(parent)
+                    if child not in parent.children:
+                        parent.children.append(child)
 
         def del_temporary_parent_child_relationships():
             # remove parent / child knowledge attributes
@@ -112,9 +121,13 @@ class Graph:
             return result
 
         assert len(set(self.nodes)) == len(self.nodes), [node.id for node in self.nodes]        # ensure no duplicates exist
+        
         setup_temporary_parent_child_relationships()
         result = order_the_nodes()
+        
+        assert len(result) == len(self.nodes), "Count increased!? from %d to %d" %(len(self.nodes), len(result))        # ensure not introducing duplicates
         assert len(set(result)) == len(result), [node.id for node in result]        # ensure no duplicates exist
+        
         #del_temporary_parent_child_relationships()                    
         return result
     
@@ -129,15 +142,28 @@ class Graph:
         if node:
             self.DeleteNode(node)
         
+    def RemoveDuplicatesButPreserveLineOrder(self, s):
+        # remove duplicates but preserver line order.  Returns a list
+        # Adapted from http://stackoverflow.com/questions/1215208/how-might-i-remove-duplicate-lines-from-a-file
+        lines_seen = set() # holds lines already seen
+        result = []
+        for line in s.split('\n'):
+            if line not in lines_seen: # not a duplicate
+                result.append(line)
+                lines_seen.add(line)
+            else:
+                print "DUPLICATE in incoming file detected, skipped", line
+        #print "******\n", '\n'.join(result)  # debug point - print exact replica of s but without duplicates
+        return result
+
     # Persistence methods 
 
-    def LoadGraphFromStrings(self, filedata):
+    def LoadGraphFromStrings(self, filedata_str):
         # load from persistence
         # nodes look like:     {'type':'node', 'id':'c5', 'x':230, 'y':174, 'width':60, 'height':120}
         # edges look like:     {'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1', 'weight':1}  weight >= 1
-        
-        filedata = filedata.split('\n')
-        for data in filedata:
+
+        for data in self.RemoveDuplicatesButPreserveLineOrder(filedata_str):
             data = data.strip()
             if not data:
                 continue
@@ -162,7 +188,13 @@ class Graph:
                     continue
                 weight = data.get('weight', None)
                 edge = self.AddEdge(sourcenode, targetnode, weight)  # AddEdge takes node objects as parameters
-                self.NotifyOfEdgeCreateFromPersistence(edge, data)
+                self.NotifyOfEdgeCreateFromPersistence(edge, data)  # e.g. UmlGraph class would add edge['uml_edge_type'] if it exists in data
+                
+                # At this point we may have created a duplicate entry, we don't know for sure till after the UmlGraph does it's bit. So hard to detect.
+                # Enable the following asserts if you suspect anything.  Bit expensive to have these on all the time.
+                #
+                #assert len(set(self.nodes)) == len(self.nodes), [node.id for node in self.nodes] # ensure no duplicates nodes have been created
+                #assert len(set([str(e) for e in self.edges])) == len(self.edges), data # ensure no duplicates edges have been created                          
 
     def GraphToString(self):
         nodes = ""
