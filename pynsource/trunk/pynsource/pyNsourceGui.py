@@ -1388,24 +1388,41 @@ class MainApp(wx.App):
                     result += "\n"
                 return result
 
-            def removeDuplates(self, lzt):
+            def removeDuplicates(self, lzt):
                 # workaround a bug in pynsource where duplicate edges are recorded - to be fixed.  For now remove duplicates.
                 return list(set(lzt))
 
             def CalcRelations(self, node, graph):
-                rels_composition = self.removeDuplates([edge['source'].id for edge in graph.edges if edge['target'].id == node.id and edge.get('uml_edge_type', '') != 'generalisation'])
-                #rels_composition = self.removeDuplates([edge['source'].id for edge in graph.edges if edge['target'].id == node.id and edge.get('uml_edge_type', '') == 'composition'])
-                rels_generalisation = self.removeDuplates([edge['target'].id for edge in graph.edges if edge['source'].id == node.id and edge.get('uml_edge_type', '') == 'generalisation'])
+                rels_composition = self.removeDuplicates([edge['source'].id for edge in graph.edges if edge['target'].id == node.id and edge.get('uml_edge_type', '') != 'generalisation'])
+                #rels_composition = self.removeDuplicates([edge['source'].id for edge in graph.edges if edge['target'].id == node.id and edge.get('uml_edge_type', '') == 'composition'])
+                rels_generalisation = self.removeDuplicates([edge['target'].id for edge in graph.edges if edge['source'].id == node.id and edge.get('uml_edge_type', '') == 'generalisation'])
                 return rels_composition, rels_generalisation
 
-            #def EnsureRootAsWideAsChild(self, maxwidth, format_directive, child_node):
-            #    # Ensure root with children is as least as wide as the first child
-            #    #if format_directive == 'root_with_children':
-            #    if '_with_children' in format_directive:
-            #        childwidth = NodeWidthCalc(child_node).calc()
-            #        if childwidth > maxwidth:
-            #            maxwidth = childwidth
-            #    return maxwidth
+            def EnsureRootAsWideAsChild(self, maxwidth, child_node):
+                # Ensure root or fc is as least as wide as its first child
+                if child_node:
+                    childwidth = NodeWidthCalc(child_node).calc()
+                    if childwidth > maxwidth:
+                        maxwidth = childwidth
+                return maxwidth
+
+            def LookAheadForNext_fc(self, i, nodes):
+                for node,annotation in nodes[i:]:
+                    if annotation == 'fc':
+                        return node
+                    if annotation == 'root':
+                        return None
+                return None
+
+            def LookAheadForNext_tabs(self, i, nodes):
+                result = []
+                for node,annotation in nodes[i:]:
+                    if annotation == 'tab':
+                        result.append(node)
+                    else:
+                        break
+                return result
+
 
             def list_parents(self, rels_generalisation):
                 parents = []
@@ -1427,7 +1444,10 @@ class MainApp(wx.App):
                 NUM_ROOTS_PER_LINE = 3
                 root_counter = 0
                 s = ""
-                for node,annotation in graph.nodes_sorted_by_generalisation:
+                i = 0
+                nodes = graph.nodes_sorted_by_generalisation
+                for i in range(len(nodes)):
+                    node,annotation = nodes[i]
 
                     if s:
                         """ Make decision re what to do with the last node"""
@@ -1447,6 +1467,7 @@ class MainApp(wx.App):
                         elif annotation == 'fc':
                             w.AddColumn(s)
                             w.Flush()
+                            root_counter = 0
                             s = ""
                         # Else tab need to be added to previous line, thus no Flush.  Header margin depends on what the ??? is
                         else:
@@ -1454,9 +1475,13 @@ class MainApp(wx.App):
                             s = ""
 
                     maxwidth = NodeWidthCalc(node).calc()
-                    #maxwidth = self.EnsureRootAsWideAsChild(maxwidth, annotation, child_node)
+                    # Ensure root or fc is as wide as its fc below it, so that parent nodes are not too thin and so generalisation line connects to parent properly.
+                    node_next_fc = None
+                    if annotation in ['fc', 'root']:
+                        node_next_fc = self.LookAheadForNext_fc(i+1, nodes)
+                        maxwidth = self.EnsureRootAsWideAsChild(maxwidth, node_next_fc)
                     maxwidth += 2
-                    
+
                     rels_composition, rels_generalisation = self.CalcRelations(node, graph)
                 
                     if rels_generalisation:
@@ -1479,7 +1504,23 @@ class MainApp(wx.App):
                     if node.meths:
                         s += self.attrs_or_meths(node.meths, maxwidth)
 
-                    s += self.top_or_bottom_line(maxwidth).rstrip()
+                    s += self.top_or_bottom_line(maxwidth)
+
+                    # Add extra height if any siblings are going to be pushing megarow higher
+                    # only need this if there is a fc coming up - hence the check for node_next_fc
+                    def height_of(node):
+                        return len(node.meths)+len(node.attrs)
+                    if node_next_fc and annotation in ['fc', 'root']:
+                        nodes_next_tabs = self.LookAheadForNext_tabs(i+1, nodes)
+                        nodes_next_tabs.append(node)
+                        max_megarow_height = max([height_of(sibling) for sibling in nodes_next_tabs])
+                        #print "nodes_next_tabs for", node.id, "are", [n.id for n in nodes_next_tabs], "max_megarow_height", max_megarow_height
+                        padding_needed = max_megarow_height - height_of(node)
+                        if padding_needed:
+                            #print "padding needed!", padding_needed
+                            s += (" | ".center(maxwidth, " ") + "\n") * padding_needed
+
+                    s = s.rstrip()
 
                 w.AddColumn(s)
                 w.Flush()
