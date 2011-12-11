@@ -1506,18 +1506,19 @@ class MainApp(wx.App):
 
                     s += self.top_or_bottom_line(maxwidth)
 
-                    # Add extra height if any siblings are going to be pushing megarow higher
-                    # only need this if there is a fc coming up - hence the check for node_next_fc
+                    # Add extra height by drawing a veritcal line underneath current node
+                    # if any subsequent siblings are going to be pushing megarow to be taller
+                    # This way the generalisation line drawn later by the fc will actually join up.
+                    # Only need this if there is a fc coming up - hence the check for node_next_fc
                     def height_of(node):
                         return len(node.meths)+len(node.attrs)
-                    if node_next_fc and annotation in ['fc', 'root']:
-                        nodes_next_tabs = self.LookAheadForNext_tabs(i+1, nodes)
-                        nodes_next_tabs.append(node)
-                        max_megarow_height = max([height_of(sibling) for sibling in nodes_next_tabs])
-                        #print "nodes_next_tabs for", node.id, "are", [n.id for n in nodes_next_tabs], "max_megarow_height", max_megarow_height
+                        
+                    if annotation in ['fc', 'root'] and node_next_fc:
+                        siblings = [node]
+                        siblings.extend(self.LookAheadForNext_tabs(i+1, nodes))
+                        max_megarow_height = max([height_of(sibling) for sibling in siblings])
                         padding_needed = max_megarow_height - height_of(node)
                         if padding_needed:
-                            #print "padding needed!", padding_needed
                             s += (" | ".center(maxwidth, " ") + "\n") * padding_needed
 
                     s = s.rstrip()
