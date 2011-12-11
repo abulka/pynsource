@@ -83,10 +83,31 @@ class Graph:
             count += max(child_level_counts)
             return count
 
+        def count_attrs_meths(node):
+            result = 0
+            if hasattr(node, 'attrs'):
+                result += len(node.attrs)
+            if hasattr(node, 'meths'):
+                result += len(node.meths)
+            return result
+                
+        def sort_siblings(children):
+            if not children:
+                return []
+                
+            # prioritise by num descendants so the leftmost node is part of the longest generalisation chain
+            kids = sorted(children, key=lambda node: -num_descendant_levels(node))
+            result = [kids[0]]
+            
+            # then prioritise by node height, from biggest to smallest
+            if len(kids) > 1:
+                result.extend( sorted(kids[1:], key=lambda node: -count_attrs_meths(node)) )
+
+            return result
+        
         def process_descendants(node, prevent_fc=False):
             result = []
-            kids = sorted(node.children[:], key=lambda node: -num_descendant_levels(node))
-
+            kids = sort_siblings(node.children)
             for child in kids:
                 if child == kids[0]:
                     if prevent_fc:
