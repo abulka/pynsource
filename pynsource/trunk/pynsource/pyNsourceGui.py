@@ -972,7 +972,7 @@ class MainApp(wx.App):
             else:
                 self.umlwin = UmlShapeCanvas(self.notebook, Log(), self.frame)
 
-            self.yuml = ImageViewer(self.notebook) # wx.Panel(self.notebook, -1)
+            #self.yuml = ImageViewer(self.notebook) # wx.Panel(self.notebook, -1)
             
             self.asciiart = wx.Panel(self.notebook, -1)
     
@@ -980,18 +980,12 @@ class MainApp(wx.App):
                 self.notebook.AddPage(panel, "UML")
             else:
                 self.notebook.AddPage(self.umlwin, "UML")
-            self.notebook.AddPage(self.yuml, "yUml")
+            #self.notebook.AddPage(self.yuml, "yUml")
             self.notebook.AddPage(self.asciiart, "Ascii Art")
     
             # Modify my own page http://www.andypatterns.com/index.php/products/pynsource/asciiart/
             # Some other ideas here http://c2.com/cgi/wiki?UmlAsciiArt 
-            self.multiText = wx.TextCtrl(self.asciiart, -1,
-            "Use the file menu to import python source code "
-            "and generate UML ascii art here.\n\n"
-            "Optionally join up your asci art UML using a tool like "
-            "e.g Java Ascii Versatile Editor http://www.jave.de/\n\n"
-            "Idea: Paste your UML Ascii art into your source code as comments!\n\n",
-            style=wx.TE_MULTILINE|wx.HSCROLL)
+            self.multiText = wx.TextCtrl(self.asciiart, -1, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE|wx.HSCROLL)
             bsizer = wx.BoxSizer()
             bsizer.Add(self.multiText, 1, wx.EXPAND)
             self.asciiart.SetSizerAndFit(bsizer)
@@ -1181,11 +1175,11 @@ class MainApp(wx.App):
     def OnTabPageChanged(self, event):
         if event.GetSelection() == 0:  # ogl
             pass
-        elif event.GetSelection() == 1:  # yuml
-            #self.yuml.ViewImage(thefile='../outyuml.png')
-            pass
-        elif event.GetSelection() == 2:  # ascii art
-            pass
+        #elif event.GetSelection() == 1:  # yuml
+        #    #self.yuml.ViewImage(thefile='../outyuml.png')
+        #    pass
+        elif event.GetSelection() == 1:  # ascii art
+            self.model_to_ascii()
         
         event.Skip()
          
@@ -1208,14 +1202,14 @@ class MainApp(wx.App):
             self.next_menu_id = wx.NewId()
 
         Add(menu1, "&New\tCtrl-N", "New Diagram", self.FileNew)
-        Add(menu1, "File &Open...\tCtrl-O", "Load UML Diagram...", self.OnLoadGraph)
-        Add(menu1, "File &Save As...\tCtrl-S", "Save UML Diagram...", self.OnSaveGraph)
+        Add(menu1, "&Open...\tCtrl-O", "Load UML Diagram...", self.OnLoadGraph)
+        Add(menu1, "&Save As...\tCtrl-S", "Save UML Diagram...", self.OnSaveGraph)
         menu1.AppendSeparator()
-        Add(menu1, "File &Import...\tCtrl-I", "Import Python Source Files", self.FileImport)
-        Add(menu1, "File &Import yUml...\tCtrl-Y", "Import Python Source Files", self.FileImport2)
-        Add(menu1, "File &Import Ascii Art...\tCtrl-J", "Import Python Source Files", self.FileImport3)
+        Add(menu1, "&Import Python Code...\tCtrl-I", "Import Python Source Files", self.FileImport)
+        #Add(menu1, "File &Import yUml...\tCtrl-Y", "Import Python Source Files", self.FileImport2)
+        #Add(menu1, "&Import Ascii Art...\tCtrl-J", "Import Python Source Files", self.FileImport3)
         menu1.AppendSeparator()
-        Add(menu1, "File &Print / Preview...\tCtrl-P", "Print", self.FilePrint)
+        Add(menu1, "&Print / Preview...\tCtrl-P", "Print", self.FilePrint)
         menu1.AppendSeparator()
         Add(menu1, "E&xit\tAlt-X", "Exit demo", self.OnButton)
         
@@ -1312,9 +1306,6 @@ class MainApp(wx.App):
             print 'Import - Done.'
 
     def FileImport3(self, event):
-        self.model_to_ascii()
-        return
-    
         from generate_code.gen_asciiart import PySourceAsText
         import urllib
         
@@ -1352,8 +1343,10 @@ class MainApp(wx.App):
             wx.SafeYield()
             #time.sleep(0.2)
             s = m.main(self.umlwin.umlworkspace.graph)
-            self.notebook.SetSelection(2)            
+            #self.notebook.SetSelection(2)            
             self.multiText.SetValue(str(s))
+            if str(s).strip() == "":
+                self.multiText.SetValue(ASCII_UML_HELP_MSG)
             self.multiText.ShowPosition(0)
         finally:
             wx.EndBusyCursor()

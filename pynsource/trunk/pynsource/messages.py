@@ -98,3 +98,10 @@ implementation
 
 end.
 """
+ASCII_UML_HELP_MSG = \
+"Use the file menu to import python source code " \
+"and generate UML ascii art here.\n\n" \
+"Optionally join up your asci art UML using a tool like " \
+"e.g Java Ascii Versatile Editor http://www.jave.de/\n\n" \
+"Idea: Paste your UML Ascii art into your source code as comments!\n\n"
+
