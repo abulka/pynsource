@@ -210,8 +210,10 @@ class ImageViewer(wx.ScrolledWindow):
         
     def FileLoad(self, event):
         frame = self.GetTopLevelParent()
+        wildcard = "Images (*.png; *.jpeg; *.jpg; *.bmp)|*.png;*.jpeg;*.jpg;*.bmp|" \
+         "All files (*.*)|*.*"
         dlg = wx.FileDialog(parent=frame, message="choose", defaultDir='.',
-            defaultFile="", wildcard="*.*", style=wx.OPEN, pos=wx.DefaultPosition)
+            defaultFile="", wildcard=wildcard, style=wx.OPEN, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
             self.ViewImage(filename)

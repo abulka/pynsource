@@ -10,7 +10,8 @@ ABOUT_LICENSE = "License: GPL 3 (free software)"
 ABOUT_MSG = """
 PyNSource is a UML modelling tool for Python source code.
 
-Reverse engineer python source code into either a UML diagram or into an Ascii Art attempt at UML - and paste it into your source code!
+Reverse engineer python source code into either a UML diagram
+or into Ascii Art UML which you can paste it into your source code!
 """
 ABOUT_FEATURES = """
 Resilient: doesn't import the python files, thus will never get "stuck" when syntax is wrong.
@@ -105,3 +106,16 @@ ASCII_UML_HELP_MSG = \
 "e.g Java Ascii Versatile Editor http://www.jave.de/\n\n" \
 "Idea: Paste your UML Ascii art into your source code as comments!\n\n"
 
+PY_YUML_ABOUT_APPNAME = "PyYuml Gui"
+PY_YUML_APP_VERSION = 1.0
+PY_YUML_HOME_URL = "http://yuml.me/"
+PY_YUML_ABOUT_MSG = """
+Convert python source code into a UML diagram.
+
+Powered by the web service yUml at http://yuml.me and the Python source code reverse engineering tool PyNSource.
+
+You cannot edit these diagrams, each import overwrites the previous.  You can however import multiple files at the same time.
+
+You can zoom with CTRL-mousewheel.
+You can annotate with SHIFT right mouse button drawing.
+"""

@@ -522,8 +522,8 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             if classentry.classesinheritsfrom:
                 for parentclass in classentry.classesinheritsfrom:
 
-                    if parentclass.find('.') <> -1:         # fix names like "unittest.TestCase" into "unittest"
-                        parentclass = parentclass.split('.')[0] # take the lhs
+                    #if parentclass.find('.') <> -1:         # fix names like "unittest.TestCase" into "unittest"
+                    #    parentclass = parentclass.split('.')[0] # take the lhs
                     AddGeneralisation(classname, parentclass)
 
             classAttrs = [ attrobj.attrname for attrobj in classentry.attrs ]
@@ -1213,12 +1213,13 @@ class MainApp(wx.App):
         menu1.AppendSeparator()
         Add(menu1, "E&xit\tAlt-X", "Exit demo", self.OnButton)
         
-        Add(menu2, "&Delete Class\tDel", "Delete Node", self.OnDeleteNode)
         Add(menu2, "&Insert Class...\tIns", "Insert Node...", self.OnInsertNode)
+        Add(menu2, "&Delete Class\tDel", "Delete Node", self.OnDeleteNode)
+        menu2.AppendSeparator()
         Add(menu2, "&Refresh", "Refresh", self.OnRefreshUmlWindow)
         
         Add(menu3, "&Layout UML\tL", "Layout UML", self.OnLayout)
-        Add(menu3, "&Layout UML Optimal(slow)\tB", "Deep Layout UML (slow)", self.OnDeepLayout)
+        Add(menu3, "&Layout UML Optimally (slow)\tB", "Deep Layout UML (slow)", self.OnDeepLayout)
         menu3.AppendSeparator()
         Add(menu3sub, "&Remember Layout into memory slot 1\tShift-9", "Remember Layout 1", self.OnRememberLayout1)
         Add(menu3sub, "&Restore Layout 1\t9", "Restore Layout 1", self.OnRestoreLayout1)
@@ -1273,65 +1274,65 @@ class MainApp(wx.App):
             wx.EndBusyCursor()
             print 'Import - Done.'
 
-    def FileImport2(self, event):
-        from generate_code.gen_yuml import PySourceAsYuml
-        import urllib
-        
-        self.notebook.SetSelection(1)
-        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
-            defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
-        if dlg.ShowModal() == wx.ID_OK:
-            filenames = dlg.GetPaths()
-            print 'Importing...'
-            wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
-            print filenames
-            
-            files=filenames
-            p = PySourceAsYuml()
-            p.optionModuleAsClass = 0
-            p.verbose = 0
-            if files:
-                for f in files:
-                    p.Parse(f)
-            p.CalcYumls()
-            print p
-
-            #yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
-            yuml_txt = ','.join(str(p).split())
-            baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
-            url = baseUrl + urllib.quote(yuml_txt)
-            self.yuml.ViewImage(url=url)
-
-            wx.EndBusyCursor()
-            print 'Import - Done.'
-
-    def FileImport3(self, event):
-        from generate_code.gen_asciiart import PySourceAsText
-        import urllib
-        
-        self.notebook.SetSelection(2)
-        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
-            defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
-        if dlg.ShowModal() == wx.ID_OK:
-            filenames = dlg.GetPaths()
-            print 'Importing...'
-            wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
-            print filenames
-            
-            files=filenames
-            p = PySourceAsText()
-            p.optionModuleAsClass = 0
-            p.verbose = 0
-            if files:
-                for f in files:
-                    p.Parse(f)
-            print p
-
-            self.multiText.SetValue(str(p))
-            self.multiText.ShowPosition(0)
-
-            wx.EndBusyCursor()
-            print 'Import - Done.'
+    #def FileImport2(self, event):
+    #    from generate_code.gen_yuml import PySourceAsYuml
+    #    import urllib
+    #    
+    #    self.notebook.SetSelection(1)
+    #    dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
+    #        defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
+    #    if dlg.ShowModal() == wx.ID_OK:
+    #        filenames = dlg.GetPaths()
+    #        print 'Importing...'
+    #        wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
+    #        print filenames
+    #        
+    #        files=filenames
+    #        p = PySourceAsYuml()
+    #        p.optionModuleAsClass = 0
+    #        p.verbose = 0
+    #        if files:
+    #            for f in files:
+    #                p.Parse(f)
+    #        p.CalcYumls()
+    #        print p
+    #
+    #        #yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
+    #        yuml_txt = ','.join(str(p).split())
+    #        baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
+    #        url = baseUrl + urllib.quote(yuml_txt)
+    #        self.yuml.ViewImage(url=url)
+    #
+    #        wx.EndBusyCursor()
+    #        print 'Import - Done.'
+    #
+    #def FileImport3(self, event):
+    #    from generate_code.gen_asciiart import PySourceAsText
+    #    import urllib
+    #    
+    #    self.notebook.SetSelection(2)
+    #    dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
+    #        defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
+    #    if dlg.ShowModal() == wx.ID_OK:
+    #        filenames = dlg.GetPaths()
+    #        print 'Importing...'
+    #        wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
+    #        print filenames
+    #        
+    #        files=filenames
+    #        p = PySourceAsText()
+    #        p.optionModuleAsClass = 0
+    #        p.verbose = 0
+    #        if files:
+    #            for f in files:
+    #                p.Parse(f)
+    #        print p
+    #
+    #        self.multiText.SetValue(str(p))
+    #        self.multiText.ShowPosition(0)
+    #
+    #        wx.EndBusyCursor()
+    #        print 'Import - Done.'
 
     def model_to_ascii(self):
         from layout.layout_ascii import model_to_ascii_builder
@@ -1387,8 +1388,8 @@ class MainApp(wx.App):
         #info.SetIcon(wx.Icon('Images\\img_uml01.png', wx.BITMAP_TYPE_PNG))
         info.SetName(ABOUT_APPNAME)
         info.SetVersion(str(APP_VERSION))
-        #info.SetDescription(ABOUT_MSG)
-        info.Description = wordwrap(ABOUT_MSG, 350, wx.ClientDC(self.frame))
+        info.SetDescription(ABOUT_MSG)
+        #info.Description = wordwrap(ABOUT_MSG, 350, wx.ClientDC(self.frame))
         info.SetCopyright(ABOUT_AUTHOR)
         #info.SetWebSite(WEB_PYNSOURCE_HOME_URL)
         info.WebSite = (WEB_PYNSOURCE_HOME_URL, "Home Page")
