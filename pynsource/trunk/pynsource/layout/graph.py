@@ -445,7 +445,7 @@ class GraphNode:
         return point[0] >= self.left and point[0] <= self.right and point[1] >= self.top and point[1] <= self.bottom
         
     def __str__(self):
-        return "Node %s: x,y (%d, %d) w,h (%d, %d)" % (self.id, self.left, self.top, self.width, self.height)
+        return "Node %s: x/left,y/top (%d, %d) w,h (%d, %d) layoutPosX,layoutPosY (%2.4f, %2.4f)" % (self.id, self.left, self.top, self.width, self.height, self.layoutPosX, self.layoutPosY)
    
 
 if __name__ == '__main__':

@@ -81,24 +81,31 @@ class UmlWorkspace:
         def line(ch='-'):
             return ch*70
         from pprint import pprint
+        print
+        print "     UmlWorkspace Model     "
+        print
         print line('*'), "DUMP UML KNOWLEDGE: classnametoshape"
         pprint(self.classnametoshape)
         print line(), "associations_generalisation (class, parent)"
         pprint(self.associations_generalisation)
         print line(), "associations_composition (to, from)"
         pprint(self.associations_composition)
-        print line('='), "GRAPH Model", self.graph
+        print
+        print "     GRAPH Model     "
+        print
+        print line('-'), 'graph.nodeSet is'
+        pprint(self.graph.nodeSet.keys())
+        print line('-'), 'self.graph.nodes'
+        print
         for node in self.graph.nodes:
             print node
-        print line('-')
+        print line('-'), 'self.graph.edges'
         for edge in self.graph.edges:
             source = edge['source'].id
             target = edge['target'].id
             edgetype = edge['uml_edge_type']
             print "from %15s --> %15s  (%s)" % (source, target, edgetype)
-        print line('-'), 'graph.nodeSet is'
-        pprint(self.graph.nodeSet.keys())
-        print line('-')
+
 
     def AddUmlNode(self, id, attrs=[], meths=[]):
         node = self.graph.FindNodeById(id)

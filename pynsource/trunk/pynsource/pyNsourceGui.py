@@ -300,18 +300,35 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             self.CmdLayout()
             
         elif keycode in ['d', 'D']:
-            self.umlworkspace.Dump()
+            self.DumpStatus()
         
         self.working = False
         event.Skip()
 
     def DumpStatus(self):
-        #print "-"*50
-        print "scale", self.coordmapper.scale
+        # Also called by Snapshot manager.
+        # When create Snapshot manager we pass ourselves as a controller and DumpStatus() is expected to exist.
+        import locale
+        locale.setlocale(locale.LC_ALL, '')  # http://stackoverflow.com/questions/1823058/how-to-print-number-with-commas-as-thousands-separators-in-python-2-x
+        
+        print "v" * 50
+        self.umlworkspace.Dump()
+        print
+        print "  MISC Scaling etc info "
+        print
+        print "CoordinateMapper factorX,factorY  ", locale.format("%d", self.coordmapper.factorX, grouping=True), locale.format("%d", self.coordmapper.factorY, grouping=True)
+        print "CoordinateMapper scale  ", self.coordmapper.scale
         print "line-line intersections", len(self.umlworkspace.graph.CountLineOverLineIntersections())
         print "node-node overlaps", self.overlap_remover.CountOverlaps()
         print "line-node crossings", self.umlworkspace.graph.CountLineOverNodeCrossings()['ALL']/2 #, self.graph.CountLineOverNodeCrossings()
         print "bounds", self.umlworkspace.graph.GetBounds()
+
+        #print "SHAPE to classname list: -------------------"
+        #for shape in self.umlboxshapes:
+        #    print 'shape', shape, shape.node.classname
+
+        print
+        print "^" * 50
 
   
     def CmdRememberLayout1(self):
@@ -1123,10 +1140,7 @@ class MainApp(wx.App):
         self.umlwin.CmdInsertNewNode()
         
     def OnDumpUmlWorkspace(self, event):
-        #self.MessageBox("OnBuildGraphFromUmlWorkspace")
-        self.umlwin.umlworkspace.Dump()
-        for shape in self.umlwin.umlboxshapes:
-            print 'shape', shape, shape.node.classname
+        self.umlwin.DumpStatus()
 
     def OnSaveGraphToConsole(self, event):
         print self.umlwin.umlworkspace.graph.GraphToString()
@@ -1180,6 +1194,7 @@ class MainApp(wx.App):
         # set layout coords to be in sync with world, so that if expand scale things will work
         self.umlwin.coordmapper.Recalibrate()
         self.umlwin.AllToLayoutCoords()
+        self.umlwin.AllToWorldCoords() # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         
         # refresh view
         self.umlwin.GetDiagram().ShowAll(1) # need this, yes

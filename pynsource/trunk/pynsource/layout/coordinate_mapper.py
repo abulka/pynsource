@@ -1,5 +1,8 @@
 # CoordinateMapper
 
+import locale
+locale.setlocale(locale.LC_ALL, '')  # http://stackoverflow.com/questions/1823058/how-to-print-number-with-commas-as-thousands-separators-in-python-2-x
+
 class CoordinateMapper:
     def __init__(self, graph, world_size, scale=2):
         self.graph = graph
@@ -28,6 +31,10 @@ class CoordinateMapper:
         
         self.factorX = ww/self.scale/lw
         self.factorY = wh/self.scale/lh
+        print
+        print "CoordinateMapper.Recalibrate scale  ", self.scale
+        print "CoordinateMapper.Recalibrate factorX,factorY  ", locale.format("%d", self.factorX, grouping=True), locale.format("%d", self.factorY, grouping=True)
+        print
             
     def LayoutToWorld(self, point):
         return [
