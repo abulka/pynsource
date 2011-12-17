@@ -1,3 +1,7 @@
+Check out from
+https://pyidea.svn.sourceforge.net/svnroot/pyidea/pynsource/trunk/
+  (remember the https or you won't be able to move/rename things)
+
 http://pyidea.sourceforge.net/
 
 was original hosting page
