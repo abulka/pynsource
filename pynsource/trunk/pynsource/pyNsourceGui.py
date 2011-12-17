@@ -737,13 +737,14 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         line.Show(True)
 
     def OnWheelZoom(self, event):
-        if self.working: return
+        print "OnWheelZoom"
+        if self.working: print "WORKING??????!!"; return
         self.working = True
 
         if event.GetWheelRotation() < 0:
-            self.cmdLayoutExpand(event)
-        else:
             self.cmdLayoutContract(event)
+        else:
+            self.cmdLayoutExpand(event)
 
         self.working = False
 
@@ -967,6 +968,7 @@ USE_SIZER = False
 class MainApp(wx.App):
     def OnInit(self):
         self.log = Log()
+        self.working = False
         wx.InitAllImageHandlers()
         self.andyapptitle = 'PyNsource GUI - Python Code into UML'
 
@@ -1008,6 +1010,7 @@ class MainApp(wx.App):
             self.asciiart.SetSizerAndFit(bsizer)
             self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))   # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
             self.multiText.Bind( wx.EVT_CHAR, self.onKeyChar_Ascii_Text_window)
+            self.multiText.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom_ascii)
 
             self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabPageChanged)
             
@@ -1122,6 +1125,43 @@ class MainApp(wx.App):
         self.frame.Bind(wx.EVT_MENU, self.OnDumpUmlWorkspace, item)
         
         self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
+        
+    def OnWheelZoom_ascii(self, event):
+        # Since our binding of wx.EVT_MOUSEWHEEL to here takes over all wheel events
+        # we have to manually do the normal test scrolling.  This event can't propogate via event.skip()
+        #
+        #The native widgets handle the low level 
+        #events (or not) their own way and wx makes no guarantees about behaviors 
+        #when intercepting them yourself. 
+        #-- 
+        #Robin Dunn 
+
+        if self.working: return
+        self.working = True
+        
+        #print event.ShouldPropagate(), dir(event)
+        
+        controlDown = event.CmdDown()
+        if controlDown:
+            font = self.multiText.GetFont()
+    
+            if event.GetWheelRotation() < 0:
+                newfontsize = font.GetPointSize() - 1
+            else:
+                newfontsize = font.GetPointSize() + 1
+    
+            if newfontsize > 0 and newfontsize < 100:
+                self.multiText.SetFont(wx.Font(newfontsize, wx.MODERN, wx.NORMAL, wx.NORMAL, False))
+        else:
+            if event.GetWheelRotation() < 0:
+                self.multiText.ScrollLines(4)
+            else:
+                self.multiText.ScrollLines(-4)
+
+        self.working = False
+
+        #self.frame.GetEventHandler().ProcessEvent(event)
+        #wx.PostEvent(self.frame, event)
         
     def onKeyChar_Ascii_Text_window(self, event):
         # See good tutorial http://www.blog.pythonlibrary.org/2009/08/29/wxpython-catching-key-and-char-events/
