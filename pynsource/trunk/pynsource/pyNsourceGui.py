@@ -990,7 +990,8 @@ class MainApp(wx.App):
             bsizer.Add(self.multiText, 1, wx.EXPAND)
             self.asciiart.SetSizerAndFit(bsizer)
             self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))   # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
-            
+            self.multiText.Bind( wx.EVT_CHAR, self.onKeyChar_Ascii_Text_window)
+
             self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabPageChanged)
             
         else:
@@ -1105,7 +1106,19 @@ class MainApp(wx.App):
         
         self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
         
+    def onKeyChar_Ascii_Text_window(self, event):
+        # See good tutorial http://www.blog.pythonlibrary.org/2009/08/29/wxpython-catching-key-and-char-events/
+        keycode = event.GetKeyCode()
+        controlDown = event.CmdDown()
+        altDown = event.AltDown()
+        shiftDown = event.ShiftDown()
+        #print keycode
         
+        if controlDown and keycode == 1:    # CTRL-A
+            self.multiText.SelectAll()
+
+        event.Skip()
+                
     def OnInsertClass(self, event):
         self.umlwin.CmdInsertNewNode()
         
