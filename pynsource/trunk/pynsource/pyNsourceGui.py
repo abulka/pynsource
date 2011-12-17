@@ -497,13 +497,13 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             
         def AddGeneralisation(classname, parentclass):
             if (classname, parentclass) in self.umlworkspace.associations_generalisation:
-                print "DUPLICATE Generalisation skipped when ConvertParseModelToUmlModel", (classname, parentclass)
+                #print "DUPLICATE Generalisation skipped when ConvertParseModelToUmlModel", (classname, parentclass) # DUPLICATE DETECTION
                 return
             self.umlworkspace.associations_generalisation.append((classname, parentclass))
 
         def AddDependency(otherclass, classname):
             if (otherclass, classname) in self.umlworkspace.associations_composition:
-                print "DUPLICATE Dependency skipped when ConvertParseModelToUmlModel", (otherclass, classname)
+                #print "DUPLICATE Dependency skipped when ConvertParseModelToUmlModel", (otherclass, classname) # DUPLICATE DETECTION
                 return
             self.umlworkspace.associations_composition.append((otherclass, classname))  # reverse direction so round black arrows look ok
 
@@ -1192,10 +1192,13 @@ class MainApp(wx.App):
         menu4 = wx.Menu()
 
         self.next_menu_id = wx.NewId()
-        def Add(menu, s1, s2, func):
-            menu.Append(self.next_menu_id, s1, s2)
+        def Add(menu, s1, s2, func, func_update=None):
+            menu_item = menu.Append(self.next_menu_id, s1, s2)
             wx.EVT_MENU(self, self.next_menu_id, func)
+            if func_update:
+                wx.EVT_UPDATE_UI(self, self.next_menu_id, func_update)
             self.next_menu_id = wx.NewId()
+            return menu_item
 
         def AddSubMenu(menu, submenu, s):
             menu.AppendMenu(self.next_menu_id, s, submenu)
@@ -1214,7 +1217,9 @@ class MainApp(wx.App):
         Add(menu1, "E&xit\tAlt-X", "Exit demo", self.OnButton)
         
         Add(menu2, "&Insert Class...\tIns", "Insert Node...", self.OnInsertNode)
-        Add(menu2, "&Delete Class\tDel", "Delete Node", self.OnDeleteNode)
+        menu_item_delete_class = Add(menu2, "&Delete Class\tDel", "Delete Node", self.OnDeleteNode, self.OnDeleteNode_update)
+        menu_item_delete_class.Enable(True)  # demo one way to enable/disable.  But better to do via _update function
+        Add(menu2, "&Edit Class Properties...\tF2", "Edit Class Properties", self.OnEditProperties, self.OnEditProperties_update)
         menu2.AppendSeparator()
         Add(menu2, "&Refresh", "Refresh", self.OnRefreshUmlWindow)
         
@@ -1232,10 +1237,10 @@ class MainApp(wx.App):
         menu3.AppendSeparator()
         
         
-        Add(menu4, "&Help...", "Help", self.OnHelp)
+        Add(menu4, "&Help...\tF1", "Help", self.OnHelp)
         Add(menu4, "&Visit PyNSource Website...", "PyNSource Website", self.OnVisitWebsite)
-        menu4.AppendSeparator()
         Add(menu4, "&Check for Updates...", "Check for Updates", self.OnCheckForUpdates)
+        menu4.AppendSeparator()
         Add(menu4, "&About...", "About...", self.OnAbout)
 
         menuBar.Append(menu1, "&File")
@@ -1334,6 +1339,7 @@ class MainApp(wx.App):
     #        wx.EndBusyCursor()
     #        print 'Import - Done.'
 
+
     def model_to_ascii(self):
         from layout.layout_ascii import model_to_ascii_builder
         import time
@@ -1424,14 +1430,28 @@ class MainApp(wx.App):
     def OnHelp(self, event):
         self.MessageBox(HELP_MSG.strip())
 
+    def Enable_if_node_selected(self, event):
+        selected = [s for s in self.umlwin.GetDiagram().GetShapeList() if s.Selected()]
+        event.Enable(len(selected) > 0)
+
     def OnDeleteNode(self, event):
         for shape in self.umlwin.GetDiagram().GetShapeList():
             if shape.Selected():
                 self.umlwin.CmdZapShape(shape)
+    def OnDeleteNode_update(self, event):
+        self.Enable_if_node_selected(event)
 
     def OnInsertNode(self, event):
         self.umlwin.CmdInsertNewNode()
-        
+
+    def OnEditProperties(self, event):
+        for shape in self.umlwin.GetDiagram().GetShapeList():
+            if shape.Selected():
+                self.umlwin.CmdEditShape(shape)
+                break
+    def OnEditProperties_update(self, event):
+        self.Enable_if_node_selected(event)
+
     def OnLayout(self, event):
         self.umlwin.CmdLayout()
 

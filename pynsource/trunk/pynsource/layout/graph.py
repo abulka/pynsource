@@ -185,7 +185,8 @@ class Graph:
                 result.append(line)
                 lines_seen.add(line)
             else:
-                print "DUPLICATE in incoming file detected, skipped", line
+                #print "DUPLICATE in incoming file detected, skipped", line  # DUPLICATE DETECTION
+                pass
         #print "******\n", '\n'.join(result)  # debug point - print exact replica of s but without duplicates
         return result
 
