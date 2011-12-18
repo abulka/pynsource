@@ -401,7 +401,8 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             node.shape.Show(True)
             
             #self.stateofthenation() # if want simple refresh
-            self.stage2() # if want overlap removal
+            #self.stage2() # if want overlap removal
+            self.stage2(force_stateofthenation=True) # if want overlap removal and proper refresh
             
             self.SelectNodeNow(node.shape)
 
@@ -659,7 +660,8 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         shape.SetCanvas(self)
         shape.SetPen(wx.BLACK_PEN)   # Controls the color of the border of the shape
         shape.SetBrush(wx.Brush("WHEAT", wx.SOLID))
-        self.GetDiagram().AddShape(shape)
+        setpos(shape, node.left, node.top)
+        self.GetDiagram().AddShape(shape) # self.AddShape is ok too, ShapeCanvas's AddShape is delegated back to Diagram's AddShape.  ShapeCanvas-->Diagram
         shape.Show(True)
 
         evthandler = MyEvtHandler(self.log, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
@@ -671,6 +673,9 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
         # Don't set the node left,top here as the shape needs to conform to the node.
         # On the other hand the node needs to conform to the shape's width,height.
+        # ACTUALLY I now do set the pos of the shape, see above,
+        # just before the AddShape() call.
+        #
         node.width, node.height = shape.GetBoundingBoxMax()
         node.shape = shape
         shape.node = node
@@ -828,12 +833,21 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         diagram.Clear(dc)
         diagram.Redraw(dc)
 
+        """
+        Do we need any of this?
+        Annoying to have a hack, esp if it keeps forcing calls to Recalibrate()
+        """
+        #self.frame.SetScrollbars(needs lots of weird args...)
+        # or
+        #self.SetScrollbars(needs lots of weird args...)
+        #
         # Hack To Force The Scrollbar To Show Up
         # Set the window size to something different
         # Return the size to what it was
-        oldSize = self.frame.GetSize()
-        self.frame.SetSize((oldSize[0]+1,oldSize[1]+1))
-        self.frame.SetSize(oldSize)
+        #
+        #oldSize = self.frame.GetSize()
+        #self.frame.SetSize((oldSize[0]+1,oldSize[1]+1))
+        #self.frame.SetSize(oldSize)
 
     def CmdLayout(self):
         if self.GetDiagram().GetCount() == 0:
@@ -1081,8 +1095,9 @@ class MainApp(wx.App):
         self.config.write()
 
     def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
-        self.umlwin.coordmapper.Recalibrate(self.frame.GetClientSize()) # may need to call self.GetVirtualSize() if scrolled window
-        #self.umlwin.coordmapper.Recalibrate(self.umlwin.GetVirtualSize())
+        if event.EventObject == self.umlwin:
+            self.umlwin.coordmapper.Recalibrate(self.frame.GetClientSize()) # may need to call self.GetVirtualSize() if scrolled window
+            #self.umlwin.coordmapper.Recalibrate(self.umlwin.GetVirtualSize())
         event.Skip()
         
     def OnRightButtonMenu(self, event):   # Menu
@@ -1234,7 +1249,7 @@ class MainApp(wx.App):
         # set layout coords to be in sync with world, so that if expand scale things will work
         self.umlwin.coordmapper.Recalibrate()
         self.umlwin.AllToLayoutCoords()
-        self.umlwin.AllToWorldCoords() # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        #self.umlwin.AllToWorldCoords() # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         
         # refresh view
         self.umlwin.GetDiagram().ShowAll(1) # need this, yes

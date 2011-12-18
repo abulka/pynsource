@@ -3,15 +3,25 @@
 import locale
 locale.setlocale(locale.LC_ALL, '')  # http://stackoverflow.com/questions/1823058/how-to-print-number-with-commas-as-thousands-separators-in-python-2-x
 
+class CustomException(Exception):
+    def __init__(self, value):
+        self.parameter = value
+    def __str__(self):
+        return repr(self.parameter)
+           
 class CoordinateMapper:
     def __init__(self, graph, world_size, scale=2):
         self.graph = graph
         self.world_size = world_size
         self.radius = 10
         self.scale = scale
+        self.factorX = -99
+        self.factorY = -99
         self.Recalibrate()
 
     def Recalibrate(self, new_world_size=None, scale=None):
+        self.DumpCalibrationInfo(True, new_world_size, scale)
+        
         if new_world_size:
             self.world_size = new_world_size
         if scale:
@@ -25,17 +35,29 @@ class CoordinateMapper:
         #assert lw
         #assert lh
         if lw == 0:
-            lw = 0.0001
+            lw = 1.0 #0.0001
         if lh == 0:
-            lh = 0.0001
+            lh = 1.0 # 0.0001
         
         self.factorX = ww/self.scale/lw
         self.factorY = wh/self.scale/lh
-        print
-        print "CoordinateMapper.Recalibrate scale  ", self.scale
-        print "CoordinateMapper.Recalibrate factorX,factorY  ", locale.format("%d", self.factorX, grouping=True), locale.format("%d", self.factorY, grouping=True)
-        print
-            
+
+        self.DumpCalibrationInfo(False, new_world_size, scale)
+
+    def DumpCalibrationInfo(self, is_function_start, new_world_size=None, scale=None):
+        if is_function_start:
+            indent = ""
+            print
+            print indent+"CoordinateMapper.Recalibrate START, calling with new_world_size=%s, scale=%s" %(new_world_size, scale)
+        else:
+            indent = "\t"
+            print indent+"CoordinateMapper.Recalibrate END"
+        print indent+"scale world_size\t\t", self.scale, " ", self.world_size
+        print indent+"layout (MinX/MinY)(MaxX/Maxy)\t(%2.2f,%2.2f) (%2.2f,%2.2f)" % (self.graph.layoutMinX, self.graph.layoutMinY, self.graph.layoutMaxX, self.graph.layoutMaxY)
+        print indent+"layout width height\t\t%2.2f %2.2f" % (self.graph.layoutMaxX - self.graph.layoutMinX, self.graph.layoutMaxY - self.graph.layoutMinY)
+        print indent+"factorX factorY\t\t\t", locale.format("%d", self.factorX, grouping=True), locale.format("%d", self.factorY, grouping=True)
+
+
     def LayoutToWorld(self, point):
         return [
           int((point[0] - self.graph.layoutMinX) * self.factorX + self.radius),
@@ -55,7 +77,13 @@ class CoordinateMapper:
     def AllToWorldCoords(self):
         for node in self.graph.nodes:
             node.left, node.top = self.LayoutToWorld([node.layoutPosX, node.layoutPosY])
-            assert node.left < 20000, "Insane x values being generated"
+            if node.left > 20000:
+                print '-'*40, "Something's gone wrong!"
+                print "node.layoutPosX, node.layoutPosY", node.layoutPosX, node.layoutPosY
+                for node in self.graph.nodes:
+                    print node, "node.layoutPosX, node.layoutPosY", node.layoutPosX, node.layoutPosY
+                self.DumpCalibrationInfo(False)
+                raise CustomException("Insane x values being generated")
 
 
 if __name__ == '__main__':
