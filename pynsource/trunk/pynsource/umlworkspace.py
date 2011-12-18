@@ -104,7 +104,7 @@ class UmlWorkspace:
             source = edge['source'].id
             target = edge['target'].id
             edgetype = edge['uml_edge_type']
-            print "from %15s --> %15s  (%s)" % (source, target, edgetype)
+            print "from %40s --> %-40s  (%s)" % (source, target, edgetype)
 
 
     def AddUmlNode(self, id, attrs=[], meths=[]):

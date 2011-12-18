@@ -316,12 +316,12 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         print
         print "  MISC Scaling etc info "
         print
-        print "CoordinateMapper factorX,factorY  ", locale.format("%d", self.coordmapper.factorX, grouping=True), locale.format("%d", self.coordmapper.factorY, grouping=True)
-        print "CoordinateMapper scale  ", self.coordmapper.scale
+        self.coordmapper.DumpCalibrationInfo(dump_nodes=False)
         print "line-line intersections", len(self.umlworkspace.graph.CountLineOverLineIntersections())
         print "node-node overlaps", self.overlap_remover.CountOverlaps()
         print "line-node crossings", self.umlworkspace.graph.CountLineOverNodeCrossings()['ALL']/2 #, self.graph.CountLineOverNodeCrossings()
         print "bounds", self.umlworkspace.graph.GetBounds()
+
 
         #print "SHAPE to classname list: -------------------"
         #for shape in self.umlboxshapes:
@@ -742,7 +742,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         line.Show(True)
 
     def OnWheelZoom(self, event):
-        print "OnWheelZoom"
+        #print "OnWheelZoom"
         if self.working: print "WORKING??????!!"; return
         self.working = True
 
@@ -836,6 +836,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         """
         Do we need any of this?
         Annoying to have a hack, esp if it keeps forcing calls to Recalibrate()
+        But we need it so that the Recalibrate() is called at least once
         """
         #self.frame.SetScrollbars(needs lots of weird args...)
         # or
@@ -845,11 +846,14 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         # Set the window size to something different
         # Return the size to what it was
         #
-        #oldSize = self.frame.GetSize()
-        #self.frame.SetSize((oldSize[0]+1,oldSize[1]+1))
-        #self.frame.SetSize(oldSize)
+        oldSize = self.frame.GetSize()
+        self.frame.SetSize((oldSize[0]+1,oldSize[1]+1))
+        self.frame.SetSize(oldSize)
 
     def CmdLayout(self):
+        print
+        print "CmdLayout"
+        print
         if self.GetDiagram().GetCount() == 0:
             #self.frame.MessageBox("Nothing to layout.  Import a python source file first.")
             return
@@ -1070,7 +1074,10 @@ class MainApp(wx.App):
         def bootstrap05():
             self.umlwin.Go(files=[os.path.abspath("printframework.py"), os.path.abspath("png.py")])
             self.umlwin.RedrawEverything()
-        bootstrap03()
+        def bootstrap06():
+            self.umlwin.Go(files=[os.path.abspath("gui_umlshapes.py")])
+            self.umlwin.RedrawEverything()
+        bootstrap06()
         # END Debug bootstrap --------------------------------------
         
         return True
