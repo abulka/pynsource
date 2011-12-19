@@ -261,14 +261,14 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
     def cmdLayoutExpand(self, event):
         if self.coordmapper.scale > 0.8:
             self.ChangeScale(-0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
-            print "expansion ", self.coordmapper.scale
+            #print "expansion ", self.coordmapper.scale
         else:
             print "Max expansion prevented.", self.coordmapper.scale
 
     def cmdLayoutContract(self, event):
         if self.coordmapper.scale < 3:
             self.ChangeScale(0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
-            print "contraction ", self.coordmapper.scale
+            #print "contraction ", self.coordmapper.scale
         else:
             print "Min expansion thwarted.", self.coordmapper.scale
 
@@ -743,7 +743,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
     def OnWheelZoom(self, event):
         #print "OnWheelZoom"
-        if self.working: print "WORKING??????!!"; return
+        if self.working: return
         self.working = True
 
         if event.GetWheelRotation() < 0:
@@ -851,9 +851,9 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.frame.SetSize(oldSize)
 
     def CmdLayout(self):
-        print
-        print "CmdLayout"
-        print
+        #print
+        #print "CmdLayout"
+        #print
         if self.GetDiagram().GetCount() == 0:
             #self.frame.MessageBox("Nothing to layout.  Import a python source file first.")
             return
@@ -1054,7 +1054,12 @@ class MainApp(wx.App):
         
         self.InitConfig()
 
-        # Debug bootstraps  --------------------------------------
+        wx.CallAfter(self.BootStrap)    # doesn't make a difference calling this via CallAfter
+        
+        return True
+    
+    def BootStrap(self):
+
         def bootstrap01():
             self.frame.SetSize((1024,768))
             self.umlwin.Go(files=[os.path.abspath( __file__ )])
@@ -1063,6 +1068,7 @@ class MainApp(wx.App):
             self.umlwin.RedrawEverything()
             #self.umlwin.umlworkspace.Dump()
         def bootstrap03():
+            self.umlwin.RedrawEverything()  # Allow main frame to resize and thus allow world coords to calibrate before we generate layout coords for loaded graph
             filename = os.path.abspath( "saved uml workspaces/uml05.txt" )
             fp = open(filename, "r")
             s = fp.read()
@@ -1077,11 +1083,10 @@ class MainApp(wx.App):
         def bootstrap06():
             self.umlwin.Go(files=[os.path.abspath("gui_umlshapes.py")])
             self.umlwin.RedrawEverything()
-        bootstrap06()
-        # END Debug bootstrap --------------------------------------
+            
+        #print "BootStrap"
+        bootstrap03()
         
-        return True
-
     #def onFocus(self, event):   # attempt at making mousewheel auto scroll the workspace
     #    self.umlwin.SetFocus()  # attempt at making mousewheel auto scroll the workspace
         
@@ -1103,6 +1108,7 @@ class MainApp(wx.App):
 
     def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
         if event.EventObject == self.umlwin:
+            #print "OnResizeFrame"
             self.umlwin.coordmapper.Recalibrate(self.frame.GetClientSize()) # may need to call self.GetVirtualSize() if scrolled window
             #self.umlwin.coordmapper.Recalibrate(self.umlwin.GetVirtualSize())
         event.Skip()
@@ -1256,7 +1262,6 @@ class MainApp(wx.App):
         # set layout coords to be in sync with world, so that if expand scale things will work
         self.umlwin.coordmapper.Recalibrate()
         self.umlwin.AllToLayoutCoords()
-        #self.umlwin.AllToWorldCoords() # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         
         # refresh view
         self.umlwin.GetDiagram().ShowAll(1) # need this, yes
@@ -1264,12 +1269,16 @@ class MainApp(wx.App):
         
     def OnTabPageChanged(self, event):
         if event.GetSelection() == 0:  # ogl
+            self.Bind(wx.EVT_MOUSEWHEEL, self.umlwin.OnWheelZoom)  # rebind as it seems to get unbound when switch to ascii tab
             pass
         #elif event.GetSelection() == 1:  # yuml
         #    #self.yuml.ViewImage(thefile='../outyuml.png')
         #    pass
         elif event.GetSelection() == 1:  # ascii art
             self.model_to_ascii()
+            #self.multiText.SetFocus()
+            #self.multiText.SetInsertionPoint(0)
+            wx.CallAfter(self.multiText.SetInsertionPoint, 0)   # why isn't this working?
         
         event.Skip()
          

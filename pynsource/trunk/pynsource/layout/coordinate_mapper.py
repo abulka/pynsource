@@ -109,15 +109,26 @@ class CoordinateMapper:
 
     def AllToLayoutCoords(self):
         something_wrong = False
+        
+        #def check_if_wrong(already_wrong, coord1, coord2):
+        #    if abs(layoutPosX) > 19.0:
+        #        print "!"*20, "Big layoutPosX?", layoutPosX, node
+        #        something_wrong = True
+        #    if already_wrong and found_wrong:
+        #        return true
+            
         for node in self.graph.nodes:
             layoutPosX, layoutPosY = self.WorldToLayout([node.left, node.top])
-            if abs(layoutPosX) > 10.0:
+            
+            if abs(layoutPosX) > 50.0:
                 print "!"*20, "Big layoutPosX?", layoutPosX, node
                 something_wrong = True
-            if abs(layoutPosY) > 10.0:
+            if abs(layoutPosY) > 50.0:
                 print "!"*20, "Big layoutPosY?", layoutPosY, node
                 something_wrong = True
+                
             node.layoutPosX, node.layoutPosY = layoutPosX, layoutPosY
+            
         if something_wrong:
             self.DumpCalibrationInfo(False)
     
@@ -125,19 +136,19 @@ class CoordinateMapper:
         for node in self.graph.nodes:
             node.left, node.top = self.LayoutToWorld([node.layoutPosX, node.layoutPosY])
             
-            if not validate_layout_to_world(self, node.layoutPosX, node.layoutPosY):
-                validate_layout_to_world(self, node.layoutPosX, node.layoutPosY)
+            #if not validate_layout_to_world(self, node.layoutPosX, node.layoutPosY):
+            #validate_layout_to_world(self, node.layoutPosX, node.layoutPosY)
             
-            rederive_layoutPosX, rederive_layoutPosY = self.WorldToLayout([node.left, node.top])
-            rederive_X_ok = abs(abs(rederive_layoutPosX) - abs(node.layoutPosX)) < 0.001
-            rederive_Y_ok = abs(abs(rederive_layoutPosY) - abs(node.layoutPosY)) < 0.001
-            if not rederive_X_ok:
-                rederive_X_ok = "False !!!!!"
-            if not rederive_Y_ok:
-                rederive_Y_ok = "False !!!!!"
-            print "rederive check X % 3.4f % 3.4f \t\t%s" % (rederive_layoutPosX, node.layoutPosX, rederive_X_ok)
-            print "rederive check Y % 3.4f % 3.4f \t\t%s" % (rederive_layoutPosY, node.layoutPosY, rederive_Y_ok)
-            print
+            #rederive_layoutPosX, rederive_layoutPosY = self.WorldToLayout([node.left, node.top])
+            #rederive_X_ok = abs(abs(rederive_layoutPosX) - abs(node.layoutPosX)) < 0.001
+            #rederive_Y_ok = abs(abs(rederive_layoutPosY) - abs(node.layoutPosY)) < 0.001
+            #if not rederive_X_ok:
+            #    rederive_X_ok = "False !!!!!"
+            #if not rederive_Y_ok:
+            #    rederive_Y_ok = "False !!!!!"
+            #print "rederive check X % 3.4f % 3.4f \t\t%s" % (rederive_layoutPosX, node.layoutPosX, rederive_X_ok)
+            #print "rederive check Y % 3.4f % 3.4f \t\t%s" % (rederive_layoutPosY, node.layoutPosY, rederive_Y_ok)
+            #print
             
             if node.left > 20000:
                 print '-'*40, "Something's gone wrong!"
