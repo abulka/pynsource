@@ -405,6 +405,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             self.stage2(force_stateofthenation=True) # if want overlap removal and proper refresh
             
             self.SelectNodeNow(node.shape)
+            
 
     def CmdEditShape(self, shape):
         node = shape.node
@@ -1206,6 +1207,7 @@ class MainApp(wx.App):
                 
     def OnInsertClass(self, event):
         self.umlwin.CmdInsertNewNode()
+        self.RefreshAsciiUmlTab()
         
     def OnDumpUmlWorkspace(self, event):
         self.umlwin.DumpStatus()
@@ -1267,23 +1269,32 @@ class MainApp(wx.App):
         self.umlwin.GetDiagram().ShowAll(1) # need this, yes
         self.umlwin.stateofthenation()
         
+        self.RefreshAsciiUmlTab()
+
+        
     def OnTabPageChanged(self, event):
         if event.GetSelection() == 0:  # ogl
             self.Bind(wx.EVT_MOUSEWHEEL, self.umlwin.OnWheelZoom)  # rebind as it seems to get unbound when switch to ascii tab
-            pass
+            wx.CallAfter(self.umlwin.SetFocus)
+            self.menuBar.EnableTop(2, True)  # enable layout menu
+
         #elif event.GetSelection() == 1:  # yuml
         #    #self.yuml.ViewImage(thefile='../outyuml.png')
         #    pass
+
         elif event.GetSelection() == 1:  # ascii art
-            self.model_to_ascii()
-            #self.multiText.SetFocus()
-            #self.multiText.SetInsertionPoint(0)
-            wx.CallAfter(self.multiText.SetInsertionPoint, 0)   # why isn't this working?
-        
-        event.Skip()
+            self.RefreshAsciiUmlTab()
+            self.menuBar.EnableTop(2, False)  # disable layout menu
+            wx.CallAfter(self.multiText.SetFocus)
+            wx.CallAfter(self.multiText.SetInsertionPoint, 0) 
          
+        event.Skip()
+        
+    def RefreshAsciiUmlTab(self):
+        self.model_to_ascii()
+        
     def InitMenus(self):
-        menuBar = wx.MenuBar()
+        menuBar = wx.MenuBar(); self.menuBar = menuBar
         menu1 = wx.Menu()
         menu2 = wx.Menu()
         menu3 = wx.Menu()
@@ -1459,6 +1470,7 @@ class MainApp(wx.App):
             
     def FileNew(self, event):
         self.umlwin.Clear()
+        self.RefreshAsciiUmlTab()
         
     def FilePrint(self, event):
 
@@ -1531,7 +1543,8 @@ class MainApp(wx.App):
 
     def Enable_if_node_selected(self, event):
         selected = [s for s in self.umlwin.GetDiagram().GetShapeList() if s.Selected()]
-        event.Enable(len(selected) > 0)
+        viewing_uml_tab = self.notebook.GetSelection() == 0
+        event.Enable(len(selected) > 0 and viewing_uml_tab)
 
     def OnDeleteNode(self, event):
         for shape in self.umlwin.GetDiagram().GetShapeList():
@@ -1542,6 +1555,7 @@ class MainApp(wx.App):
 
     def OnInsertNode(self, event):
         self.umlwin.CmdInsertNewNode()
+        self.RefreshAsciiUmlTab()
 
     def OnEditProperties(self, event):
         for shape in self.umlwin.GetDiagram().GetShapeList():
@@ -1560,6 +1574,7 @@ class MainApp(wx.App):
 
     def OnRefreshUmlWindow(self, event):
         self.umlwin.RedrawEverything()
+        self.RefreshAsciiUmlTab()
 
     def MessageBox(self, msg):
         dlg = wx.MessageDialog(self.frame, msg, 'Message', wx.OK | wx.ICON_INFORMATION)
