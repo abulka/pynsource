@@ -44,6 +44,18 @@ class UmlNode(GraphNode):
     def set_id(self, val):
         self.id = val
     classname = property(get_id, set_id)
+
+class CommentNode(GraphNode):
+    def __init__(self, id, left, top, width=60, height=60, comment=""):
+        GraphNode.__init__(self, id, left, top, width=60, height=60)
+        self.comment = comment
+        self.shape = None
+
+    def get_id(self):
+        return self.id
+    def set_id(self, val):
+        self.id = val
+    classname = property(get_id, set_id)
     
 class UmlWorkspace:
     def __init__(self):
@@ -126,4 +138,11 @@ class UmlWorkspace:
         node = self.graph.AddNode(node)
         return node
         
+    def AddCommentNode(self, id, comment):
+        if self.graph.FindNodeById(id):
+            id += str(random.randint(1,9999))
+        t,l,w,h = random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160)
+        node = CommentNode(id, t, l, w, h, comment=comment)
+        node = self.graph.AddNode(node)
+        return node
 

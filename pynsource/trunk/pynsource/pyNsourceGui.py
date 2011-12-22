@@ -33,7 +33,6 @@ from gui_umlshapes import *
 
 APP_VERSION = 1.51
 WINDOW_SIZE = (1024,768)
-IMAGENODES = False
 MULTI_TAB_GUI = True
 
 # compensate for the fact that x, y for a ogl shape are the centre of the shape, not the top left
@@ -383,7 +382,28 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             node.shape.Show(True)
             self.stateofthenation()
         dialog.Destroy()
-
+        
+    def CmdInsertNewComment(self):
+        id = 'D' + str(random.randint(1,9999))
+        dialog = wx.TextEntryDialog ( None, 'Enter a comment:', 'New Comment', "hello\nthere") #, wx.TE_MULTILINE )
+        if dialog.ShowModal() == wx.ID_OK:
+            comment = dialog.GetValue() + "\nfred"
+            node = self.umlworkspace.AddCommentNode(id, comment)
+            shape = self.createCommentShape(node)
+            self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+            node.shape.Show(True)
+            self.stateofthenation()
+        dialog.Destroy()
+        
+        
+    def CmdInsertNewImageNode(self):
+        curr_dir = os.path.dirname( os.path.abspath( __file__ ) )
+        F = os.path.join(curr_dir, '..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP')
+        # wx.ImageFromBitmap(bitmap) and wx.BitmapFromImage(image)
+        self.CreateImageShape(F)
+        self.stage2(force_stateofthenation=True) # if want overlap removal and proper refresh
+        #self.SelectNodeNow(node.shape)
+            
     def CmdInsertNewNode(self):
         result, id, attrs, methods = self.DisplayDialogUmlNodeEdit(id='D' + str(random.randint(1,99)),
                                             attrs=['attribute 1', 'attribute 2', 'attribute 3'],
@@ -574,32 +594,29 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         # Layout
         self.LayoutAndPositionShapes()
               
+    def CreateImageShape(self, F):
+        shape = ogl.BitmapShape()
+        img = wx.Image(F, wx.BITMAP_TYPE_ANY)
+        bmp = wx.BitmapFromImage(img)
+        shape.SetBitmap(bmp)
+
+        self.GetDiagram().AddShape(shape)
+        shape.Show(True)
+
+        evthandler = MyEvtHandler(self.log, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
+        evthandler.SetShape(shape)
+        evthandler.SetPreviousHandler(shape.GetEventHandler())
+        shape.SetEventHandler(evthandler)
+
+        setpos(shape, 0, 0)
+        #setpos(shape, node.left, node.top)
+        #node.width, node.height = shape.GetBoundingBoxMax()
+        #node.shape = shape
+        #shape.node = node
+        return shape
+        
     def CreateUmlShape(self, node):
 
-        if IMAGENODES:
-            curr_dir = os.path.dirname( os.path.abspath( __file__ ) )
-            F = os.path.join(curr_dir, '..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP')
-            # wx.ImageFromBitmap(bitmap) and wx.BitmapFromImage(image)
-            shape = ogl.BitmapShape()
-            img = wx.Image(F, wx.BITMAP_TYPE_ANY)
-            bmp = wx.BitmapFromImage(img)
-            shape.SetBitmap(bmp)
-
-            self.GetDiagram().AddShape(shape)
-            shape.Show(True)
-    
-            evthandler = MyEvtHandler(self.log, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
-            evthandler.SetShape(shape)
-            evthandler.SetPreviousHandler(shape.GetEventHandler())
-            shape.SetEventHandler(evthandler)
-
-            setpos(shape, node.left, node.top)
-            node.width, node.height = shape.GetBoundingBoxMax()
-            node.shape = shape
-            shape.node = node
-            return shape
-            
-            
         def newRegion(font, name, textLst, maxWidth, totHeight = 10):
             # Taken from Boa, but put into the canvas class instead of the scrolled window class.
             region = ogl.ShapeRegion()
@@ -685,6 +702,28 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
     def createNodeShape(self, node):     # FROM SPRING LAYOUT
         shape = ogl.RectangleShape( node.width, node.height )
         shape.AddText(node.id)
+        setpos(shape, node.left, node.top)
+        #shape.SetDraggable(True, True)
+        self.AddShape( shape )
+        node.shape = shape
+        shape.node = node
+        
+        # wire in the event handler for the new shape
+        evthandler = MyEvtHandler(None, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
+        evthandler.SetShape(shape)
+        evthandler.SetPreviousHandler(shape.GetEventHandler())
+        shape.SetEventHandler(evthandler)
+
+    def createCommentShape(self, node):
+        shape = ogl.TextShape( node.width, node.height )
+            
+        shape.SetCanvas(self)
+        shape.SetPen(wx.BLACK_PEN)
+        shape.SetBrush(wx.LIGHT_GREY_BRUSH)
+        shape.SetBrush(wx.RED_BRUSH)
+        for line in node.comment.split('\n'):
+            shape.AddText(line)
+        
         setpos(shape, node.left, node.top)
         #shape.SetDraggable(True, True)
         self.AddShape( shape )
@@ -829,13 +868,13 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         canvas.PrepareDC(dc)
         for shape in self.umlboxshapes:
             shape.Move(dc, shape.GetX(), shape.GetY())
-            if not IMAGENODES:
+            if shape.__class__.__name__ == 'DividedShape':
                 shape.SetRegionSizes()
         diagram.Clear(dc)
         diagram.Redraw(dc)
 
         """
-        Do we need any of this?
+        Do we need any of this?  YES.
         Annoying to have a hack, esp if it keeps forcing calls to Recalibrate()
         But we need it so that the Recalibrate() is called at least once
         """
@@ -1131,6 +1170,10 @@ class MainApp(wx.App):
         
         item = self.popupmenu.Append(wx.NewId(), "Insert Class...")
         self.frame.Bind(wx.EVT_MENU, self.OnInsertClass, item)
+        item = self.popupmenu.Append(wx.NewId(), "Insert Image...")
+        self.frame.Bind(wx.EVT_MENU, self.OnInsertImage, item)
+        item = self.popupmenu.Append(wx.NewId(), "Insert Comment...")
+        self.frame.Bind(wx.EVT_MENU, self.OnInsertComment, item)
 
         self.popupmenu.AppendSeparator()
 
@@ -1204,11 +1247,7 @@ class MainApp(wx.App):
             self.multiText.SelectAll()
 
         event.Skip()
-                
-    def OnInsertClass(self, event):
-        self.umlwin.CmdInsertNewNode()
-        self.RefreshAsciiUmlTab()
-        
+
     def OnDumpUmlWorkspace(self, event):
         self.umlwin.DumpStatus()
 
@@ -1326,7 +1365,9 @@ class MainApp(wx.App):
         menu1.AppendSeparator()
         Add(menu1, "E&xit\tAlt-X", "Exit demo", self.OnButton)
         
-        Add(menu2, "&Insert Class...\tIns", "Insert Node...", self.OnInsertNode)
+        Add(menu2, "&Insert Class...\tIns", "Insert Class...", self.OnInsertClass)
+        Add(menu2, "&Insert Image...\tCtrl-Ins", "Insert Image...", self.OnInsertImage)
+        Add(menu2, "&Insert Comment...\tShift-Ins", "Insert Comment...", self.OnInsertComment)
         menu_item_delete_class = Add(menu2, "&Delete Class\tDel", "Delete Node", self.OnDeleteNode, self.OnDeleteNode_update)
         menu_item_delete_class.Enable(True)  # demo one way to enable/disable.  But better to do via _update function
         Add(menu2, "&Edit Class Properties...\tF2", "Edit Class Properties", self.OnEditProperties, self.OnEditProperties_update)
@@ -1334,7 +1375,7 @@ class MainApp(wx.App):
         Add(menu2, "&Refresh", "Refresh", self.OnRefreshUmlWindow)
         
         Add(menu3, "&Layout UML\tL", "Layout UML", self.OnLayout)
-        Add(menu3, "&Layout UML Optimally (slow)\tB", "Deep Layout UML (slow)", self.OnDeepLayout)
+        Add(menu3, "&Layout UML Optimally (slower)\tB", "Deep Layout UML (slow)", self.OnDeepLayout)
         menu3.AppendSeparator()
         Add(menu3sub, "&Remember Layout into memory slot 1\tShift-9", "Remember Layout 1", self.OnRememberLayout1)
         Add(menu3sub, "&Restore Layout 1\t9", "Restore Layout 1", self.OnRestoreLayout1)
@@ -1553,10 +1594,16 @@ class MainApp(wx.App):
     def OnDeleteNode_update(self, event):
         self.Enable_if_node_selected(event)
 
-    def OnInsertNode(self, event):
+    def OnInsertComment(self, event):
+        self.umlwin.CmdInsertNewComment()
+
+    def OnInsertImage(self, event):
+        self.umlwin.CmdInsertNewImageNode()
+                
+    def OnInsertClass(self, event):
         self.umlwin.CmdInsertNewNode()
         self.RefreshAsciiUmlTab()
-
+        
     def OnEditProperties(self, event):
         for shape in self.umlwin.GetDiagram().GetShapeList():
             if shape.Selected():

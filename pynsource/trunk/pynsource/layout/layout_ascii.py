@@ -16,8 +16,9 @@ class NodeWidthCalc:
                 self.maxlen = len(line)
     def calc(self):
         self.maxlen = len(self.node.id)
-        self._scan(self.node.attrs)
-        self._scan(self.node.meths)
+        if self.node.__class__.__name__ == 'UmlNode':  # TODO need to have every node figure out its own width !!!
+            self._scan(self.node.attrs)
+            self._scan(self.node.meths)
         return self.maxlen
 
 class model_to_ascii_builder:
@@ -159,9 +160,9 @@ class model_to_ascii_builder:
 
             self.pending_composition_line_output.extend(rels_composition)
 
-            if node.attrs:
+            if hasattr(node, 'attrs') and node.attrs:
                 s += self.attrs_or_meths(node.attrs, maxwidth)
-            if node.meths:
+            if hasattr(node, 'meths') and node.meths:
                 s += self.attrs_or_meths(node.meths, maxwidth)
 
             s += self.top_or_bottom_line(maxwidth)
