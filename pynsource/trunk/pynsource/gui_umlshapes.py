@@ -178,3 +178,40 @@ class DividedShapeSmall(DividedShape):
         self.SetRegionSizes()
         self.ReformatRegions()
         self.GetCanvas().Refresh()
+
+class BitmapShapeResizable(ogl.BitmapShape):
+    """Draws a bitmap (andy's attempt at a resizable one)."""
+    def __init__(self):
+        ogl.BitmapShape.__init__(self)
+        self._ori_bmp = None    # ANDY ADDED
+        
+    def ResetSize(self):        # ANDY ADDED
+        if self._bitmap.Ok():
+            w = self._ori_bmp.GetWidth()
+            h = self._ori_bmp.GetHeight()
+            self.SetSize(w,h)
+        
+    def SetSize(self, w, h, recursive = True):
+        if self._bitmap.Ok():
+
+            # ANDY ADDED
+            if self._bitmap.GetWidth() != w or self._bitmap.GetHeight() != h:
+                img = wx.ImageFromBitmap(self._ori_bmp)
+                adjusted_img = img.Rescale(w,h, wx.IMAGE_QUALITY_HIGH)
+                bitmap = wx.BitmapFromImage(adjusted_img)
+                self._bitmap = bitmap  #shape.SetBitmap(bitmap)  # don't call SetBitmap() cos it will infinite loop.  Plus don't want to destroy ori bmp info
+            ##########
+            
+            w = self._bitmap.GetWidth()
+            h = self._bitmap.GetHeight()
+
+        self.SetAttachmentSize(w, h)
+
+        self._width = w
+        self._height = h
+
+        self.SetDefaultRegionSize()
+
+    def SetBitmap(self, bitmap):    # Override
+        ogl.BitmapShape.SetBitmap(self, bitmap)
+        self._ori_bmp = bitmap  # ANDY ADDED

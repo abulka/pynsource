@@ -46,7 +46,7 @@ def getpos(shape):
     y = shape.GetY()
     return x - width/2, y - height/2
 
-    
+         
 class MyEvtHandler(ogl.ShapeEvtHandler):
     def __init__(self, log, frame, shapecanvas):
         ogl.ShapeEvtHandler.__init__(self)
@@ -99,11 +99,13 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         ogl.ShapeEvtHandler.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
         
         width, height = shape.GetBoundingBoxMin()
-        print shape.node, "resized to", width, height
-        #print shape.node.id, shape.node.left, shape.node.top, "resized to", width, height
-        # Adjust the GraphNode to match the shape x,y
-        shape.node.width, shape.node.height = width, height
-        shape.node.left, shape.node.top = getpos(shape)
+        if hasattr(shape, 'node'):
+            #print shape.node, "resized to", width, height
+            #print shape.node.id, shape.node.left, shape.node.top, "resized to", width, height
+            
+            # Adjust the GraphNode to match the shape x,y
+            shape.node.width, shape.node.height = width, height
+            shape.node.left, shape.node.top = getpos(shape)
         
         self.UpdateStatusBar(self.GetShape())
 
@@ -112,6 +114,8 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         
         shape.GetCanvas().stage2()
         
+    #def OnEndSize(self, width, height):
+    #    print "OnEndSize", width, height
 
     def OnMovePost(self, dc, x, y, oldX, oldY, display):
         shape = self.GetShape()
@@ -123,7 +127,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
     def OnPopupItemSelected(self, event):
         item = self.popupmenu.FindItemById(event.GetId()) 
         text = item.GetText() 
-        if text == "Delete Class\tDel":
+        if text == "Delete\tDel":
             self.RightClickDeleteNode()
         elif text == "Properties...":
             self.NodeProperties()
@@ -131,7 +135,13 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
             self.GetShape().GetCanvas().NewEdgeMarkFrom()
         elif text == "End - Draw Line to this class\tw":
             self.GetShape().GetCanvas().NewEdgeMarkTo()
-        
+        elif text == "Reset Image Size":
+            shape = self.GetShape()
+            shape.ResetSize()
+            #shape.GetCanvas().Refresh(False)   # don't seem to need since SelectNodeNow() might be doing it for us
+            shape.GetCanvas().SelectNodeNow(shape)
+            self.UpdateStatusBar(shape)
+
     def OnRightClick(self, x, y, keys, attachment):
         self._SelectNodeNow(x, y, keys, attachment)
 
@@ -149,11 +159,16 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         MakeMenuItem(menu_sub, "Begin - Draw Line from this class\tq")
         MakeMenuItem(menu_sub, "End - Draw Line to this class\tw")
         self.popupmenu.AppendMenu(wx.NewId(), "Draw Line", menu_sub)
+
+        if self.GetShape().__class__.__name__ == 'BitmapShapeResizable':
+            self.popupmenu.AppendSeparator()
+            MakeMenuItem(self.popupmenu, "Reset Image Size")
         
         self.popupmenu.AppendSeparator()
-        MakeMenuItem(self.popupmenu, "Delete Class\tDel")
+        MakeMenuItem(self.popupmenu, "Delete\tDel")
         self.popupmenu.AppendSeparator()
         MakeMenuItem(self.popupmenu, "Cancel")
+        
         
         self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
 
@@ -595,9 +610,15 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.LayoutAndPositionShapes()
               
     def CreateImageShape(self, F):
-        shape = ogl.BitmapShape()
+        #shape = ogl.BitmapShape()
+        shape = BitmapShapeResizable()
         img = wx.Image(F, wx.BITMAP_TYPE_ANY)
-        bmp = wx.BitmapFromImage(img)
+        
+        #adjusted_img = img.AdjustChannels(factor_red = 1., factor_green = 1., factor_blue = 1., factor_alpha = 0.5)
+        #adjusted_img = img.Rescale(10,10)
+        adjusted_img = img
+        
+        bmp = wx.BitmapFromImage(adjusted_img)
         shape.SetBitmap(bmp)
 
         self.GetDiagram().AddShape(shape)
@@ -1368,7 +1389,7 @@ class MainApp(wx.App):
         Add(menu2, "&Insert Class...\tIns", "Insert Class...", self.OnInsertClass)
         Add(menu2, "&Insert Image...\tCtrl-Ins", "Insert Image...", self.OnInsertImage)
         Add(menu2, "&Insert Comment...\tShift-Ins", "Insert Comment...", self.OnInsertComment)
-        menu_item_delete_class = Add(menu2, "&Delete Class\tDel", "Delete Node", self.OnDeleteNode, self.OnDeleteNode_update)
+        menu_item_delete_class = Add(menu2, "&Delete\tDel", "Delete", self.OnDeleteNode, self.OnDeleteNode_update)
         menu_item_delete_class.Enable(True)  # demo one way to enable/disable.  But better to do via _update function
         Add(menu2, "&Edit Class Properties...\tF2", "Edit Class Properties", self.OnEditProperties, self.OnEditProperties_update)
         menu2.AppendSeparator()
