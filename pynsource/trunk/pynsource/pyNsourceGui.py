@@ -411,11 +411,12 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         dialog.Destroy()
         
         
-    def CmdInsertNewImageNode(self):
-        curr_dir = os.path.dirname( os.path.abspath( __file__ ) )
-        F = os.path.join(curr_dir, '..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP')
-        # wx.ImageFromBitmap(bitmap) and wx.BitmapFromImage(image)
-        self.CreateImageShape(F)
+    def CmdInsertNewImageNode(self, filename=None):
+        if not filename:
+            curr_dir = os.path.dirname( os.path.abspath( __file__ ) )
+            filename = os.path.join(curr_dir, '..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP')
+        
+        self.CreateImageShape(filename)
         self.stage2(force_stateofthenation=True) # if want overlap removal and proper refresh
         #self.SelectNodeNow(node.shape)
             
@@ -1619,7 +1620,19 @@ class MainApp(wx.App):
         self.umlwin.CmdInsertNewComment()
 
     def OnInsertImage(self, event):
-        self.umlwin.CmdInsertNewImageNode()
+        filename = None
+        
+        thisdir = self.config.get('LastDirInsertImage', '.') # remember dir path
+        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir=thisdir,
+            defaultFile="", wildcard="*.jpg", style=wx.OPEN, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            filename = dlg.GetPath()
+
+            self.config['LastDirInsertImage'] = dlg.GetDirectory()  # remember dir path
+            self.config.write()
+        dlg.Destroy()
+        
+        self.umlwin.CmdInsertNewImageNode(filename)
                 
     def OnInsertClass(self, event):
         self.umlwin.CmdInsertNewNode()
