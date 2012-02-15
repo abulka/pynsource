@@ -31,7 +31,7 @@ import os, stat
 from messages import *
 from gui_umlshapes import *
 
-APP_VERSION = 1.51
+APP_VERSION = 1.6
 WINDOW_SIZE = (1024,768)
 MULTI_TAB_GUI = True
 

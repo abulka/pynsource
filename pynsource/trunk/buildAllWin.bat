@@ -1,10 +1,10 @@
 @echo off
 REM All in one build script
-set outsourceexe1=PyNsource-1.51.win32.exe
-set outsourceexe=PyNsource-1.51.win32-py26.exe
-set outsourcezip=pyNsource-1.51-src.zip
-set outstandalonezip=pyNsource-1.51-standalone.zip
-set outsetupexe=pyNsource-1.51-setup.exe
+set outsourceexe1=PyNsource-1.60.win32.exe
+set outsourceexe=PyNsource-1.60.win32-py26.exe
+set outsourcezip=pyNsource-1.60-src.zip
+set outstandalonezip=pyNsource-1.60-standalone.zip
+set outsetupexe=pyNsource-1.60-setup.exe
 
 REM delete all generated files and regen the build.txt file from subversion
 del /q dist\*.*
@@ -17,7 +17,7 @@ REM goto step3
 :step1
 REM Build source distribution via setup tools exe
 del /q build\lib\pynsource\*.*
-c:\python26\python.exe setup.py bdist_wininst
+c:\python27\python.exe setup.py bdist_wininst
 move dist\%outsourceexe1% dist\%outsourceexe%
 
 :step2
@@ -35,7 +35,9 @@ cd ..
 
 :step4
 REM Build standalone with convenient setup using innosetup
-"c:\Program Files\Inno Setup 5\ISCC.exe" buildSetupExeWin.iss
+REM "c:\Program Files\Inno Setup 5\ISCC.exe" buildSetupExeWin.iss
+"C:\Program Files (x86)\Inno Setup 5\ISCC.exe" buildSetupExeWin.iss
+
 move build\setup.exe dist\%outsetupexe%
 
 :end
