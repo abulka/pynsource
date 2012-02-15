@@ -1,0 +1,40 @@
+# Builds a standalone 32 bit pyNsourceGui for mac
+
+# Not sure if we need this to invoke things in 32 bit mode.  Probably not.
+# Though I did have success and did all my testing in a terminal window 
+# with this environment variable set to yes
+#export VERSIONER_PYTHON_PREFER_32_BIT=yes
+
+# instructions from
+# http://svn.pythonmac.org/py2app/py2app/trunk/doc/index.html#abstract
+# and
+# http://stackoverflow.com/questions/7472301/how-to-force-py2app-to-run-app-in-32-bit-mode
+
+cd pynsource
+
+# Build the setup.py file (note, cannot change the name of the output file, it must be setup.py)
+# see /System/Library//Frameworks/Python.framework/Versions/2.7//Extras/lib/python/py2app/script_py2applet.py
+#
+py2applet --make-setup pyNsourceGui.py      # sudo easy_install py2app
+
+# Clean up your build directories
+rm -rf build dist
+
+#python setup.py py2app -A # testing - doesn't actually build much, standalone application not built
+python setup.py py2app      # deployment - makes a universal with 64 bit favoured.
+
+# Strip out the 64bit binaries which are run by default, and fail since wxPython 2.8 is 32bit
+ditto -rsrc --arch i386 dist/pyNsourceGui.app/ dist/pyNsourceGui32.app
+
+# The easiest way to wrap your application up for distribution at this point is 
+# simply to right-click the application from Finder and choose "Create Archive"
+# or "Compress", in my Lion, it seems.  The .app is a directory structure and only
+# treated as a single file on a Mac.  So we need to zip it.  Mac users simply unzip
+# and they have their app.  Note we use -r for recursion since the .app is a dir structure.
+cd dist
+cp ../../Readme.txt .
+zip -r pyNsourceGui32.zip pyNsourceGui32.app/ Readme.txt
+
+cd ../..
+echo 'done, please upload the following file to sourceforge'
+ls pynsource/dist/pyNsourceGui32.zip
