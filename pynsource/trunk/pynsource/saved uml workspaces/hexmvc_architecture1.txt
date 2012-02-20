@@ -1,0 +1,39 @@
+{'type':'node', 'id':'IModelDependencies', 'x':10, 'y':41, 'width':208, 'height':93, 'attrs':'__metaclass__', 'meths':'notifyOfModelChange'}
+{'type':'node', 'id':'App', 'x':434, 'y':621, 'width':162, 'height':189, 'attrs':'model|server|gui', 'meths':'__init__|Boot|AddThing|GetModelSize|notifyOfModelChange'}
+{'type':'node', 'id':'IModel', 'x':221, 'y':502, 'width':106, 'height':99, 'attrs':'', 'meths':'Clear|GetModelSize|AddThing'}
+{'type':'node', 'id':'Server', 'x':258, 'y':8, 'width':106, 'height':189, 'attrs':'host|port|app', 'meths':'__init__|SetApp|GetUrlOrigin|StartServer|ajax'}
+{'type':'node', 'id':'Thing', 'x':67, 'y':216, 'width':74, 'height':125, 'attrs':'info', 'meths':'__init__|__str__|AddInfo'}
+{'type':'node', 'id':'IServerDependencies', 'x':482, 'y':10, 'width':219, 'height':93, 'attrs':'__metaclass__', 'meths':'GetModelSize'}
+{'type':'node', 'id':'IGui', 'x':548, 'y':227, 'width':74, 'height':67, 'attrs':'', 'meths':'AddThing'}
+{'type':'node', 'id':'IGuiDependencies', 'x':707, 'y':63, 'width':186, 'height':93, 'attrs':'__metaclass__', 'meths':'AddThing'}
+{'type':'node', 'id':'MyFrame', 'x':942, 'y':240, 'width':162, 'height':173, 'attrs':'need_abort|app|m_listBox1', 'meths':'__init__|SetApp|notifyOfModelChange|AddThing'}
+{'type':'node', 'id':'Model', 'x':177, 'y':247, 'width':106, 'height':205, 'attrs':'things|observers|app', 'meths':'__init__|__str__|SetApp|Clear|GetModelSize|AddThing'}
+{'type':'node', 'id':'MyWxApp', 'x':931, 'y':674, 'width':88, 'height':93, 'attrs':'myframe', 'meths':'OnInit'}
+{'type':'node', 'id':'IApp', 'x':428, 'y':464, 'width':114, 'height':93, 'attrs':'__metaclass__', 'meths':'Boot'}
+{'type':'node', 'id':'HexAdapter', 'x':377, 'y':245, 'width':120, 'height':93, 'attrs':'__metaclass__', 'meths':'SetApp'}
+{'type':'node', 'id':'IServer', 'x':414, 'y':112, 'width':106, 'height':83, 'attrs':'', 'meths':'StartServer|GetUrlOrigin'}
+{'type':'node', 'id':'IAppIModelDependencies', 'x':625, 'y':307, 'width':252, 'height':31, 'attrs':'', 'meths':''}
+{'type':'node', 'id':'IAppIModelDependenciesIServerDependencies', 'x':431, 'y':388, 'width':461, 'height':31, 'attrs':'', 'meths':''}
+{'type':'node', 'id':'IAppIModelDependenciesIServerDependenciesIGuiDependencies', 'x':667, 'y':453, 'width':637, 'height':31, 'attrs':'', 'meths':''}
+{'type':'node', 'id':'HexMvcGuiFrame1', 'x':802, 'y':178, 'width':175, 'height':31, 'attrs':'', 'meths':''}
+{'type':'node', 'id':'HexMvcGuiFrame1IGui', 'x':1027, 'y':159, 'width':219, 'height':31, 'attrs':'', 'meths':''}
+{'type':'node', 'id':'HexMvcGuiFrame1IGuiIModelDependencies', 'x':922, 'y':85, 'width':417, 'height':31, 'attrs':'', 'meths':''}
+{'type':'node', 'id':'wx.App', 'x':1007, 'y':610, 'width':76, 'height':31, 'attrs':'', 'meths':''}
+{'type':'node', 'id':'wx.Appwx.lib.mixins.inspection.InspectionMixin', 'x':867, 'y':565, 'width':516, 'height':31, 'attrs':'', 'meths':''}
+{'type':'node', 'id':'multicast', 'x':18, 'y':391, 'width':109, 'height':31, 'attrs':'', 'meths':''}
+{'type':'edge', 'id':'App_to_IApp', 'source':'App', 'target':'IApp', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'App_to_IAppIModelDependencies', 'source':'App', 'target':'IAppIModelDependencies', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'App_to_IAppIModelDependenciesIServerDependencies', 'source':'App', 'target':'IAppIModelDependenciesIServerDependencies', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'App_to_IAppIModelDependenciesIServerDependenciesIGuiDependencies', 'source':'App', 'target':'IAppIModelDependenciesIServerDependenciesIGuiDependencies', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'IModel_to_HexAdapter', 'source':'IModel', 'target':'HexAdapter', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'Server_to_IServer', 'source':'Server', 'target':'IServer', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'IGui_to_HexAdapter', 'source':'IGui', 'target':'HexAdapter', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'MyFrame_to_HexMvcGuiFrame1', 'source':'MyFrame', 'target':'HexMvcGuiFrame1', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'MyFrame_to_HexMvcGuiFrame1IGui', 'source':'MyFrame', 'target':'HexMvcGuiFrame1IGui', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'MyFrame_to_HexMvcGuiFrame1IGuiIModelDependencies', 'source':'MyFrame', 'target':'HexMvcGuiFrame1IGuiIModelDependencies', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'Model_to_IModel', 'source':'Model', 'target':'IModel', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'MyWxApp_to_wx.App', 'source':'MyWxApp', 'target':'wx.App', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'MyWxApp_to_wx.Appwx.lib.mixins.inspection.InspectionMixin', 'source':'MyWxApp', 'target':'wx.Appwx.lib.mixins.inspection.InspectionMixin', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'IServer_to_HexAdapter', 'source':'IServer', 'target':'HexAdapter', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'multicast_to_Model', 'source':'multicast', 'target':'Model', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Thing_to_Model', 'source':'Thing', 'target':'Model', 'uml_edge_type':'composition'}
