@@ -6,6 +6,17 @@ PureMVC minimalist wxpython example - Converted to HexMVC
 Replacing hard to follow pure mvc home-grown eventing with simple multicast
 calling of methods on objects. All objects/subsystems are injected hexagonal
 style, and adhere to abstract interfaces for swappability.
+
+On The Role of App
+------------------
+App has job of housing the domain logic and app logic and thus the controller/commands.
+App also has job of wiring the ring adapters together as it knows the relationship of them all to each other.
+App sometimes mediates - calls come in and app sends them out again.
+App sometimes steps out of the way, wires up the ring adapters to talk to each other.
+
+Instantiation should be outside the app.  Theoretically inject different ring adapters into the app
+and the app will still work.
+
 """
 
 import wx
@@ -52,70 +63,60 @@ class MyFormMediator:
 
 class Data:
     def __init__(self):
-        self.data = "Hello - hit enter"
+        self.someinfo = "Hello - hit enter"
 
 # Model Proxy
 
-class DataModelProxy():
-    #NAME = "DataModelProxy"
-    
+class DataModelProxy(object):
     def __init__(self):
         self.realdata = Data()
         self.observers = multicast()
 
     def Boot(self):  # New - needed for HexMvc version since wiring of observers is much delayed so can't do it in init
-        self.observers.DATA_CHANGED(self.realdata.data)
+        self.observers.DATA_CHANGED(self.data)
 
-    def setData(self, data):
-        self.realdata.data = data
-        print "setData (model) to", data
-        self.observers.DATA_CHANGED(self.realdata.data)
+    @property
+    def data(self):
+        return self.realdata.someinfo
+    @data.setter
+    def data(self, value):
+        print "setData (model) to", value
+        self.realdata.someinfo = value
+        self.observers.DATA_CHANGED(self.data)
 
 # App
 
 # Controller
 
 class DataSubmittedCommand():
-    #def execute(self, notification):
-    #    print "submit execute (command)", notification.getBody()
-    #    mydata = notification.getBody()
-    #    self.datamodelProxy = self.facade.retrieveProxy(DataModelProxy.NAME)
-    #    self.datamodelProxy.setData(mydata.upper())
+    def __init__(self, model, mydata):
+        self.model = model
+        self.mydata = mydata
+
+    def execute(self):
+        print "CMD submit execute (command)"
+        self.model.data = self.mydata.upper()
+
+class Controller():
+    def __init__(self, model):
+        self.model = model
+
     def DATA_SUBMITTED(self, mydata):
-        print "submit execute (command)", mydata
-        self.datamodelProxy.setData(mydata.upper())
+        DataSubmittedCommand(self.model, mydata).execute()
 
 class App:
-    def __init__(self, model, controller, gui):
+    def __init__(self, model, gui):
         self.model = model
-        self.controller = controller
+        self.controller = Controller(model)
         self.gui = gui
-        model.app = controller.app = gui.app = self
+        model.app = self.controller.app = gui.app = self
 
-        # WHATS THE POINT OF THE ABOVE IF NOTHING IS BEING ROUTED THROUGH APP
-        # IF RING ADAPTERS ARE TALKING TO EACH OTHER VIA NOTIFICATIONS
-        # AND WE ARE BYPASSING APP - HMMMMMM
-        
-        """
-        Need to give the app the job of housing the logic and thus the commands.
-        App also has job of wiring the ring adapters together as it knows the relationship of them all to each other.
-        App sometimes mediates - calls come in and app sends them out again.
-        App sometimes steps out of the way, wires up the ring adapters to talk to each other.
-        
-        Instantiation should be outside the app.  Theoretically inject different ring adapters into the app
-        and the app will still work.
-        """
-
-        # Wire controller to point to model, hard wire rather than a complex proxy lookup system
-        controller.datamodelProxy = model
-        
         # Wire observers
-        gui.observers.addObserver(controller)
+        gui.observers.addObserver(self.controller)
         model.observers.addObserver(gui)
     
     def Boot(self):
         self.model.Boot()
-
     
 if __name__ == '__main__':
     # Create Gui
@@ -125,15 +126,12 @@ if __name__ == '__main__':
     # Create Model
     model = DataModelProxy()
     
-    # Create Controller
-    cmd = DataSubmittedCommand()
-    
     # Create Core Hexagon App and inject adapters
-    app = App(model, cmd, gui)
+    app = App(model, gui)
     wx.CallAfter(app.Boot)
     
     # Start Gui
     wxapp.MainLoop()
     
     print "DONE"     
-    
+   
