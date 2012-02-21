@@ -10,15 +10,47 @@ from architecture_support import *
 
 # MODEL
 
-class Model(object):
-    def __init__(self):
+class ModelProxy(object):
+    def __init__(self, model):
         self.app = None
+        self.model = model
         self.observers = multicast()
-        self.things = []
-        self.AddThing("initial thing")
 
     def Boot(self):
         self.observers.MODEL_CHANGED(self.things)
+
+    @property
+    def size(self):
+        return self.model.size
+
+    @property
+    def things(self):
+        return self.model.things
+
+    # Things you can do to the Model
+    
+    def Clear(self):
+        self.model.things = []
+        self.observers.MODEL_CLEARED()
+
+    def AddThing(self, info):
+        thing = Thing(info)
+        thing.model = self.model  # backpointer
+        self.model.things.append(thing)
+        self.observers.MODEL_THING_ADDED(thing, self.size)
+        return thing
+
+    def AddInfoToThing(self, thing, moreinfo):
+        thing.AddInfo(moreinfo)
+        self.observers.MODEL_THING_UPDATE(thing)
+
+    def DeleteThing(self, thing):
+        self.model.things.remove(thing)
+        self.observers.MODEL_THING_DELETED(thing)
+    
+class Model(object):
+    def __init__(self):
+        self.things = []
 
     def __str__(self):
         return str([str(t) for t in self.things])
@@ -27,39 +59,6 @@ class Model(object):
     def size(self):
         return len(self.things)
 
-    # Things you can do to the Model
-    
-    def Clear(self):
-        self.things = []
-        self.observers.MODEL_CLEARED()
-
-    def AddThing(self, info):
-        thing = Thing(info)
-        thing.model = self  # backpointer
-        self.things.append(thing)
-        self.observers.MODEL_THING_ADDED(thing, self.size)
-        return thing
-
-    def AddInfoToThing(self, thing, moreinfo):
-        print "ZZZZZZZZZZZZZZZZZZZ"
-
-        thing.AddInfo(moreinfo)
-        self.observers.MODEL_THING_UPDATE(thing)
-
-    def DeleteThing(self, thing):
-        self.things.remove(thing)
-        self.observers.MODEL_THING_DELETED(thing)
-
-
-    """
-    TODO
-    -----
-    If model is pure then things like THING should not have
-    event notifications in them.
-    Should be a distinction between pure model and the proxy
-    around it.
-    """
-    
 class Thing:
     def __init__(self, info):
         self.model = None  # backpointer
@@ -252,17 +251,18 @@ class App(object):
         self.controller = Controller(model)
         model.app = self.controller.app = gui.app = server.app = self
 
-        # Wire observers
+        # Inject multicast dependencies / observers
         gui.observers.addObserver(self.controller)
         model.observers.addObserver(gui)
         model.observers.addObserver(self.controller) # diagnostic, optional
         
-        # Inject dependencies that need to be more immediate
+        # Inject normal dependencies
         self.server.model = model
         
     def Boot(self):
         self.gui.Boot()
         self.model.Boot()
+        self.model.AddThing("initial thing")
         self.server.StartServer()
 
     # Some methods the app has to define itself - rather than exposing
@@ -276,7 +276,7 @@ class App(object):
 if __name__ == '__main__':        
 
     # Create Model - SIMPLE
-    model = Model()
+    model = ModelProxy(Model())
 
     # Create Server
     server = Server(host='localhost', port=8081)
