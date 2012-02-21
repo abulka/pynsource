@@ -74,7 +74,7 @@
             <property name="size">514,413</property>
             <property name="style">wxDEFAULT_FRAME_STYLE</property>
             <property name="subclass"></property>
-            <property name="title">HexMvc Gui 1</property>
+            <property name="title">HexMvc Architecture2 Gui</property>
             <property name="toolbar_pane">0</property>
             <property name="tooltip"></property>
             <property name="validator_data_type"></property>
@@ -1774,7 +1774,7 @@
                                                     <property name="window_extra_style"></property>
                                                     <property name="window_name"></property>
                                                     <property name="window_style"></property>
-                                                    <event name="OnButtonClick">DeleteThing</event>
+                                                    <event name="OnButtonClick">OnDeleteThing</event>
                                                     <event name="OnChar"></event>
                                                     <event name="OnEnterWindow"></event>
                                                     <event name="OnEraseBackground"></event>

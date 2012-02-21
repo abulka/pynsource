@@ -40,6 +40,17 @@ class Model(object):
         self.observers.MODEL_THING_ADDED(thing, self.size)
         return thing
 
+    def AddInfoToThing(self, thing, moreinfo):
+        print "ZZZZZZZZZZZZZZZZZZZ"
+
+        thing.AddInfo(moreinfo)
+        self.observers.MODEL_THING_UPDATE(thing)
+
+    def DeleteThing(self, thing):
+        self.things.remove(thing)
+        self.observers.MODEL_THING_DELETED(thing)
+
+
     """
     TODO
     -----
@@ -57,11 +68,8 @@ class Thing:
     def __str__(self):
         return "Thing!-" + self.info
 
-    # Things you can do to the Model  (naughty - see note above)
-
     def AddInfo(self, msg):
         self.info += " " + msg
-        self.model.observers.MODEL_THING_UPDATE(self)
     
 # SERVER
 
@@ -141,15 +149,21 @@ class MyFormMediator(GuiFrame):
             if self.m_listBox1.GetClientData(i) == clientData:
                 return i
         return wx.NOT_FOUND
-    
+
+    def _RepairSelection(self, index):
+        if self.m_listBox1.IsEmpty():
+            return
+        index = max(0, index-1)
+        self.m_listBox1.SetSelection(index)
+        
     # Gui Generated Events, override the handler here
     
+    def OnFileNew(self, event):
+        self.observers.CMD_FILE_NEW()
+
     def OnAddThing(self, event):
         info = str(random.randint(0,99999)) + " " + self.inputFieldTxt.GetValue()
         self.observers.CMD_ADD_THING(info)
-
-    def OnFileNew(self, event):
-        self.observers.CMD_FILE_NEW()
 
     def OnAddInfoToThing(self, event):
         if self.m_listBox1.IsEmpty():
@@ -159,12 +173,16 @@ class MyFormMediator(GuiFrame):
             return
         thing = self.m_listBox1.GetClientData(index) # see ItemContainer methods http://www.wxpython.org/docs/api/wx.ItemContainer-class.html
         self.observers.CMD_ADD_INFO_TO_THING(thing, "Z")
+
+    def OnDeleteThing(self, event):
+        if self.m_listBox1.IsEmpty():
+            return
+        index = self.m_listBox1.GetSelection()
+        thing = self.m_listBox1.GetClientData(index) # see ItemContainer methods http://www.wxpython.org/docs/api/wx.ItemContainer-class.html
+        self.observers.CMD_DELETE_THING(thing)
         
     # Non Gui Incoming Events
     
-    def MODEL_THING_ADDED(self, thing, modelsize):
-        self.m_listBox1.Append(str(thing), thing)
-
     def MODEL_CLEARED(self):
         self.m_listBox1.Clear()
         
@@ -173,11 +191,21 @@ class MyFormMediator(GuiFrame):
         for thing in things:
             self.m_listBox1.Append(str(thing), thing)
 
+    def MODEL_THING_ADDED(self, thing, modelsize):
+        self.m_listBox1.Append(str(thing), thing)
+
     def MODEL_THING_UPDATE(self, thing):
         index = self._FindClientData(self.m_listBox1, thing)
         if index != wx.NOT_FOUND:
             self.m_listBox1.SetString(index, str(thing))  # Maybe .Set() does both at the same time?
             self.m_listBox1.SetClientData(index, thing)
+
+    def MODEL_THING_DELETED(self, thing):
+        index = self._FindClientData(self.m_listBox1, thing)
+        if index != wx.NOT_FOUND:
+            self.m_listBox1.Delete(index)
+            self._RepairSelection(index)        
+
         
 class MyWxApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnInit(self):
@@ -198,15 +226,19 @@ class Controller():
 
     # Events from Gui
     
-    def CMD_ADD_THING(self, info):
-        thing = self.model.AddThing(info)
-
     def CMD_FILE_NEW(self):
         self.model.Clear()
 
-    def CMD_ADD_INFO_TO_THING(self, thing, moreinfo):
-        thing.AddInfo(moreinfo)
+    def CMD_ADD_THING(self, info):
+        thing = self.model.AddThing(info)
 
+    def CMD_ADD_INFO_TO_THING(self, thing, moreinfo):
+        #thing.AddInfo(moreinfo)
+        self.model.AddInfoToThing(thing, moreinfo)
+
+    def CMD_DELETE_THING(self, thing):
+        self.model.DeleteThing(thing)
+        
     # Other events
     
     def MODEL_THING_ADDED(self, thing, modelsize):

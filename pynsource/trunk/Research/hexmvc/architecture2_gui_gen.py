@@ -18,7 +18,7 @@ import wx.aui
 class GuiFrame ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"HexMvc Gui 1", pos = wx.DefaultPosition, size = wx.Size( 514,413 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"HexMvc Architecture2 Gui", pos = wx.DefaultPosition, size = wx.Size( 514,413 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		self.m_mgr = wx.aui.AuiManager()
@@ -170,7 +170,7 @@ class GuiFrame ( wx.Frame ):
 		self.m_button6.Bind( wx.EVT_BUTTON, self.OnFileNew )
 		self.m_button7.Bind( wx.EVT_BUTTON, self.FileLoad )
 		self.m_button1.Bind( wx.EVT_BUTTON, self.OnAddThing )
-		self.m_button2.Bind( wx.EVT_BUTTON, self.DeleteThing )
+		self.m_button2.Bind( wx.EVT_BUTTON, self.OnDeleteThing )
 		self.m_button121.Bind( wx.EVT_BUTTON, self.OnAddInfoToThing )
 	
 	def __del__( self ):
@@ -208,7 +208,7 @@ class GuiFrame ( wx.Frame ):
 	def OnAddThing( self, event ):
 		event.Skip()
 	
-	def DeleteThing( self, event ):
+	def OnDeleteThing( self, event ):
 		event.Skip()
 	
 	def OnAddInfoToThing( self, event ):
