@@ -4,7 +4,7 @@ Attempt to sketch the whole hexmvc thing out simply.
 
 from architecture_support import *
 
-SIMPLE_MODEL = True #False #True
+SIMPLE_MODEL = False #True
 
 #
 # Ring Adapter Classes
@@ -126,6 +126,31 @@ else:
             Thing.delete(thing.id)
             self.observers.MODEL_THING_DELETED(thing)
         
+        def Boot(self):
+            ModelProxyBase.Boot(self)
+            
+            from sqlobject.sqlite import builder
+            from sqlobject import sqlhub
+            
+            SQLiteConnection = builder()
+            conn = SQLiteConnection('hexmodel_sqlobject.db', debug=False)
+            sqlhub.processConnection = conn
+            try:
+                the_model = Model.get(1)
+                #a_thing = Thing.get(1)
+            except:
+                print "Oops - possibly no database - creating one now..."
+                Model.dropTable(True)
+                Model.createTable()
+                Thing.dropTable(True)
+                Thing.createTable()
+        
+                the_model = Model()
+                assert the_model == Model.get(1)
+                #~ thing1 = Thing(info="mary", model=model)
+                #~ thing2 = Thing(info="fred", model=model)
+                
+                #model = Model.get(1)        
 # SERVER
 
 from bottle import route, run, template, request
@@ -338,28 +363,12 @@ if __name__ == '__main__':
         # Create Model - SQLOBJECT
         from sqlobject.sqlite import builder
         from sqlobject import sqlhub
+        
         SQLiteConnection = builder()
         conn = SQLiteConnection('hexmodel_sqlobject.db', debug=False)
         sqlhub.processConnection = conn
-        try:
-            model = Model.get(1)
-            thing = Thing.get(1)
-        except:
-            print "Oops - possibly no database - creating one now..."
-            Model.dropTable(True)
-            Model.createTable()
-            Thing.dropTable(True)
-            Thing.createTable()
-    
-            model = Model()
-            thing1 = Thing(info="mary", model=model)
-            thing2 = Thing(info="fred", model=model)
             
-            model = Model.get(1)
-
-        model = ModelProxySqlObject(model)
-
-
+        model = ModelProxySqlObject(Model.get(1))
 
     # Create Server
     server = Server(host='localhost', port=8081)
