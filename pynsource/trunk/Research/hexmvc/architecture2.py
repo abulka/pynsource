@@ -4,7 +4,7 @@ Attempt to sketch the whole hexmvc thing out simply.
 
 from architecture_support import *
 
-SIMPLE_MODEL = False #True
+SIMPLE_MODEL = True #False #True
 
 #
 # Ring Adapter Classes
@@ -12,7 +12,7 @@ SIMPLE_MODEL = False #True
 
 # MODEL
 
-class ModelProxy(object):
+class ModelProxyBase(object):
     def __init__(self, model):
         self.app = None
         self.model = model
@@ -21,8 +21,8 @@ class ModelProxy(object):
     def Boot(self):
         self.observers.MODEL_CHANGED(self.things)
 
-    def __str__(self):
-        return str([str(t) for t in self.model.things])
+    #~ def __str__(self):
+        #~ return str([str(t) for t in self.model.things])
 
     @property
     def size(self):
@@ -48,19 +48,19 @@ class ModelProxy(object):
         self.observers.MODEL_THING_UPDATE(thing)
 
     def DeleteThing(self, thing):
-        self.model.things.remove(thing)
-        self.observers.MODEL_THING_DELETED(thing)
+		raise Exception("DeleteThing not implemented in proxy");
 
 if SIMPLE_MODEL:
 
     # Simple (in memory) Model
-    
+
     class Model(object):
         def __init__(self):
             self.things = []
     
         def Clear(self):
-            self.model.things = []
+            self.things = []
+            print "simple model cleared"
 
         def AddThing(self, info):
             thing = Thing(info)
@@ -82,6 +82,13 @@ if SIMPLE_MODEL:
     
         def AddInfo(self, msg):
             self.info += " " + msg
+
+    class ModelProxySimple(ModelProxyBase):
+        def DeleteThing(self, thing):
+            self.model.things.remove(thing)
+            self.observers.MODEL_THING_DELETED(thing)
+
+    print ModelProxySimple(None)
 
 else:
     
@@ -114,6 +121,11 @@ else:
         def AddInfo(self, msg):
             self.info += " " + msg
 
+    class ModelProxySqlObject(ModelProxyBase):
+        def DeleteThing(self, thing):
+            Thing.delete(thing.id)
+            self.observers.MODEL_THING_DELETED(thing)
+        
 # SERVER
 
 from bottle import route, run, template, request
@@ -321,7 +333,7 @@ if __name__ == '__main__':
 
     if SIMPLE_MODEL:
         # Create Model - SIMPLE
-        model = ModelProxy(Model())
+        model = ModelProxySimple(Model())
     else:
         # Create Model - SQLOBJECT
         from sqlobject.sqlite import builder
@@ -345,7 +357,7 @@ if __name__ == '__main__':
             
             model = Model.get(1)
 
-        model = ModelProxy(model)
+        model = ModelProxySqlObject(model)
 
 
 
