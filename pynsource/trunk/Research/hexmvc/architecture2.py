@@ -4,6 +4,8 @@ Attempt to sketch the whole hexmvc thing out simply.
 
 from architecture_support import *
 
+SIMPLE_MODEL = False #True
+
 #
 # Ring Adapter Classes
 #
@@ -19,6 +21,9 @@ class ModelProxy(object):
     def Boot(self):
         self.observers.MODEL_CHANGED(self.things)
 
+    def __str__(self):
+        return str([str(t) for t in self.model.things])
+
     @property
     def size(self):
         return self.model.size
@@ -30,13 +35,11 @@ class ModelProxy(object):
     # Things you can do to the Model
     
     def Clear(self):
-        self.model.things = []
+        self.model.Clear()
         self.observers.MODEL_CLEARED()
 
     def AddThing(self, info):
-        thing = Thing(info)
-        thing.model = self.model  # backpointer
-        self.model.things.append(thing)
+        thing = self.model.AddThing(info)
         self.observers.MODEL_THING_ADDED(thing, self.size)
         return thing
 
@@ -47,29 +50,70 @@ class ModelProxy(object):
     def DeleteThing(self, thing):
         self.model.things.remove(thing)
         self.observers.MODEL_THING_DELETED(thing)
+
+if SIMPLE_MODEL:
+
+    # Simple (in memory) Model
     
-class Model(object):
-    def __init__(self):
-        self.things = []
-
-    def __str__(self):
-        return str([str(t) for t in self.things])
-
-    @property
-    def size(self):
-        return len(self.things)
-
-class Thing:
-    def __init__(self, info):
-        self.model = None  # backpointer
-        self.info = info
-        
-    def __str__(self):
-        return "Thing!-" + self.info
-
-    def AddInfo(self, msg):
-        self.info += " " + msg
+    class Model(object):
+        def __init__(self):
+            self.things = []
     
+        def Clear(self):
+            self.model.things = []
+
+        def AddThing(self, info):
+            thing = Thing(info)
+            thing.model = self  # backpointer
+            self.things.append(thing)
+            return thing
+
+        @property
+        def size(self):
+            return len(self.things)
+    
+    class Thing:
+        def __init__(self, info):
+            self.model = None  # backpointer
+            self.info = info
+            
+        def __str__(self):
+            return "Thing!-" + self.info
+    
+        def AddInfo(self, msg):
+            self.info += " " + msg
+
+else:
+    
+    # SqlObject Model
+    
+    from sqlobject import *
+    
+    class Model(SQLObject):
+        things = MultipleJoin('Thing')
+    
+        @property
+        def size(self):
+            return len(self.things)
+            
+        def Clear(self):
+            for thing in self.things:
+                Thing.delete(thing.id)
+
+        def AddThing(self, info):
+            thing = Thing(info=info, model=self)
+            return thing
+    
+    class Thing(SQLObject):
+        info = StringCol(length=50)
+        model = ForeignKey('Model', default=None)
+
+        def __str__(self):
+            return "Thing@-: " + self.info
+    
+        def AddInfo(self, msg):
+            self.info += " " + msg
+
 # SERVER
 
 from bottle import route, run, template, request
@@ -275,8 +319,35 @@ class App(object):
 
 if __name__ == '__main__':        
 
-    # Create Model - SIMPLE
-    model = ModelProxy(Model())
+    if SIMPLE_MODEL:
+        # Create Model - SIMPLE
+        model = ModelProxy(Model())
+    else:
+        # Create Model - SQLOBJECT
+        from sqlobject.sqlite import builder
+        from sqlobject import sqlhub
+        SQLiteConnection = builder()
+        conn = SQLiteConnection('hexmodel_sqlobject.db', debug=False)
+        sqlhub.processConnection = conn
+        try:
+            model = Model.get(1)
+            thing = Thing.get(1)
+        except:
+            print "Oops - possibly no database - creating one now..."
+            Model.dropTable(True)
+            Model.createTable()
+            Thing.dropTable(True)
+            Thing.createTable()
+    
+            model = Model()
+            thing1 = Thing(info="mary", model=model)
+            thing2 = Thing(info="fred", model=model)
+            
+            model = Model.get(1)
+
+        model = ModelProxy(model)
+
+
 
     # Create Server
     server = Server(host='localhost', port=8081)
