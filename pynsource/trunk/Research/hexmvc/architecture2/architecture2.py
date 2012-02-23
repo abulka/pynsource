@@ -2,6 +2,7 @@
 Attempt to sketch the whole hexmvc thing out simply.
 """
 
+import sys; sys.path.append("../lib")
 from architecture_support import *
 
 SIMPLE_MODEL = False #True

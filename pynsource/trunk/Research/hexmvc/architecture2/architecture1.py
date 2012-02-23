@@ -2,6 +2,7 @@
 Attempt to sketch the whole hexmvc thing out simply.
 """
 
+import sys; sys.path.append("../lib"); sys.path.append("../hexagon3")
 from architecture_support import *
 import abc
 

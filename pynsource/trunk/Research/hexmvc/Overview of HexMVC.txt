@@ -1,6 +1,40 @@
 Overview of HexMVC
+==================
+
+Misc notes.
+
+
+AIM
+---
+Replacing hard to follow pure mvc home-grown eventing with simple multicast
+calling of methods on objects. All objects/subsystems are injected hexagonal
+style, and adhere to abstract interfaces for swappability.
+
+
+
+On The Role of App
+
 ------------------
 
+App has job of housing the domain logic and app logic and thus the controller/commands.
+App also has job of wiring the ring adapters together as it knows the relationship of them all to each other.
+App sometimes mediates - calls come in and app sends them out again.
+App sometimes steps out of the way, wires up the ring adapters to talk to each other.
+
+Instantiation should be outside the app.  Theoretically inject different ring adapters into the app
+and the app will still work.
+
+Injection single vs. multicast - a neat symmetry.
+---------------------------------------------------
+Inject a single object to a var (destination expects an interface to be adhered to, doesn't care about the object)
+
+OR
+
+Inject append to a multicast var (destination expects an interface to be adhered to, doesn't care about the object). Calls on the object's method are the same as if it was a single object.  The multicasting is hidden.  But same philosophy.  Thus we dispense with eventing and anything complex.  Its all just function calls on objects, where the object is anything that satisfies an interface/convention.
+
+
+EARLY TALK SUMMARY
+------------------
 I have a talk entitled "HexMVC" brewing which is a simplified blend of the Hexagonal architecture, PureMVC and dependency injection.  Not sure I can have it ready for February but am keen to present it to the group soon.
 
 I have an implementation of HexMVC in Python which proves the ideas work (so far!), allowing developers to "program to interfaces/abstractions" and plug and play different implementations within an MVC architecture.  The ideas aren't new but what HexMVC aims at is a useful blend of patterns and idioms - resulting in a simple architectural pattern that anybody can build a complex app with.  And there is no 'framework' code needed to get started, you just start coding with any language, with the pattern "in your head".
@@ -34,4 +68,5 @@ wx.CallAfter(app.Boot)
 
 # Start Gui
 wxapp.MainLoop()
+
 
