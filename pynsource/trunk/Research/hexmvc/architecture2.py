@@ -21,8 +21,8 @@ class ModelProxyBase(object):
     def Boot(self):
         self.observers.MODEL_CHANGED(self.things)
 
-    #~ def __str__(self):
-        #~ return str([str(t) for t in self.model.things])
+    def __str__(self):
+        return str([str(t) for t in self.model.things])
 
     @property
     def size(self):
@@ -48,7 +48,7 @@ class ModelProxyBase(object):
         self.observers.MODEL_THING_UPDATE(thing)
 
     def DeleteThing(self, thing):
-		raise Exception("DeleteThing not implemented in proxy");
+        raise Exception("DeleteThing not implemented in proxy");
 
 if SIMPLE_MODEL:
 
@@ -126,8 +126,8 @@ else:
             Thing.delete(thing.id)
             self.observers.MODEL_THING_DELETED(thing)
         
-        def Boot(self):
-            ModelProxyBase.Boot(self)
+        @classmethod
+        def GetModel(self):
             
             from sqlobject.sqlite import builder
             from sqlobject import sqlhub
@@ -136,7 +136,7 @@ else:
             conn = SQLiteConnection('hexmodel_sqlobject.db', debug=False)
             sqlhub.processConnection = conn
             try:
-                the_model = Model.get(1)
+                model = Model.get(1)
                 #a_thing = Thing.get(1)
             except:
                 print "Oops - possibly no database - creating one now..."
@@ -150,7 +150,10 @@ else:
                 #~ thing1 = Thing(info="mary", model=model)
                 #~ thing2 = Thing(info="fred", model=model)
                 
-                #model = Model.get(1)        
+                model = Model.get(1)
+                
+            return model
+            
 # SERVER
 
 from bottle import route, run, template, request
@@ -260,6 +263,10 @@ class MyFormMediator(GuiFrame):
         index = self.m_listBox1.GetSelection()
         thing = self.m_listBox1.GetClientData(index) # see ItemContainer methods http://www.wxpython.org/docs/api/wx.ItemContainer-class.html
         self.observers.CMD_DELETE_THING(thing)
+
+    def onDumpModel(self, event):
+        #self.m_textCtrlDump.Clear()
+        self.m_textCtrlDump.AppendText(str(self.app.model) + "\n")
         
     # Non Gui Incoming Events
     
@@ -286,7 +293,6 @@ class MyFormMediator(GuiFrame):
             self.m_listBox1.Delete(index)
             self._RepairSelection(index)        
 
-        
 class MyWxApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnInit(self):
         self.Init()  # initialize the inspection tool
@@ -361,14 +367,7 @@ if __name__ == '__main__':
         model = ModelProxySimple(Model())
     else:
         # Create Model - SQLOBJECT
-        from sqlobject.sqlite import builder
-        from sqlobject import sqlhub
-        
-        SQLiteConnection = builder()
-        conn = SQLiteConnection('hexmodel_sqlobject.db', debug=False)
-        sqlhub.processConnection = conn
-            
-        model = ModelProxySqlObject(Model.get(1))
+        model = ModelProxySqlObject(ModelProxySqlObject.GetModel())
 
     # Create Server
     server = Server(host='localhost', port=8081)
