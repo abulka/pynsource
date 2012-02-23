@@ -1,12 +1,12 @@
-from ModelSimple import Model
-from ModelProxySimple import ModelProxySimple
-from ServerBottle import Server
-from ViewWxMediator import MyWxApp
+from ModelOo import Model
+from ModelOoAdapter import ModelOoAdapter
+from ServerBottleAdapter import Server
+from ViewWxAdapter import MyWxApp
 import wx
 from App import App
 
 # Create Model - SIMPLE
-model = ModelProxySimple(Model())
+model = ModelOoAdapter(Model())
 
 # Create Server
 server = Server(host='localhost', port=8081)

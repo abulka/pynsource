@@ -1,10 +1,10 @@
 from ModelSql import Model, Thing
-from ModelProxyBase import ModelProxyBase
+from ModelAdapterBase import ModelAdapterBase
 
 from sqlobject.sqlite import builder
 from sqlobject import sqlhub
 
-class ModelProxySqlObject(ModelProxyBase):
+class ModelSqlObjectAdapter(ModelAdapterBase):
     def DeleteThing(self, thing):
         Thing.delete(thing.id)
         self.observers.MODEL_THING_DELETED(thing)

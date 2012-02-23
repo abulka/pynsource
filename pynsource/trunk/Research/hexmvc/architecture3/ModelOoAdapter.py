@@ -1,6 +1,6 @@
-from ModelProxyBase import ModelProxyBase
+from ModelAdapterBase import ModelAdapterBase
 
-class ModelProxySimple(ModelProxyBase):
+class ModelOoAdapter(ModelAdapterBase):
     def DeleteThing(self, thing):
         self.model.things.remove(thing)
         self.observers.MODEL_THING_DELETED(thing)

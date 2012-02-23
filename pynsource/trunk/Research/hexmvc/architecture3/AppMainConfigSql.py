@@ -1,12 +1,11 @@
-from ModelSimple import Model
-from ModelProxySql import ModelProxySqlObject
-from ServerBottle import Server
-from ViewWxMediator import MyWxApp
+from ModelSqlAdapter import ModelSqlObjectAdapter
+from ServerBottleAdapter import Server
+from ViewWxAdapter import MyWxApp
 import wx
 from App import App
 
 # Create Model - SQLOBJECT
-model = ModelProxySqlObject(ModelProxySqlObject.GetModel())
+model = ModelSqlObjectAdapter(ModelSqlObjectAdapter.GetModel())
 
 # Create Server
 server = Server(host='localhost', port=8081)

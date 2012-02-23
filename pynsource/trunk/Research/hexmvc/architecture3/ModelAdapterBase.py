@@ -1,7 +1,7 @@
 import sys; sys.path.append("../lib")
 from architecture_support import *
 
-class ModelProxyBase(object):
+class ModelAdapterBase(object):
     def __init__(self, model):
         self.app = None
         self.model = model
