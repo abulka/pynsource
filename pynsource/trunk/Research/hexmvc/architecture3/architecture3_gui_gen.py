@@ -154,7 +154,7 @@ class GuiFrame ( wx.Frame ):
 		# Connect Events
 		self.Bind( wx.EVT_MENU, self.OnFileNew, id = self.m_menuItem1FileNew.GetId() )
 		self.m_button12.Bind( wx.EVT_BUTTON, self.OnFileNew )
-		self.m_button11.Bind( wx.EVT_BUTTON, self.onDumpModel )
+		self.m_button11.Bind( wx.EVT_BUTTON, self.OnDumpModel )
 		self.m_button122.Bind( wx.EVT_BUTTON, self.OnAddThing )
 		self.m_button121.Bind( wx.EVT_BUTTON, self.OnAddInfoToThing )
 		self.m_button131.Bind( wx.EVT_BUTTON, self.OnDeleteThing )
@@ -168,7 +168,7 @@ class GuiFrame ( wx.Frame ):
 		event.Skip()
 	
 	
-	def onDumpModel( self, event ):
+	def OnDumpModel( self, event ):
 		event.Skip()
 	
 	def OnAddThing( self, event ):
