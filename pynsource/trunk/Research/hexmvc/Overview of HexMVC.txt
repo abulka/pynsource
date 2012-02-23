@@ -32,6 +32,23 @@ OR
 
 Inject append to a multicast var (destination expects an interface to be adhered to, doesn't care about the object). Calls on the object's method are the same as if it was a single object.  The multicasting is hidden.  But same philosophy.  Thus we dispense with eventing and anything complex.  Its all just function calls on objects, where the object is anything that satisfies an interface/convention.
 
+Renamings of pureMvc terms to "Adapter"
+---------------------------------------
+
+PureMvc uses the term one or more "mediators" in front of gui plumbing - all sitting behind the term "View"
+PureMvc uses the term one or more "proxies" in front of model plumbing - all sitting behind the term "Model"
+PureMvc talks about many "commands" objects which all sit behind the term "Controller"
+The Application "facade" is the centre.
+
+The problem with these terms are that is debatable that these things are really proxies and mediators etc.  I rename them Adapters.
+The other problem in puremvc is that additional plug in parts of the architecture (which is not catered for anyway) need pattern names too, so by using the generic name Adapter we can have infinite numbers of Adapters composing a system.
+
+Plus Adapters are more conducive to the idea of interfaces.  Adapters offer the same interface, whilst the behind the scenes implementation changes - this is the very essence of what an Adapter is.  And its the very essence of what an interface is, and thus the injecting of adapters that conform to some interface is a good thing to do.  And remember by having multicast variables pointing to multiple adapters, we get a simple "event"-ing framework - for free.
+
+Adapters can be wrapping or inheriting - that's in the design pattern book.
+My wx pure minimalist gui adapter is an example of a wrapping (compositional) adapter.
+My wx architecture 3 gui adapter is an example of an inheritance based adapter.
+
 
 EARLY TALK SUMMARY
 ------------------
