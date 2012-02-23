@@ -21,6 +21,7 @@ and the app will still work.
 
 import wx
 import abc
+import sys; sys.path.append("..")
 from architecture_support import *
 
 # GUI
