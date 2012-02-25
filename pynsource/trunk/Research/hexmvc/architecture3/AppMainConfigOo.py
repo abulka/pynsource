@@ -1,12 +1,17 @@
 from ModelOo import Model
 from ModelOoAdapter import ModelOoAdapter
+#from PersistenceOoPickle import Persistence
+from PersistenceOoHomegrown import Persistence
 from ServerBottleAdapter import Server
 from ViewWxAdapter import MyWxApp
 import wx
 from App import App
 
 # Create Model - SIMPLE
-model = ModelOoAdapter(Model())
+model = Model()
+#persistence = Persistence("hexmodel_sqlobject.pickle")
+persistence = Persistence("hexmodel_homegrown.txt")
+model = ModelOoAdapter(model, persistence)
 
 # Create Server
 server = Server(host='localhost', port=8081)

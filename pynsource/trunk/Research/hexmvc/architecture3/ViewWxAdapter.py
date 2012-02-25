@@ -49,6 +49,12 @@ class MyFormMediator(GuiFrame):
     def OnFileNew(self, event):
         self.observers.CMD_FILE_NEW()
 
+    def OnLoadAll(self, event):
+        self.observers.CMD_FILE_LOAD_ALL()
+
+    def OnSaveAll(self, event):
+        self.observers.CMD_FILE_SAVE_ALL()
+        
     def OnAddThing(self, event):
         info = str(random.randint(0,99999)) + " " + self.inputFieldTxt.GetValue()
         self.observers.CMD_ADD_THING(info)
@@ -72,7 +78,7 @@ class MyFormMediator(GuiFrame):
     def OnDumpModel(self, event):
         #self.m_textCtrlDump.Clear()
         self.m_textCtrlDump.AppendText(str(self.app.model) + "\n")
-        
+
     # Non Gui Incoming Events
     
     def MODEL_CLEARED(self):
@@ -97,6 +103,9 @@ class MyFormMediator(GuiFrame):
         if index != wx.NOT_FOUND:
             self.m_listBox1.Delete(index)
             self._RepairSelection(index)        
+
+    def MODEL_STATUS_LOAD_OR_SAVE_ALL(self, msg, success):
+        self.m_statusBar1.SetStatusText("%(msg)s result: %(success)s" % vars())
 
 class MyWxApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnInit(self):

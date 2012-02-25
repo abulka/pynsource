@@ -8,6 +8,12 @@ class Controller():
     def CMD_FILE_NEW(self):
         self.model.Clear()
 
+    def CMD_FILE_LOAD_ALL(self):
+        self.model.LoadAll()
+
+    def CMD_FILE_SAVE_ALL(self):
+        self.model.SaveAll()
+
     def CMD_ADD_THING(self, info):
         thing = self.model.AddThing(info)
 

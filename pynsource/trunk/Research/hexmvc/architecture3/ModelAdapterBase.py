@@ -38,3 +38,10 @@ class ModelAdapterBase(object):
 
     def DeleteThing(self, thing):
         raise Exception("DeleteThing not implemented in proxy");
+
+    def LoadAll(self, thing):
+        raise Exception("LoadAll not implemented in proxy");
+
+    def SaveAll(self, thing):
+        raise Exception("SaveAll not implemented in proxy");
+
