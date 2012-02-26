@@ -19,7 +19,8 @@ class App(object):
     def Boot(self):
         self.gui.Boot()
         self.model.Boot()
-        self.model.AddThing("initial thing")
+        if self.model.size == 0:
+            self.model.AddThing("initial thing")
         self.server.StartServer()
 
     # Some methods the app has to define itself - rather than exposing
