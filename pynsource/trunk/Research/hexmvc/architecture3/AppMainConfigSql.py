@@ -5,7 +5,8 @@ import wx
 from App import App
 
 # Create Model - SQLOBJECT
-model = ModelSqlObjectAdapter(ModelSqlObjectAdapter.GetModel())
+model_sql = ModelSqlObjectAdapter.GetModel()
+model = ModelSqlObjectAdapter(model_sql)
 
 # Create Server
 server = Server(host='localhost', port=8081)

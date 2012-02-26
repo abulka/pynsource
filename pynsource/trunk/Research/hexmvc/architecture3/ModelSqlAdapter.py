@@ -32,3 +32,11 @@ class ModelSqlObjectAdapter(ModelAdapterBase):
             model = Model.get(1)
             
         return model
+
+    # Sql we are always persistent - unless perhaps if we set up transactions
+    
+    def LoadAll(self, filename=None):
+        pass
+
+    def SaveAll(self, filename=None):
+        pass

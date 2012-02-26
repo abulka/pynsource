@@ -9,13 +9,13 @@ class ModelOoAdapter(ModelAdapterBase):
         self.model.things.remove(thing)
         self.observers.MODEL_THING_DELETED(thing)
 
-    def LoadAll(self):
-        self.model = self.persistence.LoadAll(self.model)
+    def LoadAll(self, filename=None):
+        self.model = self.persistence.LoadAll(self.model, filename)
 
         self.observers.MODEL_STATUS_LOAD_OR_SAVE_ALL('Load All', True)
         self.observers.MODEL_CHANGED(self.model.things)
 
-    def SaveAll(self):
-        self.persistence.SaveAll(self.model)
+    def SaveAll(self, filename=None):
+        self.persistence.SaveAll(self.model, filename)
         
         self.observers.MODEL_STATUS_LOAD_OR_SAVE_ALL('Save All', True)

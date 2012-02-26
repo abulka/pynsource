@@ -1,6 +1,13 @@
 import sys; sys.path.append("../lib")
 from architecture_support import *
 
+"""
+This is the 'model' interface provided to the App, and is provided by the model
+adapter (modelProxy). The methods include model manipulation and access methods,
+as well as persistence methods. The Adapter has a reference to both the
+underlying model and persistence object (if any).
+"""
+
 class ModelAdapterBase(object):
     def __init__(self, model):
         self.app = None
@@ -39,9 +46,11 @@ class ModelAdapterBase(object):
     def DeleteThing(self, thing):
         raise Exception("DeleteThing not implemented in proxy");
 
-    def LoadAll(self, thing):
+    # Delegate to Persistence
+    
+    def LoadAll(self, filename=None):
         raise Exception("LoadAll not implemented in proxy");
 
-    def SaveAll(self, thing):
+    def SaveAll(self, filename=None):
         raise Exception("SaveAll not implemented in proxy");
 

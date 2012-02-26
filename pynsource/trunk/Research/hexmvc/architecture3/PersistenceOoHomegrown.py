@@ -4,12 +4,14 @@ import pickle
 
 from ModelOo import Model, Thing
 
+DEFAULT_FILENAME = "hexmodel_homegrown.txt"
+
 class Persistence:
-    def __init__(self, filename):
-        self.filename = filename
         
-    def LoadAll(self, model):
-        output = open(self.filename, 'r')
+    def LoadAll(self, model, filename):
+        if not filename:
+            filename = DEFAULT_FILENAME
+        output = open(filename, 'r')
         
         # Could also just create a new model e.g.
         #   model = Model()
@@ -24,8 +26,10 @@ class Persistence:
         
         return model
 
-    def SaveAll(self, model):
-        output = open(self.filename, 'w')
+    def SaveAll(self, model, filename):
+        if not filename:
+            filename = DEFAULT_FILENAME
+        output = open(filename, 'w')
         for thing in model.things:
             output.write(str(thing.info)+'\n')
         output.close()

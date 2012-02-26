@@ -10,10 +10,7 @@ Replacing hard to follow pure mvc home-grown eventing with simple multicast
 calling of methods on objects. All objects/subsystems are injected hexagonal
 style, and adhere to abstract interfaces for swappability.
 
-
-
 On The Role of App
-
 ------------------
 
 App has job of housing the domain logic and app logic and thus the controller/commands.
@@ -48,6 +45,71 @@ Plus Adapters are more conducive to the idea of interfaces.  Adapters offer the 
 Adapters can be wrapping or inheriting - that's in the design pattern book.
 My wx pure minimalist gui adapter is an example of a wrapping (compositional) adapter.
 My wx architecture 3 gui adapter is an example of an inheritance based adapter.
+
+On Persistence
+---------------
+This is the 'model' interface provided to the App, and is provided by the model
+adapter (modelProxy). The methods include model manipulation and access methods,
+as well as persistence methods. The Adapter has a reference to both the
+underlying model and persistence object (if any).
+ 
+             
+            ModelAdapterBase
+             .            . 
+            /_\          /_\
+             |            |
+        ModelOoAdapter   ModelSqlObjectAdapter
+        -------
+        Clear       
+        AddThing
+        ...
+        LoadAll
+        SaveAll
+
+The underlying real model class provides the model methods, obviously.
+The underlying real persistence class provides the persistence methods.
+ 
+        ModelOoAdapter
+         |          |
+         v          v
+        ModelOo <- Persistence
+        -------    -----------
+        Clear       LoadAll
+        AddThing    SaveAll
+        DeleteThing
+        etc.
+ 
+NOTE: The Model Adapter LoadAll() optionally does take a filename as a
+parameter. This is fine for when the app wants to specify a persistence file to
+load/save to and is the common case catered for.
+For more complex configurations e.g. like persisting to a database using a
+connection string, this should arguably be done in the
+configuration/wiring/bootup stage when the Persistance object is instantiated
+and configured. After all we cannot contaminate the interface of ModelAdapter
+with all sorts of Persistence specific methods - the ModelAdapter must be a
+generic interface so that other persistence implementations can be swapped in/out
+seamlessly.
+
+In the case of Sql database persistence, a Persistence class is probably not needed
+and the Model is auto persisted.  In which case the ModelSqlAdapter implements the
+required LoadAll methods by doing nothing.
+
+        ModelSqlAdapter
+         |
+         |  SQLObject
+         |   . 
+         |  /_\
+         v   |   
+        ModelSql
+
+On the idea of swappable db implementation backends - if you want to provide a
+model that has swappable backends that is fine - that's a separate layer of
+functionality and doesn't concern the ModelSqlAdapter. Pick your backend in the
+instantiation-configuration-wiring-bootup stage.
+
+On the idea that the model should write to an abstract persistence interface
+which you can swap - this is too hard. But again, if you can pull it off, that's
+fine. Just hide all this behind the Model Adapter.
 
 
 EARLY TALK SUMMARY

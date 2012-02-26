@@ -8,10 +8,9 @@ import wx
 from App import App
 
 # Create Model - SIMPLE
-model = Model()
-#persistence = Persistence("hexmodel_sqlobject.pickle")
-persistence = Persistence("hexmodel_homegrown.txt")
-model = ModelOoAdapter(model, persistence)
+model_oo = Model()
+persistence = Persistence()
+model = ModelOoAdapter(model_oo, persistence)
 
 # Create Server
 server = Server(host='localhost', port=8081)
