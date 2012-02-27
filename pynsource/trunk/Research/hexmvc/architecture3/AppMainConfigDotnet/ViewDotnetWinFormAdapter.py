@@ -40,6 +40,15 @@ class WinFormAdapter(MainForm):
         
     def BtnDebug1Click(self, sender, e):
         print "got debug event"
+        from System.Collections import ArrayList
+        self.array = ArrayList()
+        for i in xrange(10):
+          self.array.Add(i)
+        self._listBox1.DataSource = self.array
+        self.array.Add(100)
+        self.array.Add(200)
+        self.array.Add(300)
+
     
     def OnLinkClicked(self, sender, e):
         print "link clicked", sender.Text
