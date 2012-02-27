@@ -27,4 +27,4 @@ class Controller():
     # Other events
     
     def MODEL_THING_ADDED(self, thing, modelsize):
-        print "App observer got notified, added value %(thing)s - modelsize now %(modelsize)4d" % vars()
+        print "App observer got notified, added value %(thing)s - modelsize now %(modelsize)d" % vars()
