@@ -39,15 +39,18 @@ class WinFormAdapter(MainForm):
     # Gui Generated Events, override the handler here
         
     def BtnDebug1Click(self, sender, e):
-        print "got debug event"
-        from System.Collections import ArrayList
-        self.array = ArrayList()
-        for i in xrange(10):
-          self.array.Add(i)
-        self._listBox1.DataSource = self.array
-        self.array.Add(100)
-        self.array.Add(200)
-        self.array.Add(300)
+        print 'self.app.server.StartServer_real'
+        self.app.server.StartServer_real()
+        
+#        print "got debug event"
+#        from System.Collections import ArrayList
+#        self.array = ArrayList()
+#        for i in xrange(10):
+#          self.array.Add(i)
+#        self._listBox1.DataSource = self.array
+#        self.array.Add(100)
+#        self.array.Add(200)
+#        self.array.Add(300)
 
     
     def OnLinkClicked(self, sender, e):

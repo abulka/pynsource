@@ -21,9 +21,13 @@ try:
 
     from ModelOo import Model
     from ModelOoAdapter import ModelOoAdapter
+    
     #from PersistenceOoPickle import Persistence
     from PersistenceOoHomegrown import Persistence
-    from ServerMock import Server
+    
+    #from ServerMock import Server
+    from ServerDotnetAdapter import Server
+    
     from App import App
     import ViewDotnetWinFormAdapter
     
@@ -48,3 +52,4 @@ except Exception, inst:
     print inst
 
 Application.Run(form)
+

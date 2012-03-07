@@ -8,17 +8,28 @@ class Server(SimpleServer):
     def url_server(self):
         return "http://%s:%s" % (self.host, self.port)
 
-    def StartServer(self):
+    def StartServer_real(self):
         print "starting server thread..."
         self.serveforever()
+
+    def StartServer(self):
+        pass
+#        print "starting server thread..."
+#        self.serveforever()
 
     def handle(self, path, method, request, response):
         #print path, method, request, response
         cmd = path[0]
-        if cmd == 'hi':
-            return "hi there"
-        elif cmd == 'hello':
-            return "oh - we are being formal are we?  Hello!"
+        
+        if cmd == '':
+            return "G'day"
+        elif cmd == 'modelsize':
+            return 'The model length is %d' % self.model.size
+        elif cmd == 'dumpthings':
+            s = ""
+            for thing in self.model.things:
+                s += str(thing) + '<BR>'
+            return s
         else:
             # do the default
             return SimpleServer.handle(self, path, method, request, response)
