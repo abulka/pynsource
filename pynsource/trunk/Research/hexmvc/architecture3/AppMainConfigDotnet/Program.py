@@ -3,7 +3,7 @@ clr.AddReference('System.Windows.Forms')
 clr.AddReference('System.Drawing')
 
 from System.Windows.Forms import Application
-import MainForm
+import ViewDotnetWinForm
 
 import sys 
 sys.path.append("c:\python27\lib")

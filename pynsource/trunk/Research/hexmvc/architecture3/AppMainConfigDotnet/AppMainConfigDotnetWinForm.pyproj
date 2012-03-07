@@ -59,7 +59,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainForm.py" />
+    <Compile Include="ServerDotnetAdapter.py" />
+    <Compile Include="ServerSimple.py" />
+    <Compile Include="ViewDotnetWinForm.py" />
     <Compile Include="Program.py" />
     <Compile Include="ServerMock.py" />
     <Compile Include="ViewDotnetWinFormAdapter.py" />
@@ -68,8 +70,8 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.py</DependentUpon>
+    <EmbeddedResource Include="ViewDotnetWinForm.resx">
+      <DependentUpon>ViewDotnetWinForm.py</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(PythonBinPath)\SharpDevelop.Build.Python.targets" />
