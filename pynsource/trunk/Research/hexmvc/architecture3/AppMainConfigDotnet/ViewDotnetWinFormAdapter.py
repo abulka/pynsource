@@ -21,6 +21,9 @@ class WinFormAdapter(MainForm):
         # we know the form is all set up and ready for app to start.  Its typically the app.Boot method.
         if self.callAfter:
             self.callAfter()
+            
+    def onClosed(self, sender, e):
+        self.app.Shutdown()
 
     def Boot(self):
         print "BOOT"
@@ -40,8 +43,8 @@ class WinFormAdapter(MainForm):
         
     def BtnDebug1Click(self, sender, e):
         print 'self.app.server.StartServer_real'
-        self.app.server.StartServer_real()
-        
+        self.app.server.StopServer()
+
 #        print "got debug event"
 #        from System.Collections import ArrayList
 #        self.array = ArrayList()

@@ -16,12 +16,17 @@ class App(object):
         # Inject normal dependencies
         self.server.model = model
         
+    # Startup and Shutdown
+    
     def Boot(self):
         self.gui.Boot()
         self.model.Boot()
         if self.model.size == 0:
             self.model.AddThing("initial thing")
         self.server.StartServer()
+
+    def Shutdown(self):
+        self.server.StopServer()
 
     # Some methods the app has to define itself - rather than exposing
     # ring objects to one another for such trivial stuff

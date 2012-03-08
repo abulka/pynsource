@@ -1,4 +1,5 @@
 from ServerSimple import SimpleServer
+from System.Threading import ThreadStart, Thread
 
 class Server(SimpleServer):
     def __init__(self, host, port):
@@ -8,14 +9,14 @@ class Server(SimpleServer):
     def url_server(self):
         return "http://%s:%s" % (self.host, self.port)
 
-    def StartServer_real(self):
-        print "starting server thread..."
-        self.serveforever()
+    def StopServer(self):
+        print "stopping server thread..."
+        self.t.Abort()
 
     def StartServer(self):
-        pass
-#        print "starting server thread..."
-#        self.serveforever()
+        print "starting server thread..."
+        self.t = Thread(ThreadStart(self.serveforever))
+        self.t.Start()
 
     def handle(self, path, method, request, response):
         #print path, method, request, response

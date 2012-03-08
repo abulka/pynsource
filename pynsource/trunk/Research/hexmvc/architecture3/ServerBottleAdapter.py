@@ -15,6 +15,10 @@ class Server(object):
     def StartServer(self):
         thread.start_new_thread(self._Serve, ())
 
+    def StopServer(self):
+        pass
+        # TODO need to stop the server thread.
+
     def _Serve(self):
         print "starting server thread..."
 

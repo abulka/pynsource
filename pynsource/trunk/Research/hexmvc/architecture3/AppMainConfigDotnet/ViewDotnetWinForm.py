@@ -256,6 +256,7 @@ class MainForm(Form):
         self.MainMenuStrip = self._menuStrip1
         self.Name = "MainForm"
         self.Text = "AppMainConfigDotnet"
+        self.FormClosed += self.onClosed
         self.Load += self.onLoad
         self._menuStrip1.ResumeLayout(False)
         self._menuStrip1.PerformLayout()
@@ -290,4 +291,7 @@ class MainForm(Form):
         pass
 
     def OnLinkClicked(self, sender, e):
+        pass
+
+    def onClosed(self, sender, e):
         pass
