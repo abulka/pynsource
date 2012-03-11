@@ -1,9 +1,11 @@
+from architecture_support import *
 from ServerSimple import SimpleServer
 from System.Threading import ThreadStart, Thread
 
 class Server(SimpleServer):
     def __init__(self, host, port):
         SimpleServer.__init__(self, host, port)
+        self.observers = multicast()
 
     @property
     def url_server(self):
@@ -31,6 +33,9 @@ class Server(SimpleServer):
             for thing in self.model.things:
                 s += str(thing) + '<BR>'
             return s
+        elif cmd == 'addthing':
+            self.observers.CMD_ADD_THING("fred")
+            return 'The model length is now %d' % self.model.size        
         else:
             # do the default
             return SimpleServer.handle(self, path, method, request, response)

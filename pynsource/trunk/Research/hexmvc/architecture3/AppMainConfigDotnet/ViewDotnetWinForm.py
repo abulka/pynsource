@@ -32,6 +32,7 @@ class MainForm(Form):
         self._button6 = System.Windows.Forms.Button()
         self._button7 = System.Windows.Forms.Button()
         self._toolTip1 = System.Windows.Forms.ToolTip(self._components)
+        self._linkLabel4 = System.Windows.Forms.LinkLabel()
         self._menuStrip1.SuspendLayout()
         self._flowLayoutPanel1.SuspendLayout()
         self._flowLayoutPanel2.SuspendLayout()
@@ -137,6 +138,7 @@ class MainForm(Form):
         self._flowLayoutPanel2.Controls.Add(self._linkLabel1)
         self._flowLayoutPanel2.Controls.Add(self._linkLabel2)
         self._flowLayoutPanel2.Controls.Add(self._linkLabel3)
+        self._flowLayoutPanel2.Controls.Add(self._linkLabel4)
         self._flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
         self._flowLayoutPanel2.Location = System.Drawing.Point(245, 141)
         self._flowLayoutPanel2.Name = "flowLayoutPanel2"
@@ -235,6 +237,16 @@ class MainForm(Form):
         self._button7.Text = "Delete Thing"
         self._button7.UseVisualStyleBackColor = True
         self._button7.Click += self.OnDeleteThing
+        # 
+        # linkLabel4
+        # 
+        self._linkLabel4.Location = System.Drawing.Point(109, 0)
+        self._linkLabel4.Name = "linkLabel4"
+        self._linkLabel4.Size = System.Drawing.Size(100, 23)
+        self._linkLabel4.TabIndex = 3
+        self._linkLabel4.TabStop = True
+        self._linkLabel4.Text = "/addthing"
+        self._linkLabel4.LinkClicked += self.OnLinkClicked
         # 
         # MainForm
         # 

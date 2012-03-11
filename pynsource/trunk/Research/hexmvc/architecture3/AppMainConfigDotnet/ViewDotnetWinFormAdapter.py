@@ -32,12 +32,16 @@ class WinFormAdapter(MainForm):
     # Util
 
     def _InitHyperlinks(self):
+        # Note - url click event done in sharpdevelop, each url has a
+        # click event pointing to OnLinkClicked.
+        # This code following is just for the tooltips.
         def seturl(obj):
             #obj.SetURL(self.app.url_server + obj.Text)
             self._toolTip1.SetToolTip(obj, obj.Text)
         seturl(self._linkLabel1)
         seturl(self._linkLabel2)
         seturl(self._linkLabel3)
+        seturl(self._linkLabel4)
 
     # Gui Generated Events, override the handler here
         
