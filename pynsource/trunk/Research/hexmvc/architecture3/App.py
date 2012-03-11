@@ -12,6 +12,7 @@ class App(object):
         gui.observers.addObserver(self.controller)
         model.observers.addObserver(gui)
         model.observers.addObserver(self.controller) # diagnostic, optional
+        server.observers.addObserver(self.controller)
         
         # Inject normal dependencies
         self.server.model = model

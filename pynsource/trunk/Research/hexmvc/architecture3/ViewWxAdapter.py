@@ -28,6 +28,7 @@ class MyFormMediator(GuiFrame):
         seturl(self.m_hyperlink1)
         seturl(self.m_hyperlink2)
         seturl(self.m_hyperlink3)
+        seturl(self.m_hyperlink4)
 
     # Util
 
@@ -46,6 +47,10 @@ class MyFormMediator(GuiFrame):
         
     # Gui Generated Events, override the handler here
     
+    def OnClose(self, event):
+        self.app.Shutdown()
+        event.Skip() # so the standard code for closing is done
+
     def OnFileNew(self, event):
         self.observers.CMD_FILE_NEW()
 

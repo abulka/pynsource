@@ -21,5 +21,8 @@ wx.CallAfter(app.Boot)
 
 # Start Gui
 wxapp.MainLoop()
-
 print "DONE"
+
+# Stops any background server threads.
+import sys
+sys.exit()

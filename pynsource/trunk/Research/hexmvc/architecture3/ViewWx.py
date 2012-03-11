@@ -82,6 +82,9 @@ class GuiFrame ( wx.Frame ):
 		self.m_hyperlink3 = wx.HyperlinkCtrl( self, wx.ID_ANY, u"/dumpthings", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
 		bSizer8Hyperlinks.Add( self.m_hyperlink3, 0, wx.ALL, 5 )
 		
+		self.m_hyperlink4 = wx.HyperlinkCtrl( self, wx.ID_ANY, u"/addthing", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
+		bSizer8Hyperlinks.Add( self.m_hyperlink4, 0, wx.ALL, 5 )
+		
 		
 		bSizer7.Add( bSizer8Hyperlinks, 1, wx.EXPAND, 5 )
 		
@@ -152,6 +155,7 @@ class GuiFrame ( wx.Frame ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
+		self.Bind( wx.EVT_CLOSE, self.OnClose )
 		self.Bind( wx.EVT_MENU, self.OnFileNew, id = self.m_menuItem1FileNew.GetId() )
 		self.m_button12.Bind( wx.EVT_BUTTON, self.OnFileNew )
 		self.m_button13.Bind( wx.EVT_BUTTON, self.OnLoadAll )
@@ -166,6 +170,9 @@ class GuiFrame ( wx.Frame ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
+	def OnClose( self, event ):
+		event.Skip()
+	
 	def OnFileNew( self, event ):
 		event.Skip()
 	

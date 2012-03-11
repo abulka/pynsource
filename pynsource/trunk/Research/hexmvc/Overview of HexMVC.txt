@@ -148,4 +148,20 @@ wx.CallAfter(app.Boot)
 # Start Gui
 wxapp.MainLoop()
 
+Killing Threads
+----------------
 
+actually cannot kill python threads!?
+
+closest advise would be to somehow send kyboard interrupt to the thread or read
+http://groups.google.com/group/bottlepy/browse_thread/thread/98a42258f9aadc27/dbd8dc5061f4d50f?lnk=gst&q=shutdown+OR+stop+OR+kill#dbd8dc5061f4d50f
+e.g.
+raise KeyboardInterrupt
+
+# Maybe if I had a handle to the thread before it started I could?
+self.thread_id.setDaemon(True)
+(but thread.start_new_thread should have demon mode true anyway?)
+
+# Stops any background server threads.
+import sys
+sys.exit()

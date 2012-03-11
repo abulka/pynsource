@@ -1,3 +1,6 @@
+import sys; sys.path.append("../lib")
+from architecture_support import *
+
 from bottle import route, run, template, request
 import thread
 
@@ -7,18 +10,19 @@ class Server(object):
         self.model = None
         self.host = host
         self.port = port
+        self.thread_id = None
+        self.observers = multicast()
         
     @property
     def url_server(self):
         return "http://%s:%s" % (self.host, self.port)
         
     def StartServer(self):
-        thread.start_new_thread(self._Serve, ())
+        self.thread_id = thread.start_new_thread(self._Serve, ())
 
     def StopServer(self):
-        pass
-        # TODO need to stop the server thread.
-
+        print "stopping server thread..." # actually cannot kill python threads!?
+        
     def _Serve(self):
         print "starting server thread..."
 
@@ -37,5 +41,15 @@ class Server(object):
                 s += str(thing) + '<BR>'
             return s
 
+        @route('/addthing')
+        def addthing():
+            self.observers.CMD_ADD_THING("fred")
+            return 'The model length is now %d' % self.model.size
+
+        @route('/json')
+        def json():
+            import time
+            return {'status':'online', 'servertime':time.time()}
+    
         run(host=self.host, port=self.port)
         # nothing runs after this point
