@@ -21,7 +21,6 @@
     <StartArguments>-X:Debug Program.py</StartArguments>
     <StartWorkingDirectory>.\</StartWorkingDirectory>
     <StartAction>Program</StartAction>
-    <StartProgram>C:\Program Files (x86)\SharpDevelop\4.2\bin\..\AddIns\BackendBindings\PythonBinding\ipy.exe</StartProgram>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -33,14 +32,13 @@
     <StartArguments>Program.py</StartArguments>
     <StartWorkingDirectory>.\</StartWorkingDirectory>
     <StartAction>Program</StartAction>
-    <StartProgram>C:\Program Files (x86)\SharpDevelop\4.2\bin\..\AddIns\BackendBindings\PythonBinding\ipy.exe</StartProgram>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="IronPython">
-      <HintPath>C:\Program Files %28x86%29\SharpDevelop\4.2\bin\..\AddIns\BackendBindings\PythonBinding\IronPython.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\SharpDevelop\4.2\AddIns\BackendBindings\PythonBinding\IronPython.dll</HintPath>
     </Reference>
     <Reference Include="IronPython.Modules">
-      <HintPath>C:\Program Files %28x86%29\SharpDevelop\4.2\bin\..\AddIns\BackendBindings\PythonBinding\IronPython.Modules.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\SharpDevelop\4.2\AddIns\BackendBindings\PythonBinding\IronPython.Modules.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />

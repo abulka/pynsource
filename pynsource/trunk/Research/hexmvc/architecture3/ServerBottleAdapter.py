@@ -56,25 +56,26 @@ class Server(object):
         """
         REST API DESIGN
 
-        Need to expose some sort of referencing scheme to refer to thing objects.
-            In Oo version the memory address? Do we need to actually create an integer id for the oo version?
-            In Sql version the db id?
+        Rreferencing scheme to refer to thing objects.  Oo version has explicit id and id allocation mechanism.
+        Sql version we get the db id for free.  Urls refer to this id, for simplicity e.g. /things/1
+        We could introduce an abstraction, some uuid as the url instead, to separate ourselves from the
+        implementation details (that 1 means id=1) but lets keep it simple, and also avoid huge uuid urls!
         
         GET /things
             Example:
                 GET http://localhost:8081/things
             Comment:
-                like dumpthings except offers list of (id, link)
+                Like our older dumpthings() except lists (id, info, link), ...
             XML:
-                <thinglink info="blah" href="http://localhost:8081/things/1"/>
-                <thinglink info="blah2" href="http://localhost:8081/things/2"/>
+                <thinglink id="1" info="blah" href="http://localhost:8081/things/1"/>
+                <thinglink id="2" href="http://localhost:8081/things/2"/>
 
         GET /things/id
             Example:
                 GET http://localhost:8081/things/1
             Comment:
-                display just the thing object. Should we include the id in the xml or
-                the fact that its on the url enough?
+                Displays just the one thing object.
+                The id is supplied for convenience even though its also on the url.
             XML:
                 <thing id="1">thing info content here</thing>
             JSON:
@@ -85,6 +86,7 @@ class Server(object):
                 POST http://localhost:8081/things, <thing>thing2 info content here</thing>
             Comment:
                 Adds a thing.  We get a link back e.g. http://localhost:8081/things/2
+                We obviously don't supply an id because the id is allocated by the server.
 
         PUT /things/id, thing
             Example:
