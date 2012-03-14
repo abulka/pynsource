@@ -6,8 +6,8 @@ import thread
 
 class Server(object):
     def __init__(self, host, port):
-        self.app = None
-        self.model = None
+        self.app = None  # inject
+        self.model = None # inject
         self.host = host
         self.port = port
         self.thread_id = None

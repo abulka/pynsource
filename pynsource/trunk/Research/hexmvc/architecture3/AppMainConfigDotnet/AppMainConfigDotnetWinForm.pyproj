@@ -61,11 +61,11 @@
       <Link>UtilRandomStdpythonAdapter.py</Link>
     </Compile>
     <Compile Include="ServerDotnetAdapter.py" />
-    <Compile Include="ServerSimple.py" />
+    <Compile Include="ServerDotnet.py" />
     <Compile Include="UtilRandomDotnetAdapter.py" />
     <Compile Include="ViewDotnetWinForm.py" />
     <Compile Include="Program.py" />
-    <Compile Include="ServerMock.py" />
+    <Compile Include="ServerMockAdapter.py" />
     <Compile Include="ViewDotnetWinFormAdapter.py" />
   </ItemGroup>
   <ItemGroup>

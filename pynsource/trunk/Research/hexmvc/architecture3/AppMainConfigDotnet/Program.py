@@ -29,8 +29,8 @@ try:
     #from PersistenceOoPickle import Persistence
     from PersistenceOoHomegrown import Persistence
     
-    #from ServerMock import Server
-    from ServerDotnetAdapter import Server
+    from ServerMockAdapter import Server
+    #from ServerDotnetAdapter import Server
     
     from UtilRandomDotnetAdapter import RandomIntFunction
     #from UtilRandomStdpythonAdapter import RandomIntFunction

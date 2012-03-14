@@ -1,10 +1,13 @@
 from architecture_support import *
-from ServerSimple import SimpleServer
+from ServerDotnet import SimpleServer
 from System.Threading import ThreadStart, Thread
 
 class Server(SimpleServer):
     def __init__(self, host, port):
         SimpleServer.__init__(self, host, port)
+        self.app = None  # inject
+        self.model = None  # inject
+        self.thread_id = None
         self.observers = multicast()
 
     @property
@@ -13,12 +16,14 @@ class Server(SimpleServer):
 
     def StopServer(self):
         print "stopping server thread..."
-        self.t.Abort()
+        if self.thread_id:
+            self.thread_id.Abort()
+            self.thread_id = None
 
     def StartServer(self):
         print "starting server thread..."
-        self.t = Thread(ThreadStart(self.serveforever))
-        self.t.Start()
+        self.thread_id = Thread(ThreadStart(self.serveforever))
+        self.thread_id.Start()
 
     def handle(self, path, method, request, response):
         #print path, method, request, response
