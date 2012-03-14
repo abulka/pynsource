@@ -29,6 +29,20 @@ OR
 
 Inject append to a multicast var (destination expects an interface to be adhered to, doesn't care about the object). Calls on the object's method are the same as if it was a single object.  The multicasting is hidden.  But same philosophy.  Thus we dispense with eventing and anything complex.  Its all just function calls on objects, where the object is anything that satisfies an interface/convention.
 
+Addendum:
+OR
+Inject just a function - not an object (e.g. see my random function).  
+
+Types of Adapters
+-----------------
+You must use a different adapter whenever you have a different implementation behind it.  What stays the same is the rest of the app which simply expects the interface of the adapter to be there.
+
+Can be adapters for real deep functionality e.g. two different servers or guis 
+Can be adapters acting as mocks
+Can be light adapter wrappers for slightly different class libraries - insulating the app from the cold hard implementation world.
+
+Adapt by inheriting or by composition, typically the latter is used.
+
 Renamings of pureMvc terms to "Adapter"
 ---------------------------------------
 

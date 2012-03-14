@@ -17,6 +17,7 @@ class MyFormMediator(GuiFrame):
         GuiFrame.__init__(self, parent)
         self.app = None
         self.observers = multicast()
+        self.random = None        # inject
         
     def Boot(self):
         self._InitHyperlinks()
@@ -61,7 +62,8 @@ class MyFormMediator(GuiFrame):
         self.observers.CMD_FILE_SAVE_ALL()
         
     def OnAddThing(self, event):
-        info = str(random.randint(0,99999)) + " " + self.inputFieldTxt.GetValue()
+        assert self.random
+        info = str(self.random(0,99999)) + " " + self.inputFieldTxt.GetValue()
         self.observers.CMD_ADD_THING(info)
 
     def OnAddInfoToThing(self, event):

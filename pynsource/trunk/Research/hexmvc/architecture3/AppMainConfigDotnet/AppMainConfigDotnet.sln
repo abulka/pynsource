@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-# SharpDevelop 4.2.0.8528-beta
+# SharpDevelop 4.2.0.8649-Beta 2
 Project("{FD48973F-F585-4F70-812B-4D0503B36CE9}") = "AppMainConfigDotnetWinForm", "AppMainConfigDotnetWinForm.pyproj", "{EA8D3EA0-9D40-4607-B7EE-D1DE72BEC9EE}"
 EndProject
 Global

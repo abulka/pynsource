@@ -14,7 +14,7 @@ class WinFormAdapter(MainForm):
         self.app = None
         self.observers = multicast()
         self.callAfter = None
-        self.getRandomInt = None        # inject
+        self.random = None        # inject
 
     def onLoad(self, sender, e):
         # Call whatever method has been wired (by the master app) into self.callAfter so that 
@@ -65,9 +65,8 @@ class WinFormAdapter(MainForm):
         System.Diagnostics.Process.Start(self.app.url_server + sender.Text)
     
     def OnAddThing(self, sender, e):
-        assert self.getRandomInt
-        info = str(self.getRandomInt(0,99999)) + " " + self._inputFieldTxt.Text
-        #info = str(random.randint(0,99999)) + " " + self._inputFieldTxt.Text
+        assert self.random
+        info = str(self.random(0,99999)) + " " + self._inputFieldTxt.Text
         self.observers.CMD_ADD_THING(info)
         print info
 

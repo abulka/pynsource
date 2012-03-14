@@ -57,8 +57,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\UtilRandomStdpythonAdapter.py">
+      <Link>UtilRandomStdpythonAdapter.py</Link>
+    </Compile>
     <Compile Include="ServerDotnetAdapter.py" />
     <Compile Include="ServerSimple.py" />
+    <Compile Include="UtilRandomDotnetAdapter.py" />
     <Compile Include="ViewDotnetWinForm.py" />
     <Compile Include="Program.py" />
     <Compile Include="ServerMock.py" />

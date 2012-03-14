@@ -2,7 +2,7 @@
 
 from ModelOo import Model, Thing
 
-DEFAULT_FILENAME = "hexmodel_homegrown.txt"
+DEFAULT_FILENAME = "hexmodel_homegrown.db.txt"
 
 class Persistence:
         
