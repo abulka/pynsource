@@ -40,3 +40,9 @@ class ModelSqlObjectAdapter(ModelAdapterBase):
 
     def SaveAll(self, filename=None):
         pass
+
+    def FindThing(self, id):
+        assert type(id) is int
+        thing = Thing.get(id)      # nice and fast sql lookup
+        return thing
+    

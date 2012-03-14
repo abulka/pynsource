@@ -19,3 +19,10 @@ class ModelOoAdapter(ModelAdapterBase):
         self.persistence.SaveAll(self.model, filename)
         
         self.observers.MODEL_STATUS_LOAD_OR_SAVE_ALL('Save All', True)
+
+    def FindThing(self, id):
+        assert type(id) is int
+        for thing in self.model.things:
+            if thing.id == id:
+                return thing
+        return None

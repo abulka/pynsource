@@ -22,8 +22,10 @@ class Thing(SQLObject):
     model = ForeignKey('Model', default=None)
 
     def __str__(self):
-        #return "Thing@-: " + self.info
         return "Thing %d - %s" % (self.id, self.info)
 
+    def to_json(self):
+        return {'id':self.id, 'info':self.info}
+        
     def AddInfo(self, msg):
         self.info += " " + msg

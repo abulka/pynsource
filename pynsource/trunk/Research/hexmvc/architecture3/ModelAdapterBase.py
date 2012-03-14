@@ -44,13 +44,18 @@ class ModelAdapterBase(object):
         self.observers.MODEL_THING_UPDATE(thing)
 
     def DeleteThing(self, thing):
-        raise Exception("DeleteThing not implemented in proxy");
+        raise Exception("DeleteThing not implemented in adapter");
+
+    # Need to subclass depending on implementation
+    
+    def FindThing(self, id):
+        raise Exception("FindThing() not implemented in this particular adapter");
 
     # Delegate to Persistence
     
     def LoadAll(self, filename=None):
-        raise Exception("LoadAll not implemented in proxy");
+        raise Exception("LoadAll not implemented in adapter");
 
     def SaveAll(self, filename=None):
-        raise Exception("SaveAll not implemented in proxy");
+        raise Exception("SaveAll not implemented in adapter");
 

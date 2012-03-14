@@ -26,6 +26,11 @@ class Server(object):
     def _Serve(self):
         print "starting server thread..."
 
+        def report_error(inst):
+            msg = "Server exception: %s" % inst
+            print msg
+            return msg
+
         @route('/')
         def index():
             return "G'day"
@@ -52,7 +57,30 @@ class Server(object):
         def jsontest():
             import time
             return {'status':'online', 'servertime':time.time()}
-    
+
+        @route('/things')
+        def things():
+            try:
+                things = []
+                for thing in self.model.things:
+                    thing_json = thing.to_json()
+                    thing_json['link'] = "%s/things/%d" % (self.url_server, thing.id)
+                    things.append(thing_json)
+                return {'things': things}
+            except Exception, inst:
+                return report_error(inst)
+
+        @route('/things/:id')
+        def things_id(id):
+            try:
+                thing = self.model.FindThing(int(id))
+                if thing:
+                    return thing.to_json()
+                return "Thing id %(id)s not found" % vars()
+            except Exception, inst:
+                return report_error(inst)
+
+
         """
         REST API DESIGN
 
