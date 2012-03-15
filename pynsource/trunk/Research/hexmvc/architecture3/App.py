@@ -35,3 +35,4 @@ class App(object):
     @property
     def url_server(self):
         return self.server.url_server
+

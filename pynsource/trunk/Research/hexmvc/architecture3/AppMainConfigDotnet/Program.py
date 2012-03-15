@@ -34,7 +34,9 @@ try:
     
     from UtilRandomDotnetAdapter import RandomIntFunction
     #from UtilRandomStdpythonAdapter import RandomIntFunction
-
+    
+    from UtilJsonDotnetAdapter import JsonFromDictFunction
+    
     from App import App
     import ViewDotnetWinFormAdapter
     
@@ -53,6 +55,7 @@ try:
 
     # Wire in random utility function
     gui.random = RandomIntFunction
+    server.json_from_dict = JsonFromDictFunction
 
     # Create Core Hexagon App and inject adapters
     app = App(model, server, gui)

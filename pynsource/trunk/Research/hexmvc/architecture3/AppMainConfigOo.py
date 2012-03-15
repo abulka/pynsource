@@ -10,6 +10,7 @@ from ServerBottleAdapter import Server
 from ViewWxAdapter import MyWxApp
 import wx
 from UtilRandomStdpythonAdapter import RandomIntFunction
+from UtilJsonStdpythonAdapter import JsonFromDictFunction
 from App import App
 
 # Create Model - Object Oriented instances in memory
@@ -26,6 +27,7 @@ gui = wxapp.myframe  # gui mediator inherits from gui rather than wrapping it, i
 
 # Hook up Utility adapters
 gui.random = RandomIntFunction
+server.json_from_dict = JsonFromDictFunction
 
 # Create Core Hexagon App and inject adapters
 app = App(model, server, gui)

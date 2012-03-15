@@ -9,6 +9,7 @@ class Server(SimpleServer):
         self.model = None  # inject
         self.thread_id = None
         self.observers = multicast()
+        self.json_from_dict = None  # inject
 
     @property
     def url_server(self):
@@ -28,6 +29,12 @@ class Server(SimpleServer):
     def handle(self, path, method, request, response):
         #print path, method, request, response
         cmd = path[0]
+        #print path, len(path)
+
+        def report_error(inst):
+            msg = "Server exception: %s" % inst
+            print msg
+            return msg
         
         if cmd == '':
             return "G'day"
@@ -40,7 +47,31 @@ class Server(SimpleServer):
             return s
         elif cmd == 'addthing':
             self.observers.CMD_ADD_THING("fred")
-            return 'The model length is now %d' % self.model.size        
+            return 'The model length is now %d' % self.model.size
+        
+        
+        # REST API
+
+        elif cmd == 'jsontest':
+            import time
+            return {'status':'online', 'servertime':time.time()}
+
+        elif cmd == 'things' and len(path) == 1:
+            try:
+                response.ContentType = "application/json"
+                return self.json_from_dict(self.app.controller.CmdGetThingsAsDict())
+            except Exception, inst:
+                return report_error(inst)
+
+        elif cmd == 'things' and len(path) == 2:
+            try:
+                id = path[1]
+                response.ContentType = "application/json"
+                return self.json_from_dict(self.app.controller.CmdGetThingAsDict(id))
+            except Exception, inst:
+                return report_error(inst)
+
+        
         else:
             # do the default
             return SimpleServer.handle(self, path, method, request, response)

@@ -28,3 +28,33 @@ class Controller():
     
     def MODEL_THING_ADDED(self, thing, modelsize):
         print "App observer got notified, added value %(thing)s - modelsize now %(modelsize)d" % vars()
+
+    # Methods that adapters need, which require immediate response vs.
+    # using the multicasting / eventing approach.  Typically these are
+    # called by the server layer which needs to block and build a reponse there and then.
+
+    def CmdGetThingsAsDict(self):
+        things = []
+        for thing in self.model.things:
+            thing_json = thing.to_dict()
+            thing_json["link"] = "%s/things/%d" % (self.app.url_server, thing.id)
+            things.append(thing_json)
+        return {"things": things}
+    
+    def CmdGetThingAsDict(self, id):
+        thing = self.model.FindThing(int(id))
+        if thing:
+            return thing.to_dict()
+        return "Thing id %(id)s not found" % vars()
+        
+    """
+    Used to redirect via app - lets not do this as too indirect.
+    let server see app.controller  !!
+    """
+    #def CmdGetThingsAsDict(self):
+    #    return self.controller.CmdGetThingsAsJson()
+    #
+    #def CmdGetThingAsDict(self, id):
+    #    return self.controller.CmdGetThingAsJson(id)
+
+        

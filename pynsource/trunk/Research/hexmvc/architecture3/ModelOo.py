@@ -32,8 +32,8 @@ class Thing:
     def __str__(self):
         return "Thing %d - %s" % (self.id, self.info)
 
-    def to_json(self):
-        return {'id':self.id, 'info':self.info}
+    def to_dict(self):
+        return {"id":self.id, "info":self.info}
         
     def AddInfo(self, msg):
         self.info += " " + msg

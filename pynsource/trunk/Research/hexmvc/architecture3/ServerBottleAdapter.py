@@ -12,6 +12,7 @@ class Server(object):
         self.port = port
         self.thread_id = None
         self.observers = multicast()
+        self.json_from_dict = None  # inject
         
     @property
     def url_server(self):
@@ -61,22 +62,14 @@ class Server(object):
         @route('/things')
         def things():
             try:
-                things = []
-                for thing in self.model.things:
-                    thing_json = thing.to_json()
-                    thing_json['link'] = "%s/things/%d" % (self.url_server, thing.id)
-                    things.append(thing_json)
-                return {'things': things}
+                return self.app.controller.CmdGetThingsAsDict()  # no need to call self.json_from_dict as bottle handles it
             except Exception, inst:
                 return report_error(inst)
 
         @route('/things/:id')
         def things_id(id):
             try:
-                thing = self.model.FindThing(int(id))
-                if thing:
-                    return thing.to_json()
-                return "Thing id %(id)s not found" % vars()
+                return self.app.controller.CmdGetThingAsDict(id)  # no need to call self.json_from_dict as bottle handles it
             except Exception, inst:
                 return report_error(inst)
 
