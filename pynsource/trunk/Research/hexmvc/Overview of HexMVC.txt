@@ -179,3 +179,15 @@ self.thread_id.setDaemon(True)
 # Stops any background server threads.
 import sys
 sys.exit()
+
+REST API DESIGN
+------------------
+Referencing scheme to refer to thing objects.  Oo version has explicit id and id allocation mechanism.
+Sql version we get the db id for free.  Urls refer to this id, for simplicity e.g. /things/1
+We could introduce an abstraction, some uuid as the url instead, to separate ourselves from the
+implementation details (that 1 means id=1) but lets keep it simple, and also avoid huge uuid urls!
+
+P.S. Useful Chrome plugins:
+    Simple REST Client
+    Advanced REST Client is even better
+    JSON formatter

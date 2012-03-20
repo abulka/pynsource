@@ -46,7 +46,28 @@ class Controller():
         if thing:
             return thing.to_dict()
         return "Thing id %(id)s not found" % vars()
-        
+
+    def CmdAddThing(self, info):
+        thing = self.model.AddThing(info)
+        if thing:
+            return thing.to_dict()
+        return "Couldn't create thing with info %(info)s" % vars()
+
+    def CmdModifyThing(self, id, info):
+        thing = self.model.FindThing(int(id))
+        if thing:
+            self.model.AddInfoToThing(thing, info)
+            return thing.to_dict()
+        return "Thing id %(id)s not found" % vars()
+
+    def CmdDeleteThing(self, id):
+        thing = self.model.FindThing(int(id))
+        if thing:
+            self.model.DeleteThing(thing)
+            return "ok deleted"
+        return "Thing id %(id)s not found" % vars()
+
+
     """
     Used to redirect via app - lets not do this as too indirect.
     let server see app.controller  !!
