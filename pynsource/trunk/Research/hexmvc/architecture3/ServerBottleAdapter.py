@@ -1,7 +1,7 @@
 import sys; sys.path.append("../lib")
 from architecture_support import *
 
-from bottle import route, run, template, request, get, post, put, delete
+from bottle import route, run, template, request, response, get, post, put, delete  # easy_install -U bottle
 import thread
 
 class Server(object):
@@ -72,6 +72,15 @@ class Server(object):
             Example: GET http://localhost:8081/things
             """
             try:
+                #response.set_header('Content-Language', 'en')
+                #print dir(response)
+                #print response.headers
+                #response.add_header('Content-Language', 'en')
+                #response.add_header('Set-Cookie', 'name2=value2')
+                #print response.headers
+                #content-type:application/x-javascript
+                #response.content_type = 'application/json'
+                #response.content_type = 'application/x-javascript'
                 return self.app.controller.CmdGetThingsAsDict()  # no need to call self.json_from_dict as bottle handles it
             except Exception, inst:
                 return report_error(inst)
@@ -99,7 +108,17 @@ class Server(object):
             Note: Is there a way to send json to the server? e.g. {"info":"thing info content here"}
             """
             try:
-                info = request.forms.get('info')
+                print request.headers.get('X-Requested-With')
+                print request.headers.get('Content-Type')
+                #if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                if request.headers.get('Content-Type') == 'application/json':
+                    print 'JSON REQUEST'
+                    print request.json
+                    info = request.json["info"]
+                else:
+                    print 'FORM REQUEST'
+                    info = request.forms.get('info')
+                    
                 return self.app.controller.CmdAddThing(info)  # no need to call self.json_from_dict as bottle handles it
             except Exception, inst:
                 return report_error(inst)
@@ -113,8 +132,16 @@ class Server(object):
                Note: Is there a way to send json to the server? e.g. {"id":1, "info":"MODIFIED info content here"}
             """
             try:
-                id = request.forms.get("id")
-                info = request.forms.get("info")
+                if request.headers.get('Content-Type') == 'application/json':
+                    print 'JSON REQUEST'
+                    print request.json
+                    id = request.json.get("id")
+                    info = request.json.get("info")
+                else:
+                    print 'FORM REQUEST'
+                    id = request.forms.get("id")
+                    info = request.forms.get("info")
+
                 return self.app.controller.CmdModifyThing(id, info)  # no need to call self.json_from_dict as bottle handles it
             except Exception, inst:
                 return report_error(inst)
@@ -147,6 +174,7 @@ class Server(object):
 <head>
     <title>Put and Delete</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <meta http-equiv="content-script-type" content="text/javascript">
     <script>
 
     $(document).ready(function() {
@@ -162,6 +190,49 @@ class Server(object):
                 $('#DeleteForm').find('.form_result').html(response);
             }});
         });
+
+        /*
+        $('a').click(function(){ 
+           console.log("hyperlink click!"); 
+        });
+        */
+        
+        $("#postjson").click(function (e) {
+        
+            var thing = {info:"thing info content here"};
+            
+            // convert object to JSON string  (See http://jollytoad.googlepages.com/json.js)
+            var objectAsJson = JSON.stringify(thing); // result is a string:  '{"Name":"Fred","Rank":"2","SerialNumber":"17268"}'
+            console.log(objectAsJson );
+            
+            $.ajax({
+              type        : "POST",
+              contentType : "application/json",
+              url         : "things",
+              data        : objectAsJson, 
+              processData : false,              // do not convert outbound data to string (already done)
+              success     : function(response){ $('#PostForm').find('.form_result').html(response); },
+              error       : function(xhr, textStatus, errorThrown){  } 
+             });
+        });
+
+        $("#putjson").click(function (e) {
+        
+            var thing = {id:1, info:"QQ"};
+            var objectAsJson = JSON.stringify(thing);
+            console.log(objectAsJson );
+            
+            $.ajax({
+              type        : "PUT",
+              contentType : "application/json",
+              url         : "things",
+              data        : objectAsJson, 
+              processData : false,              // do not convert outbound data to string (already done)
+              success     : function(response){ $('#PostForm').find('.form_result').html(response); },
+              error       : function(xhr, textStatus, errorThrown){  } 
+             });
+        });
+        
     });
     
     </script>
@@ -169,6 +240,8 @@ class Server(object):
 
 <body>
     <p><a href="/things">/things</a></p>
+    <p><a href="" id="postjson">post json object</a></p>
+    <p><a href="" id="putjson">put json object to 1</a></p>
     
     <form id="PostForm" action="/things" method="POST">
         info: <input type="text" name="info" value="Some info" /><br/> 
