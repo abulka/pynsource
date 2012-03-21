@@ -134,58 +134,56 @@ class Server(object):
             
         # REST API - Support
             
-        @get('/add') # or @route('/add')
-        def add_form():
-            return '''<form action="/things" method="POST">
-                        <input name="info"     type="text" />
-                      </form>'''
-
-        @get('/modify') # or @route('/add')
+        @route('/api')
         def modify_form():
             """
-            Note PUT and DELETE are not supported in normal forms, so we have to do it via ajax
+            POST is done via normal form submit post.
+            PUT and DELETE are not supported in normal forms, so we have to do it via ajax
             """
             return '''
 <!DOCTYPE html>
 
 <html>
 <head>
-    <title>Put</title>
+    <title>Put and Delete</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <script>
 
-    function submitForm() {
-        $.ajax({type:'PUT', url: 'things', data:$('#ContactForm').serialize(), success: function(response) {
-            $('#ContactForm').find('.form_result').html(response);
-        }});
-        return false;
-    }
-    
-    
-    // why doesn't this version work?
-    // see http://www.jstiles.com/Blog/How-To-Submit-a-Form-with-jQuery-and-AJAX
-    
-    $('#delete').click(function (e) { 
-    e.preventDefault();
-    console.log("fred");
-    $.ajax(
-        {type:'PUT', url: 'things', data:$('#ContactForm').serialize(), success: function(response) {
-                    $('#ContactForm').find('.form_result').html(response);
-        }}    
-    ); 
+    $(document).ready(function() {
+        $("#PutForm input[type=button]").click(function (e) {
+            //console.log("PUT " + $("#PutForm input[name=id]").attr('value') + " " + $("#PutForm input[name=info]").attr('value'));
+            $.ajax({type:'PUT', url: 'things', data:$('#PutForm').serialize(), success: function(response) {
+                $('#PutForm').find('.form_result').html(response);
+            }});
+        });
+        $("#DeleteForm input[type=button]").click(function (e) {
+            id = $("#DeleteForm input[name=id]").attr('value');
+            $.ajax({type:'DELETE', url: 'things/'+id, data:$('#DeleteForm').serialize(), success: function(response) {
+                $('#DeleteForm').find('.form_result').html(response);
+            }});
+        });
     });
     
     </script>
 </head>
 
 <body>
+    <p><a href="/things">/things</a></p>
     
-    <form id="ContactForm" onsubmit="return submitForm();">
-        id: <input type="text" name="id" value="" /><br/> 
-        info: <input type="text" name="info" value="" /><br/> 
-        <br/>
-        <input type="submit" name="submit" value="Submit" /><br />
-        <input type="submit" name="delete" value="delete" /><br />
+    <form id="PostForm" action="/things" method="POST">
+        info: <input type="text" name="info" value="Some info" /><br/> 
+        <input type="submit" value="POST"><br><br>
+        <div class="form_result"> </div>
+    </form>
+    <form id="PutForm" >
+        id: <input type="text" name="id" value="1" /><br/> 
+        info: <input type="text" name="info" value="Hi" /><br/> 
+        <input type="button" value="PUT"><br><br>
+        <div class="form_result"> </div>
+    </form>
+    <form id="DeleteForm" >
+        id: <input type="text" name="id" value="1" /><br/> 
+        <input type="button" value="DELETE">
         <div class="form_result"> </div>
     </form>
 
