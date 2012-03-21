@@ -3,6 +3,7 @@ from architecture_support import *
 
 from bottle import route, run, template, request, response, get, post, put, delete  # easy_install -U bottle
 import thread
+import wx # for mutex under linux so can update gui via app
 
 class Server(object):
     def __init__(self, host, port):
@@ -72,15 +73,6 @@ class Server(object):
             Example: GET http://localhost:8081/things
             """
             try:
-                #response.set_header('Content-Language', 'en')
-                #print dir(response)
-                #print response.headers
-                #response.add_header('Content-Language', 'en')
-                #response.add_header('Set-Cookie', 'name2=value2')
-                #print response.headers
-                #content-type:application/x-javascript
-                #response.content_type = 'application/json'
-                #response.content_type = 'application/x-javascript'
                 return self.app.controller.CmdGetThingsAsDict()  # no need to call self.json_from_dict as bottle handles it
             except Exception, inst:
                 return report_error(inst)
@@ -108,18 +100,17 @@ class Server(object):
             Note: Is there a way to send json to the server? e.g. {"info":"thing info content here"}
             """
             try:
-                print request.headers.get('X-Requested-With')
+                print request.headers.get('X-Requested-With') # typically 'XMLHttpRequest'
                 print request.headers.get('Content-Type')
-                #if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                if request.headers.get('Content-Type') == 'application/json':
-                    print 'JSON REQUEST'
-                    print request.json
+                content_type = request.headers.get('Content-Type');
+
+                if content_type == 'application/json':
                     info = request.json["info"]
-                else:
-                    print 'FORM REQUEST'
-                    info = request.forms.get('info')
-                    
-                return self.app.controller.CmdAddThing(info)  # no need to call self.json_from_dict as bottle handles it
+                elif content_type == 'application/x-www-form-urlencoded':
+                    info = request.forms["info"]
+
+                dict = self.app.controller.CmdAddThing(info)  # no need to call self.json_from_dict as bottle handles it
+                return dict
             except Exception, inst:
                 return report_error(inst)
 
@@ -132,9 +123,9 @@ class Server(object):
                Note: Is there a way to send json to the server? e.g. {"id":1, "info":"MODIFIED info content here"}
             """
             try:
-                if request.headers.get('Content-Type') == 'application/json':
+                content_type = request.headers.get('Content-Type');
+                if content_type == 'application/json':
                     print 'JSON REQUEST'
-                    print request.json
                     id = request.json.get("id")
                     info = request.json.get("info")
                 else:
@@ -142,7 +133,8 @@ class Server(object):
                     id = request.forms.get("id")
                     info = request.forms.get("info")
 
-                return self.app.controller.CmdModifyThing(id, info)  # no need to call self.json_from_dict as bottle handles it
+                dict = self.app.controller.CmdModifyThing(id, info)  # no need to call self.json_from_dict as bottle handles it
+                return dict
             except Exception, inst:
                 return report_error(inst)
 
@@ -214,6 +206,7 @@ class Server(object):
               success     : function(response){ $('#PostForm').find('.form_result').html(response); },
               error       : function(xhr, textStatus, errorThrown){  } 
              });
+             return false;
         });
 
         $("#putjson").click(function (e) {
@@ -228,9 +221,10 @@ class Server(object):
               url         : "things",
               data        : objectAsJson, 
               processData : false,              // do not convert outbound data to string (already done)
-              success     : function(response){ $('#PostForm').find('.form_result').html(response); },
-              error       : function(xhr, textStatus, errorThrown){  } 
+              success     : function(response){ $('#PutForm').find('.form_result').html(response); },
+              error       : function(xhr, textStatus, errorThrown){ $('#PutForm').find('.form_result').html("some error"); } 
              });
+             return false;             
         });
         
     });
