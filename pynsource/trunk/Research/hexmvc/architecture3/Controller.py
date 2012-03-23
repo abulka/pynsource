@@ -48,29 +48,31 @@ class Controller():
         return "Thing id %(id)s not found" % vars()
 
     def CmdAddThing(self, info):
-        import wx # yuk
-        wx.MutexGuiEnter()  # prevent threading problems in linux
-        thing = self.model.AddThing(info) # will indirectly update wx gui
-        wx.MutexGuiLeave()
+        #import wx # yuk
+        #wx.MutexGuiEnter()  # prevent threading problems in linux
+        self.app.MainThreadMutexGuiEnter()
+        thing = self.model.AddThing(info) # will typically indirectly update a gui
+        #wx.MutexGuiLeave()
+        self.app.MainThreadMutexGuiLeave()
         if thing:
             return thing.to_dict()
         return "Couldn't create thing with info %(info)s" % vars()
 
     def CmdModifyThing(self, id, info):
-        import wx # yuk
-        wx.MutexGuiEnter()  # prevent threading problems in linux
+        #import wx # yuk
+        #wx.MutexGuiEnter()  # prevent threading problems in linux
         thing = self.model.FindThing(int(id))
-        wx.MutexGuiLeave()
+        #wx.MutexGuiLeave()
         if thing:
             self.model.AddInfoToThing(thing, info)
             return thing.to_dict()
         return "Thing id %(id)s not found" % vars()
 
     def CmdDeleteThing(self, id):
-        import wx # yuk
-        wx.MutexGuiEnter()  # prevent threading problems in linux
+        #import wx # yuk
+        #wx.MutexGuiEnter()  # prevent threading problems in linux
         thing = self.model.FindThing(int(id))
-        wx.MutexGuiLeave()
+        #wx.MutexGuiLeave()
         if thing:
             self.model.DeleteThing(thing)
             return "ok deleted"

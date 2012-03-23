@@ -46,6 +46,14 @@ class MyFormMediator(GuiFrame):
         index = max(0, index-1)
         self.m_listBox1.SetSelection(index)
         
+    # Threading
+    
+    def MainThreadMutexGuiEnter(self):
+        wx.MutexGuiEnter()
+    
+    def MainThreadMutexGuiLeave(self):
+        wx.MutexGuiLeave()
+        
     # Gui Generated Events, override the handler here
     
     def OnClose(self, event):

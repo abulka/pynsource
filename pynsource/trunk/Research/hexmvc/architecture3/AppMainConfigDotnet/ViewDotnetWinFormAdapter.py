@@ -43,6 +43,14 @@ class WinFormAdapter(MainForm):
         seturl(self._linkLabel3)
         seturl(self._linkLabel4)
 
+    # Threading
+    
+    def MainThreadMutexGuiEnter(self):
+        pass
+    
+    def MainThreadMutexGuiLeave(self):
+        pass
+        
     # Gui Generated Events, override the handler here
         
     def BtnDebug1Click(self, sender, e):

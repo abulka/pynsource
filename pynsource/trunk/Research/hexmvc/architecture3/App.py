@@ -29,10 +29,21 @@ class App(object):
     def Shutdown(self):
         self.server.StopServer()
 
-    # Some methods the app has to define itself - rather than exposing
+    # Thread control utility methods. E.g. When server thread calls in to main thread
+    # which then makes triggers a GUI update in the main thread, we need to manage this
+    # in wx under linux, and possibly other configurations.
+
+    def MainThreadMutexGuiEnter(self):
+        self.gui.MainThreadMutexGuiEnter()
+    
+    def MainThreadMutexGuiLeave(self):
+        self.gui.MainThreadMutexGuiLeave()
+
+    # Some methods/properties the app has to define itself - rather than exposing
     # ring objects to one another for such trivial stuff
 
     @property
     def url_server(self):
         return self.server.url_server
 
+    
