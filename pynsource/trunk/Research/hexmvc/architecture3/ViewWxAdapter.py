@@ -105,6 +105,7 @@ class MyFormMediator(GuiFrame):
             self.m_listBox1.Append(str(thing), thing)
 
     def MODEL_THING_ADDED(self, thing, modelsize):
+        print "MODEL_THING_ADDED"
         self.m_listBox1.Append(str(thing), thing)
 
     def MODEL_THING_UPDATE(self, thing):
@@ -114,6 +115,7 @@ class MyFormMediator(GuiFrame):
             self.m_listBox1.SetClientData(index, thing)
 
     def MODEL_THING_DELETED(self, thing):
+        print "MODEL_THING_DELETED"
         index = self._FindClientData(self.m_listBox1, thing)
         if index != wx.NOT_FOUND:
             self.m_listBox1.Delete(index)
