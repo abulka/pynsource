@@ -18,8 +18,6 @@
     <OutputType>WinExe</OutputType>
     <DebugInfo>True</DebugInfo>
     <MainFile>Program.py</MainFile>
-    <StartArguments>-X:Debug Program.py</StartArguments>
-    <StartWorkingDirectory>.\</StartWorkingDirectory>
     <StartAction>Program</StartAction>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -29,16 +27,14 @@
     <Optimize>True</Optimize>
     <OutputType>WinExe</OutputType>
     <MainFile>Program.py</MainFile>
-    <StartArguments>Program.py</StartArguments>
-    <StartWorkingDirectory>.\</StartWorkingDirectory>
     <StartAction>Program</StartAction>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="IronPython">
-      <HintPath>..\..\..\..\..\..\Program Files\SharpDevelop\4.2\AddIns\BackendBindings\PythonBinding\IronPython.dll</HintPath>
+      <HintPath>lib_andy_python\IronPython.dll</HintPath>
     </Reference>
     <Reference Include="IronPython.Modules">
-      <HintPath>..\..\..\..\..\..\Program Files\SharpDevelop\4.2\AddIns\BackendBindings\PythonBinding\IronPython.Modules.dll</HintPath>
+      <HintPath>lib_andy_python\IronPython.Modules.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
@@ -65,7 +61,6 @@
     <Compile Include="UtilRandomDotnetAdapter.py" />
     <Compile Include="ViewDotnetWinForm.py" />
     <Compile Include="Program.py" />
-    <Compile Include="ServerMockAdapter.py" />
     <Compile Include="ViewDotnetWinFormAdapter.py" />
   </ItemGroup>
   <ItemGroup>
