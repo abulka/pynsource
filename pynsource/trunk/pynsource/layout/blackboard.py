@@ -7,7 +7,17 @@ class LayoutBlackboard:
     def __init__(self, graph, controller):
         self.graph = graph
         self.controller = controller
+        #self.kill_layout = False
 
+    def stateofthespring(self):
+        pass
+
+    def kill_layout(self):
+        if not self.outer_thread.CheckContinue():
+            return True
+        else:
+            return False
+            
     def LayoutMultipleChooseBest(self, numlayouts=3):
         """
         Blackboard
@@ -20,9 +30,11 @@ class LayoutBlackboard:
         Finish at the best scale as chosen by this algorithm
         """
         self.controller.AllToLayoutCoords()    # doesn't matter what scale the layout starts with
-        layouter = GraphLayoutSpring(self.graph, gui=None)
+        layouter = GraphLayoutSpring(self.graph, gui=self)
         self.controller.snapshot_mgr.Clear()
         oriscale = self.controller.coordmapper.scale
+
+        print "ENTERING LayoutMultipleChooseBest"
 
         def ThinkAndAddSnapshot(res):
             num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = res
@@ -43,6 +55,10 @@ class LayoutBlackboard:
 
         # Generate several totally fresh layout variations
         for i in range(numlayouts):
+            
+            if not self.outer_thread.CheckContinue(progress=numlayouts-i):
+                print "exiting LayoutMultipleChooseBest"
+                return
             
             # Do a layout 
             layouter.layout(keep_current_positions=False)

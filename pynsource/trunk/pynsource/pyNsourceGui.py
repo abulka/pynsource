@@ -30,6 +30,7 @@ import shelve
 import os, stat
 from messages import *
 from gui_umlshapes import *
+import thread
 
 APP_VERSION = 1.6
 WINDOW_SIZE = (1024,768)
@@ -257,7 +258,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         #    self.ReLayout(keep_current_positions=False, gui=self, optimise=optimise)
         
         if keycode == wx.WXK_ESCAPE:
-            print "Abort Layout"
+            print "ESC key detected: Abort Layout"
             self.kill_layout = True
         
         if keycode == wx.WXK_RIGHT:
@@ -928,7 +929,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.LayoutAndPositionShapes()
         self.RedrawEverything()
 
-    def CmdDeepLayout(self):
+    def CmdDeepLayout_OFFLINE(self):
         wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
         wx.SafeYield()
         try:
@@ -936,6 +937,16 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             b.LayoutMultipleChooseBest(4)
         finally:
             wx.EndBusyCursor()
+
+    def CmdDeepLayout(self):
+        from blackboard_thread import MainBlackboardFrame
+        """Init Main App."""
+        f = MainBlackboardFrame(parent=self.frame, id=-1)
+        f.Show(True)
+        
+        b = LayoutBlackboard(graph=self.umlworkspace.graph, controller=self)
+        f.SetBlackboardObject(b)
+        print "CmdDeepLayout end"
 
     def ReLayout(self, keep_current_positions=False, gui=None, optimise=True):
         self.AllToLayoutCoords()
