@@ -21,6 +21,9 @@ class GraphLayoutSpring:
         if not keep_current_positions:
             self.layoutPrepare()
 
+        if self.gui:
+            self.gui.kill_layout = False  # initialise
+
         memento1 = self.graph.GetMementoOfLayoutPoints()
         break_pending = 0
         
@@ -31,6 +34,10 @@ class GraphLayoutSpring:
                 if self.gui:
                     self.layoutCalcBounds()         # this is the only time you need to call this explicitly since are in the MIDDLE of a layout and about to visualise
                     self.gui.stateofthespring()     # refresh gui
+                    
+                    if self.gui.kill_layout:
+                        print "Layout aborted early, due to user interrupt"
+                        break
 
             if i%20==0:
                 if optimise:

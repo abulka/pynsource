@@ -231,7 +231,8 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.coordmapper = CoordinateMapper(self.umlworkspace.graph, self.GetSize())
         self.layouter = GraphLayoutSpring(self.umlworkspace.graph, gui=self)
         self.overlap_remover = OverlapRemoval(self.umlworkspace.graph, margin=50, gui=self)
-    
+        self.kill_layout = False   # flag to communicate with layout engine.  aborting keypress in gui should set this to true
+        
     def AllToLayoutCoords(self):
         self.coordmapper.AllToLayoutCoords()
 
@@ -254,7 +255,11 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         #elif keycode == wx.WXK_UP:
         #    optimise = not event.ShiftDown()
         #    self.ReLayout(keep_current_positions=False, gui=self, optimise=optimise)
-            
+        
+        if keycode == wx.WXK_ESCAPE:
+            print "Abort Layout"
+            self.kill_layout = True
+        
         if keycode == wx.WXK_RIGHT:
             self.cmdLayoutExpand(event)
             
