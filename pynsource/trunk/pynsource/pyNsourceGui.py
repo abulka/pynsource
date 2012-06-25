@@ -508,6 +508,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         shape.Delete()
 
     def Clear(self):
+        print "Draw: Clear"
         self.GetDiagram().DeleteAllShapes()
 
         dc = wx.ClientDC(self)
@@ -852,6 +853,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             self.stateofthenation()
         
     def stage1(self, translatecoords=True):         # FROM SPRING LAYOUT
+        print "Draw: stage1"
         if translatecoords:
             self.AllToWorldCoords()
 
@@ -873,6 +875,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.Redraw222()
 
     def stage2(self, force_stateofthenation=False, watch_removals=True):
+        print "Draw: stage2 force_stateofthenation=", force_stateofthenation
         ANIMATION = False
         
         #if ANIMATION:
@@ -884,17 +887,20 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
             self.stateofthenation(animate=ANIMATION)
 
     def stateofthenation(self, animate=False):
+        print "Draw: stateofthenation"
         for node in self.umlworkspace.graph.nodes:
             self.AdjustShapePosition(node)
         self.Redraw222()
         wx.SafeYield()
 
     def stateofthespring(self):
+        print "Draw: stateofthespring"
         self.coordmapper.Recalibrate()
         self.AllToWorldCoords()
         self.stateofthenation() # DON'T do overlap removal or it will get mad!
                 
     def RedrawEverything(self):
+        print "Draw: RedrawEverything"
         diagram = self.GetDiagram()
         canvas = self
         assert self == canvas == diagram.GetCanvas()
@@ -926,6 +932,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.frame.SetSize(oldSize)
 
     def CmdLayout(self):
+        print "Draw: CmdLayout"
         #print
         #print "CmdLayout"
         #print
@@ -957,36 +964,38 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         print "CmdDeepLayout end"
 
     def ReLayout(self, keep_current_positions=False, gui=None, optimise=True):
+        print "Draw: ReLayout"
         self.AllToLayoutCoords()
         self.layouter.layout(keep_current_positions, optimise=optimise)
         self.AllToWorldCoords()
         self.stage2() # does overlap removal and stateofthenation
     
     def LayoutAndPositionShapes(self):
+        print "Draw: LayoutAndPositionShapes"
         self.ReLayout()
         return
     
-        positions, shapeslist, newdiagramsize = self.layout.Layout(self.umlworkspace, self.umlboxshapes)
-        print "Layout positions", positions
-        
-        self.setSize(newdiagramsize)
-
-        dc = wx.ClientDC(self)
-        self.PrepareDC(dc)
-
-        # Now move the shapes into place.
-        for (pos, classShape) in zip(positions, shapeslist):
-            #print pos, classShape.region1.GetText()
-            x, y = pos
-
-            # compensate for the fact that x, y for a ogl shape are the centre of the shape, not the top left
-            width, height = classShape.GetBoundingBoxMax()
-            x += width/2
-            y += height/2
-
-            classShape.Move(dc, x, y, False)
-
-        #self.umlworkspace.Dump()
+        #positions, shapeslist, newdiagramsize = self.layout.Layout(self.umlworkspace, self.umlboxshapes)
+        #print "Layout positions", positions
+        #
+        #self.setSize(newdiagramsize)
+        #
+        #dc = wx.ClientDC(self)
+        #self.PrepareDC(dc)
+        #
+        ## Now move the shapes into place.
+        #for (pos, classShape) in zip(positions, shapeslist):
+        #    #print pos, classShape.region1.GetText()
+        #    x, y = pos
+        #
+        #    # compensate for the fact that x, y for a ogl shape are the centre of the shape, not the top left
+        #    width, height = classShape.GetBoundingBoxMax()
+        #    x += width/2
+        #    y += height/2
+        #
+        #    classShape.Move(dc, x, y, False)
+        #
+        ##self.umlworkspace.Dump()
         
         
     def setSize(self, size):
@@ -1000,6 +1009,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
 
 
     def AdjustShapePosition(self, node, point=None):   # FROM SPRING LAYOUT
+        print "Draw:  AdjustShapePosition", node.left, node.top
         assert node.shape
         
         if point:
@@ -1016,6 +1026,10 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         node.shape.MoveLinks(dc)
         
     def Redraw222(self, clear=True):        # FROM SPRING LAYOUT
+        #self.RedrawEverything() # HACK
+        #return
+        
+        print "Draw: Redraw222   clear=", clear
         diagram = self.GetDiagram()
         canvas = self
         assert canvas == diagram.GetCanvas()
