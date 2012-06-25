@@ -948,11 +948,12 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
     def CmdDeepLayout(self):
         from blackboard_thread import MainBlackboardFrame
         """Init Main App."""
-        f = MainBlackboardFrame(parent=self.frame, id=-1)
+        f = MainBlackboardFrame(parent=self.frame)
         f.Show(True)
         
         b = LayoutBlackboard(graph=self.umlworkspace.graph, controller=self)
         f.SetBlackboardObject(b)
+        f.Start()
         print "CmdDeepLayout end"
 
     def ReLayout(self, keep_current_positions=False, gui=None, optimise=True):

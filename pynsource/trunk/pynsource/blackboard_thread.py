@@ -53,8 +53,10 @@ class WorkerThread(Thread):
         # need to structure your processing so that you periodically
         # peek at the abort variable
         
-        self.blackboard.outer_thread = self
-        self.blackboard.LayoutMultipleChooseBest(4)
+        if self.blackboard:
+            self.blackboard.outer_thread = self
+            self.blackboard.LayoutMultipleChooseBest(4)
+            
         if self._want_abort:
             # Use a result of None to acknowledge the abort (of
             # course you can use whatever you'd like or even
@@ -72,61 +74,125 @@ class WorkerThread(Thread):
         # Method for use by main thread to signal an abort
         self._want_abort = 1
 
+
 # GUI Frame class that spins off the worker thread
-class MainBlackboardFrame(wx.Frame):
-    """Class MainFrame."""
-    def __init__(self, parent, id):
-        """Create the MainFrame."""
-        wx.Frame.__init__(self, parent, id, 'Blackboard Layout Manager')
-
-        # Dumb sample frame with two buttons
-        wx.Button(self, ID_START, 'Start', pos=(0,0))
-        wx.Button(self, ID_STOP, 'Stop', pos=(0,50))
-        self.status = wx.StaticText(self, -1, '', pos=(0,100))
-
-        self.Bind(wx.EVT_BUTTON, self.OnStart, id=ID_START)
-        self.Bind(wx.EVT_BUTTON, self.OnStop, id=ID_STOP)
-
+from dialogs.FrameDeepLayout import FrameDeepLayout
+class MainBlackboardFrame(FrameDeepLayout):
+    
+    def __init__(self, *args, **kwargs):
+        super(MainBlackboardFrame, self).__init__(*args, **kwargs) 
+        self.InitUI()
+        
+    def InitUI(self):
+        self.status = self.m_staticText3
+        self.progressbar = self.m_gauge1
+        
         # Set up event handler for any worker thread results
         EVT_RESULT(self,self.OnResult)
 
         # And indicate we don't have a worker thread yet
         self.worker = None
-
         self.blackboard = None
-
-    def SetBlackboardObject(self, b):
-        self.blackboard = b
         
-    def OnStart(self, event):
+    def Start(self):
         """Start Computation."""
         # Trigger the worker thread unless it's already busy
         if not self.worker:
-            self.status.SetLabel('Starting computation')
+            self.status.SetLabel('Starting Layout')
             self.worker = WorkerThread(self, self.blackboard)
-
-
-    def OnStop(self, event):
+            
+    def OnCancelClick( self, event ):
+        print "got cancel"
+        
         """Stop Computation."""
         # Flag the worker thread to stop if running
         if self.worker:
-            self.status.SetLabel('Trying to abort computation')
+            self.status.SetLabel('Trying to abort')
             self.worker.abort()
+            
+        self.Destroy()
+        
+    def SetBlackboardObject(self, b):
+        self.blackboard = b
 
     def OnResult(self, event):
         """Show Result status."""
         
         if event.data is None:
             # Thread aborted (using our convention of None return)
-            self.status.SetLabel('Computation aborted')
+            self.status.SetLabel('Layout aborted')
         else:
             # Process results here
-            self.status.SetLabel('Computation Result: %s' % event.data)
+            self.status.SetLabel('Analysing layout: %s' % event.data)
+            
+            if not event.data_shouldStop:
+                #print "setting progress bar to", event.data
+                self.progressbar.SetValue(event.data)
 
         if event.data_shouldStop:
             # the worker is done
             self.worker = None
-
+            
+            self.Destroy()  # close the frame
+        
+# GUI Frame class that spins off the worker thread
+#class MainBlackboardFrame_OLD(wx.Frame):
+#    """Class MainFrame."""
+#    def __init__(self, parent):
+#        """Create the MainFrame."""
+#        wx.Frame.__init__(self, parent, wx.ID_ANY, 'Blackboard Layout Manager')
+#
+#        # Dumb sample frame with two buttons
+#        wx.Button(self, ID_START, 'Start', pos=(0,0))
+#        wx.Button(self, ID_STOP, 'Stop', pos=(0,50))
+#        self.status = wx.StaticText(self, -1, '', pos=(0,100))
+#
+#        self.Bind(wx.EVT_BUTTON, self.OnStart, id=ID_START)
+#        self.Bind(wx.EVT_BUTTON, self.OnStop, id=ID_STOP)
+#
+#        # Set up event handler for any worker thread results
+#        EVT_RESULT(self,self.OnResult)
+#
+#        # And indicate we don't have a worker thread yet
+#        self.worker = None
+#
+#        self.blackboard = None
+#
+#    def SetBlackboardObject(self, b):
+#        self.blackboard = b
+#        
+#    def Start(self):
+#        pass  # use button to start
+#    
+#    def OnStart(self, event):
+#        """Start Computation."""
+#        # Trigger the worker thread unless it's already busy
+#        if not self.worker:
+#            self.status.SetLabel('Starting computation')
+#            self.worker = WorkerThread(self, self.blackboard)
+#
+#
+#    def OnStop(self, event):
+#        """Stop Computation."""
+#        # Flag the worker thread to stop if running
+#        if self.worker:
+#            self.status.SetLabel('Trying to abort computation')
+#            self.worker.abort()
+#
+#    def OnResult(self, event):
+#        """Show Result status."""
+#        
+#        if event.data is None:
+#            # Thread aborted (using our convention of None return)
+#            self.status.SetLabel('Computation aborted')
+#        else:
+#            # Process results here
+#            self.status.SetLabel('Computation Result: %s' % event.data)
+#
+#        if event.data_shouldStop:
+#            # the worker is done
+#            self.worker = None
+#
 
 
 
@@ -136,7 +202,7 @@ if __name__ == '__main__':
         """Class Main App."""
         def OnInit(self):
             """Init Main App."""
-            self.frame = MainBlackboardFrame(None, -1)
+            self.frame = MainBlackboardFrame(None)
             self.frame.Show(True)
             self.SetTopWindow(self.frame)
             return True

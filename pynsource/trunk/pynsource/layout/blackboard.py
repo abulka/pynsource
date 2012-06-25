@@ -7,16 +7,9 @@ class LayoutBlackboard(object):
     def __init__(self, graph, controller):
         self.graph = graph
         self.controller = controller
-        #self.kill_layout = False
 
     def stateofthespring(self):
         pass
-
-    #def kill_layout(self):
-    #    if not self.outer_thread.CheckContinue():
-    #        return True
-    #    else:
-    #        return False
 
     @property
     def kill_layout(self):
@@ -66,7 +59,7 @@ class LayoutBlackboard(object):
         # Generate several totally fresh layout variations
         for i in range(numlayouts):
             
-            if not self.outer_thread.CheckContinue(progress=numlayouts-i):
+            if not self.outer_thread.CheckContinue(progress=i):
                 print "exiting LayoutMultipleChooseBest"
                 return
             
