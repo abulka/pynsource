@@ -17,7 +17,7 @@ import wx.xrc
 class FrameDeepLayout ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Layout Progress", pos = wx.DefaultPosition, size = wx.Size( 260,159 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Layout Progress", pos = wx.DefaultPosition, size = wx.Size( 274,228 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
@@ -26,7 +26,7 @@ class FrameDeepLayout ( wx.Frame ):
 		
 		bSizer1.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
 		
-		self.m_gauge1 = wx.Gauge( self, wx.ID_ANY, 3, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
+		self.m_gauge1 = wx.Gauge( self, wx.ID_ANY, 4, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
 		self.m_gauge1.SetValue( 1 ) 
 		bSizer1.Add( self.m_gauge1, 0, wx.ALL|wx.EXPAND, 5 )
 		
@@ -34,13 +34,21 @@ class FrameDeepLayout ( wx.Frame ):
 		bSizer1.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
 		
 		self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText3.Wrap( -1 )
-		self.m_staticText3.SetFont( wx.Font( 10, 74, 90, 92, False, "Tahoma" ) )
+		self.m_staticText3.Wrap( 1 )
+		self.m_staticText3.SetFont( wx.Font( 8, 74, 90, 92, False, "Tahoma" ) )
 		
 		bSizer1.Add( self.m_staticText3, 0, wx.ALL, 5 )
 		
-		self.m_button1 = wx.Button( self, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer1.Add( self.m_button1, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+		self.m_textCtrl1 = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY )
+		self.m_textCtrl1.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_APPWORKSPACE ) )
+		
+		bSizer1.Add( self.m_textCtrl1, 25, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		bSizer1.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.btnCancelClose = wx.Button( self, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer1.Add( self.btnCancelClose, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 		
 		
 		self.SetSizer( bSizer1 )
@@ -49,7 +57,7 @@ class FrameDeepLayout ( wx.Frame ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
-		self.m_button1.Bind( wx.EVT_BUTTON, self.OnCancelClick )
+		self.btnCancelClose.Bind( wx.EVT_BUTTON, self.OnCancelClick )
 	
 	def __del__( self ):
 		pass

@@ -37,8 +37,6 @@ class LayoutBlackboard(object):
         self.controller.snapshot_mgr.Clear()
         oriscale = self.controller.coordmapper.scale
 
-        print "ENTERING LayoutMultipleChooseBest"
-
         def ThinkAndAddSnapshot(res):
             num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = res
 
@@ -59,25 +57,26 @@ class LayoutBlackboard(object):
         # Generate several totally fresh layout variations
         for i in range(numlayouts):
             
-            if not self.outer_thread.CheckContinue(progress=i):
-                print "exiting LayoutMultipleChooseBest"
-                return
+            progress_val = i+1 # range is 1..n inclusive whereas for loop is 0..n-1 excluding n, so adjust by adding 1 for visual progress
+            if not self.outer_thread.CheckContinue(statusmsg="Layout #%d of %d" % (progress_val, numlayouts), progress=progress_val):
+                break
             
             # Do a layout
-            print "layout"
+            self.outer_thread.Log("spring layout started")
             layouter.layout(keep_current_positions=False)
-            print "  EXIT layout"
+            self.outer_thread.Log("layout done")
 
-            if not self.outer_thread.CheckContinue(): return
-            
+            if not self.outer_thread.CheckContinue(logmsg="GetVitalStats"): break
+
             # Expand directly to the original scale, and calc vitals stats
             res = self.GetVitalStats(scale=oriscale, animate=False)
             ThinkAndAddSnapshot(res)
             
             if res[0] == 0 and res[2] <= 0:     # LL crossings solved and LN reasonable, so optimise and break - save time
+                self.outer_thread.Log("LL crossings solved and LN reasonable, so optimise and break - save time")
                 break
 
-            if not self.outer_thread.CheckContinue(): return
+            if not self.outer_thread.CheckContinue(logmsg="ScaleUpMadly"): break
 
             # Expand progressively from small to large scale, and calc vitals stats
             # This can be SLOW
@@ -255,7 +254,7 @@ class LayoutBlackboard(object):
             
             num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = res
 
-            if not self.outer_thread.CheckContinue():
+            if not self.outer_thread.CheckContinue(logmsg="Scale test %d"%i):
                 break
             
             if strategy == ":reduce pre overlap removal NN overlaps":

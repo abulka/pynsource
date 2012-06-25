@@ -953,7 +953,7 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         
         b = LayoutBlackboard(graph=self.umlworkspace.graph, controller=self)
         f.SetBlackboardObject(b)
-        f.Start()
+        f.Start(num_attempts=3)
         print "CmdDeepLayout end"
 
     def ReLayout(self, keep_current_positions=False, gui=None, optimise=True):

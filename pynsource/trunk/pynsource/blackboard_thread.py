@@ -18,34 +18,41 @@ def EVT_RESULT(win, func):
 
 class ResultEvent(wx.PyEvent):
     """Simple event to carry arbitrary result data."""
-    def __init__(self, data, data_shouldStop):
+    def __init__(self, statusmsg=None, logmsg=None, progress=-1, shouldStop=False):
         """Init Result Event."""
         wx.PyEvent.__init__(self)
         self.SetEventType(EVT_RESULT_ID)
-        self.data = data
-        self.data_shouldStop = data_shouldStop
+        
+        self.logmsg = logmsg
+        self.statusmsg = statusmsg
+        self.progress = progress
+        self.shouldStop = shouldStop
 
 # Thread class that executes processing
 class WorkerThread(Thread):
     """Worker Thread Class."""
-    def __init__(self, notify_window, blackboard):
+    def __init__(self, notify_window, blackboard, num_attempts):
         """Init Worker Thread Class."""
         Thread.__init__(self)
         self._notify_window = notify_window
-        self._want_abort = 0
+        self._want_abort = False
         self.blackboard = blackboard
+        self.NUM_BLACKBOARD_ATTEMPTS = num_attempts
         # This starts the thread running on creation, but you could
         # also make the GUI thread responsible for calling this
         self.start()
 
-    def CheckContinue(self, progress=None):
+    def Log(self, logmsg):
+        wx.PostEvent(self._notify_window, ResultEvent(logmsg=logmsg))
+        
+    def CheckContinue(self, statusmsg=None, logmsg=None, progress=-1):
         if self._want_abort:
             return False
         else:
-            if progress:
-                wx.PostEvent(self._notify_window, ResultEvent(progress, data_shouldStop=False))
+            wx.PostEvent(self._notify_window, ResultEvent(statusmsg, logmsg, progress))
             return True
-    
+    #def GoodHalt(self):
+        
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread. Simulation of
@@ -55,24 +62,24 @@ class WorkerThread(Thread):
         
         if self.blackboard:
             self.blackboard.outer_thread = self
-            self.blackboard.LayoutMultipleChooseBest(4)
+            self.blackboard.LayoutMultipleChooseBest(numlayouts=self.NUM_BLACKBOARD_ATTEMPTS)
             
         if self._want_abort:
-            # Use a result of None to acknowledge the abort (of
-            # course you can use whatever you'd like or even
+            # Use a result with shouldStop set to true
+            # to acknowledge the abort 
+            # (of course you can use whatever you'd like or even
             # a separate event type)
-            wx.PostEvent(self._notify_window, ResultEvent(None, data_shouldStop=True))
+            wx.PostEvent(self._notify_window, ResultEvent(statusmsg="Layout aborted", shouldStop=True))
             return
         
-        # Here's where the result would be returned (this is an
-        # example fixed result of the number 10, but it could be
-        # any Python object)
-        wx.PostEvent(self._notify_window, ResultEvent("Layout complete", data_shouldStop=True))
+        # Here's where the result would be returned
+        wx.PostEvent(self._notify_window, ResultEvent(statusmsg="Layout complete", progress=self.NUM_BLACKBOARD_ATTEMPTS+1, shouldStop=True))
+        #self.GoodHalt()
 
     def abort(self):
         """abort worker thread."""
         # Method for use by main thread to signal an abort
-        self._want_abort = 1
+        self._want_abort = True
 
 
 # GUI Frame class that spins off the worker thread
@@ -87,6 +94,8 @@ class MainBlackboardFrame(FrameDeepLayout):
         self.status = self.m_staticText3
         self.progressbar = self.m_gauge1
         
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
+        
         # Set up event handler for any worker thread results
         EVT_RESULT(self,self.OnResult)
 
@@ -94,46 +103,58 @@ class MainBlackboardFrame(FrameDeepLayout):
         self.worker = None
         self.blackboard = None
         
-    def Start(self):
+    def Start(self, num_attempts):
+        self.progressbar.SetRange(num_attempts)
+        self.progressbar.SetValue(1)  # range is 0..num_attempts inclusive. 0 shows no progress.
+        
         """Start Computation."""
         # Trigger the worker thread unless it's already busy
         if not self.worker:
             self.status.SetLabel('Starting Layout')
-            self.worker = WorkerThread(self, self.blackboard)
-            
-    def OnCancelClick( self, event ):
-        print "got cancel"
-        
+            self.worker = WorkerThread(self, self.blackboard, num_attempts)
+
+    def StopComputation(self):
         """Stop Computation."""
         # Flag the worker thread to stop if running
         if self.worker:
             self.status.SetLabel('Trying to abort')
             self.worker.abort()
-            
-        self.Destroy()
+        
+    def OnClose( self, event ):
+        self.StopComputation()
+        wx.FutureCall(500, self.Destroy)
+
+    def OnCancelClick( self, event ):
+        if self.btnCancelClose.GetLabel() == 'Close':
+            self.Destroy()
+        self.StopComputation()
+        self.btnCancelClose.SetLabel('Close')
         
     def SetBlackboardObject(self, b):
         self.blackboard = b
 
     def OnResult(self, event):
         """Show Result status."""
-        
-        if event.data is None:
-            # Thread aborted (using our convention of None return)
-            self.status.SetLabel('Layout aborted')
-        else:
-            # Process results here
-            self.status.SetLabel('Analysing layout: %s' % event.data)
-            
-            if not event.data_shouldStop:
-                #print "setting progress bar to", event.data
-                self.progressbar.SetValue(event.data)
 
-        if event.data_shouldStop:
+        def log(msg):
+            self.m_textCtrl1.AppendText(msg + "\n")
+            
+        if event.logmsg:
+            log(event.logmsg)
+
+        if event.statusmsg:
+            self.status.SetLabel(event.statusmsg)
+            log("** " + event.statusmsg)
+
+        if event.progress <> -1:
+            self.progressbar.SetValue(event.progress)
+        
+        if event.shouldStop:
             # the worker is done
             self.worker = None
             
-            self.Destroy()  # close the frame
+            self.btnCancelClose.SetLabel('Close')
+            #self.Destroy()  # auto close the frame
         
 # GUI Frame class that spins off the worker thread
 #class MainBlackboardFrame_OLD(wx.Frame):
