@@ -3,7 +3,7 @@
 from graph import Graph
 from layout_spring import GraphLayoutSpring
 
-class LayoutBlackboard:
+class LayoutBlackboard(object):
     def __init__(self, graph, controller):
         self.graph = graph
         self.controller = controller
@@ -12,12 +12,22 @@ class LayoutBlackboard:
     def stateofthespring(self):
         pass
 
+    #def kill_layout(self):
+    #    if not self.outer_thread.CheckContinue():
+    #        return True
+    #    else:
+    #        return False
+
+    @property
     def kill_layout(self):
         if not self.outer_thread.CheckContinue():
             return True
         else:
             return False
-            
+    @kill_layout.setter
+    def kill_layout(self, value):
+      pass
+          
     def LayoutMultipleChooseBest(self, numlayouts=3):
         """
         Blackboard
@@ -60,8 +70,12 @@ class LayoutBlackboard:
                 print "exiting LayoutMultipleChooseBest"
                 return
             
-            # Do a layout 
+            # Do a layout
+            print "layout"
             layouter.layout(keep_current_positions=False)
+            print "  EXIT layout"
+
+            if not self.outer_thread.CheckContinue(): return
             
             # Expand directly to the original scale, and calc vitals stats
             res = self.GetVitalStats(scale=oriscale, animate=False)
@@ -70,7 +84,10 @@ class LayoutBlackboard:
             if res[0] == 0 and res[2] <= 0:     # LL crossings solved and LN reasonable, so optimise and break - save time
                 break
 
+            if not self.outer_thread.CheckContinue(): return
+
             # Expand progressively from small to large scale, and calc vitals stats
+            # This can be SLOW
             res = self.ScaleUpMadly(strategy=":reduce post overlap removal LN crossings")
             ThinkAndAddSnapshot(res)
                 
@@ -240,10 +257,14 @@ class LayoutBlackboard:
         
         self.controller.coordmapper.Recalibrate(scale=SCALE_START)
         for i in range(15):
+            
             res = self.GetVitalStats(scale=self.controller.coordmapper.scale - SCALE_STEP, animate=animate)
             
             num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = res
 
+            if not self.outer_thread.CheckContinue():
+                break
+            
             if strategy == ":reduce pre overlap removal NN overlaps":
                 if num_node_node_overlaps <= ACCEPTABLE_NODE_NODE_PRE_REMOVAL:
                     #print "Mad: Aborting expansion since num NN overlaps <= %d" % ACCEPTABLE_NODE_NODE_PRE_REMOVAL

@@ -232,8 +232,15 @@ class UmlShapeCanvas(ogl.ShapeCanvas):
         self.coordmapper = CoordinateMapper(self.umlworkspace.graph, self.GetSize())
         self.layouter = GraphLayoutSpring(self.umlworkspace.graph, gui=self)
         self.overlap_remover = OverlapRemoval(self.umlworkspace.graph, margin=50, gui=self)
-        self.kill_layout = False   # flag to communicate with layout engine.  aborting keypress in gui should set this to true
-        
+        self._kill_layout = False   # flag to communicate with layout engine.  aborting keypress in gui should set this to true
+
+        @property
+        def kill_layout(self):
+          return self._kill_layout
+        @kill_layout.setter
+        def kill_layout(self, value):
+          self._kill_layout = value
+    
     def AllToLayoutCoords(self):
         self.coordmapper.AllToLayoutCoords()
 
