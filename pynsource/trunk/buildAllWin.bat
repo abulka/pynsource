@@ -13,6 +13,7 @@ REM remember to run "svn update" before running this in order to get the correct
 svn info > build.txt
 
 REM goto step3
+goto step3
 
 :step1
 REM Build source distribution via setup tools exe
