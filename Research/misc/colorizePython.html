@@ -1,0 +1,125 @@
+<pre><font face="Lucida,Courier New"><font color="#004080">"""
+    MoinMoin - Python Source Parser
+"""</font>
+
+<font color="#008000"># Imports
+</font><font color="#C00000">import</font> <font color="#000000">cgi</font><font color="#0000C0">,</font> <font color="#000000">string</font><font color="#0000C0">,</font> <font color="#000000">sys</font><font color="#0000C0">,</font> <font color="#000000">cStringIO</font>
+<font color="#C00000">import</font> <font color="#000000">keyword</font><font color="#0000C0">,</font> <font color="#000000">token</font><font color="#0000C0">,</font> <font color="#000000">tokenize</font>
+
+
+<font color="#008000">#############################################################################
+</font><font color="#008000">### Python Source Parser (does Hilighting)
+</font><font color="#008000">#############################################################################
+</font>
+<font color="#000000">_KEYWORD</font> <font color="#0000C0">=</font> <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">NT_OFFSET</font> <font color="#0000C0">+</font> <font color="#0080C0">1</font>
+<font color="#000000">_TEXT</font>    <font color="#0000C0">=</font> <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">NT_OFFSET</font> <font color="#0000C0">+</font> <font color="#0080C0">2</font>
+
+<font color="#000000">_colors</font> <font color="#0000C0">=</font> <font color="#0000C0">{</font>
+    <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">NUMBER</font><font color="#0000C0">:</font>       <font color="#004080">'#0080C0'</font><font color="#0000C0">,</font>
+    <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">OP</font><font color="#0000C0">:</font>           <font color="#004080">'#0000C0'</font><font color="#0000C0">,</font>
+    <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">STRING</font><font color="#0000C0">:</font>       <font color="#004080">'#004080'</font><font color="#0000C0">,</font>
+    <font color="#000000">tokenize</font><font color="#0000C0">.</font><font color="#000000">COMMENT</font><font color="#0000C0">:</font>   <font color="#004080">'#008000'</font><font color="#0000C0">,</font>
+    <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">NAME</font><font color="#0000C0">:</font>         <font color="#004080">'#000000'</font><font color="#0000C0">,</font>
+    <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">ERRORTOKEN</font><font color="#0000C0">:</font>   <font color="#004080">'#FF8080'</font><font color="#0000C0">,</font>
+    <font color="#000000">_KEYWORD</font><font color="#0000C0">:</font>           <font color="#004080">'#C00000'</font><font color="#0000C0">,</font>
+    <font color="#000000">_TEXT</font><font color="#0000C0">:</font>              <font color="#004080">'#000000'</font><font color="#0000C0">,</font>
+<font color="#0000C0">}</font>
+
+
+<font color="#C00000">class</font> <font color="#000000">Parser</font><font color="#0000C0">:</font>
+    <font color="#004080">""" Send colored python source.
+    """</font>
+
+    <font color="#C00000">def</font> <font color="#000000">__init__</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">,</font> <font color="#000000">raw</font><font color="#0000C0">,</font> <font color="#000000">out</font> <font color="#0000C0">=</font> <font color="#000000">sys</font><font color="#0000C0">.</font><font color="#000000">stdout</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#004080">""" Store the source text.
+        """</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">raw</font> <font color="#0000C0">=</font> <font color="#000000">string</font><font color="#0000C0">.</font><font color="#000000">strip</font><font color="#0000C0">(</font><font color="#000000">string</font><font color="#0000C0">.</font><font color="#000000">expandtabs</font><font color="#0000C0">(</font><font color="#000000">raw</font><font color="#0000C0">)</font><font color="#0000C0">)</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">out</font> <font color="#0000C0">=</font> <font color="#000000">out</font>
+
+    <font color="#C00000">def</font> <font color="#000000">format</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">,</font> <font color="#000000">formatter</font><font color="#0000C0">,</font> <font color="#000000">form</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#004080">""" Parse and send the colored source.
+        """</font>
+        <font color="#008000"># store line offsets in self.lines
+</font>        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">lines</font> <font color="#0000C0">=</font> <font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">,</font> <font color="#0080C0">0</font><font color="#0000C0">]</font>
+        <font color="#000000">pos</font> <font color="#0000C0">=</font> <font color="#0080C0">0</font>
+        <font color="#C00000">while</font> <font color="#0080C0">1</font><font color="#0000C0">:</font>
+            <font color="#000000">pos</font> <font color="#0000C0">=</font> <font color="#000000">string</font><font color="#0000C0">.</font><font color="#000000">find</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">raw</font><font color="#0000C0">,</font> <font color="#004080">'\n'</font><font color="#0000C0">,</font> <font color="#000000">pos</font><font color="#0000C0">)</font> <font color="#0000C0">+</font> <font color="#0080C0">1</font>
+            <font color="#C00000">if</font> <font color="#C00000">not</font> <font color="#000000">pos</font><font color="#0000C0">:</font> <font color="#C00000">break</font>
+            <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">lines</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font><font color="#000000">pos</font><font color="#0000C0">)</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">lines</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font><font color="#000000">len</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">raw</font><font color="#0000C0">)</font><font color="#0000C0">)</font>
+
+        <font color="#008000"># parse the source and write it
+</font>        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">pos</font> <font color="#0000C0">=</font> <font color="#0080C0">0</font>
+        <font color="#000000">text</font> <font color="#0000C0">=</font> <font color="#000000">cStringIO</font><font color="#0000C0">.</font><font color="#000000">StringIO</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">raw</font><font color="#0000C0">)</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">out</font><font color="#0000C0">.</font><font color="#000000">write</font><font color="#0000C0">(</font><font color="#004080">'&lt;pre&gt;&lt;font face="Lucida,Courier New"&gt;'</font><font color="#0000C0">)</font>
+        <font color="#C00000">try</font><font color="#0000C0">:</font>
+            <font color="#000000">tokenize</font><font color="#0000C0">.</font><font color="#000000">tokenize</font><font color="#0000C0">(</font><font color="#000000">text</font><font color="#0000C0">.</font><font color="#000000">readline</font><font color="#0000C0">,</font> <font color="#000000">self</font><font color="#0000C0">)</font>
+        <font color="#C00000">except</font> <font color="#000000">tokenize</font><font color="#0000C0">.</font><font color="#000000">TokenError</font><font color="#0000C0">,</font> <font color="#000000">ex</font><font color="#0000C0">:</font>
+            <font color="#000000">msg</font> <font color="#0000C0">=</font> <font color="#000000">ex</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font>
+            <font color="#000000">line</font> <font color="#0000C0">=</font> <font color="#000000">ex</font><font color="#0000C0">[</font><font color="#0080C0">1</font><font color="#0000C0">]</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font>
+            <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">out</font><font color="#0000C0">.</font><font color="#000000">write</font><font color="#0000C0">(</font><font color="#004080">"&lt;h3&gt;ERROR: %s&lt;/h3&gt;%s\n"</font> <font color="#0000C0">%</font> <font color="#0000C0">(</font>
+                <font color="#000000">msg</font><font color="#0000C0">,</font> <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">raw</font><font color="#0000C0">[</font><font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">lines</font><font color="#0000C0">[</font><font color="#000000">line</font><font color="#0000C0">]</font><font color="#0000C0">:</font><font color="#0000C0">]</font><font color="#0000C0">)</font><font color="#0000C0">)</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">out</font><font color="#0000C0">.</font><font color="#000000">write</font><font color="#0000C0">(</font><font color="#004080">'&lt;/font&gt;&lt;/pre&gt;'</font><font color="#0000C0">)</font>
+
+    <font color="#C00000">def</font> <font color="#000000">__call__</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">,</font> <font color="#000000">toktype</font><font color="#0000C0">,</font> <font color="#000000">toktext</font><font color="#0000C0">,</font> <font color="#0000C0">(</font><font color="#000000">srow</font><font color="#0000C0">,</font><font color="#000000">scol</font><font color="#0000C0">)</font><font color="#0000C0">,</font> <font color="#0000C0">(</font><font color="#000000">erow</font><font color="#0000C0">,</font><font color="#000000">ecol</font><font color="#0000C0">)</font><font color="#0000C0">,</font> <font color="#000000">line</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#004080">""" Token handler.
+        """</font>
+        <font color="#C00000">if</font> <font color="#0080C0">0</font><font color="#0000C0">:</font>
+            <font color="#C00000">print</font> <font color="#004080">"type"</font><font color="#0000C0">,</font> <font color="#000000">toktype</font><font color="#0000C0">,</font> <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">tok_name</font><font color="#0000C0">[</font><font color="#000000">toktype</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#004080">"text"</font><font color="#0000C0">,</font> <font color="#000000">toktext</font><font color="#0000C0">,</font>
+            <font color="#C00000">print</font> <font color="#004080">"start"</font><font color="#0000C0">,</font> <font color="#000000">srow</font><font color="#0000C0">,</font><font color="#000000">scol</font><font color="#0000C0">,</font> <font color="#004080">"end"</font><font color="#0000C0">,</font> <font color="#000000">erow</font><font color="#0000C0">,</font><font color="#000000">ecol</font><font color="#0000C0">,</font> <font color="#004080">"&lt;br&gt;"</font>
+
+        <font color="#008000"># calculate new positions
+</font>        <font color="#000000">oldpos</font> <font color="#0000C0">=</font> <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">pos</font>
+        <font color="#000000">newpos</font> <font color="#0000C0">=</font> <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">lines</font><font color="#0000C0">[</font><font color="#000000">srow</font><font color="#0000C0">]</font> <font color="#0000C0">+</font> <font color="#000000">scol</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">pos</font> <font color="#0000C0">=</font> <font color="#000000">newpos</font> <font color="#0000C0">+</font> <font color="#000000">len</font><font color="#0000C0">(</font><font color="#000000">toktext</font><font color="#0000C0">)</font>
+
+        <font color="#008000"># handle newlines
+</font>        <font color="#C00000">if</font> <font color="#000000">toktype</font> <font color="#C00000">in</font> <font color="#0000C0">[</font><font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">NEWLINE</font><font color="#0000C0">,</font> <font color="#000000">tokenize</font><font color="#0000C0">.</font><font color="#000000">NL</font><font color="#0000C0">]</font><font color="#0000C0">:</font>
+            <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">out</font><font color="#0000C0">.</font><font color="#000000">write</font><font color="#0000C0">(</font><font color="#004080">'\n'</font><font color="#0000C0">)</font>
+            <font color="#C00000">return</font>
+
+        <font color="#008000"># send the original whitespace, if needed
+</font>        <font color="#C00000">if</font> <font color="#000000">newpos</font> <font color="#0000C0">&gt;</font> <font color="#000000">oldpos</font><font color="#0000C0">:</font>
+            <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">out</font><font color="#0000C0">.</font><font color="#000000">write</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">raw</font><font color="#0000C0">[</font><font color="#000000">oldpos</font><font color="#0000C0">:</font><font color="#000000">newpos</font><font color="#0000C0">]</font><font color="#0000C0">)</font>
+
+        <font color="#008000"># skip indenting tokens
+</font>        <font color="#C00000">if</font> <font color="#000000">toktype</font> <font color="#C00000">in</font> <font color="#0000C0">[</font><font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">INDENT</font><font color="#0000C0">,</font> <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">DEDENT</font><font color="#0000C0">]</font><font color="#0000C0">:</font>
+            <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">pos</font> <font color="#0000C0">=</font> <font color="#000000">newpos</font>
+            <font color="#C00000">return</font>
+
+        <font color="#008000"># map token type to a color group
+</font>        <font color="#C00000">if</font> <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">LPAR</font> <font color="#0000C0">&lt;=</font> <font color="#000000">toktype</font> <font color="#C00000">and</font> <font color="#000000">toktype</font> <font color="#0000C0">&lt;=</font> <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">OP</font><font color="#0000C0">:</font>
+            <font color="#000000">toktype</font> <font color="#0000C0">=</font> <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">OP</font>
+        <font color="#C00000">elif</font> <font color="#000000">toktype</font> <font color="#0000C0">==</font> <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">NAME</font> <font color="#C00000">and</font> <font color="#000000">keyword</font><font color="#0000C0">.</font><font color="#000000">iskeyword</font><font color="#0000C0">(</font><font color="#000000">toktext</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+            <font color="#000000">toktype</font> <font color="#0000C0">=</font> <font color="#000000">_KEYWORD</font>
+        <font color="#000000">color</font> <font color="#0000C0">=</font> <font color="#000000">_colors</font><font color="#0000C0">.</font><font color="#000000">get</font><font color="#0000C0">(</font><font color="#000000">toktype</font><font color="#0000C0">,</font> <font color="#000000">_colors</font><font color="#0000C0">[</font><font color="#000000">_TEXT</font><font color="#0000C0">]</font><font color="#0000C0">)</font>
+
+        <font color="#000000">style</font> <font color="#0000C0">=</font> <font color="#004080">''</font>
+        <font color="#C00000">if</font> <font color="#000000">toktype</font> <font color="#0000C0">==</font> <font color="#000000">token</font><font color="#0000C0">.</font><font color="#000000">ERRORTOKEN</font><font color="#0000C0">:</font>
+            <font color="#000000">style</font> <font color="#0000C0">=</font> <font color="#004080">' style="border: solid 1.5pt #FF0000;"'</font>
+
+        <font color="#008000"># send text
+</font>        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">out</font><font color="#0000C0">.</font><font color="#000000">write</font><font color="#0000C0">(</font><font color="#004080">'&lt;font color="%s"%s&gt;'</font> <font color="#0000C0">%</font> <font color="#0000C0">(</font><font color="#000000">color</font><font color="#0000C0">,</font> <font color="#000000">style</font><font color="#0000C0">)</font><font color="#0000C0">)</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">out</font><font color="#0000C0">.</font><font color="#000000">write</font><font color="#0000C0">(</font><font color="#000000">cgi</font><font color="#0000C0">.</font><font color="#000000">escape</font><font color="#0000C0">(</font><font color="#000000">toktext</font><font color="#0000C0">)</font><font color="#0000C0">)</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">out</font><font color="#0000C0">.</font><font color="#000000">write</font><font color="#0000C0">(</font><font color="#004080">'&lt;/font&gt;'</font><font color="#0000C0">)</font>
+
+
+<font color="#C00000">if</font> <font color="#000000">__name__</font> <font color="#0000C0">==</font> <font color="#004080">"__main__"</font><font color="#0000C0">:</font>
+    <font color="#C00000">import</font> <font color="#000000">os</font><font color="#0000C0">,</font> <font color="#000000">sys</font>
+    <font color="#000000">FILENAME</font> <font color="#0000C0">=</font> <font color="#004080">'colorizePython'</font>
+    <font color="#000000">FILENAME_PY</font> <font color="#0000C0">=</font> <font color="#000000">FILENAME</font><font color="#0000C0">+</font><font color="#004080">'.py'</font>
+    <font color="#000000">FILENAME_HTML</font> <font color="#0000C0">=</font> <font color="#000000">FILENAME</font><font color="#0000C0">+</font><font color="#004080">'.html'</font>
+
+    <font color="#C00000">print</font> <font color="#004080">"Formatting..."</font>
+
+    <font color="#008000"># open own source
+</font>    <font color="#000000">source</font> <font color="#0000C0">=</font> <font color="#000000">open</font><font color="#0000C0">(</font><font color="#000000">FILENAME_PY</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">read</font><font color="#0000C0">(</font><font color="#0000C0">)</font>
+
+    <font color="#008000"># write colorized version to "python.html"
+</font>    <font color="#000000">Parser</font><font color="#0000C0">(</font><font color="#000000">source</font><font color="#0000C0">,</font> <font color="#000000">open</font><font color="#0000C0">(</font><font color="#000000">FILENAME_HTML</font><font color="#0000C0">,</font> <font color="#004080">'wt'</font><font color="#0000C0">)</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">format</font><font color="#0000C0">(</font><font color="#000000">None</font><font color="#0000C0">,</font> <font color="#000000">None</font><font color="#0000C0">)</font>
+
+    <font color="#008000"># load HTML page into browser
+</font>    <font color="#C00000">if</font> <font color="#000000">os</font><font color="#0000C0">.</font><font color="#000000">name</font> <font color="#0000C0">==</font> <font color="#004080">"nt"</font><font color="#0000C0">:</font>
+        <font color="#000000">os</font><font color="#0000C0">.</font><font color="#000000">system</font><font color="#0000C0">(</font><font color="#004080">"explorer "</font> <font color="#0000C0">+</font> <font color="#000000">FILENAME_HTML</font><font color="#0000C0">)</font>
+    <font color="#C00000">else</font><font color="#0000C0">:</font>
+        <font color="#000000">os</font><font color="#0000C0">.</font><font color="#000000">system</font><font color="#0000C0">(</font><font color="#004080">"netscape "</font> <font color="#0000C0">+</font>  <font color="#0000C0">+</font> <font color="#000000">FILENAME_HTML</font> <font color="#0000C0">+</font> <font color="#004080">" &amp;"</font><font color="#0000C0">)</font><font color="#000000"></font></font></pre>

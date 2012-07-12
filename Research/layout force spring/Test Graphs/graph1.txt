@@ -1,0 +1,29 @@
+{'type':'node', 'id':'A', 'x':208, 'y':162, 'width':250, 'height':250}
+{'type':'node', 'id':'A1', 'x':234, 'y':19, 'width':60, 'height':60}
+{'type':'node', 'id':'A2', 'x':77, 'y':165, 'width':60, 'height':60}
+{'type':'node', 'id':'B', 'x':84, 'y':86, 'width':60, 'height':60}
+{'type':'node', 'id':'B1', 'x':10, 'y':10, 'width':60, 'height':60}
+{'type':'node', 'id':'B2', 'x':143, 'y':184, 'width':60, 'height':60}
+{'type':'node', 'id':'B21', 'x':289, 'y':97, 'width':60, 'height':60}
+{'type':'node', 'id':'B22', 'x':86, 'y':263, 'width':100, 'height':200}
+{'type':'node', 'id':'c', 'x':336, 'y':417, 'width':60, 'height':60}
+{'type':'node', 'id':'c1', 'x':191, 'y':417, 'width':60, 'height':60}
+{'type':'node', 'id':'c2', 'x':271, 'y':417, 'width':60, 'height':60}
+{'type':'node', 'id':'c3', 'x':401, 'y':417, 'width':60, 'height':60}
+{'type':'node', 'id':'c4', 'x':463, 'y':242, 'width':60, 'height':60}
+{'type':'node', 'id':'c5', 'x':463, 'y':117, 'width':60, 'height':120}
+{'type':'edge', 'id':'A_to_A1', 'source':'A', 'target':'A1'}
+{'type':'edge', 'id':'A_to_A2', 'source':'A', 'target':'A2'}
+{'type':'edge', 'id':'B_to_B1', 'source':'B', 'target':'B1'}
+{'type':'edge', 'id':'B_to_B2', 'source':'B', 'target':'B2'}
+{'type':'edge', 'id':'B2_to_B21', 'source':'B2', 'target':'B21'}
+{'type':'edge', 'id':'B2_to_B22', 'source':'B2', 'target':'B22'}
+{'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1'}
+{'type':'edge', 'id':'c_to_c2', 'source':'c', 'target':'c2'}
+{'type':'edge', 'id':'c_to_c3', 'source':'c', 'target':'c3'}
+{'type':'edge', 'id':'c_to_c4', 'source':'c', 'target':'c4'}
+{'type':'edge', 'id':'c_to_c5', 'source':'c', 'target':'c5'}
+{'type':'edge', 'id':'A_to_c', 'source':'A', 'target':'c'}
+{'type':'edge', 'id':'B2_to_c', 'source':'B2', 'target':'c'}
+{'type':'edge', 'id':'B2_to_c5', 'source':'B2', 'target':'c5'}
+{'type':'edge', 'id':'A_to_c5', 'source':'A', 'target':'c5'}

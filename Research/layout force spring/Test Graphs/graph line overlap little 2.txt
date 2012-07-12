@@ -1,0 +1,6 @@
+{'type':'node', 'id':'A', 'x':3, 'y':12, 'width':84, 'height':126}
+{'type':'node', 'id':'B', 'x':167, 'y':11, 'width':157, 'height':79}
+{'type':'node', 'id':'C', 'x':21, 'y':228, 'width':288, 'height':91}
+{'type':'node', 'id':'m1', 'x':192, 'y':117, 'width':56, 'height':66}
+{'type':'edge', 'id':'A_to_B', 'source':'A', 'target':'B'}
+{'type':'edge', 'id':'A_to_C', 'source':'A', 'target':'C'}
