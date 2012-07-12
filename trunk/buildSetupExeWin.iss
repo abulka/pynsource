@@ -17,7 +17,7 @@ VersionInfoVersion=1.60
 OutputDir=build
 
 [Files]
-Source: pynsource\dist\pyNsourceGui.exe; DestDir: {app}; 
-Source: pynsource\dist\*; DestDir: {app}; Flags: recursesubdirs
+Source: src\dist\pyNsourceGui.exe; DestDir: {app}; 
+Source: src\dist\*; DestDir: {app}; Flags: recursesubdirs
 Source: Readme.txt; DestDir: {app}
 Source: build.txt; DestDir: {app}

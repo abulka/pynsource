@@ -10,7 +10,7 @@ svn info > build.txt
 REM goto step3a
 
 REM buildstandalone exe zip
-cd pynsource
+cd src
 del /q dist\*.*
 del /q build\*.*
 REM python setup.py py2exe
@@ -18,6 +18,6 @@ bb-freeze pyNsourceGui.py
 cd ..
 
 :step3a
-7z a -tzip  dist\%outstandalonezip% .\pynsource\dist\* .\Readme.txt .\build.txt
+7z a -tzip  dist\%outstandalonezip% .\src\dist\* .\Readme.txt .\build.txt
 
 

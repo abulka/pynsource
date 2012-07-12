@@ -5,7 +5,7 @@ import unittest
 import os
 
 import sys
-sys.path.append("../pynsource")
+sys.path.append("../src")
 from generate_code.gen_yuml import PySourceAsYuml
 
 class TestCaseYuml01(unittest.TestCase):

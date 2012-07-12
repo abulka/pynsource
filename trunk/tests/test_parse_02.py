@@ -11,7 +11,7 @@ import unittest
 import os
 
 import sys
-sys.path.append("../pynsource")
+sys.path.append("../src")
 from generate_code.gen_asciiart import PySourceAsText
 
 class TestCase01(unittest.TestCase):

@@ -1,7 +1,7 @@
 import unittest
 
 import sys
-sys.path.append("../pynsource")
+sys.path.append("../src")
 
 from layout.overlap_removal import OverlapRemoval, LINE_NODE_OVERLAP_REMOVAL_ENABLED
 from layout.graph import Graph, GraphNode
