@@ -17,7 +17,7 @@
 # We have to use env again because we are invoking a script which then invokes some version of python.
 # whatever is first in the path will win.  
 
-cd pynsource
+cd src
 
 # Build the setup.py file (note, cannot change the name of the output file, it must be setup.py)
 # Proof: /System/Library//Frameworks/Python.framework/Versions/2.7//Extras/lib/python/py2app/script_py2applet.py

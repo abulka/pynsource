@@ -1,2 +1,2 @@
-cd pynsource
+cd src
 python pynsourcegui.py

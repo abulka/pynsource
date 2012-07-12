@@ -13,6 +13,6 @@ setup (name = "PyNsource",
        description = "A python reverse engineering code scanner that generates - UML pictures (as text or UML diagrams) - Java or Delphi code (which can be imported into advanced UML modelling tools.)",
        keywords = "UML modelling python reverse engineering",
        license = "GPL v3 Free as long as author is acknowledged and derivitave source is also open source.",
-       packages=['pynsource'],
+       packages=['src'],
        data_files=[('myextras', ['Readme.txt', 'rungui.bat'])]   
        )

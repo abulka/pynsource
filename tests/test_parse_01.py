@@ -4,7 +4,7 @@
 import unittest
 
 import sys
-sys.path.append("../pynsource")
+sys.path.append("../src")
 from generate_code.gen_asciiart import PySourceAsText
 
 
