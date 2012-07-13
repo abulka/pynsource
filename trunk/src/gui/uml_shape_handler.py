@@ -1,0 +1,140 @@
+# Event handler
+
+import wx
+import wx.lib.ogl as ogl
+from coord_utils import setpos, getpos
+
+class UmlShapeHandler(ogl.ShapeEvtHandler):
+    def __init__(self, log, frame, shapecanvas):
+        ogl.ShapeEvtHandler.__init__(self)
+        self.log = log
+        self.frame = frame              # these are arbitrary initialisations
+        self.shapecanvas = shapecanvas  # these are arbitrary initialisations
+
+    def UpdateStatusBar(self, shape):
+        x, y = shape.GetX(), shape.GetY()
+        x, y = getpos(shape)
+        width, height = shape.GetBoundingBoxMax()
+        self.frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)" % (x, y, width, height))
+
+    def OnLeftClick(self, x, y, keys = 0, attachment = 0):
+        self._SelectNodeNow(x, y, keys, attachment)
+
+    def _SelectNodeNow(self, x, y, keys = 0, attachment = 0):
+        shape = self.GetShape()
+        shape.GetCanvas().SelectNodeNow(shape)
+        self.UpdateStatusBar(shape)
+
+    def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
+        shape = self.GetShape()
+        oldpos = getpos(shape)
+        ogl.ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment) # super
+        if not shape.Selected():
+            self.OnLeftClick(x, y, keys, attachment)
+        newpos = getpos(shape)
+        try:
+            print shape.node.id, "moved from", oldpos, "to", newpos
+            # Adjust the GraphNode to match the shape x,y
+            shape.node.left, shape.node.top = newpos
+        except:
+            print "no node model attached to this shape!"
+            
+        self.UpdateStatusBar(shape)
+
+        # Invoke overlap removal (unless hold down shift key)
+        KEY_SHIFT = 1
+        if keys & KEY_SHIFT:
+            #shape.GetCanvas().stateofthenation()   # do we need this?  did quite well without it before
+            pass
+        else:
+            shape.GetCanvas().stage2()
+
+    def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
+        shape = self.GetShape()
+
+        # super        
+        ogl.ShapeEvtHandler.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
+        
+        width, height = shape.GetBoundingBoxMin()
+        if hasattr(shape, 'node'):
+            #print shape.node, "resized to", width, height
+            #print shape.node.id, shape.node.left, shape.node.top, "resized to", width, height
+            
+            # Adjust the GraphNode to match the shape x,y
+            shape.node.width, shape.node.height = width, height
+            shape.node.left, shape.node.top = getpos(shape)
+        
+        self.UpdateStatusBar(self.GetShape())
+
+        #wx.SafeYield()
+        #time.sleep(0.2)
+        
+        shape.GetCanvas().stage2()
+        
+    #def OnEndSize(self, width, height):
+    #    print "OnEndSize", width, height
+
+    def OnMovePost(self, dc, x, y, oldX, oldY, display):
+        shape = self.GetShape()
+        ogl.ShapeEvtHandler.OnMovePost(self, dc, x, y, oldX, oldY, display)
+        self.UpdateStatusBar(shape)
+        if "wxMac" in wx.PlatformInfo:
+            shape.GetCanvas().Refresh(False) 
+
+    def OnPopupItemSelected(self, event):
+        item = self.popupmenu.FindItemById(event.GetId()) 
+        text = item.GetText() 
+        if text == "Delete\tDel":
+            self.RightClickDeleteNode()
+        elif text == "Properties...":
+            self.NodeProperties()
+        elif text == "Begin - Draw Line from this class\tq":
+            self.GetShape().GetCanvas().NewEdgeMarkFrom()
+        elif text == "End - Draw Line to this class\tw":
+            self.GetShape().GetCanvas().NewEdgeMarkTo()
+        elif text == "Reset Image Size":
+            shape = self.GetShape()
+            shape.ResetSize()
+            #shape.GetCanvas().Refresh(False)   # don't seem to need since SelectNodeNow() might be doing it for us
+            shape.GetCanvas().SelectNodeNow(shape)
+            self.UpdateStatusBar(shape)
+
+    def OnRightClick(self, x, y, keys, attachment):
+        self._SelectNodeNow(x, y, keys, attachment)
+
+        #self.log.WriteText("%s\n" % self.GetShape())
+        self.popupmenu = wx.Menu()     # Creating a menu
+        
+        def MakeMenuItem(menu, msg):
+            item = menu.Append(wx.NewId(), msg)
+            self.frame.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)  # Not sure why but passing item is needed.  Not to find the menu item later, but to avoid crashes?  try two right click deletes followed by main menu edit/delete.  Official Bind 3rd parameter DOCO:  menu source - Sometimes the event originates from a different window than self, but you still want to catch it in self. (For example, a button event delivered to a frame.) By passing the source of the event, the event handling system is able to differentiate between the same event type from different controls.
+            
+        MakeMenuItem(self.popupmenu, "Properties...")
+        self.popupmenu.AppendSeparator()
+
+        menu_sub = wx.Menu()
+        MakeMenuItem(menu_sub, "Begin - Draw Line from this class\tq")
+        MakeMenuItem(menu_sub, "End - Draw Line to this class\tw")
+        self.popupmenu.AppendMenu(wx.NewId(), "Draw Line", menu_sub)
+
+        if self.GetShape().__class__.__name__ == 'BitmapShapeResizable':
+            self.popupmenu.AppendSeparator()
+            MakeMenuItem(self.popupmenu, "Reset Image Size")
+        
+        self.popupmenu.AppendSeparator()
+        MakeMenuItem(self.popupmenu, "Delete\tDel")
+        self.popupmenu.AppendSeparator()
+        MakeMenuItem(self.popupmenu, "Cancel")
+        
+        
+        self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
+
+    def RightClickDeleteNode(self):
+        self.GetShape().GetCanvas().CmdZapShape(self.GetShape())
+
+    def OnLeftDoubleClick(self, x, y, keys, attachment):
+        self.GetShape().GetCanvas().CmdEditShape(self.GetShape())
+
+    def NodeProperties(self):
+        self.GetShape().GetCanvas().CmdEditShape(self.GetShape())
+
