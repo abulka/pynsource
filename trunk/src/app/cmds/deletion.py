@@ -5,9 +5,6 @@ class CmdNodeDelete(CmdBase):
 
     def execute(self):
         """ Docstring """
-        print 'doing CmdNodeDelete'
-        #self._oldstate = TestCase01.fakeScreen
-        
         assert self.umlwin
         
         for shape in self.umlwin.GetDiagram().GetShapeList():
