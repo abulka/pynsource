@@ -93,7 +93,7 @@ class CommandManager(object):
             self._list.pop()
         self._current_undo -= 1
 
-    def add_and_run_command(self, item):
+    def run(self, item):
         """
         Main API for driving the command manager.
         Pass in a command object.
@@ -200,7 +200,7 @@ class TestCase01(unittest.TestCase):
 
         assert TestCase01.fakeScreen == ''
 
-        undoStack.add_and_run_command(cmd)   # cmd.execute
+        undoStack.run(cmd)   # cmd.execute
         assert TestCase01.fakeScreen == 'aaaaa'
 
         undoStack.undo(1)
@@ -215,7 +215,7 @@ class TestCase01(unittest.TestCase):
 
         assert TestCase01.fakeScreen == ''
 
-        undoStack.add_and_run_command(cmd)   # cmd.execute
+        undoStack.run(cmd)   # cmd.execute
         assert TestCase01.fakeScreen == 'aaaaa'
 
         undoStack.undo(1)
@@ -233,7 +233,7 @@ class TestCase01(unittest.TestCase):
 
         assert TestCase01.fakeScreen == ''
 
-        undoStack.add_and_run_command(cmd)   # cmd.execute
+        undoStack.run(cmd)   # cmd.execute
         assert TestCase01.fakeScreen == 'aaaaa'
 
         undoStack.undo(1)
@@ -249,7 +249,7 @@ class TestCase01(unittest.TestCase):
 
         assert TestCase01.fakeScreen == ''
 
-        undoStack.add_and_run_command(cmd)   # cmd.execute
+        undoStack.run(cmd)   # cmd.execute
         assert TestCase01.fakeScreen == 'aaaaa'
 
         undoStack.undo(1)
@@ -271,10 +271,10 @@ class TestCase01(unittest.TestCase):
 
         assert TestCase01.fakeScreen == ''
 
-        undoStack.add_and_run_command(cmdA)   # cmd.execute
+        undoStack.run(cmdA)   # cmd.execute
         assert TestCase01.fakeScreen == 'aaaaa'
 
-        undoStack.add_and_run_command(cmdB)   # cmd.execute
+        undoStack.run(cmdB)   # cmd.execute
         assert TestCase01.fakeScreen == 'bbbbbbbbbbbbbbbbbbb'
 
         undoStack.undo(1)
@@ -298,13 +298,13 @@ class TestCase01(unittest.TestCase):
 
         assert TestCase01.fakeScreen == ''
 
-        undoStack.add_and_run_command(cmdA)   # cmd.execute
+        undoStack.run(cmdA)   # cmd.execute
         assert TestCase01.fakeScreen == 'aaaaa'
 
-        undoStack.add_and_run_command(cmdB)   # cmd.execute
+        undoStack.run(cmdB)   # cmd.execute
         assert TestCase01.fakeScreen == 'bbbbbbbbbbbbbbbbbbb'
 
-        undoStack.add_and_run_command(cmdA2)   # cmd.execute
+        undoStack.run(cmdA2)   # cmd.execute
         assert TestCase01.fakeScreen == 'aaaaa'
 
         undoStack.undo(1)
