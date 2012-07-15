@@ -619,12 +619,12 @@ class MainApp(wx.App):
         self.cmd_mgr.run(insertion.CmdInsertImage(self.umlwin, self.frame, self.config))
                 
     def OnInsertClass(self, event):
-        self.cmd_mgr.run(insertion.CmdInsertNewNode(self.umlwin, self))
+        self.cmd_mgr.run(insertion.CmdInsertNewNode(self.umlwin, self, self.umlwin.umlworkspace))
         
     def OnEditProperties(self, event):
         for shape in self.umlwin.GetDiagram().GetShapeList():
             if shape.Selected():
-                self.umlwin.CmdEditShape(shape)
+                self.cmd_mgr.run(insertion.CmdEditShape(self.umlwin, self, self.umlwin.umlworkspace, shape))
                 break
     def OnEditProperties_update(self, event):
         self.Enable_if_node_selected(event)
