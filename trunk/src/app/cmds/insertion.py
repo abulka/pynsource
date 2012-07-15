@@ -12,13 +12,8 @@ class CmdInsertNewComment(CmdBase):
         
         self.umlwin.CmdInsertNewComment()
             
-    def redo(self):  # override
-        """ Docstring """
-        # print 'redo B'
-        self.execute()
-
     def undo(self):  # override
         """ Docstring """
-        # print 'undo B'
-        #TestCase01.fakeScreen = self._oldstate
+        # not implemented
+
         
