@@ -38,10 +38,7 @@ from gui.wx_log import Log
 from gui_imageviewer import ImageViewer
 
 from command_pattern import CommandManager
-
-#from app.cmds import *
-from app.cmds.deletion import CmdNodeDelete
-from app.cmds.insertion import CmdInsertNewComment
+from app.cmds import *
 
 class MainApp(wx.App):
     def OnInit(self):
@@ -610,13 +607,13 @@ class MainApp(wx.App):
         event.Enable(len(selected) > 0 and viewing_uml_tab)
 
     def OnDeleteNode(self, event):
-        self.cmd_mgr.run(CmdNodeDelete(self.umlwin))
+        self.cmd_mgr.run(deletion.CmdNodeDelete(self.umlwin))
                 
     def OnDeleteNode_update(self, event):
         self.Enable_if_node_selected(event)
 
     def OnInsertComment(self, event):
-        self.cmd_mgr.run(CmdInsertNewComment(self.umlwin))
+        self.cmd_mgr.run(insertion.CmdInsertNewComment(self.umlwin))
 
     def OnInsertImage(self, event):
         filename = None
