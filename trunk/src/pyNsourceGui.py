@@ -616,23 +616,10 @@ class MainApp(wx.App):
         self.cmd_mgr.run(insertion.CmdInsertNewComment(self.umlwin))
 
     def OnInsertImage(self, event):
-        filename = None
-        
-        thisdir = self.config.get('LastDirInsertImage', '.') # remember dir path
-        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir=thisdir,
-            defaultFile="", wildcard="*.jpg", style=wx.OPEN, pos=wx.DefaultPosition)
-        if dlg.ShowModal() == wx.ID_OK:
-            filename = dlg.GetPath()
-
-            self.config['LastDirInsertImage'] = dlg.GetDirectory()  # remember dir path
-            self.config.write()
-        dlg.Destroy()
-        
-        self.umlwin.CmdInsertNewImageNode(filename)
+        self.cmd_mgr.run(insertion.CmdInsertImage(self.umlwin, self.frame, self.config))
                 
     def OnInsertClass(self, event):
-        self.umlwin.CmdInsertNewNode()
-        self.RefreshAsciiUmlTab()
+        self.cmd_mgr.run(insertion.CmdInsertNewNode(self.umlwin, self))
         
     def OnEditProperties(self, event):
         for shape in self.umlwin.GetDiagram().GetShapeList():

@@ -252,10 +252,12 @@ class UmlCanvas(ogl.ShapeCanvas):
         
         
     def CmdInsertNewImageNode(self, filename=None):
+        import os
         if not filename:
             curr_dir = os.path.dirname( os.path.abspath( __file__ ) )
-            filename = os.path.join(curr_dir, '..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP')
-        
+            filename = os.path.join(curr_dir, '..\\..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP')
+            print filename
+            
         self.CreateImageShape(filename)
         self.stage2(force_stateofthenation=True) # if want overlap removal and proper refresh
         #self.SelectNodeNow(node.shape)
