@@ -37,6 +37,12 @@ from gui.uml_canvas import UmlCanvas
 from gui.wx_log import Log
 from gui_imageviewer import ImageViewer
 
+from command_pattern import CommandManager
+
+#from app.cmds import *
+from app.cmds.deletion import CmdNodeDelete
+from app.cmds.insertion import CmdInsertNewComment
+
 class MainApp(wx.App):
     def OnInit(self):
         self.log = Log()
@@ -108,6 +114,8 @@ class MainApp(wx.App):
         
         self.InitConfig()
 
+        self.cmd_mgr = CommandManager(100)
+        
         wx.CallAfter(self.BootStrap)    # doesn't make a difference calling this via CallAfter
         
         return True
@@ -602,14 +610,13 @@ class MainApp(wx.App):
         event.Enable(len(selected) > 0 and viewing_uml_tab)
 
     def OnDeleteNode(self, event):
-        for shape in self.umlwin.GetDiagram().GetShapeList():
-            if shape.Selected():
-                self.umlwin.CmdZapShape(shape)
+        self.cmd_mgr.run(CmdNodeDelete(self.umlwin))
+                
     def OnDeleteNode_update(self, event):
         self.Enable_if_node_selected(event)
 
     def OnInsertComment(self, event):
-        self.umlwin.CmdInsertNewComment()
+        self.cmd_mgr.run(CmdInsertNewComment(self.umlwin))
 
     def OnInsertImage(self, event):
         filename = None
