@@ -5,11 +5,7 @@ class CmdInsertNewComment(CmdBase):
 
     def execute(self):
         """ Docstring """
-        print 'doing CmdNodeDelete'
-        #self._oldstate = TestCase01.fakeScreen
-        
         assert self.umlwin
-        
         self.umlwin.CmdInsertNewComment()
             
     def undo(self):  # override
