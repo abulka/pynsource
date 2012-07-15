@@ -9,3 +9,7 @@ class CmdBase(Command):
     def __init__(self, umlwin):
         """ pass in all the relevant context """
         self.umlwin = umlwin
+
+    def redo(self):
+        """ redoes the command. Usually as simple as re executing it. """
+        self.execute()
