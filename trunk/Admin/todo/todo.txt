@@ -1,36 +1,5 @@
-TODO
-====
+All issues moved to
+http://code.google.com/p/pynsource/issues
 
-Regular dependencies should be represented in the uml
-e.g. CmdLinePythonToJava creates an instance of PySourceAsText but because its assigned to a local variable, it doesn't register as a dependency.
-
-====================
-
-running
-python pynsource\pynsource.py -y nopng pynsource\gen_asciiart.py
-generates
-
-[ParseReportGenerator]^[PySourceAsText__init__();_DumpAttribute();_DumpCompositeExtraFooter);_DumpClassNameAndGeneralisations();_DumpMethods();_Line();_DumpClassFooter()]
-
-note the missing ] in PySourceAsText__init__()
-should be             PySourceAsText.__init__()
-
-=========================
-
-class GraphRendererOgl:
-    def __init__(self, graph, oglcanvas):
-        self.graph = graph
-
-Currently UML is
-
-GraphRendererOgl ----> nothing
-
-  should be
-
-GraphRendererOgl ----> Graph
-
-but this means interpreting 'graph' as 'Graph' class - a bit presumptious?  Then again we could prehaps check if there are certain methods being called on that object to confirm.  Yeah - that's a good idea.
-
-=========================
-
+----
 
