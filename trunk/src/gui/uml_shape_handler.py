@@ -133,8 +133,8 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self.GetShape().GetCanvas().CmdZapShape(self.GetShape())
 
     def OnLeftDoubleClick(self, x, y, keys, attachment):
-        self.GetShape().GetCanvas().CmdEditShape(self.GetShape())
+        self.GetShape().GetCanvas().CmdEditShape(self.GetShape())  # FIX PLEASE
 
     def NodeProperties(self):
-        self.GetShape().GetCanvas().CmdEditShape(self.GetShape())
+        self.GetShape().GetCanvas().CmdEditShape(self.GetShape())  # FIX PLEASE
 

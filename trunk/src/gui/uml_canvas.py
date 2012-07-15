@@ -194,37 +194,37 @@ class UmlCanvas(ogl.ShapeCanvas):
     def CmdRestoreLayout2(self):
         self.snapshot_mgr.QuickRestore(slot=2)
 
-    def DisplayDialogUmlNodeEdit(self, id, attrs, methods):
-        """
-        id, attrs, methods are lists of strings
-        returns id, attrs, methods as lists of strings
-        """
-        from dialogs.DialogUmlNodeEdit import DialogUmlNodeEdit
-        class EditDialog(DialogUmlNodeEdit):
-            def OnClassNameEnter( self, event ):
-                self.EndModal(wx.ID_OK) 
-        dialog = EditDialog(None)
-
-        dialog.txtClassName.Value, dialog.txtAttrs.Value, dialog.txtMethods.Value = id, "\n".join(attrs), "\n".join(methods)
-        if dialog.ShowModal() == wx.ID_OK:
-            #wx.MessageBox("got wx.ID_OK")
-            result = True
-            id = dialog.txtClassName.Value
-
-            def string_to_list_smart(s):
-                s = s.strip()
-                if s == "":
-                    return []
-                else:
-                    return s.split('\n')
-
-            attrs = string_to_list_smart(dialog.txtAttrs.Value)
-            methods = string_to_list_smart(dialog.txtMethods.Value)
-            print id, attrs, methods
-        else:
-            result, id, attrs, methods = False, None, None, None
-        dialog.Destroy()
-        return (result, id, attrs, methods)
+    #def DisplayDialogUmlNodeEdit(self, id, attrs, methods):
+    #    """
+    #    id, attrs, methods are lists of strings
+    #    returns id, attrs, methods as lists of strings
+    #    """
+    #    from dialogs.DialogUmlNodeEdit import DialogUmlNodeEdit
+    #    class EditDialog(DialogUmlNodeEdit):
+    #        def OnClassNameEnter( self, event ):
+    #            self.EndModal(wx.ID_OK) 
+    #    dialog = EditDialog(None)
+    #
+    #    dialog.txtClassName.Value, dialog.txtAttrs.Value, dialog.txtMethods.Value = id, "\n".join(attrs), "\n".join(methods)
+    #    if dialog.ShowModal() == wx.ID_OK:
+    #        #wx.MessageBox("got wx.ID_OK")
+    #        result = True
+    #        id = dialog.txtClassName.Value
+    #
+    #        def string_to_list_smart(s):
+    #            s = s.strip()
+    #            if s == "":
+    #                return []
+    #            else:
+    #                return s.split('\n')
+    #
+    #        attrs = string_to_list_smart(dialog.txtAttrs.Value)
+    #        methods = string_to_list_smart(dialog.txtMethods.Value)
+    #        print id, attrs, methods
+    #    else:
+    #        result, id, attrs, methods = False, None, None, None
+    #    dialog.Destroy()
+    #    return (result, id, attrs, methods)
         
     def CmdInsertNewNode_OLD_SIMPLE(self):
         id = 'D' + str(random.randint(1,99))
@@ -262,53 +262,8 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.stage2(force_stateofthenation=True) # if want overlap removal and proper refresh
         #self.SelectNodeNow(node.shape)
             
-    def CmdInsertNewNode(self):
-        result, id, attrs, methods = self.DisplayDialogUmlNodeEdit(id='D' + str(random.randint(1,99)),
-                                            attrs=['attribute 1', 'attribute 2', 'attribute 3'],
-                                            methods=['method A', 'method B', 'method C', 'method D'])
 
-        if result:
-            # Ensure unique name
-            while self.umlworkspace.graph.FindNodeById(id):
-                id += '2'
 
-            node = self.umlworkspace.AddUmlNode(id, attrs, methods)
-            shape = self.CreateUmlShape(node)
-            self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
-            
-            node.shape.Show(True)
-            
-            #self.stateofthenation() # if want simple refresh
-            #self.stage2() # if want overlap removal
-            self.stage2(force_stateofthenation=True) # if want overlap removal and proper refresh
-            
-            self.SelectNodeNow(node.shape)
-            
-
-    def CmdEditShape(self, shape):
-        node = shape.node
-         
-        result, id, attrs, methods = self.DisplayDialogUmlNodeEdit(node.id, node.attrs, node.meths)
-        if result:
-            self.umlworkspace.graph.RenameNode(node, id)   # need special rename cos of underlying graph plumbing - perhaps put setter on id?
-            node.attrs = attrs
-            node.meths = methods
-    
-            self.CmdZapShape(shape, deleteNodeToo=False)
-            
-            shape = self.CreateUmlShape(node)
-            self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
-    
-            # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
-            for edge in self.umlworkspace.graph.edges:
-                self.CreateUmlEdge(edge)
-                
-            node.shape.Show(True)
-            self.stateofthenation()
-
-            # TODO Why doesn't this select the node?
-            #self.SelectNodeNow(node.shape)
-            #self.stateofthenation()
 
         
     def SelectNodeNow(self, shape):
@@ -601,26 +556,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
 
-    def CmdEditShape(self, shape):
-        node = shape.node
-         
-        result, id, attrs, methods = self.DisplayDialogUmlNodeEdit(node.id, node.attrs, node.meths)
-        if result:
-            self.umlworkspace.graph.RenameNode(node, id)   # need special rename cos of underlying graph plumbing - perhaps put setter on id?
-            node.attrs = attrs
-            node.meths = methods
-    
-            self.CmdZapShape(shape, deleteNodeToo=False)
-            
-            shape = self.CreateUmlShape(node)
-            self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
-    
-            # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
-            for edge in self.umlworkspace.graph.edges:
-                self.CreateUmlEdge(edge)
-                
-            node.shape.Show(True)
-            self.stateofthenation()
         
     def CreateUmlEdge(self, edge):
         fromShape = edge['source'].shape
