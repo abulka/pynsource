@@ -635,7 +635,7 @@ class MainApp(wx.App):
         event.Enable(len(selected) > 0 and viewing_uml_tab)
 
     def OnDeleteNode(self, event):
-        self.observers.CMD_NODE_DELETE()
+        self.observers.CMD_NODE_DELETE_SELECTED()
                 
     def OnDeleteNode_update(self, event):
         self.Enable_if_node_selected(event)

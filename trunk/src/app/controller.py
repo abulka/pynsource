@@ -15,11 +15,14 @@ class Controller():
         
     # Events from wxapp (for now)
 
-    def CMD_NODE_DELETE(self):
-        self.run(cmds.deletion.CmdNodeDelete(self.app.context))
+    def CMD_NODE_DELETE_SELECTED(self):
+        self.run2(cmds.deletion.CmdNodeDeleteSelected)
+
+    def CMD_NODE_DELETE(self, shape):
+        self.run(cmds.deletion.CmdNodeDelete(self.app.context, shape))
 
     def CMD_INSERT_COMMENT(self):
-        self.run(cmds.insertion.CmdInsertComment(self.app.context))
+        self.run2(cmds.insertion.CmdInsertComment)
 
     def CMD_INSERT_IMAGE(self):
         self.run2(cmds.insertion.CmdInsertImage)

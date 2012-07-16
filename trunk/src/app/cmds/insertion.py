@@ -120,7 +120,8 @@ class CmdEditClass(CmdInsertOrEditNode):
             node.attrs = attrs
             node.meths = methods
     
-            umlwin.CmdZapShape(self.shape, deleteNodeToo=False)  # TODO turn this into a sub command
+            #umlwin.CmdZapShape(self.shape, deleteNodeToo=False)  # TODO turn this into a sub command
+            model.decouple_node_from_shape(shape)
             
             shape = umlwin.CreateUmlShape(node)
             model.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.

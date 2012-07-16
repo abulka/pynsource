@@ -136,13 +136,11 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
 
     def RightClickDeleteNode(self):
-        self.GetShape().GetCanvas().CmdZapShape(self.GetShape())
+        self.observers.CMD_NODE_DELETE(self.GetShape())
 
     def OnLeftDoubleClick(self, x, y, keys, attachment):
         self.observers.CMD_EDIT_CLASS(self.GetShape())
-        #self.GetShape().GetCanvas().CmdEditShape(self.GetShape())  # FIX PLEASE
 
     def NodeProperties(self):
         self.observers.CMD_EDIT_CLASS(self.GetShape())
-        #self.GetShape().GetCanvas().CmdEditShape(self.GetShape())  # FIX PLEASE
 
