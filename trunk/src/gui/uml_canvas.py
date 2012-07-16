@@ -22,6 +22,8 @@ import wx.lib.ogl as ogl
 
 from uml_shape_handler import UmlShapeHandler
 
+from architecture_support import *
+
 class UmlCanvas(ogl.ShapeCanvas):
     scrollStepX = 10
     scrollStepY = 10
@@ -33,6 +35,8 @@ class UmlCanvas(ogl.ShapeCanvas):
         maxHeight = 1000
         self.SetScrollbars(20, 20, maxWidth/20, maxHeight/20)
 
+        self.observers = multicast()
+        
         self.log = log
         self.frame = frame
         self.SetBackgroundColour("LIGHT BLUE") #wxWHITE)
@@ -427,6 +431,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
+        self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler) # allow app.controller to become observer of new evthandler, without knowing about controller here
 
         setpos(shape, 0, 0)
         #setpos(shape, node.left, node.top)
@@ -506,6 +511,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
+        self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler) # allow app.controller to become observer of new evthandler, without knowing about controller here
         
         shape.FlushText()
 
@@ -533,6 +539,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
+        self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler) # allow app.controller to become observer of new evthandler, without knowing about controller here
 
     def createCommentShape(self, node):
         shape = ogl.TextShape( node.width, node.height )
@@ -555,6 +562,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
+        self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler) # allow app.controller to become observer of new evthandler, without knowing about controller here
 
         
     def CreateUmlEdge(self, edge):

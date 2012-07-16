@@ -4,12 +4,11 @@ class CmdNodeDelete(CmdBase):
     """ Delete nodes """
 
     def execute(self):
-        """ Docstring """
-        assert self.umlwin
+        """ Delete selected node.  Cannot multi-select at present. """
         
-        for shape in self.umlwin.GetDiagram().GetShapeList():
+        for shape in self.context.umlwin.GetDiagram().GetShapeList():
             if shape.Selected():
-                self.umlwin.CmdZapShape(shape)
+                self.context.umlwin.CmdZapShape(shape)
 
     def undo(self):  # override
         """ Docstring """

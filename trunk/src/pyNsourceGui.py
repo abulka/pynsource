@@ -37,8 +37,8 @@ from gui.uml_canvas import UmlCanvas
 from gui.wx_log import Log
 from gui_imageviewer import ImageViewer
 
-from command_pattern import CommandManager
-from app.cmds import *
+from architecture_support import *
+from app.app import App
 
 class MainApp(wx.App):
     def OnInit(self):
@@ -111,7 +111,35 @@ class MainApp(wx.App):
         
         self.InitConfig()
 
-        self.cmd_mgr = CommandManager(100)
+        self.observers = multicast()
+
+        class Context(object):
+            """ Everything everybody needs to know """
+            pass
+        context = Context()
+        # init the context
+        context.wxapp = self
+        context.config = self.config
+        context.umlwin = self.umlwin
+        context.model = self.umlwin.umlworkspace
+        context.snapshot_mgr = self.umlwin.snapshot_mgr
+        context.coordmapper = self.umlwin.coordmapper
+        context.layouter = self.umlwin.layouter
+        context.overlap_remover = self.umlwin.overlap_remover
+        context.frame = self.frame
+        context.multiText = self.multiText
+        context.asciiart = self.asciiart
+        
+        # App knows about everyone.
+        # Everyone (ring classes) should be an adapter
+        # but not strictly necessary unless you want an extra level
+        # of indirection and separation or don't want to constantly
+        # edit the ring classes to match what the app (and other ring
+        # objects) expect - edit an adapter instead.
+        self.app = App(context)
+        #app.Boot()
+        
+        
         
         wx.CallAfter(self.BootStrap)    # doesn't make a difference calling this via CallAfter
         
@@ -607,25 +635,26 @@ class MainApp(wx.App):
         event.Enable(len(selected) > 0 and viewing_uml_tab)
 
     def OnDeleteNode(self, event):
-        self.cmd_mgr.run(deletion.CmdNodeDelete(self.umlwin))
+        self.observers.CMD_NODE_DELETE()
                 
     def OnDeleteNode_update(self, event):
         self.Enable_if_node_selected(event)
 
     def OnInsertComment(self, event):
-        self.cmd_mgr.run(insertion.CmdInsertNewComment(self.umlwin))
+        self.observers.CMD_INSERT_COMMENT()
 
     def OnInsertImage(self, event):
-        self.cmd_mgr.run(insertion.CmdInsertImage(self.umlwin, self.frame, self.config))
+        self.observers.CMD_INSERT_IMAGE()
                 
     def OnInsertClass(self, event):
-        self.cmd_mgr.run(insertion.CmdInsertNewNode(self.umlwin, self, self.umlwin.umlworkspace))
+        self.observers.CMD_INSERT_CLASS()
         
     def OnEditProperties(self, event):
         for shape in self.umlwin.GetDiagram().GetShapeList():
             if shape.Selected():
-                self.cmd_mgr.run(insertion.CmdEditShape(self.umlwin, self, self.umlwin.umlworkspace, shape))
+                self.observers.CMD_EDIT_CLASS(shape)
                 break
+            
     def OnEditProperties_update(self, event):
         self.Enable_if_node_selected(event)
 
