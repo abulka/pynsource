@@ -9,8 +9,17 @@ class CmdInsertComment(CmdBase):
 
     def execute(self):
         """ insert comment node """
-        self.context.umlwin.CmdInsertNewComment()
-            
+        id = 'D' + str(random.randint(1,9999))
+        dialog = wx.TextEntryDialog ( None, 'Enter a comment:', 'New Comment', "hello\nthere") #, wx.TE_MULTILINE )
+        if dialog.ShowModal() == wx.ID_OK:
+            comment = dialog.GetValue() + "\nfred"
+            node = self.context.model.AddCommentNode(id, comment)
+            shape = self.context.umlwin.createCommentShape(node)
+            self.context.model.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+            node.shape.Show(True)
+            self.context.umlwin.stateofthenation()
+        dialog.Destroy()
+        
     def undo(self):  # override
         """ undo insert new comment """
         # not implemented
@@ -52,12 +61,6 @@ class CmdInsertOrEditNode(CmdBase):
 
 class CmdInsertNewNode(CmdInsertOrEditNode):
     """ Insert new node """
-
-    #def __init__(self, umlwin, wxapp, umlworkspace):
-    #    """ pass in all the relevant context """
-    #    super(CmdInsertNewNode, self).__init__(umlwin)
-    #    self.wxapp = wxapp
-    #    self.umlworkspace = umlworkspace
 
     def execute(self):
         """ insert the new node and refresh the ascii tab too """
@@ -111,6 +114,7 @@ class CmdEditClass(CmdInsertOrEditNode):
         wxapp = self.context.wxapp
         model = self.context.model
         shape = self.shape
+        gui = self.context.umlwin
 
         node = shape.node
          
@@ -122,6 +126,7 @@ class CmdEditClass(CmdInsertOrEditNode):
     
             #umlwin.CmdZapShape(self.shape, deleteNodeToo=False)  # TODO turn this into a sub command
             model.decouple_node_from_shape(shape)
+            gui.delete_shape_view(shape)
             
             shape = umlwin.CreateUmlShape(node)
             model.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
@@ -145,12 +150,6 @@ class CmdEditClass(CmdInsertOrEditNode):
 class CmdInsertImage(CmdBase):
     """ Insert image """
 
-    #def __init__(self, umlwin, frame, config):
-    #    """ pass in all the relevant context """
-    #    super(CmdInsertImage, self).__init__(umlwin)
-    #    self.config = config
-    #    self.frame = frame
-
     def execute(self):
         """ Docstring """
         frame = self.context.frame
@@ -168,8 +167,19 @@ class CmdInsertImage(CmdBase):
             config.write()
         dlg.Destroy()
         
-        self.context.umlwin.CmdInsertNewImageNode(filename)
+        self.create_new_image_node(filename)
+
+    def create_new_image_node(self, filename=None):
+        import os
+        if not filename:
+            curr_dir = os.path.dirname( os.path.abspath( __file__ ) )
+            filename = os.path.join(curr_dir, '..\\..\..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP')
+            print filename
             
+        self.context.umlwin.CreateImageShape(filename)
+        self.context.umlwin.stage2(force_stateofthenation=True) # if want overlap removal and proper refresh
+        #self.SelectNodeNow(node.shape)
+        
     def undo(self):  # override
         """ Docstring """
         # not implemented

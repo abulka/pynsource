@@ -196,82 +196,11 @@ class UmlCanvas(ogl.ShapeCanvas):
     def CmdRestoreLayout2(self):
         self.snapshot_mgr.QuickRestore(slot=2)
 
-    #def DisplayDialogUmlNodeEdit(self, id, attrs, methods):
-    #    """
-    #    id, attrs, methods are lists of strings
-    #    returns id, attrs, methods as lists of strings
-    #    """
-    #    from dialogs.DialogUmlNodeEdit import DialogUmlNodeEdit
-    #    class EditDialog(DialogUmlNodeEdit):
-    #        def OnClassNameEnter( self, event ):
-    #            self.EndModal(wx.ID_OK) 
-    #    dialog = EditDialog(None)
-    #
-    #    dialog.txtClassName.Value, dialog.txtAttrs.Value, dialog.txtMethods.Value = id, "\n".join(attrs), "\n".join(methods)
-    #    if dialog.ShowModal() == wx.ID_OK:
-    #        #wx.MessageBox("got wx.ID_OK")
-    #        result = True
-    #        id = dialog.txtClassName.Value
-    #
-    #        def string_to_list_smart(s):
-    #            s = s.strip()
-    #            if s == "":
-    #                return []
-    #            else:
-    #                return s.split('\n')
-    #
-    #        attrs = string_to_list_smart(dialog.txtAttrs.Value)
-    #        methods = string_to_list_smart(dialog.txtMethods.Value)
-    #        print id, attrs, methods
-    #    else:
-    #        result, id, attrs, methods = False, None, None, None
-    #    dialog.Destroy()
-    #    return (result, id, attrs, methods)
-        
-    def CmdInsertNewNode_OLD_SIMPLE(self):
-        id = 'D' + str(random.randint(1,99))
-        dialog = wx.TextEntryDialog ( None, 'Enter an id string:', 'Create a new node', id )
-        if dialog.ShowModal() == wx.ID_OK:
-            id = dialog.GetValue()
-            node = self.umlworkspace.AddSimpleNode(id)
-            shape = self.createNodeShape(node)
-            self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
-            node.shape.Show(True)
-            self.stateofthenation()
-        dialog.Destroy()
-        
-    def CmdInsertNewComment(self):
-        id = 'D' + str(random.randint(1,9999))
-        dialog = wx.TextEntryDialog ( None, 'Enter a comment:', 'New Comment', "hello\nthere") #, wx.TE_MULTILINE )
-        if dialog.ShowModal() == wx.ID_OK:
-            comment = dialog.GetValue() + "\nfred"
-            node = self.umlworkspace.AddCommentNode(id, comment)
-            shape = self.createCommentShape(node)
-            self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
-            node.shape.Show(True)
-            self.stateofthenation()
-        dialog.Destroy()
-        
-        
-    def CmdInsertNewImageNode(self, filename=None):
-        import os
-        if not filename:
-            curr_dir = os.path.dirname( os.path.abspath( __file__ ) )
-            filename = os.path.join(curr_dir, '..\\..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP')
-            print filename
-            
-        self.CreateImageShape(filename)
-        self.stage2(force_stateofthenation=True) # if want overlap removal and proper refresh
-        #self.SelectNodeNow(node.shape)
-            
-
-
-
-        
+   
     def SelectNodeNow(self, shape):
         canvas = shape.GetCanvas()
 
-        canvas.DeselectAllShapes()
+        self.observers.CMD_DESELECT_ALL_SHAPES()
 
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
@@ -282,7 +211,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def delete_shape_view(self, shape):
         # View
-        self.DeselectAllShapes()
+        self.observers.CMD_DESELECT_ALL_SHAPES()
         for line in shape.GetLines()[:]:
             line.Delete()
         shape.Delete()
@@ -821,17 +750,6 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
         # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
-        self.DeselectAllShapes()
+        self.observers.CMD_DESELECT_ALL_SHAPES()
 
-    def DeselectAllShapes(self):
-        selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
-        if selected:
-            assert len(selected) == 1
-            s = selected[0]
-            canvas = s.GetCanvas()
-            
-            dc = wx.ClientDC(canvas)
-            canvas.PrepareDC(dc)
-            s.Select(False, dc)
-            canvas.Refresh(False)   # Need this or else Control points ('handles') leave blank holes
-       
+
