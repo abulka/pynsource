@@ -4,12 +4,18 @@ import wx
 import wx.lib.ogl as ogl
 from coord_utils import setpos, getpos
 
+import sys
+if ".." not in sys.path: sys.path.append("..")
+from architecture_support import *
+
 class UmlShapeHandler(ogl.ShapeEvtHandler):
     def __init__(self, log, frame, shapecanvas):
         ogl.ShapeEvtHandler.__init__(self)
         self.log = log
         self.frame = frame              # these are arbitrary initialisations
         self.shapecanvas = shapecanvas  # these are arbitrary initialisations
+        
+        self.observers = multicast()
 
     def UpdateStatusBar(self, shape):
         x, y = shape.GetX(), shape.GetY()
@@ -133,8 +139,10 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self.GetShape().GetCanvas().CmdZapShape(self.GetShape())
 
     def OnLeftDoubleClick(self, x, y, keys, attachment):
-        self.GetShape().GetCanvas().CmdEditShape(self.GetShape())  # FIX PLEASE
+        self.observers.CMD_EDIT_CLASS(self.GetShape())
+        #self.GetShape().GetCanvas().CmdEditShape(self.GetShape())  # FIX PLEASE
 
     def NodeProperties(self):
-        self.GetShape().GetCanvas().CmdEditShape(self.GetShape())  # FIX PLEASE
+        self.observers.CMD_EDIT_CLASS(self.GetShape())
+        #self.GetShape().GetCanvas().CmdEditShape(self.GetShape())  # FIX PLEASE
 

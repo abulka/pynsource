@@ -4,13 +4,12 @@ from base_cmd import CmdBase
 import wx
 import random
 
-class CmdInsertNewComment(CmdBase):
+class CmdInsertComment(CmdBase):
     """ Insert node """
 
     def execute(self):
         """ insert comment node """
-        assert self.umlwin
-        self.umlwin.CmdInsertNewComment()
+        self.context.umlwin.CmdInsertNewComment()
             
     def undo(self):  # override
         """ undo insert new comment """
@@ -54,17 +53,17 @@ class CmdInsertOrEditNode(CmdBase):
 class CmdInsertNewNode(CmdInsertOrEditNode):
     """ Insert new node """
 
-    def __init__(self, umlwin, wxapp, umlworkspace):
-        """ pass in all the relevant context """
-        super(CmdInsertNewNode, self).__init__(umlwin)
-        self.wxapp = wxapp
-        self.umlworkspace = umlworkspace
+    #def __init__(self, umlwin, wxapp, umlworkspace):
+    #    """ pass in all the relevant context """
+    #    super(CmdInsertNewNode, self).__init__(umlwin)
+    #    self.wxapp = wxapp
+    #    self.umlworkspace = umlworkspace
 
     def execute(self):
         """ insert the new node and refresh the ascii tab too """
-        assert self.umlwin
-        assert self.wxapp
-        assert self.umlworkspace
+        umlwin = self.context.umlwin
+        wxapp = self.context.wxapp
+        model = self.context.model
         
         #self.umlwin.CmdInsertNewNode()
         
@@ -74,64 +73,64 @@ class CmdInsertNewNode(CmdInsertOrEditNode):
 
         if result:
             # Ensure unique name
-            while self.umlworkspace.graph.FindNodeById(id):
+            while model.graph.FindNodeById(id):
                 id += '2'
 
-            node = self.umlworkspace.AddUmlNode(id, attrs, methods)
-            shape = self.umlwin.CreateUmlShape(node)
-            self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+            node = model.AddUmlNode(id, attrs, methods)
+            shape = umlwin.CreateUmlShape(node)
+            model.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             
             node.shape.Show(True)
             
             #self.umlwin.stateofthenation() # if want simple refresh
             #self.umlwin.stage2() # if want overlap removal
-            self.umlwin.stage2(force_stateofthenation=True) # if want overlap removal and proper refresh
+            umlwin.stage2(force_stateofthenation=True) # if want overlap removal and proper refresh
             
-            self.umlwin.SelectNodeNow(node.shape)        
+            umlwin.SelectNodeNow(node.shape)        
         
-            self.wxapp.RefreshAsciiUmlTab()
+            wxapp.RefreshAsciiUmlTab()
 
     def undo(self):  # override
         """ undo insert new node """
         # not implemented
 
 
-class CmdEditShape(CmdInsertOrEditNode):
+class CmdEditClass(CmdInsertOrEditNode):
     """ Edit node properties """
 
-    def __init__(self, umlwin, wxapp, umlworkspace, shape):
-        """ pass in all the relevant context """
-        super(CmdEditShape, self).__init__(umlwin)
-        self.wxapp = wxapp
-        self.umlworkspace = umlworkspace
+    def __init__(self, context, shape):
+        """ pass in all the relevant context
+            as well as the shape/class
+        """
+        super(CmdEditClass, self).__init__(context)
         self.shape = shape
 
     def execute(self):
         """  """
-        assert self.umlwin
-        assert self.wxapp
-        assert self.umlworkspace
-        assert self.shape
+        umlwin = self.context.umlwin
+        wxapp = self.context.wxapp
+        model = self.context.model
+        shape = self.shape
 
-        node = self.shape.node
+        node = shape.node
          
         result, id, attrs, methods = self.DisplayDialogUmlNodeEdit(node.id, node.attrs, node.meths)
         if result:
-            self.umlworkspace.graph.RenameNode(node, id)   # need special rename cos of underlying graph plumbing - perhaps put setter on id?
+            model.graph.RenameNode(node, id)   # need special rename cos of underlying graph plumbing - perhaps put setter on id?
             node.attrs = attrs
             node.meths = methods
     
-            self.umlwin.CmdZapShape(self.shape, deleteNodeToo=False)  # TODO turn this into a sub command
+            umlwin.CmdZapShape(self.shape, deleteNodeToo=False)  # TODO turn this into a sub command
             
-            shape = self.umlwin.CreateUmlShape(node)
-            self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+            shape = umlwin.CreateUmlShape(node)
+            model.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
     
             # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
-            for edge in self.umlworkspace.graph.edges:
-                self.umlwin.CreateUmlEdge(edge)
+            for edge in model.graph.edges:
+                umlwin.CreateUmlEdge(edge)
                 
             node.shape.Show(True)
-            self.umlwin.stateofthenation()
+            umlwin.stateofthenation()
 
             # TODO Why doesn't this select the node?
             #self.SelectNodeNow(node.shape)
@@ -145,30 +144,30 @@ class CmdEditShape(CmdInsertOrEditNode):
 class CmdInsertImage(CmdBase):
     """ Insert image """
 
-    def __init__(self, umlwin, frame, config):
-        """ pass in all the relevant context """
-        super(CmdInsertImage, self).__init__(umlwin)
-        self.config = config
-        self.frame = frame
+    #def __init__(self, umlwin, frame, config):
+    #    """ pass in all the relevant context """
+    #    super(CmdInsertImage, self).__init__(umlwin)
+    #    self.config = config
+    #    self.frame = frame
 
     def execute(self):
         """ Docstring """
-        assert self.umlwin
-        assert self.config
+        frame = self.context.frame
+        config = self.context.config
 
         filename = None
         
-        thisdir = self.config.get('LastDirInsertImage', '.') # remember dir path
-        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir=thisdir,
+        thisdir = config.get('LastDirInsertImage', '.') # remember dir path
+        dlg = wx.FileDialog(parent=frame, message="choose", defaultDir=thisdir,
             defaultFile="", wildcard="*.jpg", style=wx.OPEN, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
 
-            self.config['LastDirInsertImage'] = dlg.GetDirectory()  # remember dir path
-            self.config.write()
+            config['LastDirInsertImage'] = dlg.GetDirectory()  # remember dir path
+            config.write()
         dlg.Destroy()
         
-        self.umlwin.CmdInsertNewImageNode(filename)
+        self.context.umlwin.CmdInsertNewImageNode(filename)
             
     def undo(self):  # override
         """ Docstring """
