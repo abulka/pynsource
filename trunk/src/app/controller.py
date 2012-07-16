@@ -1,6 +1,7 @@
 #from cmds import *
 import cmds.deletion
 import cmds.insertion
+import cmds.selection
 
 class Controller():
     def __init__(self, app):
@@ -33,6 +34,9 @@ class Controller():
     def CMD_EDIT_CLASS(self, shape):
         self.run(cmds.insertion.CmdEditClass(self.app.context, shape))
 
+    def CMD_DESELECT_ALL_SHAPES(self):
+        self.run2(cmds.selection.CmdDeselectAllShapes)
+    
 
     # Events from Gui
     

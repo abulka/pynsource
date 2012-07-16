@@ -15,6 +15,7 @@ class App(object):
         
         # Inject multicast dependencies / observers
         self.context.wxapp.observers.addObserver(self.controller)
+        self.context.umlwin.observers.addObserver(self.controller)
         self.context.umlwin.observers.addObserver(self)
         #gui.observers.addObserver(self.controller)
         #model.observers.addObserver(gui)
