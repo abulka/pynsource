@@ -55,8 +55,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
 
         self.umlworkspace = UmlWorkspace()
-        #self.layout = LayoutBasic()
-        #self.layout = LayoutBasic(leftmargin=0, topmargin=0, verticalwhitespace=0, horizontalwhitespace=0, maxclassesperline=5)
         self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
 
         self.snapshot_mgr = GraphSnapshotMgr(graph=self.umlworkspace.graph, controller=self)
@@ -86,15 +84,6 @@ class UmlCanvas(ogl.ShapeCanvas):
             return
         self.working = True
 
-
-        #if keycode == wx.WXK_DOWN:
-        #    optimise = not event.ShiftDown()
-        #    self.ReLayout(keep_current_positions=True, gui=self, optimise=optimise)
-        #
-        #elif keycode == wx.WXK_UP:
-        #    optimise = not event.ShiftDown()
-        #    self.ReLayout(keep_current_positions=False, gui=self, optimise=optimise)
-        
         if keycode == wx.WXK_ESCAPE:
             print "ESC key detected: Abort Layout"
             self.kill_layout = True
@@ -626,13 +615,8 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def CmdLayout(self):
         print "Draw: CmdLayout"
-        #print
-        #print "CmdLayout"
-        #print
         if self.GetDiagram().GetCount() == 0:
-            #self.frame.MessageBox("Nothing to layout.  Import a python source file first.")
             return
-        
         self.LayoutAndPositionShapes()
         self.RedrawEverything()
 
@@ -666,30 +650,6 @@ class UmlCanvas(ogl.ShapeCanvas):
     def LayoutAndPositionShapes(self):
         print "Draw: LayoutAndPositionShapes"
         self.ReLayout()
-        return
-    
-        #positions, shapeslist, newdiagramsize = self.layout.Layout(self.umlworkspace, self.umlboxshapes)
-        #print "Layout positions", positions
-        #
-        #self.setSize(newdiagramsize)
-        #
-        #dc = wx.ClientDC(self)
-        #self.PrepareDC(dc)
-        #
-        ## Now move the shapes into place.
-        #for (pos, classShape) in zip(positions, shapeslist):
-        #    #print pos, classShape.region1.GetText()
-        #    x, y = pos
-        #
-        #    # compensate for the fact that x, y for a ogl shape are the centre of the shape, not the top left
-        #    width, height = classShape.GetBoundingBoxMax()
-        #    x += width/2
-        #    y += height/2
-        #
-        #    classShape.Move(dc, x, y, False)
-        #
-        ##self.umlworkspace.Dump()
-        
         
     def setSize(self, size):
         size = wx.Size(size[0], size[1])

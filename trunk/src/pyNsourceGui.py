@@ -477,66 +477,6 @@ class MainApp(wx.App):
             wx.EndBusyCursor()
             print 'Import - Done.'
 
-    #def FileImport2(self, event):
-    #    from generate_code.gen_yuml import PySourceAsYuml
-    #    import urllib
-    #    
-    #    self.notebook.SetSelection(1)
-    #    dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
-    #        defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
-    #    if dlg.ShowModal() == wx.ID_OK:
-    #        filenames = dlg.GetPaths()
-    #        print 'Importing...'
-    #        wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
-    #        print filenames
-    #        
-    #        files=filenames
-    #        p = PySourceAsYuml()
-    #        p.optionModuleAsClass = 0
-    #        p.verbose = 0
-    #        if files:
-    #            for f in files:
-    #                p.Parse(f)
-    #        p.CalcYumls()
-    #        print p
-    #
-    #        #yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
-    #        yuml_txt = ','.join(str(p).split())
-    #        baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
-    #        url = baseUrl + urllib.quote(yuml_txt)
-    #        self.yuml.ViewImage(url=url)
-    #
-    #        wx.EndBusyCursor()
-    #        print 'Import - Done.'
-    #
-    #def FileImport3(self, event):
-    #    from generate_code.gen_asciiart import PySourceAsText
-    #    import urllib
-    #    
-    #    self.notebook.SetSelection(2)
-    #    dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.',
-    #        defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
-    #    if dlg.ShowModal() == wx.ID_OK:
-    #        filenames = dlg.GetPaths()
-    #        print 'Importing...'
-    #        wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
-    #        print filenames
-    #        
-    #        files=filenames
-    #        p = PySourceAsText()
-    #        p.optionModuleAsClass = 0
-    #        p.verbose = 0
-    #        if files:
-    #            for f in files:
-    #                p.Parse(f)
-    #        print p
-    #
-    #        self.multiText.SetValue(str(p))
-    #        self.multiText.ShowPosition(0)
-    #
-    #        wx.EndBusyCursor()
-    #        print 'Import - Done.'
-
 
     def model_to_ascii(self):
         from layout.layout_ascii import model_to_ascii_builder

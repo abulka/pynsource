@@ -124,7 +124,6 @@ class CmdEditClass(CmdInsertOrEditNode):
             node.attrs = attrs
             node.meths = methods
     
-            #umlwin.CmdZapShape(self.shape, deleteNodeToo=False)  # TODO turn this into a sub command
             model.decouple_node_from_shape(shape)
             gui.delete_shape_view(shape)
             
