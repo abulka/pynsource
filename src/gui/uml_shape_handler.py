@@ -72,13 +72,11 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         
         self.UpdateStatusBar(self.GetShape())
 
-        #wx.SafeYield()
-        #time.sleep(0.2)
-        
         shape.GetCanvas().stage2()
         
-    #def OnEndSize(self, width, height):
-    #    print "OnEndSize", width, height
+    def OnEndSize(self, width, height):
+        #print "OnEndSize", width, height
+        pass
 
     def OnMovePost(self, dc, x, y, oldX, oldY, display):
         shape = self.GetShape()
@@ -131,7 +129,6 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         MakeMenuItem(self.popupmenu, "Delete\tDel")
         self.popupmenu.AppendSeparator()
         MakeMenuItem(self.popupmenu, "Cancel")
-        
         
         self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
 
