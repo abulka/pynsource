@@ -71,13 +71,9 @@ class UmlWorkspace:
         self.associations_generalisation = []  # list of (classname, parentclassname) tuples
         self.associations_composition = []     # list of (rhs, lhs) tuples
         
-    def DeleteShape(self, shape, deleteNodeToo=True):
+    def decouple_node_from_shape(self, shape):
         classname = (classname for classname,shaperef in self.classnametoshape.items() if shaperef==shape).next()  # see http://johnstachurski.net/lectures/generators.html on how generators work, which can be built from list comprehension syntax
-        print 'found class to delete: ', classname
-
-        if deleteNodeToo:
-            self.graph.DeleteNodeById(shape.node.id)
-            print 'deleted node shape.node.id', shape.node.id
+        print 'found class to decouple: ', classname
 
         del self.classnametoshape[classname]
         """
@@ -88,6 +84,30 @@ class UmlWorkspace:
         #    self.associations_generalisation.remove(shape)
         #if shape in self.associations_composition:
         #    self.associations_composition.remove(shape)
+
+    def delete_node_for_shape(self, shape):
+        self.decouple_node_from_shape(shape)
+
+        self.graph.DeleteNodeById(shape.node.id)
+        print 'deleted node shape.node.id', shape.node.id
+    
+    #def DeleteShape(self, shape, deleteNodeToo=True):
+    #    classname = (classname for classname,shaperef in self.classnametoshape.items() if shaperef==shape).next()  # see http://johnstachurski.net/lectures/generators.html on how generators work, which can be built from list comprehension syntax
+    #    print 'found class to delete: ', classname
+    #
+    #    if deleteNodeToo:
+    #        self.graph.DeleteNodeById(shape.node.id)
+    #        print 'deleted node shape.node.id', shape.node.id
+    #
+    #    del self.classnametoshape[classname]
+    #    """
+    #    Too hard to remove the classname from these structures since these are tuples
+    #    between two classes.  Harmless to keep them in here.
+    #    """
+    #    #if class1, class2 in self.associations_generalisation:
+    #    #    self.associations_generalisation.remove(shape)
+    #    #if shape in self.associations_composition:
+    #    #    self.associations_composition.remove(shape)
 
     def Dump(self):
         def line(ch='-'):

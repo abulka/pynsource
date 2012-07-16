@@ -109,10 +109,8 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.CmdInsertNewNode()
         elif keycode == wx.WXK_DELETE:
             print "DELETE"
-            selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
-            if selected:
-                shape = selected[0]
-                self.CmdZapShape(shape)
+            self.observers.CMD_NODE_DELETE_SELECTED()
+            
         self.working = False
         event.Skip()
 
@@ -282,13 +280,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         
         #self.UpdateStatusBar(shape)  # only available in the shape evt handler (this method used to live there...)
 
-    def CmdZapShape(self, shape, deleteNodeToo=True):
-        # Model/Uml related....
-        self.umlworkspace.DeleteShape(shape, deleteNodeToo)
-        # Delete View
-        self._ZapShape(shape)
-        
-    def _ZapShape(self, shape):
+    def delete_shape_view(self, shape):
         # View
         self.DeselectAllShapes()
         for line in shape.GetLines()[:]:
@@ -632,7 +624,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         # Clear existing visualisation
         for node in self.umlworkspace.graph.nodes:
             if node.shape:
-                self._ZapShape(node.shape)
+                self.delete_shape_view(node.shape)
                 node.shape = None
 
         # Create fresh visualisation
