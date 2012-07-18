@@ -2,6 +2,9 @@
 # holds shapes too, though Shape is not interrogated except for 'GetBoundingBoxMax()'
 # meaning stubs could be used
 
+import sys, glob
+if ".." not in sys.path: sys.path.append("..")
+
 import random
 import sys
 from layout.graph import Graph, GraphNode
@@ -150,3 +153,53 @@ class UmlWorkspace:
         node = self.graph.AddNode(node)
         return node
 
+    def ConvertParseModelToUmlModel(self, p):
+        
+        def BuildEdgeModel(association_tuples, edge_label):
+            for fromClassname, toClassname in association_tuples:
+                from_node = self.AddUmlNode(fromClassname)
+                to_node = self.AddUmlNode(toClassname)
+                edge = self.graph.AddEdge(from_node, to_node)
+                edge['uml_edge_type'] = edge_label
+            
+        def AddGeneralisation(classname, parentclass):
+            if (classname, parentclass) in self.associations_generalisation:
+                #print "DUPLICATE Generalisation skipped when ConvertParseModelToUmlModel", (classname, parentclass) # DUPLICATE DETECTION
+                return
+            self.associations_generalisation.append((classname, parentclass))
+
+        def AddDependency(otherclass, classname):
+            if (otherclass, classname) in self.associations_composition:
+                #print "DUPLICATE Dependency skipped when ConvertParseModelToUmlModel", (otherclass, classname) # DUPLICATE DETECTION
+                return
+            self.associations_composition.append((otherclass, classname))  # reverse direction so round black arrows look ok
+
+        for classname, classentry in p.classlist.items():
+            """
+            These are a list of (attr, otherclass) however they imply that THIS class
+            owns all those other classes.
+            """
+            #print 'CLASS', classname, classentry
+            
+            # Composition / Dependencies
+            for attr, otherclass in classentry.classdependencytuples:
+                AddDependency(otherclass, classname)
+
+            # Generalisations
+            if classentry.classesinheritsfrom:
+                for parentclass in classentry.classesinheritsfrom:
+
+                    #if parentclass.find('.') <> -1:         # fix names like "unittest.TestCase" into "unittest"
+                    #    parentclass = parentclass.split('.')[0] # take the lhs
+                    AddGeneralisation(classname, parentclass)
+
+            classAttrs = [ attrobj.attrname for attrobj in classentry.attrs ]
+            classMeths = classentry.defs
+            node = self.AddUmlNode(classname, classAttrs, classMeths)
+
+        # ensure no duplicate relationships exist
+        assert len(set(self.associations_composition)) == len(self.associations_composition), self.associations_composition        # ensure no duplicates exist
+        assert len(set(self.associations_generalisation)) == len(self.associations_generalisation), self.associations_generalisation        # ensure no duplicates exist
+
+        BuildEdgeModel(self.associations_generalisation, 'generalisation')
+        BuildEdgeModel(self.associations_composition, 'composition')
