@@ -4,7 +4,8 @@ if ".." not in sys.path: sys.path.append("..")
 import random
 
 from generate_code.gen_java import PySourceAsJava
-from umlworkspace import UmlWorkspace
+
+from model.umlworkspace import UmlWorkspace
 
 from uml_shapes import *
 from coord_utils import setpos, getpos
@@ -229,57 +230,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.CreateUmlEdge(edge)
         self.stateofthenation()
 
-    def ConvertParseModelToUmlModel(self, p):
-        
-        def BuildEdgeModel(association_tuples, edge_label):
-            for fromClassname, toClassname in association_tuples:
-                from_node = self.umlworkspace.AddUmlNode(fromClassname)
-                to_node = self.umlworkspace.AddUmlNode(toClassname)
-                edge = self.umlworkspace.graph.AddEdge(from_node, to_node)
-                edge['uml_edge_type'] = edge_label
-            
-        def AddGeneralisation(classname, parentclass):
-            if (classname, parentclass) in self.umlworkspace.associations_generalisation:
-                #print "DUPLICATE Generalisation skipped when ConvertParseModelToUmlModel", (classname, parentclass) # DUPLICATE DETECTION
-                return
-            self.umlworkspace.associations_generalisation.append((classname, parentclass))
-
-        def AddDependency(otherclass, classname):
-            if (otherclass, classname) in self.umlworkspace.associations_composition:
-                #print "DUPLICATE Dependency skipped when ConvertParseModelToUmlModel", (otherclass, classname) # DUPLICATE DETECTION
-                return
-            self.umlworkspace.associations_composition.append((otherclass, classname))  # reverse direction so round black arrows look ok
-
-        for classname, classentry in p.classlist.items():
-            """
-            These are a list of (attr, otherclass) however they imply that THIS class
-            owns all those other classes.
-            """
-            #print 'CLASS', classname, classentry
-            
-            # Composition / Dependencies
-            for attr, otherclass in classentry.classdependencytuples:
-                AddDependency(otherclass, classname)
-
-            # Generalisations
-            if classentry.classesinheritsfrom:
-                for parentclass in classentry.classesinheritsfrom:
-
-                    #if parentclass.find('.') <> -1:         # fix names like "unittest.TestCase" into "unittest"
-                    #    parentclass = parentclass.split('.')[0] # take the lhs
-                    AddGeneralisation(classname, parentclass)
-
-            classAttrs = [ attrobj.attrname for attrobj in classentry.attrs ]
-            classMeths = classentry.defs
-            node = self.umlworkspace.AddUmlNode(classname, classAttrs, classMeths)
-
-        # ensure no duplicate relationships exist
-        assert len(set(self.umlworkspace.associations_composition)) == len(self.umlworkspace.associations_composition), self.umlworkspace.associations_composition        # ensure no duplicates exist
-        assert len(set(self.umlworkspace.associations_generalisation)) == len(self.umlworkspace.associations_generalisation), self.umlworkspace.associations_generalisation        # ensure no duplicates exist
-
-        BuildEdgeModel(self.umlworkspace.associations_generalisation, 'generalisation')
-        BuildEdgeModel(self.umlworkspace.associations_composition, 'composition')
-  
     def Go(self, files=None, path=None):
 
         # these are tuples between class names.
@@ -291,7 +241,8 @@ class UmlCanvas(ogl.ShapeCanvas):
                 p.optionModuleAsClass = 0
                 p.verbose = 0
                 p.Parse(f)
-                self.ConvertParseModelToUmlModel(p)
+                self.umlworkspace.ConvertParseModelToUmlModel(p)
+                #self.ConvertParseModelToUmlModel(p)
 
         self.stage1()
 
