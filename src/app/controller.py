@@ -2,6 +2,7 @@
 import cmds.deletion
 import cmds.insertion
 import cmds.selection
+import cmds.diagnostics
 
 class Controller():
     def __init__(self, app):
@@ -37,7 +38,9 @@ class Controller():
     def CMD_DESELECT_ALL_SHAPES(self):
         self.run2(cmds.selection.CmdDeselectAllShapes)
     
-
+    def CMD_DUMP_UML_WORKSPACE(self):
+        self.run2(cmds.diagnostics.CmdDumpUmlWorkspace)
+    
     # Events from Gui
     
     def CMD_FILE_NEW(self):

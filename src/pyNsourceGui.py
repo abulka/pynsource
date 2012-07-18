@@ -296,7 +296,7 @@ class MainApp(wx.App):
         event.Skip()
 
     def OnDumpUmlWorkspace(self, event):
-        self.umlwin.DumpStatus()
+        self.observers.CMD_DUMP_UML_WORKSPACE()
 
     def OnSaveGraphToConsole(self, event):
         print self.umlwin.umlworkspace.graph.GraphToString()

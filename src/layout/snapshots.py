@@ -3,9 +3,9 @@
 from graph import Graph
 
 class GraphSnapshotMgr:
-    def __init__(self, graph, controller):
+    def __init__(self, graph, umlcanvas):
         self.graph = graph
-        self.controller = controller
+        self.umlcanvas = umlcanvas
         self.Clear()
         self.quick_save_slots = {}
 
@@ -14,7 +14,7 @@ class GraphSnapshotMgr:
 
     def QuickSave(self, slot=1):
         snapshot = self.AddSnapshot(layout_score=-1, LL=-1, NN=-1, LN=-1,
-                    scale=self.controller.coordmapper.scale,
+                    scale=self.umlcanvas.coordmapper.scale,
                     bounds=(-1,-1), bounds_area_simple=-1,
                     graph_memento=self.graph.GetMementoOfPositions(),
                     quicksave=True)
@@ -32,17 +32,19 @@ class GraphSnapshotMgr:
         if snapshot_number < len(self.snapshots):
             self.RestoreGraph(self.snapshots[snapshot_number]['memento'], self.snapshots[snapshot_number]['scale'])
             self.DumpSnapshots(current_snapshot_index=snapshot_number, label="Restoring %d" % (snapshot_number+1))
-            self.controller.DumpStatus()
+            #self.umlcanvas.DumpStatus()
+            self.umlcanvas.observers.CMD_DUMP_UML_WORKSPACE()
+            
         else:
             print "No such snapshot", snapshot_number+1
         
     def RestoreGraph(self, memento, scale):
         self.graph.RestoreWorldPositions(memento)
-        self.controller.stateofthenation()
+        self.umlcanvas.stateofthenation()
 
         # Unecessary, but just in case you choose to <- or -> "scale from layout" next
-        self.controller.coordmapper.Recalibrate(scale=scale)
-        self.controller.AllToLayoutCoords() 
+        self.umlcanvas.coordmapper.Recalibrate(scale=scale)
+        self.umlcanvas.AllToLayoutCoords() 
             
     def DumpSnapshots(self, current_snapshot_index=None, label=""):
         # If supplied, current_snapshot is 0 based
