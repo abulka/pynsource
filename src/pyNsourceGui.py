@@ -149,33 +149,27 @@ class MainApp(wx.App):
 
         def bootstrap01():
             self.frame.SetSize((1024,768))
-            self.umlwin.Go(files=[os.path.abspath( __file__ )])
+            self.observers.CMD_FILE_IMPORT_SOURCE(files=[os.path.abspath( __file__ )])
         def bootstrap02():
-            self.umlwin.Go(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
+            self.observers.CMD_FILE_IMPORT_SOURCE(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
             self.umlwin.RedrawEverything()
-            #self.umlwin.umlworkspace.Dump()
         def bootstrap03():
             self.umlwin.RedrawEverything()  # Allow main frame to resize and thus allow world coords to calibrate before we generate layout coords for loaded graph
-            filename = os.path.abspath( "saved uml workspaces/uml05.txt" )
-            fp = open(filename, "r")
-            s = fp.read()
-            fp.close()
-            self.LoadGraph(s)
+            self.observers.CMD_LOAD_WORKSPACE_FROM_FILEPATH(filepath=os.path.abspath("saved uml workspaces/uml05.txt"))
+            # Don't need to redraw everything after, because persisted
+            # workspace is already laid out ok?  Or because we did it first?
         def bootstrap04():
-            self.umlwin.Go(files=[os.path.abspath( "pyNsourceGui.py" )])
+            self.observers.CMD_FILE_IMPORT_SOURCE(files=[os.path.abspath( "pyNsourceGui.py" )])
             self.umlwin.RedrawEverything()
         def bootstrap05():
-            self.umlwin.Go(files=[os.path.abspath("printframework.py"), os.path.abspath("png.py")])
+            self.observers.CMD_FILE_IMPORT_SOURCE(files=[os.path.abspath("printframework.py"), os.path.abspath("png.py")])
             self.umlwin.RedrawEverything()
         def bootstrap06():
-            self.umlwin.Go(files=[os.path.abspath("gui_umlshapes.py")])
+            self.observers.CMD_FILE_IMPORT_SOURCE(files=[os.path.abspath("gui/uml_shapes.py")])
             self.umlwin.RedrawEverything()
             
-        #print "BootStrap"
         bootstrap03()
         
-    #def onFocus(self, event):   # attempt at making mousewheel auto scroll the workspace
-    #    self.umlwin.SetFocus()  # attempt at making mousewheel auto scroll the workspace
         
     def InitConfig(self):
         config_dir = os.path.join(wx.StandardPaths.Get().GetUserConfigDir(), PYNSOURCE_CONFIG_DIR)
@@ -299,64 +293,16 @@ class MainApp(wx.App):
         self.observers.CMD_DUMP_UML_WORKSPACE()
 
     def OnSaveGraphToConsole(self, event):
-        print self.umlwin.umlworkspace.graph.GraphToString()
+        self.observers.CMD_SAVE_WORKSPACE_TO_CONSOLE()
 
     def OnSaveGraph(self, event):
-        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir='.\\saved uml workspaces',
-            defaultFile="", wildcard="*.txt", style=wx.FD_SAVE, pos=wx.DefaultPosition)
-        if dlg.ShowModal() == wx.ID_OK:
-            filename = dlg.GetPath()
-            
-            fp = open(filename, "w")
-            fp.write(self.umlwin.umlworkspace.graph.GraphToString())
-            fp.close()
-        dlg.Destroy()
+        self.observers.CMD_SAVE_WORKSPACE()
         
     def OnLoadGraphFromText(self, event):
-        eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
-        dialog = wx.TextEntryDialog (parent=self.frame, message='Enter node/edge persistence strings:', caption='Load Graph From Text', defaultValue=eg, style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
-        if dialog.ShowModal() == wx.ID_OK:
-            txt = dialog.GetValue()
-            print txt
-            self.LoadGraph(txt)
-        dialog.Destroy()
+        self.observers.CMD_LOAD_WORKSPACE_VIA_QUICK_PROMPT()
             
     def OnLoadGraph(self, event):
-        thisdir = self.config.get('LastDirFileOpen', '.\\saved uml workspaces') # remember dir path
-        
-        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir=thisdir,
-            defaultFile="", wildcard="*.txt", style=wx.OPEN, pos=wx.DefaultPosition)
-        if dlg.ShowModal() == wx.ID_OK:
-            filename = dlg.GetPath()
-
-            self.config['LastDirFileOpen'] = dlg.GetDirectory()  # remember dir path
-            self.config.write()
-
-            fp = open(filename, "r")
-            s = fp.read()
-            fp.close()
-
-            self.LoadGraph(s)
-        dlg.Destroy()
-
-    def LoadGraph(self, filedata=""):
-        self.umlwin.Clear()
-        
-        self.umlwin.umlworkspace.graph.LoadGraphFromStrings(filedata)
-                
-        # build view from model
-        self.umlwin.stage1(translatecoords=False)
-
-        # set layout coords to be in sync with world, so that if expand scale things will work
-        self.umlwin.coordmapper.Recalibrate()
-        self.umlwin.AllToLayoutCoords()
-        
-        # refresh view
-        self.umlwin.GetDiagram().ShowAll(1) # need this, yes
-        self.umlwin.stateofthenation()
-        
-        self.RefreshAsciiUmlTab()
-
+        self.observers.CMD_LOAD_WORKSPACE_VIA_DIALOG()
         
     def OnTabPageChanged(self, event):
         if event.GetSelection() == 0:  # ogl
@@ -472,7 +418,7 @@ class MainApp(wx.App):
             print 'Importing...'
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
             print filenames
-            self.umlwin.Go(files=filenames)
+            self.observers.CMD_FILE_IMPORT_SOURCE(files=filenames)
             self.umlwin.RedrawEverything()
             wx.EndBusyCursor()
             print 'Import - Done.'
@@ -497,8 +443,7 @@ class MainApp(wx.App):
             wx.EndBusyCursor()
             
     def FileNew(self, event):
-        self.umlwin.Clear()
-        self.RefreshAsciiUmlTab()
+        self.observers.CMD_FILE_NEW()
         
     def FilePrint(self, event):
 
