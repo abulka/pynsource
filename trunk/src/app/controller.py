@@ -3,6 +3,7 @@ import cmds.deletion
 import cmds.insertion
 import cmds.selection
 import cmds.diagnostics
+import cmds.filemgmt
 
 class Controller():
     def __init__(self, app):
@@ -40,17 +41,33 @@ class Controller():
     
     def CMD_DUMP_UML_WORKSPACE(self):
         self.run2(cmds.diagnostics.CmdDumpUmlWorkspace)
+
+    def CMD_FILE_IMPORT_SOURCE(self, files=None, path=None):
+        self.run(cmds.filemgmt.CmdFileImportSource(self.app.context, files, path))
     
+    def CMD_SAVE_WORKSPACE(self):
+        self.run2(cmds.filemgmt.CmdFileSaveWorkspace)
+
+    def CMD_SAVE_WORKSPACE_TO_CONSOLE(self):
+        self.run2(cmds.filemgmt.CmdFileSaveWorkspaceToConsole)
+
+    def CMD_FILE_NEW(self):
+        self.run2(cmds.filemgmt.CmdFileNew)
+
+    def CMD_LOAD_WORKSPACE_VIA_QUICK_PROMPT(self):
+        self.run2(cmds.filemgmt.CmdFileLoadWorkspaceFromQuickPrompt)
+
+    def CMD_LOAD_WORKSPACE_VIA_DIALOG(self):
+        self.run2(cmds.filemgmt.CmdFileLoadWorkspaceViaDialog)
+
+    def CMD_LOAD_WORKSPACE_FROM_FILEPATH(self, filepath):
+        self.run(cmds.filemgmt.CmdFileLoadWorkspaceFromFilepath(self.app.context, filepath))
+    
+
+
+    """
     # Events from Gui
     
-    def CMD_FILE_NEW(self):
-        self.model.Clear()
-
-    def CMD_FILE_LOAD_ALL(self):
-        self.model.LoadAll()
-
-    def CMD_FILE_SAVE_ALL(self):
-        self.model.SaveAll()
 
     def CMD_ADD_THING(self, info):
         thing = self.model.AddThing(info)
@@ -116,7 +133,7 @@ class Controller():
             return "Thing id %(id)s not found" % vars()
         finally:
             self.app.MainThreadMutexGuiLeave()
-
+    """
 
     """
     Used to redirect via app - lets not do this as too indirect.

@@ -1,5 +1,8 @@
-import sys, glob
-if ".." not in sys.path: sys.path.append("..")
+# Uml canvas
+
+if __name__ == '__main__':
+    import sys, glob
+    if ".." not in sys.path: sys.path.append("..")
 
 import random
 
@@ -230,24 +233,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.CreateUmlEdge(edge)
         self.stateofthenation()
 
-    def Go(self, files=None, path=None):
-
-        # these are tuples between class names.
-        self.umlworkspace.ClearAssociations()       # WHY DO WE WANT TO DESTROY THIS VALUABLE INFO?
-
-        if files:
-            for f in files:
-                p = PySourceAsJava()
-                p.optionModuleAsClass = 0
-                p.verbose = 0
-                p.Parse(f)
-                self.umlworkspace.ConvertParseModelToUmlModel(p)
-                #self.ConvertParseModelToUmlModel(p)
-
-        self.stage1()
-
-        # Layout
-        self.LayoutAndPositionShapes()
               
     def CreateImageShape(self, F):
         #shape = ogl.BitmapShape()
