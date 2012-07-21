@@ -544,7 +544,7 @@ class MainApp(wx.App):
         self.app.run.CmdLayout()
 
     def OnDeepLayout(self, event):
-        self.umlwin.CmdDeepLayout()
+        self.app.run.CmdDeepLayout()
 
 
     def OnRefreshUmlWindow(self, event):

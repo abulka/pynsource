@@ -4,9 +4,9 @@ from graph import Graph
 from layout_spring import GraphLayoutSpring
 
 class LayoutBlackboard(object):
-    def __init__(self, graph, controller):
+    def __init__(self, graph, umlwin):
         self.graph = graph
-        self.controller = controller
+        self.umlwin = umlwin
 
     def stateofthespring(self):
         pass
@@ -32,10 +32,10 @@ class LayoutBlackboard(object):
         Coordinate scaling runs 3.2 to max within ScaleUpMadly()
         Finish at the best scale as chosen by this algorithm
         """
-        self.controller.AllToLayoutCoords()    # doesn't matter what scale the layout starts with
+        self.umlwin.AllToLayoutCoords()    # doesn't matter what scale the layout starts with
         layouter = GraphLayoutSpring(self.graph, gui=self)
-        self.controller.snapshot_mgr.Clear()
-        oriscale = self.controller.coordmapper.scale
+        self.umlwin.snapshot_mgr.Clear()
+        oriscale = self.umlwin.coordmapper.scale
 
         def ThinkAndAddSnapshot(res):
             num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = res
@@ -44,12 +44,12 @@ class LayoutBlackboard(object):
             score = 0
             bounds = self.graph.GetBounds()
             
-            self.controller.snapshot_mgr.AddSnapshot(\
+            self.umlwin.snapshot_mgr.AddSnapshot(\
                 layout_score=score,
                 LL=num_line_line_crossings,
                 NN=num_node_node_overlaps,
                 LN=num_line_node_crossings,
-                scale=self.controller.coordmapper.scale,
+                scale=self.umlwin.coordmapper.scale,
                 bounds=bounds,
                 bounds_area_simple=bounds[0]*bounds[1]/10000,
                 graph_memento=self.graph.GetMementoOfPositions())
@@ -86,7 +86,7 @@ class LayoutBlackboard(object):
             if res[0] == 0 and res[2] <= 0:     # LL crossings solved and LN reasonable, so optimise and break - save time
                 break
         
-        #self.controller.snapshot_mgr.DumpSnapshots(label='Unsorted')
+        #self.umlwin.snapshot_mgr.DumpSnapshots(label='Unsorted')
             
         """
         blackboard now sorting smarter because I have converted snapshots to
@@ -98,29 +98,29 @@ class LayoutBlackboard(object):
             # this does the thinking!
           return (d['LL'], d['LN'], d['bounds_area_simple'], -d['scale'], d['NN_pre_OR'])        
 
-        #self.controller.snapshot_mgr.Sort()
-        self.controller.snapshot_mgr.Sort(sortfunc)  # this does the thinking!
-        #self.controller.snapshot_mgr.Sort(lambda d: (d['scale'], -d['LL'], -d['LN']))   # pick biggest with most line crossings! - Ha ha          
+        #self.umlwin.snapshot_mgr.Sort()
+        self.umlwin.snapshot_mgr.Sort(sortfunc)  # this does the thinking!
+        #self.umlwin.snapshot_mgr.Sort(lambda d: (d['scale'], -d['LL'], -d['LN']))   # pick biggest with most line crossings! - Ha ha          
         
-        #self.controller.snapshot_mgr.DumpSnapshots('Sorted')
+        #self.umlwin.snapshot_mgr.DumpSnapshots('Sorted')
         
-        self.controller.snapshot_mgr.Restore(0)
+        self.umlwin.snapshot_mgr.Restore(0)
 
 
     def LayoutThenPickBestScale(self, strategy=None, scramble=False, animate_at_scale=None):
         """
         layout to untangle then scale up repeatedly till strategy met
         """
-        self.controller.AllToLayoutCoords()  # doesn't matter what scale the layout starts with
+        self.umlwin.AllToLayoutCoords()  # doesn't matter what scale the layout starts with
         
         if animate_at_scale:
-            self.controller.coordmapper.Recalibrate(scale=animate_at_scale) # Scale up just for watching purposes...
+            self.umlwin.coordmapper.Recalibrate(scale=animate_at_scale) # Scale up just for watching purposes...
         
-        layouter = GraphLayoutSpring(self.graph, gui=self.controller)  # TODO gui = controller - yuk
+        layouter = GraphLayoutSpring(self.graph, gui=self.umlwin)  # TODO gui = controller - yuk
         layouter.layout(keep_current_positions=not scramble)
 
         self.ScaleUpMadly(strategy, animate=True)
-        self.controller.stateofthenation()
+        self.umlwin.stateofthenation()
 
     def Experiment1(self):
         """
@@ -143,8 +143,8 @@ class LayoutBlackboard(object):
         SCALE_STEP = 0.2
         SCALE_START = 3.2
 
-        self.controller.AllToLayoutCoords()  # doesn't matter what scale the layout starts with
-        layouter = GraphLayoutSpring(self.graph, gui=self.controller)  # TODO gui = controller - yuk
+        self.umlwin.AllToLayoutCoords()  # doesn't matter what scale the layout starts with
+        layouter = GraphLayoutSpring(self.graph, gui=self.umlwin)  # TODO gui = controller - yuk
         layouter.layout(keep_current_positions=False)
 
         initial_num_line_line_crossings = len(self.graph.CountLineOverLineIntersections(ignore_nodes=True))  # node height/width ignored
@@ -153,12 +153,12 @@ class LayoutBlackboard(object):
         else:
             print "Not Tangled", initial_num_line_line_crossings
             
-        self.controller.coordmapper.Recalibrate(scale=SCALE_START)
+        self.umlwin.coordmapper.Recalibrate(scale=SCALE_START)
         for i in range(8):
-            self.controller.coordmapper.Recalibrate(scale=self.controller.coordmapper.scale - SCALE_STEP)
-            self.controller.AllToWorldCoords()
+            self.umlwin.coordmapper.Recalibrate(scale=self.umlwin.coordmapper.scale - SCALE_STEP)
+            self.umlwin.AllToWorldCoords()
     
-            self.controller.stateofthenation()
+            self.umlwin.stateofthenation()
             
             # see how many INITIAL, PRE OVERLAP REMOVAL line-line crossings there are.
             num_line_line_crossings = len(self.graph.CountLineOverLineIntersections(ignore_nodes=True))
@@ -175,14 +175,14 @@ class LayoutBlackboard(object):
         level spring layout, operating there on layout coords - Spring Layout
         itself drops out early if nothing seems to be changing.
         """
-        self.controller.AllToLayoutCoords()     # doesn't matter what scale the layout starts with
+        self.umlwin.AllToLayoutCoords()     # doesn't matter what scale the layout starts with
         memento1 = self.graph.GetMementoOfPositions()
         
-        layouter = GraphLayoutSpring(self.graph, gui=self.controller)  # TODO gui = controller - yuk
+        layouter = GraphLayoutSpring(self.graph, gui=self.umlwin)  # TODO gui = controller - yuk
         layouter.layout(keep_current_positions=not scramble)
 
         for i in range(1, maxtimes):
-            self.controller.AllToWorldCoords()
+            self.umlwin.AllToWorldCoords()
             memento2 = self.graph.GetMementoOfPositions()
             
             if Graph.MementosEqual(memento1, memento2):
@@ -195,8 +195,8 @@ class LayoutBlackboard(object):
             layouter.layout(keep_current_positions=True)
             memento1 = memento2
         
-        self.controller.AllToWorldCoords()
-        self.controller.stage2() # does overlap removal and stateofthenation
+        self.umlwin.AllToWorldCoords()
+        self.umlwin.stage2() # does overlap removal and stateofthenation
         
     def ScaleUpMadly(self, strategy, animate=False):
         """
@@ -247,10 +247,10 @@ class LayoutBlackboard(object):
         SCALE_STEP = 0.2
         SCALE_START = 3.2
         
-        self.controller.coordmapper.Recalibrate(scale=SCALE_START)
+        self.umlwin.coordmapper.Recalibrate(scale=SCALE_START)
         for i in range(15):
             
-            res = self.GetVitalStats(scale=self.controller.coordmapper.scale - SCALE_STEP, animate=animate)
+            res = self.GetVitalStats(scale=self.umlwin.coordmapper.scale - SCALE_STEP, animate=animate)
             
             num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = res
 
@@ -272,12 +272,12 @@ class LayoutBlackboard(object):
             else:
                 assert False, "Mad: unknown strategy"
     
-            if self.controller.coordmapper.scale < MAX_SCALE:
-                #print "Mad: Aborting expansion - gone too far.", self.controller.coordmapper.scale
+            if self.umlwin.coordmapper.scale < MAX_SCALE:
+                #print "Mad: Aborting expansion - gone too far.", self.umlwin.coordmapper.scale
                 break
     
         if animate:
-            self.controller.stateofthenation()
+            self.umlwin.stateofthenation()
         
         return num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings
 
@@ -289,11 +289,11 @@ class LayoutBlackboard(object):
         NN Overlap Removal performed.
         """
         
-        self.controller.coordmapper.Recalibrate(scale=scale)
-        self.controller.AllToWorldCoords()
+        self.umlwin.coordmapper.Recalibrate(scale=scale)
+        self.umlwin.AllToWorldCoords()
 
         if animate:
-            self.controller.stateofthenation()
+            self.umlwin.stateofthenation()
         
         """Pre Overlap Removal"""
         
@@ -304,10 +304,10 @@ class LayoutBlackboard(object):
         # worked out
 
         # count NN (pre overlap removal)
-        num_node_node_overlaps = self.controller.overlap_remover.CountOverlaps()
+        num_node_node_overlaps = self.umlwin.overlap_remover.CountOverlaps()
 
         """Remove Node Overlaps"""
-        self.controller.overlap_remover.RemoveOverlaps(watch_removals=False)
+        self.umlwin.overlap_remover.RemoveOverlaps(watch_removals=False)
 
         """Post Overlap Removal"""
 
@@ -317,7 +317,7 @@ class LayoutBlackboard(object):
         # How many LL reduced (or perhaps increased) after expansion & post removing NN overlaps
         num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
 
-        #print "GetVitalStats: At scale %.1f NN_pre %d LN %d LL %d" % (self.controller.coordmapper.scale, num_node_node_overlaps, num_line_node_crossings, num_line_line_crossings)
+        #print "GetVitalStats: At scale %.1f NN_pre %d LN %d LL %d" % (self.umlwin.coordmapper.scale, num_node_node_overlaps, num_line_node_crossings, num_line_line_crossings)
     
         return num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings
 
