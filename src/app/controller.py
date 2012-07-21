@@ -1,68 +1,50 @@
-#from cmds import *
-import cmds.deletion
-import cmds.insertion
-import cmds.selection
-import cmds.diagnostics
-import cmds.filemgmt
+# Controller
 
+# Uses a CmdInvoker to create command instances, assigns the
+# context object and then runs the command via the command manager.
+
+if __name__ == '__main__':
+    import sys
+    if ".." not in sys.path: sys.path.append("..")
+
+from command_pattern import CommandManager
+
+from cmds.diagnostics import *
+from cmds.deletion import *
+from cmds.insertion import *
+from cmds.selection import *
+from cmds.filemgmt import *
+# TODO: Perhaps can add these modules to the globals within the
+# invoker class, to avoid having to import each module explicitly?
+
+class CmdInvoker:   # CmdInvoker4
+    """
+    When you call any method on an instance of this invoker class, the method is
+    interpreted as the name of a command class to be instantiated. Parameters in
+    the method call are used as paramters to the constructor. After the command
+    class is instantiated, a context object is attached, and the command passed
+    to a command manager to be run. No extra parameters are injected into the
+    constructor or to the execute() call.
+    """
+    def __init__(self, context, cmd_mgr):
+        self.context = context
+        self.cmd_mgr = cmd_mgr
+        
+    # needs to return a callable function which will then be called by python,
+    # with the arguments to the original call to '.method/klass' call.
+    def __getattr__(self, klass):
+        def broadcaster(*args, **kwargs):
+            cmd = eval(klass+'(*args, **kwargs)', globals(), locals())
+            cmd.context = self.context
+            self.cmd_mgr.run(cmd)
+        return broadcaster
+    
 class Controller():
     def __init__(self, app):
         self.app = app
-
-    def run(self, cmd):
-        self.app.cmd_mgr.run(cmd)
         
-    def run2(self, cmd_class):
-        cmd = cmd_class(self.app.context)
-        self.app.cmd_mgr.run(cmd)
-        
-    # Events from wxapp (for now)
-
-    def CMD_NODE_DELETE_SELECTED(self):
-        self.run2(cmds.deletion.CmdNodeDeleteSelected)
-
-    def CMD_NODE_DELETE(self, shape):
-        self.run(cmds.deletion.CmdNodeDelete(self.app.context, shape))
-
-    def CMD_INSERT_COMMENT(self):
-        self.run2(cmds.insertion.CmdInsertComment)
-
-    def CMD_INSERT_IMAGE(self):
-        self.run2(cmds.insertion.CmdInsertImage)
-
-    def CMD_INSERT_CLASS(self):
-        self.run2(cmds.insertion.CmdInsertNewNode)
-
-    def CMD_EDIT_CLASS(self, shape):
-        self.run(cmds.insertion.CmdEditClass(self.app.context, shape))
-
-    def CMD_DESELECT_ALL_SHAPES(self):
-        self.run2(cmds.selection.CmdDeselectAllShapes)
-    
-    def CMD_DUMP_UML_WORKSPACE(self):
-        self.run2(cmds.diagnostics.CmdDumpUmlWorkspace)
-
-    def CMD_FILE_IMPORT_SOURCE(self, files=None, path=None):
-        self.run(cmds.filemgmt.CmdFileImportSource(self.app.context, files, path))
-    
-    def CMD_SAVE_WORKSPACE(self):
-        self.run2(cmds.filemgmt.CmdFileSaveWorkspace)
-
-    def CMD_SAVE_WORKSPACE_TO_CONSOLE(self):
-        self.run2(cmds.filemgmt.CmdFileSaveWorkspaceToConsole)
-
-    def CMD_FILE_NEW(self):
-        self.run2(cmds.filemgmt.CmdFileNew)
-
-    def CMD_LOAD_WORKSPACE_VIA_QUICK_PROMPT(self):
-        self.run2(cmds.filemgmt.CmdFileLoadWorkspaceFromQuickPrompt)
-
-    def CMD_LOAD_WORKSPACE_VIA_DIALOG(self):
-        self.run2(cmds.filemgmt.CmdFileLoadWorkspaceViaDialog)
-
-    def CMD_LOAD_WORKSPACE_FROM_FILEPATH(self, filepath):
-        self.run(cmds.filemgmt.CmdFileLoadWorkspaceFromFilepath(self.app.context, filepath))
-    
+        self.cmd_mgr = CommandManager(100)
+        self.invoker = CmdInvoker(self.app.context, self.cmd_mgr)
 
 
     """
@@ -145,4 +127,53 @@ class Controller():
     #def CmdGetThingAsDict(self, id):
     #    return self.controller.CmdGetThingAsJson(id)
 
+
+
+
+if __name__ == '__main__':
         
+    class CmdMgr:
+        def run(self, cmd):
+            cmd.execute()
+
+    invoker = CmdInvoker(context={'a':4}, cmd_mgr=CmdMgr())
+    
+    class CmdWoody:
+        ugg = 1
+        def __init__(self, num, num2=98):
+            #self.context = context
+            self.num = num
+            self.num2 = num2
+        def execute(self):
+            print "hi from Woody and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__
+     
+    invoker.CmdWoody(100)  # instantiates class CmdWoody with constructor value (100) and calls execute() on it
+    invoker.CmdWoody(100, 97)
+    
+    # Test again with base class idea
+    
+    class CmdBase:
+        def setContext(self, context):
+            self.context = context
+        def execute(self):
+            raise "virtual"
+        def redo(self):
+            self.execute()
+            
+    class CmdBob(CmdBase):
+        def __init__(self, num, num2=98):
+            self.num = num
+            self.num2 = num2
+        def execute(self):
+            assert self.context
+            print "hi from Bob and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__
+    
+    invoker.CmdBob(100)  # instantiates class CmdBob with constructor value (100) and calls execute() on it
+    invoker.CmdBob(100, 97)
+    
+    # Using command outside of the invoker framework
+    c = CmdBob(100, 88)
+    c.setContext({'a':44})   # Need to do this if not using the framework
+    c.execute()
+    
+    print "done"        

@@ -3,14 +3,6 @@ from base_cmd import CmdBase
 # Cannot multi-select nodes at present.
 
 class CmdNodeDeleteBase(CmdBase):
-
-    def execute(self):
-        raise "virtual"
-    
-    def undo(self):  # override
-        """ Docstring """
-        # not implemented
-
     def delete_shape(self, shape):
         model = self.context.model
         gui = self.context.umlwin
@@ -21,19 +13,16 @@ class CmdNodeDeleteBase(CmdBase):
         
 class CmdNodeDelete(CmdNodeDeleteBase):
     """ Delete specific shape/node. """
-
-    def __init__(self, context, shape):
-        """ pass in all the relevant context as well as the shape/class """
-        super(CmdNodeDelete, self).__init__(context)
+    def __init__(self, shape):
         self.shape = shape
 
     def execute(self):
         """ Delete specific shape/node. """
         self.delete_shape(self.shape)
+
         
 class CmdNodeDeleteSelected(CmdNodeDeleteBase):
     """ Delete selected node """
-
     def execute(self):
         """ Delete selected node. """
         selected = [s for s in self.context.umlwin.GetDiagram().GetShapeList() if s.Selected()]

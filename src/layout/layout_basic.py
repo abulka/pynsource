@@ -1,6 +1,6 @@
 # basic layout
 
-from umlworkspace import UmlWorkspace
+from model.umlworkspace import UmlWorkspace
 
 class LayoutBasic:
     def __init__(self, leftmargin=200, topmargin=230, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=5):

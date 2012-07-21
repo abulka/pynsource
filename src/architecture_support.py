@@ -3,49 +3,29 @@
 #
 
 # Multicasting based on objects
+# My own simpler version -
+# see http://code.activestate.com/recipes/52289-multicasting-on-objects/
 
-import operator
+class multicast:
+    def __init__(self):
+        self.objects = []
 
-class multicast(dict):
-    "Class multiplexes messages to registered objects"
+    def add(self, o):
+        self.objects.append(o)
 
-    def __init__(self, objs=[]):
-        super(multicast, self).__init__()
-        for alias, obj in objs:
-            self.setdefault(alias, obj)
+    # needs to return a callable function which will then be called by python,
+    # with the arguments to the original 'method' call.
+    def __getattr__(self, method):
+        print method
+        def broadcaster(*args, **kwargs):
+            for o in self.objects:
+                func = getattr(o, method, None)
+                if func and callable(func):
+                    func(*args, **kwargs)
+        return broadcaster
+    
 
-    def __call__(self, *args, **kwargs):
-        "Invoke method attributes and return results through another multicast"
-        return self.__class__( [ (alias, obj(*args, **kwargs) ) \
-                for alias, obj in self.items() if callable(obj) ] )
-
-    def __nonzero__(self):
-        "A multicast is logically true if all delegate attributes are logically true"
-
-        return operator.truth(reduce(lambda a, b: a and b, self.values(), 1))
-
-    def __getattr__(self, name):
-        "Wrap requested attributes for further processing"
-        return self.__class__( [ (alias, getattr(obj, name) ) \
-                for alias, obj in self.items() if hasattr(obj, name) ] )
-
-    def __setattr__(self, name, value):
-        """Wrap setting of requested attributes for further
-        processing"""
-
-        for o in self.values():
-            o.setdefault(name, value)
-
-    # Andy Modifications
-
-    def addObserver(self, o):
-        self[id(o)] = o
-
-    def removeObserver(self, o):
-        if id(o) in self:
-            del self[id(o)]
-
-# Decorators
+# Misc Decorators
 
 class countcalls(object):
     "Decorator that keeps track of the number of times a function is called."
