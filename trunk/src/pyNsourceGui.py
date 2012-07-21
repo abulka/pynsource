@@ -111,8 +111,6 @@ class MainApp(wx.App):
         
         self.InitConfig()
 
-        self.observers = multicast()
-
         class Context(object):
             """ Everything everybody needs to know """
             pass
@@ -137,8 +135,7 @@ class MainApp(wx.App):
         # edit the ring classes to match what the app (and other ring
         # objects) expect - edit an adapter instead.
         self.app = App(context)
-        #app.Boot()
-        
+        self.app.Boot()
         
         
         wx.CallAfter(self.BootStrap)    # doesn't make a difference calling this via CallAfter
@@ -149,23 +146,23 @@ class MainApp(wx.App):
 
         def bootstrap01():
             self.frame.SetSize((1024,768))
-            self.observers.CMD_FILE_IMPORT_SOURCE(files=[os.path.abspath( __file__ )])
+            self.app.run.CmdFileImportSource(files=[os.path.abspath( __file__ )])
         def bootstrap02():
-            self.observers.CMD_FILE_IMPORT_SOURCE(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
+            self.app.run.CmdFileImportSource(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
             self.umlwin.RedrawEverything()
         def bootstrap03():
             self.umlwin.RedrawEverything()  # Allow main frame to resize and thus allow world coords to calibrate before we generate layout coords for loaded graph
-            self.observers.CMD_LOAD_WORKSPACE_FROM_FILEPATH(filepath=os.path.abspath("saved uml workspaces/uml05.txt"))
+            self.app.run.CmdFileLoadWorkspaceFromFilepath(filepath=os.path.abspath("saved uml workspaces/uml05.txt"))
             # Don't need to redraw everything after, because persisted
             # workspace is already laid out ok?  Or because we did it first?
         def bootstrap04():
-            self.observers.CMD_FILE_IMPORT_SOURCE(files=[os.path.abspath( "pyNsourceGui.py" )])
+            self.app.run.CmdFileImportSource(files=[os.path.abspath( "pyNsourceGui.py" )])
             self.umlwin.RedrawEverything()
         def bootstrap05():
-            self.observers.CMD_FILE_IMPORT_SOURCE(files=[os.path.abspath("printframework.py"), os.path.abspath("png.py")])
+            self.app.run.CmdFileImportSource(files=[os.path.abspath("printframework.py"), os.path.abspath("png.py")])
             self.umlwin.RedrawEverything()
         def bootstrap06():
-            self.observers.CMD_FILE_IMPORT_SOURCE(files=[os.path.abspath("gui/uml_shapes.py")])
+            self.app.run.CmdFileImportSource(files=[os.path.abspath("gui/uml_shapes.py")])
             self.umlwin.RedrawEverything()
             
         bootstrap03()
@@ -290,19 +287,19 @@ class MainApp(wx.App):
         event.Skip()
 
     def OnDumpUmlWorkspace(self, event):
-        self.observers.CMD_DUMP_UML_WORKSPACE()
+        self.app.run.CmdDumpUmlWorkspace()
 
     def OnSaveGraphToConsole(self, event):
-        self.observers.CMD_SAVE_WORKSPACE_TO_CONSOLE()
+        self.app.run.CmdFileSaveWorkspaceToConsole()
 
     def OnSaveGraph(self, event):
-        self.observers.CMD_SAVE_WORKSPACE()
+        self.app.run.CmdFileSaveWorkspace()
         
     def OnLoadGraphFromText(self, event):
-        self.observers.CMD_LOAD_WORKSPACE_VIA_QUICK_PROMPT()
+        self.app.run.CmdFileLoadWorkspaceFromQuickPrompt()
             
     def OnLoadGraph(self, event):
-        self.observers.CMD_LOAD_WORKSPACE_VIA_DIALOG()
+        self.app.run.CmdFileLoadWorkspaceViaDialog()
         
     def OnTabPageChanged(self, event):
         if event.GetSelection() == 0:  # ogl
@@ -418,7 +415,7 @@ class MainApp(wx.App):
             print 'Importing...'
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
             print filenames
-            self.observers.CMD_FILE_IMPORT_SOURCE(files=filenames)
+            self.app.run.CmdFileImportSource(files=filenames)
             self.umlwin.RedrawEverything()
             wx.EndBusyCursor()
             print 'Import - Done.'
@@ -443,7 +440,7 @@ class MainApp(wx.App):
             wx.EndBusyCursor()
             
     def FileNew(self, event):
-        self.observers.CMD_FILE_NEW()
+        self.app.run.CmdFileNew()
         
     def FilePrint(self, event):
 
@@ -520,24 +517,24 @@ class MainApp(wx.App):
         event.Enable(len(selected) > 0 and viewing_uml_tab)
 
     def OnDeleteNode(self, event):
-        self.observers.CMD_NODE_DELETE_SELECTED()
+        self.app.run.CmdNodeDeleteSelected()
                 
     def OnDeleteNode_update(self, event):
         self.Enable_if_node_selected(event)
 
     def OnInsertComment(self, event):
-        self.observers.CMD_INSERT_COMMENT()
+        self.app.run.CmdInsertComment()
 
     def OnInsertImage(self, event):
-        self.observers.CMD_INSERT_IMAGE()
+        self.app.run.CmdInsertImage()
                 
     def OnInsertClass(self, event):
-        self.observers.CMD_INSERT_CLASS()
+        self.app.run.CmdInsertNewNodeClass()
         
     def OnEditProperties(self, event):
         for shape in self.umlwin.GetDiagram().GetShapeList():
             if shape.Selected():
-                self.observers.CMD_EDIT_CLASS(shape)
+                self.app.run.CmdEditClass(shape)
                 break
             
     def OnEditProperties_update(self, event):

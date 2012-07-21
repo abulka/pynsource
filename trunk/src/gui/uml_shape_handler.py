@@ -14,8 +14,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self.log = log
         self.frame = frame              # these are arbitrary initialisations
         self.shapecanvas = shapecanvas  # these are arbitrary initialisations
-        
-        self.observers = multicast()
+        self.app = None  # assigned later by event sent to controller from uml canvas when creating new shapes
 
     def UpdateStatusBar(self, shape):
         x, y = shape.GetX(), shape.GetY()
@@ -133,11 +132,11 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
 
     def RightClickDeleteNode(self):
-        self.observers.CMD_NODE_DELETE(self.GetShape())
+        self.app.run.CmdNodeDelete(self.GetShape())
 
     def OnLeftDoubleClick(self, x, y, keys, attachment):
-        self.observers.CMD_EDIT_CLASS(self.GetShape())
+        self.app.run.CmdEditClass(self.GetShape())
 
     def NodeProperties(self):
-        self.observers.CMD_EDIT_CLASS(self.GetShape())
+        self.app.run.CmdEditClass(self.GetShape())
 

@@ -2,7 +2,6 @@ from base_cmd import CmdBase
 import wx
 
 class CmdDeselectAllShapes(CmdBase):
-
     def execute(self):
         selected = [s for s in self.context.umlwin.GetDiagram().GetShapeList() if s.Selected()]
         if selected:

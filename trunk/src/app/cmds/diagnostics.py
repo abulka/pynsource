@@ -2,7 +2,6 @@ from base_cmd import CmdBase
 import wx
 
 class CmdDumpUmlWorkspace(CmdBase):
-
     def execute(self):
         # Also called by Snapshot manager.
         # When create Snapshot manager we pass ourselves as a controller and DumpStatus() is expected to exist.
@@ -27,7 +26,3 @@ class CmdDumpUmlWorkspace(CmdBase):
 
         print
         print "^" * 50
-		
-    def undo(self):  # override
-        """ Docstring """
-        # not implemented

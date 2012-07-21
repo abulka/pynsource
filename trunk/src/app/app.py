@@ -1,6 +1,3 @@
-import sys
-if ".." not in sys.path: sys.path.append("..")
-from command_pattern import CommandManager
 from controller import Controller
 
 class App(object):
@@ -9,27 +6,23 @@ class App(object):
         #self.server = server
         #self.gui = gui
         self.context = context
+
         self.controller = Controller(app=self)
+        self.run = self.controller.invoker
+        
         #model.app = self.controller.app = gui.app = server.app = self
-        self.cmd_mgr = CommandManager(100)
         
         # Inject multicast dependencies / observers
-        self.context.wxapp.observers.addObserver(self.controller)
-        self.context.umlwin.observers.addObserver(self.controller)
-        self.context.umlwin.observers.addObserver(self)
-        #gui.observers.addObserver(self.controller)
-        #model.observers.addObserver(gui)
-        #model.observers.addObserver(self.controller) # diagnostic, optional
-        #server.observers.addObserver(self.controller)
+        self.context.umlwin.observers.add(self)
         
         # Inject normal dependencies
         #self.server.model = model
         
     # Housekeeping.
-    # Inject multicast dependencies / observers
-    # for new objects created during the lifetime of the app
+    
     def NOTIFY_EVT_HANDLER_CREATED(self, evthandler):
-        evthandler.observers.addObserver(self.controller)
+        # For new objects created during the lifetime of the app
+        evthandler.app = self
         
     # Startup and Shutdown
     
@@ -48,6 +41,8 @@ class App(object):
         #self.multiText.app = \
         #self.asciiart.app = \
         #                    self
+
+        self.context.umlwin.app = self
         
         #self.gui.Boot()
         #self.model.Boot()

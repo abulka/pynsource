@@ -33,7 +33,8 @@ class GraphSnapshotMgr:
             self.RestoreGraph(self.snapshots[snapshot_number]['memento'], self.snapshots[snapshot_number]['scale'])
             self.DumpSnapshots(current_snapshot_index=snapshot_number, label="Restoring %d" % (snapshot_number+1))
             #self.umlcanvas.DumpStatus()
-            self.umlcanvas.observers.CMD_DUMP_UML_WORKSPACE()
+            #self.umlcanvas.observers.CMD_DUMP_UML_WORKSPACE()
+            self.umlcanvas.app.run.CmdDumpUmlWorkspace()
             
         else:
             print "No such snapshot", snapshot_number+1

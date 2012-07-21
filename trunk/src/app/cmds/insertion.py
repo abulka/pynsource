@@ -6,7 +6,6 @@ import random
 
 class CmdInsertComment(CmdBase):
     """ Insert node """
-
     def execute(self):
         """ insert comment node """
         id = 'D' + str(random.randint(1,9999))
@@ -20,10 +19,6 @@ class CmdInsertComment(CmdBase):
             self.context.umlwin.stateofthenation()
         dialog.Destroy()
         
-    def undo(self):  # override
-        """ undo insert new comment """
-        # not implemented
-
 
 class CmdInsertOrEditNode(CmdBase):
     def DisplayDialogUmlNodeEdit(self, id, attrs, methods):
@@ -59,9 +54,8 @@ class CmdInsertOrEditNode(CmdBase):
         return (result, id, attrs, methods)
 
 
-class CmdInsertNewNode(CmdInsertOrEditNode):
+class CmdInsertNewNodeClass(CmdInsertOrEditNode):
     """ Insert new node """
-
     def execute(self):
         """ insert the new node and refresh the ascii tab too """
         umlwin = self.context.umlwin
@@ -101,11 +95,7 @@ class CmdInsertNewNode(CmdInsertOrEditNode):
 class CmdEditClass(CmdInsertOrEditNode):
     """ Edit node properties """
 
-    def __init__(self, context, shape):
-        """ pass in all the relevant context
-            as well as the shape/class
-        """
-        super(CmdEditClass, self).__init__(context)
+    def __init__(self, shape):
         self.shape = shape
 
     def execute(self):

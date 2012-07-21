@@ -15,6 +15,10 @@ class multicast_1:
             if func:
                 func(*args, **kwargs)
 
+# Multicasting based on objects
+# My own simpler version -
+# see http://code.activestate.com/recipes/52289-multicasting-on-objects/
+
 class multicast:
     def __init__(self):
         self.objects = []
@@ -24,7 +28,7 @@ class multicast:
 
     # needs to return a callable function which will then be called by python,
     # with the arguments to the original 'method' call.
-    def __getattr__(self, method): 
+    def __getattr__(self, method):
         def broadcaster(*args, **kwargs):
             for o in self.objects:
                 func = getattr(o, method, None)

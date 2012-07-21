@@ -3,17 +3,13 @@ from generate_code.gen_java import PySourceAsJava
 import wx
 
 class CmdFileNew(CmdBase):
-
     def execute(self):
         self.context.umlwin.Clear()
         self.context.wxapp.RefreshAsciiUmlTab()
 
         
 class CmdFileImportSource(CmdBase):
-
-    def __init__(self, context, files=None, path=None):
-        """ pass in all the relevant context as well as the files to import """
-        super(CmdFileImportSource, self).__init__(context)
+    def __init__(self, files=None, path=None):
         self.files = files
         self.path = path
         
@@ -34,12 +30,8 @@ class CmdFileImportSource(CmdBase):
         # Layout
         self.context.umlwin.LayoutAndPositionShapes()
         
-    def undo(self):  # override
-        """ Docstring """
-        # not implemented
 
 class CmdFileSaveWorkspace(CmdBase):
-
     def execute(self):
         dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir='.\\saved uml workspaces',
             defaultFile="", wildcard="*.txt", style=wx.FD_SAVE, pos=wx.DefaultPosition)
@@ -52,7 +44,6 @@ class CmdFileSaveWorkspace(CmdBase):
         dlg.Destroy()
 
 class CmdFileSaveWorkspaceToConsole(CmdBase):
-
     def execute(self):
         print self.context.model.graph.GraphToString()
 
@@ -81,10 +72,7 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
         raise "base/virtual only"
         
 class CmdFileLoadWorkspaceFromFilepath(CmdFileLoadWorkspaceBase):
-
-    def __init__(self, context, filepath):
-        """ pass in all the relevant context as well as the files to import """
-        super(CmdFileLoadWorkspaceFromFilepath, self).__init__(context)
+    def __init__(self, filepath):
         self.filepath = filepath
         
     def execute(self):
@@ -94,7 +82,6 @@ class CmdFileLoadWorkspaceFromFilepath(CmdFileLoadWorkspaceBase):
             self.LoadGraph(s)
             
 class CmdFileLoadWorkspaceFromQuickPrompt(CmdFileLoadWorkspaceBase):
-
     def execute(self):
         eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
         dialog = wx.TextEntryDialog (parent=self.context.frame, message='Enter node/edge persistence strings:', caption='Load Graph From Text', defaultValue=eg, style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
@@ -122,5 +109,3 @@ class CmdFileLoadWorkspaceViaDialog(CmdFileLoadWorkspaceBase):
 
             self.LoadGraph(s)
         dlg.Destroy()
-
-

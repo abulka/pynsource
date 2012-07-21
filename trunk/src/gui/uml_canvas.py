@@ -1,7 +1,7 @@
 # Uml canvas
 
 if __name__ == '__main__':
-    import sys, glob
+    import sys
     if ".." not in sys.path: sys.path.append("..")
 
 import random
@@ -40,6 +40,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.SetScrollbars(20, 20, maxWidth/20, maxHeight/20)
 
         self.observers = multicast()
+        self.app = None  # assigned later by app boot
         
         self.log = log
         self.frame = frame
@@ -101,8 +102,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         elif keycode == wx.WXK_INSERT:
             self.CmdInsertNewNode()
         elif keycode == wx.WXK_DELETE:
-            print "DELETE"
-            self.observers.CMD_NODE_DELETE_SELECTED()
+            self.app.run.CmdNodeDeleteSelected()
             
         self.working = False
         event.Skip()
@@ -149,7 +149,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.CmdLayout()
             
         elif keycode in ['d', 'D']:
-            self.observers.CMD_DUMP_UML_WORKSPACE()
+            self.app.run.CmdDumpUmlWorkspace()
         
         self.working = False
         event.Skip()
@@ -169,7 +169,7 @@ class UmlCanvas(ogl.ShapeCanvas):
     def SelectNodeNow(self, shape):
         canvas = shape.GetCanvas()
 
-        self.observers.CMD_DESELECT_ALL_SHAPES()
+        self.app.run.CmdDeselectAllShapes()
 
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
@@ -180,7 +180,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def delete_shape_view(self, shape):
         # View
-        self.observers.CMD_DESELECT_ALL_SHAPES()
+        self.app.run.CmdDeselectAllShapes()
         for line in shape.GetLines()[:]:
             line.Delete()
         shape.Delete()
@@ -253,7 +253,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
-        self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler) # allow app.controller to become observer of new evthandler, without knowing about controller here
+        self.new_evthandler_housekeeping(evthandler)
 
         setpos(shape, 0, 0)
         #setpos(shape, node.left, node.top)
@@ -333,7 +333,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
-        self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler) # allow app.controller to become observer of new evthandler, without knowing about controller here
+        self.new_evthandler_housekeeping(evthandler)
         
         shape.FlushText()
 
@@ -361,7 +361,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
-        self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler) # allow app.controller to become observer of new evthandler, without knowing about controller here
+        self.new_evthandler_housekeeping(evthandler)
 
     def createCommentShape(self, node):
         shape = ogl.TextShape( node.width, node.height )
@@ -384,8 +384,15 @@ class UmlCanvas(ogl.ShapeCanvas):
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
-        self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler) # allow app.controller to become observer of new evthandler, without knowing about controller here
+        self.new_evthandler_housekeeping(evthandler)
 
+    def new_evthandler_housekeeping(self, evthandler):
+        # notify app of this new evthandler so app can
+        # assign the evthandler's .app attribute.
+        # Or could have just done:
+        #   evthandler.app = self.app
+        # here.  But we may need observer for other things later.
+        self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler) 
         
     def CreateUmlEdge(self, edge):
         fromShape = edge['source'].shape
@@ -622,6 +629,6 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
         # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
-        self.observers.CMD_DESELECT_ALL_SHAPES()
+        self.app.run.CmdDeselectAllShapes()
 
 
