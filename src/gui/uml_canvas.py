@@ -18,7 +18,6 @@ from layout.layout_basic import LayoutBasic
 from layout.snapshots import GraphSnapshotMgr
 from layout.layout_spring import GraphLayoutSpring
 from layout.overlap_removal import OverlapRemoval
-from layout.blackboard import LayoutBlackboard
 from layout.coordinate_mapper import CoordinateMapper
 
 import wx
@@ -130,7 +129,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.snapshot_mgr.Restore(todisplay)
 
         elif keycode in ['b', 'B']:
-            self.CmdDeepLayout()
+            self.app.run.CmdDeepLayout()
                 
         elif keycode in ['l', 'L']:
             self.app.run.CmdLayout()
@@ -510,36 +509,18 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.frame.SetSize(oldSize)
 
 
-    def CmdDeepLayout_OFFLINE(self):
-        wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
-        wx.SafeYield()
-        try:
-            b = LayoutBlackboard(graph=self.umlworkspace.graph, controller=self)
-            b.LayoutMultipleChooseBest(4)
-        finally:
-            wx.EndBusyCursor()
-
-    def CmdDeepLayout(self):
-        from blackboard_thread import MainBlackboardFrame
-        """Init Main App."""
-        f = MainBlackboardFrame(parent=self.frame)
-        f.Show(True)
-        
-        b = LayoutBlackboard(graph=self.umlworkspace.graph, controller=self)
-        f.SetBlackboardObject(b)
-        f.Start(num_attempts=3)
-        print "CmdDeepLayout end"
-
-    def ReLayout(self, keep_current_positions=False, gui=None, optimise=True):
-        print "Draw: ReLayout"
+    def LayoutAndPositionShapes(self):
+        # This is called by CmdLayout and CmdFileImportSource
+        # do we turn it into a command (but it doesn't get called like a command)
+        # or leave it here as a utility function?
+        print "Draw: LayoutAndPositionShapes"
+        keep_current_positions=False
+        gui=None
+        optimise=True
         self.AllToLayoutCoords()
         self.layouter.layout(keep_current_positions, optimise=optimise)
         self.AllToWorldCoords()
         self.stage2() # does overlap removal and stateofthenation
-    
-    def LayoutAndPositionShapes(self):
-        print "Draw: LayoutAndPositionShapes"
-        self.ReLayout()
         
     def setSize(self, size):
         size = wx.Size(size[0], size[1])

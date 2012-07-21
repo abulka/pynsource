@@ -48,3 +48,18 @@ class CmdLayoutContract(CmdLayoutExpandContractBase):
             #print "contraction ", self.coordmapper.scale
         else:
             print "Min expansion thwarted.", self.context.coordmapper.scale
+
+
+from blackboard_thread import MainBlackboardFrame
+from layout.blackboard import LayoutBlackboard
+
+class CmdDeepLayout(CmdBase):
+    def execute(self):
+        """Init Main App."""
+        f = MainBlackboardFrame(parent=self.context.frame)
+        f.Show(True)
+        
+        b = LayoutBlackboard(graph=self.context.model.graph, umlwin=self.context.umlwin)
+        f.SetBlackboardObject(b)
+        f.Start(num_attempts=3)
+        print "CmdDeepLayout end"
