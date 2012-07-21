@@ -541,7 +541,7 @@ class MainApp(wx.App):
         self.Enable_if_node_selected(event)
 
     def OnLayout(self, event):
-        self.umlwin.CmdLayout()
+        self.app.run.CmdLayout()
 
     def OnDeepLayout(self, event):
         self.umlwin.CmdDeepLayout()
