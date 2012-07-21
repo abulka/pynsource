@@ -94,10 +94,10 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.kill_layout = True
         
         if keycode == wx.WXK_RIGHT:
-            self.cmdLayoutExpand(event)
+            self.app.run.CmdLayoutExpand(remap_world_to_layout=event.ShiftDown(), remove_overlaps=not event.ControlDown())
             
         elif keycode == wx.WXK_LEFT:
-            self.cmdLayoutContract(event)
+            self.app.run.CmdLayoutContract(remap_world_to_layout=event.ShiftDown(), remove_overlaps=not event.ControlDown())
 
         elif keycode == wx.WXK_INSERT:
             self.CmdInsertNewNode()
@@ -107,19 +107,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.working = False
         event.Skip()
 
-    def cmdLayoutExpand(self, event):
-        if self.coordmapper.scale > 0.8:
-            self.ChangeScale(-0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
-            #print "expansion ", self.coordmapper.scale
-        else:
-            print "Max expansion prevented.", self.coordmapper.scale
-
-    def cmdLayoutContract(self, event):
-        if self.coordmapper.scale < 3:
-            self.ChangeScale(0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
-            #print "contraction ", self.coordmapper.scale
-        else:
-            print "Min expansion thwarted.", self.coordmapper.scale
 
     def onKeyChar(self, event):
         if event.GetKeyCode() >= 256:
@@ -146,7 +133,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.CmdDeepLayout()
                 
         elif keycode in ['l', 'L']:
-            self.CmdLayout()
+            self.app.run.CmdLayout()
             
         elif keycode in ['d', 'D']:
             self.app.run.CmdDumpUmlWorkspace()
@@ -424,9 +411,9 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.working = True
 
         if event.GetWheelRotation() < 0:
-            self.cmdLayoutContract(event)
+            self.app.run.CmdLayoutContract(remap_world_to_layout=event.ShiftDown(), remove_overlaps=not event.ControlDown())
         else:
-            self.cmdLayoutExpand(event)
+            self.app.run.CmdLayoutExpand(remap_world_to_layout=event.ShiftDown(), remove_overlaps=not event.ControlDown())
 
         self.working = False
 
@@ -442,17 +429,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         self.working = False
         
-    def ChangeScale(self, delta, remap_world_to_layout=False, removeoverlaps=True):
-        if remap_world_to_layout:
-            self.AllToLayoutCoords()    # Experimental - only needed when you've done world coord changes 
-        self.coordmapper.Recalibrate(scale=self.coordmapper.scale+delta)
-        self.AllToWorldCoords()
-        numoverlaps = self.overlap_remover.CountOverlaps()
-        if removeoverlaps:
-            self.stage2(force_stateofthenation=True, watch_removals=False) # does overlap removal and stateofthenation
-        else:
-            self.stateofthenation()
-        
+       
     def stage1(self, translatecoords=True):         # FROM SPRING LAYOUT
         print "Draw: stage1"
         if translatecoords:
@@ -532,12 +509,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.frame.SetSize((oldSize[0]+1,oldSize[1]+1))
         self.frame.SetSize(oldSize)
 
-    def CmdLayout(self):
-        print "Draw: CmdLayout"
-        if self.GetDiagram().GetCount() == 0:
-            return
-        self.LayoutAndPositionShapes()
-        self.RedrawEverything()
 
     def CmdDeepLayout_OFFLINE(self):
         wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)

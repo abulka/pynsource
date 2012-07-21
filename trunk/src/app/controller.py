@@ -14,6 +14,7 @@ from cmds.deletion import *
 from cmds.insertion import *
 from cmds.selection import *
 from cmds.filemgmt import *
+from cmds.layout import *
 # TODO: Perhaps can add these modules to the globals within the
 # invoker class, to avoid having to import each module explicitly?
 
