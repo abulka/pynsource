@@ -33,7 +33,7 @@ class CmdFileImportSource(CmdBase):
 
 class CmdFileSaveWorkspace(CmdBase):
     def execute(self):
-        dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir='.\\saved uml workspaces',
+        dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir='..\\tests\\saved uml workspaces',
             defaultFile="", wildcard="*.txt", style=wx.FD_SAVE, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
@@ -93,7 +93,7 @@ class CmdFileLoadWorkspaceFromQuickPrompt(CmdFileLoadWorkspaceBase):
         
 class CmdFileLoadWorkspaceViaDialog(CmdFileLoadWorkspaceBase):
     def execute(self):
-        thisdir = self.context.config.get('LastDirFileOpen', '.\\saved uml workspaces') # remember dir path
+        thisdir = self.context.config.get('LastDirFileOpen', '..\\tests\\saved uml workspaces') # remember dir path
         
         dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir=thisdir,
             defaultFile="", wildcard="*.txt", style=wx.OPEN, pos=wx.DefaultPosition)

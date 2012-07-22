@@ -513,12 +513,8 @@ class UmlCanvas(ogl.ShapeCanvas):
         # This is called by CmdLayout and CmdFileImportSource
         # do we turn it into a command (but it doesn't get called like a command)
         # or leave it here as a utility function?
-        print "Draw: LayoutAndPositionShapes"
-        keep_current_positions=False
-        gui=None
-        optimise=True
         self.AllToLayoutCoords()
-        self.layouter.layout(keep_current_positions, optimise=optimise)
+        self.layouter.layout(keep_current_positions=False, optimise=True)
         self.AllToWorldCoords()
         self.stage2() # does overlap removal and stateofthenation
         

@@ -48,6 +48,8 @@ def suite():
             'test_parse_07',
             'test_overlaps1',
             'test_overlaps2stress',
+            'test_asciiworkspace_01',
+            'test_asciiworkspace_02',
             'test_parse_yuml_01'
             )   # ANDY - and so on
     alltests = unittest.TestSuite()

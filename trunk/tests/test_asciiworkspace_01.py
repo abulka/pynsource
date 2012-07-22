@@ -1,7 +1,18 @@
-from asciiworkspace import AsciiWorkspace
-w = AsciiWorkspace()
+import unittest
+import os
 
-w.AddColumn("""
+import sys
+sys.path.append("../src")
+from asciiworkspace import AsciiWorkspace
+
+OUT_FILE = "ascii_out.txt"
+
+class TestCaseAscii_01(unittest.TestCase):
+
+    def setUp(self):
+        w = AsciiWorkspace()
+
+        w.AddColumn("""
 +------------+
 |   Editor   |
 |------------|
@@ -14,25 +25,25 @@ w.AddColumn("""
 +------------+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
 +------------+
 | TopHandler |
 +------------+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
 +-----+
 | GUI |
 +-----+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
 +------------+
 | Statechart |
 +------------+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
            [ ogl ]           
               .              
              /_\             
@@ -90,7 +101,7 @@ w.AddColumn("""
 +-----------------------------+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
 +-----------+
 |    Log    |
 |-----------|
@@ -98,7 +109,7 @@ w.AddColumn("""
 +-----------+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
             [ wx ]            
               .               
              /_\              
@@ -152,7 +163,7 @@ w.AddColumn("""
 +------------------------------+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
        [ ogl ]        
           .           
          /_\          
@@ -179,63 +190,86 @@ w.AddColumn("""
 +----------------------+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
 +-----+
 | ogl |
 +-----+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
 +----+
 | wx |
 +----+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
 +--------------+
 | UmlWorkspace |
 +--------------+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
 +-------------+
 | LayoutBasic |
 +-------------+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
 +------------------+
 | CoordinateMapper |
 +------------------+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
 +-------------------+
 | GraphLayoutSpring |
 +-------------------+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
 +----------------+
 | OverlapRemoval |
 +----------------+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
 +-------+
 | Frame |
 +-------+
 """)
 
-w.AddColumn("""
+        w.AddColumn("""
 +-------------+
 | ImageViewer |
 +-------------+
 """)
 
-w.Flush()
-fp = open("ascii_out.txt", "w")
-fp.write(w.contents)
-fp.close()
+        w.Flush()
+        fp = open(OUT_FILE, "w")
+        fp.write(w.contents)
+        fp.close()
 
-print "done!"
+    def tearDown(self):
+        os.remove(OUT_FILE)
+    
+    def test_ascii_layout_01(self):
+        fp = open(OUT_FILE, "r")
+        lines = fp.readlines()
+        fp.close()
+        
+        self.assertEqual("                                                                                                                                                                                                                                                                                                                                                                                                                    \n", lines[0])
+        self.assertEqual("+------------+                          +------------+   +-----+   +------------+              [ ogl ]                                              +-----------+               [ wx ]                                                   [ ogl ]             +-----+   +----+   +--------------+   +-------------+   +------------------+   +-------------------+   +----------------+   +-------+   +-------------+\n", lines[1])
+        self.assertEqual("| statechart |  ---->  [ GUI ]                                                      +-----------------------------+                                                 +------------------------------+                              +----------------------+                                                                                                                                                          \n", lines[6])
+
+
+def suite():
+    suite1 = unittest.makeSuite(TestCaseAscii_01, 'test')
+    alltests = unittest.TestSuite((suite1, ))
+    return alltests
+
+def main():
+    runner = unittest.TextTestRunner(descriptions = 0, verbosity = 2) # default is descriptions=1, verbosity=1
+    runner.run(suite())
+
+if __name__ == '__main__':
+    main()
