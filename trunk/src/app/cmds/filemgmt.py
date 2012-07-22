@@ -28,7 +28,7 @@ class CmdFileImportSource(CmdBase):
         self.context.umlwin.stage1()
 
         # Layout
-        self.context.umlwin.LayoutAndPositionShapes()
+        self.context.umlwin.layout_and_position_shapes()
         
 
 class CmdFileSaveWorkspace(CmdBase):

@@ -6,8 +6,8 @@ class CmdLayout(CmdBase):
         
         if canvas.GetDiagram().GetCount() == 0:
             return
-        canvas.LayoutAndPositionShapes()
-        canvas.RedrawEverything()
+        canvas.layout_and_position_shapes()
+        canvas.redraw_everything()
         
     def undo(self):  # override
         """ Docstring """

@@ -428,7 +428,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         self.working = False
         
-       
+    # UTILITY - called by CmdFileImportSource, CmdFileLoadWorkspaceBase.LoadGraph   
     def stage1(self, translatecoords=True):         # FROM SPRING LAYOUT
         print "Draw: stage1"
         if translatecoords:
@@ -449,8 +449,19 @@ class UmlCanvas(ogl.ShapeCanvas):
         for edge in self.umlworkspace.graph.edges:
             self.CreateUmlEdge(edge)
 
-        self.Redraw222()
+        self.redraw_222()
 
+    # UTILITY - called by everyone!!??
+    #
+    #CmdInsertNewNodeClass, CmdInsertImage, CmdLayoutExpandContractBase, 
+    #umlwin.OnWheelZoom_OverlapRemoval_Defunct, 
+    #umlwin.layout_and_position_shapes, 
+    #UmlShapeHandler.OnEndDragLeft
+    #UmlShapeHandler.OnSizingEndDragLeft
+    #LayoutBlackboard.LayoutLoopTillNoChange
+    #
+    # RENAME?: removeoverlaps_And_RedrawIfNecc
+    #
     def stage2(self, force_stateofthenation=False, watch_removals=True):
         print "Draw: stage2 force_stateofthenation=", force_stateofthenation
         ANIMATION = False
@@ -463,21 +474,65 @@ class UmlCanvas(ogl.ShapeCanvas):
         if self.overlap_remover.GetStats()['total_overlaps_found'] > 0 or force_stateofthenation:
             self.stateofthenation(animate=ANIMATION)
 
+    # UTILITY - called by everyone!!??
+    #
+    #CmdFileLoadWorkspaceBase, CmdInsertComment, CmdEditClass
+    #CmdLayoutExpandContractBase, 
+    #CmdInsertNewNodeClass (no longer though, use stage2 instead)
+    #umlwin.NewEdgeMarkTo
+    #umlwin.OnWheelZoom_OverlapRemoval_Defunct
+    #umlwin.stage2  (!!!)
+    #umlwin.stateofthespring    (!!!)
+    #LayoutBlackboard.LayoutThenPickBestScale
+    #LayoutBlackboard.Experiment1
+    #LayoutBlackboard.LayoutLoopTillNoChange
+    #LayoutBlackboard.ScaleUpMadly
+    #LayoutBlackboard.GetVitalStats  (only if animate is true)
+    #OverlapRemoval.RemoveOverlaps   ( refresh gui if self.gui and watch_removals)
+    #GraphSnapshotMgr.RestoreGraph
+    #
+    # TIP: identical to redraw_everything() except shapes not moved
+    #
+    # RENAME?: dc_DiagramClearAndRedraw
+    #
     def stateofthenation(self, animate=False):
+        
+        # RENAME?: NodeShapeSetXy_Then_dc_ShapeMoveLinks
+        #
+        def AdjustShapePosition(umlwin, node):   # FROM SPRING LAYOUT
+            #
+            # Here we call setpos which sets the pos but doesn't actually render anything, which is why you need
+            # a real shape.Move(dc, shape.GetX(), shape.GetY()) later
+            #
+            print "Draw:  AdjustShapePosition", node.left, node.top
+            assert node.shape
+            
+            x, y = node.left, node.top
+                
+            # Don't need to use node.shape.Move(dc, x, y, False)
+            setpos(node.shape, x, y)
+    
+            # But you DO need to use a dc to adjust the links
+            dc = wx.ClientDC(umlwin)
+            umlwin.PrepareDC(dc)
+            node.shape.MoveLinks(dc)
+        
         print "Draw: stateofthenation"
         for node in self.umlworkspace.graph.nodes:
-            self.AdjustShapePosition(node)
-        self.Redraw222()
+            AdjustShapePosition(self, node)
+        self.redraw_222()
         wx.SafeYield()
 
+    # UTILITY - called by core spring layout self.gui.stateofthespring()
     def stateofthespring(self):
         print "Draw: stateofthespring"
         self.coordmapper.Recalibrate()
         self.AllToWorldCoords()
         self.stateofthenation() # DON'T do overlap removal or it will get mad!
-                
-    def RedrawEverything(self):
-        print "Draw: RedrawEverything"
+            
+    # UTILITY - called by CmdLayout and pynsourcegui.FileImport, OnRefreshUmlWindow and Bootstrap
+    def redraw_everything(self):
+        print "Draw: redraw_everything"
         diagram = self.GetDiagram()
         canvas = self
         assert self == canvas == diagram.GetCanvas()
@@ -508,48 +563,19 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.frame.SetSize((oldSize[0]+1,oldSize[1]+1))
         self.frame.SetSize(oldSize)
 
-
-    def LayoutAndPositionShapes(self):
-        # This is called by CmdLayout and CmdFileImportSource
-        # do we turn it into a command (but it doesn't get called like a command)
-        # or leave it here as a utility function?
+    # UTILITY - used by CmdLayout and CmdFileImportSource
+    def layout_and_position_shapes(self):
         self.AllToLayoutCoords()
         self.layouter.layout(keep_current_positions=False, optimise=True)
         self.AllToWorldCoords()
         self.stage2() # does overlap removal and stateofthenation
         
-    def setSize(self, size):
-        size = wx.Size(size[0], size[1])
-        
-        nvsx, nvsy = size.x / self.scrollStepX, size.y / self.scrollStepY
-        self.Scroll(0, 0)
-        self.SetScrollbars(self.scrollStepX, self.scrollStepY, nvsx, nvsy)
-        canvas = self
-        canvas.SetSize(canvas.GetVirtualSize())
-
-
-    def AdjustShapePosition(self, node, point=None):   # FROM SPRING LAYOUT
-        print "Draw:  AdjustShapePosition", node.left, node.top
-        assert node.shape
-        
-        if point:
-            x, y = point
-        else:
-            x, y = node.left, node.top
-            
-        # Don't need to use node.shape.Move(dc, x, y, False)
-        setpos(node.shape, x, y)
-
-        # But you DO need to use a dc to adjust the links
-        dc = wx.ClientDC(self)
-        self.PrepareDC(dc)
-        node.shape.MoveLinks(dc)
-        
-    def Redraw222(self, clear=True):        # FROM SPRING LAYOUT
-        #self.RedrawEverything() # HACK
+    # UTILITY - called by umlwin.stage1 and umlwin.stateofthenation
+    def redraw_222(self, clear=True):        # FROM SPRING LAYOUT
+        #self.redraw_everything() # HACK
         #return
         
-        print "Draw: Redraw222   clear=", clear
+        print "Draw: redraw_222   clear=", clear
         diagram = self.GetDiagram()
         canvas = self
         assert canvas == diagram.GetCanvas()
@@ -565,6 +591,21 @@ class UmlCanvas(ogl.ShapeCanvas):
             diagram.Clear(dc)
         diagram.Redraw(dc)
         
+    # UTILITY - not used, possibly could be called by pynsourcegui.BootStrap
+    def set_uml_canvas_size(self, size):
+        """
+        Currently unused, but it works and sets the canvas size
+        and the scrollbars adjust accordingly.
+        Set to something big and always have a large scrollable region e.g.
+            self.umlwin.set_uml_canvas_size((9000,9000))
+        """
+        size = wx.Size(size[0], size[1])
+        nvsx, nvsy = size.x / self.scrollStepX, size.y / self.scrollStepY
+        self.Scroll(0, 0)
+        self.SetScrollbars(self.scrollStepX, self.scrollStepY, nvsx, nvsy)
+        canvas = self
+        canvas.SetSize(canvas.GetVirtualSize())
+
     def get_umlboxshapes(self):
         return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]
 
