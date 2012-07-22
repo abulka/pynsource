@@ -449,7 +449,11 @@ class UmlCanvas(ogl.ShapeCanvas):
         for edge in self.umlworkspace.graph.edges:
             self.CreateUmlEdge(edge)
 
-        self.redraw_222()
+        dc = wx.ClientDC(self)
+        self.PrepareDC(dc)
+        
+        self.GetDiagram().Clear(dc)
+        self.GetDiagram().Redraw(dc)
 
     # UTILITY - called by everyone!!??
     #
@@ -460,19 +464,15 @@ class UmlCanvas(ogl.ShapeCanvas):
     #UmlShapeHandler.OnSizingEndDragLeft
     #LayoutBlackboard.LayoutLoopTillNoChange
     #
+    # Tip: force_stateofthenation = true by CmdInsertNewNodeClass, CmdInsertImage, CmdLayoutExpandContractBase
+    #
     # RENAME?: removeoverlaps_And_RedrawIfNecc
     #
     def stage2(self, force_stateofthenation=False, watch_removals=True):
-        print "Draw: stage2 force_stateofthenation=", force_stateofthenation
-        ANIMATION = False
-        
-        #if ANIMATION:
-        #    self.graph.SaveOldPositionsForAnimationPurposes()
-        #    watch_removals = False  # added this when I turned animation on.
-        
+        #print "Draw: stage2 force_stateofthenation=", force_stateofthenation
         self.overlap_remover.RemoveOverlaps(watch_removals=watch_removals)
         if self.overlap_remover.GetStats()['total_overlaps_found'] > 0 or force_stateofthenation:
-            self.stateofthenation(animate=ANIMATION)
+            self.stateofthenation()
 
     # UTILITY - called by everyone!!??
     #
@@ -496,35 +496,27 @@ class UmlCanvas(ogl.ShapeCanvas):
     #
     # RENAME?: dc_DiagramClearAndRedraw
     #
-    def stateofthenation(self, animate=False, recalibrate=False):
+    def stateofthenation(self, recalibrate=False):
         if recalibrate:  # was stateofthespring
             self.coordmapper.Recalibrate()
             self.AllToWorldCoords()
             
-        # RENAME?: NodeShapeSetXy_Then_dc_ShapeMoveLinks
-        #
-        def AdjustShapePosition(umlwin, node):   # FROM SPRING LAYOUT
-            #
-            # Here we call setpos which sets the pos but doesn't actually render anything, which is why you need
-            # a real shape.Move(dc, shape.GetX(), shape.GetY()) later
-            #
-            print "Draw:  AdjustShapePosition", node.left, node.top
-            assert node.shape
-            
-            x, y = node.left, node.top
+        dc = wx.ClientDC(self)
+        self.PrepareDC(dc)
+
+        for node in self.umlworkspace.graph.nodes:
+            # Here we call setpos which sets the pos but doesn't actually render
+            # anything, which is why you need a real shape.Move(dc,
+            # shape.GetX(), shape.GetY()) later - REALLY?
                 
             # Don't need to use node.shape.Move(dc, x, y, False)
-            setpos(node.shape, x, y)
+            setpos(node.shape, node.left, node.top)
     
             # But you DO need to use a dc to adjust the links
-            dc = wx.ClientDC(umlwin)
-            umlwin.PrepareDC(dc)
             node.shape.MoveLinks(dc)
-        
-        print "Draw: stateofthenation"
-        for node in self.umlworkspace.graph.nodes:
-            AdjustShapePosition(self, node)
-        self.redraw_222()
+            
+        self.GetDiagram().Clear(dc)
+        self.GetDiagram().Redraw(dc)
         wx.SafeYield()
 
     # UTILITY - called by CmdLayout and pynsourcegui.FileImport, OnRefreshUmlWindow and Bootstrap
@@ -566,27 +558,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.layouter.layout(keep_current_positions=False, optimise=True)
         self.AllToWorldCoords()
         self.stage2() # does overlap removal and stateofthenation
-        
-    # UTILITY - called by umlwin.stage1 and umlwin.stateofthenation
-    def redraw_222(self, clear=True):        # FROM SPRING LAYOUT
-        #self.redraw_everything() # HACK
-        #return
-        
-        print "Draw: redraw_222   clear=", clear
-        diagram = self.GetDiagram()
-        canvas = self
-        assert canvas == diagram.GetCanvas()
-    
-        dc = wx.ClientDC(canvas)
-        canvas.PrepareDC(dc)
-        
-        #for node in self.graph.nodes:    # TODO am still moving nodes in the pynsourcegui version?
-        #    shape = node.shape
-        #    shape.Move(dc, shape.GetX(), shape.GetY())
-        
-        if clear:
-            diagram.Clear(dc)
-        diagram.Redraw(dc)
         
     # UTILITY - not used, possibly could be called by pynsourcegui.BootStrap
     def set_uml_canvas_size(self, size):
