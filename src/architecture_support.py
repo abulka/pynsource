@@ -16,7 +16,6 @@ class multicast:
     # needs to return a callable function which will then be called by python,
     # with the arguments to the original 'method' call.
     def __getattr__(self, method):
-        print method
         def broadcaster(*args, **kwargs):
             for o in self.objects:
                 func = getattr(o, method, None)
