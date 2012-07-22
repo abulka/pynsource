@@ -482,7 +482,6 @@ class UmlCanvas(ogl.ShapeCanvas):
     #umlwin.NewEdgeMarkTo
     #umlwin.OnWheelZoom_OverlapRemoval_Defunct
     #umlwin.stage2  (!!!)
-    #umlwin.stateofthespring    (!!!)
     #LayoutBlackboard.LayoutThenPickBestScale
     #LayoutBlackboard.Experiment1
     #LayoutBlackboard.LayoutLoopTillNoChange
@@ -491,12 +490,17 @@ class UmlCanvas(ogl.ShapeCanvas):
     #OverlapRemoval.RemoveOverlaps   ( refresh gui if self.gui and watch_removals)
     #GraphSnapshotMgr.RestoreGraph
     #
+    # recalibrate = True - called by core spring layout self.gui.stateofthenation()
+    #
     # TIP: identical to redraw_everything() except shapes not moved
     #
     # RENAME?: dc_DiagramClearAndRedraw
     #
-    def stateofthenation(self, animate=False):
-        
+    def stateofthenation(self, animate=False, recalibrate=False):
+        if recalibrate:  # was stateofthespring
+            self.coordmapper.Recalibrate()
+            self.AllToWorldCoords()
+            
         # RENAME?: NodeShapeSetXy_Then_dc_ShapeMoveLinks
         #
         def AdjustShapePosition(umlwin, node):   # FROM SPRING LAYOUT
@@ -523,13 +527,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.redraw_222()
         wx.SafeYield()
 
-    # UTILITY - called by core spring layout self.gui.stateofthespring()
-    def stateofthespring(self):
-        print "Draw: stateofthespring"
-        self.coordmapper.Recalibrate()
-        self.AllToWorldCoords()
-        self.stateofthenation() # DON'T do overlap removal or it will get mad!
-            
     # UTILITY - called by CmdLayout and pynsourcegui.FileImport, OnRefreshUmlWindow and Bootstrap
     def redraw_everything(self):
         print "Draw: redraw_everything"

@@ -8,7 +8,7 @@ class LayoutBlackboard(object):
         self.graph = graph
         self.umlwin = umlwin
 
-    def stateofthespring(self):
+    def stateofthenation(self, animate=False, recalibrate=False):
         pass
 
     @property
