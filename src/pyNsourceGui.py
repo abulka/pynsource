@@ -152,7 +152,7 @@ class MainApp(wx.App):
             self.umlwin.RedrawEverything()
         def bootstrap03():
             self.umlwin.RedrawEverything()  # Allow main frame to resize and thus allow world coords to calibrate before we generate layout coords for loaded graph
-            self.app.run.CmdFileLoadWorkspaceFromFilepath(filepath=os.path.abspath("saved uml workspaces/uml05.txt"))
+            self.app.run.CmdFileLoadWorkspaceFromFilepath(filepath=os.path.abspath("../tests/saved uml workspaces/uml05.txt"))
             # Don't need to redraw everything after, because persisted
             # workspace is already laid out ok?  Or because we did it first?
         def bootstrap04():
