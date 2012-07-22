@@ -149,23 +149,24 @@ class MainApp(wx.App):
             self.app.run.CmdFileImportSource(files=[os.path.abspath( __file__ )])
         def bootstrap02():
             self.app.run.CmdFileImportSource(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
-            self.umlwin.RedrawEverything()
+            self.umlwin.redraw_everything()
         def bootstrap03():
-            self.umlwin.RedrawEverything()  # Allow main frame to resize and thus allow world coords to calibrate before we generate layout coords for loaded graph
+            self.umlwin.redraw_everything()  # Allow main frame to resize and thus allow world coords to calibrate before we generate layout coords for loaded graph
             self.app.run.CmdFileLoadWorkspaceFromFilepath(filepath=os.path.abspath("../tests/saved uml workspaces/uml05.txt"))
             # Don't need to redraw everything after, because persisted
             # workspace is already laid out ok?  Or because we did it first?
         def bootstrap04():
             self.app.run.CmdFileImportSource(files=[os.path.abspath( "pyNsourceGui.py" )])
-            self.umlwin.RedrawEverything()
+            self.umlwin.redraw_everything()
         def bootstrap05():
             self.app.run.CmdFileImportSource(files=[os.path.abspath("printframework.py"), os.path.abspath("png.py")])
-            self.umlwin.RedrawEverything()
+            self.umlwin.redraw_everything()
         def bootstrap06():
             self.app.run.CmdFileImportSource(files=[os.path.abspath("gui/uml_shapes.py")])
-            self.umlwin.RedrawEverything()
+            self.umlwin.redraw_everything()
             
         bootstrap03()
+        #self.umlwin.set_uml_canvas_size((9000,9000))
         
         
     def InitConfig(self):
@@ -416,7 +417,7 @@ class MainApp(wx.App):
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
             print filenames
             self.app.run.CmdFileImportSource(files=filenames)
-            self.umlwin.RedrawEverything()
+            self.umlwin.redraw_everything()
             wx.EndBusyCursor()
             print 'Import - Done.'
 
@@ -548,7 +549,7 @@ class MainApp(wx.App):
 
 
     def OnRefreshUmlWindow(self, event):
-        self.umlwin.RedrawEverything()
+        self.umlwin.redraw_everything()
         self.RefreshAsciiUmlTab()
 
     def MessageBox(self, msg):
