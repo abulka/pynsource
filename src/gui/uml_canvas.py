@@ -328,7 +328,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         # ACTUALLY I now do set the pos of the shape, see above,
         # just before the AddShape() call.
         #
-        node.width, node.height = shape.GetBoundingBoxMax()
+        node.width, node.height = shape.GetBoundingBoxMax()  # TODO: Shouldn't this be in node coords not world coords?
         node.shape = shape
         shape.node = node
         return shape

@@ -7,7 +7,7 @@ import thread
 import random
 
 import sys
-sys.path.append("../../pynsource/")
+sys.path.append("../../src/")
 from layout.graph import *
 from layout.layout_spring import GraphLayoutSpring
 from layout.overlap_removal import OverlapRemoval
@@ -148,7 +148,7 @@ class GraphRendererOgl:
         self.need_abort = False
         self.new_edge_from = None
         self.working = False
-        self.snapshot_mgr = GraphSnapshotMgr(graph=self.graph, controller=self)
+        self.snapshot_mgr = GraphSnapshotMgr(graph=self.graph, umlcanvas=self)
 
         if UNIT_TESTING_MODE:
             self.overlap_remover = OverlapRemoval(self.graph, margin=5, gui=self)
@@ -334,19 +334,19 @@ class GraphRendererOgl:
                 strategy = ":reduce post overlap removal LN crossings"
             elif keycode in ['C','c']:
                 strategy = ":reduce post overlap removal LN and LL crossings"
-            b = LayoutBlackboard(graph=self.graph, controller=self)
+            b = LayoutBlackboard(graph=self.graph, umlwin=self)
             b.LayoutThenPickBestScale(scramble=keycode in ['Z','X','C'], strategy=strategy)
             
         elif keycode in ['e',]:
-            b = LayoutBlackboard(graph=self.graph, controller=self)
+            b = LayoutBlackboard(graph=self.graph, umlwin=self)
             b.Experiment1()
 
         elif keycode in ['r', 'R']:
-            b = LayoutBlackboard(graph=self.graph, controller=self)
+            b = LayoutBlackboard(graph=self.graph, umlwin=self)
             b.LayoutLoopTillNoChange(scramble=keycode == 'R')
 
         elif keycode in ['b', 'B']:
-            b = LayoutBlackboard(graph=self.graph, controller=self)
+            b = LayoutBlackboard(graph=self.graph, umlwin=self)
             b.LayoutMultipleChooseBest(4)
             
         elif keycode in ['?',]:
@@ -391,7 +391,10 @@ class GraphRendererOgl:
         if self.overlap_remover.GetStats()['total_overlaps_found'] > 0 or force_stateofthenation:
             self.stateofthenation(animate=ANIMATION)
         
-    def stateofthenation(self, animate=False):
+    def stateofthenation(self, animate=False, recalibrate=False):
+        if recalibrate:  # was stateofthespring
+            self.coordmapper.Recalibrate()
+            self.AllToWorldCoords()
         if animate:
             from animation import GeneratePoints
             
@@ -416,10 +419,10 @@ class GraphRendererOgl:
             self.Redraw()
             wx.SafeYield()
         
-    def stateofthespring(self):
-        self.coordmapper.Recalibrate()
-        self.AllToWorldCoords()
-        self.stateofthenation() # DON'T do overlap removal or it will get mad!
+    #def stateofthespring(self):
+    #    self.coordmapper.Recalibrate()
+    #    self.AllToWorldCoords()
+    #    self.stateofthenation() # DON'T do overlap removal or it will get mad!
 
     def ChangeScale(self, delta, remap_world_to_layout=False, removeoverlaps=True):
         if remap_world_to_layout:
