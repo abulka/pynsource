@@ -18,7 +18,7 @@ structure of classes is typically:
 
 """
 
-technique = '7'
+technique = '6'
 
 def process_key(keycode, frame, canvas, shapes):
         
@@ -53,6 +53,7 @@ def process_key(keycode, frame, canvas, shapes):
                 # duplicates / smudges there
                 shape.SetX(x)
                 shape.SetY(y)
+                shape.MoveLinks(dc)  # normally shape.Move() would have done this
                 canvas.GetDiagram().Clear(dc)
                 canvas.GetDiagram().Redraw(dc)
                 
@@ -112,16 +113,17 @@ def process_key(keycode, frame, canvas, shapes):
                 """
                 Then I discovered frame and canvas both have a Refresh() method.  This seems to clear
                 the whole virtual canvas area and repaints everything.
+                
+                OUTSTANDING QUESTION:
+                Why isn't an eventual shape.draw() or diagram.redraw() needed
+                anymore. DOES canvas.Refresh() SOMEHOW TRIGGER AN ACTUAL DRAW?
                 """
                 # WOW this technique WORKS on scrolled area, bug fixed
-                shape.Move(dc, x, y)
-                canvas.frame.Refresh()
+                shape.Move(dc, x, y)  # handles shape.MoveLinks(dc) internally too
+                canvas.Refresh()     # or canvas.frame.Refresh()
             
             elif technique == '7':
-                # WOW this technique WORKS on scrolled area, bug fixed, handles links too
-                shape.Move(dc, x, y)
-                shape.MoveLinks(dc)
-                canvas.Refresh()
+                pass
 
         elif keycode == 'f':
             canvas.frame.SetDimensions(200, 200, 350, 350) # get size with frame.GetSize()
