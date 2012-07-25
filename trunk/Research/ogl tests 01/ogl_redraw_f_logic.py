@@ -117,6 +117,7 @@ def process_key(keycode, frame, canvas, shapes):
                 OUTSTANDING QUESTION:
                 Why isn't an eventual shape.draw() or diagram.redraw() needed
                 anymore. DOES canvas.Refresh() SOMEHOW TRIGGER AN ACTUAL DRAW?
+                Tip: a Refresh() by default will erase the background before sending the paint event
                 """
                 # WOW this technique WORKS on scrolled area, bug fixed
                 shape.Move(dc, x, y)  # handles shape.MoveLinks(dc) internally too

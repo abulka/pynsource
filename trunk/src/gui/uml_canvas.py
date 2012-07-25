@@ -524,8 +524,13 @@ class UmlCanvas(ogl.ShapeCanvas):
         #self.GetDiagram().Redraw(dc)  # WHY ISN'T THIS NEEDED ANYMORE? WHEN DOES ANY .DRAW HAPPEN?
         
         self.Refresh()                  # DOES THIS SOMEHOW TRIGGER AN ACTUAL DRAW?
+                                    #  Tip: a Refresh() by default will erase the background before sending the paint event
         
-        wx.SafeYield()  # Why?  Without this the nodes don't paint during a "L" layout (edges do!?)
+        # You need to be yielding or updating on a regular basis, so that when
+        # your OS/window manager sends repaint messages to your app, it can handle them.
+        # http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh
+        self.Update() # or wx.SafeYield()  # Why?  Without this the nodes don't paint during a "L" layout (edges do!?)
+        
 
     # UTILITY - called by CmdLayout and pynsourcegui.FileImport, OnRefreshUmlWindow and Bootstrap
     def redraw_everything(self):
