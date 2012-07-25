@@ -505,9 +505,14 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.PrepareDC(dc)
 
         for node in self.umlworkspace.graph.nodes:
-            # Here we call setpos which sets the pos but doesn't actually render
-            # anything, which is why you need a real shape.Move(dc,
-            # shape.GetX(), shape.GetY()) later - REALLY?
+            # Here we call setpos() which sets the pos using setX() and setY()
+            # but this doesn't actually draw  anything,
+            # which shape.Move(dc, shape.GetX(), shape.GetY()) would
+            # have done.  But the diagram.Redraw(dc) eventually does the draw.
+            # (Hmmm - but now we are not even doing that! Now that we use.Refresh())
+            #
+            # Also shape.Move() would have internally done .MoveLinks(), but
+            # since we don't use it, we have to call .MoveLinks(dc) manually.
                 
             # Don't need to use node.shape.Move(dc, x, y, False)
             setpos(node.shape, node.left, node.top)
@@ -516,9 +521,11 @@ class UmlCanvas(ogl.ShapeCanvas):
             node.shape.MoveLinks(dc)
             
         #self.GetDiagram().Clear(dc)
-        #self.GetDiagram().Redraw(dc)
-        self.Refresh()
-        wx.SafeYield()
+        #self.GetDiagram().Redraw(dc)  # WHY ISN'T THIS NEEDED ANYMORE? WHEN DOES ANY .DRAW HAPPEN?
+        
+        self.Refresh()                  # DOES THIS SOMEHOW TRIGGER AN ACTUAL DRAW?
+        
+        wx.SafeYield()  # Why?  Without this the nodes don't paint during a "L" layout (edges do!?)
 
     # UTILITY - called by CmdLayout and pynsourcegui.FileImport, OnRefreshUmlWindow and Bootstrap
     def redraw_everything(self):
