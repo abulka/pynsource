@@ -7,7 +7,7 @@ import wx.lib.ogl as ogl
 import os, stat
 import random
 
-WINDOW_SIZE = (1024,768)
+
 
 #from gui.coord_utils import setpos, getpos
 
@@ -30,14 +30,14 @@ def getpos(shape):
     return x - width/2, y - height/2
 
 class UmlCanvas(ogl.ShapeCanvas):
-    scrollStepX = 10
-    scrollStepY = 10
+    #scrollStepX = 10
+    #scrollStepY = 10
 
     def __init__(self, parent, log, frame):
         ogl.ShapeCanvas.__init__(self, parent)
-        maxWidth  = 1000
-        maxHeight = 1000
-        self.SetScrollbars(20, 20, maxWidth/20, maxHeight/20)
+        #maxWidth  = 1000
+        #maxHeight = 1000
+        #self.SetScrollbars(20, 20, maxWidth/20, maxHeight/20)
         
         self.log = log
         self.frame = frame
@@ -62,53 +62,18 @@ class UmlCanvas(ogl.ShapeCanvas):
             event.Skip()
             return
         self.working = True
-        
+
+        from ogl_redraw_f_logic import process_key
+
+        canvas = self
         keycode = chr(event.GetKeyCode())
 
-        if keycode == 'm':
-            #print len(self.GetDiagram().GetShapeList())
-            
-            shape = self.GetDiagram().GetShapeList()[random.randint(0,17)]
-            
-            dc = wx.ClientDC(self)
-            self.PrepareDC(dc)
+        process_key(keycode, self.frame, canvas, canvas.GetDiagram().GetShapeList())
 
-            # V1
-            #setpos(shape, random.randint(1,300), 0)
-            #self.GetDiagram().Clear(dc)
-            #self.GetDiagram().Redraw(dc)
-        
-            # V2 - duplicates cos no clear
-            #shape.Move(dc, shape.GetX(), shape.GetY())
-        
-            # V3 - duplicates cos no clear
-            #x = random.randint(1,300)
-            #y = 0
-            #width, height = shape.GetBoundingBoxMax()
-            #x += width/2
-            #y += height/2
-            #shape.Move(dc, x, y)
-
-            x = random.randint(1,600)
-            y = shape.GetY()
-            width, height = shape.GetBoundingBoxMax()
-            x += width/2
-            #y += height/2
-            shape.Move(dc, x, y, display=False)
-            self.GetDiagram().Clear(dc)
-            self.GetDiagram().Redraw(dc)
-
-        elif keycode == 'w':
-            pass
-            
-        elif keycode in ['1','2','3','4','5','6','7','8']:
-            pass
-
-        elif keycode in ['b', 'B']:
-            pass
-                
         self.working = False
         event.Skip()
+        
+        # END OPTIONAL
   
     def OnDestroy(self, evt):
         for shape in self.GetDiagram().GetShapeList():
@@ -128,14 +93,16 @@ class UmlCanvas(ogl.ShapeCanvas):
         Set to something big and always have a large scrollable region e.g.
             self.umlwin.set_uml_canvas_size((9000,9000))
         """
-        size = wx.Size(size[0], size[1])
-        nvsx, nvsy = size.x / self.scrollStepX, size.y / self.scrollStepY
-        self.Scroll(0, 0)
-        self.SetScrollbars(self.scrollStepX, self.scrollStepY, nvsx, nvsy)
-        canvas = self
-        canvas.SetSize(canvas.GetVirtualSize())
+        return
+        #size = wx.Size(size[0], size[1])
+        #nvsx, nvsy = size.x / self.scrollStepX, size.y / self.scrollStepY
+        #self.Scroll(0, 0)
+        #self.SetScrollbars(self.scrollStepX, self.scrollStepY, nvsx, nvsy)
+        #canvas = self
+        #canvas.SetSize(canvas.GetVirtualSize()) # Sets the size of the window in pixels.
 
 
+WINDOW_SIZE = (600, 400)
 
 class MainApp(wx.App):
     def OnInit(self):
@@ -144,16 +111,22 @@ class MainApp(wx.App):
         wx.InitAllImageHandlers()
         self.andyapptitle = 'ogl scroll testPyNsource GUI - Python Code into UML'
 
-        self.frame = wx.Frame(None, -1, self.andyapptitle, pos=(50,50), size=(0,0),
+        self.frame = wx.Frame(None, -1, self.andyapptitle, pos=(450,450), size=WINDOW_SIZE,
                         style=wx.NO_FULL_REPAINT_ON_RESIZE|wx.DEFAULT_FRAME_STYLE)
-        self.frame.CreateStatusBar()
+        #wx.FULL_REPAINT_ON_RESIZE
+        #wx.NO_FULL_REPAINT_ON_RESIZE
+        #self.frame.CreateStatusBar()
 
         self.umlwin = UmlCanvas(self.frame, Log(), self.frame)
-            
+        self.umlwin.frame = self.frame
+        
+        self.umlwin.SetScrollbars(1, 1, 1200, 800)
+        
         ogl.OGLInitialize()  # creates some pens and brushes that the OGL library uses.
         
         # Set the frame to a good size for showing stuff
-        self.frame.SetSize(WINDOW_SIZE)
+        #self.frame.SetSize(WINDOW_SIZE)
+        
         self.umlwin.SetFocus()
         self.SetTopWindow(self.frame)
 
@@ -172,7 +145,7 @@ class MainApp(wx.App):
         #    #self.umlwin.coordmapper.Recalibrate(self.umlwin.GetVirtualSize())
 
         sz = self.frame.GetClientSize()
-        self.umlwin.set_uml_canvas_size(sz)  # (9000,9000)
+        #self.umlwin.set_uml_canvas_size(sz)  # (9000,9000)
 
         event.Skip()
 
