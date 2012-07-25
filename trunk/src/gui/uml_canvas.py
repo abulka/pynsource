@@ -515,8 +515,9 @@ class UmlCanvas(ogl.ShapeCanvas):
             # But you DO need to use a dc to adjust the links
             node.shape.MoveLinks(dc)
             
-        self.GetDiagram().Clear(dc)
-        self.GetDiagram().Redraw(dc)
+        #self.GetDiagram().Clear(dc)
+        #self.GetDiagram().Redraw(dc)
+        self.Refresh()
         wx.SafeYield()
 
     # UTILITY - called by CmdLayout and pynsourcegui.FileImport, OnRefreshUmlWindow and Bootstrap
@@ -532,8 +533,9 @@ class UmlCanvas(ogl.ShapeCanvas):
             shape.Move(dc, shape.GetX(), shape.GetY())
             if shape.__class__.__name__ == 'DividedShape':
                 shape.SetRegionSizes()
-        diagram.Clear(dc)
-        diagram.Redraw(dc)
+        #diagram.Clear(dc)
+        #diagram.Redraw(dc)
+        self.Refresh()
 
         """
         Do we need any of this?  YES.
