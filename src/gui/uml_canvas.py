@@ -134,6 +134,12 @@ class UmlCanvas(ogl.ShapeCanvas):
         elif keycode in ['l', 'L']:
             self.app.run.CmdLayout()
             
+        elif keycode == 'r':
+            self.redraw_everything()
+
+        elif keycode == 'R':
+            self.Refresh()
+
         elif keycode in ['d', 'D']:
             self.app.run.CmdDumpUmlWorkspace()
         
@@ -516,38 +522,57 @@ class UmlCanvas(ogl.ShapeCanvas):
                 
             # Don't need to use node.shape.Move(dc, x, y, False)
             setpos(node.shape, node.left, node.top)
-    
+            #node.shape.Move(dc, node.shape.GetX(), node.shape.GetY())
+            
             # But you DO need to use a dc to adjust the links
             node.shape.MoveLinks(dc)
             
         #self.GetDiagram().Clear(dc)
-        #self.GetDiagram().Redraw(dc)  # WHY ISN'T THIS NEEDED ANYMORE? WHEN DOES ANY .DRAW HAPPEN?
+        #self.GetDiagram().Redraw(dc)
+        #
+        # WHY ISN'T .Redraw NEEDED ANYMORE? WHEN DOES ANY .DRAW HAPPEN? ANSWER:
+        # the .Refresh() by default will erase the background before sending the
+        # paint event, which then triggers calls to .Draw()
         
-        self.Refresh()                  # DOES THIS SOMEHOW TRIGGER AN ACTUAL DRAW?
-                                    #  Tip: a Refresh() by default will erase the background before sending the paint event
+        self.Refresh()
+
         
         # You need to be yielding or updating on a regular basis, so that when
         # your OS/window manager sends repaint messages to your app, it can handle them.
         # http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh
         self.Update() # or wx.SafeYield()  # Why?  Without this the nodes don't paint during a "L" layout (edges do!?)
-        
 
+        
     # UTILITY - called by CmdLayout and pynsourcegui.FileImport, OnRefreshUmlWindow and Bootstrap
     def redraw_everything(self):
         print "Draw: redraw_everything"
         diagram = self.GetDiagram()
         canvas = self
         assert self == canvas == diagram.GetCanvas()
-
+        
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
         for shape in self.umlboxshapes:
             shape.Move(dc, shape.GetX(), shape.GetY())
             if shape.__class__.__name__ == 'DividedShape':
                 shape.SetRegionSizes()
-        #diagram.Clear(dc)
-        #diagram.Redraw(dc)
-        self.Refresh()
+        diagram.Clear(dc)
+        diagram.Redraw(dc)
+        
+        # The above does nothing. What's really causing this to repair any
+        # smudgy redraw problems, was that a .Refresh() was indirectly generated
+        # via the frame resize scrollbar hack below.
+        #
+        # Though we might occassionally need the call to SetRegionSizes() though.
+        
+        # A .Refresh() will always work, regards to erasing and redrawing
+        # the screen incl. virtualsize area.  But it probaly won't
+        # help with the scrollbars.  So don't do it, since the
+        # scrollbar hack generates its own .Refresh() - by coincidence
+        # due to the fact that we are using a notebook with >1 page.
+        # Yeah, weird.
+        #
+        #self.Refresh()
 
         """
         Do we need any of this?  YES.
@@ -558,7 +583,10 @@ class UmlCanvas(ogl.ShapeCanvas):
         # or
         #self.SetScrollbars(needs lots of weird args...)
         #
-        # Hack To Force The Scrollbar To Show Up
+        # Temporary frame resize hack to cause scrollbar to appear properly
+        # probably causes .Refresh() but only if your ogl canvas is in a tab
+        # of a notebook and there are at least two notebook pages. Whew!
+        #
         # Set the window size to something different
         # Return the size to what it was
         #

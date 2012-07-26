@@ -120,7 +120,7 @@ def process_key(keycode, frame, canvas, shapes):
                 Tip: a Refresh() by default will erase the background before sending the paint event
                 """
                 # WOW this technique WORKS on scrolled area, bug fixed
-                shape.Move(dc, x, y)  # handles shape.MoveLinks(dc) internally too
+                shape.Move(dc, x, y, display=False)  # handles shape.MoveLinks(dc) internally too
                 canvas.Refresh()     # or canvas.frame.Refresh()
             
             elif technique == '7':
@@ -132,6 +132,14 @@ def process_key(keycode, frame, canvas, shapes):
         elif keycode == 'r':
             canvas.frame.Refresh()
             
+        elif keycode == 's':
+            # Temporary frame resize hack to cause scrollbar to appear properly
+            # probably causes .Refresh() but only if your ogl canvas is in a tab
+            # of a notebook and there are at least two notebook pages. Whew!
+            oldSize = frame.GetSize()
+            frame.SetSize((oldSize[0]+1,oldSize[1]+1))
+            frame.SetSize(oldSize)
+
         elif keycode == 'c':
             # Aha - this does NOT clear the scrolled area!
             # even though I have prepareDC !!!!

@@ -39,9 +39,11 @@ from gui_imageviewer import ImageViewer
 
 from architecture_support import *
 from app.app import App
+import wx.lib.mixins.inspection  # Ctrl-Alt-I
 
-class MainApp(wx.App):
+class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnInit(self):
+        self.Init()  # initialize the inspection tool
         self.log = Log()
         self.working = False
         wx.InitAllImageHandlers()
@@ -125,8 +127,12 @@ class MainApp(wx.App):
         context.layouter = self.umlwin.layouter
         context.overlap_remover = self.umlwin.overlap_remover
         context.frame = self.frame
-        context.multiText = self.multiText
-        context.asciiart = self.asciiart
+        if MULTI_TAB_GUI:
+            context.multiText = self.multiText
+            context.asciiart = self.asciiart
+        else:
+            context.multiText = None
+            context.asciiart = None
         
         # App knows about everyone.
         # Everyone (ring classes) should be an adapter
@@ -423,6 +429,8 @@ class MainApp(wx.App):
 
 
     def model_to_ascii(self):
+        if not MULTI_TAB_GUI:
+            return
         from layout.layout_ascii import model_to_ascii_builder
         import time
         
@@ -550,6 +558,7 @@ class MainApp(wx.App):
 
     def OnRefreshUmlWindow(self, event):
         self.umlwin.redraw_everything()
+        #self.umlwin.stateofthenation()
         self.RefreshAsciiUmlTab()
 
     def MessageBox(self, msg):
