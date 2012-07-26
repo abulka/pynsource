@@ -6,7 +6,7 @@ import wx
 import wx.lib.ogl as ogl
 import os, stat
 import random
-
+import wx.lib.mixins.inspection  # Ctrl-Alt-I 
 
 
 #from gui.coord_utils import setpos, getpos
@@ -103,9 +103,11 @@ class UmlCanvas(ogl.ShapeCanvas):
 
 
 WINDOW_SIZE = (600, 400)
+USENOTEBOOK = False
 
-class MainApp(wx.App):
+class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnInit(self):
+        self.Init()  # initialize the inspection tool
         self.log = Log()
         self.working = False
         wx.InitAllImageHandlers()
@@ -116,8 +118,15 @@ class MainApp(wx.App):
         #wx.FULL_REPAINT_ON_RESIZE
         #wx.NO_FULL_REPAINT_ON_RESIZE
         #self.frame.CreateStatusBar()
+        
+        if USENOTEBOOK:
+            self.notebook = wx.Notebook(self.frame, -1)
+            self.umlwin = UmlCanvas(self.notebook, Log(), self.frame)
+            self.notebook.AddPage(self.umlwin, "test")
+            self.notebook.AddPage(wx.Panel(self.notebook, -1), "Ascii Art")
+        else:
+            self.umlwin = UmlCanvas(self.frame, Log(), self.frame)
 
-        self.umlwin = UmlCanvas(self.frame, Log(), self.frame)
         self.umlwin.frame = self.frame
         
         self.umlwin.SetScrollbars(1, 1, 1200, 800)
