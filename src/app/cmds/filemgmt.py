@@ -83,7 +83,7 @@ class CmdBootStrap(CmdBase):
         def bootstrap06():
             self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("gui/uml_shapes.py")])
             
-        bootstrap03()
+        #bootstrap03()
         #self.umlwin.set_uml_canvas_size((9000,9000))
         
 
@@ -92,8 +92,7 @@ class CmdBootStrap(CmdBase):
 
 class CmdRefreshUmlWindow(CmdBase):
     def execute(self):
-        self.context.umlwin.redraw_everything()
-        #self.context.umlwin.stateofthenation()
+        self.context.umlwin.Refresh()
         self.context.wxapp.RefreshAsciiUmlTab()
 
 

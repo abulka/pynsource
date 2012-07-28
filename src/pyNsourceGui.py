@@ -164,9 +164,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
         if event.EventObject == self.umlwin:
-            #print "OnResizeFrame"
-            self.umlwin.coordmapper.Recalibrate(self.frame.GetClientSize()) # may need to call self.GetVirtualSize() if scrolled window
-            #self.umlwin.coordmapper.Recalibrate(self.umlwin.GetVirtualSize())
+            self.umlwin.frame_calibration()
         event.Skip()
         
     def OnRightButtonMenu(self, event):   # Menu
