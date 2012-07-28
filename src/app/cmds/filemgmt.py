@@ -27,7 +27,7 @@ class CmdFileImportBase(CmdBase):   # BASE
                 p.Parse(f)
                 self.context.model.ConvertParseModelToUmlModel(p)
 
-        self.context.umlwin.stage1()
+        self.context.umlwin.build_view()
 
         # Layout
         self.context.umlwin.layout_and_position_shapes()
@@ -83,7 +83,7 @@ class CmdBootStrap(CmdBase):
         def bootstrap06():
             self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("gui/uml_shapes.py")])
             
-        #bootstrap03()
+        bootstrap03()
         #self.umlwin.set_uml_canvas_size((9000,9000))
         
 
@@ -128,7 +128,7 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
         self.context.model.graph.LoadGraphFromStrings(filedata)
                 
         # build view from model
-        umlcanvas.stage1(translatecoords=False)
+        umlcanvas.build_view(translatecoords=False)
 
         # set layout coords to be in sync with world, so that if expand scale things will work
         self.context.coordmapper.Recalibrate()

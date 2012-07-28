@@ -435,8 +435,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.working = False
         
     # UTILITY - called by CmdFileImportSource, CmdFileLoadWorkspaceBase.LoadGraph   
-    def stage1(self, translatecoords=True):         # FROM SPRING LAYOUT
-        print "Draw: stage1"
+    def build_view(self, translatecoords=True):
         if translatecoords:
             self.AllToWorldCoords()
 
@@ -455,11 +454,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         for edge in self.umlworkspace.graph.edges:
             self.CreateUmlEdge(edge)
 
-        dc = wx.ClientDC(self)
-        self.PrepareDC(dc)
-        
-        self.GetDiagram().Clear(dc)
-        self.GetDiagram().Redraw(dc)
 
     # UTILITY - called by everyone!!??
     #
@@ -497,8 +491,6 @@ class UmlCanvas(ogl.ShapeCanvas):
     #GraphSnapshotMgr.RestoreGraph
     #
     # recalibrate = True - called by core spring layout self.gui.stateofthenation()
-    #
-    # TIP: identical to redraw_everything() except shapes not moved
     #
     # RENAME?: dc_DiagramClearAndRedraw
     #
@@ -576,11 +568,11 @@ class UmlCanvas(ogl.ShapeCanvas):
         canvas = self
         canvas.SetSize(canvas.GetVirtualSize())
 
-    def get_umlboxshapes(self):
-        # Doesn't do much, only redraw_everything() uses this.
-        return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
-
-    umlboxshapes = property(get_umlboxshapes)
+    #def get_umlboxshapes(self):
+    #    # Doesn't do much, only diagnostic uses this now - but even that is commented out.
+    #    return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
+    #
+    #umlboxshapes = property(get_umlboxshapes)
     
     def OnDestroy(self, evt):
         for shape in self.GetDiagram().GetShapeList():
