@@ -543,7 +543,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.Update() # or wx.SafeYield()  # Why?  Without this the nodes don't paint during a "L" layout (edges do!?)
 
         
-    # UTILITY - called by CmdLayout and pynsourcegui.FileImport, OnRefreshUmlWindow and Bootstrap
+    # UTILITY - called by CmdFileImport, CmdFileImport, CmdRefreshUmlWindow
     def redraw_everything(self):
         print "Draw: redraw_everything"
         diagram = self.GetDiagram()
@@ -567,7 +567,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         
         # A .Refresh() will always work, regards to erasing and redrawing
         # the screen incl. virtualsize area.  But it probaly won't
-        # help with the scrollbars.  So don't do it, since the
+        # help with the scrollbars.  So don't do it here, since the
         # scrollbar hack generates its own .Refresh() - by coincidence
         # due to the fact that we are using a notebook with >1 page.
         # Yeah, weird.
@@ -617,7 +617,8 @@ class UmlCanvas(ogl.ShapeCanvas):
         canvas.SetSize(canvas.GetVirtualSize())
 
     def get_umlboxshapes(self):
-        return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]
+        # Doesn't do much, only redraw_everything() uses this.
+        return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
 
     umlboxshapes = property(get_umlboxshapes)
     
