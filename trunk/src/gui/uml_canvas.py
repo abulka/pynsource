@@ -542,60 +542,20 @@ class UmlCanvas(ogl.ShapeCanvas):
         # http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh
         self.Update() # or wx.SafeYield()  # Why?  Without this the nodes don't paint during a "L" layout (edges do!?)
 
-        
-    # UTILITY - called by CmdLayout, CmdRefreshUmlWindow
-    def redraw_everything(self):
-        print "Draw: redraw_everything"
-        diagram = self.GetDiagram()
-        canvas = self
-        assert self == canvas == diagram.GetCanvas()
-        
-        dc = wx.ClientDC(canvas)
-        canvas.PrepareDC(dc)
-        for shape in self.umlboxshapes:
-            shape.Move(dc, shape.GetX(), shape.GetY())
-            if shape.__class__.__name__ == 'DividedShape':
-                shape.SetRegionSizes()
-        diagram.Clear(dc)
-        diagram.Redraw(dc)
-        
-        # The above does nothing. What's really causing this to repair any
-        # smudgy redraw problems, was that a .Refresh() was indirectly generated
-        # via the frame resize scrollbar hack below.
-        #
-        # Though we might occassionally need the call to SetRegionSizes() though.
-        
-        # A .Refresh() will always work, regards to erasing and redrawing
-        # the screen incl. virtualsize area.  But it probaly won't
-        # help with the scrollbars.  So don't do it here, since the
-        # scrollbar hack generates its own .Refresh() - by coincidence
-        # due to the fact that we are using a notebook with >1 page.
-        # Yeah, weird.
-        #
-        #self.Refresh()
-
+    def frame_calibration(self):
         """
-        Do we need any of this?  YES.
-        Annoying to have a hack, esp if it keeps forcing calls to Recalibrate()
-        But we need it so that the Recalibrate() is called at least once
+        Calibrate model / shape / layout coordinate mapping system to the
+        visible physical window client size.
+        
+        Tip: Don't calibrate passing self.GetVirtualSize() as a parameter
+        because it seems to spread the layout out too much, plus perhaps its too
+        uncertain a size to be relied upon?
         """
-        #self.frame.SetScrollbars(needs lots of weird args...)
-        # or
-        #self.SetScrollbars(needs lots of weird args...)
-        #
-        # Temporary frame resize hack to cause scrollbar to appear properly
-        # probably causes .Refresh() but only if your ogl canvas is in a tab
-        # of a notebook and there are at least two notebook pages. Whew!
-        #
-        # Set the window size to something different
-        # Return the size to what it was
-        #
-        oldSize = self.frame.GetSize()
-        self.frame.SetSize((oldSize[0]+1,oldSize[1]+1))
-        self.frame.SetSize(oldSize)
-
-    # UTILITY - used by CmdLayout and CmdFileImportSource
+        self.coordmapper.Recalibrate(self.frame.GetClientSize())  
+        
+    # UTILITY - used by CmdLayout and CmdFileImportBase
     def layout_and_position_shapes(self):
+        self.frame_calibration()
         self.AllToLayoutCoords()
         self.layouter.layout(keep_current_positions=False, optimise=True)
         self.AllToWorldCoords()
