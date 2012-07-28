@@ -135,7 +135,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.app.run.CmdLayout()
             
         elif keycode == 'r':
-            self.redraw_everything()
+            self.app.run.CmdRefreshUmlWindow()
 
         elif keycode == 'R':
             self.Refresh()

@@ -143,38 +143,9 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.app = App(context)
         self.app.Boot()
         
-        
-        wx.CallAfter(self.BootStrap)    # doesn't make a difference calling this via CallAfter
-        
+        wx.CallAfter(self.app.run.CmdBootStrap)    # doesn't make a difference calling this via CallAfter
         return True
     
-    def BootStrap(self):
-
-        def bootstrap01():
-            self.frame.SetSize((1024,768))
-            self.app.run.CmdFileImportSource(files=[os.path.abspath( __file__ )])
-        def bootstrap02():
-            self.app.run.CmdFileImportSource(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
-            self.umlwin.redraw_everything()
-        def bootstrap03():
-            self.umlwin.redraw_everything()  # Allow main frame to resize and thus allow world coords to calibrate before we generate layout coords for loaded graph
-            self.app.run.CmdFileLoadWorkspaceFromFilepath(filepath=os.path.abspath("../tests/saved uml workspaces/uml05.txt"))
-            # Don't need to redraw everything after, because persisted
-            # workspace is already laid out ok?  Or because we did it first?
-        def bootstrap04():
-            self.app.run.CmdFileImportSource(files=[os.path.abspath( "pyNsourceGui.py" )])
-            self.umlwin.redraw_everything()
-        def bootstrap05():
-            self.app.run.CmdFileImportSource(files=[os.path.abspath("printframework.py"), os.path.abspath("png.py")])
-            self.umlwin.redraw_everything()
-        def bootstrap06():
-            self.app.run.CmdFileImportSource(files=[os.path.abspath("gui/uml_shapes.py")])
-            self.umlwin.redraw_everything()
-            
-        bootstrap03()
-        #self.umlwin.set_uml_canvas_size((9000,9000))
-        
-        
     def InitConfig(self):
         config_dir = os.path.join(wx.StandardPaths.Get().GetUserConfigDir(), PYNSOURCE_CONFIG_DIR)
         try:
@@ -354,9 +325,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu1, "&Open...\tCtrl-O", "Load UML Diagram...", self.OnLoadGraph)
         Add(menu1, "&Save As...\tCtrl-S", "Save UML Diagram...", self.OnSaveGraph)
         menu1.AppendSeparator()
-        Add(menu1, "&Import Python Code...\tCtrl-I", "Import Python Source Files", self.FileImport)
-        #Add(menu1, "File &Import yUml...\tCtrl-Y", "Import Python Source Files", self.FileImport2)
-        #Add(menu1, "&Import Ascii Art...\tCtrl-J", "Import Python Source Files", self.FileImport3)
+        Add(menu1, "&Import Python Code...\tCtrl-I", "Import Python Source Files", self.OnFileImport)
         menu1.AppendSeparator()
         Add(menu1, "&Print / Preview...\tCtrl-P", "Print", self.FilePrint)
         menu1.AppendSeparator()
@@ -406,27 +375,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnRestoreLayout2(self, event):
         self.umlwin.CmdRestoreLayout2()
         
-    def FileImport(self, event):
-        self.notebook.SetSelection(0)
-        
-        thisdir = self.config.get('LastDirFileImport', os.getcwd()) # remember dir path
-        
-        dlg = wx.FileDialog(parent=self.frame, message="choose", defaultDir=thisdir,
-            defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
-        if dlg.ShowModal() == wx.ID_OK:
-            
-            self.config['LastDirFileImport'] = dlg.GetDirectory()  # remember dir path
-            self.config.write()
-            
-            filenames = dlg.GetPaths()
-            print 'Importing...'
-            wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
-            print filenames
-            self.app.run.CmdFileImportSource(files=filenames)
-            self.umlwin.redraw_everything()
-            wx.EndBusyCursor()
-            print 'Import - Done.'
-
+    def OnFileImport(self, event):
+        self.app.run.CmdFileImport()
 
     def model_to_ascii(self):
         if not MULTI_TAB_GUI:
@@ -555,11 +505,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnDeepLayout(self, event):
         self.app.run.CmdDeepLayout()
 
-
     def OnRefreshUmlWindow(self, event):
-        self.umlwin.redraw_everything()
-        #self.umlwin.stateofthenation()
-        self.RefreshAsciiUmlTab()
+        self.app.run.CmdRefreshUmlWindow()
 
     def MessageBox(self, msg):
         dlg = wx.MessageDialog(self.frame, msg, 'Message', wx.OK | wx.ICON_INFORMATION)

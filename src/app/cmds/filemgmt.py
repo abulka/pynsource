@@ -1,13 +1,39 @@
 from base_cmd import CmdBase
 from generate_code.gen_java import PySourceAsJava
 import wx
+import os
 
 class CmdFileNew(CmdBase):
     def execute(self):
         self.context.umlwin.Clear()
         self.context.wxapp.RefreshAsciiUmlTab()
 
+class CmdFileImport(CmdBase):
+    def execute(self):
+        self.context.wxapp.notebook.SetSelection(0)
         
+        thisdir = self.context.config.get('LastDirFileImport', os.getcwd()) # remember dir path
+        
+        dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir=thisdir,
+            defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            
+            self.context.config['LastDirFileImport'] = dlg.GetDirectory()  # remember dir path
+            self.context.config.write()
+            
+            filenames = dlg.GetPaths()
+            print 'Importing...'
+            wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
+            print filenames
+            
+            self.context.wxapp.app.run.CmdFileImportSource(files=filenames)   # Command calling another command!
+                                                                # Hmmm subcommand does a layout too!????
+            self.context.umlwin.redraw_everything()
+            
+            wx.EndBusyCursor()
+            print 'Import - Done.'
+
+
 class CmdFileImportSource(CmdBase):
     def __init__(self, files=None, path=None):
         self.files = files
@@ -30,6 +56,46 @@ class CmdFileImportSource(CmdBase):
         # Layout
         self.context.umlwin.layout_and_position_shapes()
         
+
+class CmdBootStrap(CmdBase):
+    def execute(self):
+        self.frame = self.context.frame
+        self.app = self.context.wxapp.app
+        self.umlwin = self.context.umlwin
+        
+        def bootstrap01():
+            self.frame.SetSize((1024,768))
+            self.app.run.CmdFileImportSource(files=[os.path.abspath( __file__ )])
+        def bootstrap02():
+            self.app.run.CmdFileImportSource(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
+            self.umlwin.redraw_everything()
+        def bootstrap03():
+            self.umlwin.redraw_everything()  # Allow main frame to resize and thus allow world coords to calibrate before we generate layout coords for loaded graph
+            self.app.run.CmdFileLoadWorkspaceFromFilepath(filepath=os.path.abspath("../tests/saved uml workspaces/uml05.txt"))
+            # Don't need to redraw everything after, because persisted
+            # workspace is already laid out ok?  Or because we did it first?
+        def bootstrap04():
+            self.app.run.CmdFileImportSource(files=[os.path.abspath( "pyNsourceGui.py" )])
+            self.umlwin.redraw_everything()
+        def bootstrap05():
+            self.app.run.CmdFileImportSource(files=[os.path.abspath("printframework.py"), os.path.abspath("png.py")])
+            self.umlwin.redraw_everything()
+        def bootstrap06():
+            self.app.run.CmdFileImportSource(files=[os.path.abspath("gui/uml_shapes.py")])
+            self.umlwin.redraw_everything()
+            
+        bootstrap03()
+        #self.umlwin.set_uml_canvas_size((9000,9000))
+        
+
+
+
+class CmdRefreshUmlWindow(CmdBase):
+    def execute(self):
+        self.context.umlwin.redraw_everything()
+        #self.context.umlwin.stateofthenation()
+        self.context.wxapp.RefreshAsciiUmlTab()
+
 
 class CmdFileSaveWorkspace(CmdBase):
     def execute(self):
