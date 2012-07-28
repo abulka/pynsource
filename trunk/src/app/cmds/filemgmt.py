@@ -8,38 +8,14 @@ class CmdFileNew(CmdBase):
         self.context.umlwin.Clear()
         self.context.wxapp.RefreshAsciiUmlTab()
 
-class CmdFileImport(CmdBase):
-    def execute(self):
-        self.context.wxapp.notebook.SetSelection(0)
-        
-        thisdir = self.context.config.get('LastDirFileImport', os.getcwd()) # remember dir path
-        
-        dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir=thisdir,
-            defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
-        if dlg.ShowModal() == wx.ID_OK:
-            
-            self.context.config['LastDirFileImport'] = dlg.GetDirectory()  # remember dir path
-            self.context.config.write()
-            
-            filenames = dlg.GetPaths()
-            print 'Importing...'
-            wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
-            print filenames
-            
-            self.context.wxapp.app.run.CmdFileImportSource(files=filenames)   # Command calling another command!
-                                                                # Hmmm subcommand does a layout too!????
-            self.context.umlwin.redraw_everything()
-            
-            wx.EndBusyCursor()
-            print 'Import - Done.'
+
+# ----- Importing python source code
 
 
-class CmdFileImportSource(CmdBase):
-    def __init__(self, files=None, path=None):
-        self.files = files
-        self.path = path
-        
+class CmdFileImportBase(CmdBase):   # BASE
     def execute(self):
+        assert self.files
+        
         # these are tuples between class names.
         self.context.model.ClearAssociations()       # WHY DO WE WANT TO DESTROY THIS VALUABLE INFO?
 
@@ -57,6 +33,36 @@ class CmdFileImportSource(CmdBase):
         self.context.umlwin.layout_and_position_shapes()
         
 
+class CmdFileImportFromFilePath(CmdFileImportBase):   # was class CmdFileImportSource(CmdBase):
+    def __init__(self, files=None):
+        self.files = files
+
+
+class CmdFileImportViaDialog(CmdFileImportBase):    # was class CmdFileImport(CmdBase):
+    def execute(self):
+        self.context.wxapp.notebook.SetSelection(0)
+        
+        thisdir = self.context.config.get('LastDirFileImport', os.getcwd()) # remember dir path
+        
+        dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir=thisdir,
+            defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            
+            self.context.config['LastDirFileImport'] = dlg.GetDirectory()  # remember dir path
+            self.context.config.write()
+            
+            self.files = dlg.GetPaths()
+            print 'Importing...', self.files
+            wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
+            
+            super(CmdFileImportViaDialog, self).execute()
+
+            wx.EndBusyCursor()
+            print 'Import - Done.'
+            
+        dlg.Destroy()
+        
+
 class CmdBootStrap(CmdBase):
     def execute(self):
         self.frame = self.context.frame
@@ -65,29 +71,23 @@ class CmdBootStrap(CmdBase):
         
         def bootstrap01():
             self.frame.SetSize((1024,768))
-            self.app.run.CmdFileImportSource(files=[os.path.abspath( __file__ )])
+            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath( __file__ )])
         def bootstrap02():
-            self.app.run.CmdFileImportSource(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
-            self.umlwin.redraw_everything()
+            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
         def bootstrap03():
-            self.umlwin.redraw_everything()  # Allow main frame to resize and thus allow world coords to calibrate before we generate layout coords for loaded graph
             self.app.run.CmdFileLoadWorkspaceFromFilepath(filepath=os.path.abspath("../tests/saved uml workspaces/uml05.txt"))
-            # Don't need to redraw everything after, because persisted
-            # workspace is already laid out ok?  Or because we did it first?
         def bootstrap04():
-            self.app.run.CmdFileImportSource(files=[os.path.abspath( "pyNsourceGui.py" )])
-            self.umlwin.redraw_everything()
+            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath( "pyNsourceGui.py" )])
         def bootstrap05():
-            self.app.run.CmdFileImportSource(files=[os.path.abspath("printframework.py"), os.path.abspath("png.py")])
-            self.umlwin.redraw_everything()
+            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("printframework.py"), os.path.abspath("png.py")])
         def bootstrap06():
-            self.app.run.CmdFileImportSource(files=[os.path.abspath("gui/uml_shapes.py")])
-            self.umlwin.redraw_everything()
+            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("gui/uml_shapes.py")])
             
         bootstrap03()
         #self.umlwin.set_uml_canvas_size((9000,9000))
         
 
+# ------- Refresh
 
 
 class CmdRefreshUmlWindow(CmdBase):
@@ -95,6 +95,9 @@ class CmdRefreshUmlWindow(CmdBase):
         self.context.umlwin.redraw_everything()
         #self.context.umlwin.stateofthenation()
         self.context.wxapp.RefreshAsciiUmlTab()
+
+
+# ------- Saving to persistence
 
 
 class CmdFileSaveWorkspace(CmdBase):
@@ -112,6 +115,10 @@ class CmdFileSaveWorkspace(CmdBase):
 class CmdFileSaveWorkspaceToConsole(CmdBase):
     def execute(self):
         print self.context.model.graph.GraphToString()
+
+
+# ------- Loading from persistence
+
 
 class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
     def load_model_from_text_and_build_shapes(self, filedata=""):
@@ -141,7 +148,8 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
             s = fp.read()
             fp.close()
             self.load_model_from_text_and_build_shapes(s)
-            
+
+
 class CmdFileLoadWorkspaceFromFilepath(CmdFileLoadWorkspaceBase):
     def __init__(self, filepath):
         self.filepath = filepath

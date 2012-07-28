@@ -543,7 +543,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.Update() # or wx.SafeYield()  # Why?  Without this the nodes don't paint during a "L" layout (edges do!?)
 
         
-    # UTILITY - called by CmdFileImport, CmdFileImport, CmdRefreshUmlWindow
+    # UTILITY - called by CmdLayout, CmdRefreshUmlWindow
     def redraw_everything(self):
         print "Draw: redraw_everything"
         diagram = self.GetDiagram()

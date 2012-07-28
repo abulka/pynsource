@@ -376,7 +376,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.umlwin.CmdRestoreLayout2()
         
     def OnFileImport(self, event):
-        self.app.run.CmdFileImport()
+        self.app.run.CmdFileImportViaDialog()
 
     def model_to_ascii(self):
         if not MULTI_TAB_GUI:
