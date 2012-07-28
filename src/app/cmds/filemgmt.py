@@ -114,7 +114,7 @@ class CmdFileSaveWorkspaceToConsole(CmdBase):
         print self.context.model.graph.GraphToString()
 
 class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
-    def LoadGraph(self, filedata=""):
+    def load_model_from_text_and_build_shapes(self, filedata=""):
         umlcanvas = self.context.umlwin
         
         umlcanvas.Clear()
@@ -134,18 +134,18 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
         
         self.context.wxapp.RefreshAsciiUmlTab()
 
-    def execute(self):
-        raise "base/virtual only"
-        
-class CmdFileLoadWorkspaceFromFilepath(CmdFileLoadWorkspaceBase):
-    def __init__(self, filepath):
-        self.filepath = filepath
+        self.filepath = None
         
     def execute(self):
             fp = open(self.filepath, "r")
             s = fp.read()
             fp.close()
-            self.LoadGraph(s)
+            self.load_model_from_text_and_build_shapes(s)
+            
+class CmdFileLoadWorkspaceFromFilepath(CmdFileLoadWorkspaceBase):
+    def __init__(self, filepath):
+        self.filepath = filepath
+
             
 class CmdFileLoadWorkspaceFromQuickPrompt(CmdFileLoadWorkspaceBase):
     def execute(self):
@@ -154,8 +154,9 @@ class CmdFileLoadWorkspaceFromQuickPrompt(CmdFileLoadWorkspaceBase):
         if dialog.ShowModal() == wx.ID_OK:
             txt = dialog.GetValue()
             print txt
-            self.LoadGraph(txt)
+            self.load_model_from_text_and_build_shapes(txt)
         dialog.Destroy()
+
         
 class CmdFileLoadWorkspaceViaDialog(CmdFileLoadWorkspaceBase):
     def execute(self):
@@ -164,14 +165,11 @@ class CmdFileLoadWorkspaceViaDialog(CmdFileLoadWorkspaceBase):
         dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir=thisdir,
             defaultFile="", wildcard="*.txt", style=wx.OPEN, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
-            filename = dlg.GetPath()
+            self.filepath = dlg.GetPath()
 
             self.context.config['LastDirFileOpen'] = dlg.GetDirectory()  # remember dir path
             self.context.config.write()
 
-            fp = open(filename, "r")
-            s = fp.read()
-            fp.close()
+            super(CmdFileLoadWorkspaceViaDialog, self).execute()
 
-            self.LoadGraph(s)
         dlg.Destroy()
