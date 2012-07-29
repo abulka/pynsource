@@ -41,16 +41,19 @@ def process_key(keycode, frame, canvas, shapes):
             global technique
             if technique == '1':
                 """
-                We are not using shape.Move which means no
-                draw is occurring within the move method.
+                Effectiveness: Poor.  Scrolled area doesn't get cleared thus get
+                duplicates / smudges there.
                 
-                But the draw eventually happens in the diagram Redraw()
-                (which loops and calls draw on each shape)
-                
-                a draw means its drawn on the canvas in any scrolled or non scrolled area
+                We are not using shape.Move which means no draw is occurring
+                within the move method. This is not a problem since the draw
+                eventually happens in the diagram Redraw() (which loops and
+                calls draw on each shape). The .Draw() methods operate correctly
+                and draws on the canvas in any scrolled or non scrolled area,
+                its just that we can't get rid of old rubbish using .Clear(dc).
+                If .Clear(dc) at least cleared the currently visible scroll
+                area, then that would be perfect. But it doesn't even though we
+                have called canvas.PrepareDC(dc) which is supposed to do this.
                 """
-                # Scrolled area doesn't get cleared thus get
-                # duplicates / smudges there
                 shape.SetX(x)
                 shape.SetY(y)
                 shape.MoveLinks(dc)  # normally shape.Move() would have done this
@@ -59,51 +62,57 @@ def process_key(keycode, frame, canvas, shapes):
                 
             elif technique == '2':
                 """
-                Using shape.Move()
-                
-                shape.Move will do a draw, unless you set display=False
-                
-                The fact that we are moving to the position the shape
-                already is may seem redundant - which it is.  But the
-                shape.Move contains a call to self.draw which means
-                we are triggering the shape draw
+                Effectiveness: Poor.  duplicates / smudges *everywhere* cos no clear
+
+                Using shape.Move() to do the drawing. Note that shape.Move()
+                will do a draw, unless you set display=False. The fact that we
+                are passing in the existing x,y of the position the shape may
+                seem redundant - which it is. But the shape.Move contains a call
+                to self.Draw() which means we actually ARE triggering a shape
+                draw Reason this smudges is that there is no .Clear going on.
                 """
-                # duplicates / smudges *everywhere* cos no clear
+                # 
                 shape.SetX(x)
                 shape.SetY(y)
                 shape.Move(dc, shape.GetX(), shape.GetY())
         
             elif technique == '3':
                 """
+                Effectiveness: Poor.  duplicates / smudges cos no clear
+                
                 Using shape.Move() and moving the shape to the new coords.
                 The default is display=True which means a draw occurs.
                 """
-                # duplicates / smudges cos no clear
                 shape.Move(dc, x, y)
 
             elif technique == '4':
                 """
-                you can remove the old shape with 
-                shape.Erase(dc)
-                but this erase will clobber any overlapping shapes.
+                Effectiveness: Good. WOW this technique WORKS on scrolled area,
+                bug fixed - BUT with provisos.
+
+                Proviso: we remove the old shape with shape.Erase(dc) but
+                this erase will clobber any overlapping shapes.
                 """
-                # WOW this technique WORKS on scrolled area, bug fixed - BUT with provisos.
                 shape.Erase(dc)
                 shape.Move(dc, x, y, display=True)
 
             elif technique == '5':
                 """
-                better perhaps to 
-                        self.GetDiagram().Clear(dc)
-                        self.GetDiagram().Redraw(dc)
-                but this means you are drawing twice, once during the move and once in the redraw.
-                you can move with display=False to avoid the extra draw.
+                Effectiveness: Poor. smudges cos no clear not effective on
+                scrolled areas. This is the long standing bug I was having.
+
+                You might think that it is better perhaps to 
+                    self.GetDiagram().Clear(dc)
+                    self.GetDiagram().Redraw(dc)
+                but this means you are drawing twice, once during the move and
+                once in the redraw. you can move with display=False to avoid the
+                extra draw.
                 
-                But the deeper problem
-                is that the clear only clears the physical visible area and the scrolled off area
-                still has content, so that when you scroll to it you get old rubbish there. e.g.
-                if the shape that was moved was in the scrolled off area, you will see double - the
-                old position and the new.
+                But the deeper problem is that the clear only clears the
+                physical visible area and the scrolled off area still has
+                content, so that when you scroll to it you get old rubbish
+                there. e.g. if the shape that was moved was in the scrolled off
+                area, you will see double - the old position and the new.
                 """
                 shape.Move(dc, x, y, display=False)
                 canvas.GetDiagram().Clear(dc)
@@ -111,19 +120,46 @@ def process_key(keycode, frame, canvas, shapes):
 
             elif technique == '6':
                 """
-                Then I discovered frame and canvas both have a Refresh() method.  This seems to clear
-                the whole virtual canvas area and repaints everything.
+                Effectiveness: Excellent. BEST technique. this technique WORKS
+                on scrolled area, bug fixed
+                
+                I discovered frame and canvas both have a Refresh() method.
+                This seems to clear the whole virtual canvas area and repaints
+                everything.
                 
                 OUTSTANDING QUESTION:
                 Why isn't an eventual shape.draw() or diagram.redraw() needed
-                anymore. DOES canvas.Refresh() SOMEHOW TRIGGER AN ACTUAL DRAW?
-                Tip: a Refresh() by default will erase the background before sending the paint event
+                anymore. DOES canvas.Refresh() SOMEHOW TRIGGER AN ACTUAL DRAW? I
+                think yes. Tip: a Refresh() by default will erase the background
+                before sending the paint event -- which then leads to a Draw.
                 """
-                # WOW this technique WORKS on scrolled area, bug fixed
                 shape.Move(dc, x, y, display=False)  # handles shape.MoveLinks(dc) internally too
                 canvas.Refresh()     # or canvas.frame.Refresh()
             
+
             elif technique == '7':
+                """
+                Effectiveness: Very Bad - experimental only to demonstate a point.
+
+                This technique shouldn't be used and only demonstrates the
+                effect of .Clear(dc) after a .Refresh() - the clear only clears
+                the physical visible area
+                
+                The .Refresh() above will be delayed till after the end of this
+                method call, thus the subsequent .Clear(dc) below will take
+                place first and then the erase/paint/draw cycle caused by the
+                .Refresh() will kick in. Thus you won't see the effect of the
+                clear. Unless you call canvas.Update() which lets wxpython
+                "breathe" and allows the .Refresh() to occur immediately. Then
+                you will see the effect of the clear.
+                """
+                shape.Move(dc, x, y, display=False)
+                canvas.Refresh()
+                canvas.Update()   # Allow .Refresh() to occur immediately
+                
+                canvas.GetDiagram().Clear(dc)
+
+            elif technique == '8':
                 pass
 
         elif keycode == 'f':
