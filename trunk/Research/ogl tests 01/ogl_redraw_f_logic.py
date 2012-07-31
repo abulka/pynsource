@@ -39,28 +39,8 @@ def process_key(keycode, frame, canvas, shapes):
             #shape.AddText("%d,%d"%(x,y))            
             
             global technique
-            if technique == '1':
-                """
-                Effectiveness: Poor.  Scrolled area doesn't get cleared thus get
-                duplicates / smudges there.
                 
-                We are not using shape.Move which means no draw is occurring
-                within the move method. This is not a problem since the draw
-                eventually happens in the diagram Redraw() (which loops and
-                calls draw on each shape). The .Draw() methods operate correctly
-                and draws on the canvas in any scrolled or non scrolled area,
-                its just that we can't get rid of old rubbish using .Clear(dc).
-                If .Clear(dc) at least cleared the currently visible scroll
-                area, then that would be perfect. But it doesn't even though we
-                have called canvas.PrepareDC(dc) which is supposed to do this.
-                """
-                shape.SetX(x)
-                shape.SetY(y)
-                shape.MoveLinks(dc)  # normally shape.Move() would have done this
-                canvas.GetDiagram().Clear(dc)
-                canvas.GetDiagram().Redraw(dc)
-                
-            elif technique == '2':
+            if technique == '2':
                 """
                 Effectiveness: Poor.  duplicates / smudges *everywhere* cos no clear
 
@@ -96,6 +76,27 @@ def process_key(keycode, frame, canvas, shapes):
                 shape.Erase(dc)
                 shape.Move(dc, x, y, display=True)
 
+            elif technique == '1':
+                """
+                Effectiveness: Poor.  Scrolled area doesn't get cleared thus get
+                duplicates / smudges there.
+                
+                We are not using shape.Move which means no draw is occurring
+                within the move method. This is not a problem since the draw
+                eventually happens in the diagram Redraw() (which loops and
+                calls draw on each shape). The .Draw() methods operate correctly
+                and draws on the canvas in any scrolled or non scrolled area,
+                its just that we can't get rid of old rubbish using .Clear(dc).
+                If .Clear(dc) at least cleared the currently visible scroll
+                area, then that would be perfect. But it doesn't even though we
+                have called canvas.PrepareDC(dc) which is supposed to do this.
+                """
+                shape.SetX(x)
+                shape.SetY(y)
+                shape.MoveLinks(dc)  # normally shape.Move() would have done this
+                canvas.GetDiagram().Clear(dc)
+                canvas.GetDiagram().Redraw(dc)
+            
             elif technique == '5':
                 """
                 Effectiveness: Poor. smudges cos no clear not effective on
@@ -160,8 +161,62 @@ def process_key(keycode, frame, canvas, shapes):
                 canvas.GetDiagram().Clear(dc)
 
             elif technique == '8':
-                pass
+                """
+                Effectiveness: Good - Traditional technique resurrected and repaired!
 
+                Traditional non .Refresh() technique, but now taking into
+                account R. Dunn's advice re NOT calling PrepareDC before a
+                Clear() but of course calling it before the Move() and Redraw()
+                Its arse about, but hey, it works!
+                
+                "The .Clear(dc) always clears the top, physical size window
+                area - never the scrolled physical size window visible at the
+                moment (even though I have called prepareDC !!). This I think may
+                be a bug? And it never clears the whole virtual sized shape canvas
+                area." - A. Bulka July 2012
+
+                "Ok, I see it too. It's not quite expected but I'm not sure it's
+                a bug as from some perspectives it is probably the correct thing
+                to do... Anyway, a simple work around is to simply not call
+                PrepareDC in that case. Then it will always be the physical
+                window area that is cleared." - R. Dunn. July 2012.
+
+                """
+                dc = wx.ClientDC(canvas)
+                canvas.GetDiagram().Clear(dc)
+
+                canvas.PrepareDC(dc)
+                shape.Move(dc, x, y, display=False)
+                # you can even postpone the .PrepareDC(dc) till this point since no drawing has occurred yet
+                canvas.GetDiagram().Redraw(dc)
+                
+            elif technique == '9':
+                # SCRAPS FOR TESTING
+                pass
+                
+                # WORKS
+                #dc = wx.ClientDC(canvas)
+                #canvas.GetDiagram().Clear(dc)
+                #
+                #shape.Move(dc, x, y, display=False)
+                #canvas.PrepareDC(dc)
+                #canvas.GetDiagram().Redraw(dc)
+
+                # WRONG - need the .PrepareDC(dc) before the Move(dc, x, y) since by default it does a .Draw()
+                #dc = wx.ClientDC(canvas)
+                #canvas.GetDiagram().Clear(dc)
+                #
+                #shape.Move(dc, x, y)
+                #canvas.PrepareDC(dc)
+                #canvas.GetDiagram().Redraw(dc)
+
+                # WRONG - without the Redraw, you only see the last moved shape, not all the shapes.
+                #dc = wx.ClientDC(canvas)
+                #canvas.GetDiagram().Clear(dc)
+                #
+                #canvas.PrepareDC(dc)
+                #shape.Move(dc, x, y)
+                
         elif keycode == 'f':
             canvas.frame.SetDimensions(200, 200, 350, 350) # get size with frame.GetSize()
             
@@ -188,7 +243,7 @@ def process_key(keycode, frame, canvas, shapes):
             print "frame.GetClientSize()", canvas.frame.GetClientSize()
             print "frame.GetSize()", canvas.frame.GetSize()
         
-        elif keycode in ['1','2','3','4','5','6','7','8']:
+        elif keycode in ['1','2','3','4','5','6','7','8','9']:
             technique = keycode
 
         elif keycode in ['b', 'B']:
