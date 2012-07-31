@@ -62,6 +62,18 @@ class MainApp(wx.App):
             canvas.PrepareDC(dc)
             canvas.GetDiagram().Clear(dc)
 
+            """
+            Ok, I see it too. It's not quite expected but I'm not sure it's a
+            bug as from some perspectives it is probably the correct thing to
+            do... Anyway, a simple work around is to simply not call PrepareDC
+            in that case. Then it will always be the physical window area that
+            is cleared.
+            """
+        elif keycode == 'C':
+            # Works ok
+            dc = wx.ClientDC(canvas)
+            canvas.GetDiagram().Clear(dc)
+            
 def main():
     application = MainApp(0)
     application.MainLoop()
