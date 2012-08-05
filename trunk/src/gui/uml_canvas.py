@@ -424,18 +424,6 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         self.working = False
 
-    def OnWheelZoom_OverlapRemoval_Defunct(self, event):
-        if self.working: return
-        self.working = True
-
-        if event.GetWheelRotation() < 0:
-            self.stage2()
-            print self.overlap_remover.GetStats()
-        else:
-            self.stateofthenation()
-
-        self.working = False
-        
     # UTILITY - called by CmdFileImportSource, CmdFileLoadWorkspaceBase.LoadGraph   
     def build_view(self, translatecoords=True):
         if translatecoords:
@@ -457,7 +445,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.CreateUmlEdge(edge)
 
 
-    # UTILITY - called by everyone!!??
+    # UTILITY - called by
     #
     #CmdInsertNewNodeClass, CmdInsertImage, CmdLayoutExpandContractBase, 
     #umlwin.OnWheelZoom_OverlapRemoval_Defunct, 
@@ -466,24 +454,21 @@ class UmlCanvas(ogl.ShapeCanvas):
     #UmlShapeHandler.OnSizingEndDragLeft
     #LayoutBlackboard.LayoutLoopTillNoChange
     #
-    # Tip: force_stateofthenation = true by CmdInsertNewNodeClass, CmdInsertImage, CmdLayoutExpandContractBase
-    #
-    # RENAME?: removeoverlaps_And_RedrawIfNecc
-    #
-    def stage2(self, force_stateofthenation=False, watch_removals=True):
-        #print "Draw: stage2 force_stateofthenation=", force_stateofthenation
+    def remove_overlaps(self, watch_removals=True):
+        """
+        Returns T/F if any overlaps found, so caller can decide whether to
+        redraw the screen
+        """
         self.overlap_remover.RemoveOverlaps(watch_removals=watch_removals)
-        if self.overlap_remover.GetStats()['total_overlaps_found'] > 0 or force_stateofthenation:
-            self.stateofthenation()
-
+        return self.overlap_remover.GetStats()['total_overlaps_found'] > 0
+   
     # UTILITY - called by everyone!!??
     #
     #CmdFileLoadWorkspaceBase, CmdInsertComment, CmdEditClass
     #CmdLayoutExpandContractBase, 
-    #CmdInsertNewNodeClass (no longer though, use stage2 instead)
+    #CmdInsertNewNodeClass
     #umlwin.NewEdgeMarkTo
     #umlwin.OnWheelZoom_OverlapRemoval_Defunct
-    #umlwin.stage2  (!!!)
     #LayoutBlackboard.LayoutThenPickBestScale
     #LayoutBlackboard.Experiment1
     #LayoutBlackboard.LayoutLoopTillNoChange
@@ -491,6 +476,13 @@ class UmlCanvas(ogl.ShapeCanvas):
     #LayoutBlackboard.GetVitalStats  (only if animate is true)
     #OverlapRemoval.RemoveOverlaps   ( refresh gui if self.gui and watch_removals)
     #GraphSnapshotMgr.RestoreGraph
+    #
+    # these do an overlap removal first before calling here
+    #
+    #CmdInsertImage
+    #umlwin.layout_and_position_shapes, 
+    #UmlShapeHandler.OnEndDragLeft
+    #UmlShapeHandler.OnSizingEndDragLeft
     #
     # recalibrate = True - called by core spring layout self.gui.stateofthenation()
     #
@@ -528,7 +520,8 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.AllToLayoutCoords()
         self.layouter.layout(keep_current_positions=False, optimise=True)
         self.AllToWorldCoords()
-        self.stage2() # does overlap removal and stateofthenation
+        if self.remove_overlaps():
+            self.stateofthenation()
         
     # UTILITY - not used, possibly could be called by pynsourcegui.BootStrap
     def set_uml_canvas_size(self, size):

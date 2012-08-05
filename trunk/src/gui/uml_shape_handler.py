@@ -52,7 +52,9 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             #shape.GetCanvas().stateofthenation()   # do we need this?  did quite well without it before
             pass
         else:
-            shape.GetCanvas().stage2()
+            canvas = shape.GetCanvas()
+            if canvas.remove_overlaps():
+                canvas.stateofthenation()
 
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
         shape = self.GetShape()
@@ -71,7 +73,9 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         
         self.UpdateStatusBar(self.GetShape())
 
-        shape.GetCanvas().stage2()
+        canvas = shape.GetCanvas()
+        if canvas.remove_overlaps():
+            canvas.stateofthenation()
         
     def OnEndSize(self, width, height):
         #print "OnEndSize", width, height

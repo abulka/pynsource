@@ -196,7 +196,9 @@ class LayoutBlackboard(object):
             memento1 = memento2
         
         self.umlwin.AllToWorldCoords()
-        self.umlwin.stage2() # does overlap removal and stateofthenation
+
+        if self.umlwin.remove_overlaps():
+            self.umlwin.stateofthenation()
         
     def ScaleUpMadly(self, strategy, animate=False):
         """
