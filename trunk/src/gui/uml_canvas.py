@@ -11,7 +11,7 @@ from generate_code.gen_java import PySourceAsJava
 from model.umlworkspace import UmlWorkspace
 
 from uml_shapes import *
-from coord_utils import setpos, getpos
+from coord_utils import setpos, Move2
 
 from layout.layout_basic import LayoutBasic
 
@@ -26,6 +26,8 @@ import wx.lib.ogl as ogl
 from uml_shape_handler import UmlShapeHandler
 
 from architecture_support import *
+
+ogl.Shape.Move2 = Move2
 
 class UmlCanvas(ogl.ShapeCanvas):
     scrollStepX = 10
@@ -503,36 +505,11 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.PrepareDC(dc)
 
         for node in self.umlworkspace.graph.nodes:
-            # Here we call setpos() which sets the pos using setX() and setY()
-            # but this doesn't actually draw  anything,
-            # which shape.Move(dc, shape.GetX(), shape.GetY()) would
-            # have done.  But the diagram.Redraw(dc) eventually does the draw.
-            # (Hmmm - but now we are not even doing that! Now that we use.Refresh())
-            #
-            # Also shape.Move() would have internally done .MoveLinks(), but
-            # since we don't use it, we have to call .MoveLinks(dc) manually.
-                
-            # Don't need to use node.shape.Move(dc, x, y, False)
-            setpos(node.shape, node.left, node.top)
-            #node.shape.Move(dc, node.shape.GetX(), node.shape.GetY())
-            
-            # But you DO need to use a dc to adjust the links
-            node.shape.MoveLinks(dc)
-            
-        #self.GetDiagram().Clear(dc)
-        #self.GetDiagram().Redraw(dc)
-        #
-        # WHY ISN'T .Redraw NEEDED ANYMORE? WHEN DOES ANY .DRAW HAPPEN? ANSWER:
-        # the .Refresh() by default will erase the background before sending the
-        # paint event, which then triggers calls to .Draw()
-        
+            node.shape.Move2(dc, node.left, node.top, display=False)
         self.Refresh()
 
-        
-        # You need to be yielding or updating on a regular basis, so that when
-        # your OS/window manager sends repaint messages to your app, it can handle them.
-        # http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh
-        self.Update() # or wx.SafeYield()  # Why?  Without this the nodes don't paint during a "L" layout (edges do!?)
+        self.Update() # or wx.SafeYield()  # Without this the nodes don't paint during a "L" layout (edges do!?)
+                      # You need to be yielding or updating on a regular basis, so that when your OS/window manager sends repaint messages to your app, it can handle them. See http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh
 
     def frame_calibration(self):
         """
