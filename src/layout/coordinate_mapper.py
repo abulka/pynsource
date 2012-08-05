@@ -121,15 +121,16 @@ class CoordinateMapper:
             layoutPosX, layoutPosY = self.WorldToLayout([node.left, node.top])
             
             if abs(layoutPosX) > 50.0:
-                print "!"*20, "Big layoutPosX?", layoutPosX, node
+                print "?"*5, "Big layoutPosX?", layoutPosX, node
                 something_wrong = True
             if abs(layoutPosY) > 50.0:
-                print "!"*20, "Big layoutPosY?", layoutPosY, node
+                print "?"*5, "Big layoutPosY?", layoutPosY, node
                 something_wrong = True
                 
             node.layoutPosX, node.layoutPosY = layoutPosX, layoutPosY
             
         if something_wrong:
+            print "\nSomething went wrong with AllToLayoutCoords - DumpCalibrationInfo\n"
             self.DumpCalibrationInfo(False)
     
     def AllToWorldCoords(self):

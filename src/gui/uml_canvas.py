@@ -11,7 +11,7 @@ from generate_code.gen_java import PySourceAsJava
 from model.umlworkspace import UmlWorkspace
 
 from uml_shapes import *
-from coord_utils import setpos, Move2
+from coord_utils import setpos, getpos, Move2, percent_change
 
 from layout.layout_basic import LayoutBasic
 
@@ -38,8 +38,10 @@ class UmlCanvas(ogl.ShapeCanvas):
         ogl.ShapeCanvas.__init__(self, parent)
         maxWidth  = 1000
         maxHeight = 1000
-        self.SetScrollbars(20, 20, maxWidth/20, maxHeight/20)
-
+        #self.SetScrollbars(20, 20, maxWidth/20, maxHeight/20)
+        self.SetScrollbars(1, 1, 1000, 1000)
+        #self.SetVirtualSizeHints(50,50,2000,2000)
+        
         self.observers = multicast()
         self.app = None  # assigned later by app boot
         
@@ -503,6 +505,9 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.Update() # or wx.SafeYield()  # Without this the nodes don't paint during a "L" layout (edges do!?)
                       # You need to be yielding or updating on a regular basis, so that when your OS/window manager sends repaint messages to your app, it can handle them. See http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh
 
+        if not recalibrate:
+            self.resize_virtual_canvas_tofit()
+
     def frame_calibration(self):
         """
         Calibrate model / shape / layout coordinate mapping system to the
@@ -513,6 +518,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         uncertain a size to be relied upon?
         """
         self.coordmapper.Recalibrate(self.frame.GetClientSize())  
+        #self.resize_virtual_canvas_tofit()
         
     # UTILITY - used by CmdLayout and CmdFileImportBase
     def layout_and_position_shapes(self):
@@ -522,27 +528,78 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.AllToWorldCoords()
         if self.remove_overlaps():
             self.stateofthenation()
-        
-    # UTILITY - not used, possibly could be called by pynsourcegui.BootStrap
-    def set_uml_canvas_size(self, size):
-        """
-        Currently unused, but it works and sets the canvas size
-        and the scrollbars adjust accordingly.
-        Set to something big and always have a large scrollable region e.g.
-            self.umlwin.set_uml_canvas_size((9000,9000))
-        """
-        size = wx.Size(size[0], size[1])
-        nvsx, nvsy = size.x / self.scrollStepX, size.y / self.scrollStepY
-        self.Scroll(0, 0)
-        self.SetScrollbars(self.scrollStepX, self.scrollStepY, nvsx, nvsy)
-        canvas = self
-        canvas.SetSize(canvas.GetVirtualSize())
 
-    #def get_umlboxshapes(self):
-    #    # Doesn't do much, only diagnostic uses this now - but even that is commented out.
-    #    return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
-    #
-    #umlboxshapes = property(get_umlboxshapes)
+    def resize_virtual_canvas_tofit(self):
+        MARGIN = 20
+        #print "bounds", self.GetBoundsAllShapes()
+        #print "canvas.GetVirtualSize()", self.GetVirtualSize()
+
+        #print "canvas.GetSize()", self.GetSize()
+        #print "frame.GetVirtualSize()", self.frame.GetVirtualSize()
+        #print "frame.GetSize()", self.frame.GetSize()
+        #print "frame.GetClientSize()", self.frame.GetClientSize()
+
+        #self.scroll.Scroll(600, 400)
+        oldscrollx = self.GetScrollPos(wx.HORIZONTAL)
+        oldscrolly = self.GetScrollPos(wx.VERTICAL)
+        
+        # MAGIC solution !!!
+        new_width, new_height = self.GetBoundsAllShapes()
+        new_width += MARGIN
+        new_height += MARGIN
+        curr_width, curr_height = self.GetVirtualSize()
+        need_more_room = new_width > curr_width or new_height > curr_height
+        PERCENT_CHANGE_SMALLER = 30
+        need_to_compact = (new_width < curr_width or new_height < curr_height) and \
+                        (percent_change(new_width, curr_width) > PERCENT_CHANGE_SMALLER or \
+                         percent_change(new_height, curr_height) > PERCENT_CHANGE_SMALLER)
+        if need_more_room or need_to_compact:
+            self.SetScrollbars(1, 1, new_width, new_height)
+
+            if oldscrollx < new_width and oldscrolly < new_height:
+                self.Scroll(oldscrollx, oldscrolly)
+
+            #print "bounds now", self.GetBoundsAllShapes()
+            #print "canvas.GetVirtualSize()", self.GetVirtualSize()
+        
+    def GetBoundsAllShapes(self):
+        maxx = 0
+        maxy = 0
+        num_shapes = 0
+        for shape in self.umlboxshapes:
+            num_shapes += 1
+            width, height = shape.GetBoundingBoxMax()
+            right = shape.GetX() + width/2
+            bottom = shape.GetY() + height/2
+            maxx = max(right, maxx)
+            maxy = max(bottom, maxy)
+            left,top=getpos(shape)
+            #print "%d %s left,top %d,%d cx,cy %d,%d width,height %d,%d, right,bottom %d,%d maxx,maxy %d,%d " % \
+            #(num_shapes, shape.region1.GetText(), left,top, shape.GetX(), shape.GetY(), width, height, right, bottom, maxx,maxy)
+        #print '$$$'
+        return (maxx, maxy)
+        
+    ## UTILITY - not used, possibly could be called by pynsourcegui.BootStrap
+    #def set_uml_canvas_size(self, size):
+    #    """
+    #    Currently unused, but it works and sets the canvas size
+    #    and the scrollbars adjust accordingly.
+    #    Set to something big and always have a large scrollable region e.g.
+    #        self.umlwin.set_uml_canvas_size((9000,9000))
+    #    """
+    #    size = wx.Size(size[0], size[1])
+    #    nvsx, nvsy = size.x / self.scrollStepX, size.y / self.scrollStepY
+    #    self.Scroll(0, 0)
+    #    self.SetScrollbars(self.scrollStepX, self.scrollStepY, nvsx, nvsy)
+    #    canvas = self
+    #    canvas.SetSize(canvas.GetVirtualSize())
+
+    def get_umlboxshapes(self):
+        # Doesn't do much, only diagnostic uses this now - but even that is commented out.
+        #return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
+        return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]
+        
+    umlboxshapes = property(get_umlboxshapes)
     
     def OnDestroy(self, evt):
         for shape in self.GetDiagram().GetShapeList():
