@@ -79,10 +79,9 @@ class CmdInsertNewNodeClass(CmdInsertOrEditNode):
             
             node.shape.Show(True)
             
-            #self.umlwin.stateofthenation() # if want simple refresh
-            #self.umlwin.stage2() # if want overlap removal
-            umlwin.stage2(force_stateofthenation=True) # if want overlap removal and proper refresh
-            
+            umlwin.remove_overlaps()
+            umlwin.stateofthenation()
+
             umlwin.SelectNodeNow(node.shape)        
         
             wxapp.RefreshAsciiUmlTab()
@@ -166,7 +165,8 @@ class CmdInsertImage(CmdBase):
             print filename
             
         self.context.umlwin.CreateImageShape(filename)
-        self.context.umlwin.stage2(force_stateofthenation=True) # if want overlap removal and proper refresh
+        self.context.umlwin.remove_overlaps()
+        self.context.umlwin.stateofthenation()
         #self.SelectNodeNow(node.shape)
         
     def undo(self):  # override

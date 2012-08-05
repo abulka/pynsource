@@ -28,9 +28,8 @@ class CmdLayoutExpandContractBase(CmdBase):   # BASE
         coordmapper.AllToWorldCoords()
         numoverlaps = self.context.umlwin.overlap_remover.CountOverlaps()
         if self.remove_overlaps:
-            self.context.umlwin.stage2(force_stateofthenation=True, watch_removals=False) # does overlap removal and stateofthenation
-        else:
-            self.context.umlwin.stateofthenation()
+            self.context.umlwin.remove_overlaps(watch_removals=False)
+        self.context.umlwin.stateofthenation()
             
 class CmdLayoutExpand(CmdLayoutExpandContractBase):
     def execute(self):
