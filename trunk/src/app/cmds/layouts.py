@@ -13,20 +13,16 @@ class CmdLayout(CmdBase):
         # not implemented
 
 class CmdLayoutExpandContractBase(CmdBase):   # BASE
-    def __init__(self, remap_world_to_layout=False, remove_overlaps=True):
-        self.remap_world_to_layout = remap_world_to_layout
+    def __init__(self, remove_overlaps=True):
         self.remove_overlaps = remove_overlaps
 
     def ChangeScale(self, delta):
         coordmapper = self.context.coordmapper
         
-        # Experimental - only needed when you've done world coord changes 
-        if self.remap_world_to_layout:
-            coordmapper.AllToLayoutCoords()
-            
+        coordmapper.AllToLayoutCoords() # this used to be optional, now I do it all the time to preserve layout exactly
         coordmapper.Recalibrate(scale=coordmapper.scale + delta)
         coordmapper.AllToWorldCoords()
-        numoverlaps = self.context.umlwin.overlap_remover.CountOverlaps()
+
         if self.remove_overlaps:
             self.context.umlwin.remove_overlaps(watch_removals=False)
         self.context.umlwin.stateofthenation()

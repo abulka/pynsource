@@ -117,13 +117,6 @@ class CoordinateMapper:
     def AllToLayoutCoords(self):
         something_wrong = False
         
-        #def check_if_wrong(already_wrong, coord1, coord2):
-        #    if abs(layoutPosX) > 19.0:
-        #        print "!"*20, "Big layoutPosX?", layoutPosX, node
-        #        something_wrong = True
-        #    if already_wrong and found_wrong:
-        #        return true
-            
         for node in self.graph.nodes:
             layoutPosX, layoutPosY = self.WorldToLayout([node.left, node.top])
             
