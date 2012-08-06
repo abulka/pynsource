@@ -8,7 +8,7 @@ class LayoutBlackboard(object):
         self.graph = graph
         self.umlwin = umlwin
 
-    def stateofthenation(self, recalibrate=False):
+    def stateofthenation(self, recalibrate=False, auto_resize_canvas=True):
         pass
 
     @property
