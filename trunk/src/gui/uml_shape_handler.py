@@ -38,7 +38,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             self.OnLeftClick(x, y, keys, attachment)
         newpos = getpos(shape)
         try:
-            print shape.node.id, "moved from", oldpos, "to", newpos
+            #print shape.node.id, "moved from", oldpos, "to", newpos
             # Adjust the GraphNode to match the shape x,y
             shape.node.left, shape.node.top = newpos
         except:

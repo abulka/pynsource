@@ -10,7 +10,7 @@ import math
 class GraphLayoutSpring:
     def __init__(self, graph, gui=None):
         self.graph = graph
-        self.iterations = 3000
+        self.iterations = 1500 #3000
         self.maxRepulsiveForceDistance = 6
         self.k = 2
         self.c = 0.01
@@ -30,7 +30,7 @@ class GraphLayoutSpring:
         for i in range(0, self.iterations):
             self.layoutIteration()
 
-            if i%50==0:
+            if i%100==0: # i%50==0:
                 if self.gui:
                     self.layoutCalcBounds()         # this is the only time you need to call this explicitly since are in the MIDDLE of a layout and about to visualise
                     self.gui.stateofthenation(recalibrate=True, auto_resize_canvas=False) # refresh gui

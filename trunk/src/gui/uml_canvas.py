@@ -63,7 +63,8 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
 
         self._kill_layout = False   # flag to communicate with layout engine.  aborting keypress in gui should set this to true
-
+        self.mark()
+        
         @property
         def kill_layout(self):
           return self._kill_layout
@@ -159,7 +160,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.app.run.CmdDumpUmlWorkspace()
 
         elif keycode == 's':
-            self.resize_virtual_canvas_tofit_bounds(force=True)
+            self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0)
         
         self.working = False
         event.Skip()
@@ -555,7 +556,27 @@ class UmlCanvas(ogl.ShapeCanvas):
         #bigger - then trim the virtual canvas. Normally the tolerance for
         #shrinking has a leeway of 20-40% or so.
         #
-        self.resize_virtual_canvas_tofit_bounds(is_frame_resize=True)
+        bounds_width, bounds_height = self.GetBoundsAllShapes()
+        frame_width, frame_height = self.GetClientSize() # self.frame.GetSize()
+
+        if self.aged_enough():
+            self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0)
+        
+        #if frame_width > bounds_width or frame_height > bounds_height:
+        #    print "VIRTUAL SIZE artificially Large - skip", frame_width,frame_height
+        #else:
+        #    self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0)
+
+    def aged_enough(self):
+        import datetime
+        d = datetime.datetime.now() - self.last_resize_time
+        #print d.seconds, "since last mark"
+        return d.seconds > 5
+
+    def mark(self):
+        import datetime
+        self.last_resize_time = datetime.datetime.now()
+        #print 'mark', self.last_resize_time
         
     # UTILITY - used by CmdLayout and CmdFileImportBase
     def layout_and_position_shapes(self):
@@ -566,7 +587,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         if self.remove_overlaps():
             self.stateofthenation()
 
-    def resize_virtual_canvas_tofit_bounds(self, is_frame_resize=False):
+    def resize_virtual_canvas_tofit_bounds(self, percent_shrinkage_trigger_amount=40):
         """
         Trick is to make the canvas virtual size == bounds of all the shapes.
         You change virtual size by calling SetScrollbars()
@@ -602,30 +623,10 @@ class UmlCanvas(ogl.ShapeCanvas):
         #print "frame.GetSize()", self.frame.GetSize()
         #print "frame.GetClientSize()", self.frame.GetClientSize()
 
-        MARGIN_AROUND_ALL_SHAPES_BOUNDS = 20
-
-        if is_frame_resize:
-            percent_shrinkage_trigger_amount=0
-        else:
-            percent_shrinkage_trigger_amount=40
-        
         bounds_width, bounds_height = self.GetBoundsAllShapes()
         virt_width, virt_height = self.GetVirtualSize()
-        frame_width, frame_height = self.GetClientSize() # self.frame.GetSize()
+        frame_width, frame_height = self.GetClientSize()
         
-        bounds_width += MARGIN_AROUND_ALL_SHAPES_BOUNDS
-        bounds_height += MARGIN_AROUND_ALL_SHAPES_BOUNDS
-
-        if is_frame_resize and frame_width > bounds_width or frame_height > bounds_height:
-            print "VIRTUAL SIZE artificially Large - skip", frame_width,frame_height
-            return
-        
-        #if virt_width == bounds_width:
-        #    print "width the same", bounds_width
-        #if virt_height == bounds_height:
-        #    print "height the same", bounds_height
-        #width_unchanged
-
         """
         Rule: virtual size must be >= bounds
         """
@@ -643,48 +644,15 @@ class UmlCanvas(ogl.ShapeCanvas):
             (percent_change(bounds_width, virt_width) > percent_shrinkage_trigger_amount or \
              percent_change(bounds_height, virt_height) > percent_shrinkage_trigger_amount)
 
-        
-        #need_to_compact = (bounds_width < virt_width or bounds_height < virt_height)
-        #msg = "bounds %d,%d | need_more_virtual_room %d need_to_compact %d" % \
-        #        (bounds_width, bounds_height, need_more_virtual_room, need_to_compact)
-        #if need_to_compact:
-        #    delta_width = percent_change(bounds_width, virt_width)
-        #    delta_height = percent_change(bounds_height, virt_height)
-        #    shrink_width_triggered = delta_width > percent_shrinkage_trigger_amount
-        #    shrink_height_triggered = delta_height > percent_shrinkage_trigger_amount
-        #    msg += " percent_change %d,%d trigger_percent %d | shrink triggered %d,%d " % \
-        #           (delta_width, delta_height, percent_shrinkage_trigger_amount, shrink_width_triggered, shrink_height_triggered)
-        #    if not (shrink_width_triggered or shrink_height_triggered):
-        #        need_to_compact = False
-        #    msg += " need_to_compact %d" % need_to_compact
-
-
-        
-        ########### virtual canvas too big, nicely bigger than bounds, but bigger than frame
-        ###########bounds < frame and frame < virtual
-        ##########if bounds_width <= frame_width:
-        ##########    if frame_width < virt_width:
-        ##########        need_to_compact = True
-        ##########    if frame_width == virt_width:
-        ##########        need_to_compact = False
-        ##########msg += " | frame_width %d virt_width %d | after frame logic: need_to_compact %d" % (frame_width, virt_width, need_to_compact)
-
-        #print msg
-
-        #frame_bigger_than_shape_bounds = frame_width > bounds_width and frame_height > bounds_height
-        #if frame_bigger_than_shape_bounds:
-        #    need_to_compact = False
-        #    need_more_virtual_room = False
-            
         if need_more_virtual_room or need_to_compact:
             oldscrollx = self.GetScrollPos(wx.HORIZONTAL)
             oldscrolly = self.GetScrollPos(wx.VERTICAL)
 
             print "Setting virtual size to %d,%d | need_more_virtual_room %d need_to_compact %d" % \
                 (bounds_width, bounds_height, need_more_virtual_room, need_to_compact)
-            #if need_to_compact:
-            #    print "SetScrollbars", bounds_width, bounds_height, percent_change(bounds_width, virt_width), percent_change(bounds_height, virt_height)
+
             self.SetScrollbars(1, 1, bounds_width, bounds_height)
+            self.mark()
 
             if oldscrollx < bounds_width and oldscrolly < bounds_height:
                 self.Scroll(oldscrollx, oldscrolly)
@@ -693,6 +661,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             #print "canvas.GetVirtualSize()", self.GetVirtualSize()
         
     def GetBoundsAllShapes(self):
+        MARGIN_AROUND_ALL_SHAPES_BOUNDS = 20
         maxx = 0
         maxy = 0
         num_shapes = 0
@@ -703,28 +672,11 @@ class UmlCanvas(ogl.ShapeCanvas):
             bottom = shape.GetY() + height/2
             maxx = max(right, maxx)
             maxy = max(bottom, maxy)
-            #left,top=getpos(shape)
-        return (maxx, maxy)
-        
-    ## UTILITY - not used, possibly could be called by pynsourcegui.BootStrap
-    #def set_uml_canvas_size(self, size):
-    #    """
-    #    Currently unused, but it works and sets the canvas size
-    #    and the scrollbars adjust accordingly.
-    #    Set to something big and always have a large scrollable region e.g.
-    #        self.umlwin.set_uml_canvas_size((9000,9000))
-    #    """
-    #    size = wx.Size(size[0], size[1])
-    #    nvsx, nvsy = size.x / self.scrollStepX, size.y / self.scrollStepY
-    #    self.Scroll(0, 0)
-    #    self.SetScrollbars(self.scrollStepX, self.scrollStepY, nvsx, nvsy)
-    #    canvas = self
-    #    canvas.SetSize(canvas.GetVirtualSize())
+        return (maxx + MARGIN_AROUND_ALL_SHAPES_BOUNDS, maxy + MARGIN_AROUND_ALL_SHAPES_BOUNDS)
 
     def get_umlboxshapes(self):
-        # Doesn't do much, only diagnostic uses this now - but even that is commented out.
         #return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
-        return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]
+        return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]  # TODO take into account images and other shapes
         
     umlboxshapes = property(get_umlboxshapes)
     
