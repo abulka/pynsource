@@ -166,7 +166,14 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
         if event.EventObject == self.umlwin:
+
+            # Proportionally constrained resize.  Nice trick from http://stackoverflow.com/questions/6005960/resizing-a-wxpython-window
+            #hsize = event.GetSize()[0] * 0.75
+            #self.frame.SetSizeHints(minW=-1, minH=hsize, maxH=hsize)
+            #self.frame.SetTitle(str(event.GetSize()))
+        
             self.umlwin.frame_calibration()
+            
         event.Skip()
         
     def OnRightButtonMenu(self, event):   # Menu

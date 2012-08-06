@@ -45,6 +45,8 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             print "no node model attached to this shape!"
             
         self.UpdateStatusBar(shape)
+        
+        shape.GetCanvas().resize_virtual_canvas_tofit_bounds()
 
         # Invoke overlap removal (unless hold down shift key)
         KEY_SHIFT = 1
@@ -87,7 +89,6 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self.UpdateStatusBar(shape)
         if "wxMac" in wx.PlatformInfo:
             shape.GetCanvas().Refresh(False) 
-        shape.GetCanvas().resize_virtual_canvas_tofit()
 
     def OnPopupItemSelected(self, event):
         item = self.popupmenu.FindItemById(event.GetId()) 
