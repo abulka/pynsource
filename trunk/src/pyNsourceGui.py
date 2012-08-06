@@ -93,7 +93,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             
         else:
             self.umlwin = UmlCanvas(self.frame, Log(), self.frame)
-            
+
         ogl.OGLInitialize()  # creates some pens and brushes that the OGL library uses.
         
         # Set the frame to a good size for showing stuff
@@ -110,6 +110,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         #self.umlwin.Bind(wx.EVT_SET_FOCUS, self.onFocus)  # attempt at making mousewheel auto scroll the workspace
         #self.frame.Bind(wx.EVT_SET_FOCUS, self.onFocus)   # attempt at making mousewheel auto scroll the workspace
+        
+        self.umlwin.InitSizeAndObjs()  # Now that frame is visible and calculated, there should be sensible world coords to use
         
         self.InitConfig()
 

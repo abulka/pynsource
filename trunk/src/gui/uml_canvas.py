@@ -62,13 +62,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.font1 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
 
-        self.umlworkspace = UmlWorkspace()
-        self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
-
-        self.snapshot_mgr = GraphSnapshotMgr(graph=self.umlworkspace.graph, umlcanvas=self)
-        self.coordmapper = CoordinateMapper(self.umlworkspace.graph, self.GetSize())
-        self.layouter = GraphLayoutSpring(self.umlworkspace.graph, gui=self)
-        self.overlap_remover = OverlapRemoval(self.umlworkspace.graph, margin=50, gui=self)
         self._kill_layout = False   # flag to communicate with layout engine.  aborting keypress in gui should set this to true
 
         @property
@@ -77,7 +70,25 @@ class UmlCanvas(ogl.ShapeCanvas):
         @kill_layout.setter
         def kill_layout(self, value):
           self._kill_layout = value
-    
+
+    def canvas_too_small(self):
+        MIN_SENSIBLE_CANVAS_SIZE = 200
+        width, height = self.GetSize()
+        return width < MIN_SENSIBLE_CANVAS_SIZE or height < MIN_SENSIBLE_CANVAS_SIZE
+        
+    def InitSizeAndObjs(self):
+        # Only call this once enclosing frame has been set up, so that get correct world coord dimensions
+        
+        if self.canvas_too_small():
+            assert False, "InitSizeAndObjs() being called too early - please set up enclosing frame size first"
+        
+        self.umlworkspace = UmlWorkspace()
+        self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
+        self.snapshot_mgr = GraphSnapshotMgr(graph=self.umlworkspace.graph, umlcanvas=self)
+        self.coordmapper = CoordinateMapper(self.umlworkspace.graph, self.GetSize())
+        self.layouter = GraphLayoutSpring(self.umlworkspace.graph, gui=self)
+        self.overlap_remover = OverlapRemoval(self.umlworkspace.graph, margin=50, gui=self)
+        
     def AllToLayoutCoords(self):
         self.coordmapper.AllToLayoutCoords()
 
@@ -516,9 +527,16 @@ class UmlCanvas(ogl.ShapeCanvas):
         Tip: Don't calibrate passing self.GetVirtualSize() as a parameter
         because it seems to spread the layout out too much, plus perhaps its too
         uncertain a size to be relied upon?
+        
+        Tip2: No need to call self.resize_virtual_canvas_tofit() since the
+        bounds of the shapes area doesn't change when resizing a frame, so you
+        would end up calling it with the same values again and again.
         """
-        self.coordmapper.Recalibrate(self.frame.GetClientSize())  
-        #self.resize_virtual_canvas_tofit()
+        if self.canvas_too_small():
+            print "Canvas too small resize thwarted."
+            return
+        self.coordmapper.Recalibrate(self.frame.GetClientSize())
+        
         
     # UTILITY - used by CmdLayout and CmdFileImportBase
     def layout_and_position_shapes(self):
@@ -539,7 +557,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         #print "frame.GetSize()", self.frame.GetSize()
         #print "frame.GetClientSize()", self.frame.GetClientSize()
 
-        #self.scroll.Scroll(600, 400)
         oldscrollx = self.GetScrollPos(wx.HORIZONTAL)
         oldscrolly = self.GetScrollPos(wx.VERTICAL)
         
@@ -549,10 +566,10 @@ class UmlCanvas(ogl.ShapeCanvas):
         new_height += MARGIN
         curr_width, curr_height = self.GetVirtualSize()
         need_more_room = new_width > curr_width or new_height > curr_height
-        PERCENT_CHANGE_SMALLER = 30
+        PERCENT_CHANGE_TRIGGER = 20
         need_to_compact = (new_width < curr_width or new_height < curr_height) and \
-                        (percent_change(new_width, curr_width) > PERCENT_CHANGE_SMALLER or \
-                         percent_change(new_height, curr_height) > PERCENT_CHANGE_SMALLER)
+                        (percent_change(new_width, curr_width) > PERCENT_CHANGE_TRIGGER or \
+                         percent_change(new_height, curr_height) > PERCENT_CHANGE_TRIGGER)
         if need_more_room or need_to_compact:
             self.SetScrollbars(1, 1, new_width, new_height)
 
@@ -573,10 +590,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             bottom = shape.GetY() + height/2
             maxx = max(right, maxx)
             maxy = max(bottom, maxy)
-            left,top=getpos(shape)
-            #print "%d %s left,top %d,%d cx,cy %d,%d width,height %d,%d, right,bottom %d,%d maxx,maxy %d,%d " % \
-            #(num_shapes, shape.region1.GetText(), left,top, shape.GetX(), shape.GetY(), width, height, right, bottom, maxx,maxy)
-        #print '$$$'
+            #left,top=getpos(shape)
         return (maxx, maxy)
         
     ## UTILITY - not used, possibly could be called by pynsourcegui.BootStrap

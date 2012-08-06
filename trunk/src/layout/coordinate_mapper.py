@@ -61,6 +61,13 @@ class CoordinateMapper:
 
         ww, wh = self.world_size                # world width, world height
         
+        # Don't want the world size to be 0 or too small otherwise get insane
+        # values when translate world to layout coords
+        MIN_WORLD_DIMENSION = 20 # should probably be 200
+        errmsg = "world coords too small, ensure a juicy, big enough frame.GetClientSize() or canvas.GetSize() value is being passed into CoordinateMapper either through the .__init__ or via .Recalibrate()"
+        assert ww > MIN_WORLD_DIMENSION, errmsg
+        assert wh > MIN_WORLD_DIMENSION, errmsd
+        
         lw = self.graph.layoutMaxX - self.graph.layoutMinX  # layout width
         lh = self.graph.layoutMaxY - self.graph.layoutMinY  # layout height
         
@@ -121,10 +128,10 @@ class CoordinateMapper:
             layoutPosX, layoutPosY = self.WorldToLayout([node.left, node.top])
             
             if abs(layoutPosX) > 50.0:
-                print "?"*5, "Big layoutPosX?", layoutPosX, node
+                print "??!", "About to set Big layoutPosX?", layoutPosX, "for",  node
                 something_wrong = True
             if abs(layoutPosY) > 50.0:
-                print "?"*5, "Big layoutPosY?", layoutPosY, node
+                print "??!", "About to set Big layoutPosY?", layoutPosY, "for",  node
                 something_wrong = True
                 
             node.layoutPosX, node.layoutPosY = layoutPosX, layoutPosY
