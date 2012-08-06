@@ -87,6 +87,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self.UpdateStatusBar(shape)
         if "wxMac" in wx.PlatformInfo:
             shape.GetCanvas().Refresh(False) 
+        shape.GetCanvas().resize_virtual_canvas_tofit()
 
     def OnPopupItemSelected(self, event):
         item = self.popupmenu.FindItemById(event.GetId()) 
