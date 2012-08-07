@@ -5,108 +5,62 @@ from coord_utils import percent_change
 import wx
 import wx.lib.ogl as ogl
 
+MIN_SENSIBLE_CANVAS_SIZE = 200
+
 class CanvasResizer(object):
+    """
+    Looks after the reszing of the canvas virtual size plus a few other related functions.
+    We change virtual size by calling SetScrollbars()
+    """
+    
     def __init__(self, canvas):
         self.canvas = canvas
-        
         self.allshapes_bounds_cached = None
         self.allshapes_bounds_last = None
-    
+
     def canvas_too_small(self):
-        MIN_SENSIBLE_CANVAS_SIZE = 200
         width, height = self.canvas.GetSize()
         return width < MIN_SENSIBLE_CANVAS_SIZE or height < MIN_SENSIBLE_CANVAS_SIZE
         
     # UTILITY - called by OnResizeFrame, layout_and_position_shapes
     def frame_calibration(self):
         """
-        Calibrate model / shape / layout coordinate mapping system to the
-        visible physical window canvas size.
+        Calibrate model/shape/layout coordinate mapping system to the visible
+        physical window canvas size. When resizing a frame, obviously the bounds
+        of the "all shapes" area doesn't change which is why we pass
+        bounds_dirty=False. And shrinkage_leeway=0 means resizing is strict and
+        avoids the lazy delayed trimming algorithm.
         """
         if self.canvas_too_small():
             return
-
         self.canvas.coordmapper.Recalibrate(self.canvas.frame.GetClientSize())  # passing self.GetVirtualSize() seems to spread the layout out too much
-
-        #Tip2: Since the bounds of the shapes area doesn't change when resizing
-        #a frame, we don't need to set the virtualsize of the canvas repeatedly.
-        #But we do call this routine in case we can shrink the virtual area at
-        #least once. Due to shrinkage_leeway being zero, if the
-        #virtual canvas is any bigger than the bounds of the shapes - even 1%
-        #bigger - then trim the virtual canvas. Normally the tolerance for
-        #shrinking has a leeway of 20-40% or so.
-        #
-
         self.resize_virtual_canvas_tofit_bounds(shrinkage_leeway=0, bounds_dirty=False)
 
-        
     # UTILITY - used by 's' key, stateofthenation, frame_calibration, OnEndDragLeft
     def resize_virtual_canvas_tofit_bounds(self, shrinkage_leeway=40, bounds_dirty=False):
         """
         Set canvas virtual size to the bounds of all the shapes.
-        You change virtual size by calling SetScrollbars()
-        
-        As you resize the frame, the canvas virtual size stays the same as what
-        you set it to using SetScrollbars() - up until the point at which the
-        scrollbars exhaust themselves and disappear - which means the that you
-        have finally made frame == virtualsize. After which point virtual size
-        auto-grows as the frame continues to grow. If you shrink the frame
-        again, then virtualsize will reduce until it hits the old original value
-        of virtualsize set by SetScrollbars(). If you continue to reduce the
-        frame then the scrollbars appear, but the virtualsize remains the same.
-        
-        ALGORITHM:
-        If its a programmatic change of bounds e.g. via stateofthenation:
-            set canvas virtualsize to match bounds taking account % leeway when compacting
-        elif is_frame_resize i.e. its a call from resize of frame event:
-            if frame > bounds then must be in virtualsize autogrow mode and we should not attempt to alter virtualsize
-            else: set canvas virtualsize to match bounds, not taking into account any % leeway.
-
-        Note: repeated calls to frame resize shouldn't be a problem because
-        canvas virtualsize should == bounds after the first time its done.
-        Making frame smaller won't affect bounds or canvas virtualsize. Making
-        frame bigger ditto. Making frame bigger than bounds will result in
-        nothing happening cos we do nothing in "autogrow mode".
+        virtual size must be >= bounds
+        virtual size should be trimmed down to bounds where possible
         """
         if bounds_dirty:
             self.allshapes_bounds_cached = None
             
-        if self.allshapes_bounds_last == self.GetBoundsAllShapes():
+        if self.allshapes_bounds_last == self.calc_allshapes_bounds():
             print "nochange",
             return
-        #print "bounds", self.GetBoundsAllShapes()
-        #print "canvas.GetVirtualSize()", self.GetVirtualSize()
 
-        #print "canvas.GetSize()", self.GetSize()
-        #print "frame.GetVirtualSize()", self.frame.GetVirtualSize()
-        #print "frame.GetSize()", self.frame.GetSize()
-        #print "frame.GetClientSize()", self.frame.GetClientSize()
-
-        bounds_width, bounds_height = self.GetBoundsAllShapes()
+        bounds_width, bounds_height = self.calc_allshapes_bounds()
         virt_width, virt_height = self.canvas.GetVirtualSize()
         frame_width, frame_height = self.canvas.GetClientSize()
         
-        """
-        Rules: virtual size must be >= bounds
-               virtual size should be trimmed down to bounds where possible
-        """
         need_more_virtual_room = bounds_width > virt_width or bounds_height > virt_height
-        need_to_compact = (bounds_width < virt_width or bounds_height < virt_height)
+        need_to_compact = will_compact = (bounds_width < virt_width or bounds_height < virt_height)
         
-        if need_to_compact and shrinkage_leeway > 0:
-            """
-            Relax the compacting rule so that canvas virtual size may be
-            shrinkage_leeway% bigger than the bounds without it
-            being trimmed/compacted down. The purpose of this is to relax the
-            rules and not have it so strict - after all it doesn't hurt to have
-            a slightly larger workspace - better than a trim workspace
-            jumping/flickering around all the time. Plus if you manually drag
-            resize the frame it will trim perfectly. """
+        if need_to_compact and shrinkage_leeway > 0:  # Relax the compacting rule
             will_compact = \
                 (percent_change(bounds_width, virt_width) > shrinkage_leeway or \
                  percent_change(bounds_height, virt_height) > shrinkage_leeway)
-        else:
-            will_compact = need_to_compact
             
         print need_more_virtual_room, need_to_compact,
         if need_to_compact and not will_compact:
@@ -132,10 +86,7 @@ class CanvasResizer(object):
         self.allshapes_bounds_last = bounds
         self.allshapes_bounds_cached = None
 
-        #print "bounds now", self.GetBoundsAllShapes(), self.allshapes_bounds_cached
-        #print "canvas.GetVirtualSize()", self.GetVirtualSize()
-        
-    def GetBoundsAllShapes(self):
+    def calc_allshapes_bounds(self):
         """
         Calculates the maxx and maxy for all the shapes on the canvas.
         """
@@ -156,3 +107,63 @@ class CanvasResizer(object):
                                         maxy + ALLSHAPES_BOUNDS_MARGIN)
         return self.allshapes_bounds_cached
 
+"""
+Notes:
+
+Purpose of shrinkage_leeway
+---------------------------
+Relax the compacting rule so that canvas virtual size may be shrinkage_leeway%
+bigger than the bounds without it being trimmed/compacted down. The purpose of
+this is to relax the rules and not have it so strict - after all it doesn't hurt
+to have a slightly larger workspace - better than a trim workspace
+jumping/flickering around all the time. Plus if you manually drag resize the
+frame it will trim perfectly.
+
+How canvas virtual size stretches
+---------------------------------
+As you resize the canvas size / frame, the canvas virtual size stays the same as
+what you set it to using SetScrollbars() - up until the point at which the
+scrollbars exhaust themselves and disappear - which means the that you have
+finally made frame == virtualsize. After which point virtual size auto-grows as
+the frame continues to grow. If you shrink the frame again, then virtualsize
+will reduce until it hits the old original value of virtualsize set by
+SetScrollbars(). If you continue to reduce the frame then the scrollbars appear,
+but the virtualsize remains the same.
+
+When bounds become dirty
+-------------------------
+After a programmatic change of bounds e.g. via stateofthenation
+or when move a node via the mouse
+
+the bounds of the shapes area doesn't change when resizing a frame, thus the
+bounds is not dirty
+        
+Repeated calls from frame resize event
+--------------------------------------
+Note: repeated calls from frame resize event shouldn't be a problem because
+current all shapes bounds canvas == self.allshapes_bounds_last due to our
+recording of allshapes_bounds_last every time it is set by us. If nothing has
+changes then we don't do anything. Additionally we cache the calls to
+calc_allshapes_bounds in self.allshapes_bounds_cached to avoid constant recalc.
+Typically the first resize event might cause the SetScrollbars() call and then
+subsequent calls do nothing.
+
+Also since shrinkage_leeway is 0 when called from a frame resize event, if the
+virtual canvas is any bigger than the bounds of the shapes - even 1% bigger -
+then trim the virtual canvas. Normally the tolerance for shrinking has a leeway
+of 20-40% or so.
+        
+
+
+"""
+
+#print "bounds", self.calc_allshapes_bounds()
+#print "canvas.GetVirtualSize()", self.GetVirtualSize()
+
+#print "canvas.GetSize()", self.GetSize()
+#print "frame.GetVirtualSize()", self.frame.GetVirtualSize()
+#print "frame.GetSize()", self.frame.GetSize()
+#print "frame.GetClientSize()", self.frame.GetClientSize()
+
+#print "bounds now", self.calc_allshapes_bounds(), self.allshapes_bounds_cached
+#print "canvas.GetVirtualSize()", self.GetVirtualSize()

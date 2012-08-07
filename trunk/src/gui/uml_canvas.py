@@ -32,38 +32,29 @@ from architecture_support import *
 ogl.Shape.Move2 = Move2
 
 class UmlCanvas(ogl.ShapeCanvas):
-    scrollStepX = 10
-    scrollStepY = 10
-    classnametoshape = {}
 
     def __init__(self, parent, log, frame):
         ogl.ShapeCanvas.__init__(self, parent)
-        maxWidth  = 1000
-        maxHeight = 1000
-        #self.SetScrollbars(20, 20, maxWidth/20, maxHeight/20)
-        self.SetScrollbars(1, 1, 1000, 1000)
-        #self.SetVirtualSizeHints(50,50,2000,2000)
         
         self.observers = multicast()
         self.app = None  # assigned later by app boot
         
         self.log = log
         self.frame = frame
-        self.SetBackgroundColour("LIGHT BLUE") #wxWHITE)
+        self.SetBackgroundColour("LIGHT BLUE")
 
         self.SetDiagram(ogl.Diagram())
         self.GetDiagram().SetCanvas(self)
-        self.save_gdi = []
-        wx.EVT_WINDOW_DESTROY(self, self.OnDestroy)
 
+        wx.EVT_WINDOW_DESTROY(self, self.OnDestroy)
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
         self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
         self.Bind(wx.EVT_CHAR, self.onKeyChar)
-        self.working = False
 
         self.font1 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
 
+        self.working = False
         self._kill_layout = False   # flag to communicate with layout engine.  aborting keypress in gui should set this to true
 
         @property
@@ -77,8 +68,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         # Only call this once enclosing frame has been set up, so that get correct world coord dimensions
         
         self.canvas_resizer = CanvasResizer(canvas=self)
-        if self.canvas_resizer.canvas_too_small():
-            assert False, "InitSizeAndObjs() being called too early - please set up enclosing frame size first"
+        assert not self.canvas_resizer.canvas_too_small(), "InitSizeAndObjs being called too early - please set up enclosing frame size first"
         
         self.umlworkspace = UmlWorkspace()
         self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
@@ -119,7 +109,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.working = False
         event.Skip()
 
-
     def onKeyChar(self, event):
         if event.GetKeyCode() >= 256:
             event.Skip()
@@ -157,14 +146,11 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.app.run.CmdDumpUmlWorkspace()
 
         elif keycode == 's':
-            #self.allshapes_bounds_dirty = True
             self.canvas_resizer.resize_virtual_canvas_tofit_bounds(shrinkage_leeway=0, bounds_dirty=True)
         
         self.working = False
         event.Skip()
 
-
-  
     def CmdRememberLayout1(self):
         self.snapshot_mgr.QuickSave(slot=1)
     def CmdRememberLayout2(self):
@@ -174,7 +160,6 @@ class UmlCanvas(ogl.ShapeCanvas):
     def CmdRestoreLayout2(self):
         self.snapshot_mgr.QuickRestore(slot=2)
 
-   
     def SelectNodeNow(self, shape):
         canvas = shape.GetCanvas()
 
@@ -199,10 +184,8 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.GetDiagram().DeleteAllShapes()
 
         dc = wx.ClientDC(self)
-        self.GetDiagram().Clear(dc)   # only ends up calling dc.Clear() - I wonder if this clears the screen?
+        self.GetDiagram().Clear(dc)   # Clears screen - don't prepare the dc or it will only clear the top scrolled bit (see my mailing list discussion)
 
-        self.save_gdi = []
-        
         self.umlworkspace.Clear()
 
     def NewEdgeMarkFrom(self):
@@ -241,7 +224,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         #edge['uml_edge_type'] = 'composition'
         self.CreateUmlEdge(edge)
         self.stateofthenation()
-
               
     def CreateImageShape(self, F):
         #shape = ogl.BitmapShape()
