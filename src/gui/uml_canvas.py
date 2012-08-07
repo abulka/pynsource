@@ -11,7 +11,7 @@ from generate_code.gen_java import PySourceAsJava
 from model.umlworkspace import UmlWorkspace
 
 from uml_shapes import *
-from coord_utils import setpos, getpos, Move2, percent_change
+from coord_utils import setpos, getpos, Move2
 
 from layout.layout_basic import LayoutBasic
 
@@ -19,6 +19,8 @@ from layout.snapshots import GraphSnapshotMgr
 from layout.layout_spring import GraphLayoutSpring
 from layout.overlap_removal import OverlapRemoval
 from layout.coordinate_mapper import CoordinateMapper
+
+from canvas_resizer import CanvasResizer
 
 import wx
 import wx.lib.ogl as ogl
@@ -64,9 +66,6 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         self._kill_layout = False   # flag to communicate with layout engine.  aborting keypress in gui should set this to true
 
-        self.allshapes_bounds_cached = None
-        self.allshapes_bounds_last = None
-
         @property
         def kill_layout(self):
           return self._kill_layout
@@ -74,15 +73,11 @@ class UmlCanvas(ogl.ShapeCanvas):
         def kill_layout(self, value):
           self._kill_layout = value
 
-    def canvas_too_small(self):
-        MIN_SENSIBLE_CANVAS_SIZE = 200
-        width, height = self.GetSize()
-        return width < MIN_SENSIBLE_CANVAS_SIZE or height < MIN_SENSIBLE_CANVAS_SIZE
-        
     def InitSizeAndObjs(self):
         # Only call this once enclosing frame has been set up, so that get correct world coord dimensions
         
-        if self.canvas_too_small():
+        self.canvas_resizer = CanvasResizer(canvas=self)
+        if self.canvas_resizer.canvas_too_small():
             assert False, "InitSizeAndObjs() being called too early - please set up enclosing frame size first"
         
         self.umlworkspace = UmlWorkspace()
@@ -163,7 +158,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         elif keycode == 's':
             #self.allshapes_bounds_dirty = True
-            self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0, bounds_dirty=True)
+            self.canvas_resizer.resize_virtual_canvas_tofit_bounds(shrinkage_leeway=0, bounds_dirty=True)
         
         self.working = False
         event.Skip()
@@ -532,157 +527,16 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.Update() # or wx.SafeYield()  # Without this the nodes don't paint during a "L" layout (edges do!?)
                       # You need to be yielding or updating on a regular basis, so that when your OS/window manager sends repaint messages to your app, it can handle them. See http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh
         if auto_resize_canvas:
-            self.resize_virtual_canvas_tofit_bounds(bounds_dirty=True)
+            self.canvas_resizer.resize_virtual_canvas_tofit_bounds(bounds_dirty=True)
 
-    # UTILITY - called by OnResizeFrame, layout_and_position_shapes
-    def frame_calibration(self):
-        """
-        Calibrate model / shape / layout coordinate mapping system to the
-        visible physical window canvas size.
-        """
-       
-        if self.canvas_too_small():
-            print "Canvas too small resize thwarted."
-            return
-
-        self.coordmapper.Recalibrate(self.frame.GetClientSize())  # passing self.GetVirtualSize() seems to spread the layout out too much
-
-        #Tip2: Since the bounds of the shapes area doesn't change when resizing
-        #a frame, we don't need to set the virtualsize of the canvas repeatedly.
-        #But we do call this routine in case we can shrink the virtual area at
-        #least once. Due to percent_shrinkage_trigger_amount being zero, if the
-        #virtual canvas is any bigger than the bounds of the shapes - even 1%
-        #bigger - then trim the virtual canvas. Normally the tolerance for
-        #shrinking has a leeway of 20-40% or so.
-        #
-
-        self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0, bounds_dirty=False)
-
-        
     # UTILITY - used by CmdLayout and CmdFileImportBase
     def layout_and_position_shapes(self):
-        self.frame_calibration()
+        self.canvas_resizer.frame_calibration()
         self.AllToLayoutCoords()
         self.layouter.layout(keep_current_positions=False, optimise=True)
         self.AllToWorldCoords()
         if self.remove_overlaps():
             self.stateofthenation()
-
-    # UTILITY - used by 's' key, stateofthenation, frame_calibration, OnEndDragLeft
-    def resize_virtual_canvas_tofit_bounds(self, percent_shrinkage_trigger_amount=40, bounds_dirty=False):
-        """
-        Set canvas virtual size to the bounds of all the shapes.
-        You change virtual size by calling SetScrollbars()
-        
-        As you resize the frame, the canvas virtual size stays the same as what
-        you set it to using SetScrollbars() - up until the point at which the
-        scrollbars exhaust themselves and disappear - which means the that you
-        have finally made frame == virtualsize. After which point virtual size
-        auto-grows as the frame continues to grow. If you shrink the frame
-        again, then virtualsize will reduce until it hits the old original value
-        of virtualsize set by SetScrollbars(). If you continue to reduce the
-        frame then the scrollbars appear, but the virtualsize remains the same.
-        
-        ALGORITHM:
-        If its a programmatic change of bounds e.g. via stateofthenation:
-            set canvas virtualsize to match bounds taking account % leeway when compacting
-        elif is_frame_resize i.e. its a call from resize of frame event:
-            if frame > bounds then must be in virtualsize autogrow mode and we should not attempt to alter virtualsize
-            else: set canvas virtualsize to match bounds, not taking into account any % leeway.
-
-        Note: repeated calls to frame resize shouldn't be a problem because
-        canvas virtualsize should == bounds after the first time its done.
-        Making frame smaller won't affect bounds or canvas virtualsize. Making
-        frame bigger ditto. Making frame bigger than bounds will result in
-        nothing happening cos we do nothing in "autogrow mode".
-        """
-        if bounds_dirty:
-            self.allshapes_bounds_cached = None
-            
-        if self.allshapes_bounds_last == self.GetBoundsAllShapes():
-            print "nochange",
-            return
-        #print "bounds", self.GetBoundsAllShapes()
-        #print "canvas.GetVirtualSize()", self.GetVirtualSize()
-
-        #print "canvas.GetSize()", self.GetSize()
-        #print "frame.GetVirtualSize()", self.frame.GetVirtualSize()
-        #print "frame.GetSize()", self.frame.GetSize()
-        #print "frame.GetClientSize()", self.frame.GetClientSize()
-
-        bounds_width, bounds_height = self.GetBoundsAllShapes()
-        virt_width, virt_height = self.GetVirtualSize()
-        frame_width, frame_height = self.GetClientSize()
-        
-        """
-        Rules: virtual size must be >= bounds
-               virtual size should be trimmed down to bounds where possible
-        """
-        need_more_virtual_room = bounds_width > virt_width or bounds_height > virt_height
-        need_to_compact = (bounds_width < virt_width or bounds_height < virt_height)
-        
-        if need_to_compact and percent_shrinkage_trigger_amount > 0:
-            """
-            Relax the compacting rule so that canvas virtual size may be
-            percent_shrinkage_trigger_amount% bigger than the bounds without it
-            being trimmed/compacted down. The purpose of this is to relax the
-            rules and not have it so strict - after all it doesn't hurt to have
-            a slightly larger workspace - better than a trim workspace
-            jumping/flickering around all the time. Plus if you manually drag
-            resize the frame it will trim perfectly. """
-            will_compact = \
-                (percent_change(bounds_width, virt_width) > percent_shrinkage_trigger_amount or \
-                 percent_change(bounds_height, virt_height) > percent_shrinkage_trigger_amount)
-        else:
-            will_compact = need_to_compact
-            
-        print need_more_virtual_room, need_to_compact,
-        if need_to_compact and not will_compact:
-            print "(compact pending)",
-                    
-        if need_more_virtual_room or will_compact:
-            print "(action)"
-            self._do_resize_virtual_canvas_tofit_bounds((bounds_width, bounds_height))
-        else:
-            print "(no action)"
-    
-    def _do_resize_virtual_canvas_tofit_bounds(self, bounds):
-        bounds_width, bounds_height = bounds
-
-        oldscrollx = self.GetScrollPos(wx.HORIZONTAL)
-        oldscrolly = self.GetScrollPos(wx.VERTICAL)
-
-        print "Setting virtual size to %d,%d" % (bounds_width, bounds_height)
-
-        self.SetScrollbars(1, 1, bounds_width, bounds_height, oldscrollx, oldscrolly, noRefresh = True)
-        
-        # Cache is different to last bounds value - cannot combine these concepts
-        self.allshapes_bounds_last = bounds
-        self.allshapes_bounds_cached = None
-
-        #print "bounds now", self.GetBoundsAllShapes(), self.allshapes_bounds_cached
-        #print "canvas.GetVirtualSize()", self.GetVirtualSize()
-        
-    def GetBoundsAllShapes(self):
-        """
-        Calculates the maxx and maxy for all the shapes on the canvas.
-        """
-        if self.allshapes_bounds_cached:
-            print ".",
-            return self.allshapes_bounds_cached
-        
-        ALLSHAPES_BOUNDS_MARGIN = 20
-        maxx = maxy = 0
-        for shape in self.umlboxshapes:
-            width, height = shape.GetBoundingBoxMax()
-            right = shape.GetX() + width/2
-            bottom = shape.GetY() + height/2
-            maxx = max(right, maxx)
-            maxy = max(bottom, maxy)
-        print "!",
-        self.allshapes_bounds_cached= (maxx + ALLSHAPES_BOUNDS_MARGIN,
-                                        maxy + ALLSHAPES_BOUNDS_MARGIN)
-        return self.allshapes_bounds_cached
 
     def get_umlboxshapes(self):
         #return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
