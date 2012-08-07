@@ -63,7 +63,10 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
 
         self._kill_layout = False   # flag to communicate with layout engine.  aborting keypress in gui should set this to true
-        self.mark()
+        #self.mark()
+        #self.bounds_dirty = True
+        #self.bounds = self.GetBoundsAllShapes()
+        self.bounds = None
         
         @property
         def kill_layout(self):
@@ -160,6 +163,8 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.app.run.CmdDumpUmlWorkspace()
 
         elif keycode == 's':
+            #self.bounds_dirty = True
+            self.bounds = None
             self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0)
         
         self.working = False
@@ -530,6 +535,7 @@ class UmlCanvas(ogl.ShapeCanvas):
                       # You need to be yielding or updating on a regular basis, so that when your OS/window manager sends repaint messages to your app, it can handle them. See http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh
 
         if auto_resize_canvas:
+            #self.bounds_dirty = True
             self.resize_virtual_canvas_tofit_bounds()
 
     def frame_calibration(self):
@@ -559,24 +565,26 @@ class UmlCanvas(ogl.ShapeCanvas):
         bounds_width, bounds_height = self.GetBoundsAllShapes()
         frame_width, frame_height = self.GetClientSize() # self.frame.GetSize()
 
-        if self.aged_enough():
-            self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0)
+        #if self.aged_enough():
+        #if self.bounds_dirty:
+        #    self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0)
+        self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0)
         
         #if frame_width > bounds_width or frame_height > bounds_height:
         #    print "VIRTUAL SIZE artificially Large - skip", frame_width,frame_height
         #else:
         #    self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0)
 
-    def aged_enough(self):
-        import datetime
-        d = datetime.datetime.now() - self.last_resize_time
-        #print d.seconds, "since last mark"
-        return d.seconds > 5
-
-    def mark(self):
-        import datetime
-        self.last_resize_time = datetime.datetime.now()
-        #print 'mark', self.last_resize_time
+    #def aged_enough(self):
+    #    import datetime
+    #    d = datetime.datetime.now() - self.last_resize_time
+    #    #print d.seconds, "since last mark"
+    #    return d.seconds > 5
+    #
+    #def mark(self):
+    #    import datetime
+    #    self.last_resize_time = datetime.datetime.now()
+    #    #print 'mark', self.last_resize_time
         
     # UTILITY - used by CmdLayout and CmdFileImportBase
     def layout_and_position_shapes(self):
@@ -640,25 +648,56 @@ class UmlCanvas(ogl.ShapeCanvas):
         jumping/flickering around all the time. Plus if you manually drag resize
         the frame it will trim perfectly.
         """
-        need_to_compact = (bounds_width < virt_width or bounds_height < virt_height) and \
-            (percent_change(bounds_width, virt_width) > percent_shrinkage_trigger_amount or \
-             percent_change(bounds_height, virt_height) > percent_shrinkage_trigger_amount)
+        need_to_compact = (bounds_width < virt_width or bounds_height < virt_height)
+        
+        if percent_shrinkage_trigger_amount:
+            need_to_compact = need_to_compact and \
+                (percent_change(bounds_width, virt_width) > percent_shrinkage_trigger_amount or \
+                 percent_change(bounds_height, virt_height) > percent_shrinkage_trigger_amount)
+            #if not self.bounds_dirty:
+            #    need_to_compact = False
+            #if self.bounds_dirty and self.bounds == self.GetBoundsAllShapes():
+            #    need_to_compact = False
 
+        if self.bounds == self.GetBoundsAllShapes():
+            need_to_compact = False
+                    
         if need_more_virtual_room or need_to_compact:
-            oldscrollx = self.GetScrollPos(wx.HORIZONTAL)
-            oldscrolly = self.GetScrollPos(wx.VERTICAL)
+            self._do_resize_virtual_canvas_tofit_bounds((bounds_width, bounds_height))
+            
+            #oldscrollx = self.GetScrollPos(wx.HORIZONTAL)
+            #oldscrolly = self.GetScrollPos(wx.VERTICAL)
+            #
+            #print "Setting virtual size to %d,%d | need_more_virtual_room %d need_to_compact %d" % \
+            #    (bounds_width, bounds_height, need_more_virtual_room, need_to_compact)
+            #
+            #self.SetScrollbars(1, 1, bounds_width, bounds_height)
+            #self.mark()
+            #
+            #if oldscrollx < bounds_width and oldscrolly < bounds_height:
+            #    self.Scroll(oldscrollx, oldscrolly)
+            #
+            ##print "bounds now", self.GetBoundsAllShapes()
+            ##print "canvas.GetVirtualSize()", self.GetVirtualSize()
+    
+    def _do_resize_virtual_canvas_tofit_bounds(self, bounds):
+        bounds_width, bounds_height = bounds
 
-            print "Setting virtual size to %d,%d | need_more_virtual_room %d need_to_compact %d" % \
-                (bounds_width, bounds_height, need_more_virtual_room, need_to_compact)
+        oldscrollx = self.GetScrollPos(wx.HORIZONTAL)
+        oldscrolly = self.GetScrollPos(wx.VERTICAL)
 
-            self.SetScrollbars(1, 1, bounds_width, bounds_height)
-            self.mark()
+        print "Setting virtual size to %d,%d" % (bounds_width, bounds_height)
 
-            if oldscrollx < bounds_width and oldscrolly < bounds_height:
-                self.Scroll(oldscrollx, oldscrolly)
+        self.SetScrollbars(1, 1, bounds_width, bounds_height)
+        #self.mark()
+        #self.bounds_dirty = False
+        self.bounds == bounds
 
-            #print "bounds now", self.GetBoundsAllShapes()
-            #print "canvas.GetVirtualSize()", self.GetVirtualSize()
+        if oldscrollx < bounds_width and oldscrolly < bounds_height:
+            self.Scroll(oldscrollx, oldscrolly)
+
+        #print "bounds now", self.GetBoundsAllShapes()
+        #print "canvas.GetVirtualSize()", self.GetVirtualSize()
         
     def GetBoundsAllShapes(self):
         MARGIN_AROUND_ALL_SHAPES_BOUNDS = 20
