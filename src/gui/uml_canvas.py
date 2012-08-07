@@ -63,11 +63,10 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
 
         self._kill_layout = False   # flag to communicate with layout engine.  aborting keypress in gui should set this to true
-        #self.mark()
-        #self.bounds_dirty = True
-        #self.bounds = self.GetBoundsAllShapes()
-        self.bounds = None
-        
+
+        self.allshapes_bounds = None
+        self.allshapes_bounds_dirty = True
+
         @property
         def kill_layout(self):
           return self._kill_layout
@@ -163,8 +162,8 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.app.run.CmdDumpUmlWorkspace()
 
         elif keycode == 's':
-            #self.bounds_dirty = True
-            self.bounds = None
+            self.allshapes_bounds = None
+            self.allshapes_bounds_dirty = True
             self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0)
         
         self.working = False
@@ -533,26 +532,22 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         self.Update() # or wx.SafeYield()  # Without this the nodes don't paint during a "L" layout (edges do!?)
                       # You need to be yielding or updating on a regular basis, so that when your OS/window manager sends repaint messages to your app, it can handle them. See http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh
-
         if auto_resize_canvas:
-            #self.bounds_dirty = True
+            self.allshapes_bounds_dirty = True
             self.resize_virtual_canvas_tofit_bounds()
 
+    # UTILITY - called by OnResizeFrame, layout_and_position_shapes
     def frame_calibration(self):
         """
         Calibrate model / shape / layout coordinate mapping system to the
-        visible physical window client size.
+        visible physical window canvas size.
         """
        
         if self.canvas_too_small():
             print "Canvas too small resize thwarted."
             return
 
-        #Tip: Don't calibrate passing self.GetVirtualSize() as a parameter
-        #because it seems to spread the layout out too much, plus perhaps its too
-        #uncertain a size to be relied upon?
-        #
-        self.coordmapper.Recalibrate(self.frame.GetClientSize())
+        self.coordmapper.Recalibrate(self.frame.GetClientSize())  # passing self.GetVirtualSize() seems to spread the layout out too much
 
         #Tip2: Since the bounds of the shapes area doesn't change when resizing
         #a frame, we don't need to set the virtualsize of the canvas repeatedly.
@@ -562,29 +557,9 @@ class UmlCanvas(ogl.ShapeCanvas):
         #bigger - then trim the virtual canvas. Normally the tolerance for
         #shrinking has a leeway of 20-40% or so.
         #
-        bounds_width, bounds_height = self.GetBoundsAllShapes()
-        frame_width, frame_height = self.GetClientSize() # self.frame.GetSize()
 
-        #if self.aged_enough():
-        #if self.bounds_dirty:
-        #    self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0)
         self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0)
-        
-        #if frame_width > bounds_width or frame_height > bounds_height:
-        #    print "VIRTUAL SIZE artificially Large - skip", frame_width,frame_height
-        #else:
-        #    self.resize_virtual_canvas_tofit_bounds(percent_shrinkage_trigger_amount=0)
 
-    #def aged_enough(self):
-    #    import datetime
-    #    d = datetime.datetime.now() - self.last_resize_time
-    #    #print d.seconds, "since last mark"
-    #    return d.seconds > 5
-    #
-    #def mark(self):
-    #    import datetime
-    #    self.last_resize_time = datetime.datetime.now()
-    #    #print 'mark', self.last_resize_time
         
     # UTILITY - used by CmdLayout and CmdFileImportBase
     def layout_and_position_shapes(self):
@@ -595,9 +570,10 @@ class UmlCanvas(ogl.ShapeCanvas):
         if self.remove_overlaps():
             self.stateofthenation()
 
+    # UTILITY - used by 's' key, stateofthenation, frame_calibration, OnEndDragLeft
     def resize_virtual_canvas_tofit_bounds(self, percent_shrinkage_trigger_amount=40):
         """
-        Trick is to make the canvas virtual size == bounds of all the shapes.
+        Set canvas virtual size to the bounds of all the shapes.
         You change virtual size by calling SetScrollbars()
         
         As you resize the frame, the canvas virtual size stays the same as what
@@ -622,7 +598,9 @@ class UmlCanvas(ogl.ShapeCanvas):
         frame bigger ditto. Making frame bigger than bounds will result in
         nothing happening cos we do nothing in "autogrow mode".
         """
-        
+        if self.allshapes_bounds == self.GetBoundsAllShapes():
+            print "nochange",
+            return
         #print "bounds", self.GetBoundsAllShapes()
         #print "canvas.GetVirtualSize()", self.GetVirtualSize()
 
@@ -650,35 +628,17 @@ class UmlCanvas(ogl.ShapeCanvas):
         """
         need_to_compact = (bounds_width < virt_width or bounds_height < virt_height)
         
-        if percent_shrinkage_trigger_amount:
+        if percent_shrinkage_trigger_amount > 0:
             need_to_compact = need_to_compact and \
                 (percent_change(bounds_width, virt_width) > percent_shrinkage_trigger_amount or \
                  percent_change(bounds_height, virt_height) > percent_shrinkage_trigger_amount)
-            #if not self.bounds_dirty:
-            #    need_to_compact = False
-            #if self.bounds_dirty and self.bounds == self.GetBoundsAllShapes():
-            #    need_to_compact = False
-
-        if self.bounds == self.GetBoundsAllShapes():
-            need_to_compact = False
+        
+        print need_more_virtual_room, need_to_compact
+        #if self.allshapes_bounds == self.GetBoundsAllShapes():
+        #    need_to_compact = False
                     
         if need_more_virtual_room or need_to_compact:
             self._do_resize_virtual_canvas_tofit_bounds((bounds_width, bounds_height))
-            
-            #oldscrollx = self.GetScrollPos(wx.HORIZONTAL)
-            #oldscrolly = self.GetScrollPos(wx.VERTICAL)
-            #
-            #print "Setting virtual size to %d,%d | need_more_virtual_room %d need_to_compact %d" % \
-            #    (bounds_width, bounds_height, need_more_virtual_room, need_to_compact)
-            #
-            #self.SetScrollbars(1, 1, bounds_width, bounds_height)
-            #self.mark()
-            #
-            #if oldscrollx < bounds_width and oldscrolly < bounds_height:
-            #    self.Scroll(oldscrollx, oldscrolly)
-            #
-            ##print "bounds now", self.GetBoundsAllShapes()
-            ##print "canvas.GetVirtualSize()", self.GetVirtualSize()
     
     def _do_resize_virtual_canvas_tofit_bounds(self, bounds):
         bounds_width, bounds_height = bounds
@@ -688,30 +648,34 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         print "Setting virtual size to %d,%d" % (bounds_width, bounds_height)
 
-        self.SetScrollbars(1, 1, bounds_width, bounds_height)
-        #self.mark()
-        #self.bounds_dirty = False
-        self.bounds == bounds
+        self.SetScrollbars(1, 1, bounds_width, bounds_height, oldscrollx, oldscrolly, noRefresh = True)
+        self.allshapes_bounds = bounds
+        self.allshapes_bounds_dirty = False
 
-        if oldscrollx < bounds_width and oldscrolly < bounds_height:
-            self.Scroll(oldscrollx, oldscrolly)
+        #if oldscrollx < bounds_width and oldscrolly < bounds_height:
+        #    self.Scroll(oldscrollx, oldscrolly)
 
-        #print "bounds now", self.GetBoundsAllShapes()
+        #print "bounds now", self.GetBoundsAllShapes(), self.allshapes_bounds
         #print "canvas.GetVirtualSize()", self.GetVirtualSize()
         
-    def GetBoundsAllShapes(self):
-        MARGIN_AROUND_ALL_SHAPES_BOUNDS = 20
-        maxx = 0
-        maxy = 0
-        num_shapes = 0
+    def GetBoundsAllShapes(self, force_recalc=False):
+        """
+        Calculates the maxx and maxy for all the shapes on the canvas.
+        """
+        if not self.allshapes_bounds_dirty and self.allshapes_bounds:  # Cache
+            print ".",
+            return self.allshapes_bounds
+        
+        ALLSHAPES_BOUNDS_MARGIN = 20
+        maxx = maxy = 0
         for shape in self.umlboxshapes:
-            num_shapes += 1
             width, height = shape.GetBoundingBoxMax()
             right = shape.GetX() + width/2
             bottom = shape.GetY() + height/2
             maxx = max(right, maxx)
             maxy = max(bottom, maxy)
-        return (maxx + MARGIN_AROUND_ALL_SHAPES_BOUNDS, maxy + MARGIN_AROUND_ALL_SHAPES_BOUNDS)
+        return (maxx + ALLSHAPES_BOUNDS_MARGIN,
+                maxy + ALLSHAPES_BOUNDS_MARGIN)
 
     def get_umlboxshapes(self):
         #return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
