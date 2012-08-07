@@ -47,7 +47,7 @@ class CanvasResizer(object):
             self.allshapes_bounds_cached = None
             
         if self.allshapes_bounds_last == self.calc_allshapes_bounds():
-            print "nochange",
+            #print "nochange",
             return
 
         bounds_width, bounds_height = self.calc_allshapes_bounds()
@@ -62,15 +62,20 @@ class CanvasResizer(object):
                 (percent_change(bounds_width, virt_width) > shrinkage_leeway or \
                  percent_change(bounds_height, virt_height) > shrinkage_leeway)
             
-        print need_more_virtual_room, need_to_compact,
-        if need_to_compact and not will_compact:
-            print "(compact pending)",
-                    
         if need_more_virtual_room or will_compact:
-            print "(action)"
             self._do_resize_virtual_canvas_tofit_bounds((bounds_width, bounds_height))
-        else:
-            print "(no action)"
+
+        #Debug version of above last two lines.
+        #
+        #print need_more_virtual_room, need_to_compact,
+        #if need_to_compact and not will_compact:
+        #    print "(compact pending)",
+        #            
+        #if need_more_virtual_room or will_compact:
+        #    print "(action)"
+        #    self._do_resize_virtual_canvas_tofit_bounds((bounds_width, bounds_height))
+        #else:
+        #    print "(no action)"
     
     def _do_resize_virtual_canvas_tofit_bounds(self, bounds):
         bounds_width, bounds_height = bounds
@@ -91,7 +96,7 @@ class CanvasResizer(object):
         Calculates the maxx and maxy for all the shapes on the canvas.
         """
         if self.allshapes_bounds_cached:
-            print ".",
+            #print ".",
             return self.allshapes_bounds_cached
         
         ALLSHAPES_BOUNDS_MARGIN = 20
@@ -102,7 +107,7 @@ class CanvasResizer(object):
             bottom = shape.GetY() + height/2
             maxx = max(right, maxx)
             maxy = max(bottom, maxy)
-        print "!",
+        #print "!",
         self.allshapes_bounds_cached= (maxx + ALLSHAPES_BOUNDS_MARGIN,
                                         maxy + ALLSHAPES_BOUNDS_MARGIN)
         return self.allshapes_bounds_cached
@@ -113,9 +118,9 @@ Notes:
 Purpose of shrinkage_leeway
 ---------------------------
 Relax the compacting rule so that canvas virtual size may be shrinkage_leeway%
-bigger than the bounds without it being trimmed/compacted down. The purpose of
-this is to relax the rules and not have it so strict - after all it doesn't hurt
-to have a slightly larger workspace - better than a trim workspace
+bigger than the "all shapes bounds" without it being trimmed/compacted down. The
+purpose of this is to relax the rules and not have it so strict - after all it
+doesn't hurt to have a slightly larger workspace - better than a trim workspace
 jumping/flickering around all the time. Plus if you manually drag resize the
 frame it will trim perfectly.
 
@@ -132,21 +137,24 @@ but the virtualsize remains the same.
 
 When bounds become dirty
 -------------------------
-After a programmatic change of bounds e.g. via stateofthenation
+After a programmatic change of "all shapes bounds" e.g. via stateofthenation
 or when move a node via the mouse
 
-the bounds of the shapes area doesn't change when resizing a frame, thus the
+"all shapes bounds" area doesn't change when resizing a frame, thus the
 bounds is not dirty
         
 Repeated calls from frame resize event
 --------------------------------------
 Note: repeated calls from frame resize event shouldn't be a problem because
-current all shapes bounds canvas == self.allshapes_bounds_last due to our
+current "all shapes bounds" == self.allshapes_bounds_last due to our
 recording of allshapes_bounds_last every time it is set by us. If nothing has
-changes then we don't do anything. Additionally we cache the calls to
-calc_allshapes_bounds in self.allshapes_bounds_cached to avoid constant recalc.
-Typically the first resize event might cause the SetScrollbars() call and then
-subsequent calls do nothing.
+changed then we don't do anything. Thus repeated hammering from resize event is
+protected against.
+
+Additionally we cache the calls to calc_allshapes_bounds in
+self.allshapes_bounds_cached to avoid constant recalc. Typically the first
+resize event might cause the SetScrollbars() call and then subsequent calls do
+nothing.
 
 Also since shrinkage_leeway is 0 when called from a frame resize event, if the
 virtual canvas is any bigger than the bounds of the shapes - even 1% bigger -
