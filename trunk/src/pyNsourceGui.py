@@ -172,7 +172,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             #self.frame.SetSizeHints(minW=-1, minH=hsize, maxH=hsize)
             #self.frame.SetTitle(str(event.GetSize()))
         
-            self.umlwin.frame_calibration()
+            self.umlwin.canvas_resizer.frame_calibration()
             
         event.Skip()
         
