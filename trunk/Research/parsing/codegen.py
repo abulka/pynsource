@@ -11,6 +11,52 @@
 from ast import *
 
 
+BOOLOP_SYMBOLS = {
+    And:        'and',
+    Or:         'or'
+}
+
+BINOP_SYMBOLS = {
+    Add:        '+',
+    Sub:        '-',
+    Mult:       '*',
+    Div:        '/',
+    FloorDiv:   '//',
+    Mod:        '%',
+    LShift:     '<<',
+    RShift:     '>>',
+    BitOr:      '|',
+    BitAnd:     '&',
+    BitXor:     '^'
+}
+
+CMPOP_SYMBOLS = {
+    Eq:         '==',
+    Gt:         '>',
+    GtE:        '>=',
+    In:         'in',
+    Is:         'is',
+    IsNot:      'is not',
+    Lt:         '<',
+    LtE:        '<=',
+    NotEq:      '!=',
+    NotIn:      'not in'
+}
+
+UNARYOP_SYMBOLS = {
+    Invert:     '~',
+    Not:        'not',
+    UAdd:       '+',
+    USub:       '-'
+}
+
+ALL_SYMBOLS = {}
+ALL_SYMBOLS.update(BOOLOP_SYMBOLS)
+ALL_SYMBOLS.update(BINOP_SYMBOLS)
+ALL_SYMBOLS.update(CMPOP_SYMBOLS)
+ALL_SYMBOLS.update(UNARYOP_SYMBOLS)
+
+
 def to_source(node, indent_with=' ' * 4, add_line_information=False):
     """This function can convert a node tree back into python sourcecode.
     This is useful for debugging purposes, especially if you're dealing with
@@ -48,6 +94,7 @@ class SourceGenerator(NodeVisitor):
         self.new_lines = 0
 
     def write(self, x):
+        assert(isinstance(x, str))
         if self.new_lines:
             if self.result:
                 self.result.append('\n' * self.new_lines)
@@ -117,7 +164,7 @@ class SourceGenerator(NodeVisitor):
     def visit_AugAssign(self, node):
         self.newline(node)
         self.visit(node.target)
-        self.write(BINOP_SYMBOLS[type(node.op)] + '=')
+        self.write(' '+BINOP_SYMBOLS[type(node.op)] + '= ')
         self.visit(node.value)
 
     def visit_ImportFrom(self, node):
@@ -126,7 +173,7 @@ class SourceGenerator(NodeVisitor):
         for idx, item in enumerate(node.names):
             if idx:
                 self.write(', ')
-            self.write(item)
+            self.visit(item)
 
     def visit_Import(self, node):
         self.newline(node)
@@ -163,21 +210,7 @@ class SourceGenerator(NodeVisitor):
         for base in node.bases:
             paren_or_comma()
             self.visit(base)
-        # XXX: the if here is used to keep this module compatible
-        #      with python 2.6.
-        if hasattr(node, 'keywords'):
-            for keyword in node.keywords:
-                paren_or_comma()
-                self.write(keyword.arg + '=')
-                self.visit(keyword.value)
-            if node.starargs is not None:
-                paren_or_comma()
-                self.write('*')
-                self.visit(node.starargs)
-            if node.kwargs is not None:
-                paren_or_comma()
-                self.write('**')
-                self.visit(node.kwargs)
+        
         self.write(have_args and '):' or ':')
         self.body(node.body)
 
@@ -197,9 +230,10 @@ class SourceGenerator(NodeVisitor):
                 self.write(':')
                 self.body(node.body)
             else:
-                self.newline()
-                self.write('else:')
-                self.body(else_)
+                if len(else_) > 0:
+                    self.newline()
+                    self.write('else:')
+                    self.body(else_)
                 break
 
     def visit_For(self, node):
@@ -252,7 +286,7 @@ class SourceGenerator(NodeVisitor):
     def visit_Delete(self, node):
         self.newline(node)
         self.write('del ')
-        for idx, target in enumerate(node):
+        for idx, target in enumerate(node.targets):
             if idx:
                 self.write(', ')
             self.visit(target)
@@ -282,8 +316,11 @@ class SourceGenerator(NodeVisitor):
 
     def visit_Return(self, node):
         self.newline(node)
-        self.write('return ')
-        self.visit(node.value)
+        if node.value is not None:
+            self.write('return ')
+            self.visit(node.value)
+        else:
+            self.write('return')
 
     def visit_Break(self, node):
         self.newline(node)
@@ -405,9 +442,9 @@ class SourceGenerator(NodeVisitor):
 
     def visit_Compare(self, node):
         self.write('(')
-        self.write(node.left)
+        self.visit(node.left)
         for op, right in zip(node.ops, node.comparators):
-            self.write(' %s %%' % CMPOP_SYMBOLS[type(op)])
+            self.write(' %s ' % CMPOP_SYMBOLS[type(op)])
             self.visit(right)
         self.write(')')
 
@@ -513,7 +550,7 @@ class SourceGenerator(NodeVisitor):
                 self.write(' if ')
                 self.visit(if_)
 
-    def visit_excepthandler(self, node):
+    def visit_ExceptHandler(self, node):
         self.newline(node)
         self.write('except')
         if node.type is not None:
@@ -524,3 +561,81 @@ class SourceGenerator(NodeVisitor):
                 self.visit(node.name)
         self.write(':')
         self.body(node.body)
+
+if __name__ == '__main__':
+    import ast
+    code2 = """
+# comment
+class A:
+    c = []
+    def __init__(self):
+        self.a = 1
+        self.b = 2
+        not_member = 10
+        self.foo_bar_(self.a, self.b)
+        self.drawString_atX_y_('foo', 10, 20)
+    def drawString_atX_y_(self, s, x, y):
+        pass
+class B(A):
+    pass
+
+def foo(a, b):
+    if a == b:
+        return a+b
+    else:
+        return a*b
+foo(1, 2)
+"""
+    code3 = """
+class Foo:
+    def foobar(self):
+        if foo:
+            if bar:
+                pass
+            else:
+                pass
+        else:
+            pass    
+
+a = [x*2 for x in range(10)]
+class FooCell(NSCell):
+    def noArgsFunc(self):
+        return 5
+
+    def drawWithFrame_inView_(self, cellFrame, controlView):
+        bp = NSBezierPath.bezierPathWithRect_(cellFrame)
+        IntToNSColor(self.objectValue()).set()
+        bp.fill()
+        a.foo().bar()
+        a.foo()
+        a.foo_bar_(a.baz_(c), b)
+        foo().baz_(c)
+"""
+
+    code = """
+class NameFlash_AppDelegate(NSObject):
+	@IBAction
+	def nextCard_(self, sender):
+		if self.currentDeck() == None:
+			self.text_UI.setStringValue_('')
+		else:
+			if self.answer_UI.stringValue() != '':
+				self.currentDeck().answered_card()
+			self.current_card = self.currentDeck().get_next_card()
+			image = NSImage.alloc().initWithContentsOfFile_(self.current_card.hint)
+			self.image_UI.setImage_(image)
+			if image == None:
+				self.text_UI.setStringValue_(self.current_card.hint)
+				self.image_UI.path = None
+			else:
+				self.text_UI.setStringValue_('')
+				self.image_UI.path = self.current_card.hint
+		self.answer_UI.setStringValue_('')
+		self.answer_UI.setBackgroundColor_(NSColor.whiteColor())
+
+"""
+
+    round1 = to_source(ast.parse(code))
+    print round1
+    round2 = to_source(ast.parse(round1))
+    print round1 == round2
