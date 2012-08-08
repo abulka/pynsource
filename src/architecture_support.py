@@ -22,7 +22,30 @@ class multicast:
                 if func and callable(func):
                     func(*args, **kwargs)
         return broadcaster
+
     
+# Who Called me - Useful call stack analysis
+
+import inspect
+def whoami(): return inspect.stack()[1][3]
+def whosdaddy(): return inspect.stack()[2][3]
+def whoscalling1(): return [inspect.stack()[i][3] for i in range(1,len(inspect.stack()))]
+def whoscalling2():
+    msg = ""
+    TOK = " <-- "
+    for i in range(2,len(inspect.stack())):
+        curr = inspect.stack()[i][3]
+        if curr == 'MainLoop' or curr == '<lambda>':
+            break
+        if curr == 'cmd_invoker_f':
+            frame = inspect.getouterframes(inspect.currentframe())[i][0]
+            argvals = inspect.getargvalues(frame)
+            curr = argvals[3]['cmd'].__class__.__name__
+        msg += curr + TOK
+    msg = msg[0:(len(msg)-len(TOK))] # strip out the last TOK
+    msg = "." + TOK + msg
+    return msg
+
 
 # Misc Decorators
 

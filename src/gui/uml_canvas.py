@@ -513,7 +513,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     # UTILITY - used by CmdLayout and CmdFileImportBase
     def layout_and_position_shapes(self):
-        self.canvas_resizer.frame_calibration()
+        self.canvas_resizer.frame_calibration(auto_resize_virtualcanvas=False)  # going to do a stateofthenation later so no point changing virt canvas now
         self.AllToLayoutCoords()
         self.layouter.layout(keep_current_positions=False, optimise=True)
         self.AllToWorldCoords()

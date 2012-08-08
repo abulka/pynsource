@@ -18,7 +18,9 @@ from cmds.layouts import *
 # TODO: Perhaps can add these modules to the globals within the
 # invoker class, to avoid having to import each module explicitly?
 
-class CmdInvoker:   # CmdInvoker4
+# Command Invoker has to be defined here in order to access the scope of the cmds modules
+
+class CmdInvoker:   # version 4 - see pyNsource\trunk\Research\python advanced\command_invokers1.py
     """
     When you call any method on an instance of this invoker class, the method is
     interpreted as the name of a command class to be instantiated. Parameters in
@@ -34,11 +36,11 @@ class CmdInvoker:   # CmdInvoker4
     # needs to return a callable function which will then be called by python,
     # with the arguments to the original call to '.method/klass' call.
     def __getattr__(self, klass):
-        def broadcaster(*args, **kwargs):
+        def cmd_invoker_f(*args, **kwargs):
             cmd = eval(klass+'(*args, **kwargs)', globals(), locals())
             cmd.context = self.context
             self.cmd_mgr.run(cmd)
-        return broadcaster
+        return cmd_invoker_f
     
 class Controller():
     def __init__(self, app):
