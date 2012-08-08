@@ -46,6 +46,7 @@ def suite():
             'test_parse_05',
             'test_parse_06',
             'test_parse_07',
+            'test_parse_08',
             'test_overlaps1',
             'test_overlaps2stress',
             'test_asciiworkspace_01',
