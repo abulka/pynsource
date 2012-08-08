@@ -46,6 +46,34 @@ def whoscalling2():
     msg = "." + TOK + msg
     return msg
 
+# Utils
+
+import collections
+def listdiff(list1, list2):
+    """
+    Difference between two lists, taking into account duplicates too
+    """
+    dups = []
+    def finddups(lzt):
+        y=collections.Counter(lzt)
+        dups.extend([i for i in y if y[i]>1])
+    def realdiffs(a,b):
+        """
+        Now lets say you wanted to know which elements in the two lists did not
+        overlap at all between them. This is sometimes referred to as the
+        symmetric distance. The following code should serve this purpose and
+        should give you "jkl" and "abc".
+        http://code.hammerpig.com/find-the-difference-between-two-lists-with-python.html
+        """
+        c = set(a).union(set(b))
+        d = set(a).intersection(set(b))
+        return list(c - d)
+    finddups(list1)
+    finddups(list2)
+    realdiffs = realdiffs(list1, list2)
+    realdiffs.extend(dups)
+    return realdiffs
+
 
 # Misc Decorators
 

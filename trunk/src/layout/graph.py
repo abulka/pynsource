@@ -3,6 +3,7 @@
 
 from line_intersection import FindLineIntersection
 from permutations import getpermutations
+from architecture_support import listdiff
 
 class Graph:
     def __init__(self):
@@ -158,7 +159,7 @@ class Graph:
         setup_temporary_parent_child_relationships()
         result = order_the_nodes()
         
-        assert len(result) == len(self.nodes), "Count increased! from %d to %d" %(len(self.nodes), len(result))         # ensure not introducing duplicates
+        assert len(result) == len(self.nodes), "Count increased! from %d to %d, diff=%s" %(len(self.nodes), len(result), listdiff([node.id for node in self.nodes], [node[0].id for node in result]))         # ensure not introducing duplicates
         assert len(set(result)) == len(result), [node.id for node in result]                                            # ensure no duplicates exist
         
         del_temporary_parent_child_relationships()                    
