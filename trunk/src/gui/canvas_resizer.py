@@ -5,8 +5,10 @@ from coord_utils import percent_change
 import wx
 import wx.lib.ogl as ogl
 
-MIN_SENSIBLE_CANVAS_SIZE = 200
+from architecture_support import whoscalling2
 
+MIN_SENSIBLE_CANVAS_SIZE = 200
+    
 class CanvasResizer(object):
     """
     Looks after the reszing of the canvas virtual size plus a few other related functions.
@@ -17,13 +19,14 @@ class CanvasResizer(object):
         self.canvas = canvas
         self.allshapes_bounds_cached = None
         self.allshapes_bounds_last = None
+        self.working = False  # setting SetScrollbars() can trigger a frame resize thus this flag prevents 2 calls
 
     def canvas_too_small(self):
         width, height = self.canvas.GetSize()
         return width < MIN_SENSIBLE_CANVAS_SIZE or height < MIN_SENSIBLE_CANVAS_SIZE
         
     # UTILITY - called by OnResizeFrame, layout_and_position_shapes
-    def frame_calibration(self):
+    def frame_calibration(self, auto_resize_virtualcanvas=True):
         """
         Calibrate model/shape/layout coordinate mapping system to the visible
         physical window canvas size. When resizing a frame, obviously the bounds
@@ -34,7 +37,9 @@ class CanvasResizer(object):
         if self.canvas_too_small():
             return
         self.canvas.coordmapper.Recalibrate(self.canvas.frame.GetClientSize())  # passing self.GetVirtualSize() seems to spread the layout out too much
-        self.resize_virtual_canvas_tofit_bounds(shrinkage_leeway=0, bounds_dirty=False)
+        
+        if auto_resize_virtualcanvas:
+            self.resize_virtual_canvas_tofit_bounds(shrinkage_leeway=0, bounds_dirty=False)
 
     # UTILITY - used by 's' key, stateofthenation, frame_calibration, OnEndDragLeft
     def resize_virtual_canvas_tofit_bounds(self, shrinkage_leeway=40, bounds_dirty=False):
@@ -49,6 +54,10 @@ class CanvasResizer(object):
         if self.allshapes_bounds_last == self.calc_allshapes_bounds():
             #print "nochange",
             return
+
+        if self.working:
+            return
+        self.working = True
 
         bounds_width, bounds_height = self.calc_allshapes_bounds()
         virt_width, virt_height = self.canvas.GetVirtualSize()
@@ -73,10 +82,13 @@ class CanvasResizer(object):
         #            
         #if need_more_virtual_room or will_compact:
         #    print "(action)"
+        #    print "\n",whoscalling2()
         #    self._do_resize_virtual_canvas_tofit_bounds((bounds_width, bounds_height))
         #else:
         #    print "(no action)"
     
+        self.working = False
+
     def _do_resize_virtual_canvas_tofit_bounds(self, bounds):
         bounds_width, bounds_height = bounds
 
