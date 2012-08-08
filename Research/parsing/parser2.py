@@ -94,11 +94,11 @@ if __name__ == '__main__':
     v = Py2Neko()
     v.visit(node)
 
-    #print
-    #print "from ast to source code"    
-    #import codegen   # http://stackoverflow.com/questions/768634/python-parse-a-py-file-read-the-ast-modify-it-then-write-back-the-modified
-    #print codegen.to_source(node)
-    #
+    print
+    print "from ast to source code"    
+    import codegen   # http://stackoverflow.com/questions/768634/python-parse-a-py-file-read-the-ast-modify-it-then-write-back-the-modified
+    print codegen.to_source(node)
+    
     
     
 """
