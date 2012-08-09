@@ -17,6 +17,8 @@ model
     .modulemethods = [method, ...]]
 """
 
+DEBUG = 0
+
 def dump_old_structure(pmodel):
     res = ""
     for classname, classentry in pmodel.classlist.items():
@@ -71,14 +73,27 @@ def convert_ast_to_old_parser(node):
             self.currclass = None
             self.am_inside_class = [False]
             self.am_inside_function = [False]
-            self.am_inside_attr_chain = []
-            self.am_inside_attr_chain_recording = True
 
+            self.init_lhs_rhs()
+            
             self.result = []
             self.indent_with = ' ' * 4
             self.indentation = 0
             self.new_lines = 0
 
+        def init_lhs_rhs(self):
+            self.am_inside_attr_chain = []
+            self.am_inside_attr_chain_rhs = []
+            self.am_inside_attr_chain_recording = True
+            
+        def record_lhs_rhs(self, s):
+            if self.am_inside_attr_chain_recording:
+                self.am_inside_attr_chain.append(s)
+                self.write("\nLHS %d %s\n" % (len(self.am_inside_attr_chain), self.am_inside_attr_chain))
+            else:
+                self.am_inside_attr_chain_rhs.append(s)
+                self.write("\nRHS %d %s\n" % (len(self.am_inside_attr_chain_rhs), self.am_inside_attr_chain_rhs))
+                
         def write(self, x):
             assert(isinstance(x, str))
             if self.new_lines:
@@ -153,8 +168,7 @@ def convert_ast_to_old_parser(node):
             self.newline(node)
             
             # A
-            self.am_inside_attr_chain = []
-            self.am_inside_attr_chain_recording = True
+            self.init_lhs_rhs()
             self.write("  attr chain cleared (before assign)\n")
             
             for idx, target in enumerate(node.targets):
@@ -162,46 +176,50 @@ def convert_ast_to_old_parser(node):
                     self.write(', ')
                     
                 # A
-                if self.am_inside_class[-1] and not self.am_inside_function[-1]:
-                    self.write(" %s is CLASS VAR  " % target.id)
-                    self.am_inside_class[-1].AddAttribute(attrname=target.id, attrtype=['static'])
+                #####if self.am_inside_class[-1] and not self.am_inside_function[-1]:
+                #####    self.write(" %s is CLASS VAR  " % target.id)
+                #####    self.am_inside_class[-1].AddAttribute(attrname=target.id, attrtype=['static'])
                     
                 self.visit(target)
+
             self.write(' = ')
             
             # A
-            #shouldn't be adding to self.am_inside_attr_chain after this point because we
-            # are parsing the rhs now
-            self.am_inside_attr_chain_recording = False
+            self.am_inside_attr_chain_recording = False  # are parsing the rhs now
             
-            self.visit(node.value)  # obj, can't print
+            self.visit(node.value)  # node.value is an ast obj, can't print it
 
             # A
-            self.am_inside_attr_chain = []
-            self.am_inside_attr_chain_recording = True
+            # At this point we have both lhs and rhs and can make a decision
+            # about which attributes to create
+            ############if self.am_inside_class[-1] and not self.am_inside_function[-1]:
+            ############    t = self.am_inside_attr_chain[0]
+            ############    self.write(" %s is CLASS VAR  " % t)
+            ############    self.am_inside_class[-1].AddAttribute(attrname=t, attrtype=['static'])
+            ############
+            ############elif (len(self.am_inside_attr_chain) == 2) and (self.am_inside_attr_chain[0] == 'self'):
+            ############    t = self.am_inside_attr_chain[1]
+            ############    if (t == '__class__') and len(self.am_inside_attr_chain) >= 3:
+            ############        t = self.am_inside_attr_chain[2]
+            ############        self.am_inside_class[-1].AddAttribute(attrname=t, attrtype=['static'])
+            ############    if (t != '__class__'):
+            ############        self.am_inside_class[-1].AddAttribute(attrname=t, attrtype=['normal'])
+
+            if self.am_inside_class[-1] and not self.am_inside_function[-1]:
+                t = self.am_inside_attr_chain[0]
+                self.am_inside_class[-1].AddAttribute(attrname=t, attrtype=['static'])
+
+            elif self.am_inside_class[-1] and self.am_inside_function[-1] and self.am_inside_attr_chain[0] == 'self':
+                t = self.am_inside_attr_chain[1]
+                if (t == '__class__') and len(self.am_inside_attr_chain) >= 3:
+                    self.am_inside_class[-1].AddAttribute(attrname=self.am_inside_attr_chain[2], attrtype=['static'])
+                if (t != '__class__'):
+                    self.am_inside_class[-1].AddAttribute(attrname=t, attrtype=['normal'])
+                    
+            self.init_lhs_rhs()
             self.write("  attr chain cleared (after assign)\n")
             
             
-        def visit_Attribute(self, node):
-            self.visit(node.value)
-            
-            # A - perhaps should be doing this in assign/call so that get a further look along to see if
-            #    the e.g. self.tileinfo: is just a reference or an assignment.  only care about assignments.
-            #    Also e.g. self.__class__.d = 30 how do we get the 'd' when we node.attr is only up to __class__
-            self.write("\nvisit_Attribute %s\n" % node.attr)
-            if self.am_inside_attr_chain_recording:
-                self.am_inside_attr_chain.append(node.attr)
-                self.write("\n%d %s\n" % (len(self.am_inside_attr_chain), self.am_inside_attr_chain))
-            if (len(self.am_inside_attr_chain) == 2) and (self.am_inside_attr_chain[0] == 'self'):
-                if (self.am_inside_attr_chain[0] != '__class__'):
-                    self.am_inside_class[-1].AddAttribute(attrname=node.attr, attrtype=['normal'])
-                #else:
-                #    self.am_inside_class[-1].AddAttribute(attrname=node.attr, attrtype=['static'])
-                
-            
-            self.write('.' + node.attr)
-
-
         def visit_Call(self, node):
             self.visit(node.func)
             self.write("\nvisit_Call ")
@@ -224,21 +242,29 @@ def convert_ast_to_old_parser(node):
             #self.write(')')
         
             # A
-            self.am_inside_attr_chain = []
-            self.am_inside_attr_chain_recording = True
-            self.write("  attr chain cleared (via call)\n")
+            ####self.init_lhs_rhs()
+            ####self.write("  attr chain cleared (via call)\n")
 
         def visit_Name(self, node):
             self.write("\nvisit_Name %s\n" % node.id)
             self.write(node.id)
+
+            # A
+            self.record_lhs_rhs(node.id)
+
+        def visit_Attribute(self, node):
+            self.visit(node.value)
             
             # A
-            if self.am_inside_attr_chain_recording:
-                self.am_inside_attr_chain.append(node.id)
-                self.write("\n%d %s\n" % (len(self.am_inside_attr_chain), self.am_inside_attr_chain))
-            #if node.id == 'self':
-            #    self.write(' GOTSELF\n ')
-                
+            self.write("\nvisit_Attribute %s\n" % node.attr)
+            self.record_lhs_rhs(node.attr)
+            ####if (len(self.am_inside_attr_chain) == 2) and (self.am_inside_attr_chain[0] == 'self'):
+            ####    if (self.am_inside_attr_chain[0] != '__class__'):
+            ####        self.am_inside_class[-1].AddAttribute(attrname=node.attr, attrtype=['normal'])
+            ####    #else:
+            ####    #    self.am_inside_class[-1].AddAttribute(attrname=node.attr, attrtype=['static'])
+            
+            self.write('.' + node.attr)
 
         def visit_Str(self, node):
             self.write(repr(node.s))
@@ -256,7 +282,8 @@ def convert_ast_to_old_parser(node):
 
     v = Visitor()
     v.visit(node)
-    print ''.join(v.result) # why doesn't print work and we have to do this
+    if DEBUG:
+        print ''.join(v.result)
     return v.model
 
 def parse_and_convert(filename):
@@ -269,13 +296,22 @@ def parse_and_convert(filename):
     p = convert_ast_to_old_parser(node)
     d2 = dump_old_structure(p)
     print d2
-    print "** old vs new method comparison = %s" % (d1 == d2)
+    comparedok = (d1 == d2)
+    print "** old vs new method comparison = %s" % comparedok
     print
+    return comparedok
 
 
-parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py')
-parse_and_convert('../../tests/python-in/testmodule02.py')
-parse_and_convert('../../tests/python-in/testmodule04.py')
-parse_and_convert('../../tests/python-in/testmodule03.py')
-parse_and_convert('../../tests/python-in/testmodule05.py')
-parse_and_convert('../../tests/python-in/testmodule01.py')
+results = []
+results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule02.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule03.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule05.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule01.py'))
+print results
+if results == [False, True, True, True, False, False]:
+    print "refactorings going OK"
+else:
+    print "oooops"
+    
