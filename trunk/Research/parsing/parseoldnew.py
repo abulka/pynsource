@@ -17,7 +17,7 @@ model
     .modulemethods = [method, ...]]
 """
 
-DEBUG = 0
+DEBUG = 1
 
 def dump_old_structure(pmodel):
     res = ""
@@ -239,11 +239,17 @@ def convert_ast_to_old_parser(node):
                 #write_comma()
                 self.write('**')
                 self.visit(node.kwargs)
-            #self.write(')')
-        
+            self.write(')')
+
             # A
-            ####self.init_lhs_rhs()
-            ####self.write("  attr chain cleared (via call)\n")
+            if len(self.am_inside_attr_chain) >= 3 and\
+                        self.am_inside_class[-1] and \
+                        self.am_inside_function[-1] and \
+                        self.am_inside_attr_chain[0] == 'self' and \
+                        self.am_inside_attr_chain[2] == 'append':
+                self.am_inside_class[-1].AddAttribute(attrname=self.am_inside_attr_chain[1], attrtype=['normal', 'many'])
+                self.init_lhs_rhs()
+                self.write("  attr chain cleared (via call)\n")
 
         def visit_Name(self, node):
             self.write("\nvisit_Name %s\n" % node.id)
@@ -303,11 +309,11 @@ def parse_and_convert(filename):
 
 
 results = []
-results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule02.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule03.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule05.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule02.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule03.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule05.py'))
 results.append(parse_and_convert('../../tests/python-in/testmodule01.py'))
 print results
 if results == [False, True, True, True, False, False]:
