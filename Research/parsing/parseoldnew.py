@@ -75,7 +75,7 @@ def convert_ast_to_old_parser(node):
         def __init__(self):
             self.model = OldParseModel()
             self.currclass = None
-            self.am_inside_class = [False]
+            self.class_nesting = [False]
             self.am_inside_function = [False]
 
             self.init_lhs_rhs()
@@ -86,19 +86,22 @@ def convert_ast_to_old_parser(node):
             self.new_lines = 0
 
         def init_lhs_rhs(self):
-            self.am_inside_attr_chain = []
-            self.am_inside_attr_chain_rhs = []
-            self.am_inside_attr_chain_recording = True
+            self.lhs = []
+            self.rhs = []
+            self.lhs_recording = True
             self.rhs_call_made = False
 
         def record_lhs_rhs(self, s):
-            if self.am_inside_attr_chain_recording:
-                self.am_inside_attr_chain.append(s)
-                self.write("\nLHS %d %s\n" % (len(self.am_inside_attr_chain), self.am_inside_attr_chain))
+            if self.lhs_recording:
+                self.lhs.append(s)
+                self.write("\nLHS %d %s\n" % (len(self.lhs), self.lhs))
             else:
-                self.am_inside_attr_chain_rhs.append(s)
-                self.write("\nRHS %d %s\n" % (len(self.am_inside_attr_chain_rhs), self.am_inside_attr_chain_rhs))
-                
+                self.rhs.append(s)
+                self.write("\nRHS %d %s\n" % (len(self.rhs), self.rhs))
+        
+        def current_class(self):
+            return self.class_nesting[-1]
+            
         def write(self, x):
             assert(isinstance(x, str))
             if self.new_lines:
@@ -133,8 +136,8 @@ def convert_ast_to_old_parser(node):
             self.currclass = c = ClassEntry()
             self.model.classlist[node.name] = c
             # A
-            self.am_inside_class.append(c)
-            self.write("  (inside class) %s " % self.am_inside_class)
+            self.class_nesting.append(c)
+            self.write("  (inside class) %s " % self.class_nesting)
 
             for base in node.bases:
                 # A
@@ -145,8 +148,8 @@ def convert_ast_to_old_parser(node):
             self.body(node.body)
 
             # A
-            self.am_inside_class.pop()
-            self.write("  (outside class) %s " % self.am_inside_class)
+            self.class_nesting.pop()
+            self.write("  (outside class) %s " % self.class_nesting)
             
         def visit_FunctionDef(self, node):
             self.newline(extra=1)
@@ -155,10 +158,10 @@ def convert_ast_to_old_parser(node):
             self.write('def %s(' % node.name)
             
             # A
-            if not self.am_inside_class[-1] and not self.am_inside_function[-1]:
+            if not self.current_class() and not self.am_inside_function[-1]:
                 self.model.modulemethods.append(node.name)
             else:
-                self.am_inside_class[-1].defs.append(node.name)
+                self.current_class().defs.append(node.name)
 
             # A
             self.am_inside_function.append(True)
@@ -183,26 +186,26 @@ def convert_ast_to_old_parser(node):
             self.write(' = ')
             
             # A
-            self.am_inside_attr_chain_recording = False  # are parsing the rhs now
+            self.lhs_recording = False  # are parsing the rhs now
             
             self.visit(node.value)  # node.value is an ast obj, can't print it
 
             # A
             # At this point we have both lhs and rhs and can make a decision
             # about which attributes to create
-            if self.am_inside_class[-1] and not self.am_inside_function[-1]:
-                t = self.am_inside_attr_chain[0]
-                self.am_inside_class[-1].AddAttribute(attrname=t, attrtype=['static'])
-            elif self.am_inside_class[-1] and self.am_inside_function[-1] and self.am_inside_attr_chain[0] == 'self':
-                t = self.am_inside_attr_chain[1]
-                if (t == '__class__') and len(self.am_inside_attr_chain) >= 3:
-                    t = self.am_inside_attr_chain[2]
-                    self.am_inside_class[-1].AddAttribute(attrname=t, attrtype=['static'])
+            if self.current_class() and not self.am_inside_function[-1]:
+                t = self.lhs[0]
+                self.current_class().AddAttribute(attrname=t, attrtype=['static'])
+            elif self.current_class() and self.am_inside_function[-1] and self.lhs[0] == 'self':
+                t = self.lhs[1]
+                if (t == '__class__') and len(self.lhs) >= 3:
+                    t = self.lhs[2]
+                    self.current_class().AddAttribute(attrname=t, attrtype=['static'])
                 elif (t != '__class__'):
-                    self.am_inside_class[-1].AddAttribute(attrname=t, attrtype=['normal'])
+                    self.current_class().AddAttribute(attrname=t, attrtype=['normal'])
                     
-                if self.rhs_call_made and len(self.am_inside_attr_chain_rhs) >= 0:
-                    self.am_inside_class[-1].classdependencytuples.append((t, self.am_inside_attr_chain_rhs[0]))
+                if self.rhs_call_made and len(self.rhs) >= 0:
+                    self.current_class().classdependencytuples.append((t, self.rhs[0]))
 
         def visit_Call(self, node):
             self.visit(node.func)
@@ -226,26 +229,26 @@ def convert_ast_to_old_parser(node):
             self.write(')')
 
             # A for the benefit of visit_Assign so that it can get the Blah() class instance name we are creating
-            if len(self.am_inside_attr_chain) >= 2 and len(self.am_inside_attr_chain_rhs) == 1:
+            if len(self.lhs) >= 2 and len(self.rhs) == 1:
                self.rhs_call_made = True
                
             # A
-            if len(self.am_inside_attr_chain) >= 3 and\
-                        self.am_inside_class[-1] and \
+            if len(self.lhs) >= 3 and\
+                        self.current_class() and \
                         self.am_inside_function[-1] and \
-                        self.am_inside_attr_chain[0] == 'self' and \
-                        self.am_inside_attr_chain[2] == 'append':
-                t = self.am_inside_attr_chain[1]
-                self.am_inside_class[-1].AddAttribute(attrname=t, attrtype=['normal', 'many'])
+                        self.lhs[0] == 'self' and \
+                        self.lhs[2] == 'append':
+                t = self.lhs[1]
+                self.current_class().AddAttribute(attrname=t, attrtype=['normal', 'many'])
                 
                 # HOW do we get the Blah from self.f.append(Blah()) into classdependencytuples ???
                 #
                 # one blah is on the rhs of an assignment, the other Blah is inside a call from append
                 # how hand both with the same or similar code?
                 #
-                #self.am_inside_attr_chain_recording = False # try to get the Blah into the rhs
+                #self.lhs_recording = False # try to get the Blah into the rhs
                 #self.rhs_call_made = True
-                #self.am_inside_class[-1].classdependencytuples.append((t, self.am_inside_attr_chain[3]))
+                #self.current_class().classdependencytuples.append((t, self.lhs[3]))
                 
 
         def visit_Name(self, node):
