@@ -24,7 +24,10 @@ sys.path.append("../../src")
 from architecture_support import whosdaddy, whosgranddaddy
 import os
 
+import traceback
+
 DEBUG = 1
+DEBUG_WRITE = 0
 
 def dump_old_structure(pmodel):
     res = ""
@@ -63,11 +66,7 @@ def ast_parser(filename):
 import sys
 sys.path.append("../../src")
 from core_parser import ClassEntry, Attribute
-
-c = ClassEntry('fred')
-print c, "%s" % c
-print [c,c,c]
-print [str(n) for n in [c,c,c]]
+from keywords import pythonbuiltinfunctions
 
 def convert_ast_to_old_parser(node):
     
@@ -124,6 +123,8 @@ def convert_ast_to_old_parser(node):
                 self.new_lines = 0
             x = "<span class=mynote%d>%s</span>" % (mynote,x)
             self.result.append(x)
+            if DEBUG_WRITE:
+                print x
 
         def build_class_entry(self, name):
             c = ClassEntry(name)
@@ -164,7 +165,6 @@ def convert_ast_to_old_parser(node):
             # At this point we have both lhs and rhs plus three flags and can
             # make a decision about what to create.
             
-            def in_class_normal_area(): return in_function_in_class() and self.lhs[0] == 'self'
             def in_class_static_area(): return self.current_class() and not self.am_inside_function()
             def in_function_in_class(): return self.current_class() and self.am_inside_function()
             def create_attr_static(t):
@@ -191,15 +191,13 @@ def convert_ast_to_old_parser(node):
                 
                 if in_class_static_area():
                     t = create_attr_static(self.lhs[0])
-                elif in_class_normal_area():
+                elif in_function_in_class() and self.lhs[0] == 'self':
                     t = create_attr_please(self.lhs[1])
                 else:
                     pass # in module area
                         
-                if self.made_rhs_call:
+                if self.lhs[0] == 'self' and self.made_rhs_call and self.rhs[0] not in pythonbuiltinfunctions:
                     self.add_classdependencytuple((t, self.rhs[0]))
-                        
-
                         
             self.init_lhs_rhs()
             self.flush_state()
@@ -233,10 +231,10 @@ def convert_ast_to_old_parser(node):
             c = self.build_class_entry(node.name)
 
             for base in node.bases:
-                # A
-                c.classesinheritsfrom.append(base.id)
-                
                 self.visit(base)
+
+                # A
+                c.classesinheritsfrom.append(".".join(self.lhs))
             
             self.body(node.body)
 
@@ -349,7 +347,14 @@ def convert_ast_to_old_parser(node):
        
 
     v = Visitor()
-    v.visit(node)
+    
+    try:
+        v.visit(node)
+    except Exception as err:
+        print("Parsing Visit error: {0}".format(err))
+        traceback.print_exc(file=sys.stdout)
+        raise
+    #finally:
     if DEBUG:
         debuginfo = '<br>'.join(v.result)
         return v.model, debuginfo
@@ -433,13 +438,16 @@ def parse_and_convert(in_filename):
 
 results = []
 results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule02.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule03.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule05.py'))
 results.append(parse_and_convert('../../tests/python-in/testmodule01.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule02.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule03.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule05.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule06.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule07.py'))
+
 print results
-if results == [False, True, True, True, False, True]:
+if results == [False, True, True, True, True, False, True, True]:
     print "refactorings going OK"
 else:
     print "oooops"
