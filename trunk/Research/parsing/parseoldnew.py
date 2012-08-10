@@ -17,6 +17,8 @@ model
     .modulemethods = [method, ...]]
 """
 
+import ast
+
 import sys
 sys.path.append("../../src")
 from architecture_support import whosdaddy, whosgranddaddy
@@ -50,8 +52,6 @@ def old_parser(filename):
     return p
 
 def ast_parser(filename):
-    import ast
-
     with open(filename,'r') as f:
         source = f.read()
     
@@ -60,11 +60,16 @@ def ast_parser(filename):
     return node
 
 
+import sys
+sys.path.append("../../src")
+from core_parser import ClassEntry, Attribute
+
+c = ClassEntry('fred')
+print c, "%s" % c
+print [c,c,c]
+print [str(n) for n in [c,c,c]]
+
 def convert_ast_to_old_parser(node):
-    import sys
-    sys.path.append("../../src")
-    from core_parser import ClassEntry, Attribute
-    import ast
     
     class OldParseModel(object):
         def __init__(self):
@@ -75,9 +80,8 @@ def convert_ast_to_old_parser(node):
         
         def __init__(self):
             self.model = OldParseModel()
-            self.currclass = None
-            self.class_nesting = [False]
-            self.am_inside_function = [False]
+            self.stack_classes = []
+            self.stack_functions = [False]
 
             self.init_lhs_rhs()
             
@@ -90,9 +94,9 @@ def convert_ast_to_old_parser(node):
             self.lhs = []
             self.rhs = []
             self.lhs_recording = True
-            self.rhs_call_made = False
-            self.assignment_made = False
-            self.append_call_made = False
+            self.made_rhs_call = False
+            self.made_assignment = False
+            self.made_append_call = False
 
         def record_lhs_rhs(self, s):
             if self.lhs_recording:
@@ -102,8 +106,14 @@ def convert_ast_to_old_parser(node):
                 self.rhs.append(s)
                 self.write("\nRHS %d %s\n" % (len(self.rhs), self.rhs), mynote=2)
         
+        def am_inside_function(self):
+            return self.stack_functions[-1]
+        
         def current_class(self):
-            return self.class_nesting[-1]
+            if self.stack_classes:
+                return self.stack_classes[-1]
+            else:
+                return None
             
         def write(self, x, mynote=0):
             assert(isinstance(x, str))
@@ -115,15 +125,26 @@ def convert_ast_to_old_parser(node):
             x = "<span class=mynote%d>%s</span>" % (mynote,x)
             self.result.append(x)
 
+        def build_class_entry(self, name):
+            c = ClassEntry(name)
+            self.model.classlist[name] = c
+            self.stack_classes.append(c)
+            self.write("  (inside class %s) %s " % (name, [str(c) for c in self.stack_classes]), mynote=3)
+            return c
+
+        def add_classdependencytuple(self, t):
+            if t not in self.current_class().classdependencytuples:
+                self.current_class().classdependencytuples.append(t)
+                
         def flush_state(self, msg=""):
             self.write("""
                 <table>
                     <tr>
                         <th>lhs</th>
                         <th>rhs</th>
-                        <th>assignment_made</th>
-                        <th>rhs_call_made</th>
-                        <th>append_call_made</th>
+                        <th>made_assignment</th>
+                        <th>made_rhs_call</th>
+                        <th>made_append_call</th>
                         <th></th>
                     </tr>
                     <tr>
@@ -135,12 +156,8 @@ def convert_ast_to_old_parser(node):
                         <td>%s</td>
                     </tr>
                 </table>
-            """ % (self.lhs, self.rhs, self.assignment_made, self.rhs_call_made, self.append_call_made, msg), mynote=0)
+            """ % (self.lhs, self.rhs, self.made_assignment, self.made_rhs_call, self.made_append_call, msg), mynote=0)
 
-        def add_classdependencytuple(self, t):
-            if t not in self.current_class().classdependencytuples:
-                self.current_class().classdependencytuples.append(t)
-                
         def flush(self):
             self.flush_state(whosgranddaddy())
             
@@ -148,8 +165,8 @@ def convert_ast_to_old_parser(node):
             # make a decision about what to create.
             
             def in_class_normal_area(): return in_function_in_class() and self.lhs[0] == 'self'
-            def in_class_static_area(): return self.current_class() and not self.am_inside_function[-1]
-            def in_function_in_class(): return self.current_class() and self.am_inside_function[-1]
+            def in_class_static_area(): return self.current_class() and not self.am_inside_function()
+            def in_function_in_class(): return self.current_class() and self.am_inside_function()
             def create_attr_static(t):
                 self.current_class().AddAttribute(attrname=t, attrtype=['static'])
                 return t
@@ -163,26 +180,32 @@ def convert_ast_to_old_parser(node):
             def create_attr_many(t):
                 self.current_class().AddAttribute(attrname=t, attrtype=['normal', 'many'])
                 return t
-                
-            if self.assignment_made or self.append_call_made:
+            def create_attr_please(t):
+                if self.made_append_call:
+                    t = create_attr_many(t)
+                else:
+                    t = create_attr(t)
+                return t
+
+            if self.made_assignment or self.made_append_call:
                 
                 if in_class_static_area():
                     t = create_attr_static(self.lhs[0])
-
                 elif in_class_normal_area():
-                    t = create_attr(self.lhs[1])
+                    t = create_attr_please(self.lhs[1])
+                else:
+                    pass # in module area
                         
-                    if self.rhs_call_made:
-                        self.add_classdependencytuple((t, self.rhs[0]))
+                if self.made_rhs_call:
+                    self.add_classdependencytuple((t, self.rhs[0]))
                         
-                    if self.append_call_made:
-                        create_attr_many(self.lhs[1])
+
                         
             self.init_lhs_rhs()
             self.flush_state()
             self.write("<hr>", mynote=2)
 
-
+        
         # MAIN VISIT METHODS
         
         def newline(self, node=None, extra=0):
@@ -207,11 +230,7 @@ def convert_ast_to_old_parser(node):
             self.write('class %s' % node.name)
             
             # A
-            self.currclass = c = ClassEntry()
-            self.model.classlist[node.name] = c
-            # A
-            self.class_nesting.append(c)
-            self.write("  (inside class) %s " % self.class_nesting, mynote=3)
+            c = self.build_class_entry(node.name)
 
             for base in node.bases:
                 # A
@@ -223,9 +242,8 @@ def convert_ast_to_old_parser(node):
 
             # A
             self.flush()
-            # A
-            self.class_nesting.pop()
-            self.write("  (outside class) %s " % self.class_nesting, mynote=3)
+            self.stack_classes.pop()
+            self.write("  (pop a class) stack now: %s " % [str(c) for c in self.stack_classes], mynote=3)
             
         def visit_FunctionDef(self, node):
             self.newline(extra=1)
@@ -234,14 +252,14 @@ def convert_ast_to_old_parser(node):
             self.write('def %s(' % node.name)
             
             # A
-            if not self.current_class() and not self.am_inside_function[-1]:
+            if not self.current_class() and not self.am_inside_function():
                 self.model.modulemethods.append(node.name)
             else:
                 self.current_class().defs.append(node.name)
 
             # A
-            self.am_inside_function.append(True)
-            self.write("  (inside function) %s " % self.am_inside_function, mynote=3)
+            self.stack_functions.append(True)
+            self.write("  (inside function) %s " % self.stack_functions, mynote=3)
             
             self.write('):')
             self.body(node.body)
@@ -249,8 +267,8 @@ def convert_ast_to_old_parser(node):
             # A
             self.flush()
             # A
-            self.am_inside_function.pop()
-            self.write("  (outside function) %s " % self.am_inside_function, mynote=3)
+            self.stack_functions.pop()
+            self.write("  (outside function) %s " % self.stack_functions, mynote=3)
             
         def visit_Assign(self, node):  # seems to be the top of the name / attr / chain
             self.write("\nvisit_Assign ", mynote=1)
@@ -269,16 +287,16 @@ def convert_ast_to_old_parser(node):
             self.visit(node.value)  # node.value is an ast obj, can't print it
             
             # A
-            self.assignment_made = True
+            self.made_assignment = True
 
         def visit_Call(self, node):
             self.visit(node.func)
             self.write("\nvisit_Call ", mynote=1)
 
             # A
-            if len(self.lhs) == 3 and self.current_class() and self.am_inside_function[-1] and self.lhs[0] == 'self' and self.lhs[2] == 'append':
+            if len(self.lhs) == 3 and self.current_class() and self.am_inside_function() and self.lhs[0] == 'self' and self.lhs[2] == 'append':
                 self.lhs_recording = False # try to get the Blah into the rhs
-                self.append_call_made = True
+                self.made_append_call = True
                 
             self.write('(')
             for arg in node.args:
@@ -300,7 +318,7 @@ def convert_ast_to_old_parser(node):
 
             # A
             if len(self.rhs) > 0:
-                self.rhs_call_made = True
+                self.made_rhs_call = True
                
         def visit_Name(self, node):
             self.write("\nvisit_Name %s\n" % node.id, mynote=1)
