@@ -20,6 +20,7 @@ model
 import sys
 sys.path.append("../../src")
 from architecture_support import whosdaddy, whosgranddaddy
+import os
 
 DEBUG = 1
 
@@ -91,6 +92,7 @@ def convert_ast_to_old_parser(node):
             self.lhs_recording = True
             self.rhs_call_made = False
             self.just_finished = None
+            self.append_call_made = False
 
         def record_lhs_rhs(self, s):
             if self.lhs_recording:
@@ -114,7 +116,7 @@ def convert_ast_to_old_parser(node):
             self.result.append(x)
 
         # A
-        def flush_state(self, msg):
+        def flush_state(self, msg=""):
             #self.write("lhs=%30s // rhs=%20s  just_finished = '%s'  rhs_call_made = %s (%s)" %(self.lhs, self.rhs, self.just_finished, self.rhs_call_made, msg), mynote=2)
             self.write("""
                 <table>
@@ -123,7 +125,8 @@ def convert_ast_to_old_parser(node):
                         <th>rhs</th>
                         <th>just_finished</th>
                         <th>rhs_call_made</th>
-                        <th>note</th>
+                        <th>append_call_made</th>
+                        <th></th>
                     </tr>
                     <tr>
                         <td>%s</td>
@@ -131,17 +134,22 @@ def convert_ast_to_old_parser(node):
                         <td>%s</td>
                         <td>%s</td>
                         <td>%s</td>
+                        <td>%s</td>
                     </tr>
                 </table>
-            """ % (self.lhs, self.rhs, self.just_finished, self.rhs_call_made, msg), mynote=0)
+            """ % (self.lhs, self.rhs, self.just_finished, self.rhs_call_made, self.append_call_made, msg), mynote=0)
 
+        # A
+        def add_classdependencytuple(self, t):
+            if t not in self.current_class().classdependencytuples:
+                self.current_class().classdependencytuples.append(t)
         # A
         def flush(self):
             #self.write("lhs=%30s // rhs=%20s  just_finished = '%s'  rhs_call_made = %s (flush begin)" %(self.lhs, self.rhs, self.just_finished, self.rhs_call_made), mynote=2)
-            self.flush_state("flush begin")
+            self.flush_state(whosgranddaddy())
             # At this point we have both lhs and rhs and can make a decision
             # about which attributes to create
-            if self.just_finished == 'visit_Assign':
+            if self.just_finished == 'visit_Assign' or self.append_call_made:
                 if self.current_class() and not self.am_inside_function[-1]:
                     t = self.lhs[0]
                     self.current_class().AddAttribute(attrname=t, attrtype=['static'])
@@ -154,30 +162,16 @@ def convert_ast_to_old_parser(node):
                         self.current_class().AddAttribute(attrname=t, attrtype=['normal'])
                         
                     if self.rhs_call_made and len(self.rhs) >= 0:
-                        self.current_class().classdependencytuples.append((t, self.rhs[0]))
+                        self.add_classdependencytuple((t, self.rhs[0]))
                         
                     if len(self.lhs) == 3 and self.lhs[2] == 'append':
+                        assert self.append_call_made
                         self.write("**********", mynote=2)
                         t = self.lhs[1]
                         self.current_class().AddAttribute(attrname=t, attrtype=['normal', 'many'])
                         
             # Need to cater for just_finished = 'None'
             # lhs= ['self', 'e', 'append'] // rhs= [] just_finished = 'None' rhs_call_made = True (flush begin)
-            """
-visit_Name self
-self
-LHS 1 ['self']
-visit_Attribute e
-LHS 2 ['self', 'e']
-.e
-visit_Attribute append
-LHS 3 ['self', 'e', 'append']
-.append
-visit_Call
-(
-10
-)
-            """
                         
             if self.rhs_call_made and \
                         len(self.lhs) == 3 and\
@@ -189,11 +183,11 @@ visit_Call
                 self.write("!!!!!!!!!!!!", mynote=2)
                 t = self.lhs[1]
                 self.current_class().AddAttribute(attrname=t, attrtype=['normal', 'many'])
-                self.current_class().classdependencytuples.append((t, self.rhs[0]))
+                self.add_classdependencytuple((t, self.rhs[0]))
                         
             self.init_lhs_rhs()
             #self.write("  attr chain cleared (via newline from %s) lhs=%s // rhs=%s\n" % (whosgranddaddy(), self.lhs, self.rhs), mynote=1)
-            self.flush_state("flush end, cleared (via newline from %s)" % whosgranddaddy())
+            self.flush_state()
             #self.write("lhs=%30s // rhs=%20s  just_finished = '%s'  rhs_call_made = %s (flush end, cleared (via newline from %s))" %(self.lhs, self.rhs, self.just_finished, self.rhs_call_made, whosgranddaddy()), mynote=2)
             self.write("<hr>", mynote=2)
             
@@ -290,7 +284,7 @@ visit_Call
             # A
             if len(self.lhs) == 3 and self.current_class() and self.am_inside_function[-1] and self.lhs[0] == 'self' and self.lhs[2] == 'append':
                 self.lhs_recording = False # try to get the Blah into the rhs
-                self.rhs_call_made = True
+                self.append_call_made = True
                 
             self.write('(')
             for arg in node.args:
@@ -314,25 +308,6 @@ visit_Call
             if len(self.lhs) >= 2 and len(self.rhs) == 1:
                self.rhs_call_made = True
                
-
-            
-            #if len(self.lhs) >= 3 and\
-            #            self.current_class() and \
-            #            self.am_inside_function[-1] and \
-            #            self.lhs[0] == 'self' and \
-            #            self.lhs[2] == 'append':
-            #    t = self.lhs[1]
-            #    self.current_class().AddAttribute(attrname=t, attrtype=['normal', 'many'])
-                
-                # HOW do we get the Blah from self.f.append(Blah()) into classdependencytuples ???
-                #
-                # one blah is on the rhs of an assignment, the other Blah is inside a call from append
-                # how hand both with the same or similar code?
-                #
-                #self.rhs_call_made = True
-                #self.current_class().classdependencytuples.append((t, self.lhs[3]))
-                
-
         def visit_Name(self, node):
             self.write("\nvisit_Name %s\n" % node.id, mynote=1)
             self.write(node.id)
@@ -384,7 +359,7 @@ def header():
     .mynote0 { font-family:monospace; font-size:1.5em; }
     .mynote1 { color:MediumBlue ; font-size:1.1em; }
     .mynote2 { color:FireBrick ; font-size:1.2em; }
-    .mynote3 { background-color:AntiqueWhite; font-size:0.8em; }
+    .mynote3 { background-color:AntiqueWhite; font-size:1.1em; }
     table, td, th
     {
     border:1px solid green;
@@ -406,7 +381,7 @@ def footer():
 """
 
 def out(s, f):
-    print s
+    #print s
     f.write("%s\n"%s)
     
 def do_parse_and_convert(filename, outf):
@@ -423,29 +398,36 @@ def do_parse_and_convert(filename, outf):
     d2 = dump_old_structure(p)
     out(tohtml(d2), f)
     
-    import difflib
-    diff = difflib.ndiff(d1.splitlines(1),d2.splitlines(1))
-    out(tohtml(''.join(diff), style_class='dumpdiff'), f)
-
     comparedok = (d1 == d2)
     out("** old vs new method comparison = %s" % comparedok, f)
+
+    import difflib
+    diff = difflib.ndiff(d1.splitlines(1),d2.splitlines(1))
+    diff_s = ''.join(diff)
+    out(tohtml(diff_s, style_class='dumpdiff'), f)
+    if not comparedok:
+        print diff_s
+
     out('',f)
     out(footer(), f)
     return comparedok
 
-def parse_and_convert(filename):
-    with open("out.html", 'w') as f:
-        return do_parse_and_convert(filename, f)
+def parse_and_convert(in_filename):
+    out_filename = os.path.basename(in_filename)
+    fileName, fileExtension = os.path.splitext(out_filename)
+    out_filename = "logs/debug_%s.html" % fileName
+    with open(out_filename, 'w') as f:
+        return do_parse_and_convert(in_filename, f)
 
 results = []
-#results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py'))
-#results.append(parse_and_convert('../../tests/python-in/testmodule02.py'))
-#results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
-#results.append(parse_and_convert('../../tests/python-in/testmodule03.py'))
-#results.append(parse_and_convert('../../tests/python-in/testmodule05.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule02.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule03.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule05.py'))
 results.append(parse_and_convert('../../tests/python-in/testmodule01.py'))
 print results
-if results == [False, True, True, True, False, False]:
+if results == [False, True, True, True, False, True]:
     print "refactorings going OK"
 else:
     print "oooops"
