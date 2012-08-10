@@ -29,6 +29,7 @@ class multicast:
 import inspect
 def whoami(): return inspect.stack()[1][3]
 def whosdaddy(): return inspect.stack()[2][3]
+def whosgranddaddy(): return inspect.stack()[3][3]
 def whoscalling1(): return [inspect.stack()[i][3] for i in range(1,len(inspect.stack()))]
 def whoscalling2():
     msg = ""
