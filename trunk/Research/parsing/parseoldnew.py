@@ -110,17 +110,35 @@ def convert_ast_to_old_parser(node):
                     self.result.append('\n' * self.new_lines)
                 self.result.append(self.indent_with * self.indentation)
                 self.new_lines = 0
-            if mynote == 1:
-                x = "<span class=mynote1>%s</span>" % x
-            elif mynote == 2:
-                x = "<span class=mynote2>%s</span>" % x
-            else:
-                x = "<span class=codegen>%s</span>" % x
+            x = "<span class=mynote%d>%s</span>" % (mynote,x)
             self.result.append(x)
 
         # A
+        def flush_state(self, msg):
+            #self.write("lhs=%30s // rhs=%20s  just_finished = '%s'  rhs_call_made = %s (%s)" %(self.lhs, self.rhs, self.just_finished, self.rhs_call_made, msg), mynote=2)
+            self.write("""
+                <table>
+                    <tr>
+                        <th>lhs</th>
+                        <th>rhs</th>
+                        <th>just_finished</th>
+                        <th>rhs_call_made</th>
+                        <th>note</th>
+                    </tr>
+                    <tr>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                    </tr>
+                </table>
+            """ % (self.lhs, self.rhs, self.just_finished, self.rhs_call_made, msg), mynote=0)
+
+        # A
         def flush(self):
-            self.write("lhs=%30s // rhs=%20s  just_finished = '%s'  rhs_call_made = %s (flush begin)" %(self.lhs, self.rhs, self.just_finished, self.rhs_call_made), mynote=2)
+            #self.write("lhs=%30s // rhs=%20s  just_finished = '%s'  rhs_call_made = %s (flush begin)" %(self.lhs, self.rhs, self.just_finished, self.rhs_call_made), mynote=2)
+            self.flush_state("flush begin")
             # At this point we have both lhs and rhs and can make a decision
             # about which attributes to create
             if self.just_finished == 'visit_Assign':
@@ -175,7 +193,8 @@ visit_Call
                         
             self.init_lhs_rhs()
             #self.write("  attr chain cleared (via newline from %s) lhs=%s // rhs=%s\n" % (whosgranddaddy(), self.lhs, self.rhs), mynote=1)
-            self.write("lhs=%30s // rhs=%20s  just_finished = '%s'  rhs_call_made = %s (flush end, cleared (via newline from %s))" %(self.lhs, self.rhs, self.just_finished, self.rhs_call_made, whosgranddaddy()), mynote=2)
+            self.flush_state("flush end, cleared (via newline from %s)" % whosgranddaddy())
+            #self.write("lhs=%30s // rhs=%20s  just_finished = '%s'  rhs_call_made = %s (flush end, cleared (via newline from %s))" %(self.lhs, self.rhs, self.just_finished, self.rhs_call_made, whosgranddaddy()), mynote=2)
             self.write("<hr>", mynote=2)
             
         def newline(self, node=None, extra=0):
@@ -204,7 +223,7 @@ visit_Call
             self.model.classlist[node.name] = c
             # A
             self.class_nesting.append(c)
-            self.write("  (inside class) %s " % self.class_nesting, mynote=2)
+            self.write("  (inside class) %s " % self.class_nesting, mynote=3)
 
             for base in node.bases:
                 # A
@@ -218,7 +237,7 @@ visit_Call
             self.flush()
             # A
             self.class_nesting.pop()
-            self.write("  (outside class) %s " % self.class_nesting, mynote=2)
+            self.write("  (outside class) %s " % self.class_nesting, mynote=3)
             
         def visit_FunctionDef(self, node):
             self.newline(extra=1)
@@ -234,7 +253,7 @@ visit_Call
 
             # A
             self.am_inside_function.append(True)
-            self.write("  (inside function) %s " % self.am_inside_function, mynote=2)
+            self.write("  (inside function) %s " % self.am_inside_function, mynote=3)
             
             self.write('):')
             self.body(node.body)
@@ -243,7 +262,7 @@ visit_Call
             self.flush()
             # A
             self.am_inside_function.pop()
-            self.write("  (outside function) %s " % self.am_inside_function, mynote=2)
+            self.write("  (outside function) %s " % self.am_inside_function, mynote=3)
             
         def visit_Assign(self, node):  # seems to be the top of the name / attr / chain
             self.write("\nvisit_Assign ", mynote=1)
@@ -345,11 +364,13 @@ visit_Call
     v = Visitor()
     v.visit(node)
     if DEBUG:
-        print "<b>", '<br>'.join(v.result), "</b>"
-    return v.model
+        debuginfo = '<br>'.join(v.result)
+        return v.model, debuginfo
+    else:
+        return v.model, ""
 
 def tohtml(s, style_class='dump1'):
-    print "<div class=%s><pre> %s</div></pre>" % (style_class, s)
+    return "<div class=%s><pre> %s</div></pre>" % (style_class, s)
     
 def header():
     return """<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
@@ -357,13 +378,22 @@ def header():
 <head>
   <title>My first styled page</title>
   <style type="text/css">
-  body { background:DarkSeaGreen; font-family:monospace; }
-  .dump1 { background:lightblue;
-            margin:3px; padding:5px; font-size:1.2em;}
-  .dumpdiff { background:black; color: white; padding:5px;}
-  .mynote1 { color:MediumBlue ; font-size:1.1em; }
-  .mynote2 { color:FireBrick ; font-size:1.2em; }
-  .codegen { font-family:monospace; font-size:1.5em; }
+    body { background:DarkSeaGreen; font-family:monospace; }
+    .dump1 { background:lightblue; margin:3px; padding:5px; font-size:1.2em;}
+    .dumpdiff { background:black; color: white; padding:5px;}
+    .mynote0 { font-family:monospace; font-size:1.5em; }
+    .mynote1 { color:MediumBlue ; font-size:1.1em; }
+    .mynote2 { color:FireBrick ; font-size:1.2em; }
+    .mynote3 { background-color:AntiqueWhite; font-size:0.8em; }
+    table, td, th
+    {
+    border:1px solid green;
+    border-collapse:collapse;
+    padding:5px;
+    font-size:0.8em;
+    font-family:"Times New Roman",Georgia,Serif;
+    background-color:PaleGreen;
+    }
   </style>
 </head>
 
@@ -375,34 +405,37 @@ def footer():
 </html>
 """
 
-
-def parse_and_convert(filename):
-    print header()
-    print "PARSING: %s *****\n" % filename
+def out(s, f):
+    print s
+    f.write("%s\n"%s)
+    
+def do_parse_and_convert(filename, outf):
+    f = outf
+    out(header(), f)
+    out("PARSING: %s *****\n" % filename, f)
     p = old_parser(filename)
     d1 = dump_old_structure(p)
-    print tohtml(d1)
-    print '-'*88
+    out(tohtml(d1), f)
+    out('-'*88, f)
     node = ast_parser(filename)
-    p = convert_ast_to_old_parser(node)
+    p, debuginfo = convert_ast_to_old_parser(node)
+    out(debuginfo, f)
     d2 = dump_old_structure(p)
-    print tohtml(d2)
+    out(tohtml(d2), f)
     
     import difflib
-    #s = difflib.SequenceMatcher(a=d1, b=d2)
-    #for block in s.get_matching_blocks():
-    #    print "match at a[%d] and b[%d] of length %d" % block    
-    #for line in difflib.context_diff(d1, d2, fromfile='before.py', tofile='after.py'):
-    #    sys.stdout.write(line)
     diff = difflib.ndiff(d1.splitlines(1),d2.splitlines(1))
-    print tohtml(''.join(diff), style_class='dumpdiff')
+    out(tohtml(''.join(diff), style_class='dumpdiff'), f)
 
     comparedok = (d1 == d2)
-    print "** old vs new method comparison = %s" % comparedok
-    print
-    print footer()
+    out("** old vs new method comparison = %s" % comparedok, f)
+    out('',f)
+    out(footer(), f)
     return comparedok
 
+def parse_and_convert(filename):
+    with open("out.html", 'w') as f:
+        return do_parse_and_convert(filename, f)
 
 results = []
 #results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py'))
