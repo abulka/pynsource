@@ -98,7 +98,8 @@ class AndyBasicParseEngine(object):
             return 0
 
 class ClassEntry:
-    def __init__(self):
+    def __init__(self, name=''):
+        self.name = name  # new and optional.
         self.defs = []
         self.attrs = []
         self.classdependencytuples = []
@@ -133,7 +134,13 @@ class ClassEntry:
         # OLD CODE
         #if not self.FindAttribute(attrname):
         #    self.attrs.append(Attribute(attrname, attrtype))
-
+        
+    def __str__(self):
+        if self.name:
+            return self.name
+        else:
+            return repr(self)
+    
 class Attribute:
     def __init__(self, attrname, attrtype='normal'):
         self.attrname = attrname
