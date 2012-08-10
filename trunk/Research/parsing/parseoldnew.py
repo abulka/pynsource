@@ -91,7 +91,7 @@ def convert_ast_to_old_parser(node):
             self.rhs = []
             self.lhs_recording = True
             self.rhs_call_made = False
-            self.just_finished = None
+            self.assignment_made = False
             self.append_call_made = False
 
         def record_lhs_rhs(self, s):
@@ -115,15 +115,13 @@ def convert_ast_to_old_parser(node):
             x = "<span class=mynote%d>%s</span>" % (mynote,x)
             self.result.append(x)
 
-        # A
         def flush_state(self, msg=""):
-            #self.write("lhs=%30s // rhs=%20s  just_finished = '%s'  rhs_call_made = %s (%s)" %(self.lhs, self.rhs, self.just_finished, self.rhs_call_made, msg), mynote=2)
             self.write("""
                 <table>
                     <tr>
                         <th>lhs</th>
                         <th>rhs</th>
-                        <th>just_finished</th>
+                        <th>assignment_made</th>
                         <th>rhs_call_made</th>
                         <th>append_call_made</th>
                         <th></th>
@@ -137,60 +135,56 @@ def convert_ast_to_old_parser(node):
                         <td>%s</td>
                     </tr>
                 </table>
-            """ % (self.lhs, self.rhs, self.just_finished, self.rhs_call_made, self.append_call_made, msg), mynote=0)
+            """ % (self.lhs, self.rhs, self.assignment_made, self.rhs_call_made, self.append_call_made, msg), mynote=0)
 
-        # A
         def add_classdependencytuple(self, t):
             if t not in self.current_class().classdependencytuples:
                 self.current_class().classdependencytuples.append(t)
-        # A
+                
         def flush(self):
-            #self.write("lhs=%30s // rhs=%20s  just_finished = '%s'  rhs_call_made = %s (flush begin)" %(self.lhs, self.rhs, self.just_finished, self.rhs_call_made), mynote=2)
             self.flush_state(whosgranddaddy())
-            # At this point we have both lhs and rhs and can make a decision
-            # about which attributes to create
-            if self.just_finished == 'visit_Assign' or self.append_call_made:
-                if self.current_class() and not self.am_inside_function[-1]:
-                    t = self.lhs[0]
+            
+            # At this point we have both lhs and rhs plus three flags and can
+            # make a decision about what to create.
+            
+            def in_class_normal_area(): return in_function_in_class() and self.lhs[0] == 'self'
+            def in_class_static_area(): return self.current_class() and not self.am_inside_function[-1]
+            def in_function_in_class(): return self.current_class() and self.am_inside_function[-1]
+            def create_attr_static(t):
+                self.current_class().AddAttribute(attrname=t, attrtype=['static'])
+                return t
+            def create_attr(t):
+                if (t == '__class__') and len(self.lhs) >= 3:
+                    t = self.lhs[2]
                     self.current_class().AddAttribute(attrname=t, attrtype=['static'])
-                elif self.current_class() and self.am_inside_function[-1] and self.lhs[0] == 'self':
-                    t = self.lhs[1]
-                    if (t == '__class__') and len(self.lhs) >= 3:
-                        t = self.lhs[2]
-                        self.current_class().AddAttribute(attrname=t, attrtype=['static'])
-                    else:
-                        self.current_class().AddAttribute(attrname=t, attrtype=['normal'])
+                else:
+                    self.current_class().AddAttribute(attrname=t, attrtype=['normal'])
+                return t
+            def create_attr_many(t):
+                self.current_class().AddAttribute(attrname=t, attrtype=['normal', 'many'])
+                return t
+                
+            if self.assignment_made or self.append_call_made:
+                
+                if in_class_static_area():
+                    t = create_attr_static(self.lhs[0])
+
+                elif in_class_normal_area():
+                    t = create_attr(self.lhs[1])
                         
-                    if self.rhs_call_made and len(self.rhs) >= 0:
+                    if self.rhs_call_made:
                         self.add_classdependencytuple((t, self.rhs[0]))
                         
-                    if len(self.lhs) == 3 and self.lhs[2] == 'append':
-                        assert self.append_call_made
-                        self.write("**********", mynote=2)
-                        t = self.lhs[1]
-                        self.current_class().AddAttribute(attrname=t, attrtype=['normal', 'many'])
-                        
-            # Need to cater for just_finished = 'None'
-            # lhs= ['self', 'e', 'append'] // rhs= [] just_finished = 'None' rhs_call_made = True (flush begin)
-                        
-            if self.rhs_call_made and \
-                        len(self.lhs) == 3 and\
-                        self.current_class() and \
-                        self.am_inside_function[-1] and \
-                        self.lhs[0] == 'self' and \
-                        self.lhs[2] == 'append' and \
-                        len(self.rhs) >= 1:
-                self.write("!!!!!!!!!!!!", mynote=2)
-                t = self.lhs[1]
-                self.current_class().AddAttribute(attrname=t, attrtype=['normal', 'many'])
-                self.add_classdependencytuple((t, self.rhs[0]))
+                    if self.append_call_made:
+                        create_attr_many(self.lhs[1])
                         
             self.init_lhs_rhs()
-            #self.write("  attr chain cleared (via newline from %s) lhs=%s // rhs=%s\n" % (whosgranddaddy(), self.lhs, self.rhs), mynote=1)
             self.flush_state()
-            #self.write("lhs=%30s // rhs=%20s  just_finished = '%s'  rhs_call_made = %s (flush end, cleared (via newline from %s))" %(self.lhs, self.rhs, self.just_finished, self.rhs_call_made, whosgranddaddy()), mynote=2)
             self.write("<hr>", mynote=2)
-            
+
+
+        # MAIN VISIT METHODS
+        
         def newline(self, node=None, extra=0):
             self.new_lines = max(self.new_lines, 1 + extra)
 
@@ -275,7 +269,7 @@ def convert_ast_to_old_parser(node):
             self.visit(node.value)  # node.value is an ast obj, can't print it
             
             # A
-            self.just_finished = 'visit_Assign'
+            self.assignment_made = True
 
         def visit_Call(self, node):
             self.visit(node.func)
@@ -304,9 +298,9 @@ def convert_ast_to_old_parser(node):
                 self.visit(node.kwargs)
             self.write(')')
 
-            # A for the benefit of visit_Assign so that it can get the Blah() class instance name we are creating
-            if len(self.lhs) >= 2 and len(self.rhs) == 1:
-               self.rhs_call_made = True
+            # A
+            if len(self.rhs) > 0:
+                self.rhs_call_made = True
                
         def visit_Name(self, node):
             self.write("\nvisit_Name %s\n" % node.id, mynote=1)
