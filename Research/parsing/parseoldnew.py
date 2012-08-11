@@ -68,20 +68,20 @@ sys.path.append("../../src")
 from core_parser import ClassEntry, Attribute
 from keywords import pythonbuiltinfunctions
 
-def convert_ast_to_old_parser(node):
+def convert_ast_to_old_parser(node, filename):
     
     class OldParseModel(object):
         def __init__(self):
             self.classlist = {}
-            self.modulemethods = []            
-
+            self.modulemethods = []
+            
     class Visitor(ast.NodeVisitor):
         
-        def __init__(self):
+        def __init__(self, quick_parse):
             self.model = OldParseModel()
             self.stack_classes = []
             self.stack_functions = [False]
-
+            self.quick_parse = quick_parse
             self.init_lhs_rhs()
             
             self.result = []
@@ -164,6 +164,30 @@ def convert_ast_to_old_parser(node):
             
             # At this point we have both lhs and rhs plus three flags and can
             # make a decision about what to create.
+        
+            def is_class_creation_call(rhs):
+                # called in the context of rhs being Blah
+                # ... = Blah()
+                # ...append(Blah())  RHS CALL MADE but whether its from the append or the Blah we don't know
+                #
+                # or even the more relaxed interpretation of a varialble as a class instance if its got the exact same name, rhs being blah
+                # ... = blah   NOT THIS, COS NO RHS CALL MADE
+                # ...append(blah)
+                #
+                def relaxed_is_instance_a_known_class(t):
+                    for c in self.quick_parse.quick_found_classes:
+                        if t.lower() == c.lower():
+                            return True, c  # return proper class name not the instance
+                    return False, t
+                
+                res, rhs = relaxed_is_instance_a_known_class(rhs)
+                if res:
+                    return True, rhs
+                
+                if rhs not in pythonbuiltinfunctions and rhs not in self.model.modulemethods:
+                    return True, rhs
+                
+                return False, rhs
             
             def in_class_static_area(): return self.current_class() and not self.am_inside_function()
             def in_function_in_class(): return self.current_class() and self.am_inside_function()
@@ -196,13 +220,16 @@ def convert_ast_to_old_parser(node):
                 else:
                     pass # in module area
                         
-                if self.lhs[0] == 'self' and self.made_rhs_call and self.rhs[0] not in pythonbuiltinfunctions:
-                    self.add_classdependencytuple((t, self.rhs[0]))
+                if self.lhs[0] == 'self' and self.made_rhs_call:
+                    res, rhs = is_class_creation_call(self.rhs[0])
+                    if res:
+                        self.add_classdependencytuple((t, rhs))
                         
             self.init_lhs_rhs()
             self.flush_state()
             self.write("<hr>", mynote=2)
 
+        
         
         # MAIN VISIT METHODS
         
@@ -292,7 +319,8 @@ def convert_ast_to_old_parser(node):
             self.write("\nvisit_Call ", mynote=1)
 
             # A
-            if len(self.lhs) == 3 and self.current_class() and self.am_inside_function() and self.lhs[0] == 'self' and self.lhs[2] == 'append':
+            if len(self.lhs) == 3 and self.current_class() and self.am_inside_function() and \
+                            self.lhs[0] == 'self' and self.lhs[2] in ('append', 'add', 'insert'):
                 self.lhs_recording = False # try to get the Blah into the rhs
                 self.made_append_call = True
                 
@@ -344,9 +372,26 @@ def convert_ast_to_old_parser(node):
             #self.write("visit_Expr")
             self.newline(node)
             self.generic_visit(node)
-       
+    
+    class QuickParse(object):
+        def __init__(self, filename):
+            import re   
+            # secret regular expression based preliminary scan for classes and module defs
+            # Feed the file text into findall(); it returns a list of all the found strings
+            with open(filename, 'r') as f:
+                source = f.read()
+            self.quick_found_classes = re.findall(r'^\s*class (.*)[:\(]', source, re.MULTILINE)  
+            self.quick_found_module_defs = re.findall(r'^def (.*)\(.*\):', source, re.MULTILINE)
+            self.quick_found_module_attrs = re.findall(r'^(\S.*?)[\.]*.*\s*=.*', source, re.MULTILINE)
+            
+            # WANT TO out(tohtml("classes found %s" % self.quick_found_classes))
+            print 'classes found ', self.quick_found_classes
+            print 'defs found', self.quick_found_module_defs
+            print 'quick_found_module_attrs', self.quick_found_module_attrs
+    
+    qp = QuickParse(filename)
 
-    v = Visitor()
+    v = Visitor(qp)
     
     try:
         v.visit(node)
@@ -410,7 +455,7 @@ def do_parse_and_convert(filename, outf):
     out(tohtml(d1), f)
     out('-'*88, f)
     node = ast_parser(filename)
-    p, debuginfo = convert_ast_to_old_parser(node)
+    p, debuginfo = convert_ast_to_old_parser(node, filename)
     out(debuginfo, f)
     d2 = dump_old_structure(p)
     out(tohtml(d2), f)
@@ -445,9 +490,10 @@ results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
 results.append(parse_and_convert('../../tests/python-in/testmodule05.py'))
 results.append(parse_and_convert('../../tests/python-in/testmodule06.py'))
 results.append(parse_and_convert('../../tests/python-in/testmodule07.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule66.py'))
 
 print results
-if results == [False, True, True, True, True, False, True, True]:
+if results == [False, True, True, True, True, False, True, True, True]:
     print "refactorings going OK"
 else:
     print "oooops"
