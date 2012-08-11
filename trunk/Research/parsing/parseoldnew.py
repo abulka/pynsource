@@ -18,16 +18,24 @@ model
 """
 
 import ast
+import traceback
+import difflib
+import os
 
 import sys
 sys.path.append("../../src")
 from architecture_support import whosdaddy, whosgranddaddy
-import os
+from core_parser import ClassEntry, Attribute
+from keywords import pythonbuiltinfunctions
 
-import traceback
+from logwriter import LogWriter
 
-DEBUG = 1
-DEBUG_WRITE = 0
+log = None
+
+DEBUGINFO = 1
+DEBUGINFO_IMMEDIATE_PRINT = 0
+LOG_TO_CONSOLE = 0
+STOP_ON_EXCEPTION = 0
 
 def dump_old_structure(pmodel):
     res = ""
@@ -62,11 +70,6 @@ def ast_parser(filename):
     #print ast.dump(node)
     return node
 
-
-import sys
-sys.path.append("../../src")
-from core_parser import ClassEntry, Attribute
-from keywords import pythonbuiltinfunctions
 
 def convert_ast_to_old_parser(node, filename):
     
@@ -123,7 +126,7 @@ def convert_ast_to_old_parser(node, filename):
                 self.new_lines = 0
             x = "<span class=mynote%d>%s</span>" % (mynote,x)
             self.result.append(x)
-            if DEBUG_WRITE:
+            if DEBUGINFO_IMMEDIATE_PRINT:
                 print x
 
         def build_class_entry(self, name):
@@ -283,7 +286,7 @@ def convert_ast_to_old_parser(node, filename):
             # A
             if not self.current_class() and not self.am_inside_function():
                 self.model.modulemethods.append(node.name)
-            else:
+            elif self.current_class():
                 self.current_class().defs.append(node.name)
 
             # A
@@ -388,10 +391,10 @@ def convert_ast_to_old_parser(node, filename):
             self.quick_found_module_defs = re.findall(r'^def (.*)\(.*\):', source, re.MULTILINE)
             self.quick_found_module_attrs = re.findall(r'^(\S.*?)[\.]*.*\s*=.*', source, re.MULTILINE)
             
-            # WANT TO out(tohtml("classes found %s" % self.quick_found_classes))
-            #print 'classes found ', self.quick_found_classes
-            #print 'defs found', self.quick_found_module_defs
-            #print 'quick_found_module_attrs', self.quick_found_module_attrs
+            log.out_wrap_in_html("quick_found_classes %s<br>quick_found_module_defs %s<br>quick_found_module_attrs %s<br>" % \
+                                (self.quick_found_classes, self.quick_found_module_defs, self.quick_found_module_attrs),
+                                style_class='quick_findings')
+
     
     qp = QuickParse(filename)
 
@@ -400,26 +403,25 @@ def convert_ast_to_old_parser(node, filename):
     try:
         v.visit(node)
     except Exception as err:
-        print("Parsing Visit error: {0}".format(err))
-        traceback.print_exc(file=sys.stdout)
-        raise
-    #finally:
-    if DEBUG:
-        debuginfo = '<br>'.join(v.result)
-        return v.model, debuginfo
-    else:
-        return v.model, ""
+        log.out("Parsing Visit error: {0}".format(err), force_print=True)
+        log.out_wrap_in_html(traceback.format_exc(), style_class='stacktrace')
+        if STOP_ON_EXCEPTION:
+            if DEBUGINFO:
+                debuginfo = '<br>'.join(v.result)
+                log.out(debuginfo)
+                log.out_html_footer()
+                log.finish()
+            raise
+
+    debuginfo = '<br>'.join(v.result)
+    return v.model, debuginfo
 
 
 #####
 
-import difflib
-from logwriter import LogWriter
-log = None
-
 def parse_and_convert(in_filename):
     global log
-    log = LogWriter(in_filename)
+    log = LogWriter(in_filename, print_to_console=LOG_TO_CONSOLE)
     
     def oldparse():
         model = old_parser(in_filename)
@@ -455,7 +457,8 @@ def parse_and_convert(in_filename):
         if not comparedok:
             print diff_s
 
-        log.out(debuginfo)
+        if DEBUGINFO:
+            log.out(debuginfo)
     
         log.out_html_footer()
     finally:
@@ -467,20 +470,23 @@ def parse_and_convert(in_filename):
 ############        
         
 results = []
-results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule01.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule02.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule03.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule05.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule06.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule07.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule66.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py')) # ast is better (base classes with .)
+#results.append(parse_and_convert('../../tests/python-in/testmodule01.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule02.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule03.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule05.py')) # ast is better (inner classes)
+#results.append(parse_and_convert('../../tests/python-in/testmodule06.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule07.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule66.py'))
 
-#print parse_and_convert('../../src/printframework.py') # ok
-#print parse_and_convert('../../src/pynsource.py') # fails
+#print parse_and_convert('../../src/printframework.py')
+#print parse_and_convert('../../src/pynsource.py') # ast is better (less module methods found - more correct)
 
-print parse_and_convert('../../src/printframework.py') # ok
+#print parse_and_convert('../../src/pyNsourceGui.py') # different - to investigate
+#print parse_and_convert('../../src/asciiworkspace.py') # different - to investigate
+#print parse_and_convert('../../src/command_pattern.py') # different - to investigate
+
 
 print results
 if results == [False, True, True, True, True, False, True, True, True]:
