@@ -7,6 +7,13 @@
 
     :copyright: Copyright 2008 by Armin Ronacher.
     :license: BSD.
+
+    This version of codegen.py was found at github: https://github.com/boxed/Misc/blob/master/codegen.py
+    ~~~~~~~~~~~~~
+    Anders Hovmöller: in post
+    http://eli.thegreenplace.net/2009/11/28/python-internals-working-with-python-asts/
+        I found some bugs in codegen.py. I’ve put the new version with my fixes
+        (and an assert that will save your life if you find any new bugs!)
 """
 from ast import *
 
