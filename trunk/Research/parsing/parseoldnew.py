@@ -166,13 +166,17 @@ def convert_ast_to_old_parser(node, filename):
             # make a decision about what to create.
         
             def is_class_creation_call(rhs):
-                # called in the context of rhs being Blah
+                # called in the context of e.g. rhs being Blah
+                #
                 # ... = Blah()
                 # ...append(Blah())  RHS CALL MADE but whether its from the append or the Blah we don't know
                 #
-                # or even the more relaxed interpretation of a varialble as a class instance if its got the exact same name, rhs being blah
+                # Or even the more relaxed interpretation of a variable as a
+                # class instance if its got the exact same name, rhs being blah
+                # being matched to real class Blah
+                #
                 # ... = blah   NOT THIS, COS NO RHS CALL MADE
-                # ...append(blah)
+                # ...append(blah)    WILL BE REINTERPRETED AS append(Blah()) - a relaxed rule I admit
                 #
                 def relaxed_is_instance_a_known_class(t):
                     for c in self.quick_parse.quick_found_classes:
@@ -385,9 +389,9 @@ def convert_ast_to_old_parser(node, filename):
             self.quick_found_module_attrs = re.findall(r'^(\S.*?)[\.]*.*\s*=.*', source, re.MULTILINE)
             
             # WANT TO out(tohtml("classes found %s" % self.quick_found_classes))
-            print 'classes found ', self.quick_found_classes
-            print 'defs found', self.quick_found_module_defs
-            print 'quick_found_module_attrs', self.quick_found_module_attrs
+            #print 'classes found ', self.quick_found_classes
+            #print 'defs found', self.quick_found_module_defs
+            #print 'quick_found_module_attrs', self.quick_found_module_attrs
     
     qp = QuickParse(filename)
 
@@ -406,81 +410,62 @@ def convert_ast_to_old_parser(node, filename):
     else:
         return v.model, ""
 
-def tohtml(s, style_class='dump1'):
-    return "<div class=%s><pre> %s</div></pre>" % (style_class, s)
-    
-def header():
-    return """<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
-<html>
-<head>
-  <title>My first styled page</title>
-  <style type="text/css">
-    body { background:DarkSeaGreen; font-family:monospace; }
-    .dump1 { background:lightblue; margin:3px; padding:5px; font-size:1.2em;}
-    .dumpdiff { background:black; color: white; padding:5px;}
-    .mynote0 { font-family:monospace; font-size:1.5em; }
-    .mynote1 { color:MediumBlue ; font-size:1.1em; }
-    .mynote2 { color:FireBrick ; font-size:1.2em; }
-    .mynote3 { background-color:AntiqueWhite; font-size:1.1em; }
-    table, td, th
-    {
-    border:1px solid green;
-    border-collapse:collapse;
-    padding:5px;
-    font-size:0.8em;
-    font-family:"Times New Roman",Georgia,Serif;
-    background-color:PaleGreen;
-    }
-  </style>
-</head>
 
-<body>
-"""
+#####
 
-def footer():
-    return """</body>
-</html>
-"""
-
-def out(s, f):
-    #print s
-    f.write("%s\n"%s)
-    
-def do_parse_and_convert(filename, outf):
-    f = outf
-    out(header(), f)
-    out("PARSING: %s *****\n" % filename, f)
-    p = old_parser(filename)
-    d1 = dump_old_structure(p)
-    out(tohtml(d1), f)
-    out('-'*88, f)
-    node = ast_parser(filename)
-    p, debuginfo = convert_ast_to_old_parser(node, filename)
-    out(debuginfo, f)
-    d2 = dump_old_structure(p)
-    out(tohtml(d2), f)
-    
-    comparedok = (d1 == d2)
-    out("** old vs new method comparison = %s" % comparedok, f)
-
-    import difflib
-    diff = difflib.ndiff(d1.splitlines(1),d2.splitlines(1))
-    diff_s = ''.join(diff)
-    out(tohtml(diff_s, style_class='dumpdiff'), f)
-    if not comparedok:
-        print diff_s
-
-    out('',f)
-    out(footer(), f)
-    return comparedok
+import difflib
+from logwriter import LogWriter
+log = None
 
 def parse_and_convert(in_filename):
-    out_filename = os.path.basename(in_filename)
-    fileName, fileExtension = os.path.splitext(out_filename)
-    out_filename = "logs/debug_%s.html" % fileName
-    with open(out_filename, 'w') as f:
-        return do_parse_and_convert(in_filename, f)
+    global log
+    log = LogWriter(in_filename)
+    
+    def oldparse():
+        model = old_parser(in_filename)
+        d1 = dump_old_structure(model)
+        log.out_wrap_in_html(d1, style_class='dump1')
+        return d1
+        
+    def newparse():
+        node = ast_parser(in_filename)
+        model, debuginfo = convert_ast_to_old_parser(node, in_filename)
+        d2 = dump_old_structure(model)
+        log.out_wrap_in_html(d2, style_class='dump1')
+        return d2, debuginfo
 
+    def dodiff(d1, d2):
+        diff = difflib.ndiff(d1.splitlines(1),d2.splitlines(1))
+        diff_s = ''.join(diff)
+        return diff_s
+    
+    try:
+        log.out_html_header()
+        log.out("PARSING: %s *****\n" % in_filename)
+        
+        d1 = oldparse()
+        log.out_divider()
+        d2, debuginfo = newparse()
+        
+        comparedok = (d1 == d2)
+        log.out("** old vs new method comparison = %s" % comparedok)
+
+        diff_s = dodiff(d1, d2)
+        log.out_wrap_in_html(diff_s, style_class='dumpdiff')
+        if not comparedok:
+            print diff_s
+
+        log.out(debuginfo)
+    
+        log.out_html_footer()
+    finally:
+        log.finish()
+        
+    return comparedok
+
+
+############        
+        
 results = []
 results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py'))
 results.append(parse_and_convert('../../tests/python-in/testmodule01.py'))
@@ -491,6 +476,11 @@ results.append(parse_and_convert('../../tests/python-in/testmodule05.py'))
 results.append(parse_and_convert('../../tests/python-in/testmodule06.py'))
 results.append(parse_and_convert('../../tests/python-in/testmodule07.py'))
 results.append(parse_and_convert('../../tests/python-in/testmodule66.py'))
+
+#print parse_and_convert('../../src/printframework.py') # ok
+#print parse_and_convert('../../src/pynsource.py') # fails
+
+print parse_and_convert('../../src/printframework.py') # ok
 
 print results
 if results == [False, True, True, True, True, False, True, True, True]:
