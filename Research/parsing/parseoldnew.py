@@ -211,7 +211,7 @@ def convert_ast_to_old_parser(node, filename):
             # At this point we have both lhs and rhs plus three flags and can
             # make a decision about what to create.
         
-            def is_class_creation_call(rhs):
+            def is_rhs_reference_to_a_class(rhs):
                 # called in the context of e.g. rhs being Blah
                 #
                 # ... = Blah()
@@ -234,7 +234,14 @@ def convert_ast_to_old_parser(node, filename):
                 if res:
                     return True, rhs
                 
-                if rhs not in pythonbuiltinfunctions and rhs not in self.model.modulemethods:
+                # Make sure the rhs is a class NOT a function. Usually its a
+                # class creation call or a relaxed ref to a class (see above)
+                #
+                # Also avoid case of self being on the rhs and being considered the first rhs token
+                #
+                #   self.curr.append(" "*self.curr_width)
+                #
+                if rhs not in pythonbuiltinfunctions and rhs not in self.model.modulemethods and rhs != 'self':
                     return True, rhs
                 
                 return False, rhs
@@ -269,7 +276,7 @@ def convert_ast_to_old_parser(node, filename):
                     pass # in module area
                         
                 if self.lhs[0] == 'self' and self.made_rhs_call:
-                    res, rhs = is_class_creation_call(self.rhs[0])
+                    res, rhs = is_rhs_reference_to_a_class(self.rhs[0])
                     if res:
                         self.add_classdependencytuple((t, rhs))
                         
@@ -458,7 +465,7 @@ def convert_ast_to_old_parser(node, filename):
 
 #####
 
-def parse_and_convert(in_filename):
+def parse_and_convert(in_filename, print_diffs=True):
     global log
     log = LogWriter(in_filename, print_to_console=LOG_TO_CONSOLE)
     
@@ -493,7 +500,7 @@ def parse_and_convert(in_filename):
 
         diff_s = dodiff(d1, d2)
         log.out_wrap_in_html(diff_s, style_class='dumpdiff')
-        if not comparedok:
+        if not comparedok and print_diffs:
             print diff_s
 
         if DEBUGINFO:
@@ -513,6 +520,8 @@ def reset_tests():
     results = []
 def test(filename):
     results.append(parse_and_convert(filename))
+def test_not(filename):
+    results.append(not parse_and_convert(filename, print_diffs=False))
 def report(msg):
     if all(results):
         print "%s OK" % msg
@@ -532,15 +541,19 @@ report("official parsing tests")
 
 reset_tests()    
 test('../../src/printframework.py')
+test('../../src/asciiworkspace.py')
 report("subsidiary parsing tests")
+
+# Expect these to fail cos ast parsing is genuinely better
+reset_tests()    
+test_not('../../tests/python-in/testmodule08_multiple_inheritance.py') # ast is better (base classes with .)
+test_not('../../src/pynsource.py') # ast is better (less module methods found - more correct)
+report("ast parsing is genuinely better")
 
 # Extras
 print
-print parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py') # ast is better (base classes with .)
-#print parse_and_convert('../../src/pynsource.py') # ast is better (less module methods found - more correct)
 
 #print parse_and_convert('../../src/pyNsourceGui.py') # different - to investigate
-#print parse_and_convert('../../src/asciiworkspace.py') # different - to investigate
 #print parse_and_convert('../../src/command_pattern.py') # different - to investigate
 
 
