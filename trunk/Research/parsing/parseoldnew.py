@@ -92,52 +92,45 @@ def convert_ast_to_old_parser(node, filename):
 
 
     class RhsAnalyser:
+        """
+        Usage:
+            is_rhs_reference_to_a_class()
+            
+        Scenarios:
+            ... = Blah()
+            ...append(Blah())  RHS CALL MADE but whether its from the append or the Blah we don't know
+            
+            ... = blah        may be reinterpreted as      = Blah()  if Blah class found - a relaxed rule I admit
+            ...append(blah)   may be reinterpreted as append(Blah()) if Blah class found - a relaxed rule I admit
+            
+            ... = 10          won't get here because no rhs
+            ...append(10)     won't get here because no rhs
+        """
+
         def __init__(self, rhs, visitor):
             self.rhs = rhs
             self.visitor = visitor
             
             assert len(self.rhs) > 0
             self.rhs_first_token = rhs[0]
-            
+
         def is_rhs_reference_to_a_class(self):
+            return self._relaxed_is_instance_a_known_class() or self._is_class_creation()
             
-            # Scenarios:
-            #
-            # ... = Blah()
-            # ...append(Blah())  RHS CALL MADE but whether its from the append or the Blah we don't know
-            #
-            # ... = blah        may be reinterpreted as      = Blah()  if Blah class found - a relaxed rule I admit
-            # ...append(blah)   may be reinterpreted as append(Blah()) if Blah class found - a relaxed rule I admit
-            #
-            # ... = 10          won't get here because no rhs
-            # ...append(10)     won't get here because no rhs
-            #
-            def relaxed_is_instance_a_known_class():
-                for c in self.visitor.quick_parse.quick_found_classes:
-                    if c.lower() == self.rhs_first_token.lower():
-                        self.rhs_first_token = c  # transform into proper class name not the instance
-                        return True
-                return False
+        def _relaxed_is_instance_a_known_class(self):
+            for c in self.visitor.quick_parse.quick_found_classes:
+                if c.lower() == self.rhs_first_token.lower():
+                    self.rhs_first_token = c  # transform into proper class name not the instance
+                    return True
+            return False
             
-            if relaxed_is_instance_a_known_class():
-                return True
-            
-            # Make sure the rhs is a class NOT a function. Usually its a
-            # class creation call or a relaxed ref to a class (see above)
-            #
-            # Also avoid case of self being on the rhs and being considered the first rhs token
-            #
-            #   self.curr.append(" "*self.curr_width)
-            #
+        def _is_class_creation(self):            
+            # Make sure the rhs is a class creation call NOT a function call.
             t = self.rhs_first_token
-            if self.visitor.made_rhs_call and \
+            return self.visitor.made_rhs_call and \
                 t not in pythonbuiltinfunctions and \
                 t not in self.visitor.model.modulemethods and \
-                t != 'self':
-                return True
-
-            return False
-
+                t != 'self' # Also avoid case of self being on the rhs and being considered the first rhs token e.g. self.curr.append(" "*self.curr_width)
 
             
     class Visitor(ast.NodeVisitor):
