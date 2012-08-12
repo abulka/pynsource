@@ -100,6 +100,9 @@ class AndyBasicParseEngine(object):
 class ClassEntry:
     def __init__(self, name=''):
         self.name = name  # new and optional.
+        self.name_long = ''  # new and optional.
+        self.stack_functions = [False]  # new, only used by ast parser.  can we make this empty? for init?
+        
         self.defs = []
         self.attrs = []
         self.classdependencytuples = []
