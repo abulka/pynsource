@@ -39,9 +39,21 @@ STOP_ON_EXCEPTION = 0
 
 def dump_old_structure(pmodel):
     res = ""
-    for classname, classentry in pmodel.classlist.items():
+    
+    # TODO build this into ClassEntry
+    def calc_classname(classentry):
+        if classentry.name_long:
+            return classentry.name_long
+        else:
+            return classentry.name
+        
+    # repair old parse models #TODO build this into the old parser so that we don't have to do this
+    for classname, classentry in  pmodel.classlist.items():
+        classentry.name = classname
+    
+    for classname, classentry in  sorted(pmodel.classlist.items(), key=lambda kv: calc_classname(kv[1])):
         res += "%s (is module=%s) inherits from %s class dependencies %s\n" % \
-                                    (classname,
+                                    (calc_classname(classentry),
                                      classentry.ismodulenotrealclass,
                                      classentry.classesinheritsfrom,
                                      classentry.classdependencytuples)
@@ -133,7 +145,8 @@ def convert_ast_to_old_parser(node, filename):
             c = ClassEntry(name)
             self.model.classlist[name] = c
             self.stack_classes.append(c)
-            self.write("  (inside class %s) %s " % (name, [str(c) for c in self.stack_classes]), mynote=3)
+            c.name_long = "_".join([str(c) for c in self.stack_classes])
+            self.write("  (inside class %s) %s " % (c.name, [str(c) for c in self.stack_classes]), mynote=3)
             return c
 
         def add_classdependencytuple(self, t):
@@ -470,15 +483,15 @@ def parse_and_convert(in_filename):
 ############        
         
 results = []
-#results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py')) # ast is better (base classes with .)
-#results.append(parse_and_convert('../../tests/python-in/testmodule01.py'))
-#results.append(parse_and_convert('../../tests/python-in/testmodule02.py'))
-#results.append(parse_and_convert('../../tests/python-in/testmodule03.py'))
-#results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
-#results.append(parse_and_convert('../../tests/python-in/testmodule05.py')) # ast is better (inner classes)
-#results.append(parse_and_convert('../../tests/python-in/testmodule06.py'))
-#results.append(parse_and_convert('../../tests/python-in/testmodule07.py'))
-#results.append(parse_and_convert('../../tests/python-in/testmodule66.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py')) # ast is better (base classes with .)
+results.append(parse_and_convert('../../tests/python-in/testmodule01.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule02.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule03.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule05.py')) # ast is better (inner classes)
+results.append(parse_and_convert('../../tests/python-in/testmodule06.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule07.py'))
+results.append(parse_and_convert('../../tests/python-in/testmodule66.py'))
 
 #print parse_and_convert('../../src/printframework.py')
 #print parse_and_convert('../../src/pynsource.py') # ast is better (less module methods found - more correct)
