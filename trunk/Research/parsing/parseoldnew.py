@@ -149,7 +149,7 @@ def convert_ast_to_old_parser(node, filename):
         def in_class_static_area(self):
             return self.current_class() and not self.current_class().stack_functions[-1]
             
-        def in_class_method_area(self):
+        def in_method_in_class_area(self):
             return self.current_class() and self.current_class().stack_functions[-1]
 
         def write(self, x, mynote=0):
@@ -172,7 +172,7 @@ def convert_ast_to_old_parser(node, filename):
             self.write("  (inside class %s) %s " % (c.name, [str(c) for c in self.stack_classes]), mynote=3)
             return c
 
-        def add_classdependencytuple(self, t):
+        def add_composite_dependency(self, t):
             if t not in self.current_class().classdependencytuples:
                 self.current_class().classdependencytuples.append(t)
                 
@@ -183,10 +183,10 @@ def convert_ast_to_old_parser(node, filename):
                         <th>lhs</th>
                         <th>rhs</th>
                         <th>made_assignment</th>
-                        <th>made_rhs_call</th>
                         <th>made_append_call</th>
+                        <th>made_rhs_call</th>
                         <th>in_class_static_area</th>
-                        <th>in_class_method_area</th>
+                        <th>in_method_in_class_area</th>
                         <th></th>
                     </tr>
                     <tr>
@@ -200,9 +200,12 @@ def convert_ast_to_old_parser(node, filename):
                         <td>%s</td>
                     </tr>
                 </table>
-            """ % (self.lhs, self.rhs, self.made_assignment, self.made_rhs_call, \
-                    self.made_append_call, \
-                    self.in_class_static_area(), self.in_class_method_area(), \
+            """ % (self.lhs, self.rhs,
+                    self.made_assignment,
+                    self.made_append_call,
+                    self.made_rhs_call,
+                    self.in_class_static_area(),
+                    self.in_method_in_class_area(),
                     msg), mynote=0)
 
         def flush(self):
@@ -212,22 +215,27 @@ def convert_ast_to_old_parser(node, filename):
             # make a decision about what to create.
         
             def is_rhs_reference_to_a_class(rhs):
-                # called in the context of e.g. rhs being Blah
+                
+                assert len(self.rhs) > 0
+                
+                # Scenarios:
                 #
                 # ... = Blah()
                 # ...append(Blah())  RHS CALL MADE but whether its from the append or the Blah we don't know
                 #
-                # Or even the more relaxed interpretation of a variable as a
-                # class instance if its got the exact same name, rhs being blah
-                # being matched to real class Blah
+                # ... = blah        may be reinterpreted as      = Blah()  if Blah class found - a relaxed rule I admit
+                # ...append(blah)   may be reinterpreted as append(Blah()) if Blah class found - a relaxed rule I admit
                 #
-                # ... = blah   NOT THIS, COS NO RHS CALL MADE
-                # ...append(blah)    WILL BE REINTERPRETED AS append(Blah()) - a relaxed rule I admit
+                # ... = 10          won't get here because no rhs
+                # ...append(10)     won't get here because no rhs
                 #
                 def relaxed_is_instance_a_known_class(t):
+                    self.write("checking to see if '%s' is relaxed_is_instance_a_known_class" % t, mynote=2)
                     for c in self.quick_parse.quick_found_classes:
                         if t.lower() == c.lower():
+                            self.write("Yes t.lower() %s == c.lower() %s" % (t.lower(), c.lower()), mynote=2)
                             return True, c  # return proper class name not the instance
+                    self.write("No", mynote=2)
                     return False, t
                 
                 res, rhs = relaxed_is_instance_a_known_class(rhs)
@@ -241,9 +249,11 @@ def convert_ast_to_old_parser(node, filename):
                 #
                 #   self.curr.append(" "*self.curr_width)
                 #
-                if rhs not in pythonbuiltinfunctions and rhs not in self.model.modulemethods and rhs != 'self':
+                if self.made_rhs_call and rhs not in pythonbuiltinfunctions and rhs not in self.model.modulemethods and rhs != 'self':
+                    self.write("rhs %s IS is_rhs_reference_to_a_class" % rhs, mynote=2)
                     return True, rhs
-                
+
+                self.write("rhs %s is NOT is_rhs_reference_to_a_class" % rhs, mynote=2)
                 return False, rhs
             
             def create_attr_static(t):
@@ -270,15 +280,15 @@ def convert_ast_to_old_parser(node, filename):
                 
                 if self.in_class_static_area():
                     t = create_attr_static(self.lhs[0])
-                elif self.in_class_method_area() and self.lhs[0] == 'self':
+                elif self.in_method_in_class_area() and self.lhs[0] == 'self':
                     t = create_attr_please(self.lhs[1])
                 else:
                     pass # in module area
                         
-                if self.lhs[0] == 'self' and self.made_rhs_call:
+                if self.lhs[0] == 'self' and len(self.rhs) > 0:
                     res, rhs = is_rhs_reference_to_a_class(self.rhs[0])
                     if res:
-                        self.add_classdependencytuple((t, rhs))
+                        self.add_composite_dependency((t, rhs))
                         
             self.init_lhs_rhs()
             self.flush_state()
@@ -369,13 +379,18 @@ def convert_ast_to_old_parser(node, filename):
 
         def visit_Call(self, node):
             self.visit(node.func)
-            self.write("\nvisit_Call ", mynote=1)
+            self.write("\nvisit_Call %s" % self.rhs, mynote=1)
 
             # A
-            if len(self.lhs) == 3 and self.in_class_method_area() and \
-                            self.lhs[0] == 'self' and self.lhs[2] in ('append', 'add', 'insert'):
-                self.lhs_recording = False # try to get the Blah into the rhs
-                self.made_append_call = True
+            just_now_made_append_call = False
+            if len(self.lhs) == 3 and \
+                    self.in_method_in_class_area() and \
+                    self.lhs[0] == 'self' and \
+                    self.lhs[2] in ('append', 'add', 'insert') and \
+                    not self.rhs:
+                self.lhs_recording = False # start recording tokens (names, attrs) on rhs
+                self.made_append_call = just_now_made_append_call = True
+                self.write("\n just_now_made_append_call", mynote=1)
                 
             self.write('(')
             for arg in node.args:
@@ -396,7 +411,14 @@ def convert_ast_to_old_parser(node, filename):
             self.write(')')
 
             # A
-            if len(self.rhs) > 0:
+            # Ensure self.made_append_call and self.made_rhs_call are different things.
+            #
+            # An append call does not necessarily imply a rhs call was made.
+            # e.g. .append(blah) or .append(10) are NOT a calls on the rhs, in
+            # fact there is no rhs clearly defined yet except till inside the
+            # append(... despite it superficially looking like a function call
+            #               
+            if len(self.rhs) > 0 and not just_now_made_append_call:
                 self.made_rhs_call = True
                
         def visit_Name(self, node):
@@ -433,7 +455,7 @@ def convert_ast_to_old_parser(node, filename):
             # Feed the file text into findall(); it returns a list of all the found strings
             with open(filename, 'r') as f:
                 source = f.read()
-            self.quick_found_classes = re.findall(r'^\s*class (.*)[:\(]', source, re.MULTILINE)  
+            self.quick_found_classes = re.findall(r'^\s*class (.*?)[\(:]', source, re.MULTILINE)  
             self.quick_found_module_defs = re.findall(r'^def (.*)\(.*\):', source, re.MULTILINE)
             self.quick_found_module_attrs = re.findall(r'^(\S.*?)[\.]*.*\s*=.*', source, re.MULTILINE)
             
@@ -515,8 +537,11 @@ def parse_and_convert(in_filename, print_diffs=True):
 
 ############        
 
+RUN_TEST_SUITE = 1
+
 results = []
-def reset_tests():        
+def reset_tests():
+    global results
     results = []
 def test(filename):
     results.append(parse_and_convert(filename))
@@ -528,33 +553,43 @@ def report(msg):
     else:
         print "oooops %s broken" % msg, results
 
-reset_tests()    
-test('../../tests/python-in/testmodule01.py')
-test('../../tests/python-in/testmodule02.py')
-test('../../tests/python-in/testmodule03.py')
-test('../../tests/python-in/testmodule04.py')
-test('../../tests/python-in/testmodule05.py') # (inner classes)
-test('../../tests/python-in/testmodule06.py')
-test('../../tests/python-in/testmodule07.py')
-test('../../tests/python-in/testmodule66.py')
-report("official parsing tests")
+if RUN_TEST_SUITE:
+    reset_tests()    
+    test('../../tests/python-in/testmodule01.py')
+    test('../../tests/python-in/testmodule02.py')
+    test('../../tests/python-in/testmodule03.py')
+    test('../../tests/python-in/testmodule04.py')
+    test('../../tests/python-in/testmodule05.py') # (inner classes)
+    test('../../tests/python-in/testmodule06.py')
+    test('../../tests/python-in/testmodule07.py')
+    test('../../tests/python-in/testmodule66.py')
+    report("official parsing tests")
+    
+    reset_tests()    
+    test('../../src/printframework.py')
+    test('../../src/asciiworkspace.py')
+    report("subsidiary parsing tests")
+    
+    # Expect these to fail cos ast parsing is genuinely better
+    reset_tests()    
+    test_not('../../tests/python-in/testmodule08_multiple_inheritance.py') # ast is better (base classes with .)
+    test_not('../../src/pynsource.py') # ast is better (less module methods found - more correct)
+    report("ast parsing is genuinely better")
 
-reset_tests()    
-test('../../src/printframework.py')
-test('../../src/asciiworkspace.py')
-report("subsidiary parsing tests")
-
-# Expect these to fail cos ast parsing is genuinely better
-reset_tests()    
-test_not('../../tests/python-in/testmodule08_multiple_inheritance.py') # ast is better (base classes with .)
-test_not('../../src/pynsource.py') # ast is better (less module methods found - more correct)
-report("ast parsing is genuinely better")
-
-# Extras
-print
+    # Extras
+    print
 
 #print parse_and_convert('../../src/pyNsourceGui.py') # different - to investigate
-#print parse_and_convert('../../src/command_pattern.py') # different - to investigate
+#print parse_and_convert('../../src/command_pattern.py') # ast is better, nested module functions ignored. class checked for when relaxed attr ref to instance
+
+"""
+TODO
+
+handle properties
+    currentItem = property(_get_current_item)
+    currentRedoItem = property(_get_current_redo_item)
+    maxItems = property(_get_max_items, _set_max_items)
+currently appearing as static attrs - which is ok.  Should be normal attra.
 
 
-    
+"""
