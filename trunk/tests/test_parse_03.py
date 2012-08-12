@@ -30,7 +30,15 @@ class TestCase01(unittest.TestCase):
 
         class D:
             pass
-        """        
+        """
+        """
+        result should be
+            ParseMeTest:
+            ParseMeTest_A:
+            ParseMeTest_B:
+            ParseMeTest_B_C:
+            D:
+        """
         FILE = 'python-in/testmodule05.py'
         self.p.Parse(FILE)
 

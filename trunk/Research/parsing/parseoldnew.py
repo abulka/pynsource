@@ -95,7 +95,7 @@ def convert_ast_to_old_parser(node, filename):
         def __init__(self, quick_parse):
             self.model = OldParseModel()
             self.stack_classes = []
-            self.stack_functions = [False]
+            self.stack_module_functions = [False]
             self.quick_parse = quick_parse
             self.init_lhs_rhs()
             
@@ -120,15 +120,38 @@ def convert_ast_to_old_parser(node, filename):
                 self.rhs.append(s)
                 self.write("\nRHS %d %s\n" % (len(self.rhs), self.rhs), mynote=2)
         
-        def am_inside_function(self):
-            return self.stack_functions[-1]
-        
+        def am_inside_module_function(self):
+            return self.stack_module_functions[-1]
+
         def current_class(self):
+            # Returns a ClassEntry or None
             if self.stack_classes:
                 return self.stack_classes[-1]
             else:
                 return None
+        
+        def pop_a_function_or_method(self):
+            if self.current_class():
+                self.current_class().stack_functions.pop()
+                self.write("  (POP method) %s " % self.current_class().stack_functions, mynote=3)
+            else:
+                self.stack_module_functions.pop()
+                self.write("  (POP module function) %s " % self.stack_module_functions, mynote=3)
+                
+        def push_a_function_or_method(self):
+            if self.current_class():
+                self.current_class().stack_functions.append(True)
+                self.write("  (PUSH method) %s " % self.current_class().stack_functions, mynote=3)
+            else:
+                self.stack_module_functions.append(True)
+                self.write("  (PUSH module function) %s " % self.stack_module_functions, mynote=3)
+                
+        def in_class_static_area(self):
+            return self.current_class() and not self.current_class().stack_functions[-1]
             
+        def in_class_method_area(self):
+            return self.current_class() and self.current_class().stack_functions[-1]
+
         def write(self, x, mynote=0):
             assert(isinstance(x, str))
             if self.new_lines:
@@ -162,6 +185,8 @@ def convert_ast_to_old_parser(node, filename):
                         <th>made_assignment</th>
                         <th>made_rhs_call</th>
                         <th>made_append_call</th>
+                        <th>in_class_static_area</th>
+                        <th>in_class_method_area</th>
                         <th></th>
                     </tr>
                     <tr>
@@ -171,9 +196,14 @@ def convert_ast_to_old_parser(node, filename):
                         <td>%s</td>
                         <td>%s</td>
                         <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
                     </tr>
                 </table>
-            """ % (self.lhs, self.rhs, self.made_assignment, self.made_rhs_call, self.made_append_call, msg), mynote=0)
+            """ % (self.lhs, self.rhs, self.made_assignment, self.made_rhs_call, \
+                    self.made_append_call, \
+                    self.in_class_static_area(), self.in_class_method_area(), \
+                    msg), mynote=0)
 
         def flush(self):
             self.flush_state(whosgranddaddy())
@@ -209,8 +239,6 @@ def convert_ast_to_old_parser(node, filename):
                 
                 return False, rhs
             
-            def in_class_static_area(): return self.current_class() and not self.am_inside_function()
-            def in_function_in_class(): return self.current_class() and self.am_inside_function()
             def create_attr_static(t):
                 self.current_class().AddAttribute(attrname=t, attrtype=['static'])
                 return t
@@ -233,9 +261,9 @@ def convert_ast_to_old_parser(node, filename):
 
             if self.made_assignment or self.made_append_call:
                 
-                if in_class_static_area():
+                if self.in_class_static_area():
                     t = create_attr_static(self.lhs[0])
-                elif in_function_in_class() and self.lhs[0] == 'self':
+                elif self.in_class_method_area() and self.lhs[0] == 'self':
                     t = create_attr_please(self.lhs[1])
                 else:
                     pass # in module area
@@ -297,23 +325,21 @@ def convert_ast_to_old_parser(node, filename):
             self.write('def %s(' % node.name)
             
             # A
-            if not self.current_class() and not self.am_inside_function():
+            if not self.current_class() and not self.am_inside_module_function():
                 self.model.modulemethods.append(node.name)
+                assert node.name in self.quick_parse.quick_found_module_defs
             elif self.current_class():
                 self.current_class().defs.append(node.name)
 
             # A
-            self.stack_functions.append(True)
-            self.write("  (inside function) %s " % self.stack_functions, mynote=3)
+            self.push_a_function_or_method()
             
             self.write('):')
             self.body(node.body)
             
             # A
             self.flush()
-            # A
-            self.stack_functions.pop()
-            self.write("  (outside function) %s " % self.stack_functions, mynote=3)
+            self.pop_a_function_or_method()
             
         def visit_Assign(self, node):  # seems to be the top of the name / attr / chain
             self.write("\nvisit_Assign ", mynote=1)
@@ -339,7 +365,7 @@ def convert_ast_to_old_parser(node, filename):
             self.write("\nvisit_Call ", mynote=1)
 
             # A
-            if len(self.lhs) == 3 and self.current_class() and self.am_inside_function() and \
+            if len(self.lhs) == 3 and self.in_class_method_area() and \
                             self.lhs[0] == 'self' and self.lhs[2] in ('append', 'add', 'insert'):
                 self.lhs_recording = False # try to get the Blah into the rhs
                 self.made_append_call = True
@@ -481,19 +507,36 @@ def parse_and_convert(in_filename):
 
 
 ############        
-        
-results = []
-results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py')) # ast is better (base classes with .)
-results.append(parse_and_convert('../../tests/python-in/testmodule01.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule02.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule03.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule05.py')) # ast is better (inner classes)
-results.append(parse_and_convert('../../tests/python-in/testmodule06.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule07.py'))
-results.append(parse_and_convert('../../tests/python-in/testmodule66.py'))
 
-#print parse_and_convert('../../src/printframework.py')
+results = []
+def reset_tests():        
+    results = []
+def test(filename):
+    results.append(parse_and_convert(filename))
+def report(msg):
+    if all(results):
+        print "%s OK" % msg
+    else:
+        print "oooops %s broken" % msg, results
+
+reset_tests()    
+test('../../tests/python-in/testmodule01.py')
+test('../../tests/python-in/testmodule02.py')
+test('../../tests/python-in/testmodule03.py')
+test('../../tests/python-in/testmodule04.py')
+test('../../tests/python-in/testmodule05.py') # (inner classes)
+test('../../tests/python-in/testmodule06.py')
+test('../../tests/python-in/testmodule07.py')
+test('../../tests/python-in/testmodule66.py')
+report("official parsing tests")
+
+reset_tests()    
+test('../../src/printframework.py')
+report("subsidiary parsing tests")
+
+# Extras
+print
+print parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py') # ast is better (base classes with .)
 #print parse_and_convert('../../src/pynsource.py') # ast is better (less module methods found - more correct)
 
 #print parse_and_convert('../../src/pyNsourceGui.py') # different - to investigate
@@ -501,9 +544,4 @@ results.append(parse_and_convert('../../tests/python-in/testmodule66.py'))
 #print parse_and_convert('../../src/command_pattern.py') # different - to investigate
 
 
-print results
-if results == [False, True, True, True, True, False, True, True, True]:
-    print "refactorings going OK"
-else:
-    print "oooops"
     
