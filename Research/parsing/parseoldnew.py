@@ -986,6 +986,8 @@ def convert_ast_to_old_parser(node, filename):
 
 #####
 
+last_diff_s = ""
+
 def parse_and_convert(in_filename, print_diffs=True):
     global log
     log = LogWriter(in_filename, print_to_console=LOG_TO_CONSOLE)
@@ -1024,6 +1026,19 @@ def parse_and_convert(in_filename, print_diffs=True):
         if not comparedok and print_diffs:
             print diff_s
 
+        #dd = difflib.HtmlDiff()
+        #diff_table = dd.make_table(d1.splitlines(1),d2.splitlines(1))
+        #log.out(diff_table)
+
+        if not comparedok:
+            global last_diff_s
+            
+            log.out("<hr>")
+            delta = difflib.unified_diff(d1.splitlines(1),d2.splitlines(1), n=0,
+                                fromfile='before.py', tofile='after.py')
+            last_diff_s = "".join(delta)
+            log.out_wrap_in_html(last_diff_s, style_class='dumpdiff')
+
         if DEBUGINFO:
             log.out(debuginfo)
     
@@ -1044,13 +1059,65 @@ def reset_tests():
     results = []
 def test(filename):
     results.append(parse_and_convert(filename))
-def test_not(filename):
-    results.append(not parse_and_convert(filename, print_diffs=False))
+def test_not(filename, expected_diffs=None):
+    # expect parse to slightly fail, with a diff matching expected_diff
+    result = parse_and_convert(filename, print_diffs=False)
+    if not result:
+        # good, we expected this
+        successful_test = True
+        if expected_diffs and last_diff_s.strip() != expected_diffs[os.path.basename(filename)].strip():
+            successful_test = False
+    else:
+        # we didn't expect this to parse and match - unbelievable.  Good but not what we expected.
+        successful_test = False
+    results.append(successful_test)
 def report(msg):
     if all(results):
         print "%s OK" % msg
     else:
         print "oooops %s broken" % msg, results
+
+###########
+
+expected_diffs = {}
+
+# ast is better, base classes with . handled
+expected_diffs['testmodule08_multiple_inheritance.py'] = """
+--- before.py
++++ after.py
+@@ -1 +1 @@
+-Fred (is module=0) inherits from ['Mary', 'MarySam'] class dependencies []
++Fred (is module=0) inherits from ['Mary', 'Mary.Sam'] class dependencies []
+"""
+
+# ast is better, (1) nested module functions ignored. (2) class actually checked
+# for when relaxed attr ref to instance. (3) extra properties picked up (though
+# they should be normal not static)
+expected_diffs['command_pattern.py'] = """
+--- before.py
++++ after.py
+@@ -5 +5 @@
+-CommandManager (is module=0) inherits from ['object'] class dependencies [('_list', 'Item')]
++CommandManager (is module=0) inherits from ['object'] class dependencies []
+@@ -9,0 +10,3 @@
++    currentItem          (attrtype ['static'])
++    currentRedoItem      (attrtype ['static'])
++    maxItems             (attrtype ['static'])
+@@ -44 +47 @@
+-    modulemethods ['suite', 'numbersuffix', 'main']
++    modulemethods ['suite', 'main']
+"""
+
+# ast is better, less module methods found - more correct
+expected_diffs['pynsource.py'] = """
+--- before.py
++++ after.py
+@@ -1 +1 @@
+-    modulemethods ['test', 'ParseArgsAndRun', 'EnsurePathExists']
++    modulemethods ['test', 'ParseArgsAndRun']
+"""
+
+###########
 
 if RUN_TEST_SUITE:
     reset_tests()    
@@ -1071,15 +1138,19 @@ if RUN_TEST_SUITE:
     
     # Expect these to fail cos ast parsing is genuinely better
     reset_tests()    
-    test_not('../../tests/python-in/testmodule08_multiple_inheritance.py') # ast is better (base classes with .)
-    test_not('../../src/pynsource.py') # ast is better (less module methods found - more correct)
+    test_not('../../tests/python-in/testmodule08_multiple_inheritance.py', expected_diffs)
+    test_not('../../src/command_pattern.py', expected_diffs)
+    test_not('../../src/pynsource.py', expected_diffs)
     report("ast parsing is genuinely better")
 
     # Extras
     print
 
 #print parse_and_convert('../../src/pyNsourceGui.py') # different - to investigate
-print parse_and_convert('../../src/command_pattern.py') # ast is better, nested module functions ignored. class checked for when relaxed attr ref to instance
+
+
+
+
 
 """
 TODO
