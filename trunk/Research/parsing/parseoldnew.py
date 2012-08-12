@@ -89,6 +89,56 @@ def convert_ast_to_old_parser(node, filename):
         def __init__(self):
             self.classlist = {}
             self.modulemethods = []
+
+
+    class RhsAnalyser:
+        def __init__(self, rhs, visitor):
+            self.rhs = rhs
+            self.visitor = visitor
+            
+            assert len(self.rhs) > 0
+            self.rhs_first_token = rhs[0]
+            
+        def is_rhs_reference_to_a_class(self):
+            
+            # Scenarios:
+            #
+            # ... = Blah()
+            # ...append(Blah())  RHS CALL MADE but whether its from the append or the Blah we don't know
+            #
+            # ... = blah        may be reinterpreted as      = Blah()  if Blah class found - a relaxed rule I admit
+            # ...append(blah)   may be reinterpreted as append(Blah()) if Blah class found - a relaxed rule I admit
+            #
+            # ... = 10          won't get here because no rhs
+            # ...append(10)     won't get here because no rhs
+            #
+            def relaxed_is_instance_a_known_class():
+                for c in self.visitor.quick_parse.quick_found_classes:
+                    if c.lower() == self.rhs_first_token.lower():
+                        self.rhs_first_token = c  # transform into proper class name not the instance
+                        return True
+                return False
+            
+            if relaxed_is_instance_a_known_class():
+                return True
+            
+            # Make sure the rhs is a class NOT a function. Usually its a
+            # class creation call or a relaxed ref to a class (see above)
+            #
+            # Also avoid case of self being on the rhs and being considered the first rhs token
+            #
+            #   self.curr.append(" "*self.curr_width)
+            #
+            t = self.rhs_first_token
+            if self.visitor.made_rhs_call and \
+                t not in pythonbuiltinfunctions and \
+                t not in self.visitor.model.modulemethods and \
+                t != 'self':
+                return True
+
+            return False
+
+
             
     class Visitor(ast.NodeVisitor):
         
@@ -214,48 +264,6 @@ def convert_ast_to_old_parser(node, filename):
             # At this point we have both lhs and rhs plus three flags and can
             # make a decision about what to create.
         
-            def is_rhs_reference_to_a_class(rhs):
-                
-                assert len(self.rhs) > 0
-                
-                # Scenarios:
-                #
-                # ... = Blah()
-                # ...append(Blah())  RHS CALL MADE but whether its from the append or the Blah we don't know
-                #
-                # ... = blah        may be reinterpreted as      = Blah()  if Blah class found - a relaxed rule I admit
-                # ...append(blah)   may be reinterpreted as append(Blah()) if Blah class found - a relaxed rule I admit
-                #
-                # ... = 10          won't get here because no rhs
-                # ...append(10)     won't get here because no rhs
-                #
-                def relaxed_is_instance_a_known_class(t):
-                    self.write("checking to see if '%s' is relaxed_is_instance_a_known_class" % t, mynote=2)
-                    for c in self.quick_parse.quick_found_classes:
-                        if t.lower() == c.lower():
-                            self.write("Yes t.lower() %s == c.lower() %s" % (t.lower(), c.lower()), mynote=2)
-                            return True, c  # return proper class name not the instance
-                    self.write("No", mynote=2)
-                    return False, t
-                
-                res, rhs = relaxed_is_instance_a_known_class(rhs)
-                if res:
-                    return True, rhs
-                
-                # Make sure the rhs is a class NOT a function. Usually its a
-                # class creation call or a relaxed ref to a class (see above)
-                #
-                # Also avoid case of self being on the rhs and being considered the first rhs token
-                #
-                #   self.curr.append(" "*self.curr_width)
-                #
-                if self.made_rhs_call and rhs not in pythonbuiltinfunctions and rhs not in self.model.modulemethods and rhs != 'self':
-                    self.write("rhs %s IS is_rhs_reference_to_a_class" % rhs, mynote=2)
-                    return True, rhs
-
-                self.write("rhs %s is NOT is_rhs_reference_to_a_class" % rhs, mynote=2)
-                return False, rhs
-            
             def create_attr_static(t):
                 self.current_class().AddAttribute(attrname=t, attrtype=['static'])
                 return t
@@ -284,11 +292,11 @@ def convert_ast_to_old_parser(node, filename):
                     t = create_attr_please(self.lhs[1])
                 else:
                     pass # in module area
-                        
+          
                 if self.lhs[0] == 'self' and len(self.rhs) > 0:
-                    res, rhs = is_rhs_reference_to_a_class(self.rhs[0])
-                    if res:
-                        self.add_composite_dependency((t, rhs))
+                    ra = RhsAnalyser(self.rhs, visitor=self)
+                    if ra.is_rhs_reference_to_a_class():
+                        self.add_composite_dependency((t, ra.rhs_first_token))
                         
             self.init_lhs_rhs()
             self.flush_state()
@@ -377,11 +385,8 @@ def convert_ast_to_old_parser(node, filename):
             # A
             self.made_assignment = True
 
-        def visit_Call(self, node):
-            self.visit(node.func)
-            self.write("\nvisit_Call %s" % self.rhs, mynote=1)
-
-            # A
+        # A
+        def detect_append_call(self):
             just_now_made_append_call = False
             if len(self.lhs) == 3 and \
                     self.in_method_in_class_area() and \
@@ -391,6 +396,14 @@ def convert_ast_to_old_parser(node, filename):
                 self.lhs_recording = False # start recording tokens (names, attrs) on rhs
                 self.made_append_call = just_now_made_append_call = True
                 self.write("\n just_now_made_append_call", mynote=1)
+            return just_now_made_append_call
+            
+        def visit_Call(self, node):
+            self.visit(node.func)
+            self.write("\nvisit_Call %s" % self.rhs, mynote=1)
+
+            # A
+            just_now_made_append_call = self.detect_append_call()
                 
             self.write('(')
             for arg in node.args:
