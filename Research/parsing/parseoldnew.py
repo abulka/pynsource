@@ -212,10 +212,14 @@ def convert_ast_to_old_parser(node, filename):
             self._calc_rhs_ref_to_class()
             
         def is_rhs_reference_to_a_class(self):
-            return self._relaxed_is_instance_a_known_class() or self._is_class_creation()
+            res1 = self._relaxed_is_instance_a_known_class()
+            res2 = self._is_class_creation()
+            return res1 or res2
 
         def _calc_rhs_ref_to_class(self):
-            if self.v.made_rhs_call: # want names's last attr - before first call
+            if self.v.made_rhs_call: # one or more calls () involved on rhs
+                # (which would have been either function calls or new class instance creations)
+                # want names's last attr - before first call
                 
                 pos = self.v.pos_rhs_call_pre_first_bracket
                 self.rhs_ref_to_class = self.v.rhs[pos]      
@@ -224,8 +228,9 @@ def convert_ast_to_old_parser(node, filename):
                 if pos > 0 and self.v.rhs[pos-1] in self.v.imports_encountered:
                     self.rhs_ref_to_class = "%s.%s" % (self.v.rhs[pos-1], self.v.rhs[pos])
                     
-            else: # must be an append, we want the thing inside the append statement
-                
+            else:   # no calls () involved on rhs at all
+                # if its an append, we want the thing inside the append statement - THEN just take the names's last attr
+                # if its an assign, we want the whole rhs -                         THEN just take the names's last attr
                 self.rhs_ref_to_class = self.v.rhs[-1]     # want names's last attr - no call here 
             
         def _relaxed_is_instance_a_known_class(self):
