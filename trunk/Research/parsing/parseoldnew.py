@@ -723,21 +723,7 @@ def convert_ast_to_old_parser(node, filename):
             self.write("\nvisit_Call %s" % self.rhs, mynote=1)
 
             # A
-            just_now_made_append_call = self.detect_append_call()
-
-            # A
-            # Ensure self.made_append_call and self.made_rhs_call are different things.
-            #
-            # An append call does not necessarily imply a rhs call was made.
-            # e.g. .append(blah) or .append(10) are NOT a calls on the rhs, in
-            # fact there is no rhs clearly defined yet except till inside the
-            # append(... despite it superficially looking like a function call
-            #               
-            if len(self.rhs) > 0 and not just_now_made_append_call:
-                if not self.made_rhs_call:
-                    self.write("FIRST BRACKET %s len is %d" % (self.rhs, len(self.rhs)), mynote=1)
-                    self.pos_rhs_call_pre_first_bracket = len(self.rhs)-1  # remember which is the token before the first bracket
-                self.made_rhs_call = True
+            self.detect_append_or_rhs_call()
                 
             self.write('(')
             for arg in node.args:
@@ -756,21 +742,34 @@ def convert_ast_to_old_parser(node, filename):
                 self.write('**')
                 self.visit(node.kwargs)
             self.write(')')
-
-
                
         # A
-        def detect_append_call(self):
-            just_now_made_append_call = False
+        def detect_append_or_rhs_call(self):
+            # Ensure self.made_append_call and self.made_rhs_call are different things.
+            #
+            # An append call does not necessarily imply a rhs call was made.
+            # e.g. .append(blah) or .append(10) are NOT a calls on the rhs, in
+            # fact there is no rhs clearly defined yet except till inside the
+            # append(... despite it superficially looking like a function call
+            #               
+
+            # Detect append call
             if len(self.lhs) == 3 and \
                     self.in_method_in_class_area() and \
                     self.lhs[0] == 'self' and \
                     self.lhs[2] in ('append', 'add', 'insert') and \
                     not self.rhs:
                 self.lhs_recording = False # start recording tokens (names, attrs) on rhs
-                self.made_append_call = just_now_made_append_call = True
+                self.made_append_call = True
+                
                 self.write("\n just_now_made_append_call", mynote=1)
-            return just_now_made_append_call
+            
+            # Detect normal rhs call
+            elif len(self.rhs) > 0 :
+                if not self.made_rhs_call:
+                    self.write("FIRST BRACKET %s len is %d" % (self.rhs, len(self.rhs)), mynote=1)
+                    self.pos_rhs_call_pre_first_bracket = len(self.rhs)-1  # remember which is the token before the first bracket
+                self.made_rhs_call = True
             
         def visit_Name(self, node):
             self.write("\nvisit_Name %s\n" % node.id, mynote=1)
