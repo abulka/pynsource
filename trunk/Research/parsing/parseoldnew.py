@@ -184,7 +184,12 @@ def convert_ast_to_old_parser(node, filename):
 
         def _calc_rhs_ref_to_class(self):
             if self.visitor.made_rhs_call:
-                self.rhs_ref_to_class = self.rhs[self.visitor.pos_rhs_call_pre_first_bracket]      # want names's last attr - before first call
+                pos = self.visitor.pos_rhs_call_pre_first_bracket
+                self.rhs_ref_to_class = self.rhs[pos]      # want names's last attr - before first call
+                
+                # adjust for import syntax
+                if pos > 0 and self.rhs[pos-1] in self.visitor.imports_encountered:
+                    self.rhs_ref_to_class = "%s.%s" % (self.rhs[pos-1], self.rhs[pos])
             else:
                 self.rhs_ref_to_class = self.rhs[-1]     # want names's last attr - no call here 
             
@@ -195,6 +200,26 @@ def convert_ast_to_old_parser(node, filename):
                     return True
             return False
             
+        def _class_creation_involves_self(self):
+            """
+            TODO
+            need to get my logic straight on this.
+            
+            Also avoid case of self being on the rhs and being considered the first rhs token e.g.
+                self.curr.append(" "*self.curr_width)
+                                     ???
+            Or this case:
+                self.canvas = self.umlwin.GetDiagram().GetCanvas()
+            we don't want rhs to be
+                = a.GetDiagram()
+                = a.b.GetDiagram()
+                = self.GetDiagram()
+                = self.a.GetDiagram()
+            unless GetDiagram is a known class or a is a known import module
+            or something like that....
+            """
+            pass
+        
         def _is_class_creation(self):            
             # Make sure the rhs is a class creation call NOT a function call.
             t = self.rhs_ref_to_class
@@ -212,6 +237,7 @@ def convert_ast_to_old_parser(node, filename):
             self.stack_module_functions = [False]
             self.quick_parse = quick_parse
             self.init_lhs_rhs()
+            self.imports_encountered = []
             
             self.result = []
             self.indent_with = ' ' * 4
@@ -225,6 +251,7 @@ def convert_ast_to_old_parser(node, filename):
             self.made_rhs_call = False
             self.made_assignment = False
             self.made_append_call = False
+            self.made_import = False
             self.pos_rhs_call_pre_first_bracket = None
             
         def record_lhs_rhs(self, s):
@@ -313,6 +340,9 @@ def convert_ast_to_old_parser(node, filename):
                     self.in_class_static_area(),
                     self.in_method_in_class_area(),
                     msg), mynote=0)
+            
+            if self.made_import:
+                self.write("self.imports_encountered %s" % self.imports_encountered, mynote=2)
 
         def flush(self):
             self.flush_state(whosgranddaddy())
@@ -355,7 +385,7 @@ def convert_ast_to_old_parser(node, filename):
                         self.add_composite_dependency((t, ra.rhs_ref_to_class))
                         
             self.init_lhs_rhs()
-            self.flush_state()
+            #self.flush_state()
             self.write("<hr>", mynote=2)
 
         
@@ -465,10 +495,15 @@ def convert_ast_to_old_parser(node, filename):
         # S            
         def visit_Import(self, node):
             self.newline(node)
+            
+            # A
+            self.made_import = True
+            self.write("self.made_import = True", mynote=2)
+ 
             for item in node.names:
                 self.write('import ')
                 self.visit(item)
-
+                
         def visit_Expr(self, node):
             #self.write("visit_Expr")
             self.newline(node)
@@ -689,6 +724,20 @@ def convert_ast_to_old_parser(node, filename):
 
             # A
             just_now_made_append_call = self.detect_append_call()
+
+            # A
+            # Ensure self.made_append_call and self.made_rhs_call are different things.
+            #
+            # An append call does not necessarily imply a rhs call was made.
+            # e.g. .append(blah) or .append(10) are NOT a calls on the rhs, in
+            # fact there is no rhs clearly defined yet except till inside the
+            # append(... despite it superficially looking like a function call
+            #               
+            if len(self.rhs) > 0 and not just_now_made_append_call:
+                if not self.made_rhs_call:
+                    self.write("FIRST BRACKET %s len is %d" % (self.rhs, len(self.rhs)), mynote=1)
+                    self.pos_rhs_call_pre_first_bracket = len(self.rhs)-1  # remember which is the token before the first bracket
+                self.made_rhs_call = True
                 
             self.write('(')
             for arg in node.args:
@@ -708,18 +757,7 @@ def convert_ast_to_old_parser(node, filename):
                 self.visit(node.kwargs)
             self.write(')')
 
-            # A
-            # Ensure self.made_append_call and self.made_rhs_call are different things.
-            #
-            # An append call does not necessarily imply a rhs call was made.
-            # e.g. .append(blah) or .append(10) are NOT a calls on the rhs, in
-            # fact there is no rhs clearly defined yet except till inside the
-            # append(... despite it superficially looking like a function call
-            #               
-            if len(self.rhs) > 0 and not just_now_made_append_call:
-                if not self.made_rhs_call:
-                    self.pos_rhs_call_pre_first_bracket = len(self.rhs)-2  # remember which is the token before the first bracket
-                self.made_rhs_call = True
+
                
         # A
         def detect_append_call(self):
@@ -912,12 +950,19 @@ def convert_ast_to_old_parser(node, filename):
     
         # Helper Nodes
     
-        # S
+        # A
         def visit_alias(self, node):
             self.write(node.name)
             if node.asname is not None:
                 self.write(' as ' + node.asname)
-    
+                
+            # A
+            if self.made_import:
+                if node.asname is not None:
+                    self.imports_encountered.append(node.asname)
+                else:
+                    self.imports_encountered.append(node.name)
+                
         # S
         def visit_comprehension(self, node):
             self.write(' for ')
@@ -1051,8 +1096,6 @@ def parse_and_convert(in_filename, print_diffs=True):
 
 ############        
 
-RUN_TEST_SUITE = 1
-
 results = []
 def reset_tests():
     global results
@@ -1117,7 +1160,50 @@ expected_diffs['pynsource.py'] = """
 +    modulemethods ['test', 'ParseArgsAndRun']
 """
 
+#expected_diffs['../../tests/python-in/testmodule09_intense.py'] = """
+"""
+--- before.py
++++ after.py
+@@ -1 +1 @@
+-Torture1 (is module=0) inherits from [] class dependencies [('a', 'UmlCanvas'), ('b', 'UmlCanvas'), ('log', 'Log'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('app', 'App'), ('config', 'ConfigObj')]
++Torture1 (is module=0) inherits from [] class dependencies [('a', 'UmlCanvas'), ('b', 'UmlCanvas'), ('log', 'Log'), ('umlwin', 'UmlCanvas'), ('app', 'App'), ('config', 'ConfigObj'), ('popupmenu', 'Menu'), ('next_menu_id', 'NewId'), ('printData', 'PrintData'), ('box', 'BoxSizer'), ('canvas', 'GetDiagram')]
+
+SHOULD GET THE FOLLOWING RESULTS:
+('a', 'UmlCanvas'),         OK
+('b', 'UmlCanvas'),         OK
+('log', 'Log'),             OK
+('frame', 'Frame'),         MORE should be wx.Frame ** fixed **
+('umlwin', 'UmlCanvas'),    OK
+('app', 'App'),             OK
+('config', 'ConfigObj'),    OK
+('popupmenu', 'Menu'),      MORE should be wx.Menu** fixed **
+('next_menu_id', 'NewId'),  MORE should be wx.NewId -> but not a class I don't think....** fixed **
+('printData', 'PrintData'), MORE should be wx.PrintData** fixed **
+('box', 'BoxSizer'),        MORE should be wx.BoxSizer** fixed **
+('canvas', 'GetDiagram')    should be skipped
+
+latest
+-------
+('a', 'UmlCanvas')
+('b', 'UmlCanvas')
+('log', 'Log')
+('frame', 'wx.Frame')
+('notebook', 'wx.Notebook')
+('umlwin', 'UmlCanvas')
+('app', 'App')
+('config', 'ConfigObj')
+('popupmenu', 'wx.Menu')
+('next_menu_id', 'wx.NewId')
+('printData', 'wx.PrintData')
+('box', 'wx.BoxSizer')
+('canvas', 'GetDiagram')    STILL WRONG should be skipped
+
+
+"""
+
 ###########
+
+RUN_TEST_SUITE = 1
 
 if RUN_TEST_SUITE:
     reset_tests()    
@@ -1147,8 +1233,74 @@ if RUN_TEST_SUITE:
     print
 
 #print parse_and_convert('../../src/pyNsourceGui.py') # different - to investigate
+#print parse_and_convert('../../tests/python-in/testmodule09_intense.py')
+
+"""
+pyNsourceGui.py
+
+OLD PARSING
+[('log', 'Log'),            OK      self.log = Log()
+-                           MISSES  from self.frame = wx.Frame    ?
+-                           MISSES  self.notebook = wx.Notebook
+('umlwin', 'UmlCanvas'),    OK      self.umlwin = UmlCanvas
+('umlwin', 'UmlCanvas'),    x2 ?
+('umlwin', 'UmlCanvas'),    x3 ?
+-                           MISSES  self.multiText = wx.TextCtrl(self.asciiart, -1, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE|wx.HSCROLL)
+('app', 'App'),             OK      self.app = App(context)
+('config', 'ConfigObj')]    OK      self.config = ConfigObj(self.user_config_file) # doco at 
+-
+- lots of others missed
+- ...
+
+NEW PARSING
+Latest
+------
+('log', 'Log')
+('frame', 'wx.Frame')
+('notebook', 'wx.Notebook')
+('umlwin', 'UmlCanvas')
+('asciiart', 'wx.Panel')
+('multiText', 'wx.TextCtrl')
+('app', 'App')
+('config', 'ConfigObj')
+('popupmenu', 'wx.Menu')
+('next_menu_id', 'wx.NewId')
+('printData', 'wx.PrintData')
+('box', 'wx.BoxSizer')
+('canvas', 'GetDiagram')    STILL WRONG should be skipped
+('preview', 'wx.PrintPreview')
+
+Previous
+--------
+[('log', 'Log'),            OK      self.log = Log()
+('frame', 'wx'),            MORE    from self.frame = wx.Frame    ? should pick up more? **FIXED**
+-                           MISSES  self.notebook = wx.Notebook(self.frame, -1)   **FIXED**
+('umlwin', 'panel'),        WRONG   self.umlwin = UmlCanvas(panel, Log(), self.frame)   **FIXED**
+('umlwin', 'notebook'),     WRONG   self.umlwin = UmlCanvas(self.notebook, Log(), self.frame)   **FIXED**
+('umlwin', 'frame'),        WRONG   self.umlwin = UmlCanvas(self.frame, Log(), self.frame)   **FIXED**
+('multiText', 'wx'),        MORE    self.multiText = wx.TextCtrl(self.asciiart, -1, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE|wx.HSCROLL)   **FIXED**
+('app', 'App'),             OK      self.app = App(context)
+('user_config_file',
+      'config_dir'),        SHOULDSKIP   self.user_config_file = os.path.join(config_dir, PYNSOURCE_CONFIG_FILE)   **FIXED**
+-                           MISSES  self.config = ConfigObj(self.user_config_file) # doco at   **FIXED**
+
+('popupmenu', 'wx'),        MORE    self.popupmenu = wx.Menu()     # Create a menu   **FIXED**
+('next_menu_id', 'wx'),     SKIP    self.next_menu_id = wx.NewId() ---- yike how to tell if LIBRARY call is class or function !!
+
+-                           MISSES  self.printData = wx.PrintData()   **FIXED**
+('printData', 'wx'),        MORE    self.printData = wx.PrintData()   **FIXED**
+
+('box', 'wx'),              MORE    self.box = wx.BoxSizer(wx.VERTICAL)   **FIXED**
+('canvas', 'umlwin')]       MORE2   self.canvas = self.umlwin.GetDiagram().GetCanvas()  STILL WRONG
+
+notes:
+with WRONG obviously its the postion of the call before bracket that is wrong.
+perhaps need different number for append calls vs. assignment calls?
 
 
+
+
+"""
 
 
 
