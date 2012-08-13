@@ -57,6 +57,11 @@ def dump_old_structure(pmodel):
                                      classentry.ismodulenotrealclass,
                                      classentry.classesinheritsfrom,
                                      classentry.classdependencytuples)
+
+        if classentry.classdependencytuples:
+            for tup in classentry.classdependencytuples:
+                res += "%s\n" % (tup,)
+
         for attrobj in classentry.attrs:
             res += "    %-20s (attrtype %s)\n" % (attrobj.attrname,
                                             attrobj.attrtype) # currently skip calc of self._GetCompositeCreatedClassesFor(attrobj.attrname), arguably it should be precalculated and part of the data structure
@@ -168,6 +173,22 @@ def convert_ast_to_old_parser(node, filename):
             
             ... = a.Blah(b.Fred())                              want names's last attr - before first call
             self.flageditor = FlagEditor(gamestatusstate=self)  want name              - before first call
+            
+            more new cases just coming in!
+            ------------------------------
+            * rule seems to be to identify the . call chain before
+            the class candidate and ensure they are in the imports
+            Also if there are subsequent . calls after the class candidate
+            disqualify
+            
+            self.curr.append(" "*self.curr_width)               skip - want names's last attr - no call here - curr_width has no corresponding class
+            self.canvas = self.umlwin.GetDiagram().GetCanvas()  skip - would be too relaxed to interpret GetDiagram as a class.
+                                                                    especially since there are further . calls
+                                                                    especially since self.umlwin is not an import
+            = a.GetDiagram()                                    skip - unless a is an import
+            = a.b.GetDiagram()                                  skip - unless a.b is an import
+            = self.GetDiagram()                                 skip - unless self is an import
+            = self.a.GetDiagram()                               skip - unless self.a is an import
 
         """
 
@@ -187,7 +208,7 @@ def convert_ast_to_old_parser(node, filename):
                 pos = self.visitor.pos_rhs_call_pre_first_bracket
                 self.rhs_ref_to_class = self.rhs[pos]      # want names's last attr - before first call
                 
-                # adjust for import syntax
+                # adjust for import syntax   TODO do this later?  TODO do this as part of FULL import chain checking logic
                 if pos > 0 and self.rhs[pos-1] in self.visitor.imports_encountered:
                     self.rhs_ref_to_class = "%s.%s" % (self.rhs[pos-1], self.rhs[pos])
             else:
@@ -200,23 +221,9 @@ def convert_ast_to_old_parser(node, filename):
                     return True
             return False
             
-        def _class_creation_involves_self(self):
+        def _has_subsequent_calls(self):
             """
             TODO
-            need to get my logic straight on this.
-            
-            Also avoid case of self being on the rhs and being considered the first rhs token e.g.
-                self.curr.append(" "*self.curr_width)
-                                     ???
-            Or this case:
-                self.canvas = self.umlwin.GetDiagram().GetCanvas()
-            we don't want rhs to be
-                = a.GetDiagram()
-                = a.b.GetDiagram()
-                = self.GetDiagram()
-                = self.a.GetDiagram()
-            unless GetDiagram is a known class or a is a known import module
-            or something like that....
             """
             pass
         
@@ -225,9 +232,7 @@ def convert_ast_to_old_parser(node, filename):
             t = self.rhs_ref_to_class
             return self.visitor.made_rhs_call and \
                 t not in pythonbuiltinfunctions and \
-                t not in self.visitor.model.modulemethods and \
-                t != 'self' # Also avoid case of self being on the rhs and being considered the first rhs token e.g. self.curr.append(" "*self.curr_width)
-
+                t not in self.visitor.model.modulemethods
             
     class Visitor(ast.NodeVisitor):
         
@@ -1053,7 +1058,7 @@ def parse_and_convert(in_filename, print_diffs=True):
         diff = difflib.ndiff(d1.splitlines(1),d2.splitlines(1))
         diff_s = ''.join(diff)
         return diff_s
-    
+            
     try:
         log.out_html_header()
         log.out("PARSING: %s *****\n" % in_filename)
@@ -1138,14 +1143,15 @@ expected_diffs['testmodule08_multiple_inheritance.py'] = """
 expected_diffs['command_pattern.py'] = """
 --- before.py
 +++ after.py
-@@ -5 +5 @@
+@@ -5,2 +5 @@
 -CommandManager (is module=0) inherits from ['object'] class dependencies [('_list', 'Item')]
+-('_list', 'Item')
 +CommandManager (is module=0) inherits from ['object'] class dependencies []
-@@ -9,0 +10,3 @@
+@@ -10,0 +10,3 @@
 +    currentItem          (attrtype ['static'])
 +    currentRedoItem      (attrtype ['static'])
 +    maxItems             (attrtype ['static'])
-@@ -44 +47 @@
+@@ -45 +47 @@
 -    modulemethods ['suite', 'numbersuffix', 'main']
 +    modulemethods ['suite', 'main']
 """
@@ -1159,14 +1165,8 @@ expected_diffs['pynsource.py'] = """
 +    modulemethods ['test', 'ParseArgsAndRun']
 """
 
-#expected_diffs['../../tests/python-in/testmodule09_intense.py'] = """
+# ast is better for python-in/testmodule09_intense.py
 """
---- before.py
-+++ after.py
-@@ -1 +1 @@
--Torture1 (is module=0) inherits from [] class dependencies [('a', 'UmlCanvas'), ('b', 'UmlCanvas'), ('log', 'Log'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('app', 'App'), ('config', 'ConfigObj')]
-+Torture1 (is module=0) inherits from [] class dependencies [('a', 'UmlCanvas'), ('b', 'UmlCanvas'), ('log', 'Log'), ('umlwin', 'UmlCanvas'), ('app', 'App'), ('config', 'ConfigObj'), ('popupmenu', 'Menu'), ('next_menu_id', 'NewId'), ('printData', 'PrintData'), ('box', 'BoxSizer'), ('canvas', 'GetDiagram')]
-
 SHOULD GET THE FOLLOWING RESULTS:
 ('a', 'UmlCanvas'),         OK
 ('b', 'UmlCanvas'),         OK
@@ -1196,8 +1196,28 @@ latest
 ('printData', 'wx.PrintData')
 ('box', 'wx.BoxSizer')
 ('canvas', 'GetDiagram')    STILL WRONG should be skipped
+"""
 
-
+expected_diffs['testmodule09_intense.py'] = """
+--- before.py
++++ after.py
+@@ -1 +1 @@
+-Torture1 (is module=0) inherits from [] class dependencies [('a', 'UmlCanvas'), ('b', 'UmlCanvas'), ('log', 'Log'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('app', 'App'), ('config', 'ConfigObj')]
++Torture1 (is module=0) inherits from [] class dependencies [('a', 'UmlCanvas'), ('b', 'UmlCanvas'), ('log', 'Log'), ('frame', 'wx.Frame'), ('notebook', 'wx.Notebook'), ('umlwin', 'UmlCanvas'), ('app', 'App'), ('config', 'ConfigObj'), ('popupmenu', 'wx.Menu'), ('next_menu_id', 'wx.NewId'), ('printData', 'wx.PrintData'), ('box', 'wx.BoxSizer'), ('canvas', 'GetDiagram')]
+@@ -5,5 +5,2 @@
+-('umlwin', 'UmlCanvas')
+-('umlwin', 'UmlCanvas')
+-('umlwin', 'UmlCanvas')
+-('umlwin', 'UmlCanvas')
+-('umlwin', 'UmlCanvas')
++('frame', 'wx.Frame')
++('notebook', 'wx.Notebook')
+@@ -12,0 +10,5 @@
++('popupmenu', 'wx.Menu')
++('next_menu_id', 'wx.NewId')
++('printData', 'wx.PrintData')
++('box', 'wx.BoxSizer')
++('canvas', 'GetDiagram')
 """
 
 ###########
@@ -1226,6 +1246,7 @@ if RUN_TEST_SUITE:
     test_not('../../tests/python-in/testmodule08_multiple_inheritance.py', expected_diffs)
     test_not('../../src/command_pattern.py', expected_diffs)
     test_not('../../src/pynsource.py', expected_diffs)
+    test_not('../../tests/python-in/testmodule09_intense.py', expected_diffs)
     report("ast parsing is genuinely better")
 
     # Extras
