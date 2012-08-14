@@ -187,17 +187,17 @@ class TestCaseBase(unittest.TestCase):
     or append   OUTPUT
     expression  token       Logic and notes
     ==========|===========|=======================
-    Blah()      Blah        if Blah class exists    
+ A  Blah()      Blah        if Blah class exists    
                 None        if Blah class doesn't exist     
-    blah        Blah        if Blah class exists    (token transmografied)
+ B  blah        Blah        if Blah class exists  (token transmografied)
                 None        if Blah class doesn't exist     
-    a.Blah      a.Blah      if Blah class exists and imported a     
+ C  a.Blah()    a.Blah      if Blah class exists and imported a     
                 None        no import of a exists   
-    a.b.Blah    a.b.Blah    if Blah class exists and imported a.b   
+ D  a.b.Blah()  a.b.Blah    if Blah class exists and imported a.b   
                 None        no import of a.b exists 
-    a().Blah()  None        too tricky      
-    a().Blah()  None        too tricky      
-    a.blah      None        too tricky  *1
+ E  a().Blah()  None        too tricky      
+ F  a().blah    None        too tricky      
+ G  a.blah      None        too tricky  *1
     
     *1 Note we could potentially check for either 
         import a.Blah
@@ -206,7 +206,7 @@ class TestCaseBase(unittest.TestCase):
 """
 
 
-class TestCase_G_Classic(TestCaseBase):
+class TestCase_A_Classic(TestCaseBase):
     #self.w = Blah()
     #self.w.append(Blah())
 
@@ -224,7 +224,8 @@ class TestCase_G_Classic(TestCaseBase):
         self.do(rhs=['Blah'], made_rhs_call=True, call_pos=0, quick_found_classes=[],
                 result_should_be=False, rhs_ref_to_class_should_be=None)
 
-class TestCase_A_rhs_is_instance(TestCaseBase):
+
+class TestCase_B_RhsIsInstance(TestCaseBase):
     # self.w = blah
     # self.w.append(blah)
         
@@ -252,39 +253,46 @@ class TestCase_A_rhs_is_instance(TestCaseBase):
         self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_found_classes=['Blah'],
                 result_should_be=True, rhs_ref_to_class_should_be='Blah')
 
-class TestCase_B_Classic(TestCaseBase):
-    # self.w = blah()
-    # self.w.append(blah())
 
-    def test_1_class_blah_exists(self):
-        """
-        If class 'blah' exists
-            # 'blah' class exists, thus is class creation. Bit weird to have lowercase class though...
-            is_rhs_reference_to_a_class ==> True
-            ra.rhs_ref_to_class ==> blah
-        """
-        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_found_classes=['blah'],
-                result_should_be=True, rhs_ref_to_class_should_be='blah')
+class TestCase_C_AttrBeforeClassic(TestCaseBase):
+    # self.w = a.Blah()
+    # self.w.append(a.Blah())
 
-    def test_2_class_blah_doesnt_exist(self):
+    def test_1_class_Blah_exists(self):
         """
-        If class 'blah' does not exist
-            # Mere function calls. No relaxed instance to class translation allowed.
-            is_rhs_reference_to_a_class ==> False
-            ra.rhs_ref_to_class ==> None
+        If class 'Blah' exists  ==> thus is class creation of a.Blah
         """
-        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_found_classes=[],
+        self.do(rhs=['a', 'Blah'], made_rhs_call=True, call_pos=1, quick_found_classes=['Blah'],
+                result_should_be=True, rhs_ref_to_class_should_be='a.Blah')
+
+    def test_2_class_Blah_doesnt_exist(self):
+        """
+        Else ==> Mere function call. No relaxed instance to class translation allowed cos its a call not an instance.
+        """
+        self.do(rhs=['a', 'Blah'], made_rhs_call=True, call_pos=1, quick_found_classes=[],
                 result_should_be=False, rhs_ref_to_class_should_be=None)
         
-    def test_3_other_variants_of_test(self):
-        """
-        Whether class 'Blah' exists - shouldn't make any difference to any result since no relaxed instance to class translation occuring
-            untested
-        """
-        pass
 
 
-class TestCase_C_AttrBeforeRhsInstance(TestCaseBase):
+class TestCase_D_MultipleAttrBeforeClassic(TestCaseBase):
+    # self.w = a.b.Blah()
+    # self.w.append(a.b.Blah())
+    pass
+
+
+class TestCase_E_DoubleCall(TestCaseBase):
+    # self.w = a().Blah()
+    # self.w.append(a().Blah())
+    pass
+
+
+class TestCase_F_CallThenTrailingInstance(TestCaseBase):
+    # self.w = a().blah
+    # self.w.append(a().blah)
+    pass
+
+
+class TestCase_G_AttrBeforeRhsInstance(TestCaseBase):
     # self.w = a.blah
     # self.w.append(a.blah)
 
@@ -306,6 +314,7 @@ class TestCase_C_AttrBeforeRhsInstance(TestCaseBase):
         to an instance of a class a.Blah? Yes but only if have imported those references e.g.
             import a.Blah
             from a import Blah
+        but this is all getting too tricky and vague guesswork.  
         """
         pass
         #Difficult !!
@@ -313,44 +322,16 @@ class TestCase_C_AttrBeforeRhsInstance(TestCaseBase):
         #self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_found_classes=['Blah'],
         #        result_should_be=True, rhs_ref_to_class_should_be='Blah')
 
-
-class TestCase_D_AttrBeforeClassic(TestCaseBase):
-    # self.w = a.blah()
-    # self.w.append(a.blah())
-
-    def test_1_class_blah_exists(self):
-        """
-        If class 'blah' exists
-            # 'blah' class exists, thus is class creation. Bit weird to have lowercase class though...
-            is_rhs_reference_to_a_class ==> True
-            ra.rhs_ref_to_class ==> blah
-        """
-        self.do(rhs=['a', 'blah'], made_rhs_call=True, call_pos=1, quick_found_classes=['blah'],
-                result_should_be=True, rhs_ref_to_class_should_be='blah')
-
-    def test_2_class_blah_doesnt_exist(self):
-        """
-        If class 'blah' does not exist
-            # Mere function calls. No relaxed instance to class translation allowed.
-            is_rhs_reference_to_a_class ==> False
-            ra.rhs_ref_to_class ==> None
-        """
-        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_found_classes=[],
-                result_should_be=False, rhs_ref_to_class_should_be=None)
-        
-    def test_3_other_variants_of_test(self):
-        """
-        Whether class 'Blah' exists - shouldn't make any difference to any result since no relaxed instance to class translation occuring
-            untested
-        """
-        pass
-
     
 def suite():
-    suite1 = unittest.makeSuite(TestCase_G_Classic, 'test')
-    suite2 = unittest.makeSuite(TestCase_A_rhs_is_instance, 'test')
-    suite3 = unittest.makeSuite(TestCase_B_Classic, 'test')
-    alltests = unittest.TestSuite((suite1, suite2, suite3))
+    suite1 = unittest.makeSuite(TestCase_A_Classic, 'test')
+    suite2 = unittest.makeSuite(TestCase_B_RhsIsInstance, 'test')
+    suite3 = unittest.makeSuite(TestCase_C_AttrBeforeClassic, 'test')
+    suite4 = unittest.makeSuite(TestCase_D_MultipleAttrBeforeClassic, 'test')
+    suite5 = unittest.makeSuite(TestCase_E_DoubleCall, 'test')
+    suite6 = unittest.makeSuite(TestCase_F_CallThenTrailingInstance, 'test')
+    suite7 = unittest.makeSuite(TestCase_G_AttrBeforeRhsInstance, 'test')
+    alltests = unittest.TestSuite((suite1, suite2, suite3, suite4, suite5, suite6, suite7))
     return alltests
 
 def main():
