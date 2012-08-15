@@ -67,13 +67,48 @@ class RhsAnalyser:
         
         self.rhs_ref_to_class = None
         self._calc_rhs_ref_to_class()
-        print 'self.rhs_ref_to_class', self.rhs_ref_to_class
+        #print 'self.rhs_ref_to_class', self.rhs_ref_to_class
         
     def is_rhs_reference_to_a_class(self):
-        res1 = self._relaxed_is_instance_a_known_class()
-        res2 = self._is_class_creation()
-        print res1, res2
-        return res1 or res2
+        
+        def rhsbrackets(): return self.v.made_rhs_call and self.v.pos_rhs_call_pre_first_bracket == 0
+            
+        if self.class_exists() and not self.in_module_methods_etc() and rhsbrackets(): # A1
+            return True
+        
+        if self.class_exists(instance_check=True) and not self.in_module_methods_etc() and not rhsbrackets(): # B1
+            self.rhs_ref_to_class = self.upper_just_first_char()
+            return True
+        
+        if not self.class_exists() and self.in_module_methods_etc() and rhsbrackets(): # A2
+            self.rhs_ref_to_class = None
+            return False
+        
+        if self.class_exists(instance_check=True) and self.in_module_methods_etc() and not rhsbrackets(): # B2
+            self.rhs_ref_to_class = None
+            return False
+
+        if self.class_exists() and self.in_module_methods_etc() and rhsbrackets(): # A3
+            return True
+        
+        if not self.class_exists() and not self.in_module_methods_etc() and rhsbrackets(): # A4
+            if self.rhs_ref_to_class[0].isupper():  # GUESS yes, if starts with uppercase letter
+                return True
+            else:
+                self.rhs_ref_to_class = None
+                return False
+                
+        self.rhs_ref_to_class = None
+        return False
+                
+
+        
+        #res1 = self._relaxed_is_instance_a_known_class()
+        #res2 = self._is_class_creation()
+        #res = res1 or res2
+        #if not res:
+        #    self.rhs_ref_to_class = None
+        #return res
 
     def _calc_rhs_ref_to_class(self):
         if self.v.made_rhs_call: # one or more calls () involved on rhs
@@ -105,14 +140,25 @@ class RhsAnalyser:
         """
         pass
     
-    def _is_class_creation(self):            
-        # Make sure the rhs is a class creation call NOT a function call.
-        t = self.rhs_ref_to_class
-        return self.v.made_rhs_call and \
-            t not in pythonbuiltinfunctions and \
-            t not in self.v.model.modulemethods
+    #def _is_class_creation(self):
+    #    if class_exists
+    #    # Make sure the rhs is a class creation call NOT a function call.
+    #    return self.v.made_rhs_call and not self.in_module_methods_etc()
+    #    if self.rhs_ref_to_class
 
+    def in_module_methods_etc(self):
+        return self.rhs_ref_to_class in pythonbuiltinfunctions or \
+               self.rhs_ref_to_class in self.v.quick_parse.quick_found_module_defs
 
+    def class_exists(self, instance_check=False):
+        if instance_check:
+            c = self.upper_just_first_char()
+        else:
+            c = self.rhs_ref_to_class
+        return c in self.v.quick_parse.quick_found_classes
+    
+    def upper_just_first_char(self):
+        return self.rhs_ref_to_class[0].upper() + self.rhs_ref_to_class[1:]
             
 import unittest
 import sys
@@ -167,11 +213,12 @@ class TestCaseBase(unittest.TestCase):
             self.v.made_assignment = False
         return self.v
 
-    def do(self, rhs, made_rhs_call, call_pos, quick_found_classes, result_should_be, rhs_ref_to_class_should_be):
+    def do(self, rhs, made_rhs_call, call_pos, quick_classes, quick_defs, result_should_be, rhs_ref_to_class_should_be):
         for mode in self.modes:
             v = self.get_visitor(rhs, mode)
             v.made_rhs_call = made_rhs_call
-            v.quick_parse.quick_found_classes = quick_found_classes
+            v.quick_parse.quick_found_classes = quick_classes
+            v.quick_parse.quick_found_module_defs = quick_defs
             v.pos_rhs_call_pre_first_bracket = call_pos
             
             ra = RhsAnalyser(v)
@@ -187,41 +234,78 @@ class TestCaseBase(unittest.TestCase):
     or append   OUTPUT
     expression  token       Logic and notes
     ==========|===========|=======================
- A  Blah()      Blah        if Blah class exists    
-                None        if Blah class doesn't exist     
- B  blah        Blah        if Blah class exists  (token transmografied)
-                None        if Blah class doesn't exist     
- C  a.Blah()    a.Blah      if Blah class exists and imported a     
-                None        no import of a exists   
- D  a.b.Blah()  a.b.Blah    if Blah class exists and imported a.b   
-                None        no import of a.b exists 
- E  a().Blah()  None        too tricky      
- F  a().blah    None        too tricky      
+ A  Blah()      Blah        1  if Blah class exists and its NOT in module methods  *2
+                None        2  if Blah class does NOT exist and it IS in module methods
+                Blah        3  if Blah class exists and it IS in module methods - CONTRADICATION, assume Blah is class
+                Blah        4  if Blah class does NOT exist and its NOT in module methods - GUESS yes, if starts with uppercase letter
+                
+ B  blah        Blah        1  if Blah class exists and blah is NOT in module methods ==> (token transmografied)
+                None        2  if Blah class exists and blah IS in module methods (clear intent that blah is a function ref)
+                Blah        3  if Blah class exists and blah is NOT in module methods but Blah IS in module methods (if Blah is a function this is unrelated to blah instance)  ==> (token transmografied)
+                None        4  if Blah class doesn't exist
+                None        5  if blah class exists - syntax is just plain wrong for class creation.
+                            Other cases - see note *3
+                
+ C  a.Blah()    a.Blah      if Blah class exists and imported a
+                None        no import of a exists
+ D  a.b.Blah()  a.b.Blah    if Blah class exists and imported a.b
+                None        no import of a.b exists
+ E  a().Blah()  None        too tricky
+ F  a().blah    None        too tricky
  G  a.blah      None        too tricky  *1
-    
-    *1 Note we could potentially check for either 
-        import a.Blah
-        from a import Blah
-    but its all a bit vague.
-"""
 
+    *1  Note we could potentially check for either
+            import a.Blah
+            from a import Blah
+        but its all a bit vague.
+
+    *2  Note we used to be that unless its a module method
+        or built in method, then assume its a class.
+        Now logic is a bit smarter:
+       
+    *3  Note if class 'blah' exists instead of class 'Blah'
+        then is just classic case A use cases.
+"""
 
 class TestCase_A_Classic(TestCaseBase):
     #self.w = Blah()
     #self.w.append(Blah())
 
     """
-    If Blah class exists ==> True, Blah
+    if Blah class exists and its NOT in module methods
+    Blah() where: class Blah - T
     """
-    def test_1_BlahClassExists(self):
-        self.do(rhs=['Blah'], made_rhs_call=True, call_pos=0, quick_found_classes=['Blah'],
+    def test_1(self):
+        self.do(rhs=['Blah'], made_rhs_call=True, call_pos=0, quick_classes=['Blah'], quick_defs=[],
                 result_should_be=True, rhs_ref_to_class_should_be='Blah')
 
     """
-    else ==> False, None
+    if Blah class does NOT exist and it IS in module methods
+    Blah() where: def Blah() - F
     """
-    def test_2_NoClassesExist(self):
-        self.do(rhs=['Blah'], made_rhs_call=True, call_pos=0, quick_found_classes=[],
+    def test_2(self):
+        self.do(rhs=['Blah'], made_rhs_call=True, call_pos=0, quick_classes=[], quick_defs=['Blah'],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
+        
+    """
+    if Blah class exists and it IS in module methods - CONTRADICATION, assume Blah is class
+    Blah() where: class Blah, def Blah() - T
+    """
+    def test_3(self):
+        self.do(rhs=['Blah'], made_rhs_call=True, call_pos=0, quick_classes=['Blah'], quick_defs=['Blah'],
+                result_should_be=True, rhs_ref_to_class_should_be='Blah')
+        
+    """
+    if Blah class does NOT exist and its NOT in module methods - GUESS yes, if starts with uppercase letter
+    Blah() where: - T
+    blah() where: - F
+    """
+    def test_4(self):
+        self.do(rhs=['Blah'], made_rhs_call=True, call_pos=0, quick_classes=[], quick_defs=[],
+                result_should_be=True, rhs_ref_to_class_should_be='Blah')
+
+    def test_5(self):
+        self.do(rhs=['blah'], made_rhs_call=True, call_pos=0, quick_classes=[], quick_defs=[],
                 result_should_be=False, rhs_ref_to_class_should_be=None)
 
 
@@ -229,29 +313,62 @@ class TestCase_B_RhsIsInstance(TestCaseBase):
     # self.w = blah
     # self.w.append(blah)
         
-    def test_1_no_classes_defined(self):
+    def test_1(self):
         """
-        Whether or not 'blah' class exists,
-            # syntax is just plain wrong for class creation.
-            is_rhs_reference_to_a_class ==> False
-            ra.rhs_ref_to_class ==> None
+        if Blah class exists and blah is NOT in module methods ==> (token transmografied)
+        blah where: class Blah - T
         """
-        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_found_classes=[],
-                result_should_be=False, rhs_ref_to_class_should_be=None)
-        
-    def test_2_blah_class_defined(self):
-        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_found_classes=['blah'],
-                result_should_be=False, rhs_ref_to_class_should_be=None)
-        
-    def test_3_Blah_class_defined_transmogrify(self):
-        """
-        If class 'Blah' exists
-            # If 'Blah' class exists, relaxed instance to class translation allowed.
-            is_rhs_reference_to_a_class ==> True
-            ra.rhs_ref_to_class ==> Blah            # TRANSMOGRIFIED!
-        """
-        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_found_classes=['Blah'],
+        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_classes=['Blah'], quick_defs=[],
                 result_should_be=True, rhs_ref_to_class_should_be='Blah')
+
+    def test_2(self):
+        """
+        if Blah class exists and blah IS in module methods (clear intent that blah is a function ref)
+        blah where: class Blah, def blah() - F
+        """
+        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_classes=['Blah'], quick_defs=['blah'],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
+        
+    def test_3(self):
+        """
+        if Blah class exists and blah is NOT in module methods but Blah IS in module methods (if Blah is a function this is unrelated to blah instance)  ==> (token transmografied)
+        blah where: class Blah, def Blah() - T
+        """
+        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_classes=['Blah'], quick_defs=['Blah'],
+                result_should_be=True, rhs_ref_to_class_should_be='Blah')
+
+    def test_4(self):
+        """
+        if Blah class doesn't exist
+        blah where: - F
+        """
+        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_classes=[], quick_defs=[],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
+
+        # the state of module methods doesn't matter:
+        # blah where: def Blah() - F
+        # blah where: def blah() - F
+        
+        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_classes=[], quick_defs=['Blah'],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
+        
+        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_classes=[], quick_defs=['blah'],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
+
+
+    def test_5(self):
+        """
+        if blah class exists - syntax is just plain wrong for class creation.
+        blah where: class blah - F
+        """
+        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_classes=['blah'], quick_defs=[],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
+
+        # the state of module methods doesn't matter:
+        # blah where: class blah, def Blah() - F
+
+        self.do(rhs=['blah'], made_rhs_call=False, call_pos=0, quick_classes=['blah'], quick_defs=['Blah'],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
 
 
 class TestCase_C_AttrBeforeClassic(TestCaseBase):
@@ -262,14 +379,14 @@ class TestCase_C_AttrBeforeClassic(TestCaseBase):
         """
         If class 'Blah' exists  ==> thus is class creation of a.Blah
         """
-        self.do(rhs=['a', 'Blah'], made_rhs_call=True, call_pos=1, quick_found_classes=['Blah'],
+        self.do(rhs=['a', 'Blah'], made_rhs_call=True, call_pos=1, quick_classes=['Blah'], quick_defs=[],
                 result_should_be=True, rhs_ref_to_class_should_be='a.Blah')
 
     def test_2_class_Blah_doesnt_exist(self):
         """
         Else ==> Mere function call. No relaxed instance to class translation allowed cos its a call not an instance.
         """
-        self.do(rhs=['a', 'Blah'], made_rhs_call=True, call_pos=1, quick_found_classes=[],
+        self.do(rhs=['a', 'Blah'], made_rhs_call=True, call_pos=1, quick_classes=[], quick_defs=[],
                 result_should_be=False, rhs_ref_to_class_should_be=None)
         
 
@@ -301,11 +418,11 @@ class TestCase_G_AttrBeforeRhsInstance(TestCaseBase):
         Whether or not 'blah' class exists, syntax is just plain wrong for class creation.
         Presence of preceding a. doesn't make a difference.
         """
-        self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_found_classes=[],
+        self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_classes=[], quick_defs=[],
                 result_should_be=False, rhs_ref_to_class_should_be=None)
         
     def test_2_blah_class_defined(self):
-        self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_found_classes=['blah'],
+        self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_classes=['blah'], quick_defs=[],
                 result_should_be=False, rhs_ref_to_class_should_be=None)
         
     def test_3_Blah_class_defined_transmogrify(self):
@@ -319,19 +436,21 @@ class TestCase_G_AttrBeforeRhsInstance(TestCaseBase):
         pass
         #Difficult !!
         
-        #self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_found_classes=['Blah'],
+        #self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_classes=['Blah'], quick_defs=[],
         #        result_should_be=True, rhs_ref_to_class_should_be='Blah')
 
     
 def suite():
-    suite1 = unittest.makeSuite(TestCase_A_Classic, 'test')
+    #suite1 = unittest.makeSuite(TestCase_A_Classic, 'test')
     suite2 = unittest.makeSuite(TestCase_B_RhsIsInstance, 'test')
-    suite3 = unittest.makeSuite(TestCase_C_AttrBeforeClassic, 'test')
-    suite4 = unittest.makeSuite(TestCase_D_MultipleAttrBeforeClassic, 'test')
-    suite5 = unittest.makeSuite(TestCase_E_DoubleCall, 'test')
-    suite6 = unittest.makeSuite(TestCase_F_CallThenTrailingInstance, 'test')
-    suite7 = unittest.makeSuite(TestCase_G_AttrBeforeRhsInstance, 'test')
-    alltests = unittest.TestSuite((suite1, suite2, suite3, suite4, suite5, suite6, suite7))
+    #suite3 = unittest.makeSuite(TestCase_C_AttrBeforeClassic, 'test')
+    #suite4 = unittest.makeSuite(TestCase_D_MultipleAttrBeforeClassic, 'test')
+    #suite5 = unittest.makeSuite(TestCase_E_DoubleCall, 'test')
+    #suite6 = unittest.makeSuite(TestCase_F_CallThenTrailingInstance, 'test')
+    #suite7 = unittest.makeSuite(TestCase_G_AttrBeforeRhsInstance, 'test')
+    #alltests = unittest.TestSuite((suite1, suite2, suite3, suite4, suite5, suite6, suite7))
+    #alltests = unittest.TestSuite((suite1, ))
+    alltests = unittest.TestSuite((suite2, ))
     return alltests
 
 def main():
