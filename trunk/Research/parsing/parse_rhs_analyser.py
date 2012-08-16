@@ -68,10 +68,34 @@ class RhsAnalyser:
         self.rhs_ref_to_class = None
         self._calc_rhs_ref_to_class()
         #print 'self.rhs_ref_to_class', self.rhs_ref_to_class
+
+    
+    @property
+    def pos(self):
+        return self.v.pos_rhs_call_pre_first_bracket
+    @property
+    def prefix_in_imports(self):
+        return self.pos > 0 and self.v.rhs[self.pos-1] in self.v.imports_encountered
         
+    def add_prefix_from_imports(self):
+        if self.prefix_in_imports:
+            return "%s.%s" % (self.v.rhs[self.pos-1], self.v.rhs[self.pos])
+
+    def is_prefixed_class_call(self):
+        return self.v.made_rhs_call and self.pos > 0
+    
     def is_rhs_reference_to_a_class(self):
         
-        def rhsbrackets(): return self.v.made_rhs_call and self.v.pos_rhs_call_pre_first_bracket == 0
+        def rhsbrackets():
+            return self.v.made_rhs_call and self.v.pos_rhs_call_pre_first_bracket == 0
+
+        if self.is_prefixed_class_call():
+            if self.class_exists() and self.prefix_in_imports: # C1
+                self.rhs_ref_to_class = self.add_prefix_from_imports()
+                return True
+            else:
+                self.rhs_ref_to_class = None
+                return False
             
         if self.class_exists() and not self.in_module_methods_etc() and rhsbrackets(): # A1
             return True
@@ -118,9 +142,9 @@ class RhsAnalyser:
             pos = self.v.pos_rhs_call_pre_first_bracket
             self.rhs_ref_to_class = self.v.rhs[pos]      
             
-            # adjust for import syntax   TODO do this later?  TODO do this as part of FULL import chain checking logic
-            if pos > 0 and self.v.rhs[pos-1] in self.v.imports_encountered:
-                self.rhs_ref_to_class = "%s.%s" % (self.v.rhs[pos-1], self.v.rhs[pos])
+            ## adjust for import syntax   TODO do this later?  TODO do this as part of FULL import chain checking logic
+            #if pos > 0 and self.v.rhs[pos-1] in self.v.imports_encountered:
+            #    self.rhs_ref_to_class = "%s.%s" % (self.v.rhs[pos-1], self.v.rhs[pos])
                 
         else:   # no calls () involved on rhs at all
             # if its an append, we want the thing inside the append statement - THEN just take the names's last attr
