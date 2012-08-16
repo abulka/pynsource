@@ -67,19 +67,13 @@ class RhsAnalyser:
         
         self.rhs_ref_to_class = None
         self._calc_rhs_ref_to_class()
-        #print 'self.rhs_ref_to_class', self.rhs_ref_to_class
-
     
     @property
     def pos(self):
         return self.v.pos_rhs_call_pre_first_bracket
     @property
-    def prefix_in_imports(self):
-        return self.pos > 0 and self.v.rhs[self.pos-1] in self.v.imports_encountered
-        
-    def add_prefix_from_imports(self):
-        if self.prefix_in_imports:
-            return "%s.%s" % (self.v.rhs[self.pos-1], self.v.rhs[self.pos])
+    def prefix(self):
+        return ".".join(self.v.rhs[0:self.pos])
 
     def is_prefixed_class_call(self):
         return self.v.made_rhs_call and self.pos > 0
@@ -90,8 +84,8 @@ class RhsAnalyser:
             return self.v.made_rhs_call and self.v.pos_rhs_call_pre_first_bracket == 0
 
         if self.is_prefixed_class_call():
-            if self.class_exists() and self.prefix_in_imports: # C1
-                self.rhs_ref_to_class = self.add_prefix_from_imports()
+            if self.class_exists() and self.prefix in self.v.imports_encountered: # C1
+                self.rhs_ref_to_class = "%s.%s" % (self.prefix, self.v.rhs[self.pos])
                 return True
             else:
                 self.rhs_ref_to_class = None
@@ -125,31 +119,19 @@ class RhsAnalyser:
         self.rhs_ref_to_class = None
         return False
                 
-
-        
-        #res1 = self._relaxed_is_instance_a_known_class()
-        #res2 = self._is_class_creation()
-        #res = res1 or res2
-        #if not res:
-        #    self.rhs_ref_to_class = None
-        #return res
-
     def _calc_rhs_ref_to_class(self):
-        if self.v.made_rhs_call: # one or more calls () involved on rhs
-            # (which would have been either function calls or new class instance creations)
-            # want names's last attr - before first call
-            
-            pos = self.v.pos_rhs_call_pre_first_bracket
-            self.rhs_ref_to_class = self.v.rhs[pos]      
-            
-            ## adjust for import syntax   TODO do this later?  TODO do this as part of FULL import chain checking logic
-            #if pos > 0 and self.v.rhs[pos-1] in self.v.imports_encountered:
-            #    self.rhs_ref_to_class = "%s.%s" % (self.v.rhs[pos-1], self.v.rhs[pos])
-                
-        else:   # no calls () involved on rhs at all
-            # if its an append, we want the thing inside the append statement - THEN just take the names's last attr
-            # if its an assign, we want the whole rhs -                         THEN just take the names's last attr
-            self.rhs_ref_to_class = self.v.rhs[-1]     # want names's last attr - no call here 
+        """
+        IF made_rhs_call then one or more calls () involved on rhs (which would
+        have been either function calls or new class instance creations) thus
+        want names's last attr - before first call.
+        ELSE no calls () involved on rhs at all. Thus if its an append, we want
+        the thing inside the append statement - if its an assign, we have the
+        whole rhs - in either case just take the names's last attr.
+        """
+        if self.v.made_rhs_call:
+            self.rhs_ref_to_class = self.v.rhs[self.pos]      
+        else:
+            self.rhs_ref_to_class = self.v.rhs[-1]     # want instance names's last attr - no call here 
         
     def _relaxed_is_instance_a_known_class(self):
         for c in self.v.quick_parse.quick_found_classes:
@@ -164,12 +146,6 @@ class RhsAnalyser:
         """
         pass
     
-    #def _is_class_creation(self):
-    #    if class_exists
-    #    # Make sure the rhs is a class creation call NOT a function call.
-    #    return self.v.made_rhs_call and not self.in_module_methods_etc()
-    #    if self.rhs_ref_to_class
-
     def in_module_methods_etc(self):
         return self.rhs_ref_to_class in pythonbuiltinfunctions or \
                self.rhs_ref_to_class in self.v.quick_parse.quick_found_module_defs
@@ -183,9 +159,11 @@ class RhsAnalyser:
     
     def upper_just_first_char(self):
         return self.rhs_ref_to_class[0].upper() + self.rhs_ref_to_class[1:]
+
             
 import unittest
 import sys
+
 
 class MockQuickParse:
     def __init__(self):
@@ -193,10 +171,12 @@ class MockQuickParse:
         self.quick_found_module_defs = []
         self.quick_found_module_attrs = []
 
+
 class MockOldParseModel:
     def __init__(self):
         self.classlist = {}
         self.modulemethods = []
+
             
 class MockVisitor:
     def __init__(self, quick_parse):
@@ -216,6 +196,7 @@ class MockVisitor:
         self.made_append_call = False
         self.made_import = False
         self.pos_rhs_call_pre_first_bracket = None
+
 
 class TestCaseBase(unittest.TestCase):
 
@@ -279,6 +260,7 @@ class TestCaseBase(unittest.TestCase):
                 
  D  a.b.Blah()  a.b.Blah    if Blah class exists and imported a.b
                 None        no import of a.b exists
+                
  E  a().Blah()  None        too tricky
  F  a().blah    None        too tricky
  G  a.blah      None        too tricky  *1
@@ -431,7 +413,34 @@ class TestCase_C_AttrBeforeClassic(TestCaseBase):
 class TestCase_D_MultipleAttrBeforeClassic(TestCaseBase):
     # self.w = a.b.Blah()
     # self.w.append(a.b.Blah())
-    pass
+
+    def test_1(self):
+        """
+        a.b.Blah() where: class Blah, import a.b - T a.b.Blah
+        """
+        self.do(rhs=['a', 'b', 'Blah'], made_rhs_call=True, call_pos=2, quick_classes=['Blah'], quick_defs=[], imports=['a.b'],
+                result_should_be=True, rhs_ref_to_class_should_be='a.b.Blah')
+
+    def test_2(self):
+        """
+        a.b.Blah() where: class Blah, import b - F
+        """
+        self.do(rhs=['a', 'b', 'Blah'], made_rhs_call=True, call_pos=2, quick_classes=['Blah'], quick_defs=[], imports=['b'],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
+
+    def test_3(self):
+        """
+        a.b.Blah() where: class Blah, import a - F
+        """
+        self.do(rhs=['a', 'b', 'Blah'], made_rhs_call=True, call_pos=2, quick_classes=['Blah'], quick_defs=[], imports=['a'],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
+
+    def test_4(self):
+        """
+        a.b.Blah() where: import a.b - F
+        """
+        self.do(rhs=['a', 'b', 'Blah'], made_rhs_call=True, call_pos=2, quick_classes=[], quick_defs=[], imports=['a.b'],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
 
 
 class TestCase_E_DoubleCall(TestCaseBase):
@@ -481,13 +490,13 @@ def suite():
     #suite1 = unittest.makeSuite(TestCase_A_Classic, 'test')
     #suite2 = unittest.makeSuite(TestCase_B_RhsIsInstance, 'test')
     suite3 = unittest.makeSuite(TestCase_C_AttrBeforeClassic, 'test')
-    #suite4 = unittest.makeSuite(TestCase_D_MultipleAttrBeforeClassic, 'test')
+    suite4 = unittest.makeSuite(TestCase_D_MultipleAttrBeforeClassic, 'test')
     #suite5 = unittest.makeSuite(TestCase_E_DoubleCall, 'test')
     #suite6 = unittest.makeSuite(TestCase_F_CallThenTrailingInstance, 'test')
     #suite7 = unittest.makeSuite(TestCase_G_AttrBeforeRhsInstance, 'test')
     #alltests = unittest.TestSuite((suite1, suite2, suite3, suite4, suite5, suite6, suite7))
     #alltests = unittest.TestSuite((suite1, ))
-    alltests = unittest.TestSuite((suite3, ))
+    alltests = unittest.TestSuite((suite3, suite4))
     return alltests
 
 def main():
