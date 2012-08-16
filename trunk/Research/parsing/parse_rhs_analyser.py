@@ -99,7 +99,7 @@ class RhsAnalyser:
             return False
             
         if self.is_prefixed_class_call(): #C, #D
-            if self.class_exists() and self.prefix in self.v.imports_encountered: # C1
+            if self.prefix in self.v.imports_encountered: # C1, # D4
                 self.rhs_ref_to_class = "%s.%s" % (self.prefix, self.v.rhs[self.pos])
                 return True
             else:
@@ -148,19 +148,6 @@ class RhsAnalyser:
         else:
             self.rhs_ref_to_class = self.v.rhs[-1]     # want instance names's last attr - no call here 
         
-    def _relaxed_is_instance_a_known_class(self):
-        for c in self.v.quick_parse.quick_found_classes:
-            if c.lower() == self.rhs_ref_to_class.lower():
-                self.rhs_ref_to_class = c  # transform into proper class name not the instance
-                return True
-        return False
-        
-    def _has_subsequent_calls(self):
-        """
-        TODO
-        """
-        pass
-    
     def in_module_methods_etc(self):
         return self.rhs_ref_to_class in pythonbuiltinfunctions or \
                self.rhs_ref_to_class in self.v.quick_parse.quick_found_module_defs
@@ -269,11 +256,13 @@ class TestCaseBase(unittest.TestCase):
                             *  Other cases - see note *3
                 
  C  a.Blah()    a.Blah      1 where: class Blah, import a - T a.Blah
-                None        2 where: class Blah - F
-                None        3 where: - F
+                a.Blah      2 where: import a - T a.Blah   Most common case, e.g. self.popupmenu = wx.Menu() where all you know about is that you imported wx.
+                None        3 where: class Blah - F
+                None        4 where: - F
         
                 
  D  a.b.Blah()  a.b.Blah    if Blah class exists and imported a.b
+                a.b.Blah    if NO Blah class exists and imported a.b   Most common case, see above #C2
                 None        no import of a.b exists
                 
  E  a().Blah()  None        too tricky
@@ -414,12 +403,20 @@ class TestCase_C_AttrBeforeClassic(TestCaseBase):
 
     def test_2(self):
         """
+        Most common case, e.g. self.popupmenu = wx.Menu() where all you know about is that you imported wx.
+        a.Blah() where: import a - T a.Blah
+        """
+        self.do(rhs=['a', 'Blah'], made_rhs_call=True, call_pos=1, quick_classes=[], quick_defs=[], imports=['a'],
+                result_should_be=True, rhs_ref_to_class_should_be='a.Blah')
+
+    def test_3(self):
+        """
         a.Blah() where: class Blah - F
         """
         self.do(rhs=['a', 'Blah'], made_rhs_call=True, call_pos=1, quick_classes=['Blah'], quick_defs=[], imports=[],
                 result_should_be=False, rhs_ref_to_class_should_be=None)
 
-    def test_3(self):
+    def test_4(self):
         """
         a.Blah() where: - F
         """
@@ -441,23 +438,23 @@ class TestCase_D_MultipleAttrBeforeClassic(TestCaseBase):
 
     def test_2(self):
         """
+        a.b.Blah() where: import a.b - T a.b.Blah()
+        """
+        self.do(rhs=['a', 'b', 'Blah'], made_rhs_call=True, call_pos=2, quick_classes=[], quick_defs=[], imports=['a.b'],
+                result_should_be=True, rhs_ref_to_class_should_be='a.b.Blah')
+
+    def test_3(self):
+        """
         a.b.Blah() where: class Blah, import b - F
         """
         self.do(rhs=['a', 'b', 'Blah'], made_rhs_call=True, call_pos=2, quick_classes=['Blah'], quick_defs=[], imports=['b'],
                 result_should_be=False, rhs_ref_to_class_should_be=None)
 
-    def test_3(self):
+    def test_4(self):
         """
         a.b.Blah() where: class Blah, import a - F
         """
         self.do(rhs=['a', 'b', 'Blah'], made_rhs_call=True, call_pos=2, quick_classes=['Blah'], quick_defs=[], imports=['a'],
-                result_should_be=False, rhs_ref_to_class_should_be=None)
-
-    def test_4(self):
-        """
-        a.b.Blah() where: import a.b - F
-        """
-        self.do(rhs=['a', 'b', 'Blah'], made_rhs_call=True, call_pos=2, quick_classes=[], quick_defs=[], imports=['a.b'],
                 result_should_be=False, rhs_ref_to_class_should_be=None)
 
 
@@ -530,6 +527,15 @@ class TestCase_G_AttrBeforeRhsInstance(TestCaseBase):
         self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_classes=['Blah'], quick_defs=[], imports=['a'],
                 result_should_be=False, rhs_ref_to_class_should_be=None)
 
+class TestCase_AddHoc(TestCaseBase):
+
+    def test_1(self):
+        """
+        self.flageditor = FlagEditor(gamestatusstate=self)
+        a.blah where: class Blah, imports a - F
+        """
+        self.do(rhs=['FlagEditor'], made_rhs_call=True, call_pos=0, quick_classes=[], quick_defs=[], imports=[],
+                result_should_be=True, rhs_ref_to_class_should_be='FlagEditor')
     
 def suite():
     #suite1 = unittest.makeSuite(TestCase_A_Classic, 'test')
@@ -538,9 +544,10 @@ def suite():
     #suite4 = unittest.makeSuite(TestCase_D_MultipleAttrBeforeClassic, 'test')
     #suite5 = unittest.makeSuite(TestCase_E_DoubleCall, 'test')
     #suite6 = unittest.makeSuite(TestCase_F_CallThenTrailingInstance, 'test')
-    suite7 = unittest.makeSuite(TestCase_G_AttrBeforeRhsInstance, 'test')
+    #suite7 = unittest.makeSuite(TestCase_G_AttrBeforeRhsInstance, 'test')
+    suite8 = unittest.makeSuite(TestCase_AddHoc, 'test')
     #alltests = unittest.TestSuite((suite1, suite2, suite3, suite4, suite5, suite6, suite7))
-    alltests = unittest.TestSuite((suite7, ))
+    alltests = unittest.TestSuite((suite8, ))
     #alltests = unittest.TestSuite((suite3, suite4))
     return alltests
 

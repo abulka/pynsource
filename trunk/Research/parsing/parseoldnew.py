@@ -29,6 +29,7 @@ from core_parser import ClassEntry, Attribute
 from keywords import pythonbuiltinfunctions
 
 from logwriter import LogWriter
+from parse_rhs_analyser import RhsAnalyser
 
 log = None
 
@@ -146,113 +147,6 @@ def convert_ast_to_old_parser(node, filename):
             self.classlist = {}
             self.modulemethods = []
 
-
-    class RhsAnalyser:
-        """
-        Usage:
-            is_rhs_reference_to_a_class()
-                Returns t/f
-                Rsulting reference in .rhs_ref_to_class
-                
-        Background:
-            You get here if
-                self.made_assignment OR
-                self.made_append_call    ( you can't have these both be true at the same time )
-            and if
-                self.lhs[0] == 'self' AND
-                len(self.rhs) > 0:
-            
-        Scenarios:
-            ... = Blah()                                want name - before first call which is Blah
-            ...append(Blah())                           want name - before first call which is Blah (remember the append is on the lhs not the rhs)
-            
-            ... = blah                                  may be reinterpreted as      = Blah()  if Blah class found - a relaxed rule I admit
-            ...append(blah)                             may be reinterpreted as append(Blah()) if Blah class found - a relaxed rule I admit
-            
-            ... = 10                                    won't get here because no rhs
-            ...append(10)                               won't get here because no rhs
-
-            new cases just coming in!
-            -------------------------
-            * rule seems to be get name or if the name has attributes, the
-              name's last attr before the first call (if there is a call)
-            
-            ... = a.Blah()                              want names's last attr - before first call
-            ... = a.blah                                want names's last attr - no call here 
-            ..append(a.blah)                            look inside append - want names's last attr - no call here 
-            ... = Blah.MaxListSize                      want names's last attr - no call here - no rhs class ref here !!
-            ... = a.Blah(b.Fred())                      want names's last attr - before first call
-            ... = Blah(b=self)                          want name              - before first call
-            
-            more new cases just coming in!
-            ------------------------------
-            * rule seems to be to identify the . call chain before
-            the class candidate and ensure they are in the imports
-            Also if there are subsequent . calls after the class candidate
-            disqualify
-            
-            ...append(" "*self.curr_width)              skip - want names's last attr - no call here - curr_width has no corresponding class
-            ... = self.umlwin.GetDiagram().GetCanvas()  skip - would be too relaxed to interpret GetDiagram as a class.
-                                                                especially since there are further . calls
-                                                                especially since self.umlwin is not an import
-            ... = a.GetDiagram()                        skip - unless a is an import
-            ... = a.b.GetDiagram()                      skip - unless a.b is an import
-            ... = self.GetDiagram()                     skip - unless self is an import
-            ... = self.a.GetDiagram()                   skip - unless self.a is an import
-
-        """
-
-        def __init__(self, visitor):
-            self.v = visitor
-            
-            assert len(self.v.rhs) > 0
-            assert not (self.v.made_assignment and self.v.made_append_call) # these both can't be true
-            
-            self.rhs_ref_to_class = None
-            self._calc_rhs_ref_to_class()
-            
-        def is_rhs_reference_to_a_class(self):
-            res1 = self._relaxed_is_instance_a_known_class()
-            res2 = self._is_class_creation()
-            return res1 or res2
-
-        def _calc_rhs_ref_to_class(self):
-            if self.v.made_rhs_call: # one or more calls () involved on rhs
-                # (which would have been either function calls or new class instance creations)
-                # want names's last attr - before first call
-                
-                pos = self.v.pos_rhs_call_pre_first_bracket
-                self.rhs_ref_to_class = self.v.rhs[pos]      
-                
-                # adjust for import syntax   TODO do this later?  TODO do this as part of FULL import chain checking logic
-                if pos > 0 and self.v.rhs[pos-1] in self.v.imports_encountered:
-                    self.rhs_ref_to_class = "%s.%s" % (self.v.rhs[pos-1], self.v.rhs[pos])
-                    
-            else:   # no calls () involved on rhs at all
-                # if its an append, we want the thing inside the append statement - THEN just take the names's last attr
-                # if its an assign, we want the whole rhs -                         THEN just take the names's last attr
-                self.rhs_ref_to_class = self.v.rhs[-1]     # want names's last attr - no call here 
-            
-        def _relaxed_is_instance_a_known_class(self):
-            for c in self.v.quick_parse.quick_found_classes:
-                if c.lower() == self.rhs_ref_to_class.lower():
-                    self.rhs_ref_to_class = c  # transform into proper class name not the instance
-                    return True
-            return False
-            
-        def _has_subsequent_calls(self):
-            """
-            TODO
-            """
-            pass
-        
-        def _is_class_creation(self):            
-            # Make sure the rhs is a class creation call NOT a function call.
-            t = self.rhs_ref_to_class
-            return self.v.made_rhs_call and \
-                t not in pythonbuiltinfunctions and \
-                t not in self.v.model.modulemethods
-            
     class Visitor(ast.NodeVisitor):
         
         def __init__(self, quick_parse):
@@ -277,14 +171,18 @@ def convert_ast_to_old_parser(node, filename):
             self.made_append_call = False
             self.made_import = False
             self.pos_rhs_call_pre_first_bracket = None
+            self.stop_recording_rhs_inside_first_bracket = None
             
         def record_lhs_rhs(self, s):
             if self.lhs_recording:
                 self.lhs.append(s)
                 self.write("\nLHS %d %s\n" % (len(self.lhs), self.lhs), mynote=2)
             else:
-                self.rhs.append(s)
-                self.write("\nRHS %d %s\n" % (len(self.rhs), self.rhs), mynote=2)
+                if self.stop_recording_rhs_inside_first_bracket <> None and self.stop_recording_rhs_inside_first_bracket > 1:
+                    self.write("\nPrevented RHS %d %s due to stop_recording_rhs_inside_first_bracket\n" % (len(self.rhs), self.rhs), mynote=2)
+                else:
+                    self.rhs.append(s)
+                    self.write("\nRHS %d %s\n" % (len(self.rhs), self.rhs), mynote=2)
         
         def am_inside_module_function(self):
             return self.stack_module_functions[-1]
@@ -748,6 +646,9 @@ def convert_ast_to_old_parser(node, filename):
 
             # A
             self.detect_append_or_rhs_call()
+            if self.stop_recording_rhs_inside_first_bracket <> None:
+                self.stop_recording_rhs_inside_first_bracket += 1
+                self.write("stop_recording_rhs_inside_first_bracket INCREMENTED %s" % self.stop_recording_rhs_inside_first_bracket, mynote=1)
                 
             self.write('(')
             for arg in node.args:
@@ -766,7 +667,12 @@ def convert_ast_to_old_parser(node, filename):
                 self.write('**')
                 self.visit(node.kwargs)
             self.write(')')
-               
+
+            # A
+            if self.stop_recording_rhs_inside_first_bracket <> None:
+                self.stop_recording_rhs_inside_first_bracket -= 1
+                self.write("stop_recording_rhs_inside_first_bracket decremented %s" % self.stop_recording_rhs_inside_first_bracket, mynote=1)
+            
         # A
         def detect_append_or_rhs_call(self):
             # Ensure self.made_append_call and self.made_rhs_call are different things.
@@ -776,7 +682,7 @@ def convert_ast_to_old_parser(node, filename):
             # fact there is no rhs clearly defined yet except till inside the
             # append(... despite it superficially looking like a function call
             #               
-
+            
             # Detect append call
             if len(self.lhs) == 3 and \
                     self.in_method_in_class_area() and \
@@ -793,6 +699,10 @@ def convert_ast_to_old_parser(node, filename):
                 if not self.made_rhs_call:
                     self.write("FIRST BRACKET %s len is %d" % (self.rhs, len(self.rhs)), mynote=1)
                     self.pos_rhs_call_pre_first_bracket = len(self.rhs)-1  # remember which is the token before the first bracket
+
+                    self.stop_recording_rhs_inside_first_bracket = 1
+                    self.write("stop_recording_rhs_inside_first_bracket INITIAL SET to 1", mynote=1)
+
                 self.made_rhs_call = True
             
         def visit_Name(self, node):
@@ -1191,6 +1101,7 @@ SHOULD GET THE FOLLOWING RESULTS:
 ('b', 'UmlCanvas'),         OK
 ('log', 'Log'),             OK
 ('frame', 'Frame'),         MORE should be wx.Frame ** fixed **
+????                        MISSING - should have ('notebook', 'wx.Notebook')
 ('umlwin', 'UmlCanvas'),    OK
 ('app', 'App'),             OK
 ('config', 'ConfigObj'),    OK
@@ -1198,10 +1109,10 @@ SHOULD GET THE FOLLOWING RESULTS:
 ('next_menu_id', 'NewId'),  MORE should be wx.NewId -> but not a class I don't think....** fixed **
 ('printData', 'PrintData'), MORE should be wx.PrintData** fixed **
 ('box', 'BoxSizer'),        MORE should be wx.BoxSizer** fixed **
-('canvas', 'GetDiagram')    should be skipped
+('canvas', 'GetDiagram')    WRONG should be skipped
 
-latest
--------
+latest is ok
+------
 ('a', 'UmlCanvas')
 ('b', 'UmlCanvas')
 ('log', 'Log')
@@ -1214,7 +1125,7 @@ latest
 ('next_menu_id', 'wx.NewId')
 ('printData', 'wx.PrintData')
 ('box', 'wx.BoxSizer')
-('canvas', 'GetDiagram')    STILL WRONG should be skipped
+
 """
 
 expected_diffs['testmodule09_intense.py'] = """
@@ -1222,7 +1133,7 @@ expected_diffs['testmodule09_intense.py'] = """
 +++ after.py
 @@ -1 +1 @@
 -Torture1 (is module=0) inherits from [] class dependencies [('a', 'UmlCanvas'), ('b', 'UmlCanvas'), ('log', 'Log'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('app', 'App'), ('config', 'ConfigObj')]
-+Torture1 (is module=0) inherits from [] class dependencies [('a', 'UmlCanvas'), ('b', 'UmlCanvas'), ('log', 'Log'), ('frame', 'wx.Frame'), ('notebook', 'wx.Notebook'), ('umlwin', 'UmlCanvas'), ('app', 'App'), ('config', 'ConfigObj'), ('popupmenu', 'wx.Menu'), ('next_menu_id', 'wx.NewId'), ('printData', 'wx.PrintData'), ('box', 'wx.BoxSizer'), ('canvas', 'GetDiagram')]
++Torture1 (is module=0) inherits from [] class dependencies [('a', 'UmlCanvas'), ('b', 'UmlCanvas'), ('log', 'Log'), ('frame', 'wx.Frame'), ('notebook', 'wx.Notebook'), ('umlwin', 'UmlCanvas'), ('app', 'App'), ('config', 'ConfigObj'), ('popupmenu', 'wx.Menu'), ('next_menu_id', 'wx.NewId'), ('printData', 'wx.PrintData'), ('box', 'wx.BoxSizer')]
 @@ -5,5 +5,2 @@
 -('umlwin', 'UmlCanvas')
 -('umlwin', 'UmlCanvas')
@@ -1231,12 +1142,11 @@ expected_diffs['testmodule09_intense.py'] = """
 -('umlwin', 'UmlCanvas')
 +('frame', 'wx.Frame')
 +('notebook', 'wx.Notebook')
-@@ -12,0 +10,5 @@
+@@ -12,0 +10,4 @@
 +('popupmenu', 'wx.Menu')
 +('next_menu_id', 'wx.NewId')
 +('printData', 'wx.PrintData')
 +('box', 'wx.BoxSizer')
-+('canvas', 'GetDiagram')
 """
 
 ###########
