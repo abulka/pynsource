@@ -77,13 +77,28 @@ class RhsAnalyser:
 
     def is_prefixed_class_call(self):
         return self.v.made_rhs_call and self.pos > 0
-    
+
+    def is_syntax_after_class_call(self):
+        lastpos = len(self.v.rhs) - 1
+        return self.v.made_rhs_call and lastpos > self.pos
+
+    def is_prefixed_instance(self):
+        return not self.v.made_rhs_call and len(self.v.rhs) > 1
+        
     def is_rhs_reference_to_a_class(self):
         
         def rhsbrackets():
             return self.v.made_rhs_call and self.v.pos_rhs_call_pre_first_bracket == 0
 
-        if self.is_prefixed_class_call():
+        if self.is_prefixed_instance(): #G
+            self.rhs_ref_to_class = None
+            return False
+
+        if self.v.made_rhs_call and self.is_syntax_after_class_call():  #E, #F, #G
+            self.rhs_ref_to_class = None
+            return False
+            
+        if self.is_prefixed_class_call(): #C, #D
             if self.class_exists() and self.prefix in self.v.imports_encountered: # C1
                 self.rhs_ref_to_class = "%s.%s" % (self.prefix, self.v.rhs[self.pos])
                 return True
@@ -265,16 +280,19 @@ class TestCaseBase(unittest.TestCase):
  F  a().blah    None        too tricky
  G  a.blah      None        too tricky  *1
 
-    *1  Note we could potentially check for either
+    *1 First of all, whether or not 'blah' class exists, syntax is just plain
+        wrong for class creation. Presence of preceding a. doesn't make a
+        difference.
+        
+       Secondly, sure we could potentially check for either
             import a.Blah
             from a import Blah
-        but its all a bit vague.
+        and transmogrify, but its all a bit vague, safer to just return F/None.
 
-    *2  Note we used to be that unless its a module method
-        or built in method, then assume its a class.
-        Now logic is a bit smarter:
+    *2 Note we used to be that unless its a module method
+       or built in method, then assume its a class. Now logic is a bit smarter:
        
-    *3  Note if class 'blah' exists instead of class 'Blah'
+    *3 Note if class 'blah' exists instead of class 'Blah'
         then is just classic case A use cases.
 """
 
@@ -446,57 +464,84 @@ class TestCase_D_MultipleAttrBeforeClassic(TestCaseBase):
 class TestCase_E_DoubleCall(TestCaseBase):
     # self.w = a().Blah()
     # self.w.append(a().Blah())
-    pass
 
+    def test_1(self):
+        """
+        a().Blah() where: class Blah - F
+        """
+        self.do(rhs=['a', 'Blah'], made_rhs_call=True, call_pos=0, quick_classes=['Blah'], quick_defs=[], imports=[],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
+
+    def test_2(self):
+        """
+        a().Blah() where: class a - F
+        """
+        self.do(rhs=['a', 'Blah'], made_rhs_call=True, call_pos=0, quick_classes=['a'], quick_defs=[], imports=[],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
 
 class TestCase_F_CallThenTrailingInstance(TestCaseBase):
     # self.w = a().blah
     # self.w.append(a().blah)
-    pass
+
+    def test_1(self):
+        """
+        a().blah where: class Blah - F
+        """
+        self.do(rhs=['a', 'blah'], made_rhs_call=True, call_pos=0, quick_classes=['Blah'], quick_defs=[], imports=[],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
 
 
 class TestCase_G_AttrBeforeRhsInstance(TestCaseBase):
     # self.w = a.blah
     # self.w.append(a.blah)
 
-    def test_1_no_classes_defined(self):
+    def test_1(self):
         """
-        Whether or not 'blah' class exists, syntax is just plain wrong for class creation.
-        Presence of preceding a. doesn't make a difference.
+        a.blah where: - F
         """
-        self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_classes=[], quick_defs=[], imports = [],
+        self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_classes=[], quick_defs=[], imports=[],
                 result_should_be=False, rhs_ref_to_class_should_be=None)
         
-    def test_2_blah_class_defined(self):
-        self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_classes=['blah'], quick_defs=[], imports = [],
+    def test_2(self):
+        """
+        a.blah where: class a - F
+        """
+        self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_classes=['a'], quick_defs=[], imports=[],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
+
+    def test_3(self):
+        """
+        a.blah where: class blah - F
+        """
+        self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_classes=['blah'], quick_defs=[], imports=[],
                 result_should_be=False, rhs_ref_to_class_should_be=None)
         
-    def test_3_Blah_class_defined_transmogrify(self):
+    def test_4(self):
         """
-        If class 'Blah' exists, do we transmogrify from a.blah into a reference
-        to an instance of a class a.Blah? Yes but only if have imported those references e.g.
-            import a.Blah
-            from a import Blah
-        but this is all getting too tricky and vague guesswork.  
+        a.blah where: class Blah - F
         """
-        pass
-        #Difficult !!
-        
-        #self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_classes=['Blah'], quick_defs=[],
-        #        result_should_be=True, rhs_ref_to_class_should_be='Blah')
+        self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_classes=['Blah'], quick_defs=[], imports=[],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
+
+    def test_5(self):
+        """
+        a.blah where: class Blah, imports a - F
+        """
+        self.do(rhs=['a', 'blah'], made_rhs_call=False, call_pos=0, quick_classes=['Blah'], quick_defs=[], imports=['a'],
+                result_should_be=False, rhs_ref_to_class_should_be=None)
 
     
 def suite():
     #suite1 = unittest.makeSuite(TestCase_A_Classic, 'test')
     #suite2 = unittest.makeSuite(TestCase_B_RhsIsInstance, 'test')
-    suite3 = unittest.makeSuite(TestCase_C_AttrBeforeClassic, 'test')
-    suite4 = unittest.makeSuite(TestCase_D_MultipleAttrBeforeClassic, 'test')
+    #suite3 = unittest.makeSuite(TestCase_C_AttrBeforeClassic, 'test')
+    #suite4 = unittest.makeSuite(TestCase_D_MultipleAttrBeforeClassic, 'test')
     #suite5 = unittest.makeSuite(TestCase_E_DoubleCall, 'test')
     #suite6 = unittest.makeSuite(TestCase_F_CallThenTrailingInstance, 'test')
-    #suite7 = unittest.makeSuite(TestCase_G_AttrBeforeRhsInstance, 'test')
+    suite7 = unittest.makeSuite(TestCase_G_AttrBeforeRhsInstance, 'test')
     #alltests = unittest.TestSuite((suite1, suite2, suite3, suite4, suite5, suite6, suite7))
-    #alltests = unittest.TestSuite((suite1, ))
-    alltests = unittest.TestSuite((suite3, suite4))
+    alltests = unittest.TestSuite((suite7, ))
+    #alltests = unittest.TestSuite((suite3, suite4))
     return alltests
 
 def main():
