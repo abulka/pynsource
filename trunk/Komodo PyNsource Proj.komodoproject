@@ -28,7 +28,7 @@
 </preference-set>
 <preference-set id="Rhs Analyser Parsing">
   <string id="command_line">parse_rhs_analyser.py</string>
-  <string relative="url" id="directory">Research/parsing</string>
+  <string relative="url" id="directory">src/parsing/</string>
   <string id="language">Python - unittest</string>
 </preference-set>
 </preference-set>
