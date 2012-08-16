@@ -2,7 +2,7 @@ import sys
 sys.path.append("../../src")
 from architecture_support import whosdaddy, whosgranddaddy
 #from core_parser import ClassEntry, Attribute
-from keywords import pythonbuiltinfunctions
+from parsing.keywords import pythonbuiltinfunctions
 
 class RhsAnalyser:
     """

@@ -1,7 +1,7 @@
 # generate java
 
 import os
-from keywords import javakeywords
+from parsing.keywords import javakeywords
 from gen_base import ReportGenerator, CmdLineGenerator
 
 class PySourceAsJava(ReportGenerator):

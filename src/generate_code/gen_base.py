@@ -1,6 +1,6 @@
 # base class for output generators and for the cmdline wrappers for those generators
 
-from core_parser import PynsourcePythonParser
+from parsing.core_parser import PynsourcePythonParser
 import os, glob
 
 class ReportGenerator(PynsourcePythonParser):
