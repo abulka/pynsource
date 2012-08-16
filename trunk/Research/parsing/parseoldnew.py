@@ -25,8 +25,8 @@ import os
 import sys
 sys.path.append("../../src")
 from architecture_support import whosdaddy, whosgranddaddy
-from core_parser import ClassEntry, Attribute
-from keywords import pythonbuiltinfunctions
+from parsing.class_entry import ClassEntry, Attribute
+from parsing.keywords import pythonbuiltinfunctions
 
 from logwriter import LogWriter
 from parse_rhs_analyser import RhsAnalyser
