@@ -72,3 +72,24 @@ class LogWriter:
             </html>
         """)
         
+class LogWriterNull:
+    def __init__(self, in_filename=None, out_filename=None, print_to_console=False):
+        pass
+    
+    def finish(self):
+        pass
+        
+    def out(self, s, force_print=False):
+        pass
+
+    def out_divider(self):
+        pass
+        
+    def out_wrap_in_html(self, s, style_class='dump1'):
+        pass
+            
+    def out_html_header(self):
+        pass
+        
+    def out_html_footer(self):
+        pass

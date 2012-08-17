@@ -3,47 +3,28 @@ Compare old and new parsing
 
 """
 
-import ast
-import difflib
 import os
+import difflib
 
 import sys
-sys.path.append("../../src")
-
-from logwriter import LogWriter
-from parsing.core_parser_ast import convert_ast_to_old_parser
+sys.path.append("../src")
+from logwriter import LogWriter, LogWriterNull
 from parsing.dump_pmodel import dump_old_structure
+from parsing.api import old_parser, new_parser
 
 global log
 
 DEBUGINFO = 1
 LOG_TO_CONSOLE = 0
 
-def old_parser(filename):
-    import sys
-    sys.path.append("../../src")
-    from generate_code.gen_asciiart import PySourceAsText
-    
-    p = PySourceAsText()
-    p.Parse(filename)
-    return p
-
-def ast_parser(filename):
-    with open(filename,'r') as f:
-        source = f.read()
-    
-    node = ast.parse(source)
-    #print ast.dump(node)
-    return node
-
-
-#####
-
 last_diff_s = ""
 
-def parse_and_convert(in_filename, print_diffs=True):
+def parse_old_and_new(in_filename, print_diffs=True):
     global log
-    log = LogWriter(in_filename, print_to_console=LOG_TO_CONSOLE)
+    if DEBUGINFO:
+        log = LogWriter(in_filename, print_to_console=LOG_TO_CONSOLE)
+    else:
+        log = LogWriterNull()
     
     def oldparse():
         model = old_parser(in_filename)
@@ -52,8 +33,7 @@ def parse_and_convert(in_filename, print_diffs=True):
         return d1
         
     def newparse():
-        node = ast_parser(in_filename)
-        model, debuginfo = convert_ast_to_old_parser(node, in_filename, log)
+        model, debuginfo = new_parser(in_filename, log)
         d2 = dump_old_structure(model)
         log.out_wrap_in_html(d2, style_class='dump1')
         return d2, debuginfo
@@ -109,10 +89,10 @@ def reset_tests():
     global results
     results = []
 def test(filename):
-    results.append(parse_and_convert(filename))
+    results.append(parse_old_and_new(filename))
 def test_not(filename, expected_diffs=None):
     # expect parse to slightly fail, with a diff matching expected_diff
-    result = parse_and_convert(filename, print_diffs=False)
+    result = parse_old_and_new(filename, print_diffs=False)
     if not result:
         # good, we expected this
         successful_test = True
@@ -124,9 +104,12 @@ def test_not(filename, expected_diffs=None):
     results.append(successful_test)
 def report(msg):
     if all(results):
-        print "%s OK" % msg
+        #print "%s OK" % msg
+        return True
     else:
         print "oooops %s broken" % msg, results
+        return False
+        
 
 ###########
 
@@ -144,7 +127,7 @@ expected_diffs['testmodule08_multiple_inheritance.py'] = """
 # ast is better, (1) nested module functions ignored. (2) class actually checked
 # for when relaxed attr ref to instance. (3) extra properties picked up (though
 # they should be normal not static)
-expected_diffs['command_pattern.py'] = """
+expected_diffs['testmodule_command_pattern.py'] = """
 --- before.py
 +++ after.py
 @@ -5,2 +5 @@
@@ -161,7 +144,7 @@ expected_diffs['command_pattern.py'] = """
 """
 
 # ast is better, less module methods found - more correct
-expected_diffs['pynsource.py'] = """
+expected_diffs['testmodule_pynsource.py'] = """
 --- before.py
 +++ after.py
 @@ -1 +1 @@
@@ -226,116 +209,55 @@ expected_diffs['testmodule09_intense.py'] = """
 
 ###########
 
-RUN_TEST_SUITE = 1
+import unittest
 
-if RUN_TEST_SUITE:
-    reset_tests()    
-    test('../../tests/python-in/testmodule01.py')
-    test('../../tests/python-in/testmodule02.py')
-    test('../../tests/python-in/testmodule03.py')
-    test('../../tests/python-in/testmodule04.py')
-    test('../../tests/python-in/testmodule05.py') # (inner classes)
-    test('../../tests/python-in/testmodule06.py')
-    test('../../tests/python-in/testmodule07.py')
-    test('../../tests/python-in/testmodule66.py')
-    report("official parsing tests")
+class TestCase_A(unittest.TestCase):
+    def test_1_official_parsing(self):
+        reset_tests()    
+        test('python-in/testmodule01.py')
+        test('python-in/testmodule02.py')
+        test('python-in/testmodule03.py')
+        test('python-in/testmodule04.py')
+        test('python-in/testmodule05.py') # (inner classes)
+        test('python-in/testmodule06.py')
+        test('python-in/testmodule07.py')
+        test('python-in/testmodule66.py')
+        self.assertTrue(report("official parsing tests"))
+
+    def test_2_subsidiary_parsing(self):
+        reset_tests()    
+        test('python-in/testmodule_printframework.py')
+        test('python-in/testmodule_asciiworkspace.py')
+        self.assertTrue(report("subsidiary parsing tests"))
+
+    def test_3_ast_parsing_is_genuinely_better(self):
+        # Expect these to fail cos ast parsing is genuinely better
+        reset_tests()    
+        test_not('python-in/testmodule08_multiple_inheritance.py', expected_diffs)
+        test_not('python-in/testmodule_command_pattern.py', expected_diffs)
+        test_not('python-in/testmodule_pynsource.py', expected_diffs)
+        test_not('python-in/testmodule09_intense.py', expected_diffs)
+        self.assertTrue(report("ast parsing is genuinely better"))
     
-    reset_tests()    
-    test('../../src/printframework.py')
-    test('../../src/asciiworkspace.py')
-    report("subsidiary parsing tests")
-    
-    # Expect these to fail cos ast parsing is genuinely better
-    reset_tests()    
-    test_not('../../tests/python-in/testmodule08_multiple_inheritance.py', expected_diffs)
-    test_not('../../src/command_pattern.py', expected_diffs)
-    test_not('../../src/pynsource.py', expected_diffs)
-    test_not('../../tests/python-in/testmodule09_intense.py', expected_diffs)
-    report("ast parsing is genuinely better")
+def suite():
+    suite1 = unittest.makeSuite(TestCase_A, 'test')
+    #suite2 = unittest.makeSuite(test_2_subsidiary_parsing, 'test')
+    #suite3 = unittest.makeSuite(test_3_ast_parsing_is_genuinely_better, 'test')
+    #suite4 = unittest.makeSuite(TestCase_D_MultipleAttrBeforeClassic, 'test')
+    #suite5 = unittest.makeSuite(TestCase_E_DoubleCall, 'test')
+    #suite6 = unittest.makeSuite(TestCase_F_CallThenTrailingInstance, 'test')
+    #suite7 = unittest.makeSuite(TestCase_G_AttrBeforeRhsInstance, 'test')
+    #suite8 = unittest.makeSuite(TestCase_AddHoc, 'test')
+    #alltests = unittest.TestSuite((suite1, suite2, suite3, suite4, suite5, suite6, suite7))
+    alltests = unittest.TestSuite((suite1, ))
+    #alltests = unittest.TestSuite((suite1, suite2, suite3))
+    return alltests
 
-    # Extras
-    print
+def main():
+    runner = unittest.TextTestRunner(descriptions = 0, verbosity = 2) # default is descriptions=1, verbosity=1
+    runner.run(suite())
 
-#print parse_and_convert('../../src/pyNsourceGui.py') # different - to investigate
-#print parse_and_convert('../../tests/python-in/testmodule09_intense.py')
+if __name__ == '__main__':
+    main()
+    #print parse_old_and_new('../../src/pyNsourceGui.py') # different - to investigate
 
-"""
-pyNsourceGui.py
-
-OLD PARSING
-[('log', 'Log'),            OK      self.log = Log()
--                           MISSES  from self.frame = wx.Frame    ?
--                           MISSES  self.notebook = wx.Notebook
-('umlwin', 'UmlCanvas'),    OK      self.umlwin = UmlCanvas
-('umlwin', 'UmlCanvas'),    x2 ?
-('umlwin', 'UmlCanvas'),    x3 ?
--                           MISSES  self.multiText = wx.TextCtrl(self.asciiart, -1, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE|wx.HSCROLL)
-('app', 'App'),             OK      self.app = App(context)
-('config', 'ConfigObj')]    OK      self.config = ConfigObj(self.user_config_file) # doco at 
--
-- lots of others missed
-- ...
-
-NEW PARSING
-Latest
-------
-('log', 'Log')
-('frame', 'wx.Frame')
-('notebook', 'wx.Notebook')
-('umlwin', 'UmlCanvas')
-('asciiart', 'wx.Panel')
-('multiText', 'wx.TextCtrl')
-('app', 'App')
-('config', 'ConfigObj')
-('popupmenu', 'wx.Menu')
-('next_menu_id', 'wx.NewId')
-('printData', 'wx.PrintData')
-('box', 'wx.BoxSizer')
-('canvas', 'GetDiagram')    STILL WRONG should be skipped
-('preview', 'wx.PrintPreview')
-
-Previous
---------
-[('log', 'Log'),            OK      self.log = Log()
-('frame', 'wx'),            MORE    from self.frame = wx.Frame    ? should pick up more? **FIXED**
--                           MISSES  self.notebook = wx.Notebook(self.frame, -1)   **FIXED**
-('umlwin', 'panel'),        WRONG   self.umlwin = UmlCanvas(panel, Log(), self.frame)   **FIXED**
-('umlwin', 'notebook'),     WRONG   self.umlwin = UmlCanvas(self.notebook, Log(), self.frame)   **FIXED**
-('umlwin', 'frame'),        WRONG   self.umlwin = UmlCanvas(self.frame, Log(), self.frame)   **FIXED**
-('multiText', 'wx'),        MORE    self.multiText = wx.TextCtrl(self.asciiart, -1, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE|wx.HSCROLL)   **FIXED**
-('app', 'App'),             OK      self.app = App(context)
-('user_config_file',
-      'config_dir'),        SHOULDSKIP   self.user_config_file = os.path.join(config_dir, PYNSOURCE_CONFIG_FILE)   **FIXED**
--                           MISSES  self.config = ConfigObj(self.user_config_file) # doco at   **FIXED**
-
-('popupmenu', 'wx'),        MORE    self.popupmenu = wx.Menu()     # Create a menu   **FIXED**
-('next_menu_id', 'wx'),     SKIP    self.next_menu_id = wx.NewId() ---- yike how to tell if LIBRARY call is class or function !!
-
--                           MISSES  self.printData = wx.PrintData()   **FIXED**
-('printData', 'wx'),        MORE    self.printData = wx.PrintData()   **FIXED**
-
-('box', 'wx'),              MORE    self.box = wx.BoxSizer(wx.VERTICAL)   **FIXED**
-('canvas', 'umlwin')]       MORE2   self.canvas = self.umlwin.GetDiagram().GetCanvas()  STILL WRONG
-
-notes:
-with WRONG obviously its the postion of the call before bracket that is wrong.
-perhaps need different number for append calls vs. assignment calls?
-
-
-
-
-"""
-
-
-
-"""
-TODO
-
-handle properties
-    currentItem = property(_get_current_item)
-    currentRedoItem = property(_get_current_redo_item)
-    maxItems = property(_get_max_items, _set_max_items)
-currently appearing as static attrs - which is ok.  Should be normal attra.
-
-
-"""
