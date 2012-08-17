@@ -258,7 +258,7 @@ def main():
     runner.run(suite())
 
 if __name__ == '__main__':
-    #main()
+    main()
     #print parse_old_and_new('../../src/pyNsourceGui.py') # different - ok
-    print parse_old_and_new('python-in/testmodule08_multiple_inheritance.py')
+    #print parse_old_and_new('python-in/testmodule08_multiple_inheritance.py')
 

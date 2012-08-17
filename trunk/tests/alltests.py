@@ -53,7 +53,8 @@ def suite():
             'test_asciiworkspace_02',
             'test_parse_yuml_01',
             'test_rhs_analyser',
-            'test_parse_old_vs_new'
+            'test_parse_old_vs_new',
+            'test_graph_nodes'
             )   # ANDY - and so on
     alltests = unittest.TestSuite()
     for module in map(__import__, modules_to_test):
