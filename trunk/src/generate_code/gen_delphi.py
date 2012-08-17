@@ -1,7 +1,7 @@
 # generate delphi
 
 import os
-from keywords import delphikeywords
+from parsing.keywords import delphikeywords
 from gen_base import ReportGenerator, CmdLineGenerator
 from messages import DELPHI_UNIT_FILE_TEMPLATE
 

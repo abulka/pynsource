@@ -51,7 +51,9 @@ def suite():
             'test_overlaps2stress',
             'test_asciiworkspace_01',
             'test_asciiworkspace_02',
-            'test_parse_yuml_01'
+            'test_parse_yuml_01',
+            'test_rhs_analyser',
+            'test_parse_old_vs_new'
             )   # ANDY - and so on
     alltests = unittest.TestSuite()
     for module in map(__import__, modules_to_test):
