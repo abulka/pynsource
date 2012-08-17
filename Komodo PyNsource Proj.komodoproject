@@ -23,12 +23,12 @@
 </preference-set>
 <preference-set id="Main Tests">
   <string id="command_line"></string>
-  <string relative="url" id="directory">tests/</string>
+  <string relative="url" id="directory">tests</string>
   <string id="language">Python - unittest</string>
 </preference-set>
 <preference-set id="Rhs Analyser Parsing">
   <string id="command_line">test_rhs_analyser.py test_parse_old_vs_new.py</string>
-  <string relative="url" id="directory">tests/</string>
+  <string relative="url" id="directory">tests</string>
   <string id="language">Python - unittest</string>
 </preference-set>
 </preference-set>

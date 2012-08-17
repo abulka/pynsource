@@ -27,7 +27,7 @@ def parse_old_and_new(in_filename, print_diffs=True):
         log = LogWriterNull()
     
     def oldparse():
-        model = old_parser(in_filename)
+        model, debuginfo = old_parser(in_filename)
         d1 = dump_old_structure(model)
         log.out_wrap_in_html(d1, style_class='dump1')
         return d1
@@ -121,7 +121,7 @@ expected_diffs['testmodule08_multiple_inheritance.py'] = """
 +++ after.py
 @@ -1 +1 @@
 -Fred (is module=0) inherits from ['Mary', 'MarySam'] class dependencies []
-+Fred (is module=0) inherits from ['Mary', 'Mary.Sam'] class dependencies []
++Fred (is module=0) inherits from ['Mary', 'Sam'] class dependencies []
 """
 
 # ast is better, (1) nested module functions ignored. (2) class actually checked
@@ -258,6 +258,7 @@ def main():
     runner.run(suite())
 
 if __name__ == '__main__':
-    main()
-    #print parse_old_and_new('../../src/pyNsourceGui.py') # different - to investigate
+    #main()
+    #print parse_old_and_new('../../src/pyNsourceGui.py') # different - ok
+    print parse_old_and_new('python-in/testmodule08_multiple_inheritance.py')
 
