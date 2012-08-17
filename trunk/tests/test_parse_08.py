@@ -6,17 +6,19 @@ import os
 
 import sys
 sys.path.append("../src")
-from generate_code.gen_asciiart import PySourceAsText
+from parsing.api import old_parser, new_parser
 
 class TestCase08(unittest.TestCase):
     def setUp(self):
-        self.p = PySourceAsText()
-
+        pass
+                
     def test01(self):
         """
         """
         FILE = 'python-in/testmodule08_multiple_inheritance.py'
-        self.p.Parse(FILE)
+
+        #self.p, debuginfo = old_parser(FILE)
+        self.p, debuginfo = new_parser(FILE)
 
         #print self.p
 

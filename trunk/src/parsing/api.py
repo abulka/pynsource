@@ -7,13 +7,11 @@ from parsing.core_parser_ast import convert_ast_to_old_parser
 from logwriter import LogWriterNull
 
 def old_parser(filename):
-    import sys
-    sys.path.append("../../src")
     from generate_code.gen_asciiart import PySourceAsText
     
     p = PySourceAsText()
     p.Parse(filename)
-    return p
+    return p, ''
 
 def new_parser(filename, log=None):
     if not log:

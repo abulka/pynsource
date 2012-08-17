@@ -2,6 +2,7 @@ from base_cmd import CmdBase
 from generate_code.gen_java import PySourceAsJava
 import wx
 import os
+from parsing.api import old_parser, new_parser
 
 class CmdFileNew(CmdBase):
     def execute(self):
@@ -21,11 +22,15 @@ class CmdFileImportBase(CmdBase):   # BASE
 
         if self.files:
             for f in self.files:
-                p = PySourceAsJava()
-                p.optionModuleAsClass = 0
-                p.verbose = 0
-                p.Parse(f)
-                self.context.model.ConvertParseModelToUmlModel(p)
+                #pmodel, debuginfo = old_parser(f)
+                pmodel, debuginfo = new_parser(f)
+                self.context.model.ConvertParseModelToUmlModel(pmodel)
+
+                #p = PySourceAsJava()
+                #p.optionModuleAsClass = 0
+                #p.verbose = 0
+                #p.Parse(f)
+                #self.context.model.ConvertParseModelToUmlModel(p)
 
         self.context.umlwin.build_view()
 
@@ -58,7 +63,7 @@ class CmdFileImportViaDialog(CmdFileImportBase):    # was class CmdFileImport(Cm
             super(CmdFileImportViaDialog, self).execute()
 
             wx.EndBusyCursor()
-            print 'Import - Done.'
+            #print 'Import - Done.'
             
         dlg.Destroy()
         

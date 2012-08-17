@@ -390,6 +390,8 @@ def convert_ast_to_old_parser(node, filename, _log):
 
                 # A
                 c.classesinheritsfrom.append(".".join(self.lhs))
+                self.write('classesinheritsfrom append %s cos lhs is %s' % (".".join(self.lhs), self.lhs))
+                self.lhs = []
             
             self.body(node.body)
 
