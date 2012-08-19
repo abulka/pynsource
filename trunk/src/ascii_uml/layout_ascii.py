@@ -146,6 +146,12 @@ class model_to_ascii_builder:
                 break
         return result
 
+    def next_node_is_fc(self, nodes, current_i):
+        if current_i >= len(nodes) - 1:
+            return False
+        else:
+            next_node, annotation = nodes[current_i + 1]
+            return annotation == 'fc'
 
     def list_parents(self, rels_generalisation):
         parents = []
@@ -153,25 +159,26 @@ class model_to_ascii_builder:
             parents += "[ " + klass + " ]"
         return parents
 
-    def main(self, graph, nodes_sorted=None):
+    def main(self, graph, nodes_annotated_and_sorted=None):
         w = AsciiWorkspace(margin=7)
         
         """
-        Calling graph.nodes_sorted_by_generalisation gives us an annotated
+        Calling graph.nodes_sorted_by_generalisation() gives us an annotated
         inheritance chain. We then process the nodes in that order, so that
-        inheritance can be drawn top down (assuming single inheritance).
+        inheritance can be drawn top down (assuming single inheritance as the
+        most common case). Update: Now handles multiple inheritance too.
         """
         print [(node.id,annotation) for node,annotation in graph.nodes_sorted_by_generalisation]
 
-        if not nodes_sorted:
-            nodes_sorted = graph.nodes_sorted_by_generalisation
+        if not nodes_annotated_and_sorted:
+            nodes_annotated_and_sorted = graph.nodes_sorted_by_generalisation
             
         NUM_ROOTS_PER_LINE = 3
         root_counter = 0
         s = ""
         i = 0
-        #nodes = graph.nodes_sorted_by_generalisation
-        nodes = nodes_sorted
+        row_top_padding = ""
+        nodes = nodes_annotated_and_sorted
         for i in range(len(nodes)):
             node,annotation = nodes[i]
 
@@ -182,23 +189,27 @@ class model_to_ascii_builder:
                 # Unless the root is part of a bunch of root loners as controlled by NUM_ROOTS_PER_LINE
                 if annotation == 'root':
                     w.AddColumn(s)
-                    if root_counter == 0:
+                    if root_counter <= 0 or self.next_node_is_fc(nodes, i):
                         w.Flush()
+                        row_top_padding = "\n\n"  # ONE, TWO
                         root_counter = NUM_ROOTS_PER_LINE
                     else:
                         root_counter -= 1
-                    s = "\n\n\n"
+                    s = "\n\n\n" # ONE, TWO, THREE
                 
                 # Any fc (first child) needs to be put on a fresh line, but no header margin cos want to glue to parent
                 elif annotation == 'fc':
                     w.AddColumn(s)
                     w.Flush()
+                    row_top_padding = ""
                     root_counter = 0
                     s = ""
-                # Else tab need to be added to previous line, thus no Flush.  Header margin depends on what the ??? is
+                # Else tab need to be added to previous line, thus no Flush.
                 else:
                     w.AddColumn(s)
-                    s = ""
+                    #s = ""
+                    s = row_top_padding
+                    root_counter -= 1
 
             maxwidth = NodeWidthCalc(node).calc()
             # Ensure root or fc is as wide as its fc below it, so that parent nodes are not too thin and so generalisation line connects to parent properly.
@@ -212,17 +223,17 @@ class model_to_ascii_builder:
         
             if rels_generalisation:
                 if annotation == 'tab':
-                    s += "\n"
+                    s += "\n"               # THREE
                     s += "".join(self.list_parents(rels_generalisation)).center(maxwidth, " ") + "\n"
 
-                if annotation == 'root' and len(rels_generalisation) > 1:   # List multiple parents as aliases when multiple inheritance
+                if annotation == 'root': #and len(rels_generalisation) > 1:   # List multiple parents as aliases when multiple inheritance
                     s += "".join(self.list_parents(rels_generalisation)).center(maxwidth, " ") + "\n"
 
                 s += " . ".center(maxwidth, " ") + "\n"
                 s += "/_\\".center(maxwidth, " ") + "\n"
                 s += " | ".center(maxwidth, " ") + "\n"
                 s += " | ".center(maxwidth, " ") + "\n"
-                if annotation != 'tab':
+                if annotation == 'fc':
                     s += (" | ".center(maxwidth, " ") + "\n") * 2  # draw extra lines to match the 'tab' case where parents are listed, so that child nodes line up horizontally
 
             s += self.top_or_bottom_line(maxwidth)
@@ -237,7 +248,7 @@ class model_to_ascii_builder:
 
             s += self.top_or_bottom_line(maxwidth)
 
-            # Add extra height by drawing a veritcal line underneath current node
+            # Add extra height by drawing a vertical line underneath current node
             # if any subsequent siblings are going to be pushing megarow to be taller
             # This way the generalisation line drawn later by the fc will actually join up.
             # Only need this if there is a fc coming up - hence the check for node_next_fc
