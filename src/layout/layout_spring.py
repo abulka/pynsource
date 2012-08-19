@@ -18,6 +18,10 @@ class GraphLayoutSpring:
         self.gui = gui
        
     def layout(self, keep_current_positions=False, optimise=True):
+        if len(self.graph.nodes) == 0:
+            print "Layout aborted - nothing to lay out."
+            return 
+        
         if not keep_current_positions:
             self.layoutPrepare()
 
