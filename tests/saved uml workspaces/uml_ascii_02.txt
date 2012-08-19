@@ -1,0 +1,54 @@
+{'type':'node', 'id':'CmdDumpUmlWorkspace', 'x':46, 'y':286, 'width':219, 'height':67, 'attrs':'', 'meths':'execute'}
+{'type':'node', 'id':'CmdBase', 'x':122, 'y':403, 'width':87, 'height':31, 'attrs':'', 'meths':''}
+{'type':'node', 'id':'CmdFileSaveWorkspace', 'x':10, 'y':484, 'width':230, 'height':67, 'attrs':'', 'meths':'execute'}
+{'type':'node', 'id':'CmdFileLoadWorkspaceFromQuickPrompt', 'x':63, 'y':169, 'width':395, 'height':67, 'attrs':'', 'meths':'execute'}
+{'type':'node', 'id':'CmdFileImportViaDialog', 'x':460, 'y':367, 'width':252, 'height':109, 'attrs':'context|files', 'meths':'execute'}
+{'type':'node', 'id':'CmdRefreshUmlWindow', 'x':87, 'y':601, 'width':219, 'height':67, 'attrs':'', 'meths':'execute'}
+{'type':'node', 'id':'CmdFileImportBase', 'x':315, 'y':250, 'width':197, 'height':67, 'attrs':'', 'meths':'execute'}
+{'type':'node', 'id':'CmdFileLoadWorkspaceViaDialog', 'x':151, 'y':10, 'width':329, 'height':109, 'attrs':'filepath|context', 'meths':'execute'}
+{'type':'node', 'id':'CmdFileNew', 'x':290, 'y':367, 'width':120, 'height':67, 'attrs':'', 'meths':'execute'}
+{'type':'node', 'id':'CmdFileSaveWorkspaceToConsole', 'x':108, 'y':802, 'width':329, 'height':67, 'attrs':'', 'meths':'execute'}
+{'type':'node', 'id':'CmdBootStrap', 'x':762, 'y':286, 'width':142, 'height':221, 'attrs':'frame|app|umlwin', 'meths':'execute|bootstrap01|bootstrap02|bootstrap03|bootstrap04|bootstrap05|bootstrap06'}
+{'type':'node', 'id':'CmdFileImportFromFilePath', 'x':864, 'y':143, 'width':285, 'height':93, 'attrs':'files', 'meths':'__init__'}
+{'type':'node', 'id':'CmdFileLoadWorkspaceFromFilepath', 'x':315, 'y':526, 'width':362, 'height':93, 'attrs':'filepath', 'meths':'__init__'}
+{'type':'node', 'id':'CmdFileLoadWorkspaceBase', 'x':508, 'y':70, 'width':306, 'height':109, 'attrs':'filepath', 'meths':'load_model_from_text_and_build_shapes|execute'}
+{'type':'node', 'id':'CmdEditClass', 'x':727, 'y':543, 'width':142, 'height':125, 'attrs':'shape', 'meths':'__init__|execute|undo'}
+{'type':'node', 'id':'CmdInsertComment', 'x':35, 'y':919, 'width':186, 'height':93, 'attrs':'context', 'meths':'execute'}
+{'type':'node', 'id':'CmdInsertImage', 'x':954, 'y':286, 'width':178, 'height':99, 'attrs':'', 'meths':'execute|create_new_image_node|undo'}
+{'type':'node', 'id':'CmdInsertNewNodeClass', 'x':625, 'y':669, 'width':241, 'height':83, 'attrs':'', 'meths':'execute|undo'}
+{'type':'node', 'id':'CmdInsertOrEditNode', 'x':356, 'y':669, 'width':219, 'height':83, 'attrs':'', 'meths':'DisplayDialogUmlNodeEdit|string_to_list_smart'}
+{'type':'node', 'id':'EditDialog', 'x':954, 'y':435, 'width':138, 'height':67, 'attrs':'', 'meths':'OnClassNameEnter'}
+{'type':'node', 'id':'DialogUmlNodeEdit', 'x':954, 'y':552, 'width':197, 'height':31, 'attrs':'', 'meths':''}
+{'type':'edge', 'id':'CmdDumpUmlWorkspace_to_CmdBase', 'source':'CmdDumpUmlWorkspace', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdDumpUmlWorkspace_to_CmdBase', 'source':'CmdDumpUmlWorkspace', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileSaveWorkspace_to_CmdBase', 'source':'CmdFileSaveWorkspace', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileLoadWorkspaceFromQuickPrompt_to_CmdFileLoadWorkspaceBase', 'source':'CmdFileLoadWorkspaceFromQuickPrompt', 'target':'CmdFileLoadWorkspaceBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileImportViaDialog_to_CmdFileImportBase', 'source':'CmdFileImportViaDialog', 'target':'CmdFileImportBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdRefreshUmlWindow_to_CmdBase', 'source':'CmdRefreshUmlWindow', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileImportBase_to_CmdBase', 'source':'CmdFileImportBase', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileLoadWorkspaceViaDialog_to_CmdFileLoadWorkspaceBase', 'source':'CmdFileLoadWorkspaceViaDialog', 'target':'CmdFileLoadWorkspaceBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileNew_to_CmdBase', 'source':'CmdFileNew', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileSaveWorkspaceToConsole_to_CmdBase', 'source':'CmdFileSaveWorkspaceToConsole', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdBootStrap_to_CmdBase', 'source':'CmdBootStrap', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileImportFromFilePath_to_CmdFileImportBase', 'source':'CmdFileImportFromFilePath', 'target':'CmdFileImportBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileLoadWorkspaceFromFilepath_to_CmdFileLoadWorkspaceBase', 'source':'CmdFileLoadWorkspaceFromFilepath', 'target':'CmdFileLoadWorkspaceBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileLoadWorkspaceBase_to_CmdBase', 'source':'CmdFileLoadWorkspaceBase', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdDumpUmlWorkspace_to_CmdBase', 'source':'CmdDumpUmlWorkspace', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileSaveWorkspace_to_CmdBase', 'source':'CmdFileSaveWorkspace', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileLoadWorkspaceFromQuickPrompt_to_CmdFileLoadWorkspaceBase', 'source':'CmdFileLoadWorkspaceFromQuickPrompt', 'target':'CmdFileLoadWorkspaceBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileImportViaDialog_to_CmdFileImportBase', 'source':'CmdFileImportViaDialog', 'target':'CmdFileImportBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdRefreshUmlWindow_to_CmdBase', 'source':'CmdRefreshUmlWindow', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileImportBase_to_CmdBase', 'source':'CmdFileImportBase', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileLoadWorkspaceViaDialog_to_CmdFileLoadWorkspaceBase', 'source':'CmdFileLoadWorkspaceViaDialog', 'target':'CmdFileLoadWorkspaceBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileNew_to_CmdBase', 'source':'CmdFileNew', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileSaveWorkspaceToConsole_to_CmdBase', 'source':'CmdFileSaveWorkspaceToConsole', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdBootStrap_to_CmdBase', 'source':'CmdBootStrap', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileImportFromFilePath_to_CmdFileImportBase', 'source':'CmdFileImportFromFilePath', 'target':'CmdFileImportBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileLoadWorkspaceFromFilepath_to_CmdFileLoadWorkspaceBase', 'source':'CmdFileLoadWorkspaceFromFilepath', 'target':'CmdFileLoadWorkspaceBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdFileLoadWorkspaceBase_to_CmdBase', 'source':'CmdFileLoadWorkspaceBase', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdEditClass_to_CmdInsertOrEditNode', 'source':'CmdEditClass', 'target':'CmdInsertOrEditNode', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdInsertComment_to_CmdBase', 'source':'CmdInsertComment', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdInsertImage_to_CmdBase', 'source':'CmdInsertImage', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdInsertNewNodeClass_to_CmdInsertOrEditNode', 'source':'CmdInsertNewNodeClass', 'target':'CmdInsertOrEditNode', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdInsertOrEditNode_to_CmdBase', 'source':'CmdInsertOrEditNode', 'target':'CmdBase', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'EditDialog_to_DialogUmlNodeEdit', 'source':'EditDialog', 'target':'DialogUmlNodeEdit', 'uml_edge_type':'generalisation'}

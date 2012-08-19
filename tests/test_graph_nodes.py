@@ -322,7 +322,7 @@ class TestCase_A(unittest.TestCase):
         from ascii_uml.layout_ascii import model_to_ascii_builder
 
         m = model_to_ascii_builder()
-        s = m.main(g, nodes_sorted=mycustom_ordering)
+        s = m.main(g, nodes_annotated_and_sorted=mycustom_ordering)
         #print
         #print s
 
