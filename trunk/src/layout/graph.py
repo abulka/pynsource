@@ -110,6 +110,14 @@ class Graph:
             return result
         
         def process_descendants(node, prevent_fc=False):
+            """
+            Note: this algorithm takes a while to understand. There is recursion
+            here too. The basic idea is to start with the lone nodes (those
+            without parents) and add them to a result list in the form of (node,
+            'annotation'). Usually a lone node gets the 'root' annotation and
+            the biggest (most methods/attrs) child (subclass) gets the honor to
+            be 'fc'.
+            """
             result = []
             kids = sort_siblings(node.children)
             for child in kids:

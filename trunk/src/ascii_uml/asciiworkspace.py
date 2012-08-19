@@ -1,4 +1,9 @@
 class AsciiWorkspace:
+    """
+    Looks after organising things in rows and columns with appropriate padding.
+    You send it chunks of text and flush/newline commands and it will appear in
+    a nice grid format. 
+    """
     def __init__(self, margin=3):
         self.contents = ""    # TODO rename _contents
         self.margin = margin
