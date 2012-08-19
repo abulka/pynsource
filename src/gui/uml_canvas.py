@@ -148,6 +148,18 @@ class UmlCanvas(ogl.ShapeCanvas):
         elif keycode == 's':
             self.canvas_resizer.resize_virtual_canvas_tofit_bounds(shrinkage_leeway=0, bounds_dirty=True)
         
+        elif keycode in ['c', 'C']:
+            if keycode == 'c':
+                self.OnCycleColours()
+            else:
+                self.OnCycleColours(colour=wx.Brush("WHEAT", wx.SOLID))
+
+        elif keycode in ['v', 'V']:
+            if keycode == 'V':
+                self.OnColourSiblings(color_range_offset=True)
+            else:
+                self.OnColourSiblings()
+
         self.working = False
         event.Skip()
 
@@ -168,6 +180,13 @@ class UmlCanvas(ogl.ShapeCanvas):
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
         shape.Select(True, dc)  # could pass None as dc if you don't want to trigger the OnDrawControlPoints(dc) handler immediately - e.g. if you want to do a complete redraw of everything later anyway
+        
+        # change colour when select
+        #shape.SetBrush(wx.WHITE_BRUSH) #wx.Brush("WHEAT", wx.SOLID))
+        #canvas.Refresh(False) # works
+        #canvas.Redraw(dc) # works too
+        #shape.Draw(dc) # works too, most efficient
+        
         #canvas.Refresh(False)   # t/f or don't use - doesn't seem to make a difference
         
         #self.UpdateStatusBar(shape)  # only available in the shape evt handler (this method used to live there...)
@@ -520,6 +539,55 @@ class UmlCanvas(ogl.ShapeCanvas):
         if self.remove_overlaps():
             self.stateofthenation()
 
+
+    def OnColourSiblings(self, color_range_offset=False):
+        from uml_colours import official2
+
+        
+        if color_range_offset:
+            offset = random.randint(1, 10)
+        else:
+            offset = 0
+
+        self.umlworkspace.graph.mark_siblings()
+        clrs = official2.strip().split('\n')
+
+        dc = wx.ClientDC(self)
+        self.PrepareDC(dc)
+        for node in self.umlworkspace.graph.nodes:
+            clr = clrs[node.colour_index + offset]
+            colour=wx.Brush(clr)
+            
+            node.shape.SetBrush(colour)
+            print "colour_index", node.id, node.colour_index, clr
+        self.Redraw(dc)
+        
+    def OnCycleColours(self, colour=None):
+        
+        from uml_colours import official2
+
+        if colour == None:
+            #colour=wx.WHITE_BRUSH
+            
+            #from wx.lib.colourdb import getColourList
+            #clrs = getColourList()
+            
+            #clrs = good.strip().split('\n')
+            clrs = official2.strip().split('\n')
+            
+            clr = clrs[random.randint(0,len(clrs)-1)]
+            print clr
+            #colour=wx.Brush(clr, wx.SOLID)
+            colour=wx.Brush(clr)
+        
+        dc = wx.ClientDC(self)
+        self.PrepareDC(dc)
+        for node in self.umlworkspace.graph.nodes:
+            node.shape.SetBrush(colour)
+        self.Redraw(dc)
+
+
+    
     def get_umlboxshapes(self):
         #return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
         return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]  # TODO take into account images and other shapes

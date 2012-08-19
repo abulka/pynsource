@@ -138,26 +138,6 @@ class Graph:
                 result.extend(process_descendants(child, prevent_fc=not isfirst))
             return result
 
-        def setup_temporary_parent_child_relationships():
-            # setup temporary parent and child relationship attributes based on generalisation
-            for node in self.nodes:
-                node.parents = []
-                node.children = []
-            for edge in self.edges:
-                if edge.has_key('uml_edge_type') and edge['uml_edge_type'] == 'generalisation':
-                    parent = edge['target']
-                    child = edge['source']
-                    if parent not in child.parents:
-                        child.parents.append(parent)
-                    if child not in parent.children:
-                        parent.children.append(child)
-
-        def del_temporary_parent_child_relationships():
-            # remove parent / child knowledge attributes
-            for node in self.nodes:
-                del node.parents
-                del node.children
-            
         def order_the_nodes():                
             result = []
             parentless_nodes = [node for node in self.nodes if not node.parents]
@@ -169,7 +149,7 @@ class Graph:
 
         assert len(set(self.nodes)) == len(self.nodes), [node.id for node in self.nodes]                                # ensure no duplicates exist
         
-        setup_temporary_parent_child_relationships()
+        self.setup_temporary_parent_child_relationships()
         result = order_the_nodes()
         
         # You CAN get repeated children entries due to having multiple parents (with multiple inheritance)
@@ -178,7 +158,7 @@ class Graph:
         assert len(result) == len(self.nodes), "Count increased! from %d to %d, diff=%s" %(len(self.nodes), len(result), listdiff([node.id for node in self.nodes], [node[0].id for node in result]))         # ensure not introducing duplicates
         assert len(set(result)) == len(result), [node.id for node in result]                                            # ensure no duplicates exist
         
-        del_temporary_parent_child_relationships()                    
+        self.del_temporary_parent_child_relationships()                    
         return result
     
     def remove_duplicates_preserver_order(self, lzt):
@@ -189,7 +169,46 @@ class Graph:
             #else:
             #    print "duplicate skipped", item
         return result
+
+    def setup_temporary_parent_child_relationships(self):
+        # setup temporary parent and child relationship attributes based on generalisation
+        for node in self.nodes:
+            node.parents = []
+            node.children = []
+        for edge in self.edges:
+            if edge.has_key('uml_edge_type') and edge['uml_edge_type'] == 'generalisation':
+                parent = edge['target']
+                child = edge['source']
+                if parent not in child.parents:
+                    child.parents.append(parent)
+                if child not in parent.children:
+                    parent.children.append(child)
+
+    def mark_siblings(self):
+        self.setup_temporary_parent_child_relationships()
+
+        def process_descendants(node, index):
+            kids = node.children
+            for child in kids:
+                child.colour_index = index
+
+            for child in kids:
+                index += 1
+                process_descendants(child, index)
+
+        parentless_nodes = [node for node in self.nodes if not node.parents]
+        for node in parentless_nodes:
+            node.colour_index = 0
+            process_descendants(node, 0)
+
+        self.del_temporary_parent_child_relationships()                    
         
+    def del_temporary_parent_child_relationships(self):
+        # remove parent / child knowledge attributes
+        for node in self.nodes:
+            del node.parents
+            del node.children
+                
     # These next methods take id as parameters, not nodes.
     
     def FindNodeById(self, id):
