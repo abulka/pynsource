@@ -3,6 +3,7 @@ sys.path.append("../src")
 from layout.graph import Graph, GraphNode
 from layout.line_intersection import FindLineIntersection
 
+import os
 import unittest
 
 class TestCase_A(unittest.TestCase):
@@ -323,8 +324,6 @@ class TestCase_A(unittest.TestCase):
 
         m = model_to_ascii_builder()
         s = m.main(g, nodes_annotated_and_sorted=mycustom_ordering)
-        #print
-        #print s
 
         expected_s = """
 +---+
@@ -338,24 +337,37 @@ class TestCase_A(unittest.TestCase):
 +---+       /_\       
              |        
              |        
-             |        
             +---+     
             | F |     
             +---+     
         """
 
+        def remove_blank_lines(str):
+            return os.linesep.join([s for s in str.splitlines() if s.strip()])
+            
+        # remove blank lines, since different margins and paddings in ascii uml layout
+        # could cause difference
+        expected_s = remove_blank_lines(expected_s)
+        s = remove_blank_lines(s)
+        
+        #print
+        #print "*"*88
+        #print expected_s
+        #print "*"*88
+        #print s
+        #print "*"*88
+        
         if s.strip() <> expected_s.strip():
+            # Write to file
+            with open('logs/test_8_out_actual_.txt','w') as f: f.write(s)
+            with open('logs/test_8_out_expected.txt','w') as f: f.write(expected_s)
+
             import difflib
             # delta = difflib.ndiff(s.strip(), expected_s.strip()) # this will always emit something, a visual of the original with changes.
             delta = difflib.unified_diff(s.strip(), expected_s.strip(), n=0,
                                 fromfile='actual', tofile='expected')
             diff_s = ''.join(delta)
             print diff_s
-        else:
-            print "No difference"
-        
-        #print s
-        #print expected_s
         
         assert s.strip() == expected_s.strip()
         
