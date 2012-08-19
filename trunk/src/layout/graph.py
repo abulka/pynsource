@@ -113,7 +113,9 @@ class Graph:
             result = []
             kids = sort_siblings(node.children)
             for child in kids:
-                if child == kids[0]:
+                if len(child.parents) > 1:  # multiple inheritance
+                    annotation = "root"
+                elif child == kids[0]:
                     if prevent_fc:
                         annotation = "root"
                     else:
@@ -162,16 +164,24 @@ class Graph:
         setup_temporary_parent_child_relationships()
         result = order_the_nodes()
         
-        # Hmm you CAN get multiple 'root' attributes when dealing with multiple inheritance
-        # and you can thus get repeated children entries due to having multiple parents
-        # hmmm.
+        # You CAN get repeated children entries due to having multiple parents (with multiple inheritance)
+        result = self.remove_duplicates_preserver_order(result) # so filter such duplicates out
+        
         assert len(result) == len(self.nodes), "Count increased! from %d to %d, diff=%s" %(len(self.nodes), len(result), listdiff([node.id for node in self.nodes], [node[0].id for node in result]))         # ensure not introducing duplicates
         assert len(set(result)) == len(result), [node.id for node in result]                                            # ensure no duplicates exist
-        #result = list(set(result)) # possible workaround not good, breaks other things.
         
         del_temporary_parent_child_relationships()                    
         return result
     
+    def remove_duplicates_preserver_order(self, lzt):
+        result = []
+        for item in lzt:
+            if item not in result:
+                result.append(item)
+            #else:
+            #    print "duplicate skipped", item
+        return result
+        
     # These next methods take id as parameters, not nodes.
     
     def FindNodeById(self, id):
