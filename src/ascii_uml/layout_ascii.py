@@ -159,6 +159,9 @@ class model_to_ascii_builder:
             parents += "[ " + klass + " ]"
         return parents
 
+    def cr(self, n=1):
+        return "\n" * n
+    
     def main(self, graph, nodes_annotated_and_sorted=None):
         w = AsciiWorkspace(margin=7)
         
@@ -167,18 +170,29 @@ class model_to_ascii_builder:
         inheritance chain. We then process the nodes in that order, so that
         inheritance can be drawn top down (assuming single inheritance as the
         most common case). Update: Now handles multiple inheritance too.
+        
+        Note: an 'alias' is where you don't draw the whole class box but instead
+        print the class inside square brackets e.g. [Fred].  We only draw aliases
+        above fully drawn nodes, to show what they inherit from.  We also use
+        aliases to depict composition associations.
         """
         print [(node.id,annotation) for node,annotation in graph.nodes_sorted_by_generalisation]
 
         if not nodes_annotated_and_sorted:
             nodes_annotated_and_sorted = graph.nodes_sorted_by_generalisation
             
-        NUM_ROOTS_PER_LINE = 3
+        NUM_LONER_ROOTS_PER_LINE = 3
         root_counter = 0
+        
+        INTRALINE = 2
+        PADDING_ABOVE_ALIASES = 2
+        row_margin = PADDING_ABOVE_ALIASES + INTRALINE
+        row_top_padding = ""
+
+        nodes = nodes_annotated_and_sorted
+        
         s = ""
         i = 0
-        row_top_padding = ""
-        nodes = nodes_annotated_and_sorted
         for i in range(len(nodes)):
             node,annotation = nodes[i]
 
@@ -186,28 +200,26 @@ class model_to_ascii_builder:
                 """ Make decision re what to do with the last node"""
                 
                 # Any root needs to be put on a fresh line, and start new node off with a header margin of \n\n
-                # Unless the root is part of a bunch of root loners as controlled by NUM_ROOTS_PER_LINE
+                # Unless the root is part of a bunch of root loners as controlled by NUM_LONER_ROOTS_PER_LINE
                 if annotation == 'root':
                     w.AddColumn(s)
                     if root_counter <= 0 or self.next_node_is_fc(nodes, i):
                         w.Flush()
-                        row_top_padding = "\n\n"  # ONE, TWO
-                        root_counter = NUM_ROOTS_PER_LINE
-                    else:
-                        root_counter -= 1
-                    s = "\n\n\n" # ONE, TWO, THREE
+                        row_top_padding = self.cr(row_margin - PADDING_ABOVE_ALIASES)  # "\n\n"  # ONE, TWO
+                        root_counter = NUM_LONER_ROOTS_PER_LINE
+                    root_counter -= 1
+                    s = self.cr(row_margin)  # "\n\n\n" # ONE, TWO, THREE
                 
                 # Any fc (first child) needs to be put on a fresh line, but no header margin cos want to glue to parent
                 elif annotation == 'fc':
                     w.AddColumn(s)
                     w.Flush()
                     row_top_padding = ""
-                    root_counter = 0
-                    s = ""
+                    s = row_top_padding
+                    root_counter = 0    # could potentially set to NUM_LONER_ROOTS_PER_LINE - 1 to keep more things on the same row but fc, tab, root sequence is tricky
                 # Else tab need to be added to previous line, thus no Flush.
                 else:
                     w.AddColumn(s)
-                    #s = ""
                     s = row_top_padding
                     root_counter -= 1
 
@@ -223,7 +235,7 @@ class model_to_ascii_builder:
         
             if rels_generalisation:
                 if annotation == 'tab':
-                    s += "\n"               # THREE
+                    s += self.cr(PADDING_ABOVE_ALIASES)     # "\n"  # THREE
                     s += "".join(self.list_parents(rels_generalisation)).center(maxwidth, " ") + "\n"
 
                 if annotation == 'root': #and len(rels_generalisation) > 1:   # List multiple parents as aliases when multiple inheritance
@@ -234,7 +246,7 @@ class model_to_ascii_builder:
                 s += " | ".center(maxwidth, " ") + "\n"
                 s += " | ".center(maxwidth, " ") + "\n"
                 if annotation == 'fc':
-                    s += (" | ".center(maxwidth, " ") + "\n") * 2  # draw extra lines to match the 'tab' case where parents are listed, so that child nodes line up horizontally
+                    s += (" | ".center(maxwidth, " ") + "\n") * (PADDING_ABOVE_ALIASES + 1)  # draw extra lines to match the 'tab' case where parents are listed, so that child nodes line up horizontally
 
             s += self.top_or_bottom_line(maxwidth)
             s += '|%s|' % node.id.center(maxwidth, " ") + "\n"
