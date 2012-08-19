@@ -161,7 +161,7 @@ class model_to_ascii_builder:
         inheritance chain. We then process the nodes in that order, so that
         inheritance can be drawn top down (assuming single inheritance).
         """
-        #print [(node.id,annotation) for node,annotation in graph.nodes_sorted_by_generalisation]
+        print [(node.id,annotation) for node,annotation in graph.nodes_sorted_by_generalisation]
 
         if not nodes_sorted:
             nodes_sorted = graph.nodes_sorted_by_generalisation
@@ -212,6 +212,7 @@ class model_to_ascii_builder:
         
             if rels_generalisation:
                 if annotation == 'tab':
+                    s += "\n"
                     s += "".join(self.list_parents(rels_generalisation)).center(maxwidth, " ") + "\n"
 
                 if annotation == 'root' and len(rels_generalisation) > 1:   # List multiple parents as aliases when multiple inheritance
@@ -222,7 +223,7 @@ class model_to_ascii_builder:
                 s += " | ".center(maxwidth, " ") + "\n"
                 s += " | ".center(maxwidth, " ") + "\n"
                 if annotation != 'tab':
-                    s += " | ".center(maxwidth, " ") + "\n"     # draw extra line to match the 'tab' case where parents are listed, so that child nodes line up horizontally
+                    s += (" | ".center(maxwidth, " ") + "\n") * 2  # draw extra lines to match the 'tab' case where parents are listed, so that child nodes line up horizontally
 
             s += self.top_or_bottom_line(maxwidth)
             s += '|%s|' % node.id.center(maxwidth, " ") + "\n"
@@ -241,7 +242,10 @@ class model_to_ascii_builder:
             # This way the generalisation line drawn later by the fc will actually join up.
             # Only need this if there is a fc coming up - hence the check for node_next_fc
             def height_of(node):
-                return len(node.meths)+len(node.attrs)
+                result = len(node.meths) + len(node.attrs)
+                if len(node.meths) and len(node.attrs):     # account for the extra dividing line if have both attrs and methods
+                    result += 1
+                return result
                 
             if annotation in ['fc', 'root'] and node_next_fc:
                 siblings = [node]
@@ -249,7 +253,7 @@ class model_to_ascii_builder:
                 max_megarow_height = max([height_of(sibling) for sibling in siblings])
                 padding_needed = max_megarow_height - height_of(node)
                 if padding_needed:
-                    s += (" | ".center(maxwidth, " ") + "\n") * padding_needed
+                    s += (" | ".center(maxwidth, " ") + "\n") * padding_needed  # long line drawn here
 
             s = s.rstrip()
 
