@@ -92,7 +92,7 @@ class model_to_ascii_builder:
             parents += "[ " + klass + " ]"
         return parents
 
-    def main(self, graph):
+    def main(self, graph, nodes_sorted=None):
         w = AsciiWorkspace(margin=7)
         
         """
@@ -102,11 +102,15 @@ class model_to_ascii_builder:
         """
         #print [(node.id,annotation) for node,annotation in graph.nodes_sorted_by_generalisation]
 
+        if not nodes_sorted:
+            nodes_sorted = graph.nodes_sorted_by_generalisation
+            
         NUM_ROOTS_PER_LINE = 3
         root_counter = 0
         s = ""
         i = 0
-        nodes = graph.nodes_sorted_by_generalisation
+        #nodes = graph.nodes_sorted_by_generalisation
+        nodes = nodes_sorted
         for i in range(len(nodes)):
             node,annotation = nodes[i]
 
@@ -148,6 +152,10 @@ class model_to_ascii_builder:
             if rels_generalisation:
                 if annotation == 'tab':
                     s += "".join(self.list_parents(rels_generalisation)).center(maxwidth, " ") + "\n"
+
+                if annotation == 'root' and len(rels_generalisation) > 1:   # List multiple parents as aliases when multiple inheritance
+                    s += "".join(self.list_parents(rels_generalisation)).center(maxwidth, " ") + "\n"
+
                 s += " . ".center(maxwidth, " ") + "\n"
                 s += "/_\\".center(maxwidth, " ") + "\n"
                 s += " | ".center(maxwidth, " ") + "\n"

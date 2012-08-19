@@ -282,22 +282,83 @@ class TestCase_A(unittest.TestCase):
         s = GraphNode('S', 0, 0, 200, 200)
         g.AddEdge(f, m)['uml_edge_type'] = 'generalisation'
         g.AddEdge(f, s)['uml_edge_type'] = 'generalisation'
+
         nodelist_normal = [node.id for node in g.nodes]
+        #print "nodelist_normal", nodelist_normal
     
         nodelist_sorted = [node.id for node,annotation in g.nodes_sorted_by_generalisation]
-        #nodelist_sorted_expected = ['A', 'B', 'D', 'F', 'C', 'H', 'E']
-        #assert nodelist_sorted_expected == nodelist_sorted
+        nodelist_sorted_expected = ['M', 'F', 'S']
+        assert nodelist_sorted_expected == nodelist_sorted, nodelist_sorted
     
-        print "nodelist_normal", nodelist_normal
         #print "nodelist_sorted_expected", nodelist_sorted_expected
-        print "nodelist_sorted", nodelist_sorted
+        #print "nodelist_sorted", nodelist_sorted
     
         nodelist_sorted_annotated = [(node.id, annotation) for node,annotation in g.nodes_sorted_by_generalisation]
-        #nodelist_sorted_expected_annotated = [('A', 'root'), ('B', 'fc'), ('D', 'tab'), ('F', 'tab'), ('C', 'fc'), ('H', 'fc'), ('E', 'root')]
-        #assert nodelist_sorted_expected_annotated == nodelist_sorted_annotated
+        nodelist_sorted_expected_annotated = [('M', 'root'), ('F', 'root'), ('S', 'root')]
+        assert nodelist_sorted_expected_annotated == nodelist_sorted_annotated, nodelist_sorted_annotated
     
-        print "nodelist_sorted_annotated", nodelist_sorted_annotated
-        print
+        #print "nodelist_sorted_expected_annotated", nodelist_sorted_expected_annotated
+        #print "nodelist_sorted_annotated", nodelist_sorted_annotated
+        #print
+
+    def test_8_multiple_inhertitance_render(self):
+        # F --|> M
+        # F --|> S
+        g = Graph()
+        f = GraphNode('F', 0, 0, 200, 200)
+        m = GraphNode('M', 0, 0, 200, 200)
+        s = GraphNode('S', 0, 0, 200, 200)
+        g.AddEdge(f, m)['uml_edge_type'] = 'generalisation'
+        g.AddEdge(f, s)['uml_edge_type'] = 'generalisation'
+        nodelist_normal = [node.id for node in g.nodes]
+
+        """
+        Custom ordering allows us to bypass the graph 'nodes_sorted_by_generalisation'
+        algorithm which might either be crashing or have unwanted ordering results.
+        Thus we can experiment with how different experimental orderings will render.
+        """
+        mycustom_ordering = [(m, 'root'), (s, 'root'), (f, 'root')]
+
+        from layout.layout_ascii import model_to_ascii_builder
+
+        m = model_to_ascii_builder()
+        s = m.main(g, nodes_sorted=mycustom_ordering)
+        #print
+        #print s
+
+        expected_s = """
++---+
+| M |
++---+
+                      
+                      
+                      
++---+       [ S ][ M ]
+| S |        .        
++---+       /_\       
+             |        
+             |        
+             |        
+            +---+     
+            | F |     
+            +---+     
+        """
+
+        if s.strip() <> expected_s.strip():
+            import difflib
+            # delta = difflib.ndiff(s.strip(), expected_s.strip()) # this will always emit something, a visual of the original with changes.
+            delta = difflib.unified_diff(s.strip(), expected_s.strip(), n=0,
+                                fromfile='actual', tofile='expected')
+            diff_s = ''.join(delta)
+            print diff_s
+        else:
+            print "No difference"
+        
+        #print s
+        #print expected_s
+        
+        assert s.strip() == expected_s.strip()
+        
     
 def suite():
     suite1 = unittest.makeSuite(TestCase_A, 'test')
