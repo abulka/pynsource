@@ -176,7 +176,7 @@ class model_to_ascii_builder:
         above fully drawn nodes, to show what they inherit from.  We also use
         aliases to depict composition associations.
         """
-        print [(node.id,annotation) for node,annotation in graph.nodes_sorted_by_generalisation]
+        #print [(node.id,annotation) for node,annotation in graph.nodes_sorted_by_generalisation]
 
         if not nodes_annotated_and_sorted:
             nodes_annotated_and_sorted = graph.nodes_sorted_by_generalisation
