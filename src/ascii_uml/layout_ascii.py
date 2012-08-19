@@ -1,9 +1,70 @@
 from asciiworkspace import AsciiWorkspace
 
 """
-This layout is generated from the graph model and relies on the call
-    graph.nodes_sorted_by_generalisation
+HOW IT WORKS
+============
+
+The ascii UML layout is generated from the graph model and relies on the call
+    graph.nodes_sorted_by_generalisation()
 which returns the nodes in an order conducive to ascii layout.
+
+The order of nodes returned is something like:
+[('A', 'root'), ('B', 'fc'), ('D', 'tab'), ('F', 'tab'), ('C', 'fc'), ('H', 'fc'), ('E', 'root')]
+or
+[(m, 'root'), (s, 'root'), (f, 'root')]
+
+Where root means start a newline and render a box.  (exception to this is where
+you have multiple roots by themselves, then we spread them out across the page)
+
+Where 'fc' means first child under a root.  Usually a subclass rendered along
+the left edge of the page.
+
+Where 'tab' means tab out to the next column in the same row.
+
+Sometimes to avoid wiring cross-overs, we write out a class a second time as
+an 'alias' which looks like this:
+
++-----------------------------+
+|             ogl             |
++-----------------------------+
+              .                                                            [ ogl ]          
+             /_\                                                              .             
+              |                                                              /_\            
+              |                                                               |             
+              |                                                               |             
++-----------------------------+                                     +----------------------+
+|        UmlShapeCanvas       |                                     |     MyEvtHandler     |
+|-----------------------------|                                     |----------------------|
+| scrollStepX                 |  ---->  [ LayoutBasic ]             | log                  |
+| scrollStepY                 |  ---->  [ OverlapRemoval ]          | frame                |
+
+
+Aliases appear in [nnnnn] square brackets. Here is another example of the use of
+aliases in the case of multiple inheritance:
+
++------+
+| Mary |
++------+
+                             
+[ Mary ][ Sam ]       +-----+
+  .                   | Sam |
+ /_\                  +-----+
+  |                          
+  |                          
+  |                          
++------+                     
+| Fred |                     
++------+                     
+
+The utility class 'asciiworkspace' is a nice class which looks after organising
+things in rows and columns with appropriate padding.  You send it chunks of text
+and flush/newline commands and it will appear in a nice grid format.
+
+unit tests in
+    test_graph_nodes.py
+    test_asciiworkspace_01.py
+    test_asciiworkspace_02.py
+    
 """
 
 class NodeWidthCalc:

@@ -3,7 +3,7 @@ import os
 
 import sys
 sys.path.append("../src")
-from asciiworkspace import AsciiWorkspace
+from ascii_uml.asciiworkspace import AsciiWorkspace
 
 OUT_FILE = "ascii_out.txt"
 

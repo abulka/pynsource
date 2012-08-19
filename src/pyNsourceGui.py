@@ -36,6 +36,7 @@ from gui.coord_utils import setpos, getpos
 from gui.uml_canvas import UmlCanvas
 from gui.wx_log import Log
 from gui_imageviewer import ImageViewer
+from ascii_uml.layout_ascii import model_to_ascii_builder
 
 from architecture_support import *
 from app.app import App
@@ -388,14 +389,11 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def model_to_ascii(self):
         if not MULTI_TAB_GUI:
             return
-        from layout.layout_ascii import model_to_ascii_builder
-        import time
         
         wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
         m = model_to_ascii_builder()
         try:
             wx.SafeYield()
-            #time.sleep(0.2)
             s = m.main(self.umlwin.umlworkspace.graph)
             #self.notebook.SetSelection(2)            
             self.multiText.SetValue(str(s))
