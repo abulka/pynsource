@@ -154,8 +154,8 @@ class UmlCanvas(ogl.ShapeCanvas):
             else:
                 self.OnCycleColours(colour=wx.Brush("WHEAT", wx.SOLID))
 
-        elif keycode in ['v', 'V']:
-            if keycode == 'V':
+        elif keycode in ['s', 'S']:
+            if keycode == 'S':
                 self.OnColourSiblings(color_range_offset=True)
             else:
                 self.OnColourSiblings()
