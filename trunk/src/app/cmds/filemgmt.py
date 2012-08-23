@@ -45,7 +45,7 @@ class CmdFileImportFromFilePath(CmdFileImportBase):   # was class CmdFileImportS
 
 class CmdFileImportViaDialog(CmdFileImportBase):    # was class CmdFileImport(CmdBase):
     def execute(self):
-        self.context.wxapp.notebook.SetSelection(0)
+        self.context.wxapp.switch_to_ogl_uml_view()
         
         thisdir = self.context.config.get('LastDirFileImport', os.getcwd()) # remember dir path
         

@@ -33,7 +33,7 @@ MULTI_TAB_GUI = True
 USE_SIZER = False
 
 if 'wxMac' in wx.PlatformInfo:
-    MULTI_TAB_GUI = True
+    MULTI_TAB_GUI = False
     
 from gui.coord_utils import setpos, getpos
 from gui.uml_canvas import UmlCanvas
@@ -345,10 +345,13 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         self.next_menu_id = wx.NewId()
         def Add(menu, s1, s2, func, func_update=None):
-            menu_item = menu.Append(self.next_menu_id, s1, s2)
-            wx.EVT_MENU(self, self.next_menu_id, func)
+            id = self.next_menu_id
+            if 'wxMac' in wx.PlatformInfo and s1 == "About...": # http://wiki.wxpython.org/Optimizing%20for%20Mac%20OS%20X
+                id = wx.ID_ABOUT
+            menu_item = menu.Append(id, s1, s2)
+            wx.EVT_MENU(self, id, func)
             if func_update:
-                wx.EVT_UPDATE_UI(self, self.next_menu_id, func_update)
+                wx.EVT_UPDATE_UI(self, id, func_update)
             self.next_menu_id = wx.NewId()
             return menu_item
 
@@ -401,8 +404,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu4, "&Visit PyNSource Website...", "PyNSource Website", self.OnVisitWebsite)
         Add(menu4, "&Check for Updates...", "Check for Updates", self.OnCheckForUpdates)
         menu4.AppendSeparator()
-        Add(menu4, "&About...", "About...", self.OnAbout)
-
+        helpID = Add(menu4, "&About...", "About...", self.OnAbout).GetId()
+        
         menuBar.Append(menu1, "&File")
         menuBar.Append(menu2, "&Edit")
         menuBar.Append(menu3, "&Layout")
@@ -439,20 +442,28 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
                 self.model_to_ascii()
                 self.PostAsciiViewSwitch()
             else:
-                self.notebook.SetSelection(0)
-                self.PostOglViewSwitch()
+                self.switch_to_ogl_uml_view()
         else:
             if self.panel_one.IsShown():
                 self.panel_one.Hide()
                 self.panel_two.Show()
                 self.model_to_ascii()
                 self.PostAsciiViewSwitch()
+                self.frame.Layout()
             else:
-                self.panel_one.Show()
-                self.panel_two.Hide()
-                self.PostOglViewSwitch()
-            self.frame.Layout()
+                self.switch_to_ogl_uml_view()
 
+    def switch_to_ogl_uml_view(self):
+        if MULTI_TAB_GUI:
+            self.notebook.SetSelection(0)
+            self.PostOglViewSwitch()
+        else:
+            self.panel_one.Show()
+            self.panel_two.Hide()
+            self.PostOglViewSwitch()
+            self.frame.Layout()
+            
+        
     def model_to_ascii(self):
         wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
         m = model_to_ascii_builder()
@@ -544,7 +555,13 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
     @property
     def viewing_uml_tab(self):
-        return self.notebook and self.notebook.GetSelection() == 0
+        if MULTI_TAB_GUI:
+            if self.notebook:
+                return self.notebook.GetSelection() == 0
+            else:
+                return False
+        else:
+            return self.panel_one.IsShown()
         
     def OnDeleteNode(self, event):
         self.app.run.CmdNodeDeleteSelected()
