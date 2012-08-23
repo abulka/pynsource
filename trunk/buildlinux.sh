@@ -5,7 +5,7 @@ msg="This script was developed in Ubuntu 11.10"
 echo $msg
 
 
-outstandalonezip=pyNsource-1.6-linux-standalone.zip
+outstandalonezip=pyNsource-1.60-linux-standalone.zip
 outsourcezip=pyNsource-1.60-src.zip
 
 do_source=true

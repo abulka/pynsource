@@ -14,10 +14,10 @@ UninstallDisplayName=PyNSource Gui
 DefaultGroupName=PyNSource
 VersionInfoVersion=1.60
 OutputDir=dist
-OutputBaseFilename=pyNsource-1.6-Setup
+OutputBaseFilename=pyNsource-1.60-setup
 
 [Files]
 Source: src\dist\pyNsourceGui.exe; DestDir: {app}; 
 Source: src\dist\*; DestDir: {app}; Flags: recursesubdirs
 Source: Readme.txt; DestDir: {app}
-Source: build.txt; DestDir: {app}
+Source: version.txt; DestDir: {app}
