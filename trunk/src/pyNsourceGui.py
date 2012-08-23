@@ -27,11 +27,14 @@ import wx.lib.ogl as ogl
 import os, stat
 from messages import *
 
-APP_VERSION = 1.6
+APP_VERSION = 1.60
 WINDOW_SIZE = (1024,768)
 MULTI_TAB_GUI = True
 USE_SIZER = False
 
+if 'wxMac' in wx.PlatformInfo:
+    MULTI_TAB_GUI = True
+    
 from gui.coord_utils import setpos, getpos
 from gui.uml_canvas import UmlCanvas
 from gui.wx_log import Log
@@ -93,8 +96,33 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabPageChanged)
             
         else:
-            self.umlwin = UmlCanvas(self.frame, Log(), self.frame)
+            self.notebook = None
 
+            self.panel_one = wx.Panel(self.frame, -1)
+            self.umlwin = UmlCanvas(self.panel_one, Log(), self.frame)
+            #
+            sizer = wx.BoxSizer(wx.VERTICAL)
+            sizer.Add(self.umlwin, 1, wx.EXPAND)
+            self.panel_one.SetSizer(sizer)
+        
+            self.panel_two = self.asciiart = wx.Panel(self.frame, -1)
+            self.multiText = wx.TextCtrl(self.panel_two, -1, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE|wx.HSCROLL)
+            self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))   # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
+            self.multiText.Bind( wx.EVT_CHAR, self.onKeyChar_Ascii_Text_window)
+            self.multiText.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom_ascii)
+            #
+            sizer = wx.BoxSizer(wx.VERTICAL)
+            sizer.Add(self.multiText, 1, wx.EXPAND)
+            self.panel_two.SetSizer(sizer)
+            
+            self.panel_two.Hide()
+     
+            self.sizer = wx.BoxSizer(wx.VERTICAL)
+            self.sizer.Add(self.panel_one, 1, wx.EXPAND)
+            self.sizer.Add(self.panel_two, 1, wx.EXPAND)
+            self.frame.SetSizer(self.sizer)
+        
+        
         ogl.OGLInitialize()  # creates some pens and brushes that the OGL library uses.
         
         # Set the frame to a good size for showing stuff
@@ -289,24 +317,22 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         
     def OnTabPageChanged(self, event):
         if event.GetSelection() == 0:  # ogl
-            self.Bind(wx.EVT_MOUSEWHEEL, self.umlwin.OnWheelZoom)  # rebind as it seems to get unbound when switch to ascii tab
-            wx.CallAfter(self.umlwin.SetFocus)
-            self.menuBar.EnableTop(2, True)  # enable layout menu
-
-        #elif event.GetSelection() == 1:  # yuml
-        #    #self.yuml.ViewImage(thefile='../outyuml.png')
-        #    pass
-
+            self.PostOglViewSwitch()
         elif event.GetSelection() == 1:  # ascii art
             self.RefreshAsciiUmlTab()
-            self.menuBar.EnableTop(2, False)  # disable layout menu
-            wx.CallAfter(self.multiText.SetFocus)
-            wx.CallAfter(self.multiText.SetInsertionPoint, 0) 
-         
+            self.PostAsciiViewSwitch()
         event.Skip()
         
     def RefreshAsciiUmlTab(self):
         self.model_to_ascii()
+    def PostAsciiViewSwitch(self):
+        self.menuBar.EnableTop(2, False)  # disable layout menu
+        wx.CallAfter(self.multiText.SetFocus)
+        wx.CallAfter(self.multiText.SetInsertionPoint, 0) 
+    def PostOglViewSwitch(self):
+        self.Bind(wx.EVT_MOUSEWHEEL, self.umlwin.OnWheelZoom)  # rebind as it seems to get unbound when switch to ascii tab
+        wx.CallAfter(self.umlwin.SetFocus)
+        self.menuBar.EnableTop(2, True)  # enable layout menu
         
     def InitMenus(self):
         menuBar = wx.MenuBar(); self.menuBar = menuBar
@@ -315,6 +341,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         menu3 = wx.Menu()
         menu3sub = wx.Menu()
         menu4 = wx.Menu()
+        menu5 = wx.Menu()
 
         self.next_menu_id = wx.NewId()
         def Add(menu, s1, s2, func, func_update=None):
@@ -348,6 +375,14 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         menu2.AppendSeparator()
         Add(menu2, "&Refresh", "Refresh", self.OnRefreshUmlWindow)
         
+        Add(menu5, "&Toggle Ascii UML\tv", "Toggle Ascii UML", self.OnViewToggleAscii)
+        menu5.AppendSeparator()
+        Add(menu5, "&Colourise Nodes (random colours)\tc", "Colourise Nodes (random colours)", self.OnCycleColours)
+        Add(menu5, "&Default Node Colours\tC", "Default Node Colours", self.OnCycleColoursDefault)
+        menu5.AppendSeparator()
+        Add(menu5, "Colour &Siblings\ts", "Colour Siblings", self.OnColourSiblings)
+        Add(menu5, "Colour &Siblings (random colours)\tS", "Colour Siblings (random colours)", self.OnColourSiblingsRandom)
+        
         Add(menu3, "&Layout UML\tL", "Layout UML", self.OnLayout)
         Add(menu3, "&Layout UML Optimally (slower)\tB", "Deep Layout UML (slow)", self.OnDeepLayout)
         menu3.AppendSeparator()
@@ -371,6 +406,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         menuBar.Append(menu1, "&File")
         menuBar.Append(menu2, "&Edit")
         menuBar.Append(menu3, "&Layout")
+        menuBar.Append(menu5, "&View")
         menuBar.Append(menu4, "&Help")
         self.frame.SetMenuBar(menuBar)
         
@@ -383,19 +419,46 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnRestoreLayout2(self, event):
         self.umlwin.CmdRestoreLayout2()
         
+    def OnCycleColours(self, event):
+        self.umlwin.OnCycleColours()
+    def OnCycleColoursDefault(self, event):
+        self.umlwin.OnCycleColours(colour=wx.Brush("WHEAT", wx.SOLID))
+
+    def OnColourSiblings(self, event):
+        self.umlwin.OnColourSiblings()
+    def OnColourSiblingsRandom(self, event):
+        self.umlwin.OnColourSiblings(color_range_offset=True)
+        
     def OnFileImport(self, event):
         self.app.run.CmdFileImportViaDialog()
 
+    def OnViewToggleAscii(self, event):
+        if MULTI_TAB_GUI:
+            if self.viewing_uml_tab:
+                self.notebook.SetSelection(1)
+                self.model_to_ascii()
+                self.PostAsciiViewSwitch()
+            else:
+                self.notebook.SetSelection(0)
+                self.PostOglViewSwitch()
+        else:
+            if self.panel_one.IsShown():
+                self.panel_one.Hide()
+                self.panel_two.Show()
+                self.model_to_ascii()
+                self.PostAsciiViewSwitch()
+            else:
+                self.panel_one.Show()
+                self.panel_two.Hide()
+                self.PostOglViewSwitch()
+            self.frame.Layout()
+
     def model_to_ascii(self):
-        if not MULTI_TAB_GUI:
-            return
-        
         wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
         m = model_to_ascii_builder()
         try:
             wx.SafeYield()
             s = m.main(self.umlwin.umlworkspace.graph)
-            #self.notebook.SetSelection(2)            
             self.multiText.SetValue(str(s))
             if str(s).strip() == "":
                 self.multiText.SetValue(ASCII_UML_HELP_MSG)
@@ -477,9 +540,12 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
     def Enable_if_node_selected(self, event):
         selected = [s for s in self.umlwin.GetDiagram().GetShapeList() if s.Selected()]
-        viewing_uml_tab = self.notebook.GetSelection() == 0
-        event.Enable(len(selected) > 0 and viewing_uml_tab)
+        event.Enable(len(selected) > 0 and self.viewing_uml_tab)
 
+    @property
+    def viewing_uml_tab(self):
+        return self.notebook and self.notebook.GetSelection() == 0
+        
     def OnDeleteNode(self, event):
         self.app.run.CmdNodeDeleteSelected()
                 
