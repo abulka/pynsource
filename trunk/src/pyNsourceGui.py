@@ -259,7 +259,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         #when intercepting them yourself. 
         #-- 
         #Robin Dunn 
-
+        
+        #print "MOUSEWHEEEL self.working=", self.working
         if self.working: return
         self.working = True
         
@@ -346,7 +347,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.next_menu_id = wx.NewId()
         def Add(menu, s1, s2, func, func_update=None):
             id = self.next_menu_id
-            if 'wxMac' in wx.PlatformInfo and s1 == "About...": # http://wiki.wxpython.org/Optimizing%20for%20Mac%20OS%20X
+            if 'wxMac' in wx.PlatformInfo and s1 == "&About...": # http://wiki.wxpython.org/Optimizing%20for%20Mac%20OS%20X
                 id = wx.ID_ABOUT
             menu_item = menu.Append(id, s1, s2)
             wx.EVT_MENU(self, id, func)
@@ -403,7 +404,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu4, "&Help...\tF1", "Help", self.OnHelp)
         Add(menu4, "&Visit PyNSource Website...", "PyNSource Website", self.OnVisitWebsite)
         Add(menu4, "&Check for Updates...", "Check for Updates", self.OnCheckForUpdates)
-        menu4.AppendSeparator()
+        if not 'wxMac' in wx.PlatformInfo:
+            menu4.AppendSeparator()
         helpID = Add(menu4, "&About...", "About...", self.OnAbout).GetId()
         
         menuBar.Append(menu1, "&File")
