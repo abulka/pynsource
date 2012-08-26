@@ -3,13 +3,28 @@
 from graph import Graph
 from layout_spring import GraphLayoutSpring
 
+ANIMATE_BLACKBOARD_ATTEMPTS = True
+ANIMATE_EVERY_DETAIL = True
+ANIMATE_LAYOUTS = True
+
 class LayoutBlackboard(object):
     def __init__(self, graph, umlwin):
         self.graph = graph
         self.umlwin = umlwin
 
     def stateofthenation(self, recalibrate=False, auto_resize_canvas=True):
-        pass
+        # Stub so that when we call GraphLayoutSpring.layout() and it calls back
+        # into us to do a stateofthenation, either nothing happens or, if we DO
+        # want to show each intermediate stage of the layout, we send a custom
+        # message using POST MESSAGE to the main gui frame to do it. Doing it in
+        # here is wrong since this LayoutBlackboard class is typically an object
+        # inside a worker thread, and we can't have any wx gui operations
+        # ocurring inside a thread.
+        if ANIMATE_LAYOUTS:
+            self.outer_thread.Cmd("stateofthenation")
+
+    def stateofthenation_inside_blackboard(self):
+        self.outer_thread.Cmd("stateofthenation")
 
     @property
     def kill_layout(self):
@@ -80,7 +95,7 @@ class LayoutBlackboard(object):
 
             # Expand progressively from small to large scale, and calc vitals stats
             # This can be SLOW
-            res = self.ScaleUpMadly(strategy=":reduce post overlap removal LN crossings")
+            res = self.ScaleUpMadly(strategy=":reduce post overlap removal LN crossings", animate=ANIMATE_BLACKBOARD_ATTEMPTS)
             ThinkAndAddSnapshot(res)
                 
             if res[0] == 0 and res[2] <= 0:     # LL crossings solved and LN reasonable, so optimise and break - save time
@@ -101,105 +116,19 @@ class LayoutBlackboard(object):
         #self.umlwin.snapshot_mgr.Sort()
         self.umlwin.snapshot_mgr.Sort(sortfunc)  # this does the thinking!
         #self.umlwin.snapshot_mgr.Sort(lambda d: (d['scale'], -d['LL'], -d['LN']))   # pick biggest with most line crossings! - Ha ha          
-        
+
+        """Diagnostic"""        
         #self.umlwin.snapshot_mgr.DumpSnapshots('Sorted')
         
-        self.umlwin.snapshot_mgr.Restore(0)
-
-
-    def LayoutThenPickBestScale(self, strategy=None, scramble=False, animate_at_scale=None):
         """
-        layout to untangle then scale up repeatedly till strategy met
+        can't do the snapshot restore
+            self.umlwin.snapshot_mgr.Restore(0)
+        here since it will call stateofthenation(), and that is wx gui activity
+        which is not allowed from inside a thread.
+        So send a special message to trigger that call.
         """
-        self.umlwin.AllToLayoutCoords()  # doesn't matter what scale the layout starts with
-        
-        if animate_at_scale:
-            self.umlwin.coordmapper.Recalibrate(scale=animate_at_scale) # Scale up just for watching purposes...
-        
-        layouter = GraphLayoutSpring(self.graph, gui=self.umlwin)  # TODO gui = controller - yuk
-        layouter.layout(keep_current_positions=not scramble)
+        self.outer_thread.Cmd("snapshot_mgr_restore_0")
 
-        self.ScaleUpMadly(strategy, animate=True)
-        self.umlwin.stateofthenation()
-
-    def Experiment1(self):
-        """
-        Disproves the potential theorem that there are no line crossings
-        (in world coordinates) immediately after a layout.  There may be.
-        
-        Post layout, if there are LL crossings - this does not prove the graph
-        is tangled. Scaling layout->world may have introduced these LL (or LL
-        raw - ignoring nodes width/height) crossings.
-        
-        This experiment: Want to test if LL raw stays the same true for all
-        scales. Turns out that it does not. And it may start at non zero too
-        (depending on the graph and the scale at which you start this experiment
-        at).
-
-        We don't do any overlap removal here of course - cos this may
-        introduce/remove LLs
-        """
-        MAX_SCALE = 1.4
-        SCALE_STEP = 0.2
-        SCALE_START = 3.2
-
-        self.umlwin.AllToLayoutCoords()  # doesn't matter what scale the layout starts with
-        layouter = GraphLayoutSpring(self.graph, gui=self.umlwin)  # TODO gui = controller - yuk
-        layouter.layout(keep_current_positions=False)
-
-        initial_num_line_line_crossings = len(self.graph.CountLineOverLineIntersections(ignore_nodes=True))  # node height/width ignored
-        if initial_num_line_line_crossings > 0:
-            print "Tangled", initial_num_line_line_crossings
-        else:
-            print "Not Tangled", initial_num_line_line_crossings
-            
-        self.umlwin.coordmapper.Recalibrate(scale=SCALE_START)
-        for i in range(8):
-            self.umlwin.coordmapper.Recalibrate(scale=self.umlwin.coordmapper.scale - SCALE_STEP)
-            self.umlwin.AllToWorldCoords()
-    
-            self.umlwin.stateofthenation()
-            
-            # see how many INITIAL, PRE OVERLAP REMOVAL line-line crossings there are.
-            num_line_line_crossings = len(self.graph.CountLineOverLineIntersections(ignore_nodes=True))
-            print 'LL raw crossings', num_line_line_crossings
-            if num_line_line_crossings <> initial_num_line_line_crossings:
-                print "AXIOM FAILED !!!! ori LL raw %d --> post scale LL raw %d" % (initial_num_line_line_crossings, num_line_line_crossings)
-        
-        
-            
-    def LayoutLoopTillNoChange(self, maxtimes=10, scramble=True):
-        """
-        Relayout till nothing seems to move anymore in real world coordinates.
-        Stay at same scale. DEFUNCT - integrated this algorithm into the lower
-        level spring layout, operating there on layout coords - Spring Layout
-        itself drops out early if nothing seems to be changing.
-        """
-        self.umlwin.AllToLayoutCoords()     # doesn't matter what scale the layout starts with
-        memento1 = self.graph.GetMementoOfPositions()
-        
-        layouter = GraphLayoutSpring(self.graph, gui=self.umlwin)  # TODO gui = controller - yuk
-        layouter.layout(keep_current_positions=not scramble)
-
-        for i in range(1, maxtimes):
-            self.umlwin.AllToWorldCoords()
-            memento2 = self.graph.GetMementoOfPositions()
-            
-            if Graph.MementosEqual(memento1, memento2):
-                print "Layout %d World Position Mementos Equal - break" % i
-                break
-            else:
-                print "Layout %d World Positions in flux - keep trying" % i
-                layouter.layout(keep_current_positions=True)
-
-            layouter.layout(keep_current_positions=True)
-            memento1 = memento2
-        
-        self.umlwin.AllToWorldCoords()
-
-        if self.umlwin.remove_overlaps():
-            self.umlwin.stateofthenation()
-        
     def ScaleUpMadly(self, strategy, animate=False):
         """
         No layout performed, assuming we are working off juicy post layout coords
@@ -252,7 +181,7 @@ class LayoutBlackboard(object):
         self.umlwin.coordmapper.Recalibrate(scale=SCALE_START)
         for i in range(15):
             
-            res = self.GetVitalStats(scale=self.umlwin.coordmapper.scale - SCALE_STEP, animate=animate)
+            res = self.GetVitalStats(scale=self.umlwin.coordmapper.scale - SCALE_STEP, animate=ANIMATE_EVERY_DETAIL)
             
             num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = res
 
@@ -277,9 +206,9 @@ class LayoutBlackboard(object):
             if self.umlwin.coordmapper.scale < MAX_SCALE:
                 #print "Mad: Aborting expansion - gone too far.", self.umlwin.coordmapper.scale
                 break
-    
+
         if animate:
-            self.umlwin.stateofthenation()
+            self.stateofthenation_inside_blackboard()
         
         return num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings
 
@@ -295,7 +224,7 @@ class LayoutBlackboard(object):
         self.umlwin.AllToWorldCoords()
 
         if animate:
-            self.umlwin.stateofthenation()
+            self.stateofthenation_inside_blackboard()
         
         """Pre Overlap Removal"""
         

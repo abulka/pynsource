@@ -18,7 +18,7 @@ def EVT_RESULT(win, func):
 
 class ResultEvent(wx.PyEvent):
     """Simple event to carry arbitrary result data."""
-    def __init__(self, statusmsg=None, logmsg=None, progress=-1, shouldStop=False):
+    def __init__(self, statusmsg=None, logmsg=None, progress=-1, shouldStop=False, cmd=None):
         """Init Result Event."""
         wx.PyEvent.__init__(self)
         self.SetEventType(EVT_RESULT_ID)
@@ -27,6 +27,10 @@ class ResultEvent(wx.PyEvent):
         self.statusmsg = statusmsg
         self.progress = progress
         self.shouldStop = shouldStop
+        self.cmd = cmd
+        
+    def __str__(self):
+        return "ResultEvent(wx.PyEvent) logmsg=%(logmsg)s statusmsg=%(statusmsg)s progress=%(progress)d shouldStop=%(shouldStop)s cmd=%(cmd)s" % self.__dict__
 
 # Thread class that executes processing
 class WorkerThread(Thread):
@@ -42,16 +46,19 @@ class WorkerThread(Thread):
         # also make the GUI thread responsible for calling this
         self.start()
 
+    def Cmd(self, cmd):
+        wx.PostEvent(self._notify_window, ResultEvent(cmd=cmd))
+
     def Log(self, logmsg):
         wx.PostEvent(self._notify_window, ResultEvent(logmsg=logmsg))
         
     def CheckContinue(self, statusmsg=None, logmsg=None, progress=-1):
+        #print statusmsg, logmsg
         if self._want_abort:
             return False
         else:
             wx.PostEvent(self._notify_window, ResultEvent(statusmsg, logmsg, progress))
             return True
-    #def GoodHalt(self):
         
     def run(self):
         """Run Worker Thread."""
@@ -82,6 +89,10 @@ class WorkerThread(Thread):
         self._want_abort = True
 
 
+if __name__ == '__main__':
+    import sys
+    sys.path.append("../..")
+    
 # GUI Frame class that spins off the worker thread
 from dialogs.FrameDeepLayout import FrameDeepLayout
 class MainBlackboardFrame(FrameDeepLayout):
@@ -135,12 +146,19 @@ class MainBlackboardFrame(FrameDeepLayout):
 
     def OnResult(self, event):
         """Show Result status."""
-
+        #print event
+        
         def log(msg):
             self.m_textCtrl1.AppendText(msg + "\n")
             
         if event.logmsg:
             log(event.logmsg)
+
+        if event.cmd:
+            if event.cmd == 'snapshot_mgr_restore_0':
+                self.blackboard.umlwin.snapshot_mgr.Restore(0)
+            elif event.cmd == 'stateofthenation':
+                self.blackboard.umlwin.stateofthenation()
 
         if event.statusmsg:
             self.status.SetLabel(event.statusmsg)
@@ -156,69 +174,33 @@ class MainBlackboardFrame(FrameDeepLayout):
             self.btnCancelClose.SetLabel('Close')
             #self.Destroy()  # auto close the frame
         
-# GUI Frame class that spins off the worker thread
-#class MainBlackboardFrame_OLD(wx.Frame):
-#    """Class MainFrame."""
-#    def __init__(self, parent):
-#        """Create the MainFrame."""
-#        wx.Frame.__init__(self, parent, wx.ID_ANY, 'Blackboard Layout Manager')
-#
-#        # Dumb sample frame with two buttons
-#        wx.Button(self, ID_START, 'Start', pos=(0,0))
-#        wx.Button(self, ID_STOP, 'Stop', pos=(0,50))
-#        self.status = wx.StaticText(self, -1, '', pos=(0,100))
-#
-#        self.Bind(wx.EVT_BUTTON, self.OnStart, id=ID_START)
-#        self.Bind(wx.EVT_BUTTON, self.OnStop, id=ID_STOP)
-#
-#        # Set up event handler for any worker thread results
-#        EVT_RESULT(self,self.OnResult)
-#
-#        # And indicate we don't have a worker thread yet
-#        self.worker = None
-#
-#        self.blackboard = None
-#
-#    def SetBlackboardObject(self, b):
-#        self.blackboard = b
-#        
-#    def Start(self):
-#        pass  # use button to start
-#    
-#    def OnStart(self, event):
-#        """Start Computation."""
-#        # Trigger the worker thread unless it's already busy
-#        if not self.worker:
-#            self.status.SetLabel('Starting computation')
-#            self.worker = WorkerThread(self, self.blackboard)
-#
-#
-#    def OnStop(self, event):
-#        """Stop Computation."""
-#        # Flag the worker thread to stop if running
-#        if self.worker:
-#            self.status.SetLabel('Trying to abort computation')
-#            self.worker.abort()
-#
-#    def OnResult(self, event):
-#        """Show Result status."""
-#        
-#        if event.data is None:
-#            # Thread aborted (using our convention of None return)
-#            self.status.SetLabel('Computation aborted')
-#        else:
-#            # Process results here
-#            self.status.SetLabel('Computation Result: %s' % event.data)
-#
-#        if event.data_shouldStop:
-#            # the worker is done
-#            self.worker = None
-#
-
-
 
 if __name__ == '__main__':
-
+    from time import sleep
+    
+    class MockLayoutBlackboard:
+        @property
+        def kill_layout(self):
+            if not self.outer_thread.CheckContinue():
+                return True
+            else:
+                return False
+        @kill_layout.setter
+        def kill_layout(self, value):
+          pass
+        
+        def LayoutMultipleChooseBest(self, numlayouts=3):
+          for i in range(numlayouts):
+              sleep(1)
+              progress_val = i+1 # range is 1..n inclusive whereas for loop is 0..n-1 excluding n, so adjust by adding 1 for visual progress
+              if not self.outer_thread.CheckContinue(statusmsg="Layout #%d of %d" % (progress_val, numlayouts), progress=progress_val):
+                  break
+              
+              # Do a layout
+              self.outer_thread.Log("spring layout started")
+  
+              sleep(0.4)
+    
     class MainApp(wx.App):
         """Class Main App."""
         def OnInit(self):
@@ -226,6 +208,12 @@ if __name__ == '__main__':
             self.frame = MainBlackboardFrame(None)
             self.frame.Show(True)
             self.SetTopWindow(self.frame)
+            
+            b = MockLayoutBlackboard()    # LayoutBlackboard(graph=self.context.model.graph, umlwin=self.context.umlwin)
+            
+            self.frame.SetBlackboardObject(b)
+        
+            self.frame.Start(6)
             return True
     
     if __name__ == '__main__':
