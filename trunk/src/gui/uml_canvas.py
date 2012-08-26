@@ -96,20 +96,19 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.kill_layout = True
         
         if keycode == wx.WXK_RIGHT:
-            self.app.run.CmdLayoutExpand(remap_world_to_layout=event.ShiftDown(), remove_overlaps=not event.ControlDown())
-            
+            self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
+                
         elif keycode == wx.WXK_LEFT:
-            self.app.run.CmdLayoutContract(remap_world_to_layout=event.ShiftDown(), remove_overlaps=not event.ControlDown())
+            self.app.run.CmdLayoutContract(remove_overlaps=not event.ShiftDown())
 
-        elif keycode == wx.WXK_INSERT:
-            self.CmdInsertNewNode()
-        elif keycode == wx.WXK_DELETE:
-            self.app.run.CmdNodeDeleteSelected()
-            
         self.working = False
         event.Skip()
 
     def onKeyChar(self, event):
+        """
+        These are secret keycodes not exposed on the menu
+        Normally shortcuts added on the menu work fine.
+        """
         if event.GetKeyCode() >= 256:
             event.Skip()
             return
@@ -130,16 +129,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             todisplay = ord(keycode) - ord('1')
             self.snapshot_mgr.Restore(todisplay)
 
-        elif keycode in ['b', 'B']:
-            self.app.run.CmdDeepLayout()
-                
-        elif keycode in ['l', 'L']:
-            self.app.run.CmdLayout()
-            
-        elif keycode == 'r':
-            self.app.run.CmdRefreshUmlWindow()
-
-        elif keycode == 'R':
+        elif keycode == 'P':
             self.Refresh()
 
         elif keycode in ['d', 'D']:
@@ -148,18 +138,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         elif keycode == 's':
             self.canvas_resizer.resize_virtual_canvas_tofit_bounds(shrinkage_leeway=0, bounds_dirty=True)
         
-        elif keycode in ['c', 'C']:
-            if keycode == 'c':
-                self.OnCycleColours()
-            else:
-                self.OnCycleColours(colour=wx.Brush("WHEAT", wx.SOLID))
-
-        elif keycode in ['s', 'S']:
-            if keycode == 'S':
-                self.OnColourSiblings(color_range_offset=True)
-            else:
-                self.OnColourSiblings()
-
         self.working = False
         event.Skip()
 

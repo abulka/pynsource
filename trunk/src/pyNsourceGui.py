@@ -56,7 +56,6 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.frame = wx.Frame(None, -1, self.andyapptitle, pos=(50,50), size=(0,0),
                         style=wx.NO_FULL_REPAINT_ON_RESIZE|wx.DEFAULT_FRAME_STYLE)
         self.frame.CreateStatusBar()
-        self.InitMenus()
 
         if MULTI_TAB_GUI:
             self.notebook = wx.Notebook(self.frame, -1)
@@ -173,6 +172,9 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         # objects) expect - edit an adapter instead.
         self.app = App(context)
         self.app.Boot()
+        
+        self.InitMenus()
+        self.PostOglViewSwitch()    # ensure key bindings kick in under linux
         
         wx.CallAfter(self.app.run.CmdBootStrap)    # doesn't make a difference calling this via CallAfter
         return True
@@ -343,9 +345,13 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         menu3sub = wx.Menu()
         menu4 = wx.Menu()
         menu5 = wx.Menu()
+        menu5sub = wx.Menu()
 
         self.next_menu_id = wx.NewId()
-        def Add(menu, s1, s2, func, func_update=None):
+        def Add(menu, s1, key=None, func=None, func_update=None):
+            s2 = s1
+            if key:
+                s1 = "%s\t%s" % (s1, key)
             id = self.next_menu_id
             if 'wxMac' in wx.PlatformInfo and s1 == "&About...": # http://wiki.wxpython.org/Optimizing%20for%20Mac%20OS%20X
                 id = wx.ID_ABOUT
@@ -360,53 +366,53 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             menu.AppendMenu(self.next_menu_id, s, submenu)
             self.next_menu_id = wx.NewId()
 
-        Add(menu1, "&New\tCtrl-N", "New Diagram", self.FileNew)
-        Add(menu1, "&Open...\tCtrl-O", "Load UML Diagram...", self.OnLoadGraph)
-        Add(menu1, "&Save As...\tCtrl-S", "Save UML Diagram...", self.OnSaveGraph)
+        Add(menu1, "&New", "Ctrl-N", self.FileNew)
+        Add(menu1, "&Open...", "Ctrl-O", self.OnLoadGraph)
+        Add(menu1, "&Save As...", "Ctrl-S", self.OnSaveGraph)
         menu1.AppendSeparator()
-        Add(menu1, "&Import Python Code...\tCtrl-I", "Import Python Source Files", self.OnFileImport)
+        Add(menu1, "&Import Python Code...", "Ctrl-I", self.OnFileImport)
         menu1.AppendSeparator()
-        Add(menu1, "&Print / Preview...\tCtrl-P", "Print", self.FilePrint)
+        Add(menu1, "&Print / Preview...", "Ctrl-P", self.FilePrint)
         menu1.AppendSeparator()
-        Add(menu1, "E&xit\tAlt-X", "Exit demo", self.OnButton)
+        Add(menu1, "E&xit", "Alt-X", self.OnButton)
         
-        Add(menu2, "&Insert Class...\tIns", "Insert Class...", self.OnInsertClass)
-        Add(menu2, "&Insert Image...\tCtrl-Ins", "Insert Image...", self.OnInsertImage)
-        Add(menu2, "&Insert Comment...\tShift-Ins", "Insert Comment...", self.OnInsertComment)
-        menu_item_delete_class = Add(menu2, "&Delete\tDel", "Delete", self.OnDeleteNode, self.OnDeleteNode_update)
+        Add(menu2, "&Insert Class...", "i", self.OnInsertClass)
+        Add(menu2, "&Insert Image...", "Ctrl-i", self.OnInsertImage)
+        Add(menu2, "&Insert Comment...", "Shift-i", self.OnInsertComment)
+        menu_item_delete_class = Add(menu2, "&Delete", "Del", self.OnDeleteNode, self.OnDeleteNode_update)
         menu_item_delete_class.Enable(True)  # demo one way to enable/disable.  But better to do via _update function
-        Add(menu2, "&Edit Class Properties...\tF2", "Edit Class Properties", self.OnEditProperties, self.OnEditProperties_update)
+        Add(menu2, "&Edit Class Properties...", "F2", self.OnEditProperties, self.OnEditProperties_update)
         menu2.AppendSeparator()
-        Add(menu2, "&Refresh", "Refresh", self.OnRefreshUmlWindow)
+        Add(menu2, "&Refresh", "r", self.OnRefreshUmlWindow)
         
-        Add(menu5, "&Toggle Ascii UML\tv", "Toggle Ascii UML", self.OnViewToggleAscii)
+        Add(menu5, "&Toggle Ascii UML", "v", self.OnViewToggleAscii)
         menu5.AppendSeparator()
-        Add(menu5, "&Colourise Nodes (random colours)\tc", "Colourise Nodes (random colours)", self.OnCycleColours)
-        Add(menu5, "&Default Node Colours\tC", "Default Node Colours", self.OnCycleColoursDefault)
-        menu5.AppendSeparator()
-        Add(menu5, "Colour &Siblings\ts", "Colour Siblings", self.OnColourSiblings)
-        Add(menu5, "Colour &Siblings (random colours)\tS", "Colour Siblings (random colours)", self.OnColourSiblingsRandom)
+        Add(menu5sub, "&Colourise Nodes (random colours)", "c", self.OnCycleColours)
+        Add(menu5sub, "&Default Node Colours", "Shift-C", self.OnCycleColoursDefault)
+        menu5sub.AppendSeparator()
+        Add(menu5sub, "Colour &Sibling Subclasses", "f", self.OnColourSiblings)
+        Add(menu5sub, "Colour &Sibling Subclasses (random colours)", "Shift-f", self.OnColourSiblingsRandom)
+        AddSubMenu(menu5, menu5sub, "Colour Nodes")
         
-        Add(menu3, "&Layout UML\tL", "Layout UML", self.OnLayout)
-        Add(menu3, "&Layout UML Optimally (slower)\tB", "Deep Layout UML (slow)", self.OnDeepLayout)
+        Add(menu3, "&Layout UML", "L", self.OnLayout)
+        Add(menu3, "&Layout UML Optimally (slower)", "B", self.OnDeepLayout)
         menu3.AppendSeparator()
-        Add(menu3sub, "&Remember Layout into memory slot 1\tShift-9", "Remember Layout 1", self.OnRememberLayout1)
-        Add(menu3sub, "&Restore Layout 1\t9", "Restore Layout 1", self.OnRestoreLayout1)
+        Add(menu3, "&Expand Layout", ".", self.app.run.CmdLayoutExpand)
+        Add(menu3, "&Expand Layout", ",", self.app.run.CmdLayoutContract)
+        menu3.AppendSeparator()
+        Add(menu3sub, "&Remember Layout into memory slot 1", "Shift-9", self.OnRememberLayout1)
+        Add(menu3sub, "&Restore Layout 1", "9", self.OnRestoreLayout1)
         menu3sub.AppendSeparator()
-        Add(menu3sub, "&Remember Layout into memory slot 2\tShift-0", "Remember Layout 2", self.OnRememberLayout2)
-        Add(menu3sub, "&Restore Layout 2\t0", "Restore Layout 2", self.OnRestoreLayout2)
+        Add(menu3sub, "&Remember Layout into memory slot 2", "Shift-0", self.OnRememberLayout2)
+        Add(menu3sub, "&Restore Layout 2", "0", self.OnRestoreLayout2)
         AddSubMenu(menu3, menu3sub, "Snapshots")
-        #menu3.AppendSeparator()
-        #Add(menu3, "&Expand Layout\t->", "Expand Layout", self.OnExpandLayout)
-        menu3.AppendSeparator()
         
-        
-        Add(menu4, "&Help...\tF1", "Help", self.OnHelp)
-        Add(menu4, "&Visit PyNSource Website...", "PyNSource Website", self.OnVisitWebsite)
-        Add(menu4, "&Check for Updates...", "Check for Updates", self.OnCheckForUpdates)
+        Add(menu4, "&Help...", "F1", self.OnHelp)
+        Add(menu4, "&Visit PyNSource Website...", "", self.OnVisitWebsite)
+        Add(menu4, "&Check for Updates...", "", self.OnCheckForUpdates)
         if not 'wxMac' in wx.PlatformInfo:
             menu4.AppendSeparator()
-        helpID = Add(menu4, "&About...", "About...", self.OnAbout).GetId()
+        helpID = Add(menu4, "&About...", "", self.OnAbout).GetId()
         
         menuBar.Append(menu1, "&File")
         menuBar.Append(menu2, "&Edit")
