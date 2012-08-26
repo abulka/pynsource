@@ -31,6 +31,7 @@ APP_VERSION = 1.60
 WINDOW_SIZE = (1024,768)
 MULTI_TAB_GUI = True
 USE_SIZER = False
+ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS = False
 
 if 'wxMac' in wx.PlatformInfo:
     MULTI_TAB_GUI = False
@@ -207,51 +208,6 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             
         event.Skip()
         
-    def OnRightButtonMenu(self, event):   # Menu
-        x, y = event.GetPosition()
-
-        # Since our binding of wx.EVT_RIGHT_DOWN to here takes over all right click events
-        # we have to manually figure out if we have clicked on shape 
-        # then allow natural shape node menu to kick in via UmlShapeHandler (defined above)
-        hit_which_shapes = [s for s in self.umlwin.GetDiagram().GetShapeList() if s.HitTest(x,y)]
-        if hit_which_shapes:
-            event.Skip()
-            return
-        
-        if self.popupmenu:
-            self.popupmenu.Destroy()    # wx.Menu objects need to be explicitly destroyed (e.g. menu.Destroy()) in this situation. Otherwise, they will rack up the USER Objects count on Windows; eventually crashing a program when USER Objects is maxed out. -- U. Artie Eoff  http://wiki.wxpython.org/index.cgi/PopupMenuOnRightClick
-        self.popupmenu = wx.Menu()     # Create a menu
-        
-        item = self.popupmenu.Append(wx.NewId(), "Insert Class...")
-        self.frame.Bind(wx.EVT_MENU, self.OnInsertClass, item)
-        item = self.popupmenu.Append(wx.NewId(), "Insert Image...")
-        self.frame.Bind(wx.EVT_MENU, self.OnInsertImage, item)
-        item = self.popupmenu.Append(wx.NewId(), "Insert Comment...")
-        self.frame.Bind(wx.EVT_MENU, self.OnInsertComment, item)
-
-        self.popupmenu.AppendSeparator()
-
-        item = self.popupmenu.Append(wx.NewId(), "Load Graph from text...")
-        self.frame.Bind(wx.EVT_MENU, self.OnLoadGraphFromText, item)
-        
-        item = self.popupmenu.Append(wx.NewId(), "Dump Graph to console")
-        self.frame.Bind(wx.EVT_MENU, self.OnSaveGraphToConsole, item)
-        
-        self.popupmenu.AppendSeparator()
-        
-        item = self.popupmenu.Append(wx.NewId(), "Load Graph...")
-        self.frame.Bind(wx.EVT_MENU, self.OnLoadGraph, item)
-        
-        item = self.popupmenu.Append(wx.NewId(), "Save Graph...")
-        self.frame.Bind(wx.EVT_MENU, self.OnSaveGraph, item)
-        
-        self.popupmenu.AppendSeparator()
-        
-        item = self.popupmenu.Append(wx.NewId(), "DumpUmlWorkspace")
-        self.frame.Bind(wx.EVT_MENU, self.OnDumpUmlWorkspace, item)
-        
-        self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
-        
     def OnWheelZoom_ascii(self, event):
         # Since our binding of wx.EVT_MOUSEWHEEL to here takes over all wheel events
         # we have to manually do the normal test scrolling.  This event can't propogate via event.skip()
@@ -377,8 +333,9 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu1, "E&xit", "Alt-X", self.OnButton)
         
         Add(menu2, "&Insert Class...", "i", self.OnInsertClass)
-        Add(menu2, "&Insert Image...", "Ctrl-i", self.OnInsertImage)
-        Add(menu2, "&Insert Comment...", "Shift-i", self.OnInsertComment)
+        if ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS:
+            Add(menu2, "&Insert Image...", "Ctrl-i", self.OnInsertImage)
+            Add(menu2, "&Insert Comment...", "Shift-i", self.OnInsertComment)
         menu_item_delete_class = Add(menu2, "&Delete", "Del", self.OnDeleteNode, self.OnDeleteNode_update)
         menu_item_delete_class.Enable(True)  # demo one way to enable/disable.  But better to do via _update function
         Add(menu2, "&Edit Class Properties...", "F2", self.OnEditProperties, self.OnEditProperties_update)
@@ -398,14 +355,10 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu3, "&Layout UML Optimally (slower)", "B", self.OnDeepLayout)
         menu3.AppendSeparator()
         Add(menu3, "&Expand Layout", ".", self.app.run.CmdLayoutExpand)
-        Add(menu3, "&Expand Layout", ",", self.app.run.CmdLayoutContract)
+        Add(menu3, "&Contract Layout", ",", self.app.run.CmdLayoutContract)
         menu3.AppendSeparator()
-        Add(menu3sub, "&Remember Layout into memory slot 1", "Shift-9", self.OnRememberLayout1)
-        Add(menu3sub, "&Restore Layout 1", "9", self.OnRestoreLayout1)
-        menu3sub.AppendSeparator()
-        Add(menu3sub, "&Remember Layout into memory slot 2", "Shift-0", self.OnRememberLayout2)
-        Add(menu3sub, "&Restore Layout 2", "0", self.OnRestoreLayout2)
-        AddSubMenu(menu3, menu3sub, "Snapshots")
+        Add(menu3, "&Remember Layout", "Shift-0", self.OnRememberLayout2)
+        Add(menu3, "&Restore Layout", "0", self.OnRestoreLayout2)
         
         Add(menu4, "&Help...", "F1", self.OnHelp)
         Add(menu4, "&Visit PyNSource Website...", "", self.OnVisitWebsite)
@@ -420,6 +373,52 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         menuBar.Append(menu5, "&View")
         menuBar.Append(menu4, "&Help")
         self.frame.SetMenuBar(menuBar)
+
+    def OnRightButtonMenu(self, event):   # Menu
+        x, y = event.GetPosition()
+
+        # Since our binding of wx.EVT_RIGHT_DOWN to here takes over all right click events
+        # we have to manually figure out if we have clicked on shape 
+        # then allow natural shape node menu to kick in via UmlShapeHandler (defined above)
+        hit_which_shapes = [s for s in self.umlwin.GetDiagram().GetShapeList() if s.HitTest(x,y)]
+        if hit_which_shapes:
+            event.Skip()
+            return
+        
+        if self.popupmenu:
+            self.popupmenu.Destroy()    # wx.Menu objects need to be explicitly destroyed (e.g. menu.Destroy()) in this situation. Otherwise, they will rack up the USER Objects count on Windows; eventually crashing a program when USER Objects is maxed out. -- U. Artie Eoff  http://wiki.wxpython.org/index.cgi/PopupMenuOnRightClick
+        self.popupmenu = wx.Menu()     # Create a menu
+        
+        item = self.popupmenu.Append(wx.NewId(), "Insert Class...")
+        self.frame.Bind(wx.EVT_MENU, self.OnInsertClass, item)
+        if ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS:
+            item = self.popupmenu.Append(wx.NewId(), "Insert Image...")
+            self.frame.Bind(wx.EVT_MENU, self.OnInsertImage, item)
+            item = self.popupmenu.Append(wx.NewId(), "Insert Comment...")
+            self.frame.Bind(wx.EVT_MENU, self.OnInsertComment, item)
+
+        self.popupmenu.AppendSeparator()
+
+        item = self.popupmenu.Append(wx.NewId(), "Load Graph from text...")
+        self.frame.Bind(wx.EVT_MENU, self.OnLoadGraphFromText, item)
+        
+        item = self.popupmenu.Append(wx.NewId(), "Dump Graph to console")
+        self.frame.Bind(wx.EVT_MENU, self.OnSaveGraphToConsole, item)
+        
+        self.popupmenu.AppendSeparator()
+        
+        item = self.popupmenu.Append(wx.NewId(), "Load Graph...")
+        self.frame.Bind(wx.EVT_MENU, self.OnLoadGraph, item)
+        
+        item = self.popupmenu.Append(wx.NewId(), "Save Graph...")
+        self.frame.Bind(wx.EVT_MENU, self.OnSaveGraph, item)
+        
+        self.popupmenu.AppendSeparator()
+        
+        item = self.popupmenu.Append(wx.NewId(), "DumpUmlWorkspace")
+        self.frame.Bind(wx.EVT_MENU, self.OnDumpUmlWorkspace, item)
+        
+        self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
         
     def OnRememberLayout1(self, event):
         self.umlwin.CmdRememberLayout1()
