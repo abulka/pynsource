@@ -115,20 +115,20 @@ class MainBlackboardFrame(FrameDeepLayout):
         self.blackboard = None
         
     def Start(self, num_attempts):
-        self.progressbar.SetRange(num_attempts)
-        self.progressbar.SetValue(1)  # range is 0..num_attempts inclusive. 0 shows no progress.
+        wx.CallAfter(self.progressbar.SetRange, num_attempts)
+        wx.CallAfter(self.progressbar.SetValue, 1)  # range is 0..num_attempts inclusive. 0 shows no progress.
         
         """Start Computation."""
         # Trigger the worker thread unless it's already busy
         if not self.worker:
-            self.status.SetLabel('Starting Layout')
+            wx.CallAfter(self.status.SetLabel, 'Starting Layout')
             self.worker = WorkerThread(self, self.blackboard, num_attempts)
 
     def StopComputation(self):
         """Stop Computation."""
         # Flag the worker thread to stop if running
         if self.worker:
-            self.status.SetLabel('Trying to abort')
+            wx.CallAfter(self.status.SetLabel, 'Trying to abort')
             self.worker.abort()
         
     def OnClose( self, event ):
@@ -139,7 +139,7 @@ class MainBlackboardFrame(FrameDeepLayout):
         if self.btnCancelClose.GetLabel() == 'Close':
             self.Destroy()
         self.StopComputation()
-        self.btnCancelClose.SetLabel('Close')
+        wx.CallAfter(self.btnCancelClose.SetLabel, 'Close')
         
     def SetBlackboardObject(self, b):
         self.blackboard = b
@@ -149,29 +149,30 @@ class MainBlackboardFrame(FrameDeepLayout):
         #print event
         
         def log(msg):
-            self.m_textCtrl1.AppendText(msg + "\n")
+            wx.CallAfter(self.m_textCtrl1.AppendText, msg + "\n")
             
         if event.logmsg:
             log(event.logmsg)
 
         if event.cmd:
             if event.cmd == 'snapshot_mgr_restore_0':
-                self.blackboard.umlwin.snapshot_mgr.Restore(0)
+                wx.CallAfter(self.blackboard.umlwin.snapshot_mgr.Restore, 0)
+                wx.CallAfter(self.btnCancelClose.SetFocus)
             elif event.cmd == 'stateofthenation':
-                self.blackboard.umlwin.stateofthenation()
+                wx.CallAfter(self.blackboard.umlwin.stateofthenation)
 
         if event.statusmsg:
-            self.status.SetLabel(event.statusmsg)
+            wx.CallAfter(self.status.SetLabel, event.statusmsg)
             log("** " + event.statusmsg)
 
         if event.progress <> -1:
-            self.progressbar.SetValue(event.progress)
+            wx.CallAfter(self.progressbar.SetValue, event.progress)
         
         if event.shouldStop:
             # the worker is done
             self.worker = None
             
-            self.btnCancelClose.SetLabel('Close')
+            wx.CallAfter(self.btnCancelClose.SetLabel, 'Close')
             #self.Destroy()  # auto close the frame
         
 

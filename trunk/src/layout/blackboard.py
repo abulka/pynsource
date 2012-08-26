@@ -4,8 +4,8 @@ from graph import Graph
 from layout_spring import GraphLayoutSpring
 
 ANIMATE_BLACKBOARD_ATTEMPTS = True
-ANIMATE_EVERY_DETAIL = True
-ANIMATE_LAYOUTS = True
+ANIMATE_EVERY_DETAIL = False
+ANIMATE_LAYOUTS = False
 
 class LayoutBlackboard(object):
     def __init__(self, graph, umlwin):
