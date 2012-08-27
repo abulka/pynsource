@@ -3,8 +3,8 @@
 import sys
 sys.path.append("../src")
 from architecture_support import whosdaddy, whosgranddaddy
-from layout.graph import Graph, GraphNode
-import layout.graph
+from model.graph import Graph, GraphNode
+import model.graph_persistence
 
 import unittest
 
@@ -31,13 +31,13 @@ class TestCase_A(unittest.TestCase):
         assert len(g.nodes) == 0
         #assert g.GraphToString().strip() == ""
         
-        layout.graph.PERSISTENCE_CURRENT_VERSION = 1.0
+        model.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.0
         #g.LoadGraphFromStrings(filedata)
-        self.assertTrue(g.UpgradeToLatestFileFormatVersion(filedata))
-        #print g.filedata_list
+        self.assertTrue(g.persistence.UpgradeToLatestFileFormatVersion(filedata))
+        #print g.persistence.filedata_list
         
-        assert g.filedata_list[0] == "# PynSource Version 1.0", g.filedata_list[0]
-        assert g.ori_file_version == 0.9
+        assert g.persistence.filedata_list[0] == "# PynSource Version 1.0", g.persistence.filedata_list[0]
+        assert g.persistence.ori_file_version == 0.9
 
     def test_2(self):
         """
@@ -49,16 +49,16 @@ class TestCase_A(unittest.TestCase):
 {'type':'node', 'id':'c1', 'x':130, 'y':174, 'width':60, 'height':120}
 {'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1'}
     """
-        layout.graph.PERSISTENCE_CURRENT_VERSION = 1.1
-        self.assertTrue(g.UpgradeToLatestFileFormatVersion(filedata))
-        #print g.filedata_list
+        model.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.1
+        self.assertTrue(g.persistence.UpgradeToLatestFileFormatVersion(filedata))
+        #print g.persistence.filedata_list
 
-        assert g.filedata_list[0] == "# PynSource Version 1.1", g.filedata_list[0]
-        assert "meta" in g.filedata_list[1], g.filedata_list[1]
-        assert g.ori_file_version == 0.9
+        assert g.persistence.filedata_list[0] == "# PynSource Version 1.1", g.persistence.filedata_list[0]
+        assert "meta" in g.persistence.filedata_list[1], g.persistence.filedata_list[1]
+        assert g.persistence.ori_file_version == 0.9
         
         # now check type node has been converted to type umlshape 
-        data = eval(g.filedata_list[2])
+        data = eval(g.persistence.filedata_list[2])
         self.assertEquals('umlshape', data.get('type'))
 
     def test_3(self):
@@ -76,16 +76,16 @@ class TestCase_A(unittest.TestCase):
 {'type':'edge', 'id':'ImageViewer_to_MainApp', 'source':'ImageViewer', 'target':'MainApp', 'uml_edge_type':'composition'}
 {'type':'edge', 'id':'UmlShapeCanvas_to_MainApp', 'source':'UmlShapeCanvas', 'target':'MainApp', 'uml_edge_type':'composition'}
     """
-        layout.graph.PERSISTENCE_CURRENT_VERSION = 1.1
-        self.assertTrue(g.UpgradeToLatestFileFormatVersion(filedata))
-        #print g.filedata_list
+        model.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.1
+        self.assertTrue(g.persistence.UpgradeToLatestFileFormatVersion(filedata))
+        #print g.persistence.filedata_list
 
-        assert g.filedata_list[0] == "# PynSource Version 1.1", g.filedata_list[0]
-        assert "meta" in g.filedata_list[1], g.filedata_list[1]
-        assert g.ori_file_version == 1.0
+        assert g.persistence.filedata_list[0] == "# PynSource Version 1.1", g.persistence.filedata_list[0]
+        assert "meta" in g.persistence.filedata_list[1], g.persistence.filedata_list[1]
+        assert g.persistence.ori_file_version == 1.0
         
         # now check type node has been converted to type umlshape 
-        data = eval(g.filedata_list[2])
+        data = eval(g.persistence.filedata_list[2])
         self.assertEquals('umlshape', data.get('type'))
 
     def test_4(self):
@@ -100,16 +100,16 @@ class TestCase_A(unittest.TestCase):
 {'type':'umlshape', 'id':'Log', 'x':1089, 'y':222, 'width':82, 'height':67, 'attrs':'', 'meths':'WriteText'}
 {'type':'edge', 'id':'UmlShapeCanvas_to_MainApp', 'source':'UmlShapeCanvas', 'target':'MainApp', 'uml_edge_type':'composition'}
     """
-        layout.graph.PERSISTENCE_CURRENT_VERSION = 1.1
-        self.assertTrue(g.UpgradeToLatestFileFormatVersion(filedata))
-        #print g.filedata_list
+        model.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.1
+        self.assertTrue(g.persistence.UpgradeToLatestFileFormatVersion(filedata))
+        #print g.persistence.filedata_list
 
-        assert g.filedata_list[0] == "# PynSource Version 1.1", g.filedata_list[0]
-        assert "meta" in g.filedata_list[1], g.filedata_list[1]
-        assert g.ori_file_version == 1.1
+        assert g.persistence.filedata_list[0] == "# PynSource Version 1.1", g.persistence.filedata_list[0]
+        assert "meta" in g.persistence.filedata_list[1], g.persistence.filedata_list[1]
+        assert g.persistence.ori_file_version == 1.1
         
         # now check type node has been converted to type umlshape 
-        data = eval(g.filedata_list[2])
+        data = eval(g.persistence.filedata_list[2])
         self.assertEquals('umlshape', data.get('type'))
 
     def test_5(self):
@@ -125,8 +125,8 @@ class TestCase_A(unittest.TestCase):
 {'type':'umlshape', 'id':'Log', 'x':1089, 'y':222, 'width':82, 'height':67, 'attrs':'', 'meths':'WriteText'}
 {'type':'edge', 'id':'UmlShapeCanvas_to_MainApp', 'source':'UmlShapeCanvas', 'target':'MainApp', 'uml_edge_type':'composition'}
     """
-        layout.graph.PERSISTENCE_CURRENT_VERSION = 1.0
-        self.assertFalse(g.UpgradeToLatestFileFormatVersion(filedata))
+        model.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.0
+        self.assertFalse(g.persistence.UpgradeToLatestFileFormatVersion(filedata))
 
 def suite():
     suite1 = unittest.makeSuite(TestCase_A, 'test')

@@ -3,7 +3,7 @@
 # Ported and Adapted from Graph::Layouter::Spring in
 #    http://search.cpan.org/~pasky/Graph-Layderer-0.02/
 
-from graph import Graph, GraphNode
+from model.graph import Graph, GraphNode
 import random
 import math
 

@@ -1,6 +1,6 @@
 # snapshots
 
-from graph import Graph
+from model.graph import Graph
 
 class GraphSnapshotMgr:
     def __init__(self, graph, umlcanvas):
