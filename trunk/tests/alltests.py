@@ -54,7 +54,8 @@ def suite():
             'test_parse_yuml_01',
             'test_rhs_analyser',
             'test_parse_old_vs_new',
-            'test_graph_nodes'
+            'test_graph_nodes',
+            'test_persistence_01'
             )   # ANDY - and so on
     alltests = unittest.TestSuite()
     for module in map(__import__, modules_to_test):

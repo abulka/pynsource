@@ -27,7 +27,8 @@ class TestCase_A(unittest.TestCase):
         assert len(g.nodes) == 1
         assert len(g.nodeSet.keys()) == 1
         assert len(g.edges) == 0
-    
+
+        # Old persistence format - very simple, I call this 0.9 format.    
         filedata = """
 {'type':'node', 'id':'c', 'x':230, 'y':174, 'width':60, 'height':120}
 {'type':'node', 'id':'c1', 'x':130, 'y':174, 'width':60, 'height':120}
@@ -40,7 +41,7 @@ class TestCase_A(unittest.TestCase):
         g.LoadGraphFromStrings(filedata)
         #for node in g.nodes:
         #    print node, "layout info:", (node.layoutPosX, node.layoutPosY)
-        assert g.GraphToString().strip() == filedata.strip()
+        #assert g.GraphToString().strip() == filedata.strip(), g.GraphToString().strip() # no longer true since upgrades to persistence format will translate the incoming text
     
         # Line intersection tests
         

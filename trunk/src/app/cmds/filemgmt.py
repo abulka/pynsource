@@ -80,7 +80,7 @@ class CmdBootStrap(CmdBase):
         def bootstrap02():
             self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
         def bootstrap03():
-            self.app.run.CmdFileLoadWorkspaceFromFilepath(filepath=os.path.abspath("../tests/saved uml workspaces/uml05.txt"))
+            self.app.run.CmdFileLoadWorkspaceFromFilepath(filepath=os.path.abspath("../tests/saved uml workspaces/uml05.pyns"))
         def bootstrap04():
             self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath( "pyNsourceGui.py" )])
         def bootstrap05():
@@ -107,7 +107,7 @@ class CmdRefreshUmlWindow(CmdBase):
 class CmdFileSaveWorkspace(CmdBase):
     def execute(self):
         dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir='..\\tests\\saved uml workspaces',
-            defaultFile="", wildcard="*.txt", style=wx.FD_SAVE, pos=wx.DefaultPosition)
+            defaultFile="", wildcard="*.pyns", style=wx.FD_SAVE, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
             
@@ -130,7 +130,9 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
         
         umlcanvas.Clear()
         
-        self.context.model.graph.LoadGraphFromStrings(filedata)
+        if not self.context.model.graph.LoadGraphFromStrings(filedata):
+            self.context.wxapp.MessageBox("Cannot read newer pyNsource file format - please upgrade PyNSource and retry loading this file.")
+            return
                 
         # build view from model
         umlcanvas.build_view(translatecoords=False)
@@ -175,7 +177,7 @@ class CmdFileLoadWorkspaceViaDialog(CmdFileLoadWorkspaceBase):
         thisdir = self.context.config.get('LastDirFileOpen', '..\\tests\\saved uml workspaces') # remember dir path
         
         dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir=thisdir,
-            defaultFile="", wildcard="*.txt", style=wx.OPEN, pos=wx.DefaultPosition)
+            defaultFile="", wildcard="*.pyns", style=wx.OPEN, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             self.filepath = dlg.GetPath()
 
