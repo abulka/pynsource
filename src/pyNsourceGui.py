@@ -363,6 +363,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu4, "&Help...", "F1", self.OnHelp)
         Add(menu4, "&Visit PyNSource Website...", "", self.OnVisitWebsite)
         Add(menu4, "&Check for Updates...", "", self.OnCheckForUpdates)
+        Add(menu4, "&Report Bug...", "", self.OnReportBug)
         if not 'wxMac' in wx.PlatformInfo:
             menu4.AppendSeparator()
         helpID = Add(menu4, "&About...", "", self.OnAbout).GetId()
@@ -419,6 +420,10 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.frame.Bind(wx.EVT_MENU, self.OnDumpUmlWorkspace, item)
         
         self.frame.PopupMenu(self.popupmenu, wx.Point(x,y))
+        
+    def OnReportBug(self, event):
+        import webbrowser
+        webbrowser.open("http://code.google.com/p/pynsource/issues/list")
         
     def OnRememberLayout1(self, event):
         self.umlwin.CmdRememberLayout1()
