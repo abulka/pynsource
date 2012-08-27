@@ -128,10 +128,20 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
     def load_model_from_text_and_build_shapes(self, filedata=""):
         umlcanvas = self.context.umlwin
         
+        force = False
+        canread, msg = self.context.model.graph.persistence.can_I_read(filedata)
+        if not canread:
+            #self.context.wxapp.MessageBox(msg)
+            retCode = wx.MessageBox(msg + "\n\nTry anyway?", "File Open Error", wx.YES_NO | wx.ICON_QUESTION)  # MessageBox simpler than MessageDialog
+            if (retCode == wx.YES):
+                force = True
+            else:
+                return
+
         umlcanvas.Clear()
         
-        if not self.context.model.graph.LoadGraphFromStrings(filedata):
-            self.context.wxapp.MessageBox("Cannot read newer pyNsource file format - please upgrade PyNSource and retry loading this file.")
+        if not self.context.model.graph.LoadGraphFromStrings(filedata, force):
+            self.context.wxapp.MessageBox("Open failed.")
             return
                 
         # build view from model

@@ -230,8 +230,8 @@ class Graph:
         
     # Persistence methods 
     
-    def LoadGraphFromStrings(self, filedata_str):
-        return self.persistence.Load(filedata_str)
+    def LoadGraphFromStrings(self, filedata_str, force=False):
+        return self.persistence.Load(filedata_str, force)
 
     def GraphToString(self):
         return self.persistence.Save()

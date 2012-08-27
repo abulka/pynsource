@@ -12,18 +12,16 @@ PERSISTENCE_UPGRADE_SEQUENCE = [0.9, 1.0, 1.1]
 PERSISTENCE_CURRENT_VERSION = PERSISTENCE_UPGRADE_SEQUENCE[-1]
 
 class GraphPersistence:
-    """
-    Version formats:
 
-    PERSISTENCE_UPGRADE_SEQUENCE = [0.9, 1.0, 1.1]
-
-    """
     def __init__(self, graph):
         self.graph = graph
 
     def RemoveDuplicatesButPreserveLineOrder(self, s):
-        # remove duplicates but preserver line order.  Returns a list
-        # Adapted from http://stackoverflow.com/questions/1215208/how-might-i-remove-duplicate-lines-from-a-file
+        """
+        Returns a list
+        
+        Adapted from http://stackoverflow.com/questions/1215208/how-might-i-remove-duplicate-lines-from-a-file
+        """
         lines_seen = set() # holds lines already seen
         result = []
         for line in s.strip().split('\n'):
@@ -36,15 +34,15 @@ class GraphPersistence:
         #print "******\n", '\n'.join(result)  # debug point - print exact replica of s but without duplicates
         return result
 
-    def UpgradeToLatestFileFormatVersion(self, filedata_str):
-        """
-        Expecting the first line to say
-        # PynSource Version 1.0
-
-        Returns T/F as to whether can read and understand the incoming format.
-        """
-        #print "PERSISTENCE_CURRENT_VERSION", PERSISTENCE_CURRENT_VERSION
-
+    def can_I_read(self, filedata_str):
+        self.prepare(filedata_str)
+        if self.ori_file_version > PERSISTENCE_CURRENT_VERSION:
+            msg = "Cannot read newer pyNsource file format %1.1f - I only understand up to version %1.1f.  Please upgrade PyNSource and retry loading this file." % (self.ori_file_version, PERSISTENCE_CURRENT_VERSION)
+            return False, msg
+        else:
+            return True, "ok"
+    
+    def prepare(self, filedata_str):
         self.filedata_list = self.RemoveDuplicatesButPreserveLineOrder(filedata_str)
 
         version_data_line = self.filedata_list[0]
@@ -59,6 +57,16 @@ class GraphPersistence:
         else:
             self.ori_file_version = 0.9
 
+    def UpgradeToLatestFileFormatVersion(self, filedata_str):
+        """
+        Expecting the first line to say something like:
+        # PynSource Version 1.1
+        Returns T/F as to whether can read and understand the incoming format.
+        """
+        #print "PERSISTENCE_CURRENT_VERSION", PERSISTENCE_CURRENT_VERSION
+
+        self.prepare(filedata_str)
+        
         if self.ori_file_version == PERSISTENCE_CURRENT_VERSION:
             return True  # nothing to do
 
@@ -97,7 +105,7 @@ class GraphPersistence:
         else:
             print "Don't know how to upgrade persistence format to %f" % to_vers
 
-    def Load(self, filedata_str):
+    def Load(self, filedata_str, force=False):
         """
         Returns T/F as to whether can read and understand the incoming format.
 
@@ -107,7 +115,7 @@ class GraphPersistence:
         # nodes look like:     {'type':'node', 'id':'c5', 'x':230, 'y':174, 'width':60, 'height':120}
         # edges look like:     {'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1', 'weight':1}  weight >= 1
 
-        if not self.UpgradeToLatestFileFormatVersion(filedata_str):
+        if not self.UpgradeToLatestFileFormatVersion(filedata_str) and force == False:
             return False
 
         for data in self.filedata_list:
