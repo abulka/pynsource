@@ -8,6 +8,7 @@ class CmdFileNew(CmdBase):
     def execute(self):
         self.context.umlwin.Clear()
         self.context.wxapp.RefreshAsciiUmlTab()
+        self.context.wxapp.set_app_title("(Untitled)")
 
 
 # ----- Importing python source code
@@ -156,14 +157,15 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
         umlcanvas.stateofthenation()
         
         self.context.wxapp.RefreshAsciiUmlTab()
+        self.context.wxapp.set_app_title(self.filepath)
 
         self.filepath = None
         
     def execute(self):
-            fp = open(self.filepath, "r")
-            s = fp.read()
-            fp.close()
-            self.load_model_from_text_and_build_shapes(s)
+        fp = open(self.filepath, "r")
+        s = fp.read()
+        fp.close()
+        self.load_model_from_text_and_build_shapes(s)
 
 
 class CmdFileLoadWorkspaceFromFilepath(CmdFileLoadWorkspaceBase):
@@ -197,3 +199,21 @@ class CmdFileLoadWorkspaceViaDialog(CmdFileLoadWorkspaceBase):
             super(CmdFileLoadWorkspaceViaDialog, self).execute()
 
         dlg.Destroy()
+
+class CmdFileLoadWorkspaceSampleViaDialog(CmdFileLoadWorkspaceBase):
+    """
+    Load from the samples directory
+    """
+    
+    def execute(self):
+        
+        thisdir = os.path.dirname(os.path.realpath(__file__))
+        thisdir = os.path.join(thisdir, "../../samples")
+        
+        dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir=thisdir,
+            defaultFile="", wildcard="*.pyns", style=wx.OPEN, pos=wx.DefaultPosition)
+        if dlg.ShowModal() == wx.ID_OK:
+            self.filepath = dlg.GetPath()
+            super(CmdFileLoadWorkspaceSampleViaDialog, self).execute()
+        dlg.Destroy()
+

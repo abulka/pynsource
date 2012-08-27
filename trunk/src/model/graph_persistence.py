@@ -36,6 +36,10 @@ class GraphPersistence:
 
     def can_I_read(self, filedata_str):
         self.prepare(filedata_str)
+        
+        if self.ori_file_version == None:
+            return False, "Empty or corrupt file"
+        
         if self.ori_file_version > PERSISTENCE_CURRENT_VERSION:
             msg = "Cannot read newer pyNsource file format %1.1f - I only understand up to version %1.1f.  Please upgrade PyNSource and retry loading this file." % (self.ori_file_version, PERSISTENCE_CURRENT_VERSION)
             return False, msg
@@ -45,10 +49,14 @@ class GraphPersistence:
     def prepare(self, filedata_str):
         self.filedata_list = self.RemoveDuplicatesButPreserveLineOrder(filedata_str)
 
+        if len(self.filedata_list) == 0 or len(filedata_str.strip()) == 0:
+            self.ori_file_version = None
+            return
+        
         version_data_line = self.filedata_list[0]
         #print "version_data_line", version_data_line
 
-        if version_data_line[0] == '#':
+        if len(version_data_line) >= len("# PynSource Version n.n") and version_data_line[0] == '#':
             version_info = version_data_line.split(' ')
             if version_info[0] != '#': return False # unexpected stuff in file
             if version_info[1] != 'PynSource': return False # unexpected stuff in file
@@ -67,12 +75,12 @@ class GraphPersistence:
 
         self.prepare(filedata_str)
         
-        if self.ori_file_version == PERSISTENCE_CURRENT_VERSION:
-            return True  # nothing to do
-
-        elif self.ori_file_version > PERSISTENCE_CURRENT_VERSION:
+        if self.ori_file_version == None or self.ori_file_version > PERSISTENCE_CURRENT_VERSION:
             # Cannot read a future version of the file format
             return False
+
+        elif self.ori_file_version == PERSISTENCE_CURRENT_VERSION:
+            return True  # nothing to do
 
         elif self.ori_file_version < PERSISTENCE_CURRENT_VERSION:
 
