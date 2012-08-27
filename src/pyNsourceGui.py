@@ -273,7 +273,13 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             
     def OnLoadGraph(self, event):
         self.app.run.CmdFileLoadWorkspaceViaDialog()
-        
+
+    def OnLoadGraphSample(self, event):
+        self.app.run.CmdFileLoadWorkspaceSampleViaDialog()
+
+    def set_app_title(self, title):
+        self.frame.SetTitle(self.andyapptitle + " - " + title)        
+
     def OnTabPageChanged(self, event):
         if event.GetSelection() == 0:  # ogl
             self.PostOglViewSwitch()
@@ -324,6 +330,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         Add(menu1, "&New", "Ctrl-N", self.FileNew)
         Add(menu1, "&Open...", "Ctrl-O", self.OnLoadGraph)
+        Add(menu1, "Open Sample &Uml...", "Ctrl-U", self.OnLoadGraphSample)
         Add(menu1, "&Save As...", "Ctrl-S", self.OnSaveGraph)
         menu1.AppendSeparator()
         Add(menu1, "&Import Python Code...", "Ctrl-I", self.OnFileImport)
