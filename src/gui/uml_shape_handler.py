@@ -20,7 +20,15 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         x, y = shape.GetX(), shape.GetY()
         x, y = getpos(shape)
         width, height = shape.GetBoundingBoxMax()
-        self.frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)" % (x, y, width, height))
+        
+        msg = ""
+        node = getattr(shape, "node", None)
+        if node:
+            colour_index = getattr(node, "colour_index", None)
+            if colour_index <> None:
+                msg += "colour_index %d" % colour_index
+            
+        self.frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d) %s" % (x, y, width, height, msg))
 
     def OnLeftClick(self, x, y, keys = 0, attachment = 0):
         self._SelectNodeNow(x, y, keys, attachment)
@@ -86,9 +94,9 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
     def OnMovePost(self, dc, x, y, oldX, oldY, display):
         shape = self.GetShape()
         ogl.ShapeEvtHandler.OnMovePost(self, dc, x, y, oldX, oldY, display)
-        self.UpdateStatusBar(shape)
-        if "wxMac" in wx.PlatformInfo:
-            shape.GetCanvas().Refresh(False) 
+        #self.UpdateStatusBar(shape)
+        #if "wxMac" in wx.PlatformInfo:
+        #    shape.GetCanvas().Refresh(False) 
 
     def OnPopupItemSelected(self, event):
         item = self.popupmenu.FindItemById(event.GetId()) 
@@ -99,8 +107,10 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             self.NodeProperties()
         elif text == "Begin - Draw Line from this class\tq":
             self.GetShape().GetCanvas().NewEdgeMarkFrom()
-        elif text == "End - Draw Line to this class\tw":
-            self.GetShape().GetCanvas().NewEdgeMarkTo()
+        elif text == "End - Draw Line to this class (composition)\tw":
+            self.GetShape().GetCanvas().NewEdgeMarkTo(edge_type='composition')
+        elif text == "End - Draw Line to this class (generalisation)\tW":
+            self.GetShape().GetCanvas().NewEdgeMarkTo(edge_type='generalisation')
         elif text == "Reset Image Size":
             shape = self.GetShape()
             shape.ResetSize()
@@ -123,7 +133,8 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
 
         menu_sub = wx.Menu()
         MakeMenuItem(menu_sub, "Begin - Draw Line from this class\tq")
-        MakeMenuItem(menu_sub, "End - Draw Line to this class\tw")
+        MakeMenuItem(menu_sub, "End - Draw Line to this class (composition)\tw")
+        MakeMenuItem(menu_sub, "End - Draw Line to this class (generalisation)\tW")
         self.popupmenu.AppendMenu(wx.NewId(), "Draw Line", menu_sub)
 
         if self.GetShape().__class__.__name__ == 'BitmapShapeResizable':

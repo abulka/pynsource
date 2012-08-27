@@ -123,7 +123,10 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.NewEdgeMarkFrom()
 
         elif keycode == 'w':
-            self.NewEdgeMarkTo()
+            self.NewEdgeMarkTo(edge_type='composition')
+
+        elif keycode == 'W':
+            self.NewEdgeMarkTo(edge_type='generalisation')
             
         elif keycode in ['1','2','3','4','5','6','7','8']:
             todisplay = ord(keycode) - ord('1')
@@ -194,7 +197,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.new_edge_from = selected[0].node
         print "From", self.new_edge_from.id
 
-    def NewEdgeMarkTo(self):
+    def NewEdgeMarkTo(self, edge_type='composition'):
         selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
         if not selected:
             print "Please select a node"
@@ -215,10 +218,10 @@ class UmlCanvas(ogl.ShapeCanvas):
             print "From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id
             return
         
-        edge = self.umlworkspace.graph.AddEdge(self.new_edge_from, tonode, weight=None)
+        edge = self.umlworkspace.graph.AddEdge(tonode, self.new_edge_from, weight=None) # swap direction as is a directional composition.
         # TODO should also arguably add to umlworkspace's associations_composition or associations_generalisation list (or create a new one for unlabelled associations like the one we are creating here)
-        edge['uml_edge_type'] = ''
-        #edge['uml_edge_type'] = 'composition'
+        #edge['uml_edge_type'] = ''
+        edge['uml_edge_type'] = edge_type
         self.CreateUmlEdge(edge)
         self.stateofthenation()
               
