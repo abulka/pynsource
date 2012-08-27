@@ -7,7 +7,7 @@
 # you desire and then run an overlap removal algorithm afterwards which
 # should slightly move the vertices around to remove overlap.
 
-from graph import GraphNode
+from model.graph import GraphNode
 import math
 
 MARGIN = 5

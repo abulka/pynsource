@@ -7,7 +7,7 @@ if ".." not in sys.path: sys.path.append("..")
 
 import random
 import sys
-from layout.graph import Graph, GraphNode
+from graph import Graph, GraphNode
 
 class UmlGraph(Graph):
 
