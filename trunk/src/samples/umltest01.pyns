@@ -7,4 +7,4 @@
 {'type':'edge', 'id':'TopHandler_to_Editor', 'source':'TopHandler', 'target':'Editor', 'uml_edge_type':'composition'}
 {'type':'edge', 'id':'GUI_to_Editor', 'source':'GUI', 'target':'Editor', 'uml_edge_type':'composition'}
 {'type':'edge', 'id':'Statechart_to_Editor', 'source':'Statechart', 'target':'Editor', 'uml_edge_type':'composition'}
-{'type':'edge', 'id':'D41_to_D26', 'source':'D41', 'target':'D26', 'uml_edge_type':''}
+{'type':'edge', 'id':'D41_to_D26', 'source':'D41', 'target':'D26', 'uml_edge_type':'composition'}
