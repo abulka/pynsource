@@ -115,7 +115,7 @@ class TestCase_A(unittest.TestCase):
     def test_5(self):
         """
         Upgrade 1.1 to 1.0 - simulate loading a newer file format into an older version of the app
-        Cannot read. (a bit strict, I know)
+        Cannot read. (a bit strict, I know - but gui allows for forcing the read - see filemgmt.py)
         """
         g = Graph()
         filedata = """
@@ -126,6 +126,18 @@ class TestCase_A(unittest.TestCase):
 {'type':'edge', 'id':'UmlShapeCanvas_to_MainApp', 'source':'UmlShapeCanvas', 'target':'MainApp', 'uml_edge_type':'composition'}
     """
         model.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.0
+        self.assertFalse(g.persistence.UpgradeToLatestFileFormatVersion(filedata))
+        self.assertFalse(g.persistence.can_I_read(filedata)[0])
+
+    def test_6(self):
+        """
+        Empty file
+        """
+        g = Graph()
+        filedata = """
+    """
+        model.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.1
+        self.assertFalse(g.persistence.can_I_read(filedata)[0])
         self.assertFalse(g.persistence.UpgradeToLatestFileFormatVersion(filedata))
 
 def suite():
