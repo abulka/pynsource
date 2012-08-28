@@ -139,11 +139,14 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.app.run.CmdDumpUmlWorkspace()
 
         elif keycode == 's':
-            self.canvas_resizer.resize_virtual_canvas_tofit_bounds(shrinkage_leeway=0, bounds_dirty=True)
+            self.CmdTrimScrollbars()
         
         self.working = False
         event.Skip()
 
+    def CmdTrimScrollbars(self):
+        self.canvas_resizer.resize_virtual_canvas_tofit_bounds(shrinkage_leeway=0, bounds_dirty=True)
+        
     def CmdRememberLayout1(self):
         self.snapshot_mgr.QuickSave(slot=1)
     def CmdRememberLayout2(self):
@@ -523,14 +526,14 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def OnColourSiblings(self, color_range_offset=False):
         from uml_colours import official2
-
         
         if color_range_offset:
             offset = random.randint(1, 10)
         else:
             offset = 0
 
-        self.umlworkspace.graph.mark_siblings()
+        self.umlworkspace.graph.colour_mark_siblings()
+        
         clrs = official2.strip().split('\n')
 
         dc = wx.ClientDC(self)
@@ -544,7 +547,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.Redraw(dc)
         
     def OnCycleColours(self, colour=None):
-        
+       
         from uml_colours import official2
 
         if colour == None:
@@ -567,6 +570,73 @@ class UmlCanvas(ogl.ShapeCanvas):
             node.shape.SetBrush(colour)
         self.Redraw(dc)
 
+    def OnColourSequential(self, color_range_offset=False):
+        
+        self.build_one_node_per_colour()
+        
+        from uml_colours import official2
+
+        if color_range_offset:
+            offset = random.randint(1, 10)
+        else:
+            offset = 0
+
+        index = 0 + offset
+        index_max = len(official2)
+        
+        for node in self.umlworkspace.graph.nodes:
+            node.colour_index = index
+            index += 1
+            if index > index_max:
+                index = 0
+
+        clrs = official2.strip().split('\n')
+
+        dc = wx.ClientDC(self)
+        self.PrepareDC(dc)
+        for node in self.umlworkspace.graph.nodes:
+            clr = clrs[node.colour_index + offset]
+            colour=wx.Brush(clr)
+            node.shape.SetBrush(colour)
+            #print "colour_index", node.id, node.colour_index, clr
+        self.Redraw(dc)
+
+    def build_one_node_per_colour(self):
+        umlcanvas = self
+        umlcanvas.Clear()
+        
+        graph = self.umlworkspace.graph
+        
+        from uml_colours import official2
+        clrs = official2.strip().split('\n')
+        
+        NODE_HEIGHT = 30
+        MAX_Y_NODES = 18 
+        index = 0
+        x = y = 10
+        for clr in clrs:
+            print clr
+            node = graph.NotifyCreateNewNode("%d %s" % (index, clr), x, y, 100, NODE_HEIGHT)
+            graph.AddNode(node)
+            index += 1
+            y += NODE_HEIGHT + 5
+            if index%MAX_Y_NODES == 0:
+                y = 10
+                x += 280
+       
+        # build view from model
+        umlcanvas.build_view(translatecoords=False)
+
+        # set layout coords to be in sync with world, so that if expand scale things will work
+        umlcanvas.coordmapper.Recalibrate()
+        umlcanvas.AllToLayoutCoords()
+        
+        # refresh view
+        umlcanvas.GetDiagram().ShowAll(1) # need this, yes
+        umlcanvas.stateofthenation()
+        
+        self.app.context.wxapp.set_app_title("(Untitled)")
+        self.CmdTrimScrollbars()
 
     
     def get_umlboxshapes(self):
