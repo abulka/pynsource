@@ -115,7 +115,11 @@ class CmdFileSaveWorkspace(CmdBase):
             fp = open(filename, "w")
             fp.write(self.context.model.graph.GraphToString())
             fp.close()
+            
+            self.context.wxapp.set_app_title(filename)
+            
         dlg.Destroy()
+
 
 class CmdFileSaveWorkspaceToConsole(CmdBase):
     def execute(self):
@@ -126,6 +130,9 @@ class CmdFileSaveWorkspaceToConsole(CmdBase):
 
 
 class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
+    def __init__(self):
+        self.filepath = None
+    
     def load_model_from_text_and_build_shapes(self, filedata=""):
         umlcanvas = self.context.umlwin
         
@@ -174,6 +181,9 @@ class CmdFileLoadWorkspaceFromFilepath(CmdFileLoadWorkspaceBase):
 
             
 class CmdFileLoadWorkspaceFromQuickPrompt(CmdFileLoadWorkspaceBase):
+    def __init__(self):
+        self.filepath = ('Console')
+
     def execute(self):
         eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
         dialog = wx.TextEntryDialog (parent=self.context.frame, message='Enter node/edge persistence strings:', caption='Load Graph From Text', defaultValue=eg, style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
