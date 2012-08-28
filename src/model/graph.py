@@ -194,16 +194,20 @@ class Graph:
 
     def mark_siblings(self):
         """
-        TODO
-        Want siblings of different parents to be a different colour.
-        Want all root nodes to be the same color, unless they have siblings, in which case the root should match the kid sibling colour.
+        Siblings of different parents to be a different colour.
+        All root nodes to be the same color.
         """
         self.setup_temporary_parent_child_relationships()
+        outer_index = 1
 
+        for node in self.nodes:
+            node.colour_index = -1      # mark so that only assign a colour once
+            
         def process_descendants(node, index):
             kids = node.children
             for child in kids:
-                child.colour_index = index
+                if child.colour_index == -1:
+                    child.colour_index = index
 
             for child in kids:
                 index += 1
@@ -212,7 +216,8 @@ class Graph:
         parentless_nodes = [node for node in self.nodes if not node.parents]
         for node in parentless_nodes:
             node.colour_index = 0
-            process_descendants(node, 0)
+            process_descendants(node, outer_index)
+            outer_index += 1
 
         self.del_temporary_parent_child_relationships()                    
         

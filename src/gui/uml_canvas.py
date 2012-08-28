@@ -540,7 +540,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             colour=wx.Brush(clr)
             
             node.shape.SetBrush(colour)
-            print "colour_index", node.id, node.colour_index, clr
+            #print "colour_index", node.id, node.colour_index, clr
         self.Redraw(dc)
         
     def OnCycleColours(self, colour=None):
@@ -557,9 +557,9 @@ class UmlCanvas(ogl.ShapeCanvas):
             clrs = official2.strip().split('\n')
             
             clr = clrs[random.randint(0,len(clrs)-1)]
-            print clr
-            #colour=wx.Brush(clr, wx.SOLID)
-            colour=wx.Brush(clr)
+            #print clr
+            
+            colour=wx.Brush(clr)  # colour=wx.Brush(clr, wx.SOLID)
         
         dc = wx.ClientDC(self)
         self.PrepareDC(dc)
