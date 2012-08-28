@@ -3,7 +3,7 @@
 import wx
 import wx.lib.ogl as ogl
 from coord_utils import setpos, getpos
-from architecture_support import *
+from common.architecture_support import *
 
 class UmlShapeHandler(ogl.ShapeEvtHandler):
     def __init__(self, log, frame, shapecanvas):

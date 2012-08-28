@@ -5,7 +5,7 @@ from coord_utils import percent_change
 import wx
 import wx.lib.ogl as ogl
 
-from architecture_support import whoscalling2
+from common.architecture_support import whoscalling2
 
 MIN_SENSIBLE_CANVAS_SIZE = 200
     

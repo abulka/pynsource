@@ -5,7 +5,7 @@ import traceback
 STOP_ON_EXCEPTION = 1
 DEBUGINFO = 1
 DEBUGINFO_IMMEDIATE_PRINT = 0
-from architecture_support import whosdaddy, whosgranddaddy
+from common.architecture_support import whosdaddy, whosgranddaddy
 from parsing.class_entry import ClassEntry, Attribute
 from parsing.keywords import pythonbuiltinfunctions
 from parse_rhs_analyser import RhsAnalyser

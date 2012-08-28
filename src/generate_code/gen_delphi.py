@@ -3,7 +3,7 @@
 import os
 from parsing.keywords import delphikeywords
 from gen_base import ReportGenerator, CmdLineGenerator
-from messages import DELPHI_UNIT_FILE_TEMPLATE
+from common.messages import DELPHI_UNIT_FILE_TEMPLATE
 
 def unique(s):
     """ Return a list of the elements in list s in arbitrary order, but without duplicates """

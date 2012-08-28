@@ -25,7 +25,7 @@ import wx
 import wx.lib.ogl as ogl
 
 import os, stat
-from messages import *
+from common.messages import *
 
 APP_VERSION = 1.60
 WINDOW_SIZE = (1024,768)
@@ -39,10 +39,9 @@ if 'wxMac' in wx.PlatformInfo:
 from gui.coord_utils import setpos, getpos
 from gui.uml_canvas import UmlCanvas
 from gui.wx_log import Log
-from gui_imageviewer import ImageViewer
 from ascii_uml.layout_ascii import model_to_ascii_builder
 
-from architecture_support import *
+from common.architecture_support import *
 from app.app import App
 import wx.lib.mixins.inspection  # Ctrl-Alt-I
 
@@ -503,7 +502,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         
     def FilePrint(self, event):
 
-        from printframework import MyPrintout
+        from common.printframework import MyPrintout
 
         self.printData = wx.PrintData()
         self.printData.SetPaperId(wx.PAPER_LETTER)

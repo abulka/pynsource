@@ -8,7 +8,7 @@ import difflib
 
 import sys
 sys.path.append("../src")
-from logwriter import LogWriter, LogWriterNull
+from common.logwriter import LogWriter, LogWriterNull
 from parsing.dump_pmodel import dump_old_structure
 from parsing.api import old_parser, new_parser
 

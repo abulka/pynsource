@@ -85,7 +85,7 @@ class CmdBootStrap(CmdBase):
         def bootstrap04():
             self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath( "pyNsourceGui.py" )])
         def bootstrap05():
-            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("printframework.py"), os.path.abspath("png.py")])
+            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("common/printframework.py"), os.path.abspath("common/png.py")])
         def bootstrap06():
             self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("gui/uml_shapes.py")])
             

@@ -222,7 +222,7 @@ class CmdLinePythonToYuml(CmdLineGenerator):
 
 import urllib
 import urllib2
-import png    # codeproject version, not the "easy_install pypng" version.
+import common.png    # codeproject version, not the "easy_install pypng" version.
 
 def _yuml_write_to_png(yuml, in_stream, out_stream):
     signature = png.read_signature(in_stream)

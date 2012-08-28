@@ -27,7 +27,7 @@ import wx.lib.ogl as ogl
 
 from uml_shape_handler import UmlShapeHandler
 
-from architecture_support import *
+from common.architecture_support import *
 
 ogl.Shape.Move2 = Move2
 

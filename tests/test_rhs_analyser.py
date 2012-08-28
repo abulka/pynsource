@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("../src")
-from architecture_support import whosdaddy, whosgranddaddy
+from common.architecture_support import whosdaddy, whosgranddaddy
 from parsing.keywords import pythonbuiltinfunctions
 from parsing.parse_rhs_analyser import RhsAnalyser
                
