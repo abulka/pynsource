@@ -10,6 +10,7 @@ from architecture_support import listdiff
 
 from graph_persistence import GraphPersistence
 
+outer_index = 1
 
 class Graph:
     def __init__(self):
@@ -192,35 +193,39 @@ class Graph:
                 if child not in parent.children:
                     parent.children.append(child)
 
-    def mark_siblings(self):
+    def colour_mark_siblings(self):
         """
         Siblings of different parents to be a different colour.
         All root nodes to be the same color.
         """
         self.setup_temporary_parent_child_relationships()
-        outer_index = 1
+        global outer_index
+        outer_index = 0
 
         for node in self.nodes:
             node.colour_index = -1      # mark so that only assign a colour once
             
-        def process_descendants(node, index):
+        def process_descendants(node):
+            global outer_index
             kids = node.children
+            if kids:
+                outer_index += 1
             for child in kids:
                 if child.colour_index == -1:
-                    child.colour_index = index
+                    child.colour_index = outer_index
 
             for child in kids:
-                index += 1
-                process_descendants(child, index)
+                process_descendants(child)
 
         parentless_nodes = [node for node in self.nodes if not node.parents]
         for node in parentless_nodes:
             node.colour_index = 0
-            process_descendants(node, outer_index)
-            outer_index += 1
+            process_descendants(node)
+            #outer_index += 1
 
         self.del_temporary_parent_child_relationships()                    
-        
+
+
     def del_temporary_parent_child_relationships(self):
         # remove parent / child knowledge attributes
         for node in self.nodes:

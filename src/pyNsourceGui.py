@@ -339,24 +339,28 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         menu1.AppendSeparator()
         Add(menu1, "E&xit", "Alt-X", self.OnButton)
         
-        Add(menu2, "&Insert Class...", "i", self.OnInsertClass)
+        Add(menu2, "&Insert Class...", "I", self.OnInsertClass)
         if ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS:
-            Add(menu2, "&Insert Image...", "Ctrl-i", self.OnInsertImage)
-            Add(menu2, "&Insert Comment...", "Shift-i", self.OnInsertComment)
+            Add(menu2, "&Insert Image...", "Ctrl-I", self.OnInsertImage)
+            Add(menu2, "&Insert Comment...", "Shift-I", self.OnInsertComment)
         menu_item_delete_class = Add(menu2, "&Delete", "Del", self.OnDeleteNode, self.OnDeleteNode_update)
         menu_item_delete_class.Enable(True)  # demo one way to enable/disable.  But better to do via _update function
         Add(menu2, "&Edit Class Properties...", "F2", self.OnEditProperties, self.OnEditProperties_update)
         menu2.AppendSeparator()
-        Add(menu2, "&Refresh", "r", self.OnRefreshUmlWindow)
+        Add(menu2, "&Refresh", "R", self.OnRefreshUmlWindow)
         
-        Add(menu5, "&Toggle Ascii UML", "v", self.OnViewToggleAscii)
+        Add(menu5, "&Toggle Ascii UML", "V", self.OnViewToggleAscii)
         menu5.AppendSeparator()
-        Add(menu5sub, "&Colourise Nodes (random colours)", "c", self.OnCycleColours)
-        Add(menu5sub, "&Default Node Colours", "Shift-C", self.OnCycleColoursDefault)
+        Add(menu5, "Colour &Sibling Subclasses", "F", self.OnColourSiblings)
+        Add(menu5, "&Default Colours", "C", self.OnCycleColoursDefault)
+        menu5.AppendSeparator()
+        
+        Add(menu5sub, "&Randomise Node Colour", "Shift-C", self.OnCycleColours)
+        Add(menu5sub, "&OnColourSequential", "G", self.OnColourSequential)
+        
         menu5sub.AppendSeparator()
-        Add(menu5sub, "Colour &Sibling Subclasses", "f", self.OnColourSiblings)
-        Add(menu5sub, "Colour &Sibling Subclasses (random colours)", "Shift-f", self.OnColourSiblingsRandom)
-        AddSubMenu(menu5, menu5sub, "Colour Nodes")
+        Add(menu5sub, "Colour &Sibling Subclasses (random colours)", "Shift-F", self.OnColourSiblingsRandom)
+        AddSubMenu(menu5, menu5sub, "Advanced")
         
         Add(menu3, "&Layout UML", "L", self.OnLayout)
         Add(menu3, "&Layout UML Optimally (slower)", "B", self.OnDeepLayout)
@@ -450,6 +454,10 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.umlwin.OnColourSiblings()
     def OnColourSiblingsRandom(self, event):
         self.umlwin.OnColourSiblings(color_range_offset=True)
+        
+    def OnColourSequential(self, event):
+        self.umlwin.OnColourSequential(color_range_offset=False)
+        
         
     def OnFileImport(self, event):
         self.app.run.CmdFileImportViaDialog()

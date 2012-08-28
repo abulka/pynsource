@@ -120,7 +120,7 @@ class GraphPersistence:
         This code is now for reading version 1.1 persistence format.
         """
         # load from persistence
-        # nodes look like:     {'type':'node', 'id':'c5', 'x':230, 'y':174, 'width':60, 'height':120}
+        # nodes look like:     {'type':'umlshape', 'id':'c5', 'x':230, 'y':174, 'width':60, 'height':120}
         # edges look like:     {'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1', 'weight':1}  weight >= 1
 
         if not self.UpgradeToLatestFileFormatVersion(filedata_str) and force == False:
