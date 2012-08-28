@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("../src")
-from architecture_support import whosdaddy, whosgranddaddy
+from common.architecture_support import whosdaddy, whosgranddaddy
 from model.graph import Graph, GraphNode
 import model.graph_persistence
 

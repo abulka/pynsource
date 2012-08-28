@@ -19,7 +19,7 @@ from ast import *
 
 import sys
 sys.path.append("../../src")
-from architecture_support import whosdaddy, whoscalling2
+from common.architecture_support import whosdaddy, whoscalling2
 
 
 BOOLOP_SYMBOLS = {

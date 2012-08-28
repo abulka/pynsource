@@ -1,7 +1,7 @@
 import ast
 
 from parsing.core_parser_ast import convert_ast_to_old_parser
-from logwriter import LogWriterNull
+from common.logwriter import LogWriterNull
 
 def old_parser(filename):
     from generate_code.gen_asciiart import PySourceAsText

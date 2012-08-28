@@ -1,4 +1,4 @@
-from command_pattern import Command
+from common.command_pattern import Command
 
 class CmdBase(Command):
     """ Base command """

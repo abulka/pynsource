@@ -1,4 +1,4 @@
-from architecture_support import whosdaddy, whosgranddaddy
+from common.architecture_support import whosdaddy, whosgranddaddy
 from parsing.keywords import pythonbuiltinfunctions
 
 class RhsAnalyser:

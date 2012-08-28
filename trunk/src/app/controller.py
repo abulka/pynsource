@@ -7,7 +7,7 @@ if __name__ == '__main__':
     import sys
     if ".." not in sys.path: sys.path.append("..")
 
-from command_pattern import CommandManager
+from common.command_pattern import CommandManager
 
 from cmds.diagnostics import *
 from cmds.deletion import *

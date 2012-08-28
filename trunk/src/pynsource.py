@@ -6,7 +6,7 @@ from generate_code.gen_asciiart import CmdLinePythonToAsciiArt
 from generate_code.gen_yuml import CmdLinePythonToYuml
 from generate_code.gen_delphi import CmdLinePythonToDelphi
 from generate_code.gen_java import CmdLinePythonToJava
-import messages
+import common.messages
 
 def test():
     #FILE = "..\\tests\\python-in\\testmodule01.py"
@@ -85,7 +85,7 @@ def ParseArgsAndRun():
             u = CmdLinePythonToAsciiArt(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
             u.ExportTo(None)
     else:
-        print messages.HELP_COMMAND_LINE_USAGE
+        print common.messages.HELP_COMMAND_LINE_USAGE
 
 if __name__ == '__main__':
     #test()

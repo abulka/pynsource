@@ -3,7 +3,7 @@
 
 from layout.line_intersection import FindLineIntersection
 from layout.permutations import getpermutations
-from architecture_support import listdiff
+from common.architecture_support import listdiff
 from graph_persistence import GraphPersistence
 
 global_colour_index = 1

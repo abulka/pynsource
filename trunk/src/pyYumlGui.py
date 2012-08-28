@@ -1,6 +1,6 @@
 import wx
-from pyYumlGui_gen import *
-from messages import *
+from dialogs.FramePyYuml import *
+from common.messages import *
 
 class PyYumlGuiFrame ( MyFrame1 ):
     def OnButton1( self, event ):

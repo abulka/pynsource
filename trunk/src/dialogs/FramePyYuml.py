@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Mar 22 2011)
+## Python code generated with wxFormBuilder (version Feb  9 2012)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO "NOT" EDIT THIS FILE!
 ###########################################################################
 
 import wx
-from gui_imageviewer import ImageViewer
+import wx.xrc
+from common.gui_imageviewer import ImageViewer
 
 ###########################################################################
 ## Class MyFrame1
@@ -53,6 +54,7 @@ class MyFrame1 ( wx.Frame ):
 		
 		self.m_customControl1 = ImageViewer(self)
 		bSizer1.Add( self.m_customControl1, 1, wx.ALL|wx.EXPAND, 1 )
+		
 		
 		self.SetSizer( bSizer1 )
 		self.Layout()
