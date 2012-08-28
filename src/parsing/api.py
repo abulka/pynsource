@@ -1,8 +1,5 @@
 import ast
 
-import sys
-sys.path.append("../../src")
-
 from parsing.core_parser_ast import convert_ast_to_old_parser
 from logwriter import LogWriterNull
 

@@ -355,11 +355,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu5, "&Default Colours", "C", self.OnCycleColoursDefault)
         menu5.AppendSeparator()
         
-        Add(menu5sub, "&Randomise Node Colour", "Shift-C", self.OnCycleColours)
-        Add(menu5sub, "&OnColourSequential", "G", self.OnColourSequential)
-        
-        menu5sub.AppendSeparator()
-        Add(menu5sub, "Colour &Sibling Subclasses (random colours)", "Shift-F", self.OnColourSiblingsRandom)
+        Add(menu5sub, "&Change Node Colour", "Shift-C", self.OnCycleColours)
+        Add(menu5sub, "Change &Sibling Subclass Colour Scheme", "Shift-F", self.OnColourSiblingsRandom)
         AddSubMenu(menu5, menu5sub, "Advanced")
         
         Add(menu3, "&Layout UML", "L", self.OnLayout)
@@ -446,18 +443,15 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.umlwin.CmdRestoreLayout2()
         
     def OnCycleColours(self, event):
-        self.umlwin.OnCycleColours()
+        self.app.run.CmdCycleColours()
     def OnCycleColoursDefault(self, event):
-        self.umlwin.OnCycleColours(colour=wx.Brush("WHEAT", wx.SOLID))
+        self.app.run.CmdCycleColours(colour=wx.Brush("WHEAT", wx.SOLID))
 
     def OnColourSiblings(self, event):
-        self.umlwin.OnColourSiblings()
+        self.app.run.CmdColourSiblings()
     def OnColourSiblingsRandom(self, event):
-        self.umlwin.OnColourSiblings(color_range_offset=True)
-        
-    def OnColourSequential(self, event):
-        self.umlwin.OnColourSequential(color_range_offset=False)
-        
+        self.app.run.CmdColourSiblings(color_range_offset=True)
+ 
         
     def OnFileImport(self, event):
         self.app.run.CmdFileImportViaDialog()
@@ -642,6 +636,14 @@ def main():
     application.MainLoop()
 
 if __name__ == '__main__':
-    main()
+    
+    # Sanity check for paths, ensure there is not any .. and other relative crud in
+    # our path.  You only need that stuff when running a module as a standalone.
+    # in which case prefix such appends with if __name__ == '__main__':
+    # Otherwise everything should be assumed to run from trunk/src/ as the root
+    #
+    #import sys, pprint
+    #pprint.pprint(sys.path)
 
+    main()
 

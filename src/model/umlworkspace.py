@@ -2,9 +2,6 @@
 # holds shapes too, though Shape is not interrogated except for 'GetBoundingBoxMax()'
 # meaning stubs could be used
 
-import sys, glob
-if ".." not in sys.path: sys.path.append("..")
-
 import random
 import sys
 from graph import Graph, GraphNode
