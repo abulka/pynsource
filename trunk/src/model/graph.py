@@ -3,14 +3,10 @@
 
 from layout.line_intersection import FindLineIntersection
 from layout.permutations import getpermutations
-
-import sys
-sys.path.append("../../src")
 from architecture_support import listdiff
-
 from graph_persistence import GraphPersistence
 
-outer_index = 1
+global_colour_index = 1
 
 class Graph:
     def __init__(self):
@@ -199,20 +195,20 @@ class Graph:
         All root nodes to be the same color.
         """
         self.setup_temporary_parent_child_relationships()
-        global outer_index
-        outer_index = 0
+        global global_colour_index
+        global_colour_index = 0
 
         for node in self.nodes:
             node.colour_index = -1      # mark so that only assign a colour once
             
         def process_descendants(node):
-            global outer_index
+            global global_colour_index
             kids = node.children
             if kids:
-                outer_index += 1
+                global_colour_index += 1
             for child in kids:
                 if child.colour_index == -1:
-                    child.colour_index = outer_index
+                    child.colour_index = global_colour_index
 
             for child in kids:
                 process_descendants(child)
@@ -221,7 +217,6 @@ class Graph:
         for node in parentless_nodes:
             node.colour_index = 0
             process_descendants(node)
-            #outer_index += 1
 
         self.del_temporary_parent_child_relationships()                    
 

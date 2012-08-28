@@ -15,10 +15,12 @@ from cmds.insertion import *
 from cmds.selection import *
 from cmds.filemgmt import *
 from cmds.layouts import *
+from cmds.colouring import *
 # TODO: Perhaps can add these modules to the globals within the
 # invoker class, to avoid having to import each module explicitly?
 
-# Command Invoker has to be defined here in order to access the scope of the cmds modules
+# IMPORTANT: Command Invoker has to be defined here in order to access the scope
+# of the above cmds modules
 
 class CmdInvoker:   # version 4 - see pyNsource\trunk\Research\python advanced\command_invokers1.py
     """

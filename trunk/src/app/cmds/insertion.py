@@ -1,5 +1,3 @@
-import sys
-if ".." not in sys.path: sys.path.append("..")
 from base_cmd import CmdBase
 import wx
 import random

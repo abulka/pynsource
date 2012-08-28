@@ -3,9 +3,6 @@
 import wx
 import wx.lib.ogl as ogl
 from coord_utils import setpos, getpos
-
-import sys
-if ".." not in sys.path: sys.path.append("..")
 from architecture_support import *
 
 class UmlShapeHandler(ogl.ShapeEvtHandler):
