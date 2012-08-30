@@ -94,7 +94,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         
         self.UpdateStatusBar(shape)
         
-        if "wxMac" in wx.PlatformInfo:      # Definately seem to need this on Mac to avoid ghost lines being left after a move
+        if "wxMac" in wx.PlatformInfo:      # Definitely seem to need this on Mac to avoid ghost lines being left after a move
             shape.GetCanvas().Refresh(False) 
 
 
@@ -122,7 +122,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self.popupmenu.AppendSeparator()
 
         menu_sub = wx.Menu()
-        MakeMenuItem(menu_sub, "Begin - Draw Line from this class\tq", self.OnDrawBegin)
+        MakeMenuItem(menu_sub, "Begin - Draw Line from this class\tq", self.OnDrawBegin)  # Note: unlike proper toolbar menus, these shortcut keys don't work - you need to add onKeyChar() interceptions in umlcanvas.py
         MakeMenuItem(menu_sub, "End - Draw Line to this class (composition)\tw", self.OnDrawEnd1)
         MakeMenuItem(menu_sub, "End - Draw Line to this class (generalisation)\te", self.OnDrawEnd2)
         self.popupmenu.AppendMenu(wx.NewId(), "Draw Line", menu_sub)
