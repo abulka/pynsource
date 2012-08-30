@@ -214,8 +214,8 @@ class CmdFileLoadWorkspaceSampleViaDialog(CmdFileLoadWorkspaceBase):
     """
     Load from the samples directory
     """
-    
-    def execute(self):
+        
+    def execute_from_dir(self):
         
         thisdir = os.path.dirname(os.path.realpath(__file__))
         thisdir = os.path.join(thisdir, "../../samples")
@@ -226,4 +226,26 @@ class CmdFileLoadWorkspaceSampleViaDialog(CmdFileLoadWorkspaceBase):
             self.filepath = dlg.GetPath()
             super(CmdFileLoadWorkspaceSampleViaDialog, self).execute()
         dlg.Destroy()
+
+class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
+    """
+    Load from the samples base64 dictionary.
+    
+    Reason for doing this: allows us to keep 'file' resources in the app itself,
+    thus no need for loading external file - which is problematic e.g. on the mac
+    
+    Run buildsamples.py to update it.
+    """
+    
+    def execute(self):
+        from base64 import b64decode
+        from samples.files_as_resource import sample_files_dict
+        
+        print "samples_dir_files", sample_files_dict.keys()
+
+        k = sample_files_dict.keys()[0]
+        self.filepath = "(Sample %s)" % k
+
+        s = b64decode(sample_files_dict[k])
+        self.load_model_from_text_and_build_shapes(s)
 

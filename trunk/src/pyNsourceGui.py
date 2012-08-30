@@ -274,7 +274,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.app.run.CmdFileLoadWorkspaceViaDialog()
 
     def OnLoadGraphSample(self, event):
-        self.app.run.CmdFileLoadWorkspaceSampleViaDialog()
+        self.app.run.CmdFileLoadWorkspaceSampleViaPickList() # CmdFileLoadWorkspaceSampleViaDialog()
 
     def set_app_title(self, title):
         self.frame.SetTitle(self.andyapptitle + " - " + title)        
