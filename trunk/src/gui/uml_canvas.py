@@ -197,6 +197,9 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         self.umlworkspace.Clear()
 
+        if "wxMac" in wx.PlatformInfo:      # Hack on Mac so that onKeyChar bindings take hold properly. 
+            wx.CallAfter(self.SetFocus)
+        
     def NewEdgeMarkFrom(self):
         selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
         if not selected:
