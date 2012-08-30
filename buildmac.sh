@@ -1,5 +1,7 @@
 # Builds a standalone 32 bit pyNsourceGui for mac
 
+python buildsamples.py
+
 # Either run this with default python or user installed python
 # by setting the correct path first e.g.
 # export PATH=/usr/local/bin:$PATH

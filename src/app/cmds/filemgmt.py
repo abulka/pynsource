@@ -227,6 +227,23 @@ class CmdFileLoadWorkspaceSampleViaDialog(CmdFileLoadWorkspaceBase):
             super(CmdFileLoadWorkspaceSampleViaDialog, self).execute()
         dlg.Destroy()
 
+
+from dialogs.DialogChooseFromList import MyDialogChooseFromList
+class DialogChooser(MyDialogChooseFromList):
+
+    def SetMyData(self, data):
+        self.data = data
+        self.m_listBox1.InsertItems(data, 0)
+        
+    # TODO how to get doubleclick to exit the ShowModal() call?
+    #def OnListDoubleClick( self, event ):
+    #    print self.GetChosenItem()
+    #    self.Close()
+
+    def GetChosenItem(self):
+        index = self.m_listBox1.GetSelection()
+        return self.data[index]
+        
 class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
     """
     Load from the samples base64 dictionary.
@@ -240,12 +257,35 @@ class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
     def execute(self):
         from base64 import b64decode
         from samples.files_as_resource import sample_files_dict
+        #print "samples_dir_files", sample_files_dict.keys()
+
+        dlg = wx.SingleChoiceDialog(
+                self.context.frame, 'Choice:', 'Choose a Sample Uml Diagram',
+                sample_files_dict.keys(), 
+                wx.CHOICEDLG_STYLE
+                )
+
+        if dlg.ShowModal() == wx.ID_OK:
+            #self.log.WriteText('You selected: %s\n' % dlg.GetStringSelection())
+            k = dlg.GetStringSelection()
+            self.filepath = "(Sample %s)" % k
         
-        print "samples_dir_files", sample_files_dict.keys()
+            s = b64decode(sample_files_dict[k])
+            self.load_model_from_text_and_build_shapes(s)
+        dlg.Destroy()
+        
+        #dialog = DialogChooser(None)
+        #dialog.m_staticTextInstruction.Value = "Please Choose:"
+        #dialog.SetMyData(sample_files_dict.keys())
+        #if dialog.ShowModal() == wx.ID_OK:
+        #    #print dialog.GetChosenItem()
+        #    k = dialog.GetChosenItem() # sample_files_dict.keys()[0]
+        #    self.filepath = "(Sample %s)" % k
+        #
+        #    s = b64decode(sample_files_dict[k])
+        #    self.load_model_from_text_and_build_shapes(s)
+        #    
+        #dialog.Destroy()
 
-        k = sample_files_dict.keys()[0]
-        self.filepath = "(Sample %s)" % k
 
-        s = b64decode(sample_files_dict[k])
-        self.load_model_from_text_and_build_shapes(s)
 

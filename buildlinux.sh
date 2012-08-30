@@ -8,11 +8,16 @@ echo $msg
 outstandalonezip=pyNsource-1.60-linux-standalone.zip
 outsourcezip=pyNsource-1.60-src.zip
 
+do_build_samples=true
 do_source=true
 do_exe=true
 do_exe_zip=true
 
 svn info > version.txt
+
+if $do_build_samples; then
+    python buildsamples.py
+fi
 
 if $do_exe; then
 	# Build standalone exe and zip it up.

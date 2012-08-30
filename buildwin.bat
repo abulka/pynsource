@@ -10,6 +10,9 @@ set outsetupexe=pyNsource-1.60-setup.exe
 :regen_version_info_from_subversion
 svn info > version.txt
 
+:build_sample_uml_diagrams_as_resource
+python buildsamples.py
+
 REM goto build_inno_setup_exe
 REM goto zip_source
 
