@@ -119,13 +119,13 @@ class UmlCanvas(ogl.ShapeCanvas):
         
         keycode = chr(event.GetKeyCode())
 
-        if keycode == 'q':
+        if keycode in ['q', 'Q']:
             self.NewEdgeMarkFrom()
 
-        elif keycode == 'w':
+        elif keycode in ['w', 'W']:
             self.NewEdgeMarkTo(edge_type='composition')
 
-        elif keycode == 'W':
+        elif keycode in ['e', 'E']:
             self.NewEdgeMarkTo(edge_type='generalisation')
             
         elif keycode in ['1','2','3','4','5','6','7','8']:
