@@ -29,7 +29,7 @@ cd ..
 7z a -tzip  dist\%outstandalonezip% .\src\dist\* .\Readme.txt .\version.txt
 
 :zip_source
-7z a -tzip  -xr!".svn" -xr!"build" -xr!"dist" -xr!*.pyc dist\%outsourcezip% src\* tests\* Readme.txt build*.bat run*.bat version.txt
+7z a -tzip  -xr!".svn" -xr!"build" -xr!"dist" -xr!*.pyc dist\%outsourcezip% src\* tests\* Readme.txt build* run* version.txt
 
 :build_inno_setup_exe
 iscc buildwin_setupexe.iss

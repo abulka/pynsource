@@ -1,65 +1,119 @@
 PyNSource and PyNSource GUI
 ---------------------------
-Reverse engineer python source code into UML - display UML as Ascii art or in a proper diagramming visual workspace.
-You can also generate java and delphi skeleton code from the python, for the purpose of importing that into other UML tools.
+Reverse engineer python source code into UML - optionally display UML as Ascii
+art for pasting into your source code.
 
-Version 1.51
-(c) Andy Bulka 2004-2011
+Version 1.60
+(c) Andy Bulka 2004-2012
 andy@andypatterns.com
 http://www.andypatterns.com/index.php/products/pynsource/
-License: GPL 3 (free software).
+License: GPL 3
 
 ========================================
 
-Features
+Features:
 
- - Resilient: doesn't import the python files, thus will never get "stuck" when syntax is wrong.
- - Fast
- - Recognises inheritance and composition  relationships
- - Recognises ocurrences of self.somevar as UML fields (no other UML tool does this for python)
- - Detects the cardinality of associations e.g. one to one or 1..*  etc
- - Optionally treat modules as classes - creating a pseudo class for each 
-   module - module variables and functions are  treated as attributes and methods of a class
- - Has been developed using unit tests (supplied) so that you can trust it just that little bit more ;-)
- - Can generate UML Ascii-art :-)
- - Can generate Java and Delphi code skeletons (out of your python code) so that you can import those into a proper UML tool.
- - Free
+pyNsourceGui.py
 
-========================================
+ - Generates UML diagrams
+ - Layout algorithm
+ - Toggle between normal and ascii UML view
+ - Colour sibling subclasses
+ - Recognises inheritance, composition and cardinality
+ - Colour sibling subclasses to understand the relationships in your uml diagram.
+ - Print and Print preview
+ - Persistence
+ - Now uses standard ast python parsing
 
-Quick Start
+Unlike most off the shelf uml python code importers, pyNsource attempts to
+recognise tricky composition relationships that are typical in python software
+development. The expression "self.somevar" is correctly recognised as a UML
+attribute "somevar". pyNsource attempts to guess the cardinality of associations
+- if you use arrays or use .append then "one to many" is assumed.
 
-Run the GUI tool pynsourcegui.exe and:
- - Import a python file and it will be reverse engineered and represented as UML.
- - Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.
- - You can import several times and classes will be added and wired up to existing classes on the workspace.
- - Layout is a bit dodgy so arrange your layout a little and then do a screen grab (using your favourite screen grabbing tool) or print.
- - You cannot add new classes in the GUI, this is just a reverse engineering tool.  You can however delete uncessesary classes by right clicking on the node.
+Use the built in layout algorithm to help you get started in arranging your
+classes on the workspace. The layout algorithm uses "spring layout" and animates
+during layout. Overlap removal means your nodes won't overlap (unless you drag
+them with the SHIFT key held down). A multipass (slower) 'Optimal' Layout is
+also available which tries to find the best possible layout, within the
+constraints of not being able to 'bend' lines.
 
-Run the Command Line tool pynsource.py and:
- - Reverse engineer python source code into UML - display UML as Ascii art.
- - You can also generate java and delphi skeleton code from the python, for the purpose of importing that into other UML tools.
+Hit "v" to toggle between normal UML and Ascii UML view. Ascii UML lets you copy
+and paste ascii uml text into your source code and text based documentation.
+Optionally use something like the Java Ascii Versatile Editor http://www.jave.de
+to wire up your ascii uml classes nicely before pasting into your source code or
+documentation.  See an example of ascii UML at the bottom of this readme.
+
+
+pynsource.py
+
+ - Command line tool
+ - Generates java and delphi skeleton code from python source code
+ - Uses an older (non ast based) python parser
+
+The main purpose of this tool is to provide a command line tool which can
+generate java and delphi skeleton code from python source code, for the purpose
+of importing (e.g. Java source code) into other UML tools - which might have
+better layout and other features.
+
+Whilst it currently uses the older python parser, it does have the feature
+(which my current ast based one used in pyNsourceGui.py doesn't) of optionally
+treat modules as classes, creating a "pseudo class" for each module/file. In
+such a case, module variables and functions are treated as attributes and
+methods of a 'class'. I hope to add the "treat modules as 'classes'" feature to
+the new ast based parser as used by pyNsourceGui.py in the future, as I think it
+allows us to visualise modules, not just classes.
+
+
+pyYumlGui.py
+
+ - Gui tool which parses python source code and uses the Yuml online service
+   http://yuml.me/ to generate png images of uml
+ - Uses an older (non ast based) python parser
+
+This was mainly a fun experiment but seems to work ok. The pynsource.py command
+line tool can also generate Yuml text from python source code (use the -y option).
+
 
 ========================================
 
 Installation
 
-There are 4 distributions variations
+Windows:
+  * Run setup.exe to install
+  * Or run the various exe's from the standalone distribution zip.
+    e.g. double click on pyNsourceGui.exe
 
-pyNsource-X.X-setup.exe       - windows setup, install and run pynsourcegui.exe from the shortcut
-pyNsource-X.X-src.zip         - source code deployment, unzip anywhere and run python pynsourcegui.py or python pynsource.py
-pyNsource-X.X-standalone.zip  - standalone exe deployment, unzip anywhere and run pynsourcegui.exe or pynsource.exe
-PyNsource-X.X.win32-py26.exe  - source code / package deployment via Distutils exe
+Mac:
+  * Drag the pyNsourceGui.app file into your Applications folder and launch
+    pyNsourceGui
 
-Note re Distutils package installation.  Your source code will be installed into 
-   \PythonXX\Lib\site-packages\pynsource\ so adjust your python command line invocations to refer to that location.
-   Using the pynsource as a package doesn't make sense at the moment as you can't import pynsource and do
-   anything useful (well it hasn't been thought out yet, anyway) so its really just a handy place to keep the source.
-   You'd probably want to write a script to invoke things more nicely.
+Linux:
+  * Run from source code (see instructions below)
+    Note that I am working on a ubuntu/debian package to make this easier.
+    Please email to help or to sponser its inclusion in the standard repository
+        
+Run from Source:
+  * Ensure you have python 2.7 installed (should be on ubuntu by default).
+  * The GUI relies on wxpython http://www.wxpython.org so run the wxpython 
+    installer on Windows or Mac.  If you are using Ubuntu Linux install the
+    wxpython package: http://wiki.wxpython.org/InstallingOnUbuntuOrDebian
+  * Install the following python egg like this:
+    easy_install configobj
+  * Run ./rungui.sh
+
    
 ========================================
  
 Change Log
+
+Version 1.60 (August 2012)
+- New ast based python parser
+- Layout algorithm
+- Ascii UML view built into the gui, incl. Ascii uml layout
+- Colour sibling nodes
+- Persistence
+- Numerous bug fixes
 
 Version 1.52
 - Can now delete the selected classe from edit menu, or simply use the Del key
@@ -117,61 +171,11 @@ Version 1.3a
 - Java or Delphi code (which can be subsequently imported into more sophisticated UML 
   modelling tools, like Enterprise Architect or ESS-Model (free).)
 
-========================================
-
-Instructions for running the GUI
-
-- Run the standalone: pynsourcegui.exe
-- Run from source code: python pyNsourceGui.py
-
-If you used the distutil installer your files might be in e.g.
-  Python26\Lib\site-packages\pynsource\pyNsourceGui.py
-
-The GUI relies on wxpython http://www.wxpython.org
-
-The PyNSource command line tool is pynsource.py
 
 ========================================
 
-Instructions for running the Command line tool
+Example of Ascii UML:
 
- pynsource -v -m [-j outdir] [-d outdir] sourceDirOrListOfPythonFiles...   
-
-no options - generate UML Ascii art
-
--j generate java files, specify output folder for java files
--d generate pascal files, specify output folder for pascal files
--v verbose
--m create psuedo class for each module,
-   module attrs/defs etc treated as class attrs/defs
-
-Examples
-
-BASIC ASCII UML OUTPUT from PYTHON - EXAMPLES
-e.g. pynsource Test/testmodule01.py
-e.g. pynsource -m Test/testmodule03.py
-
-GENERATE JAVA FILES from PYTHON - EXAMPLES
-e.g. pynsource -j c:/try c:/try
-e.g. pynsource -v -m -j c:/try c:/try
-e.g. pynsource -v -m -j c:/try c:/try/s*.py
-e.g. pynsource -j c:/try c:/try/s*.py Tests/u*.py
-e.g. pynsource -v -m -j c:/try c:/try/s*.py Tests/u*.py c:\cc\Devel\Client\w*.py
-
-GENERATE DELPHI  FILES from PYTHON - EXAMPLE
-e.g. pynsource -d c:/delphiouputdir c:/pythoninputdir/*.py
-e.g. \python26\python.exe  \Python26\Lib\site-packages\pynsource\pynsource.py  -d  c:\delphiouputdir  c:\pythoninputdir\*.py
- (The above line will scan all the files in c:\pythoninputdir and generate a bunch of delphi files in the folder c:\delphiouputdir)
-
-TIP on long path names and path names with spaces:  
-  If you have long filenames, then enclosing paths and file references in double quotes is necessary and works ok. 
-  e.g. "c:\Documents and Settings\Administrator\Desktop\stuff"
-
-========================================
-
-Displaying UML in Ascii using pynsource
-
-Sample:
 
                                                                +---------------------------+
              +------------------------------------+            |RoleServicesObject         |
@@ -202,39 +206,34 @@ See http://www.andypatterns.com/index.php/products/pynsource/asciiart/ for more 
 
 ========================================
 
-Notes for building a pynsource release
+SVN repository for pynsource is
+  http://code.google.com/p/pynsource/
 
-Just run 
- - buildAllWin.bat
-
-This will
- - Build win32 installers in dist as an exe.  
-   People can run this exe to install the source code as a package into \PythonXX\Lib\site-packages\pynsource
- - Zip up pynsource source files and Tests and ./setup.py into a pure source code release e.g. pynsourceX.X.zip
- - Build a standalone exe using py2exe.  This is done in the pynsource subdirectory's dist dir.  
-   These files (incl. the standalone pynsourcegui.exe) are zipped. 
- - Run Inno setup to create a standalone setup.exe, together with uninstall tool.   
-
+Report bugs to
+  http://code.google.com/p/pynsource/issues/list
+  
 ========================================
 
-SVN repository is
- http://pyidea.svn.sourceforge.net/svnroot/pyidea/pynsource/trunk
+Q: What does pynsource mean?
 
+A: Since it was built in Australia, which is famous for its meat pies and sauce
+   at football matches, Pie-and-Sauce.  Where Py = Python and Source = source code.
+   
 ========================================
 
 License
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ========================================
