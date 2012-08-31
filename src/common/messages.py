@@ -4,27 +4,27 @@ WEB_VERSION_CHECK_URL = "http://www.atug.com/downloads/pynsource-latest.txt"
 WEB_PYNSOURCE_HOME_URL = "http://www.andypatterns.com/index.php/products/pynsource/"
 PYNSOURCE_CONFIG_FILE = "pynsource.ini"
 PYNSOURCE_CONFIG_DIR = "PyNSource"
-ABOUT_AUTHOR = "(c) Andy Bulka 2004-2011"
+ABOUT_AUTHOR = "(c) Andy Bulka 2004-2012"
 ABOUT_APPNAME = "PyNSource"
-ABOUT_LICENSE = "License: GPL 3 (free software)"
+ABOUT_LICENSE = "License: GPL 3"
 ABOUT_MSG = """
 PyNSource is a UML modelling tool for Python source code.
 
 Reverse engineer python source code into either a UML diagram
-or into Ascii Art UML which you can paste it into your source code!
+or into Ascii Art UML which you can paste into your source code!
 """
-ABOUT_FEATURES = """
-Resilient: doesn't import the python files, thus will never get "stuck" when syntax is wrong.
-Fast
-Free
-Recognises inheritance and composition  relationships
-Recognises ocurrences of self.somevar as UML fields (no other UML tool does this for python)
-Detects the cardinality of associations e.g. one to one or 1..*  etc
-Optionally treat modules as classes - creating a pseudo class for each module - module variables and functions are  treated as attributes and methods of a class
-Has been developed using unit tests (supplied) so that you can trust it just that little bit more ;-)
-Can generate UML Ascii-art :-)
-Can generate Java and Delphi code skeletons (out of your python code) so that you can import those into a proper UML tool.
-"""
+#ABOUT_FEATURES = """
+#Resilient: doesn't import the python files, thus will never get "stuck" when syntax is wrong.
+#Fast
+#Free
+#Recognises inheritance and composition  relationships
+#Recognises ocurrences of self.somevar as UML fields (no other UML tool does this for python)
+#Detects the cardinality of associations e.g. one to one or 1..*  etc
+#Optionally treat modules as classes - creating a pseudo class for each module - module variables and functions are  treated as attributes and methods of a class
+#Has been developed using unit tests (supplied) so that you can trust it just that little bit more ;-)
+#Can generate UML Ascii-art :-)
+#Can generate Java and Delphi code skeletons (out of your python code) so that you can import those into a proper UML tool.
+#"""
 
 WEB_UPDATE_MSG = """
 There is a newer version of PyNSource GUI available:  %s
@@ -42,25 +42,36 @@ Import a python file and it will be reverse engineered and represented as UML.
 Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.
 You can import repeatedly and incoming classes will be added and wired up to existing classes on the workspace.
 
-Whilst this is mainly a reverse engineering tool, you can add new classes by pressing Ins.  You can also delete uncessesary classes by pressing Del.
-To draw lines between classes: Select the first class, hit 'q', select the second class, hit 'w'.
+Whilst this is mainly a reverse engineering tool, you can delete classes add new classes.  
+To draw lines between classes: Select the first class, hit 'q', select the second class, hit 'w' (association) or 'e' (generalisation).
 
-Use -> (right arrow) to expand the layout spacing and <- (left arrow) to contract.  Or use the MouseWheel.  Laying out lots of classes does better with an increased layout spacing, but takes up more room.
+Use -> (right arrow) to expand the layout spacing and <- (left arrow) to contract.  Or use the CTRL-MouseWheel.  Laying out lots of classes does better with an increased layout spacing, but takes up more room.
 
-After a (possibly slow) 'Optimal' Layout, there may be layout variants that you can access by pressing 1, 2 ... 8 in order of perfection.
+After a (possibly slow) 'Optimal' Layout, there may be layout variants that you can access by pressing keys 1, 2 ... 8 in decreasing order of layout perfection.
+
+The 'colour sibling subclasses' feature helps use colour to understand the relationships in your uml diagram.
+
+Hit "v" to toggle between normal UML and Ascii UML - copy and paste ascii uml text into your source code!
+Optionally use Java Ascii Versatile Editor http://www.jave.de to wire up your ascii uml classes nicely before pasting into your source code or documentation.
 """
 
 HELP_COMMAND_LINE_USAGE = """
 Usage: pynsource -v -m [-j|d outdir] | [-y outfile.png | nopng] sourcedir_or_pythonfiles...
 
 -a generate ascii art uml (default option, no need to specify)
+   NOTE: this ascii art is old alpha code - run the pyNsourceGui.py
+    for superior uml as ascii
 -j generate java files, specify output folder for java files
 -d generate delphi files, specify output folder for delphi files
 -y generate yUml text, specify output png or 'nopng' if you don't want one
+   NOTE: run the pyYumlGui.py for a gui interface to this.
 -v verbose
 -m create psuedo class for each module,
    module attrs/defs etc treated as class attrs/defs
 
+Note: pynsource uses an old alpha python parser.  pyNsourceGui.py runs
+      a newer, superior, ast based python parser.
+      
 UML ASCI-ART EXAMPLES
 ---------------------
 python pynsource.py Test\\testmodule01.py

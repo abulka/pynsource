@@ -22,7 +22,7 @@ class PyYumlGuiFrame ( MyFrame1 ):
         self.Close(True)
     
     def OnAbout( self, event ):
-        #wx.MessageBox("(c) Andy Bulka, 2011")
+        #wx.MessageBox("(c) Andy Bulka, 2012")
         
         from wx.lib.wordwrap import wordwrap
         info = wx.AboutDialogInfo()

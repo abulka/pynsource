@@ -2,7 +2,7 @@
 PyNSource GUI
 -------------
 
-Andy Bulka
+(c) Andy Bulka
 www.andypatterns.com
 
 LICENSE: GPL 3
