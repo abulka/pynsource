@@ -1,0 +1,333 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+		<title>AndyPatterns :: ARCHIVED MISC PYNSOURCE PAGES</title>
+	</head>
+	<body>
+		<h2>
+			Old sourceforge info</h2>
+		<p>
+			<span style="color: rgb(85, 85, 85); font-family: sans-serif; font-size: 13px; line-height: 18px; background-color: rgb(255, 255, 255); ">Trac:&nbsp;</span><a href="https://sourceforge.net/apps/trac/pyidea/" style="margin: 0px; padding: 0px; font-size: 13px; vertical-align: baseline; background-color: rgb(255, 255, 255); outline: none; color: rgb(0, 153, 204); -webkit-tap-highlight-color: rgb(0, 119, 170); font-family: sans-serif; line-height: 18px; ">https://sourceforge.net/apps/trac/pyidea/</a><span style="color: rgb(85, 85, 85); font-family: sans-serif; font-size: 13px; line-height: 18px; background-color: rgb(255, 255, 255); ">&nbsp;</span></p>
+		<p>
+			<span style="color: rgb(85, 85, 85); font-family: sans-serif; font-size: 13px; line-height: 18px; background-color: rgb(255, 255, 255); ">Check out latest source from:</span><a href="https://pyidea.svn.sourceforge.net/svnroot/pyidea/pynsource/trunk/" style="margin: 0px; padding: 0px; font-size: 13px; vertical-align: baseline; background-color: rgb(255, 255, 255); outline: none; color: rgb(0, 102, 153); text-decoration: none; -webkit-tap-highlight-color: rgb(0, 119, 170); font-family: sans-serif; line-height: 18px; ">https://pyidea.svn.sourceforge.net/svnroot/pyidea/pynsource/trunk/</a><br style="color: rgb(85, 85, 85); font-family: sans-serif; font-size: 13px; line-height: 18px; background-color: rgb(255, 255, 255); " />
+			<br style="color: rgb(85, 85, 85); font-family: sans-serif; font-size: 13px; line-height: 18px; background-color: rgb(255, 255, 255); " />
+			<span style="color: rgb(85, 85, 85); font-family: sans-serif; font-size: 13px; line-height: 18px; background-color: rgb(255, 255, 255); ">*** UPDATE ***: Code now moved to google code&nbsp;</span><a href="http://code.google.com/p/pynsource/" style="margin: 0px; padding: 0px; font-size: 13px; vertical-align: baseline; background-color: rgb(255, 255, 255); outline: none; color: rgb(0, 102, 153); text-decoration: none; -webkit-tap-highlight-color: rgb(0, 119, 170); font-family: sans-serif; line-height: 18px; ">http://code.google.com/p/pynsource/</a></p>
+		<h2>
+			Misc</h2>
+		<p>
+			PyNSource is a python code scanner and UML modelling tool. Reverse engineer python source code into UML - display UML as Ascii art or in a proper diagramming visual workspace.</p>
+		<p>
+			You can also generate <strong>java</strong> and <strong>delphi</strong> skeleton code from the python, for the purpose of importing that skeleton code into other more sophisticated UML tools e.g.&nbsp;<a href="http://www.sparxsystems.com.au/" target="_blank">Enterprise Architect</a>&nbsp;or&nbsp;<a href="http://essmodel.sourceforge.net/" target="_blank">ESS-Model</a>&nbsp;(free).</p>
+		<h2>
+			Features</h2>
+		<ul>
+			<li>
+				Resilient: doesn&#39;t import the python files, thus will never get &quot;stuck&quot; when syntax is wrong.</li>
+			<li>
+				Fast</li>
+			<li>
+				Free</li>
+			<li>
+				Recognises inheritance and composition &nbsp;relationships</li>
+			<li>
+				Recognises ocurrences of self.somevar as UML fields (no other UML tool does this for python)</li>
+			<li>
+				Detects the cardinality of associations e.g. one to one or 1..* &nbsp;etc</li>
+			<li>
+				Optionally treat modules as classes - creating a pseudo class for each&nbsp;module - module variables and functions are &nbsp;treated as attributes and methods of a class</li>
+			<li>
+				Has been developed using unit tests (supplied) so that you can trust it just that little bit more ;-)</li>
+			<li>
+				Can generate UML Ascii-art :-)</li>
+			<li>
+				Can generate Java and Delphi code skeletons (out of your python code) so that you can import those into a proper UML tool.</li>
+		</ul>
+		<p>
+			&nbsp;</p>
+<!--msthemelist-->		<h2>
+			Future Directions &amp; Help Needed</h2>
+		<p>
+			In priority order:</p>
+		<p>
+			Need a <strong> smarter layout algorithm</strong>.</p>
+		<p>
+			<strong>Marquee selection</strong> facility - be able to select multiple uml classes at the same time, and be able to drag them around to position them.</p>
+		<p>
+			Make the <strong>code parser smarter</strong> and smarter - not easy to do with a dynamic language like python.</p>
+		<p>
+			<strong>Zoom out</strong> functionality - can use the approach used by <a href="http://web.tiscalinet.it/ggbhome">UML Pad</a> (which is written in wxWindows, though I think in C) which scales all objects on the canvas.&nbsp; Works remarkably well.&nbsp; We could port the algorithm over to wxPython and integrate it into PyNSource.&nbsp; Or maybe ditch wx and use Java/Jython based swing GUI&nbsp; with zoom+ graph layout?</p>
+		<p>
+			<strong>Persistence</strong> - save diagrams to disk and then as you re-import only changes are updated.&nbsp; That way a nicely laid out diagram could always be kept up to date.&nbsp; Could save in standard UML xml format, which could then be imported into other uml modellers which can read xml.</p>
+		<p>
+			Add all the features of the <strong>command line parser to the GUI</strong>.&nbsp; E.g. The java and delphi code generation, the Ascii UML generation.&nbsp; Perhaps even have &#39;batch jobs&#39; that could be run periodically to regenerate any java or delphi source code, which is then in turn imported by a third party UML modeller.</p>
+		<p>
+			<em>If you like PyNSource then have a go at one of the tasks above, and send me the patches &amp; I will incorporate and re-release.</em></p>
+		<h2>
+			Acknowledgements</h2>
+		<p>
+			Thanks to <a href="mailto:denis.dube@mail.mcgill.ca">Denis Dube</a> for the recursive import algorithm and some misc GUI fixes, including the initial version of the&nbsp; print preview support.<br />
+			Thanks to <a href="mailto:VernonM@berkeleyprocess.com">Vern Muhr</a> for fixing a small bug in Printing.<br />
+			<span lang="en-us">Thanks to <a href="mailto:tommy.m@gmail.com">Thomas Margraf</a> for working out the tweak to make the GUI run under wxpython 2.5 (even on a Mac!).</span></p>
+		<h2>
+			&nbsp;</h2>
+		<h2>
+			<span style="font-size: 21px; line-height: 28px; ">Important notice. &nbsp;</span><span style="font-size: 21px; line-height: 28px; font-weight: normal; ">Hosting of the source code has moved from sourceforge to google code. &nbsp;</span></h2>
+		<h2>
+			<span style="font-size: 21px; line-height: 28px;"><span style="font-weight: normal;">Whilst the last stable executable version can be downloaded from the sourceforge link below, if you can handle running from source code.&nbsp;&nbsp;I recommend you grab the latest source code from</span></span></h2>
+		<p>
+			<span style="font-size: 21px; line-height: 28px;"><a href="http://code.google.com/p/pynsource/">http://code.google.com/p/pynsource/</a></span></p>
+		<p>
+			<span style="font-size: 21px; line-height: 28px;">which is a stable version with a spring layout algorithm and many bug fixes.</span></p>
+		<p>
+			<span style="font-size: 21px; line-height: 28px;">-Andy</span></p>
+		<p>
+			&nbsp;</p>
+		<p>
+			<strong>PyNSource is free and open source.</strong></p>
+		<p>
+			Download from&nbsp;<a href="http://sourceforge.net/projects/pyidea/files/PyNSource/1.51/">http://sourceforge.net/projects/pyidea/files/PyNSource/1.51/</a></p>
+		<p>
+			A detailed Readme.txt and changelog will appear when you visit the above url.</p>
+		<p>
+			<strong>Installation</strong></p>
+		<p>
+			There are 4 distributions variations</p>
+		<table border="0" cellpadding="3" cellspacing="0" style="width: 100%; height: 100%;">
+			<tbody>
+				<tr>
+					<td align="left" valign="top">
+						pyNsource-X.X-setup.exe</td>
+					<td align="left" valign="top">
+						windows setup, install and run pynsourcegui.exe from the shortcut</td>
+				</tr>
+				<tr>
+					<td align="left" valign="top">
+						pyNsource-X.X-src.zip</td>
+					<td align="left" valign="top">
+						source code deployment, unzip anywhere and run python pynsourcegui.py or python pynsource.py</td>
+				</tr>
+				<tr>
+					<td align="left" valign="top">
+						pyNsource-X.X-standalone.zip</td>
+					<td align="left" valign="top">
+						standalone exe deployment, unzip anywhere and run pynsourcegui.exe or pynsource.exe</td>
+				</tr>
+				<tr>
+					<td align="left" valign="top">
+						PyNsource-X.X.win32-pyXX.exe</td>
+					<td align="left" valign="top">
+						source code / package deployment via Distutils exe</td>
+				</tr>
+			</tbody>
+		</table>
+		<h2>
+			<span style="color: #663399;">A recent google thread on a UML dream tool</span></h2>
+		<p>
+			Whilst almost responding to the &#39;dream project&#39; thread I decided that this post warranted <a href="http://groups.google.com/groups?hl=en&amp;lr=&amp;ie=UTF-8&amp;threadm=13dc97b8.0401062218.71e5616%40posting.google.com&amp;rnum=2&amp;prev=/groups%3Fhl%3Den%26lr%3D%26ie%3DISO-8859-1%26q%3Dbulka%2Buml%26meta%3D" target="_blank">its own thread</a>.&nbsp; What about a solid UML tool with round trip functionality for the Python Community?</p>
+		<p>
+			Some attempts at reverse engineering python are<br />
+			<br />
+			&nbsp; PyReverse <a href="http://www.logilab.org/projects/pyreverse/">http://www.logilab.org/projects/pyreverse/</a><br />
+			&nbsp; PyUt <a href="http://pyut.sourceforge.net/">http://pyut.sourceforge.net/</a>&nbsp;<br />
+			&nbsp; PyNSource&nbsp; <a href="http://www.atug.com/andypatterns/pynsource.htm">http://www.atug.com/andypatterns/pynsource.htm</a><br />
+			&nbsp; Boa Constructor&nbsp; <a href="http://sourceforge.net/projects/boa-constructor/">http://sourceforge.net/projects/boa-constructor/</a><br />
+			&nbsp; IDLE&#39;s class browser<br />
+			&nbsp; PythonWin &#39;s class browser<br />
+			all of which have their problems and limitations.&nbsp;</p>
+		<p>
+			E.g. PyUt will hang if it cannot __import__ successfully and its GUI<br />
+			has no zoom nor scroll etc.&nbsp; PyReverse is hard to use, misses a lot of<br />
+			basic information and then what do you do with the XML files? - who<br />
+			will read these?&nbsp; I have to edit them manually to import them into<br />
+			Enterprise Architect&nbsp;&nbsp;&nbsp;<a href="http://www.sparxsystems.com.au/">http://www.sparxsystems.com.au</a> and the last time I tried, you couldn&#39;t import into &nbsp;&nbsp;Poseidon&nbsp; <a href="http://www.gentleware.com/products/index.php4">http://www.gentleware.com/products/index.php4</a> community edition, which is the better descendant of the free Argo.</p>
+		<p>
+			Some Java-centric UML tools I believe do export python, though this is<br />
+			usually very simple and usually broken.&nbsp; For example<br />
+			&nbsp; Object Domain&nbsp; <a href="http://www.objectdomain.com/products/od/overview.do">http://www.objectdomain.com/products/od/overview.do</a><br />
+			claims to import python code, but the last I looked, this particular<br />
+			functionality was fragile.</p>
+		<p>
+			Potential powerful technology that could be used is<br />
+			&nbsp; Bicycle Repair Man&nbsp; <a href="http://bicyclerepair.sourceforge.net/">http://bicyclerepair.sourceforge.net/</a><br />
+			a refactoring tool for Python which could be combined with some sort<br />
+			of Java GUI (with zoom and all those niceties) - since the hard bit of<br />
+			the problem is parsing python reliably and knowing how to change it /<br />
+			regenerate it nicely.&nbsp; Bicycle Repair Man already treads deeply in<br />
+			this territory.&nbsp; Also<br />
+			&nbsp; PyChecker <a href="http://pychecker.sf.net/">http://pychecker.sf.net/</a><br />
+			walks similar territory.</p>
+		<p>
+			Ideal tools would look and behave something like<br />
+			&nbsp;ModelMaker (for Delphi) <a href="http://www.modelmakertools.com/">http://www.modelmakertools.com/</a><br />
+			&nbsp;TogetherJ&nbsp; <a href="http://www.togethersoft.com/products/index.jsp">http://www.togethersoft.com/products/index.jsp</a><br />
+			where you can work in code or in diagrams and the two are seamlessly<br />
+			kept in synch.&nbsp; Its truly cool, and I wish I could do these sorts of<br />
+			things in Python.</p>
+		<p>
+			Does anybody know of any other work being done in this area?</p>
+		<pre>
+		I then added the following comment:</pre>
+		<p>
+			&nbsp;</p>
+		<pre>
+		&gt; Anyway - ideally I was hoping for a robust discussion by senior Python
+&gt; people on what they may be using with regards to UML and what their
+&gt; feelings are about the situation. UML is very important yet there is
+&gt; no GUI driven two-way tool for python programmers.  Surely serious,
+&gt; larger scale, software development in Python would want to be using
+&gt; UML as part of the process?</pre>
+		<p>
+			&nbsp;</p>
+		<p>
+			Read the entire <a href="http://groups.google.com/groups?hl=en&amp;lr=&amp;ie=UTF-8&amp;threadm=13dc97b8.0401062218.71e5616%40posting.google.com&amp;rnum=2&amp;prev=/groups%3Fhl%3Den%26lr%3D%26ie%3DISO-8859-1%26q%3Dbulka%2Buml%26meta%3D" target="_blank">thread</a>.</p>
+		<h2>
+			<span style="color: #663399;">Example</span></h2>
+		<h3>
+			<span style="color: #663399;"><a name="pythoncode01"></a>The following python code:</span></h3>
+		<pre>
+		class ParseMeTest:
+    def __init__(self):
+        self.a = 10            # class attribute
+        self.b = Blah()        # class attribute COMPOSITE
+        self.a.c = 20          # skip
+        self.__class__.d = 30  # static class attribute
+        self.e.append(10)      # class attribute (list/vector)
+        self.f.append(Blah())  # class attribute (list/vector) COMPOSITE
+        </pre>
+		<p>
+			&nbsp;</p>
+		<pre>
+		def IsInBattle(self):
+        if not self.tileinfo:
+            return 0
+        return self.tileinfo.battletriggered</pre>
+		<p>
+			&nbsp;</p>
+		<pre>
+		def DoA(self):
+        pass</pre>
+		<p>
+			&nbsp;</p>
+		<pre>
+		class ParseMeTest2(ParseMeTest):
+    def DoB(self):
+        self._secretinfo = 2</pre>
+		<p>
+			&nbsp;</p>
+		<pre>
+		&nbsp;</pre>
+		<p>
+			is converted to two ascii representations of UML classes:</p>
+		<pre>
+		--------------------
+        ParseMeTest  --------|&gt; []
+        --------------------
+        a
+        b  ----&gt; [&#39;Blah&#39;]
+        d  static
+        e  1..*
+        f  ----&gt; [&#39;Blah&#39;] 1..*
+        --------------------
+        __init__
+        IsInBattle
+        DoA
+        --------------------</pre>
+		<p>
+			&nbsp;</p>
+		<pre>
+		--------------------
+        ParseMeTest2  --------|&gt; [&#39;ParseMeTest&#39;]
+        --------------------
+        _secretinfo
+        --------------------
+        DoB
+        --------------------</pre>
+		<p>
+			&nbsp;</p>
+		<pre>
+		&nbsp;</pre>
+		<p>
+			&nbsp;</p>
+		<pre>
+		--------------------
+	Blah  --------|&gt; []
+	--------------------
+	--------------------
+	__init__
+	--------------------</pre>
+		<p>
+			&nbsp;</p>
+		<pre>
+		using the command</pre>
+		<p>
+			&nbsp;</p>
+		<pre>
+		e.g. </pre>
+		<p>
+			&nbsp;</p>
+		<pre>
+		\python22\python.exe  \Python22\Lib\site-packages\pynsource\pynsource.py  pythoninputfile.py</pre>
+		<h3>
+			<span style="color: #663399;">Symbol Meanings</span></h3>
+		<table border="2" cellpadding="3" cellspacing="1">
+			<tbody>
+				<tr>
+					<td>
+						<span style="font-family: Arial,Arial,Helvetica;">composition</span></td>
+					<td>
+						<pre>
+						a ----&gt; [A ]</pre>
+					</td>
+					<td>
+						<span style="font-family: Arial,Arial,Helvetica;">attribute b composite relationship to A&nbsp;<br />
+						(i.e. the class in which a lives creates&nbsp;<br />
+						an instance of A and stores that in&nbsp;<br />
+						instance variable a) </span>
+						<p>
+							<span style="font-family: Arial,Arial,Helvetica;">e.g.</span></p>
+						<p>
+							<span style="font-family: Arial,Arial,Helvetica;">self.a = A()</span></p>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<span style="font-family: Arial,Arial,Helvetica;">inheritance</span></td>
+					<td>
+						<pre>
+						B --------|&gt; [A ]</pre>
+					</td>
+					<td>
+						<span style="font-family: Arial,Arial,Helvetica;">class B inherits from class A</span></td>
+				</tr>
+			</tbody>
+		</table>
+		<pre>
+		+---------------------------+
+             +------------------------------------+            |RoleServicesObject         |
+             |AI                                  |            |...........................|
+             |.....................................          * |role                       |
+             |roleServiceObjects                  &#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;|gameservices               |----- ...|
+ +-----+     |gameServices                        |_____       |_rolemanager               |         |
+ |game `-.   |....................................|     |      |_etc1                      |         |
+ +-----+  `-.|API_RunABit                         |     |      |...........................|         |
+             |API_GetOrdersForRole                |     |      |API_GetCurrentStoryline    |         |
+             |API_CreateRoleServicesObjectForRole |     |      |API_GetCurrentRoleName     |         |
+             +------------------------------------+     |      |API_GetRoleSubordinates    |         |
+                                                        |      +---------------------------+         |
+                                                        |                                            |
+                                                        |                                            |
+                                                        | 1 +-------------------------------+ /      |
+                                                        .---+GameServices                   |_.......&#39;
+                                                            +-------------------------------| -.
+                                                            |_scenario                      |
+                                                            |_game                          |
+                                                            ................................|
+                                                            |API_GetAstarTravelTimeBlahBlah |
+                                                            |API_GetOobtreeInfoOnOobId      |
+                                                            |API_GetOobtreeInfoOnMe         |
+                                                            +-------------------------------+
+  
+</pre></body>
+</html>
