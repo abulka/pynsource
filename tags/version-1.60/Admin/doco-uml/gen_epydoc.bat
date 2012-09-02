@@ -1,0 +1,1 @@
+python C:\Python26\Lib\site-packages\epydoc\cli.py -o c:\users\andy\desktop\try --graph umlclasstree --dotpath "\program files\graphviz2.26.3\bin\dot.exe" "F:\Documents\AndyTabletXp2\Documents and Settings\Andy\My Documents\Software Development\aa python\pyNsource\pynsource\*.py" 

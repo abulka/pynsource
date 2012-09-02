@@ -1,0 +1,23 @@
+{'type':'node', 'id':'HandleClassAttributes', 'x':435, 'y':42, 'width':241, 'height':317, 'attrs':'attrslist|waitingfordot|waitingforsubsequentdot|waitingforvarname|waitingforequalsymbol|currvarname|lastcurrvarname|waitforappendopenbracket|nextvarnameisstatic|nextvarnameismany', 'meths':'__init__|On_newline|_Clearwaiting|JustGotASelfAttr|On_meat|_AddAttribute'}
+{'type':'node', 'id':'HandleClasses', 'x':1150, 'y':84, 'width':210, 'height':333, 'attrs':'currclasslist|_currclass|nexttokenisclass|classlist|modulemethods|optionModuleAsClass|inbetweenClassAndFirstDef', 'meths':'__init__|On_deindent|_DeriveNestedClassName|PushCurrClass|PopCurrClass|GetCurrClassIndentLevel|GetCurrClass|_JustThenGotclass|On_newline|On_meat'}
+{'type':'node', 'id':'AndyBasicParseEngine', 'x':985, 'y':555, 'width':231, 'height':301, 'attrs':'meat|tokens|isfreshline|indentlevel', 'meths':'__init__|_ReadAllTokensFromFile|Parse|_ParseLoop|On_deindent|On_newline|On_meat|_Gotmeat|_Isblank|_Isnewline|_Ispadding'}
+{'type':'node', 'id':'PynsourcePythonParser', 'x':10, 'y':794, 'width':241, 'height':67, 'attrs':'', 'meths':'__init__'}
+{'type':'node', 'id':'ClassEntry', 'x':471, 'y':411, 'width':178, 'height':189, 'attrs':'defs|attrs|classdependencytuples|classesinheritsfrom|ismodulenotrealclass', 'meths':'__init__|FindAttribute|AddAttribute'}
+{'type':'node', 'id':'HandleClassStaticAttrs', 'x':74, 'y':312, 'width':252, 'height':157, 'attrs':'__waitingforequalsymbol|__staticattrname', 'meths':'__init__|__Clearwaiting|On_meat|__AddAttrModuleLevel'}
+{'type':'node', 'id':'HandleDefs', 'x':705, 'y':364, 'width':210, 'height':173, 'attrs':'currdef|nexttokenisdef|modulemethods|inbetweenClassAndFirstDef', 'meths':'__init__|_Gotdef|On_meat'}
+{'type':'node', 'id':'HandleComposites', 'x':35, 'y':14, 'width':210, 'height':253, 'attrs':'dummy|dummy2|lastselfattrname|waitingforclassname|waitingforOpenBracket|possibleclassname|dontdoanythingnow', 'meths':'__init__|JustGotASelfAttr|_ClearwaitingOnComposites|On_newline|On_meat'}
+{'type':'node', 'id':'Attribute', 'x':685, 'y':581, 'width':110, 'height':109, 'attrs':'attrname|attrtype', 'meths':'__init__'}
+{'type':'node', 'id':'HandleModuleLevelDefsAndAttrs', 'x':98, 'y':539, 'width':329, 'height':205, 'attrs':'moduleasclass|waitingforequalsymbolformoduleattr|modulelevelattrname', 'meths':'__init__|__Clearwaiting|Parse|On_meat|On_newline|_AddAttrModuleLevel'}
+{'type':'node', 'id':'HandleInheritedClasses', 'x':859, 'y':125, 'width':252, 'height':221, 'attrs':'currsuperclass|nexttokenisBracketOpenOrColon|nexttokenisSuperclass|nexttokenisComma|nexttokenisBracketOpen', 'meths':'__init__|_JustThenGotclass|_ClearwaitingInheriteClasses|On_newline|On_meat'}
+{'type':'node', 'id':'object', 'x':1257, 'y':500, 'width':76, 'height':31, 'attrs':'', 'meths':''}
+{'type':'edge', 'id':'HandleClassAttributes_to_HandleDefs', 'source':'HandleClassAttributes', 'target':'HandleDefs', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'HandleClasses_to_AndyBasicParseEngine', 'source':'HandleClasses', 'target':'AndyBasicParseEngine', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'AndyBasicParseEngine_to_object', 'source':'AndyBasicParseEngine', 'target':'object', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'PynsourcePythonParser_to_HandleModuleLevelDefsAndAttrs', 'source':'PynsourcePythonParser', 'target':'HandleModuleLevelDefsAndAttrs', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'HandleClassStaticAttrs_to_HandleComposites', 'source':'HandleClassStaticAttrs', 'target':'HandleComposites', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'HandleDefs_to_HandleInheritedClasses', 'source':'HandleDefs', 'target':'HandleInheritedClasses', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'HandleComposites_to_HandleClassAttributes', 'source':'HandleComposites', 'target':'HandleClassAttributes', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'HandleModuleLevelDefsAndAttrs_to_HandleClassStaticAttrs', 'source':'HandleModuleLevelDefsAndAttrs', 'target':'HandleClassStaticAttrs', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'HandleInheritedClasses_to_HandleClasses', 'source':'HandleInheritedClasses', 'target':'HandleClasses', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'Attribute_to_ClassEntry', 'source':'Attribute', 'target':'ClassEntry', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'ClassEntry_to_HandleComposites', 'source':'ClassEntry', 'target':'HandleComposites', 'uml_edge_type':'composition'}
