@@ -1,0 +1,30 @@
+Wed, 15 Jun 2011 17:59:48 - copycat - INFO - [CORE] No snapshot files..
+Wed, 15 Jun 2011 17:59:49 - copycat - DEBUG - Taking snapshot on: ./files/snapshot_000000000000002.dat
+Wed, 15 Jun 2011 17:59:49 - copycat - INFO - [CORE] Copycat init....
+Wed, 15 Jun 2011 17:59:49 - copycat - DEBUG - Recovering snapshot from: ./files/snapshot_000000000000002.dat
+Wed, 15 Jun 2011 17:59:49 - copycat - DEBUG - [RESTORE] Files found: None
+Wed, 15 Jun 2011 17:59:49 - copycat - INFO - [CORE] Spent 0:00:00.001000microseconds
+Wed, 15 Jun 2011 17:59:49 - copycat - DEBUG - [CORE] Error: global name 'datetime' is not defined
+Wed, 15 Jun 2011 18:01:23 - copycat - INFO - [CORE] Copycat init....
+Wed, 15 Jun 2011 18:01:24 - copycat - DEBUG - Recovering snapshot from: ./files/snapshot_000000000000002.dat
+Wed, 15 Jun 2011 18:01:24 - copycat - DEBUG - [RESTORE] Files found: ['./files/transaction_000000000000003.log']
+Wed, 15 Jun 2011 18:01:24 - copycat - DEBUG - [RESTORE] Opening  ./files/transaction_000000000000003.log
+Wed, 15 Jun 2011 18:01:24 - copycat - DEBUG - [RESTORE] create_page
+Wed, 15 Jun 2011 18:01:24 - copycat - DEBUG - [RESTORE] Actions re-execution
+Wed, 15 Jun 2011 18:01:24 - copycat - INFO - [CORE] Spent 0:00:00.018000microseconds
+Wed, 15 Jun 2011 18:02:05 - copycat - INFO - [CORE] Copycat init....
+Wed, 15 Jun 2011 18:02:05 - copycat - DEBUG - Recovering snapshot from: ./files/snapshot_000000000000002.dat
+Wed, 15 Jun 2011 18:02:05 - copycat - DEBUG - [RESTORE] Files found: ['./files/transaction_000000000000003.log']
+Wed, 15 Jun 2011 18:02:05 - copycat - DEBUG - [RESTORE] Opening  ./files/transaction_000000000000003.log
+Wed, 15 Jun 2011 18:02:05 - copycat - DEBUG - [RESTORE] create_page
+Wed, 15 Jun 2011 18:02:05 - copycat - DEBUG - [RESTORE] create_page
+Wed, 15 Jun 2011 18:02:05 - copycat - DEBUG - [RESTORE] Actions re-execution
+Wed, 15 Jun 2011 18:02:05 - copycat - INFO - [CORE] Spent 0:00:00.018000microseconds
+Wed, 15 Jun 2011 18:02:08 - copycat - INFO - [CORE] Copycat init....
+Wed, 15 Jun 2011 18:02:08 - copycat - DEBUG - Recovering snapshot from: ./files/snapshot_000000000000002.dat
+Wed, 15 Jun 2011 18:02:08 - copycat - DEBUG - [RESTORE] Files found: ['./files/transaction_000000000000003.log']
+Wed, 15 Jun 2011 18:02:08 - copycat - DEBUG - [RESTORE] Opening  ./files/transaction_000000000000003.log
+Wed, 15 Jun 2011 18:02:08 - copycat - DEBUG - [RESTORE] create_page
+Wed, 15 Jun 2011 18:02:08 - copycat - DEBUG - [RESTORE] create_page
+Wed, 15 Jun 2011 18:02:08 - copycat - DEBUG - [RESTORE] Actions re-execution
+Wed, 15 Jun 2011 18:02:08 - copycat - INFO - [CORE] Spent 0:00:00.022000microseconds

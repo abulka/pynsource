@@ -1,0 +1,62 @@
+{'type':'node', 'id':'A', 'x':341, 'y':152, 'width':250, 'height':250}
+{'type':'node', 'id':'A1', 'x':347, 'y':10, 'width':60, 'height':60}
+{'type':'node', 'id':'A2', 'x':182, 'y':101, 'width':60, 'height':60}
+{'type':'node', 'id':'B', 'x':114, 'y':233, 'width':60, 'height':60}
+{'type':'node', 'id':'B1', 'x':10, 'y':130, 'width':60, 'height':60}
+{'type':'node', 'id':'B2', 'x':305, 'y':407, 'width':60, 'height':60}
+{'type':'node', 'id':'B21', 'x':191, 'y':384, 'width':60, 'height':60}
+{'type':'node', 'id':'B22', 'x':596, 'y':21, 'width':100, 'height':200}
+{'type':'node', 'id':'c', 'x':513, 'y':407, 'width':60, 'height':60}
+{'type':'node', 'id':'c1', 'x':701, 'y':198, 'width':60, 'height':60}
+{'type':'node', 'id':'c2', 'x':701, 'y':313, 'width':60, 'height':60}
+{'type':'node', 'id':'c3', 'x':583, 'y':415, 'width':60, 'height':60}
+{'type':'node', 'id':'c4', 'x':683, 'y':480, 'width':60, 'height':60}
+{'type':'node', 'id':'c5', 'x':596, 'y':226, 'width':60, 'height':120}
+{'type':'node', 'id':'D29', 'x':373, 'y':407, 'width':128, 'height':68}
+{'type':'node', 'id':'D14', 'x':259, 'y':480, 'width':109, 'height':113}
+{'type':'node', 'id':'D31', 'x':373, 'y':480, 'width':66, 'height':81}
+{'type':'node', 'id':'D80', 'x':335, 'y':683, 'width':104, 'height':112}
+{'type':'node', 'id':'D95', 'x':309, 'y':800, 'width':130, 'height':140}
+{'type':'node', 'id':'D62', 'x':444, 'y':480, 'width':91, 'height':63}
+{'type':'node', 'id':'D46', 'x':599, 'y':801, 'width':135, 'height':133}
+{'type':'node', 'id':'D18', 'x':444, 'y':548, 'width':157, 'height':130}
+{'type':'node', 'id':'D85', 'x':606, 'y':548, 'width':144, 'height':142}
+{'type':'node', 'id':'D38', 'x':755, 'y':545, 'width':116, 'height':134}
+{'type':'node', 'id':'D79', 'x':876, 'y':548, 'width':92, 'height':84}
+{'type':'node', 'id':'D90', 'x':876, 'y':545, 'width':115, 'height':111}
+{'type':'node', 'id':'D92', 'x':876, 'y':475, 'width':116, 'height':68}
+{'type':'node', 'id':'D147303', 'x':876, 'y':545, 'width':134, 'height':79}
+{'type':'node', 'id':'D61', 'x':755, 'y':545, 'width':81, 'height':139}
+{'type':'node', 'id':'D146360', 'x':373, 'y':951, 'width':140, 'height':70}
+{'type':'node', 'id':'D67', 'x':876, 'y':548, 'width':93, 'height':120}
+{'type':'node', 'id':'D64', 'x':876, 'y':545, 'width':103, 'height':79}
+{'type':'node', 'id':'D147044', 'x':444, 'y':683, 'width':154, 'height':113}
+{'type':'node', 'id':'D35', 'x':755, 'y':545, 'width':86, 'height':151}
+{'type':'node', 'id':'D20', 'x':876, 'y':545, 'width':116, 'height':74}
+{'type':'node', 'id':'D58', 'x':508, 'y':801, 'width':65, 'height':62}
+{'type':'node', 'id':'D53', 'x':373, 'y':1020, 'width':137, 'height':113}
+{'type':'node', 'id':'D51', 'x':876, 'y':545, 'width':104, 'height':120}
+{'type':'node', 'id':'D13', 'x':373, 'y':1020, 'width':63, 'height':103}
+{'type':'node', 'id':'D40', 'x':508, 'y':801, 'width':79, 'height':78}
+{'type':'node', 'id':'D857614', 'x':755, 'y':394, 'width':72, 'height':146}
+{'type':'node', 'id':'D19', 'x':508, 'y':801, 'width':86, 'height':67}
+{'type':'node', 'id':'D25', 'x':444, 'y':868, 'width':150, 'height':78}
+{'type':'node', 'id':'D98', 'x':444, 'y':868, 'width':146, 'height':81}
+{'type':'node', 'id':'D318089', 'x':755, 'y':548, 'width':158, 'height':140}
+{'type':'edge', 'id':'A_to_A1', 'source':'A', 'target':'A1'}
+{'type':'edge', 'id':'A_to_A2', 'source':'A', 'target':'A2'}
+{'type':'edge', 'id':'B_to_B1', 'source':'B', 'target':'B1'}
+{'type':'edge', 'id':'B_to_B2', 'source':'B', 'target':'B2'}
+{'type':'edge', 'id':'B2_to_B21', 'source':'B2', 'target':'B21'}
+{'type':'edge', 'id':'B2_to_B22', 'source':'B2', 'target':'B22'}
+{'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1'}
+{'type':'edge', 'id':'c_to_c2', 'source':'c', 'target':'c2'}
+{'type':'edge', 'id':'c_to_c3', 'source':'c', 'target':'c3'}
+{'type':'edge', 'id':'c_to_c4', 'source':'c', 'target':'c4'}
+{'type':'edge', 'id':'c_to_c5', 'source':'c', 'target':'c5'}
+{'type':'edge', 'id':'A_to_c', 'source':'A', 'target':'c'}
+{'type':'edge', 'id':'B2_to_c', 'source':'B2', 'target':'c'}
+{'type':'edge', 'id':'B2_to_c5', 'source':'B2', 'target':'c5'}
+{'type':'edge', 'id':'A_to_c5', 'source':'A', 'target':'c5'}
+{'type':'edge', 'id':'D318089_to_D46', 'source':'D318089', 'target':'D46'}
+{'type':'edge', 'id':'D18_to_D85', 'source':'D18', 'target':'D85'}

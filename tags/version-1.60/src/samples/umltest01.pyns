@@ -1,0 +1,10 @@
+{'type':'node', 'id':'Editor', 'x':84, 'y':146, 'width':90, 'height':141, 'attrs':'topHandler|GUI|statechart', 'meths':'__init__|start'}
+{'type':'node', 'id':'TopHandler', 'x':10, 'y':65, 'width':120, 'height':31, 'attrs':'', 'meths':''}
+{'type':'node', 'id':'GUI', 'x':224, 'y':168, 'width':43, 'height':31, 'attrs':'', 'meths':''}
+{'type':'node', 'id':'Statechart', 'x':277, 'y':10, 'width':120, 'height':31, 'attrs':'', 'meths':''}
+{'type':'node', 'id':'D41', 'x':182, 'y':353, 'width':43, 'height':125, 'attrs':'a|b', 'meths':'c|d'}
+{'type':'node', 'id':'D26', 'x':389, 'y':253, 'width':43, 'height':125, 'attrs':'a|b', 'meths':'c|d'}
+{'type':'edge', 'id':'TopHandler_to_Editor', 'source':'TopHandler', 'target':'Editor', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'GUI_to_Editor', 'source':'GUI', 'target':'Editor', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Statechart_to_Editor', 'source':'Statechart', 'target':'Editor', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'D41_to_D26', 'source':'D41', 'target':'D26', 'uml_edge_type':'composition'}

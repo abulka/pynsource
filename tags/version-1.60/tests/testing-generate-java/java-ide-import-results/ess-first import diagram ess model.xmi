@@ -1,0 +1,2986 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XMI xmi.version="1.0">
+<XMI.header>
+<XMI.documentation>
+<XMI.exporter>Eldean ESS-Model</XMI.exporter>
+<XMI.exporterVersion>2.2</XMI.exporterVersion>
+</XMI.documentation>
+<XMI.metamodel xmi.name="UML" xmi.version="1.3"/>
+</XMI.header>
+<XMI.content>
+<Model_Management.Model xmi.id="xmi.1" xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-8000">
+<Foundation.Core.ModelElement.name>Modelo</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.Namespace.ownedElement>
+<Foundation.Core.DataType xmi.id="xmi.2"
+>
+<Foundation.Core.ModelElement.name>void</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+</Foundation.Core.DataType>
+<Foundation.Core.Class xmi.id="xmi.3"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FFE"
+>
+<Foundation.Core.ModelElement.name>TestCase</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.GeneralizableElement.specialization>
+<Foundation.Core.Generalization xmi.idref="xmi.4"/>
+<Foundation.Core.Generalization xmi.idref="xmi.6"/>
+<Foundation.Core.Generalization xmi.idref="xmi.8"/>
+</Foundation.Core.GeneralizableElement.specialization>
+</Foundation.Core.Class>
+<Foundation.Core.Generalization xmi.id="xmi.4" xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FFD">
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Generalization.child>
+<Foundation.Core.Class xmi.idref="xmi.5"/>
+</Foundation.Core.Generalization.child>
+<Foundation.Core.Generalization.parent>
+<Foundation.Core.Class xmi.idref="xmi.3"/>
+</Foundation.Core.Generalization.parent>
+</Foundation.Core.Generalization>
+<Foundation.Core.Generalization xmi.id="xmi.6" xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FFB">
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Generalization.child>
+<Foundation.Core.Class xmi.idref="xmi.7"/>
+</Foundation.Core.Generalization.child>
+<Foundation.Core.Generalization.parent>
+<Foundation.Core.Class xmi.idref="xmi.3"/>
+</Foundation.Core.Generalization.parent>
+</Foundation.Core.Generalization>
+<Foundation.Core.Generalization xmi.id="xmi.8" xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FF9">
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Generalization.child>
+<Foundation.Core.Class xmi.idref="xmi.9"/>
+</Foundation.Core.Generalization.child>
+<Foundation.Core.Generalization.parent>
+<Foundation.Core.Class xmi.idref="xmi.3"/>
+</Foundation.Core.Generalization.parent>
+</Foundation.Core.Generalization>
+<Foundation.Core.Class xmi.id="xmi.10"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FF7"
+>
+<Foundation.Core.ModelElement.name>dict</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.11"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FF6"
+>
+<Foundation.Core.ModelElement.name>EventPlayAPI</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Classifier.feature>
+<Foundation.Core.Operation xmi.id="xmi.12"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FF5"
+>
+<Foundation.Core.ModelElement.name>GetCurrentValue</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.11"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.12"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.13"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FF4"
+>
+<Foundation.Core.ModelElement.name>GetMaxValue</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.11"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.13"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.14"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FF3"
+>
+<Foundation.Core.ModelElement.name>JumpToValue</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.11"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.14"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.15"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FF2"
+>
+<Foundation.Core.ModelElement.name>_DeriveOtherPlayheadPositionsFrom</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.11"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.15"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.16"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FF1"
+>
+<Foundation.Core.ModelElement.name>_TimeOfEventAt</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.11"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.16"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.17"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FF0"
+>
+<Foundation.Core.ModelElement.name>_SetOtherPlayheadsTo</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.11"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.17"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.18"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FEF"
+>
+<Foundation.Core.ModelElement.name>SynchroniseOtherPlayheads</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.11"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.18"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+</Foundation.Core.Classifier.feature>
+<Foundation.Core.GeneralizableElement.generalization>
+<Foundation.Core.Generalization xmi.idref="xmi.19"/>
+</Foundation.Core.GeneralizableElement.generalization>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.20"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FED"
+>
+<Foundation.Core.ModelElement.name>PlayAPI</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Classifier.feature>
+<Foundation.Core.Attribute xmi.id="xmi.21"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FEC"
+>
+<Foundation.Core.ModelElement.name>mediator</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.22"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Attribute xmi.id="xmi.23"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FEA"
+>
+<Foundation.Core.ModelElement.name>playhead</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.22"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Attribute xmi.id="xmi.24"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FE9"
+>
+<Foundation.Core.ModelElement.name>turnMgr</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.22"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Operation xmi.id="xmi.25"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FE8"
+>
+<Foundation.Core.ModelElement.name>__init__</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.25"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.26"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FE7"
+>
+<Foundation.Core.ModelElement.name>IsEmpty</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.26"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.27"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FE6"
+>
+<Foundation.Core.ModelElement.name>IsMoreToPlay</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.27"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.28"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FE5"
+>
+<Foundation.Core.ModelElement.name>Start</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.28"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.29"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FE4"
+>
+<Foundation.Core.ModelElement.name>Endd</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.29"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.30"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FE3"
+>
+<Foundation.Core.ModelElement.name>Next</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.30"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.31"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FE2"
+>
+<Foundation.Core.ModelElement.name>Previous</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.31"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.32"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FE1"
+>
+<Foundation.Core.ModelElement.name>_GetCurrentPosition</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.32"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.33"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FE0"
+>
+<Foundation.Core.ModelElement.name>GetCurrentValue</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.33"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.34"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FDF"
+>
+<Foundation.Core.ModelElement.name>_GetMaxPosition</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.34"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.35"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FDE"
+>
+<Foundation.Core.ModelElement.name>GetMaxValue</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.35"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.36"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FDD"
+>
+<Foundation.Core.ModelElement.name>_JumpToPosition</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.36"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.37"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FDC"
+>
+<Foundation.Core.ModelElement.name>JumpToValue</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.37"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.38"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FDB"
+>
+<Foundation.Core.ModelElement.name>NotifyOfInsert</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.38"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.39"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FDA"
+>
+<Foundation.Core.ModelElement.name>NotifyPositionNowValid</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.39"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.40"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FD9"
+>
+<Foundation.Core.ModelElement.name>SynchroniseOtherPlayheads</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.40"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.41"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FD8"
+>
+<Foundation.Core.ModelElement.name>_FindLastEventWithTimeElseMostRecentEventLessthanTime</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.41"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.42"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FD7"
+>
+<Foundation.Core.ModelElement.name>_FindLastEventWithTimeElseMostRecentEventLessthanTime_ORI</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.42"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.43"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FD6"
+>
+<Foundation.Core.ModelElement.name>_EnsureMaxTimeCorrespondsToMaxTurn</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.43"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.44"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FD5"
+>
+<Foundation.Core.ModelElement.name>_GetPositionToSyncTo</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.20"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.44"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+</Foundation.Core.Classifier.feature>
+<Foundation.Core.GeneralizableElement.specialization>
+<Foundation.Core.Generalization xmi.idref="xmi.19"/>
+<Foundation.Core.Generalization xmi.idref="xmi.45"/>
+<Foundation.Core.Generalization xmi.idref="xmi.47"/>
+</Foundation.Core.GeneralizableElement.specialization>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.22"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FEB"
+>
+<Foundation.Core.ModelElement.name>variant</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.49"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FD0"
+>
+<Foundation.Core.ModelElement.name>list</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.GeneralizableElement.specialization>
+<Foundation.Core.Generalization xmi.idref="xmi.50"/>
+</Foundation.Core.GeneralizableElement.specialization>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.52"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FCD"
+>
+<Foundation.Core.ModelElement.name>object</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.53"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FCC"
+>
+<Foundation.Core.ModelElement.name>Playhead</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Classifier.feature>
+<Foundation.Core.Attribute xmi.id="xmi.54"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FCB"
+>
+<Foundation.Core.ModelElement.name>Position</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.22"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Attribute xmi.id="xmi.55"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FCA"
+>
+<Foundation.Core.ModelElement.name>MaxPosition</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.22"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Operation xmi.id="xmi.56"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FC9"
+>
+<Foundation.Core.ModelElement.name>__init__</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.56"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.57"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FC8"
+>
+<Foundation.Core.ModelElement.name>Clear</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.57"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.58"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FC7"
+>
+<Foundation.Core.ModelElement.name>_ClipPositionToMax</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.58"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.59"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FC6"
+>
+<Foundation.Core.ModelElement.name>_SetMaxItems</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.59"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.60"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FC5"
+>
+<Foundation.Core.ModelElement.name>IsEmpty</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.60"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.61"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FC4"
+>
+<Foundation.Core.ModelElement.name>IsMoreToPlay</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.61"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.62"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FC3"
+>
+<Foundation.Core.ModelElement.name>NotifyPositionNowValid</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.62"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.63"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FC2"
+>
+<Foundation.Core.ModelElement.name>NotifyOfInsert</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.63"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.64"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FC1"
+>
+<Foundation.Core.ModelElement.name>GoStart</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.64"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.65"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FC0"
+>
+<Foundation.Core.ModelElement.name>GoEnd</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.65"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.66"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FBF"
+>
+<Foundation.Core.ModelElement.name>Go</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.66"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.67"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FBE"
+>
+<Foundation.Core.ModelElement.name>GoNext</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.67"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.68"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FBD"
+>
+<Foundation.Core.ModelElement.name>GoPrevious</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.53"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.68"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+</Foundation.Core.Classifier.feature>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.69"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FBC"
+>
+<Foundation.Core.ModelElement.name>PlayheadMediator</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Classifier.feature>
+<Foundation.Core.Attribute xmi.id="xmi.70"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FBB"
+>
+<Foundation.Core.ModelElement.name>turnMgr</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.69"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.22"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Attribute xmi.id="xmi.71"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FBA"
+>
+<Foundation.Core.ModelElement.name>story</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.69"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.22"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Attribute xmi.id="xmi.72"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FB9"
+>
+<Foundation.Core.ModelElement.name>eventPlayhead</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.69"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.53"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Attribute xmi.id="xmi.73"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FB8"
+>
+<Foundation.Core.ModelElement.name>timePlayhead</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.69"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.53"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Attribute xmi.id="xmi.74"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FB7"
+>
+<Foundation.Core.ModelElement.name>turnPlayhead</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.69"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.53"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Attribute xmi.id="xmi.75"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FB6"
+>
+<Foundation.Core.ModelElement.name>byEvent</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.69"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.11"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Attribute xmi.id="xmi.76"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FB5"
+>
+<Foundation.Core.ModelElement.name>byTime</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.69"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.46"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Attribute xmi.id="xmi.77"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FB4"
+>
+<Foundation.Core.ModelElement.name>byTurn</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.69"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.48"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Operation xmi.id="xmi.78"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FB3"
+>
+<Foundation.Core.ModelElement.name>__init__</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.69"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.78"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.79"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FB2"
+>
+<Foundation.Core.ModelElement.name>Clear</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.69"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.79"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.80"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FB1"
+>
+<Foundation.Core.ModelElement.name>IsEmpty</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.69"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.80"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+</Foundation.Core.Classifier.feature>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.46"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FD3"
+>
+<Foundation.Core.ModelElement.name>TimePlayAPI</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Classifier.feature>
+<Foundation.Core.Operation xmi.id="xmi.81"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FB0"
+>
+<Foundation.Core.ModelElement.name>GetCurrentValue</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.46"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.81"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.82"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FAF"
+>
+<Foundation.Core.ModelElement.name>GetMaxValue</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.46"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.82"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.83"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FAE"
+>
+<Foundation.Core.ModelElement.name>JumpToValue</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.46"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.83"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.84"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FAD"
+>
+<Foundation.Core.ModelElement.name>_DeriveOtherPlayheadPositionsFrom</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.46"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.84"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.85"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FAC"
+>
+<Foundation.Core.ModelElement.name>_SetOtherPlayheadsTo</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.46"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.85"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.86"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FAB"
+>
+<Foundation.Core.ModelElement.name>SynchroniseOtherPlayheads</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.46"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.86"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+</Foundation.Core.Classifier.feature>
+<Foundation.Core.GeneralizableElement.generalization>
+<Foundation.Core.Generalization xmi.idref="xmi.45"/>
+</Foundation.Core.GeneralizableElement.generalization>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.48"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FD1"
+>
+<Foundation.Core.ModelElement.name>TurnPlayAPI</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Classifier.feature>
+<Foundation.Core.Operation xmi.id="xmi.87"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FAA"
+>
+<Foundation.Core.ModelElement.name>GetCurrentValue</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.48"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.87"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.88"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FA9"
+>
+<Foundation.Core.ModelElement.name>GetMaxValue</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.48"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.88"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.89"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FA8"
+>
+<Foundation.Core.ModelElement.name>JumpToValue</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.48"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.89"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.90"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FA7"
+>
+<Foundation.Core.ModelElement.name>_DeriveOtherPlayheadPositionsFrom</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.48"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.90"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.91"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FA6"
+>
+<Foundation.Core.ModelElement.name>_SetOtherPlayheadsTo</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.48"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.91"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.92"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FA5"
+>
+<Foundation.Core.ModelElement.name>SynchroniseOtherPlayheads</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.48"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.92"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+</Foundation.Core.Classifier.feature>
+<Foundation.Core.GeneralizableElement.generalization>
+<Foundation.Core.Generalization xmi.idref="xmi.47"/>
+</Foundation.Core.GeneralizableElement.generalization>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.5"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FFC"
+>
+<Foundation.Core.ModelElement.name>TestCase00</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Classifier.feature>
+<Foundation.Core.Attribute xmi.id="xmi.93"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FA4"
+>
+<Foundation.Core.ModelElement.name>simplestr</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.22"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Attribute xmi.id="xmi.94"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FA3"
+>
+<Foundation.Core.ModelElement.name>normalstr</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.22"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Operation xmi.id="xmi.95"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FA2"
+>
+<Foundation.Core.ModelElement.name>setUp</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.95"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.96"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FA1"
+>
+<Foundation.Core.ModelElement.name>checkSimple</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.96"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.97"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FA0"
+>
+<Foundation.Core.ModelElement.name>checkNormal</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.97"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.98"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F9F"
+>
+<Foundation.Core.ModelElement.name>checkNormalOrder</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.98"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.99"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F9E"
+>
+<Foundation.Core.ModelElement.name>checkSplitModernAT</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.99"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.100"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F9D"
+>
+<Foundation.Core.ModelElement.name>checkSplitFutureAT</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.100"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.101"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F9C"
+>
+<Foundation.Core.ModelElement.name>checkSplitHasWithDicts</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.101"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.102"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F9B"
+>
+<Foundation.Core.ModelElement.name>checkasciiDate</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.102"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.103"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F9A"
+>
+<Foundation.Core.ModelElement.name>checkasciiDateAgain</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.103"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.104"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F99"
+>
+<Foundation.Core.ModelElement.name>checkCoordCompare</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.104"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.105"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F98"
+>
+<Foundation.Core.ModelElement.name>checkRoundit</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.105"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.106"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F97"
+>
+<Foundation.Core.ModelElement.name>checkScenarioPath</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.106"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.107"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F96"
+>
+<Foundation.Core.ModelElement.name>checkFullPathForSingleFile</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.107"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.108"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F95"
+>
+<Foundation.Core.ModelElement.name>checkImportFileScenarioFile01</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.108"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.109"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F94"
+>
+<Foundation.Core.ModelElement.name>checkPixelToAbsQuadconversions</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.109"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.110"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F93"
+>
+<Foundation.Core.ModelElement.name>checkspeedofeventstrtolist</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.110"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.111"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F92"
+>
+<Foundation.Core.ModelElement.name>checkSortedDict_01</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.111"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.112"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F91"
+>
+<Foundation.Core.ModelElement.name>checkSortedDict_01a</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.5"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.112"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+</Foundation.Core.Classifier.feature>
+<Foundation.Core.GeneralizableElement.generalization>
+<Foundation.Core.Generalization xmi.idref="xmi.4"/>
+</Foundation.Core.GeneralizableElement.generalization>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.7"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FFA"
+>
+<Foundation.Core.ModelElement.name>TestCase01</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Classifier.feature>
+<Foundation.Core.Attribute xmi.id="xmi.113"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F90"
+>
+<Foundation.Core.ModelElement.name>_goto</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.69"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Operation xmi.id="xmi.114"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F8F"
+>
+<Foundation.Core.ModelElement.name>setUp</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.114"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.115"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F8E"
+>
+<Foundation.Core.ModelElement.name>checkInit</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.115"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.116"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F8D"
+>
+<Foundation.Core.ModelElement.name>checkStartNoItemsNormal</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.116"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.117"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F8C"
+>
+<Foundation.Core.ModelElement.name>checkStartNoItemsAndGoPreviousNormal</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.117"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.118"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F8B"
+>
+<Foundation.Core.ModelElement.name>checkStartOneItemNormal</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.118"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.119"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F8A"
+>
+<Foundation.Core.ModelElement.name>checkBasicMovementSynch01Normal</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.119"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.120"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F89"
+>
+<Foundation.Core.ModelElement.name>checkBasicMovementSynch02Normal</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.120"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.121"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F88"
+>
+<Foundation.Core.ModelElement.name>checkMaxValue</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.121"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.122"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F87"
+>
+<Foundation.Core.ModelElement.name>checkJumpToAndValidateCurrentValueNormal</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.122"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.123"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F86"
+>
+<Foundation.Core.ModelElement.name>checkIsEmptyNormal</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.123"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.124"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F85"
+>
+<Foundation.Core.ModelElement.name>checkByTimeAndEventPositioningNormal</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.124"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.125"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F84"
+>
+<Foundation.Core.ModelElement.name>checkByTurnPositioningNormal</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.125"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.126"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F83"
+>
+<Foundation.Core.ModelElement.name>checkByTimeAndEventPositioningNormal02</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.7"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.126"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+</Foundation.Core.Classifier.feature>
+<Foundation.Core.GeneralizableElement.generalization>
+<Foundation.Core.Generalization xmi.idref="xmi.6"/>
+</Foundation.Core.GeneralizableElement.generalization>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.9"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FF8"
+>
+<Foundation.Core.ModelElement.name>TestCase02</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Classifier.feature>
+<Foundation.Core.Attribute xmi.id="xmi.127"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F82"
+>
+<Foundation.Core.ModelElement.name>_goto</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.9"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.StructuralFeature.type>
+<Foundation.Core.Class xmi.idref="xmi.69"/>
+</Foundation.Core.StructuralFeature.type>
+</Foundation.Core.Attribute>
+<Foundation.Core.Operation xmi.id="xmi.128"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F81"
+>
+<Foundation.Core.ModelElement.name>setUp</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.9"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.128"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.129"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F80"
+>
+<Foundation.Core.ModelElement.name>CalcAmountOfTimeInStoryline</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.9"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.129"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.130"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F7F"
+>
+<Foundation.Core.ModelElement.name>EnsureSanity</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.9"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.130"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.131"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F7E"
+>
+<Foundation.Core.ModelElement.name>check01</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.9"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.131"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+</Foundation.Core.Classifier.feature>
+<Foundation.Core.GeneralizableElement.generalization>
+<Foundation.Core.Generalization xmi.idref="xmi.8"/>
+</Foundation.Core.GeneralizableElement.generalization>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.51"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FCE"
+>
+<Foundation.Core.ModelElement.name>UniqueList</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Classifier.feature>
+<Foundation.Core.Operation xmi.id="xmi.132"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F7D"
+>
+<Foundation.Core.ModelElement.name>append</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.51"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.132"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.133"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F7C"
+>
+<Foundation.Core.ModelElement.name>__add__</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.51"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.133"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+<Foundation.Core.Operation xmi.id="xmi.134"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F7B"
+>
+<Foundation.Core.ModelElement.name>__iadd__</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.visibility xmi.value="public"/>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Feature.owner>
+<Foundation.Core.Classifier xmi.idref="xmi.51"/>
+</Foundation.Core.Feature.owner>
+<Foundation.Core.BehavioralFeature.isQuery xmi.value="false"/>
+<Foundation.Core.Operation.isRoot xmi.value="false" />
+<Foundation.Core.Operation.isLeaf xmi.value="false" />
+<Foundation.Core.Operation.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.BehavioralFeature.parameter>
+<Foundation.Core.Parameter>
+<Foundation.Core.Parameter.kind xmi.value="return"/>
+<Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.BehavioralFeature xmi.idref="xmi.134"/>
+</Foundation.Core.Parameter.behavioralFeature>
+<Foundation.Core.Parameter.type>
+<Foundation.Core.DataType xmi.idref="xmi.2"/>
+</Foundation.Core.Parameter.type>
+</Foundation.Core.Parameter>
+</Foundation.Core.BehavioralFeature.parameter>
+</Foundation.Core.Operation>
+</Foundation.Core.Classifier.feature>
+<Foundation.Core.GeneralizableElement.generalization>
+<Foundation.Core.Generalization xmi.idref="xmi.50"/>
+</Foundation.Core.GeneralizableElement.generalization>
+</Foundation.Core.Class>
+<Foundation.Core.Class xmi.id="xmi.135"
+ xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7F7A"
+>
+<Foundation.Core.ModelElement.name>unittest</Foundation.Core.ModelElement.name>
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.Class.isActive xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isRoot xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isLeaf xmi.value="false" />
+<Foundation.Core.GeneralizableElement.isAbstract xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+</Foundation.Core.Class>
+<Foundation.Core.Generalization xmi.id="xmi.19" xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FEE">
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Generalization.child>
+<Foundation.Core.Class xmi.idref="xmi.11"/>
+</Foundation.Core.Generalization.child>
+<Foundation.Core.Generalization.parent>
+<Foundation.Core.Class xmi.idref="xmi.20"/>
+</Foundation.Core.Generalization.parent>
+</Foundation.Core.Generalization>
+<Foundation.Core.Generalization xmi.id="xmi.45" xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FD4">
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Generalization.child>
+<Foundation.Core.Class xmi.idref="xmi.46"/>
+</Foundation.Core.Generalization.child>
+<Foundation.Core.Generalization.parent>
+<Foundation.Core.Class xmi.idref="xmi.20"/>
+</Foundation.Core.Generalization.parent>
+</Foundation.Core.Generalization>
+<Foundation.Core.Generalization xmi.id="xmi.47" xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FD2">
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Generalization.child>
+<Foundation.Core.Class xmi.idref="xmi.48"/>
+</Foundation.Core.Generalization.child>
+<Foundation.Core.Generalization.parent>
+<Foundation.Core.Class xmi.idref="xmi.20"/>
+</Foundation.Core.Generalization.parent>
+</Foundation.Core.Generalization>
+<Foundation.Core.Generalization xmi.id="xmi.50" xmi.uuid="-106--94-51-41-5c9766:ee6479a4ca:-7FCF">
+<Foundation.Core.ModelElement.isSpecification xmi.value="false" />
+<Foundation.Core.ModelElement.namespace><Foundation.Core.Namespace xmi.idref="xmi.1" /></Foundation.Core.ModelElement.namespace>
+<Foundation.Core.Generalization.child>
+<Foundation.Core.Class xmi.idref="xmi.51"/>
+</Foundation.Core.Generalization.child>
+<Foundation.Core.Generalization.parent>
+<Foundation.Core.Class xmi.idref="xmi.49"/>
+</Foundation.Core.Generalization.parent>
+</Foundation.Core.Generalization>
+</Foundation.Core.Namespace.ownedElement>
+</Model_Management.Model>
+</XMI.content>
+</XMI>

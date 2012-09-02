@@ -1,0 +1,15 @@
+{
+ "latest_version" : 1.60,
+ "latest_announcement" : """
+Hi there folks this is a major update
+with a new python parser, integrated ascii uml view, 
+animated layout algorithm, node colouring 
+and the ability to save your diagrams to disk.
+""",
+ "version_syntax_format" : 1,
+ "download_url" : "http://www.andypatterns.com/index.php/products/pynsource/download"
+}
+
+# Upload this file to
+# http://www.atug.com/downloads/pynsource-latest.txt
+# Versions 1.51 and higher check for this file.

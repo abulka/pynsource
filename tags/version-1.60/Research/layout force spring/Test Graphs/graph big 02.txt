@@ -1,0 +1,86 @@
+{'type':'node', 'id':'A', 'x':164, 'y':183, 'width':250, 'height':250}
+{'type':'node', 'id':'A1', 'x':122, 'y':94, 'width':60, 'height':60}
+{'type':'node', 'id':'A2', 'x':10, 'y':190, 'width':60, 'height':60}
+{'type':'node', 'id':'B', 'x':414, 'y':89, 'width':60, 'height':60}
+{'type':'node', 'id':'B1', 'x':381, 'y':10, 'width':60, 'height':60}
+{'type':'node', 'id':'B2', 'x':484, 'y':188, 'width':60, 'height':60}
+{'type':'node', 'id':'B21', 'x':680, 'y':238, 'width':60, 'height':60}
+{'type':'node', 'id':'B22', 'x':575, 'y':145, 'width':100, 'height':200}
+{'type':'node', 'id':'c', 'x':288, 'y':438, 'width':60, 'height':60}
+{'type':'node', 'id':'c1', 'x':429, 'y':307, 'width':60, 'height':60}
+{'type':'node', 'id':'c2', 'x':351, 'y':438, 'width':60, 'height':60}
+{'type':'node', 'id':'c3', 'x':215, 'y':438, 'width':60, 'height':60}
+{'type':'node', 'id':'c4', 'x':99, 'y':300, 'width':60, 'height':60}
+{'type':'node', 'id':'c5', 'x':419, 'y':183, 'width':60, 'height':120}
+{'type':'node', 'id':'D29', 'x':1134, 'y':884, 'width':128, 'height':68}
+{'type':'node', 'id':'D14', 'x':295, 'y':619, 'width':109, 'height':113}
+{'type':'node', 'id':'D31', 'x':1106, 'y':2, 'width':122, 'height':138}
+{'type':'node', 'id':'D80', 'x':857, 'y':187, 'width':244, 'height':112}
+{'type':'node', 'id':'D95', 'x':434, 'y':587, 'width':130, 'height':140}
+{'type':'node', 'id':'D62', 'x':1164, 'y':145, 'width':208, 'height':120}
+{'type':'node', 'id':'D46', 'x':678, 'y':639, 'width':135, 'height':133}
+{'type':'node', 'id':'D18', 'x':1082, 'y':477, 'width':157, 'height':130}
+{'type':'node', 'id':'D85', 'x':1169, 'y':612, 'width':144, 'height':142}
+{'type':'node', 'id':'D38', 'x':847, 'y':582, 'width':116, 'height':134}
+{'type':'node', 'id':'D79', 'x':968, 'y':533, 'width':92, 'height':84}
+{'type':'node', 'id':'D90', 'x':662, 'y':523, 'width':115, 'height':111}
+{'type':'node', 'id':'D92', 'x':518, 'y':516, 'width':116, 'height':68}
+{'type':'node', 'id':'D147303', 'x':653, 'y':410, 'width':134, 'height':79}
+{'type':'node', 'id':'D61', 'x':907, 'y':721, 'width':81, 'height':139}
+{'type':'node', 'id':'D146360', 'x':989, 'y':759, 'width':140, 'height':70}
+{'type':'node', 'id':'D67', 'x':810, 'y':457, 'width':93, 'height':120}
+{'type':'node', 'id':'D64', 'x':792, 'y':361, 'width':103, 'height':79}
+{'type':'node', 'id':'D147044', 'x':1396, 'y':255, 'width':154, 'height':113}
+{'type':'node', 'id':'D35', 'x':571, 'y':610, 'width':86, 'height':151}
+{'type':'node', 'id':'D20', 'x':902, 'y':378, 'width':116, 'height':74}
+{'type':'node', 'id':'D58', 'x':1318, 'y':720, 'width':65, 'height':62}
+{'type':'node', 'id':'D53', 'x':70, 'y':569, 'width':140, 'height':432}
+{'type':'node', 'id':'D51', 'x':1168, 'y':759, 'width':104, 'height':120}
+{'type':'node', 'id':'D13', 'x':1244, 'y':435, 'width':63, 'height':103}
+{'type':'node', 'id':'D40', 'x':1426, 'y':760, 'width':79, 'height':78}
+{'type':'node', 'id':'D857614', 'x':1370, 'y':540, 'width':72, 'height':146}
+{'type':'node', 'id':'D19', 'x':1279, 'y':540, 'width':86, 'height':67}
+{'type':'node', 'id':'D25', 'x':1610, 'y':619, 'width':150, 'height':78}
+{'type':'node', 'id':'D98', 'x':1312, 'y':454, 'width':146, 'height':81}
+{'type':'node', 'id':'D318089', 'x':700, 'y':777, 'width':158, 'height':140}
+{'type':'edge', 'id':'A_to_A1', 'source':'A', 'target':'A1'}
+{'type':'edge', 'id':'A_to_A2', 'source':'A', 'target':'A2'}
+{'type':'edge', 'id':'B_to_B1', 'source':'B', 'target':'B1'}
+{'type':'edge', 'id':'B_to_B2', 'source':'B', 'target':'B2'}
+{'type':'edge', 'id':'B2_to_B21', 'source':'B2', 'target':'B21'}
+{'type':'edge', 'id':'B2_to_B22', 'source':'B2', 'target':'B22'}
+{'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1'}
+{'type':'edge', 'id':'c_to_c2', 'source':'c', 'target':'c2'}
+{'type':'edge', 'id':'c_to_c3', 'source':'c', 'target':'c3'}
+{'type':'edge', 'id':'c_to_c4', 'source':'c', 'target':'c4'}
+{'type':'edge', 'id':'c_to_c5', 'source':'c', 'target':'c5'}
+{'type':'edge', 'id':'A_to_c', 'source':'A', 'target':'c'}
+{'type':'edge', 'id':'B2_to_c', 'source':'B2', 'target':'c'}
+{'type':'edge', 'id':'B2_to_c5', 'source':'B2', 'target':'c5'}
+{'type':'edge', 'id':'A_to_c5', 'source':'A', 'target':'c5'}
+{'type':'edge', 'id':'D318089_to_D46', 'source':'D318089', 'target':'D46'}
+{'type':'edge', 'id':'D18_to_D85', 'source':'D18', 'target':'D85'}
+{'type':'edge', 'id':'D92_to_D90', 'source':'D92', 'target':'D90'}
+{'type':'edge', 'id':'D90_to_D35', 'source':'D90', 'target':'D35'}
+{'type':'edge', 'id':'D90_to_D67', 'source':'D90', 'target':'D67'}
+{'type':'edge', 'id':'D67_to_D64', 'source':'D67', 'target':'D64'}
+{'type':'edge', 'id':'D67_to_D20', 'source':'D67', 'target':'D20'}
+{'type':'edge', 'id':'D67_to_D147303', 'source':'D67', 'target':'D147303'}
+{'type':'edge', 'id':'D67_to_D79', 'source':'D67', 'target':'D79'}
+{'type':'edge', 'id':'D79_to_D61', 'source':'D79', 'target':'D61'}
+{'type':'edge', 'id':'D79_to_D38', 'source':'D79', 'target':'D38'}
+{'type':'edge', 'id':'D79_to_D85', 'source':'D79', 'target':'D85'}
+{'type':'edge', 'id':'D35_to_D46', 'source':'D35', 'target':'D46'}
+{'type':'edge', 'id':'D35_to_D95', 'source':'D35', 'target':'D95'}
+{'type':'edge', 'id':'D95_to_D14', 'source':'D95', 'target':'D14'}
+{'type':'edge', 'id':'D95_to_D92', 'source':'D95', 'target':'D92'}
+{'type':'edge', 'id':'D85_to_D13', 'source':'D85', 'target':'D13'}
+{'type':'edge', 'id':'D85_to_D857614', 'source':'D85', 'target':'D857614'}
+{'type':'edge', 'id':'D85_to_D98', 'source':'D85', 'target':'D98'}
+{'type':'edge', 'id':'D85_to_D19', 'source':'D85', 'target':'D19'}
+{'type':'edge', 'id':'D85_to_D51', 'source':'D85', 'target':'D51'}
+{'type':'edge', 'id':'D51_to_D58', 'source':'D51', 'target':'D58'}
+{'type':'edge', 'id':'D51_to_D29', 'source':'D51', 'target':'D29'}
+{'type':'edge', 'id':'D51_to_D146360', 'source':'D51', 'target':'D146360'}
+{'type':'edge', 'id':'D58_to_D40', 'source':'D58', 'target':'D40'}
+{'type':'edge', 'id':'D62_to_D31', 'source':'D62', 'target':'D31'}
