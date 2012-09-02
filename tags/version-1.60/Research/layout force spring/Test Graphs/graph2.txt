@@ -1,5 +1,0 @@
-{'type':'node', 'id':'B', 'x':50, 'y':185, 'width':60, 'height':60}
-{'type':'node', 'id':'B1', 'x':160, 'y':25, 'width':160, 'height':60}
-{'type':'node', 'id':'c2', 'x':30, 'y':26, 'width':88, 'height':90}
-{'type':'node', 'id':'c3', 'x':140, 'y':225, 'width':60, 'height':130}
-{'type':'edge', 'id':'B_to_c2', 'source':'B', 'target':'c2'}

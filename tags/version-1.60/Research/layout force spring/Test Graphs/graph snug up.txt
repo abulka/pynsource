@@ -1,4 +1,0 @@
-{'type':'node', 'id':'B1', 'x':17, 'y':17, 'width':56, 'height':106}
-{'type':'node', 'id':'B2', 'x':164, 'y':9, 'width':52, 'height':112}
-{'type':'node', 'id':'A', 'x':17, 'y':127, 'width':206, 'height':136}
-{'type':'node', 'id':'m1', 'x':84, 'y':40, 'width':62, 'height':60}

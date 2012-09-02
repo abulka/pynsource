@@ -1,3 +1,0 @@
-{'type':'node', 'id':'MyPrintout', 'x':21, 'y':164, 'width':178, 'height':253, 'attrs':'canvas|log', 'meths':'__init__|OnBeginDocument|OnEndDocument|OnBeginPrinting|OnEndPrinting|OnPreparePrinting|HasPage|GetPageInfo|OnPrintPage|IncreasePrintAreaSize'}
-{'type':'node', 'id':'wx', 'x':74, 'y':30, 'width':32, 'height':31, 'attrs':'', 'meths':''}
-{'type':'edge', 'id':'MyPrintout_to_wx', 'source':'MyPrintout', 'target':'wx', 'uml_edge_type':'generalisation'}

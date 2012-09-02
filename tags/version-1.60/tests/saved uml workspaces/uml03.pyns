@@ -1,7 +1,0 @@
-{'type':'node', 'id':'CmdLinePythonToAsciiArt', 'x':13, 'y':233, 'width':263, 'height':141, 'attrs':'p', 'meths':'_GenerateAuxilliaryClasses|_CreateParser|_Process|ExportTo'}
-{'type':'node', 'id':'PySourceAsText', 'x':246, 'y':10, 'width':266, 'height':163, 'attrs':'', 'meths':'__init__|_DumpAttribute|_DumpCompositeExtraFooter|_DumpClassNameAndGeneralisations|_DumpMethods|_Line|_DumpClassFooter'}
-{'type':'node', 'id':'CmdLineGenerator', 'x':10, 'y':91, 'width':186, 'height':31, 'attrs':'', 'meths':''}
-{'type':'node', 'id':'ReportGenerator', 'x':20, 'y':11, 'width':175, 'height':31, 'attrs':'', 'meths':''}
-{'type':'edge', 'id':'CmdLinePythonToAsciiArt_to_CmdLineGenerator', 'source':'CmdLinePythonToAsciiArt', 'target':'CmdLineGenerator', 'uml_edge_type':'generalisation'}
-{'type':'edge', 'id':'PySourceAsText_to_ReportGenerator', 'source':'PySourceAsText', 'target':'ReportGenerator', 'uml_edge_type':'generalisation'}
-{'type':'edge', 'id':'PySourceAsText_to_CmdLinePythonToAsciiArt', 'source':'PySourceAsText', 'target':'CmdLinePythonToAsciiArt', 'uml_edge_type':'composition'}
