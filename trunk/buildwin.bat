@@ -7,6 +7,7 @@ set outsourcezip=pyNsource-1.61-src.zip
 set outstandalonezip=pyNsource-1.61-win32-standalone.zip
 
 :regen_version_info_from_subversion
+svn up
 svn info > version.txt
 
 :build_sample_uml_diagrams_as_resource
