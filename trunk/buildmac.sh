@@ -46,7 +46,7 @@ ditto -rsrc --arch i386 dist/pyNsourceGui.app/ dist/pyNsourceGui32.app
 # and they have their app.  Note we use -r for recursion since the .app is a dir structure.
 cd dist
 cp ../../Readme.txt .
-zip -r pyNsource-1.60-macosx.zip pyNsourceGui32.app/ Readme.txt
+zip -r pyNsource-1.61-macosx.zip pyNsourceGui32.app/ Readme.txt
 mkdir ../../dist
 mv pyNsourceGui32_macosx.zip ../../dist/
 

@@ -3,7 +3,7 @@ PyNSource and PyNSource GUI
 Reverse engineer python source code into UML - optionally display UML as Ascii
 art for pasting into your source code.
 
-Version 1.60
+Version 1.61
 (c) Andy Bulka 2004-2012
 andy@andypatterns.com
 http://www.andypatterns.com/index.php/products/pynsource/
@@ -18,12 +18,13 @@ pyNsourceGui.py
  - Generates UML diagrams
  - Layout algorithm
  - Toggle between normal and ascii UML view
- - Colour sibling subclasses
  - Recognises inheritance, composition and cardinality
  - Colour sibling subclasses to understand the relationships in your uml diagram.
  - Print and Print preview
  - Persistence
  - Now uses standard ast python parsing
+ - Windows 7, Mac os x, Linux compatibility
+ - Open Source
 
 Unlike most off the shelf uml python code importers, pyNsource attempts to
 recognise tricky composition relationships that are typical in python software
@@ -106,6 +107,9 @@ Run from Source:
 ========================================
  
 Change Log
+
+Version 1.61 (September 2012)
+- Fixed bug parsing ** operator
 
 Version 1.60 (August 2012)
 - New ast based python parser

@@ -3,8 +3,8 @@ REM easy_install bbfreeze
 REM ensure "c:\Program Files\7-Zip" or (x86) version is in your path
 REM ensure "c:\Program Files (x86)\Inno Setup 5\" is in your path
 
-set outsourcezip=pyNsource-1.60-src.zip
-set outstandalonezip=pyNsource-1.60-win32-standalone.zip
+set outsourcezip=pyNsource-1.61-src.zip
+set outstandalonezip=pyNsource-1.61-win32-standalone.zip
 
 :regen_version_info_from_subversion
 svn info > version.txt
