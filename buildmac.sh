@@ -48,8 +48,8 @@ cd dist
 cp ../../Readme.txt .
 zip -r pyNsource-1.61-macosx.zip pyNsourceGui32.app/ Readme.txt
 mkdir ../../dist
-mv pyNsourceGui32_macosx.zip ../../dist/
+mv pyNsource-1.61-macosx.zip ../../dist/
 
 cd ../..
 echo 'done, please upload the following file to sourceforge'
-ls dist/pyNsourceGui32_macosx.zip
+ls -l dist/pyNsource-1.61-macosx.zip
