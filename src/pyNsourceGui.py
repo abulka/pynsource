@@ -27,7 +27,7 @@ import wx.lib.ogl as ogl
 import os, stat
 from common.messages import *
 
-APP_VERSION = 1.60
+APP_VERSION = 1.61
 WINDOW_SIZE = (1024,768)
 MULTI_TAB_GUI = True
 USE_SIZER = False
