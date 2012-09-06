@@ -1,0 +1,24 @@
+pyDeCode
+pyNsource     ;-)
+pySource
+pySauce
+pyDestructure
+pyStructure
+pySkeleton
+pyBones
+pyReverseThatActuallyWorks
+
+
+others from Mark...
+
+pyBase
+pyArchitect
+pyAuthor
+pyBuilder  !
+pyConstructor
+pyDesigner
+pyFather
+pyGenerator
+pyMaker
+pyInspiration
+pyBuild

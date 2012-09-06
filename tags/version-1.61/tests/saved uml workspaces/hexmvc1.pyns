@@ -1,0 +1,42 @@
+# PynSource Version 1.1
+{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin.'}
+{'type':'umlshape', 'id':'CmdSaveModel', 'x':25, 'y':127, 'width':142, 'height':67, 'attrs':'', 'meths':'Execute'}
+{'type':'umlshape', 'id':'CmdNew', 'x':10, 'y':244, 'width':76, 'height':67, 'attrs':'', 'meths':'Execute'}
+{'type':'umlshape', 'id':'CmdCreateThing', 'x':248, 'y':264, 'width':164, 'height':93, 'attrs':'result', 'meths':'Execute'}
+{'type':'umlshape', 'id':'CmdLoadModel', 'x':25, 'y':10, 'width':142, 'height':67, 'attrs':'', 'meths':'Execute'}
+{'type':'umlshape', 'id':'App', 'x':860, 'y':36, 'width':122, 'height':301, 'attrs':'model|server|gui', 'meths':'__init__|Boot|GetUrlOrigin|GetModelSize|New|Load|Save|CreateThing|DeleteThing|AddInfoToThing|GetThing|StartServer'}
+{'type':'umlshape', 'id':'Cmd', 'x':217, 'y':140, 'width':74, 'height':93, 'attrs':'app', 'meths':'__init__'}
+{'type':'umlshape', 'id':'CmdStartServer', 'x':48, 'y':362, 'width':164, 'height':67, 'attrs':'', 'meths':'Execute'}
+{'type':'umlshape', 'id':'CmdDeleteThing', 'x':217, 'y':23, 'width':164, 'height':67, 'attrs':'', 'meths':'Execute'}
+{'type':'umlshape', 'id':'CmdAddInfoToThing', 'x':341, 'y':115, 'width':197, 'height':67, 'attrs':'', 'meths':'Execute'}
+{'type':'umlshape', 'id':'Thing', 'x':463, 'y':228, 'width':74, 'height':125, 'attrs':'info', 'meths':'__init__|__str__|AddInfo'}
+{'type':'umlshape', 'id':'Model', 'x':676, 'y':181, 'width':98, 'height':189, 'attrs':'persistence|things', 'meths':'__init__|__str__|__len__|Clear|LoadAll|SaveAll'}
+{'type':'umlshape', 'id':'SQLObject', 'x':571, 'y':95, 'width':109, 'height':31, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'MyWxApp', 'x':436, 'y':629, 'width':88, 'height':93, 'attrs':'myframe', 'meths':'OnInit'}
+{'type':'umlshape', 'id':'MyFrame', 'x':833, 'y':387, 'width':162, 'height':477, 'attrs':'need_abort|app|m_listBox1', 'meths':'__init__|SetApp|_InitHyperlinks|seturl|DumpModel|DumpClear|AddJunkText|_AddJunkText|MiscMessageBox|_IncrGuage|_DumpModel|FileLoad|FileNew|AddThing|DeleteThing|AddInfoToThing|_FindClientData|NotifyOfModelChange|_RepairSelection|BackgroundTask1|StopBackgroundTask1|_DoSomeLongTask|StartServer'}
+{'type':'umlshape', 'id':'wx.App', 'x':297, 'y':595, 'width':76, 'height':31, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'wx.Appwx.lib.mixins.inspection.InspectionMixin', 'x':267, 'y':543, 'width':516, 'height':31, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'HexMvcGuiFrame1', 'x':1008, 'y':290, 'width':175, 'height':31, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'wx.Frame', 'x':1032, 'y':204, 'width':98, 'height':31, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'PersistenceMock2', 'x':31, 'y':622, 'width':186, 'height':157, 'attrs':'savedmodel|app', 'meths':'__init__|SetApp|SaveAll|LoadAll'}
+{'type':'umlshape', 'id':'PersistenceMock', 'x':18, 'y':494, 'width':175, 'height':83, 'attrs':'', 'meths':'Save|Load'}
+{'type':'umlshape', 'id':'MockModel', 'x':645, 'y':417, 'width':110, 'height':67, 'attrs':'', 'meths':'__len__'}
+{'type':'umlshape', 'id':'MockApp', 'x':442, 'y':391, 'width':106, 'height':109, 'attrs':'model', 'meths':'__init__|GetModelSize'}
+{'type':'umlshape', 'id':'Server1', 'x':1082, 'y':418, 'width':106, 'height':285, 'attrs':'host|port|app', 'meths':'__init__|SetApp|GetUrlOrigin|StartServer|_Serve|index|xml|hello|ajax|ajax_info1|index'}
+{'type':'edge', 'id':'CmdSaveModel_to_Cmd', 'source':'CmdSaveModel', 'target':'Cmd', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdNew_to_Cmd', 'source':'CmdNew', 'target':'Cmd', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdCreateThing_to_Cmd', 'source':'CmdCreateThing', 'target':'Cmd', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdLoadModel_to_Cmd', 'source':'CmdLoadModel', 'target':'Cmd', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdStartServer_to_Cmd', 'source':'CmdStartServer', 'target':'Cmd', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdDeleteThing_to_Cmd', 'source':'CmdDeleteThing', 'target':'Cmd', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'CmdAddInfoToThing_to_Cmd', 'source':'CmdAddInfoToThing', 'target':'Cmd', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'Thing_to_CmdCreateThing', 'source':'Thing', 'target':'CmdCreateThing', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Model_to_App', 'source':'Model', 'target':'App', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Thing_to_SQLObject', 'source':'Thing', 'target':'SQLObject', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'Model_to_SQLObject', 'source':'Model', 'target':'SQLObject', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'MyWxApp_to_wx.App', 'source':'MyWxApp', 'target':'wx.App', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'MyWxApp_to_wx.Appwx.lib.mixins.inspection.InspectionMixin', 'source':'MyWxApp', 'target':'wx.Appwx.lib.mixins.inspection.InspectionMixin', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'MyFrame_to_HexMvcGuiFrame1', 'source':'MyFrame', 'target':'HexMvcGuiFrame1', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'HexMvcGuiFrame1_to_wx.Frame', 'source':'HexMvcGuiFrame1', 'target':'wx.Frame', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'MockModel_to_MockApp', 'source':'MockModel', 'target':'MockApp', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Model_to_Thing', 'source':'Model', 'target':'Thing', 'uml_edge_type':'composition'}
