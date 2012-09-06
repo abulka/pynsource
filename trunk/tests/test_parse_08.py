@@ -44,6 +44,27 @@ class TestCase08(unittest.TestCase):
         assert gotevent1
         assert not gotevent3
 
+    def test_parse_power_operator(self):
+        """
+        """
+        FILE = 'python-in/testmodule11_incoming_bugs.py'
+
+        #self.p, debuginfo = old_parser(FILE)
+        self.p, debuginfo = new_parser(FILE)
+
+        #print self.p
+
+        # -------------------------------------------------------
+
+        gotevent1 = 0
+        gotevent2 = 0
+
+        for classname, classentry in self.p.classlist.items():
+            if classname == 'Incoming1':
+                gotevent1 = 1
+
+
+        assert gotevent1
 
 
 
