@@ -29,7 +29,8 @@ BINOP_SYMBOLS = {
     RShift:     '>>',
     BitOr:      '|',
     BitAnd:     '&',
-    BitXor:     '^'
+    BitXor:     '^',
+    Pow:        '**'
 }
 
 CMPOP_SYMBOLS = {
@@ -360,7 +361,9 @@ def convert_ast_to_old_parser(node, filename, _log):
             # A
             if not self.current_class() and not self.am_inside_module_function():
                 self.model.modulemethods.append(node.name)
-                assert node.name in self.quick_parse.quick_found_module_defs
+                if node.name not in self.quick_parse.quick_found_module_defs:  # TODO how to repro this failure, it was only reported by Charlie - issue #31
+                    print 'Parse assert WARNING: node.name', node.name, 'is not in quick_found_module_defs', self.quick_parse.quick_found_module_defs
+                    
             elif self.current_class():
                 self.current_class().defs.append(node.name)
 
