@@ -25,6 +25,10 @@ class CmdFileImportBase(CmdBase):   # BASE
             for f in self.files:
                 #pmodel, debuginfo = old_parser(f)
                 pmodel, debuginfo = new_parser(f)
+                
+                #from parsing.dump_pmodel import dump_old_structure
+                #print dump_old_structure(pmodel)
+                
                 self.context.model.ConvertParseModelToUmlModel(pmodel)
 
                 #p = PySourceAsJava()

@@ -2,8 +2,16 @@
 Old Parser results model structure:
 -----------------------------------
 
-model
-    .classlist {classname, classentry ...} where classentry is
+The parse model has two properties
+
+    class AbstractParseModel(object):
+        def __init__(self):
+            self.classlist = {}
+            self.modulemethods = []
+            
+where
+
+    .classlist {classname:classentry, ...} where classname is a string, classentry is a class containing
         .ismodulenotrealclass T/F
         .classdependencytuples [(fromclass, toclass), ...]
         .classesinheritsfrom [class, ...]  # todo should be renamed classinheritsfrom (singular)
@@ -12,6 +20,7 @@ model
                 .attrtype []  # todo should be renamed attrtypes plural
                 .compositedependencies  # todo (calculated in real time, should precalc)
         .defs [method, ...]
+        
     .modulemethods = [method, ...]]
 """
 
