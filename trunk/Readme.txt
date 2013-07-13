@@ -59,7 +59,7 @@ better layout and other features.
 
 Whilst it currently uses the older python parser, it does have the feature
 (which my current ast based one used in pyNsourceGui.py doesn't) of optionally
-treat modules as classes, creating a "pseudo class" for each module/file. In
+treating modules as classes, creating a "pseudo class" for each module/file. In
 such a case, module variables and functions are treated as attributes and
 methods of a 'class'. I hope to add the "treat modules as 'classes'" feature to
 the new ast based parser as used by pyNsourceGui.py in the future, as I think it
@@ -109,7 +109,7 @@ Run from Source:
 Change Log
 
 Version 1.61 (September 2012)
-- Fixed bug parsing ** operator
+- Fixed bug parsing the ** operator
 
 Version 1.60 (August 2012)
 - New ast based python parser
