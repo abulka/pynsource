@@ -59,6 +59,9 @@ ALL_SYMBOLS.update(BINOP_SYMBOLS)
 ALL_SYMBOLS.update(CMPOP_SYMBOLS)
 ALL_SYMBOLS.update(UNARYOP_SYMBOLS)
 
+TREAT_PROPERTY_DECORATOR_AS_PROP = True
+PROPERTY_DECORATORS = ['property', '.setattr']
+
 
 
 def convert_ast_to_old_parser(node, filename, _log):
@@ -217,7 +220,7 @@ def convert_ast_to_old_parser(node, filename, _log):
                 
                 if self.in_class_static_area():
                     t = create_attr_static(self.lhs[0])
-                elif self.in_method_in_class_area() and self.lhs[0] == 'self':
+                elif self.in_method_in_class_area() and self.lhs[0] == 'self' and len(self.lhs) > 1:
                     t = create_attr_please(self.lhs[1])
                 else:
                     pass # in module area
@@ -363,7 +366,17 @@ def convert_ast_to_old_parser(node, filename, _log):
                 self.model.modulemethods.append(node.name)
                 if node.name not in self.quick_parse.quick_found_module_defs:  # TODO how to repro this failure, it was only reported by Charlie - issue #31
                     print 'Parse assert WARNING: node.name', node.name, 'is not in quick_found_module_defs', self.quick_parse.quick_found_module_defs
-                    
+            # look for decorator @property definition and treat as property
+            elif TREAT_PROPERTY_DECORATOR_AS_PROP and self.current_class() and \
+            len(node.decorator_list):
+                for decorator in node.decorator_list:
+                    for prop_match in PROPERTY_DECORATORS:
+                        if hasattr(decorator, 'id') and prop_match in decorator.id:
+                            self.current_class().AddAttribute(attrname=node.name,
+                                                              attrtype=['static'])
+                            break
+                        elif hasattr(decorator, 'attr') and prop_match == decorator.value:
+                            pass
             elif self.current_class():
                 self.current_class().defs.append(node.name)
 
@@ -888,4 +901,3 @@ def convert_ast_to_old_parser(node, filename, _log):
 
     debuginfo = '<br>'.join(v.result)
     return v.model, debuginfo
-
