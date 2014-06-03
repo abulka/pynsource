@@ -13,7 +13,6 @@ class AndyBasicParseEngine(object):
         self.meat = 0
         self.tokens = None
         self.isfreshline = 1
-        # print 'NEWLINE'
         self.indentlevel = 0
 
     def _ReadAllTokensFromFile(self, file):
@@ -82,14 +81,11 @@ class AndyBasicParseEngine(object):
         return 0
 
     def _Isnewline(self):
-        toHex = lambda x:"".join([hex(ord(c))[2:].zfill(2) for c in x])
-        # print '_Isnewline?', self.token, toHex(self.token)
-        if (self.token == '\n' or self.token == '\r' or self.token == '\r\n' or self.tokentype == token.N_TOKENS):
+        if (self.token == '\n' or self.tokentype == token.N_TOKENS):
             if self.tokentype == token.N_TOKENS:
                 assert '#' in self.token
             self.meat = 0
             self.isfreshline = 1
-            # print 'NEWLINE2'
             self.On_newline()
             return 1
         else:
@@ -275,7 +271,7 @@ class HandleClassAttributes(HandleDefs):
 
     def On_meat(self):
         HandleDefs.On_meat(self)
-        # print 'token %-10s' % self.token.strip()[0:9], 'nexttoken %-10s' % self.nexttoken.strip()[0:9], 'wfdot', self.waitingfordot, 'wfvarname', self.waitingforvarname, 'wfequalsymbol', self.waitingforequalsymbol, 'wfsubsequentdot', self.waitingforsubsequentdot, 'isfreshline', self.isfreshline, 'self.nstatic', self.nextvarnameisstatic, 'self.obracket', self.waitforappendopenbracket, 'self.nmany', self.nextvarnameismany
+
         if self.isfreshline and self.token == 'self' and self.nexttoken == '.':
             self.waitingfordot = 1
 
@@ -330,10 +326,8 @@ class HandleClassAttributes(HandleDefs):
             self.waitingforequalsymbol = 0
             self._AddAttribute()
             self._Clearwaiting()
-        # print '      %-10s' % '', '          %-10s' % '', 'wfdot', self.waitingfordot, 'wfvarname', self.waitingforvarname, 'wfequalsymbol', self.waitingforequalsymbol, 'wfsubsequentdot', self.waitingforsubsequentdot, 'isfreshline', self.isfreshline, 'self.nstatic', self.nextvarnameisstatic, 'self.obracket', self.waitforappendopenbracket, 'self.nmany', self.nextvarnameismany
 
     def _AddAttribute(self):
-        # print '_AddAttribute'
         classentry = self.classlist[self.currclass]
         if self.nextvarnameisstatic:
             attrtype = ['static']
@@ -344,7 +338,7 @@ class HandleClassAttributes(HandleDefs):
             attrtype.append('many')
 
         classentry.AddAttribute(self.currvarname, attrtype)
-        # print '       ATTR  ', self.currvarname
+        #print '       ATTR  ', self.currvarname
         self.JustGotASelfAttr(self.currvarname)
 
 class HandleComposites(HandleClassAttributes):
