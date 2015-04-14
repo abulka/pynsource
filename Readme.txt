@@ -4,7 +4,7 @@ Reverse engineer python source code into UML - optionally display UML as Ascii
 art for pasting into your source code.
 
 Version 1.61
-(c) Andy Bulka 2004-2012
+(c) Andy Bulka 2004-2015
 andy@andypatterns.com
 http://www.andypatterns.com/index.php/products/pynsource/
 License: GPL 3
@@ -181,32 +181,32 @@ Version 1.3a
 Example of Ascii UML:
 
 
-                                                  +---------------------------+
-+------------------------------------+            |RoleServicesObject         |
-|AI                                  |            |...........................|
-|.....................................          * |role                       |
-|roleServiceObjects                  '''''''''''''|gameservices               |----- ...|
-|gameServices                        |_____       |_rolemanager               |         |
-|....................................|     |      |_etc1                      |         |
-|API_RunABit                         |     |      |...........................|         |
-|API_GetOrdersForRole                |     |      |API_GetCurrentStoryline    |         |
-|API_CreateRoleServicesObjectForRole |     |      |API_GetCurrentRoleName     |         |
-+------------------------------------+     |      |API_GetRoleSubordinates    |         |
-                                           |      +---------------------------+         |
-                                           |                                            |
-                                           |                                            |
-                                           | 1 +-------------------------------+ /      |
-                                           .---+GameServices                   |_.......'
-                                               +-------------------------------| -.
-                                               |_scenario                      |
-                                               |_game                          |
-                                               ................................|
-                                               |API_GetAstarTravelTimeBlahBlah |
-                                               |API_GetOobtreeInfoOnOobId      |
-                                               |API_GetOobtreeInfoOnMe         |
-                                               +-------------------------------+
+                               +-----------------------+
++-------------------+          |RoleServicesObject     |
+|AI                 |          |.......................|
+|....................        * |role                   |
+|roleServiceObjects '''''''''''|gameservices           |----- .|
+|gameServices       |___       |_rolemanager           |       |
+|...................|   |      |_etc1                  |       |
+|API_RunABit        |   |      |.......................|       |
+|API_GetOrdersForR  |   |      |API_GetCurrentStoryline|       |
+|API_CreateRoleServc|   |      |API_GetCurrentRoleName |       |
++-------------------+   |      |API_GetRoleSubordinates|       |
+                        |      +-----------------------+       |
+                        |                                      |
+                        |                                      |
+                        | 1 +---------------------------+ /    |
+                        .---+GameServices               |_.....'
+                            +---------------------------| -.
+                            |_scenario                  |
+                            |_game                      |
+                            ............................|
+                            |API_GetAstarTravelTimeBlah |
+                            |API_GetOobtreeInfoOnOobId  |
+                            |API_GetOobtreeInfoOnMe     |
+                            +---------------------------+
   
-See http://www.andypatterns.com/index.php/products/pynsource/asciiart/ for more into
+See http://www.andypatterns.com/index.php/products/pynsource/asciiart/ for more info
 
 ========================================
 
