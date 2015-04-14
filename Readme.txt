@@ -181,40 +181,42 @@ Version 1.3a
 Example of Ascii UML:
 
 
-                                                               +---------------------------+
-             +------------------------------------+            |RoleServicesObject         |
-             |AI                                  |            |...........................|
-             |.....................................          * |role                       |
-             |roleServiceObjects                  '''''''''''''|gameservices               |----- ...|
- +-----+     |gameServices                        |_____       |_rolemanager               |         |
- |game `-.   |....................................|     |      |_etc1                      |         |
- +-----+  `-.|API_RunABit                         |     |      |...........................|         |
-             |API_GetOrdersForRole                |     |      |API_GetCurrentStoryline    |         |
-             |API_CreateRoleServicesObjectForRole |     |      |API_GetCurrentRoleName     |         |
-             +------------------------------------+     |      |API_GetRoleSubordinates    |         |
-                                                        |      +---------------------------+         |
-                                                        |                                            |
-                                                        |                                            |
-                                                        | 1 +-------------------------------+ /      |
-                                                        .---+GameServices                   |_.......'
-                                                            +-------------------------------| -.
-                                                            |_scenario                      |
-                                                            |_game                          |
-                                                            ................................|
-                                                            |API_GetAstarTravelTimeBlahBlah |
-                                                            |API_GetOobtreeInfoOnOobId      |
-                                                            |API_GetOobtreeInfoOnMe         |
-                                                            +-------------------------------+
+                                                  +---------------------------+
++------------------------------------+            |RoleServicesObject         |
+|AI                                  |            |...........................|
+|.....................................          * |role                       |
+|roleServiceObjects                  '''''''''''''|gameservices               |----- ...|
+|gameServices                        |_____       |_rolemanager               |         |
+|....................................|     |      |_etc1                      |         |
+|API_RunABit                         |     |      |...........................|         |
+|API_GetOrdersForRole                |     |      |API_GetCurrentStoryline    |         |
+|API_CreateRoleServicesObjectForRole |     |      |API_GetCurrentRoleName     |         |
++------------------------------------+     |      |API_GetRoleSubordinates    |         |
+                                           |      +---------------------------+         |
+                                           |                                            |
+                                           |                                            |
+                                           | 1 +-------------------------------+ /      |
+                                           .---+GameServices                   |_.......'
+                                               +-------------------------------| -.
+                                               |_scenario                      |
+                                               |_game                          |
+                                               ................................|
+                                               |API_GetAstarTravelTimeBlahBlah |
+                                               |API_GetOobtreeInfoOnOobId      |
+                                               |API_GetOobtreeInfoOnMe         |
+                                               +-------------------------------+
   
 See http://www.andypatterns.com/index.php/products/pynsource/asciiart/ for more into
 
 ========================================
 
 SVN repository for pynsource is
-  http://code.google.com/p/pynsource/
+  http://code.google.com/p/pynsource/    *** deprecated
+  https://github.com/abulka/pynsource    new repo
 
 Report bugs to
-  http://code.google.com/p/pynsource/issues/list
+  http://code.google.com/p/pynsource/issues/list     *** deprecated
+  https://github.com/abulka/pynsource/issues
   
 ========================================
 
