@@ -1,0 +1,2773 @@
+------------------------------------------------------------------------
+r590 | abulka@gmail.com | 2014-08-25 21:11:16 +1000 (Mon, 25 Aug 2014) | 1 line
+
+comment added re where javascript version of spring layout came from
+------------------------------------------------------------------------
+r589 | abulka@gmail.com | 2014-08-25 21:08:42 +1000 (Mon, 25 Aug 2014) | 1 line
+
+added rungui32.sh app launcher for mac 32 bit
+------------------------------------------------------------------------
+r588 | abulka@gmail.com | 2014-06-04 16:47:51 +1000 (Wed, 04 Jun 2014) | 1 line
+
+latest joint javascript demo for UML shapes looks good
+------------------------------------------------------------------------
+r587 | abulka@gmail.com | 2014-06-03 21:31:39 +1000 (Tue, 03 Jun 2014) | 1 line
+
+Added pycharm project files
+------------------------------------------------------------------------
+r586 | abulka@gmail.com | 2014-06-03 21:29:22 +1000 (Tue, 03 Jun 2014) | 1 line
+
+fixed unit tests on mac, which related to old parser only cr lf issue
+------------------------------------------------------------------------
+r583 | nickshobe@gmail.com | 2014-01-26 16:45:00 +1100 (Sun, 26 Jan 2014) | 1 line
+
+AST parser treats @property decorators as properties
+------------------------------------------------------------------------
+r582 | abulka | 2013-07-13 15:09:14 +1000 (Sat, 13 Jul 2013) | 1 line
+
+Edited Readme.txt to correct a typo.
+------------------------------------------------------------------------
+r581 | abulka | 2013-07-13 15:05:27 +1000 (Sat, 13 Jul 2013) | 1 line
+
+added j1 as a test only
+------------------------------------------------------------------------
+r580 | abulka | 2013-02-07 13:06:44 +1100 (Thu, 07 Feb 2013) | 1 line
+
+Added doco on how to get to models.
+------------------------------------------------------------------------
+r579 | abulka@gmail.com | 2012-09-09 10:32:22 +1000 (Sun, 09 Sep 2012) | 1 line
+
+web announcements - various screenshots
+------------------------------------------------------------------------
+r578 | abulka | 2012-09-06 17:45:04 +1000 (Thu, 06 Sep 2012) | 1 line
+
+Added "svn up" to build script or else get wrong repository versions in version.txt
+------------------------------------------------------------------------
+r576 | abulka@gmail.com | 2012-09-06 17:35:47 +1000 (Thu, 06 Sep 2012) | 2 lines
+
+mac build script updated for 1.61
+
+------------------------------------------------------------------------
+r575 | abulka | 2012-09-06 17:09:17 +1000 (Thu, 06 Sep 2012) | 1 line
+
+1.61 release
+------------------------------------------------------------------------
+r574 | abulka | 2012-09-06 16:46:39 +1000 (Thu, 06 Sep 2012) | 1 line
+
+Fixed issue 31 re parsing power operator.
+------------------------------------------------------------------------
+r573 | abulka | 2012-09-06 16:39:45 +1000 (Thu, 06 Sep 2012) | 4 lines
+
+Added unit test to catch power operator parsing problem.
+
+Update issue 31
+Added unit test to catch power operator parsing problem.
+------------------------------------------------------------------------
+r572 | abulka@gmail.com | 2012-09-02 14:37:43 +1000 (Sun, 02 Sep 2012) | 1 line
+
+joint - javascript digramming library experiments
+------------------------------------------------------------------------
+r568 | abulka | 2012-08-31 18:36:25 +1000 (Fri, 31 Aug 2012) | 4 lines
+
+1.60 released
+
+Update issue 6
+1.60 released
+------------------------------------------------------------------------
+r567 | abulka | 2012-08-31 15:17:17 +1000 (Fri, 31 Aug 2012) | 4 lines
+
+build output files names tweaked again
+
+Update issue 6
+build output files names tweaked again
+------------------------------------------------------------------------
+r566 | abulka | 2012-08-31 14:52:53 +1000 (Fri, 31 Aug 2012) | 4 lines
+
+build output files names tweaked
+
+Update issue 6
+build output files names tweaked
+------------------------------------------------------------------------
+r565 | abulka | 2012-08-31 14:31:33 +1000 (Fri, 31 Aug 2012) | 4 lines
+
+Preparing for imminent 1.6 release.
+
+Update issue 6
+Preparing for imminent 1.6 release.
+------------------------------------------------------------------------
+r564 | abulka | 2012-08-30 18:43:36 +1000 (Thu, 30 Aug 2012) | 1 line
+
+samples - load from resource list dialog 
+------------------------------------------------------------------------
+r563 | abulka | 2012-08-30 17:04:06 +1000 (Thu, 30 Aug 2012) | 1 line
+
+sample files now loaded from a dict resource to help mac users get the samples uml diagrams
+------------------------------------------------------------------------
+r562 | abulka | 2012-08-30 15:14:38 +1000 (Thu, 30 Aug 2012) | 1 line
+
+linux - Hack on Linux so that onKeyChar bindings take hold properly. 
+------------------------------------------------------------------------
+r561 | abulka@gmail.com | 2012-08-30 15:13:54 +1000 (Thu, 30 Aug 2012) | 2 lines
+
+linux - rungui.sh script added
+
+------------------------------------------------------------------------
+r560 | abulka@gmail.com | 2012-08-30 11:30:38 +1000 (Thu, 30 Aug 2012) | 3 lines
+
+mac - more tweaks and hacks to ensure onKeyChar works first time you launch
+
+
+------------------------------------------------------------------------
+r559 | abulka | 2012-08-30 10:54:10 +1000 (Thu, 30 Aug 2012) | 1 line
+
+mac - reinstated refresh after shape move, as you definitely need it.
+------------------------------------------------------------------------
+r558 | abulka@gmail.com | 2012-08-28 21:27:45 +1000 (Tue, 28 Aug 2012) | 1 line
+
+moved some very old pynsource manual test scripts into subdir
+------------------------------------------------------------------------
+r557 | abulka@gmail.com | 2012-08-28 21:12:26 +1000 (Tue, 28 Aug 2012) | 4 lines
+
+old windows build all script deleted.
+
+Update issue 6
+old windows build all script deleted. (again - forgot to do it)
+------------------------------------------------------------------------
+r556 | abulka@gmail.com | 2012-08-28 21:11:07 +1000 (Tue, 28 Aug 2012) | 1 line
+
+pyYuml - fixed slight glitch in referring to common library png
+------------------------------------------------------------------------
+r555 | abulka@gmail.com | 2012-08-28 21:02:45 +1000 (Tue, 28 Aug 2012) | 1 line
+
+reorganisation - moved lots of modules into 'common' package
+------------------------------------------------------------------------
+r554 | abulka@gmail.com | 2012-08-28 19:06:20 +1000 (Tue, 28 Aug 2012) | 7 lines
+
+colouring nodes - proper commands created. Colours now change sequentially not randomly.
+Some spurious sys.path append statements cleaned up.
+
+Update issue 16
+colouring nodes - proper commands created. Colours now change sequentially not randomly.
+Some spurious sys.path append statements cleaned up.
+
+------------------------------------------------------------------------
+r553 | abulka@gmail.com | 2012-08-28 14:40:41 +1000 (Tue, 28 Aug 2012) | 6 lines
+
+sibling colours - new algorithm yet again, to prevent colours being skipped.
+
+Update issue 16
+sibling colours - new algorithm yet again, to prevent colours being skipped.
+
+Also added a routine to create a colour chart of official2 colours on the workspace!
+------------------------------------------------------------------------
+r552 | abulka@gmail.com | 2012-08-28 12:59:52 +1000 (Tue, 28 Aug 2012) | 7 lines
+
+colour siblings - algorithm changed and simplified - shows more colors and more useful.
+
+Update issue 16
+colour siblings - algorithm changed and simplified - shows more colors and more useful.
+
+Siblings of different parents to be a different colour.
+All root nodes to be the same color.
+------------------------------------------------------------------------
+r551 | abulka@gmail.com | 2012-08-28 10:04:00 +1000 (Tue, 28 Aug 2012) | 1 line
+
+set app title on save, as well.
+------------------------------------------------------------------------
+r550 | abulka@gmail.com | 2012-08-28 10:03:31 +1000 (Tue, 28 Aug 2012) | 1 line
+
+right click menu cleanup - bind to exact method.
+------------------------------------------------------------------------
+r549 | abulka@gmail.com | 2012-08-27 21:25:33 +1000 (Mon, 27 Aug 2012) | 7 lines
+
+Need to rework sibling colouring algorithm - hexmvc1.pyns is not colouring nicely and it should.
+
+Update issue 16
+Need to rework sibling colouring algorithm - hexmvc1.pyns is not colouring nicely and it should.
+Want siblings of different parents to be a different colour.
+Want all root nodes to be the same color, unless they have siblings, in which case the root should match the kid sibling colour.
+ 
+------------------------------------------------------------------------
+r548 | abulka@gmail.com | 2012-08-27 21:23:43 +1000 (Mon, 27 Aug 2012) | 4 lines
+
+edge drawing now makes proper edges - either composition or generalisation - never a plain line anymore.  Could reintroduce plain lines later again, but it messes with persistence at the moment.
+
+Update issue 18
+edge drawing now makes proper edges - either composition or generalisation - never a plain line anymore.  Could reintroduce plain lines later again, but it messes with persistence at the moment.
+------------------------------------------------------------------------
+r547 | abulka@gmail.com | 2012-08-27 20:25:15 +1000 (Mon, 27 Aug 2012) | 1 line
+
+test - renaming
+------------------------------------------------------------------------
+r546 | abulka@gmail.com | 2012-08-27 20:24:17 +1000 (Mon, 27 Aug 2012) | 4 lines
+
+persistence - load from samples.  Also set title of frame to last loaded file, or (untitled) if new.
+
+Update issue 18
+persistence - load from samples.  Also set title of frame to last loaded file, or (untitled) if new.
+------------------------------------------------------------------------
+r545 | abulka@gmail.com | 2012-08-27 18:37:31 +1000 (Mon, 27 Aug 2012) | 4 lines
+
+persistence - handle future versions better - give user opportunity to load anyway.
+
+Update issue 18
+persistence - handle future versions better - give user opportunity to load anyway.
+------------------------------------------------------------------------
+r544 | abulka@gmail.com | 2012-08-27 18:02:49 +1000 (Mon, 27 Aug 2012) | 4 lines
+
+persistence - moved persistence methods into their own class.  Moved graph.py into model package.
+
+Update issue 18
+persistence - moved persistence methods into their own class.  Moved graph.py into model package.
+------------------------------------------------------------------------
+r543 | abulka@gmail.com | 2012-08-27 14:21:33 +1000 (Mon, 27 Aug 2012) | 4 lines
+
+Persistence format upgraded to 1.1.  Added logic to read old formats and upgrade them.  File extension .pyns adopted for saved files.
+
+Update issue 18
+Persistence format upgraded to 1.1.  Added logic to read old formats and upgrade them.  File extension .pyns adopted for saved files.
+------------------------------------------------------------------------
+r542 | abulka@gmail.com | 2012-08-27 09:47:01 +1000 (Mon, 27 Aug 2012) | 1 line
+
+menus - a few more tweaks
+------------------------------------------------------------------------
+r541 | abulka@gmail.com | 2012-08-27 00:04:27 +1000 (Mon, 27 Aug 2012) | 1 line
+
+menu reorg and clean up of shortcut keys
+------------------------------------------------------------------------
+r540 | abulka@gmail.com | 2012-08-26 22:43:57 +1000 (Sun, 26 Aug 2012) | 4 lines
+
+blackboard - split frame and thread into separate modules.  Correct progress bar off by one error.
+
+Update issue 28
+blackboard - split frame and thread into separate modules.  Correct progress bar off by one error.
+------------------------------------------------------------------------
+r539 | abulka@gmail.com | 2012-08-26 22:01:23 +1000 (Sun, 26 Aug 2012) | 6 lines
+
+linux - added wx.CallAfter commands so that blackboard layout status window updates correctly.
+
+Update issue 28
+linux - added wx.CallAfter commands so that blackboard layout status window updates correctly.
+
+
+------------------------------------------------------------------------
+r538 | abulka@gmail.com | 2012-08-26 21:22:57 +1000 (Sun, 26 Aug 2012) | 6 lines
+
+blackboard - stopped calls to stateofthenation from inside worked thread.
+Removed old unused blackboard code.
+
+Update issue 28
+blackboard - stopped calls to stateofthenation from inside worked thread.
+Removed old unused blackboard code.
+------------------------------------------------------------------------
+r537 | abulka | 2012-08-24 18:17:12 +1000 (Fri, 24 Aug 2012) | 1 line
+
+n/a removed diagnostic
+------------------------------------------------------------------------
+r536 | abulka@gmail.com | 2012-08-24 17:39:15 +1000 (Fri, 24 Aug 2012) | 6 lines
+
+mac - fixed about box so it comes up in the mac os x standard place.
+
+update issue 6
+mac - fixed about box so it comes up in the mac os x standard place.
+
+
+------------------------------------------------------------------------
+r535 | abulka@gmail.com | 2012-08-23 18:37:45 +1000 (Thu, 23 Aug 2012) | 2 lines
+
+mac tweaks esp. re tab switching
+
+------------------------------------------------------------------------
+r534 | abulka | 2012-08-23 16:51:37 +1000 (Thu, 23 Aug 2012) | 4 lines
+
+mac - removed notebook widget on mac platform because of redraw problems.
+
+Update issue 6
+mac - removed notebook widget on mac platform because of redraw problems.
+------------------------------------------------------------------------
+r533 | abulka | 2012-08-23 12:05:56 +1000 (Thu, 23 Aug 2012) | 1 line
+
+n/a ignore version.txt
+------------------------------------------------------------------------
+r532 | abulka | 2012-08-23 12:04:17 +1000 (Thu, 23 Aug 2012) | 4 lines
+
+setup.py REMOVED from pyNsource (again) as am not using py2exe anymore for main exe building under windows.  __init__.py removed from pyNsource/src as that is not a package. buildwin.bat script cleaned up and old windows build all script deleted.
+
+Update issue 6
+setup.py REMOVED from pyNsource (again) as am not using py2exe anymore for main exe building under windows.  __init__.py removed from pyNsource/src as that is not a package. buildwin.bat script cleaned up and old windows build all script deleted.
+------------------------------------------------------------------------
+r531 | abulka@gmail.com | 2012-08-22 18:38:45 +1000 (Wed, 22 Aug 2012) | 6 lines
+
+linux build script for bash
+
+Update issue 6
+linux build script for bash
+
+
+------------------------------------------------------------------------
+r530 | abulka@gmail.com | 2012-08-21 00:12:28 +1000 (Tue, 21 Aug 2012) | 4 lines
+
+install script - update version numbers
+
+Update issue 6
+install script - update version numbers
+------------------------------------------------------------------------
+r529 | abulka@gmail.com | 2012-08-20 00:16:29 +1000 (Mon, 20 Aug 2012) | 4 lines
+
+Colour sibling uml shapes = version 1.
+
+Update issue 16
+Colour sibling uml shapes = version 1.  Hot keys are c/C/v/V - need to add to menu.
+------------------------------------------------------------------------
+r527 | abulka@gmail.com | 2012-08-19 21:26:49 +1000 (Sun, 19 Aug 2012) | 1 line
+
+n/a - repair trivial unit test
+------------------------------------------------------------------------
+r526 | abulka@gmail.com | 2012-08-19 18:55:43 +1000 (Sun, 19 Aug 2012) | 1 line
+
+n/a switch off some diagnostics.
+------------------------------------------------------------------------
+r525 | abulka@gmail.com | 2012-08-19 18:53:53 +1000 (Sun, 19 Aug 2012) | 10 lines
+
+Prevent layout on empty graphs.  Fixes issue 7.
+
+Problem was caused by setting important values to infinity and then th layout doesn't do anything and these values remain at infinity (NaN - not a number).
+
+    def layoutCalcBounds(self):
+        minx = float("inf")
+        maxx = float("-inf")
+        miny = float("inf")
+        maxy = float("-inf")
+
+------------------------------------------------------------------------
+r524 | abulka@gmail.com | 2012-08-19 18:02:36 +1000 (Sun, 19 Aug 2012) | 4 lines
+
+ascii uml - Made paddings/margin configurable by constants.
+
+Update issue 15
+ascii uml - Made paddings/margin configurable by constants.
+------------------------------------------------------------------------
+r523 | abulka@gmail.com | 2012-08-19 16:22:52 +1000 (Sun, 19 Aug 2012) | 4 lines
+
+ascii uml - More tweaks.  Added concept of row top padding.  Also ensure do CR when next_node_is_fc
+
+Update issue 15
+ascii uml - More tweaks.  Added concept of row top padding.  Also ensure do CR when next_node_is_fc
+------------------------------------------------------------------------
+r522 | abulka@gmail.com | 2012-08-19 14:53:18 +1000 (Sun, 19 Aug 2012) | 4 lines
+
+ascii uml - Added an extra bit of space above alias classes.
+
+Update issue 15
+ascii uml - Added an extra bit of space above alias classes.  Still some tweaks to do.
+------------------------------------------------------------------------
+r521 | abulka@gmail.com | 2012-08-19 14:07:52 +1000 (Sun, 19 Aug 2012) | 4 lines
+
+Moved ascii_uml modules into its own package.  Added documentation.
+
+Update issue 17
+Moved ascii_uml modules into its own package.  Added documentation.
+------------------------------------------------------------------------
+r520 | abulka@gmail.com | 2012-08-19 13:36:51 +1000 (Sun, 19 Aug 2012) | 4 lines
+
+Fixed ascii rendering problem in cases of multiple inheritance.
+
+Update issue 17
+Fixed ascii rendering problem in cases of multiple inheritance.
+------------------------------------------------------------------------
+r519 | abulka | 2012-08-17 18:17:07 +1000 (Fri, 17 Aug 2012) | 4 lines
+
+Moved graph node tests into testing dir.
+
+Update Issue 17
+Moved graph node tests into testing dir.  One test that is failing is the one we have to solve to fix this bug.
+------------------------------------------------------------------------
+r518 | abulka | 2012-08-17 17:41:11 +1000 (Fri, 17 Aug 2012) | 8 lines
+
+ast_parser - switched pynsourcegui to the new ast parser!  Fixed multiple inheritence parsing bug.
+
+Update issue 17
+ast_parser - switched pynsourcegui to the new ast parser!  Fixed multiple inheritence parsing bug.
+
+Still have multiple inheritance crash when switch to ascii uml view because of graph.py sort by generalisation algorithm introducing duplicates.
+
+
+------------------------------------------------------------------------
+r517 | abulka | 2012-08-17 13:13:56 +1000 (Fri, 17 Aug 2012) | 1 line
+
+log dir in ignore list
+------------------------------------------------------------------------
+r516 | abulka | 2012-08-17 13:12:30 +1000 (Fri, 17 Aug 2012) | 1 line
+
+Moving parsing research into main src - step 3 incl migrating all tests into test dir.
+------------------------------------------------------------------------
+r515 | abulka | 2012-08-16 18:29:20 +1000 (Thu, 16 Aug 2012) | 1 line
+
+Moving parsing research into main src - step 2
+------------------------------------------------------------------------
+r514 | abulka | 2012-08-16 17:57:06 +1000 (Thu, 16 Aug 2012) | 1 line
+
+Moving parsing research into main src - step 1
+------------------------------------------------------------------------
+r513 | abulka | 2012-08-16 17:31:15 +1000 (Thu, 16 Aug 2012) | 1 line
+
+RhsAnalyser - refactored the comments and method order.
+------------------------------------------------------------------------
+r512 | abulka | 2012-08-16 17:02:48 +1000 (Thu, 16 Aug 2012) | 1 line
+
+RhsAnalyser - integrated into main parse_and_convert. tests pass.
+------------------------------------------------------------------------
+r511 | abulka | 2012-08-16 12:30:21 +1000 (Thu, 16 Aug 2012) | 1 line
+
+RhsAnalyser - TestCase_G_AttrBeforeRhsInstance passes (as well as E and F)
+------------------------------------------------------------------------
+r510 | abulka | 2012-08-16 11:51:44 +1000 (Thu, 16 Aug 2012) | 1 line
+
+RhsAnalyser - TestCase_D_MultipleAttrBeforeClassic passing.
+------------------------------------------------------------------------
+r509 | abulka | 2012-08-16 11:23:40 +1000 (Thu, 16 Aug 2012) | 1 line
+
+RhsAnalyser - TestCase_C_AttrBeforeClassic pass.
+------------------------------------------------------------------------
+r508 | abulka | 2012-08-15 18:30:43 +1000 (Wed, 15 Aug 2012) | 1 line
+
+RhsAnalyser - about to start on TestCase_C_AttrBeforeClassic and imports.
+------------------------------------------------------------------------
+r507 | abulka | 2012-08-15 17:55:49 +1000 (Wed, 15 Aug 2012) | 1 line
+
+RhsAnalyser - reworked logic yet again. TestCase_A_Classic and TestCase_B_RhsIsInstance passing.
+------------------------------------------------------------------------
+r506 | abulka | 2012-08-14 18:48:06 +1000 (Tue, 14 Aug 2012) | 1 line
+
+ast parsing/parse_rhs_analyser.py - updated tests
+------------------------------------------------------------------------
+r505 | abulka | 2012-08-14 17:54:05 +1000 (Tue, 14 Aug 2012) | 1 line
+
+ast parsing/parse_rhs_analyser - unit tests being worked on.
+------------------------------------------------------------------------
+r504 | abulka@gmail.com | 2012-08-14 00:07:23 +1000 (Tue, 14 Aug 2012) | 1 line
+
+ast parse_and_convert - breaking RhsAnalyser into separate class with own unit tests.
+------------------------------------------------------------------------
+r503 | abulka@gmail.com | 2012-08-13 22:32:51 +1000 (Mon, 13 Aug 2012) | 1 line
+
+ast parse_and_convert - organising comments
+------------------------------------------------------------------------
+r502 | abulka@gmail.com | 2012-08-13 19:04:49 +1000 (Mon, 13 Aug 2012) | 1 line
+
+ast parse_and_convert - removed erroneous check for self on rhs. Clarified comments re next steps. Brought testmodule09_intense.py under test.
+------------------------------------------------------------------------
+r501 | abulka@gmail.com | 2012-08-13 18:23:23 +1000 (Mon, 13 Aug 2012) | 1 line
+
+ast parse_and_convert - refactoring, cleaned up detect_append_or_rhs_call() logic
+------------------------------------------------------------------------
+r500 | abulka@gmail.com | 2012-08-13 18:14:32 +1000 (Mon, 13 Aug 2012) | 1 line
+
+ast parse_and_convert - handle import statements.
+------------------------------------------------------------------------
+r499 | abulka@gmail.com | 2012-08-13 00:48:03 +1000 (Mon, 13 Aug 2012) | 1 line
+
+ast parse_and_convert - improved parsing locked in on some tests, using diff technology, so we can lock in the improvements.
+------------------------------------------------------------------------
+r498 | abulka@gmail.com | 2012-08-12 23:50:11 +1000 (Sun, 12 Aug 2012) | 1 line
+
+ast parse_and_convert - added FULL syntax parsing.  Also fixed bug re class dependancies (again!) and switched to more subtle "want names's last attr" approach.  Tests pass.
+------------------------------------------------------------------------
+r497 | abulka@gmail.com | 2012-08-12 22:08:27 +1000 (Sun, 12 Aug 2012) | 1 line
+
+ast parse_and_convert - refactored RhsAnalyser class.
+------------------------------------------------------------------------
+r496 | abulka@gmail.com | 2012-08-12 21:55:24 +1000 (Sun, 12 Aug 2012) | 1 line
+
+ast parse_and_convert - extracted is_rhs_reference_to_a_class() into a member of a brand new class RhsAnalyser
+------------------------------------------------------------------------
+r495 | abulka@gmail.com | 2012-08-12 21:24:42 +1000 (Sun, 12 Aug 2012) | 6 lines
+
+ast parse_and_convert - fixed some very subtle bugs.  Ensure self.made_append_call and self.made_rhs_call are different things.
+
+An append call does not necessarily imply a rhs call was made.
+e.g. .append(blah) or .append(10) are NOT a calls on the rhs, in
+fact there is no rhs clearly defined yet except till inside the
+append(... despite it superficially looking like a function call
+------------------------------------------------------------------------
+r494 | abulka@gmail.com | 2012-08-12 15:41:35 +1000 (Sun, 12 Aug 2012) | 5 lines
+
+ast parse_and_convert - asciiworkspace.py now parses OK.  Fix to self. being on rhs viz.
+
+Make sure the rhs is a class NOT a function. Usually its a class creation call or a relaxed ref to a class (see above). Also avoid case of self being on the rhs and being considered the first rhs token
+
+  self.curr.append(" "*self.curr_width)
+------------------------------------------------------------------------
+r493 | abulka@gmail.com | 2012-08-12 15:21:10 +1000 (Sun, 12 Aug 2012) | 1 line
+
+ast parsing and conversion - testmodule 5 with nested classes now passes. Improved my temporary testing suite. Major refactor - keep function stack for class in the ClassEntry itself.
+------------------------------------------------------------------------
+r492 | abulka@gmail.com | 2012-08-12 14:03:34 +1000 (Sun, 12 Aug 2012) | 1 line
+
+ast parsing and conversion - sorting the pmodel dump_old_structure
+------------------------------------------------------------------------
+r491 | abulka@gmail.com | 2012-08-11 17:35:28 +1000 (Sat, 11 Aug 2012) | 21 lines
+
+ast parsing and conversion - got exceptions into the html ok.
+
+Current parsing results are as follows:
+
+#results.append(parse_and_convert('../../tests/python-in/testmodule08_multiple_inheritance.py')) # ast is better (base classes with .)
+#results.append(parse_and_convert('../../tests/python-in/testmodule01.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule02.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule03.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule04.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule05.py')) # ast is better (inner classes)
+#results.append(parse_and_convert('../../tests/python-in/testmodule06.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule07.py'))
+#results.append(parse_and_convert('../../tests/python-in/testmodule66.py'))
+
+#print parse_and_convert('../../src/printframework.py')
+#print parse_and_convert('../../src/pynsource.py') # ast is better (less module methods found - more correct)
+
+#print parse_and_convert('../../src/pyNsourceGui.py') # different - to investigate
+#print parse_and_convert('../../src/asciiworkspace.py') # different - to investigate
+#print parse_and_convert('../../src/command_pattern.py') # different - to investigate
+
+------------------------------------------------------------------------
+r490 | abulka@gmail.com | 2012-08-11 16:13:32 +1000 (Sat, 11 Aug 2012) | 1 line
+
+ast parsing and conversion - refactored output generation.  Still need to get it cleaner, and to get exceptions into the html.
+------------------------------------------------------------------------
+r489 | abulka@gmail.com | 2012-08-11 14:03:15 +1000 (Sat, 11 Aug 2012) | 1 line
+
+ast parsing and conversion - testmodule66.py passes.  Tricky new rules introduced relaxed_is_instance_a_known_class() to allow the more relaxed interpretation of a variable as a class instance if its got the exact same name.
+------------------------------------------------------------------------
+r488 | abulka@gmail.com | 2012-08-11 01:28:44 +1000 (Sat, 11 Aug 2012) | 1 line
+
+ast parsing and conversion - testmodule06.py and testmodule07.py now pass.
+------------------------------------------------------------------------
+r487 | abulka@gmail.com | 2012-08-11 00:18:11 +1000 (Sat, 11 Aug 2012) | 1 line
+
+ast parsing and conversion - refactorings
+------------------------------------------------------------------------
+r486 | abulka@gmail.com | 2012-08-10 23:37:45 +1000 (Fri, 10 Aug 2012) | 1 line
+
+ast parsing and conversion - refactoring flush() method.  Underlying logic starting to become apparent.
+------------------------------------------------------------------------
+r485 | abulka@gmail.com | 2012-08-10 22:36:31 +1000 (Fri, 10 Aug 2012) | 1 line
+
+ast parsing and conversion - python-in/testmodule01.py finally PASSES !
+------------------------------------------------------------------------
+r484 | abulka@gmail.com | 2012-08-10 21:49:57 +1000 (Fri, 10 Aug 2012) | 1 line
+
+ast parsing and conversion - debug html out to file
+------------------------------------------------------------------------
+r483 | abulka | 2012-08-10 18:37:38 +1000 (Fri, 10 Aug 2012) | 1 line
+
+ast parsing and conversion - html debug output in place.
+------------------------------------------------------------------------
+r482 | abulka@gmail.com | 2012-08-10 00:10:24 +1000 (Fri, 10 Aug 2012) | 1 line
+
+ast parsing and conversion - renaming
+------------------------------------------------------------------------
+r481 | abulka@gmail.com | 2012-08-09 23:59:50 +1000 (Thu, 09 Aug 2012) | 1 line
+
+ast parsing and conversion - Almost have testmodule01.py passing - have one class dependency done.  Other is hard.
+------------------------------------------------------------------------
+r480 | abulka@gmail.com | 2012-08-09 23:10:04 +1000 (Thu, 09 Aug 2012) | 1 line
+
+ast parsing and conversion - Almost have testmodule01.py passing except for class dependencies []
+------------------------------------------------------------------------
+r479 | abulka@gmail.com | 2012-08-09 22:55:20 +1000 (Thu, 09 Aug 2012) | 1 line
+
+ast parsing and conversion - bit of a breakthrough using the lhs and rhs technique.  Almost have testmodule01.py passing.
+------------------------------------------------------------------------
+r478 | abulka | 2012-08-09 18:28:34 +1000 (Thu, 09 Aug 2012) | 1 line
+
+ast parsing and conversion - parsing half my old test modules.
+------------------------------------------------------------------------
+r477 | abulka@gmail.com | 2012-08-09 08:52:59 +1000 (Thu, 09 Aug 2012) | 1 line
+
+ast parsing - got class and base classes to parse
+------------------------------------------------------------------------
+r476 | abulka@gmail.com | 2012-08-09 00:01:47 +1000 (Thu, 09 Aug 2012) | 1 line
+
+Started new parseoldnew.py module which does an ast parse and converts to old parse model.
+------------------------------------------------------------------------
+r475 | abulka@gmail.com | 2012-08-08 22:24:17 +1000 (Wed, 08 Aug 2012) | 1 line
+
+Parsing experiments - updated codegen.py from a version at https://github.com/boxed/Misc as referred to in the comments of http://eli.thegreenplace.net/2009/11/28/python-internals-working-with-python-asts/
+------------------------------------------------------------------------
+r474 | abulka | 2012-08-08 19:03:24 +1000 (Wed, 08 Aug 2012) | 1 line
+
+Parsing experiments with ast.
+------------------------------------------------------------------------
+r473 | abulka | 2012-08-08 18:10:29 +1000 (Wed, 08 Aug 2012) | 4 lines
+
+Preparing to debug multiple inheritance parsing bug, adding unit tests to catch it.
+
+Update issue 17
+Preparing to debug multiple inheritance parsing bug, adding unit tests to catch it.
+------------------------------------------------------------------------
+r472 | abulka | 2012-08-08 12:21:23 +1000 (Wed, 08 Aug 2012) | 6 lines
+
+Optimised canvas_resizer.py to reduce number of virtual canvas resizings.
+
+Update issue 5
+Optimised canvas_resizer.py to reduce number of virtual canvas resizings.
+
+Also note the use of the new whoscalling2() diagnostic which dumps the call stack in a nice way.
+------------------------------------------------------------------------
+r471 | abulka@gmail.com | 2012-08-07 23:14:43 +1000 (Tue, 07 Aug 2012) | 9 lines
+
+Turned off most debugging in canvas_resizer.py
+
+Update issue 5
+Turned off most debugging in canvas_resizer.py
+
+Still need to figure out why canvas resizing sometimes happens repeatedly during a layout. e.g.
+Setting virtual size to 970,1022
+Setting virtual size to 970,1022
+
+------------------------------------------------------------------------
+r470 | abulka@gmail.com | 2012-08-07 23:04:12 +1000 (Tue, 07 Aug 2012) | 5 lines
+
+Refactoring and cleanup of canvas_resizer.py
+
+Update issue 5
+Refactoring and cleanup of canvas_resizer.py
+Debugging info still present.
+------------------------------------------------------------------------
+r469 | abulka@gmail.com | 2012-08-07 21:54:15 +1000 (Tue, 07 Aug 2012) | 5 lines
+
+Moved canvas resizing and associated functionality into separate class in canvas_resizer.py
+
+Update issue 5
+Moved canvas resizing and associated functionality into separate class in canvas_resizer.py
+Class CanvasResizer
+------------------------------------------------------------------------
+r468 | abulka | 2012-08-07 18:33:20 +1000 (Tue, 07 Aug 2012) | 8 lines
+
+Refactored canvas virtual size resizing logic, got rid of dirty flag and now its a parameter to resize_virtual_canvas_tofit_bounds().
+
+Update issue 5
+Refactored canvas virtual size resizing logic, got rid of dirty flag and now its a parameter to resize_virtual_canvas_tofit_bounds(). Now only have
+self.allshapes_bounds_cached
+self.allshapes_bounds_last
+
+Nice debugging statements on in this version.
+------------------------------------------------------------------------
+r467 | abulka | 2012-08-07 15:37:02 +1000 (Tue, 07 Aug 2012) | 6 lines
+
+Added some caching to GetBoundsAllShapes() calculation.  Some refactoring.
+
+Update issue 5
+Added some caching to GetBoundsAllShapes() calculation.  Some refactoring.  We now use a allshapes_bounds and an allshapes_bounds_dirty flag.
+
+Also set virtualsize using SetScrollBars() call with extra parameters which avoid the flashing! :-)
+------------------------------------------------------------------------
+r466 | abulka | 2012-08-07 12:39:43 +1000 (Tue, 07 Aug 2012) | 6 lines
+
+Moved the virtual canvas resizing to a new non time based algorithm.
+
+Update issue 5
+Moved the virtual canvas resizing to a new non time based algorithm.  Basically the solution is to remember the overall shapes bounds whenever we set the virtual canvas size to = bounds.  That way we only do the painful flashy resizing operation when bounds have truly changed.  
+
+This (I think) gets us around the previously mentioned issue that virtualsize may be a temporarily stretched value, due to the frame resize stretch auto mode thing.
+------------------------------------------------------------------------
+r465 | abulka@gmail.com | 2012-08-06 23:19:51 +1000 (Mon, 06 Aug 2012) | 5 lines
+
+Switched to a time based approach to calling resize_virtual_canvas_tofit_bounds() from FRAME resize event.  Seems to work better - user experience wise.
+
+Update issue 5
+Switched to a time based approach to calling resize_virtual_canvas_tofit_bounds() from FRAME resize event.  Seems to work better - user experience wise.
+
+------------------------------------------------------------------------
+r464 | abulka@gmail.com | 2012-08-06 21:33:41 +1000 (Mon, 06 Aug 2012) | 42 lines
+
+Changed scroll to be normal scroll. CTRL scroll is not resize scale.  Scale logic now always preserves layout.  Virtualsize canvas trimming better.
+
+Update issue 5
+Changed scroll to be normal scroll. CTRL scroll is not resize scale.  Scale logic now always preserves layout.  
+
+Virtualsize canvas trimming better.  Responds to frame resizes.  Responds to node movement out of bounds.
+
+Trick is to make the canvas virtual size == bounds of all the shapes.
+You change virtual size by calling SetScrollbars()
+
+SCROLLBAR BEHAVIOUR TIP
+As you resize the frame, the canvas virtual size stays the same as what
+you set it to using SetScrollbars() - up until the point at which the
+scrollbars exhaust themselves and disappear - which means the that you
+have finally made frame == virtualsize. After which point virtual size
+auto-grows as the frame continues to grow. If you shrink the frame
+again, then virtualsize will reduce until it hits the old original value
+of virtualsize set by SetScrollbars(). If you continue to reduce the
+frame then the scrollbars appear, but the virtualsize remains the same.
+
+ALGORITHM:
+IF its a programmatic change of bounds e.g. via stateofthenation:
+    set canvas virtualsize to match bounds taking account % leeway when compacting
+ELSE is_frame_resize i.e. its a call from resize of frame event:
+    if frame > bounds then must be in virtualsize autogrow mode 
+                        and we should not attempt to alter virtualsize
+    else: set canvas virtualsize to match bounds, not taking into account any % leeway.
+
+Note: repeated calls to frame resize shouldn't be a problem because
+canvas virtualsize should == bounds after the first time its done.
+Making frame smaller won't affect bounds or canvas virtualsize. Making
+frame bigger ditto. Making frame bigger than bounds will result in
+nothing happening cos we do nothing in "autogrow mode".
+
+Rule: virtual size must be >= bounds
+
+Rule: virtual size must be no more than n% bigger than the bounds else
+virtualsize will be trimmed/compacted down. The purpose of this is to
+relax the rules and not have it so strict - after all it doesn't hurt to
+have a slightly larger workspace - better than a trim workspace
+jumping/flickering around all the time. Plus if you manually drag resize
+the frame it will trim perfectly.
+------------------------------------------------------------------------
+r463 | abulka@gmail.com | 2012-08-06 13:21:56 +1000 (Mon, 06 Aug 2012) | 4 lines
+
+Expand canvas when move shapes out of bounds.
+
+Update issue 5
+Expand canvas when move shapes out of bounds.
+------------------------------------------------------------------------
+r462 | abulka@gmail.com | 2012-08-06 11:17:43 +1000 (Mon, 06 Aug 2012) | 8 lines
+
+Fixed canvas resizing problems by ensuring word size passed in is correct during boot up phase.
+
+Update issue 5
+Fixed canvas resizing problems by ensuring word size passed in is correct during boot up phase.
+
+Delayed creation of umlwin sub objects till frame is up and running and has the right size. New method InitSizeAndObjs created which is now called when that is all done.
+
+Tip2: No need to call self.resize_virtual_canvas_tofit() every time the frame is resized since the  bounds of the shapes area doesn't change when resizing a frame, so you would end up calling it with the same values again and again.
+------------------------------------------------------------------------
+r461 | abulka@gmail.com | 2012-08-06 00:01:40 +1000 (Mon, 06 Aug 2012) | 7 lines
+
+Changing shape canvas size more accurately.
+
+Update issue 5
+Changing shape canvas size more accurately.
+Now getting a bug when zoom scale with scroll wheel to min size and then scale up again - this never happened before. Prevent by holding SHIFT down whilst scrolling or by doing layout first.
+Also need to expand canvas when move shapes out of bounds.
+Also need to handle frame resizing better.
+------------------------------------------------------------------------
+r460 | abulka@gmail.com | 2012-08-05 11:28:07 +1000 (Sun, 05 Aug 2012) | 10 lines
+
+stage2 removed.
+
+Update issue 5
+stage2 removed.  All stage2() did was overlap removal.  So a new shape canvas method remove_overlaps() created which people can call explicitly.  And then a subsequent stateofthenation can also be called explicityly.  This simplifies everything.
+
+So now we basically have
+.remove_overlaps
+.stateofthenation
+and when doing a CmdLayout or CmdFileImportBase.execute
+.layout_and_position_shapes
+------------------------------------------------------------------------
+r459 | abulka@gmail.com | 2012-08-05 10:46:49 +1000 (Sun, 05 Aug 2012) | 5 lines
+
+Created a Move2 method to inject into shape.
+
+Update issue 5
+Created a Move2 method to inject into shape.  Refactored the coord_utils.py
+stateofthenation() simplified to use Move2() followed by a .Refresh().
+------------------------------------------------------------------------
+r458 | abulka | 2012-07-31 18:46:11 +1000 (Tue, 31 Jul 2012) | 27 lines
+
+Resurrected old clear/redraw technique in my research code.
+
+Update issue 5
+Resurrected old clear/redraw technique in my research code.  Made mailing list post:
+
+On Tue, Jul 31, 2012 at 2:40 AM, Robin Dunn <robin@alldunn.com> wrote:   
+Ok, I see it too.  It's not quite expected but I'm not sure it's a bug as from some perspectives it is probably the correct thing to do... Anyway, a simple work around is to simply not call PrepareDC in that case.  Then it will always be the physical window area that is cleared.
+
+Thanks - a most fascinating workaround, which opens up all sorts of possibilities again.  Now I have a way to Clear the visible physical window area regardless of scroll.  This now means that I can rework my old code and it now works e.g.
+
+dc = wx.ClientDC(canvas)
+canvas.GetDiagram().Clear(dc)  # do not prepare the dc !!
+                
+canvas.PrepareDC(dc)
+shape.Move(dc, x, y)
+canvas.GetDiagram().Redraw(dc)
+
+which is not quite as pithy as the newer .Refresh based solution 
+
+shape.Move(dc, x, y, display=False)
+canvas.Refresh()
+
+but nevertheless is now a viable option.
+
+Yeah its curious that you must call PrepareDC before drawing operations in order to take into account scrolling offsets, but must not call PrepareDC before clearing operations.  It does seem inconsistent.
+
+But now that I think about it, it sort of makes sense.  I mean, to clear the current physical screen is a no brainer - its just sitting there in the frame all the time - from a hardware point of view. On the other hand to clear just the topmost window area that has possibly scrolled out of view - that's the thing that requires calculation, and thus which requires a call to PrepareDC - and thus you do get the clever ability to only clear that top windowful of area and if e.g. there is a slight scroll in place, the Clear will only clear a portion of the visible screen.  As to why anybody would ever want to just clear the top window-ful of a scrolled canvas - I don't know.  But I think I'm at peace with how this all works now. Thanks!
+------------------------------------------------------------------------
+r457 | abulka@gmail.com | 2012-07-29 14:27:18 +1000 (Sun, 29 Jul 2012) | 6 lines
+
+Made another demo for wxpython mailing list discussion re functionality of canvas.Clear(dc)
+
+Update issue 5
+Made another demo for wxpython mailing list discussion re functionality of canvas.Clear(dc)
+
+Ironically this discussion seems to be leading back to the topic of the original poster's subject line "dc.Clear(): is this a bug or am I doing something wrong?".  I think there may be a bug in .Clear(dc) not taking into account of the scroll, even though canvas.PrepareDC(dc) has been called.
+------------------------------------------------------------------------
+r456 | abulka@gmail.com | 2012-07-28 16:10:14 +1000 (Sat, 28 Jul 2012) | 4 lines
+
+stage2 renamed build_view
+
+Update issue 5
+stage2 renamed build_view and the needless rendering it does removed, as later stateofthenation will do it.  This makes build_view nice and clean - and it just does one thing, build a view (shapes etc) from a model.  Used by a file open and file import - which makes sense as we are building a new view from persisted or newly built model.
+------------------------------------------------------------------------
+r455 | abulka@gmail.com | 2012-07-28 15:26:01 +1000 (Sat, 28 Jul 2012) | 6 lines
+
+redraw_everything() removed.
+
+Update issue 12
+redraw_everything() removed. :-) The functions that were calling it didn't need it, they were already calling stateofthenation etc. Even the scrollbar appearance hack doesn't seem necessary anymore. 
+
+Added more accurately placed calls to the coordmapper calibration to the size of the physical screen viz. frame_calibration() and this has improved layouts on first import - a long standing bug that is diagnosed by seeing the animated layout CRUSHED in the top left corner of the screen rather than beautifully spread out.
+------------------------------------------------------------------------
+r454 | abulka@gmail.com | 2012-07-28 14:17:54 +1000 (Sat, 28 Jul 2012) | 5 lines
+
+Refactored File Import commands.
+
+Update issue 12
+Refactored File Import commands.
+Also, redraw_everything() now only called by CmdLayout, CmdRefreshUmlWindow
+------------------------------------------------------------------------
+r453 | abulka@gmail.com | 2012-07-28 13:05:36 +1000 (Sat, 28 Jul 2012) | 4 lines
+
+Refactored Cmd File persistence commands.
+
+Updated issue 5
+Refactored Cmd File persistence commands to use base classes more cleverly.
+------------------------------------------------------------------------
+r452 | abulka@gmail.com | 2012-07-28 11:47:05 +1000 (Sat, 28 Jul 2012) | 4 lines
+
+Created commands out of remaining pynsourcegui methods that call redraw_everything
+
+Update issue 12
+Created commands out of remaining pynsourcegui methods that call redraw_everything().  CmdFileImport, CmdFileImport, CmdRefreshUmlWindow.  Now the only things that calls redraw_everything() are commands.  Just trying to get organised here and reduce couplings.  Still hope to unify redraw_everything() and stateofthenation soon.
+------------------------------------------------------------------------
+r451 | abulka | 2012-07-26 18:07:03 +1000 (Thu, 26 Jul 2012) | 6 lines
+
+Various experiments confirming that .Refresh() triggers a proper clear over the virtualsize shapecanvas and then calls paint which then most likely calls Draw on everything.
+
+Update issue 5
+Various experiments confirming that .Refresh() triggers a proper clear over the virtualsize shapecanvas and then calls paint which then most likely calls Draw on everything.
+
+Also confirmed that redraw_everything() does nothing. What's really causing this to repair any smudgy redraw problems, was that a .Refresh() was indirectly generated via the frame resize scrollbar hack.
+------------------------------------------------------------------------
+r450 | abulka@gmail.com | 2012-07-26 00:13:35 +1000 (Thu, 26 Jul 2012) | 7 lines
+
+Explanation of the purpose of self.Update() # or wx.SafeYield()
+
+Update issue 5
+Re Refresh().  Tip: a Refresh() by default will erase the background before sending the paint event.
+
+Also re wx.SafeYield() or self.Update() - You need to be yielding or updating on a regular basis, so that when your OS/window manager sends repaint messages to your app, it can handle them.  http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh
+Without this call the nodes don't paint during a "L" layout (edges do!?)
+------------------------------------------------------------------------
+r449 | abulka@gmail.com | 2012-07-26 00:01:48 +1000 (Thu, 26 Jul 2012) | 10 lines
+
+Updated comments on redraw methods as my understanding grows.
+
+Update issue 5
+The current redraw breakthrough of
+
+  shape.Move(dc, x, y)  # handles shape.MoveLinks(dc) internally too
+  canvas.Refresh()     # or canvas.frame.Refresh()
+
+leaves me with an OUTSTANDING QUESTION: Why isn't an eventual shape.draw() or diagram.redraw() needed
+anymore. DOES canvas.Refresh() SOMEHOW TRIGGER AN ACTUAL DRAW?
+------------------------------------------------------------------------
+r448 | abulka@gmail.com | 2012-07-25 23:11:03 +1000 (Wed, 25 Jul 2012) | 5 lines
+
+Created standalone example for the mailing list.
+
+Update issue 5
+Created standalone example for the mailing list.
+https://groups.google.com/forum/?hl=en&fromgroups#!searchin/wxpython-users/dc.Clear():$20is$20this$20a$20bug$20or$20am$20I$20doing$20something$20wrong?/wxpython-users/X840K1bA5R4/kf29SKR5X40J
+------------------------------------------------------------------------
+r447 | abulka | 2012-07-25 18:33:42 +1000 (Wed, 25 Jul 2012) | 4 lines
+
+Ogl official demo as standalone, with my draw code injected.
+
+Update issue 5
+Ogl official demo from the big fat demo app as standalone app - with my draw code injected in a modular way.  Hit 'm' to move a shape.  Hit 'r' to refresh.  Hit '1-7' to change redraw/refresh technique.
+------------------------------------------------------------------------
+r446 | abulka | 2012-07-25 18:23:50 +1000 (Wed, 25 Jul 2012) | 1 line
+
+Renamed older ogl demos that don't run anymore in the new wx.
+------------------------------------------------------------------------
+r445 | abulka | 2012-07-25 18:20:40 +1000 (Wed, 25 Jul 2012) | 4 lines
+
+Research demos related to draw, refresh and scrolling.
+
+Update issue 5
+Research demos related to draw, refresh and scrolling. Note that ogl_redraw_f_logic.py has USEFUL comments as to various drawing techniques and their strengths and weaknesses.
+------------------------------------------------------------------------
+r444 | abulka | 2012-07-25 18:18:20 +1000 (Wed, 25 Jul 2012) | 7 lines
+
+Solves (for now) the problem, use canvas.Refresh instead of the diagram clear + redraw combo.
+
+Update issue 5
+The solution seems to be to use canvas.Refresh instead of the diagram clear + redraw combo.  The problem with
+  self.GetDiagram().Clear(dc)
+  self.GetDiagram().Redraw(dc)
+is that the clear() only clears the physical visible area and the scrolled off area still has content, so that when you scroll to it you get old rubbish there. e.g. if the shape that was moved was in the scrolled off area, you will see double - the old position and the new.
+------------------------------------------------------------------------
+r443 | abulka | 2012-07-24 18:49:50 +1000 (Tue, 24 Jul 2012) | 4 lines
+
+Trying to build repro case for scroll redraw errors and experimenting with redraw.
+
+Update issue 5
+Initial simplified repro examples.  ogl_scroll1.py demos the problem nicely.
+------------------------------------------------------------------------
+r442 | abulka@gmail.com | 2012-07-23 23:33:24 +1000 (Mon, 23 Jul 2012) | 1 line
+
+Fixed a few broken research guis and added a few comments.
+------------------------------------------------------------------------
+r441 | abulka@gmail.com | 2012-07-23 00:04:37 +1000 (Mon, 23 Jul 2012) | 1 line
+
+Cleaned up stateofthenation() and removed redraw_222()
+------------------------------------------------------------------------
+r440 | abulka@gmail.com | 2012-07-22 23:03:36 +1000 (Sun, 22 Jul 2012) | 1 line
+
+Got rid of redrawing method stateofthespring(), one down, lots to go.
+------------------------------------------------------------------------
+r439 | abulka@gmail.com | 2012-07-22 22:22:55 +1000 (Sun, 22 Jul 2012) | 4 lines
+
+Preparing to consolidate the plethora of redraw functions.
+
+Update issue 12
+Commented how the plethora of redraw functions are used (who is calling each of them) and renamed some of them.  Hoping to consolidate them soon.
+------------------------------------------------------------------------
+r438 | abulka@gmail.com | 2012-07-22 21:06:43 +1000 (Sun, 22 Jul 2012) | 1 line
+
+Moved some tests into the tests folder, as well as the "saved uml workspaces" directory.
+------------------------------------------------------------------------
+r437 | abulka@gmail.com | 2012-07-22 00:26:55 +1000 (Sun, 22 Jul 2012) | 4 lines
+
+More layout commands incl blackboard layout and its threaded window moved into commands.
+
+Update issue 12
+
+------------------------------------------------------------------------
+r436 | abulka@gmail.com | 2012-07-22 00:02:02 +1000 (Sun, 22 Jul 2012) | 4 lines
+
+Layout commands starting to be moved into command objects.
+
+Update issue 12
+Layout commands starting to be moved into command objects.  Interestingly some layout functions are being called from other commands - so the issue of commands using each other is coming up. Perhaps such commands simply use common functionality which doesn't get turned into a command.
+------------------------------------------------------------------------
+r435 | abulka@gmail.com | 2012-07-21 13:27:20 +1000 (Sat, 21 Jul 2012) | 12 lines
+
+Refactored from using observer based command invocation to a simpler CmdInvoker class.
+
+Update issue 12
+Refactored from using observer based command invocation to a simpler CmdInvoker class, which means no need for Controller to have lots of proxy functions fronting for the command classes.
+
+CmdInvoker:
+    When you call any method on an instance of this invoker class, the method is
+    interpreted as the name of a command class to be instantiated. Parameters in
+    the method call are used as paramters to the constructor. After the command
+    class is instantiated, a context object is attached, and the command passed
+    to a command manager to be run. No extra parameters are injected into the
+    constructor or to the execute() call.
+------------------------------------------------------------------------
+r434 | abulka | 2012-07-19 15:43:00 +1000 (Thu, 19 Jul 2012) | 6 lines
+
+Moved file management commands into app/cmds/filemgmt.py
+
+Update issue 12
+Converted file management commands into command objects in app/cmds/filemgmt.py
+Having the controller.py route all these calls is getting tedious.  And creating commands with special initialisers is also a bit tedious.
+
+------------------------------------------------------------------------
+r433 | abulka@gmail.com | 2012-07-18 22:49:52 +1000 (Wed, 18 Jul 2012) | 18 lines
+
+Moved ConvertParseModelToUmlModel() method to model class UmlWorkspace
+
+Update issue 12
+Created model package and moved class UmlWorkspace in there.  As well as refactoring to give it the method ConvertParseModelToUmlModel() which should always have been in there anyway.
+
+Note: before we start mapping to wx shapes, it seems we have the 
+ * 'ParseModel' the parse model (our original model created by the command line tool pynsource)
+ * 'UmlModel' the UmlWorkspace  model (more advanced model, subsumes the old model)
+the latter contains lots of juicy info e.g. 
+ * dict of classname => shape entries  # self.classnametoshape = {}
+ * list of (classname, parentclassname) tuples  # self.associations_generalisation = []
+ * list of (rhs, lhs) tuples  # self.associations_composition = []
+ * UmlGraph()   # self.graph
+and the graph is full of GraphNode objects, and associations, which are ultimately what we layout.
+
+- arguably the dict of classname => shape entries is a rendering related mapping which shouldn't be here?
+
+- I think we need the association mappings because the graph object we use only has simple associations not the level of detail we need.  Perhaps re-examing this and rely only on a      beefed up graph class instead - in order to simplify things?
+------------------------------------------------------------------------
+r432 | abulka@gmail.com | 2012-07-18 22:18:48 +1000 (Wed, 18 Jul 2012) | 4 lines
+
+cmd diagnostics.py created for dumping out info.
+
+Update issue 12
+Decided to keep local dump diagnostics in the relevant module e.g. umlworkspace (which is the model) has a .Dump() methods, as does self.context.coordmapper.DumpCalibrationInfo etc.  Only the master CmdDumpUmlWorkspace (as called by self.observers.CMD_DUMP_UML_WORKSPACE()) is a cmd.
+------------------------------------------------------------------------
+r431 | abulka@gmail.com | 2012-07-16 23:33:43 +1000 (Mon, 16 Jul 2012) | 1 line
+
+Removed lots of commented out code.
+------------------------------------------------------------------------
+r430 | abulka@gmail.com | 2012-07-16 23:11:52 +1000 (Mon, 16 Jul 2012) | 4 lines
+
+More refactoring. Fixed bug in CmdEditClass where shape was left on canvas causing duplication.
+
+Update issue 12
+CMD_DESELECT_ALL_SHAPES implemented.
+------------------------------------------------------------------------
+r429 | abulka@gmail.com | 2012-07-16 14:21:38 +1000 (Mon, 16 Jul 2012) | 4 lines
+
+Node Shape deletion refactored to use a command.  Goodbye CmdZapShape.
+
+Update issue 12
+Cleaned up Node Shape deletion - made clear the separation between model and view a bit more.  Shapes is a view model element and points to a node model element via the umlworkspace model mapping dictionary.
+------------------------------------------------------------------------
+r428 | abulka@gmail.com | 2012-07-16 12:55:40 +1000 (Mon, 16 Jul 2012) | 4 lines
+
+Fixed OnLeftDoubleClick() and NodeProperties() - introduced beginnings of hexmvc architecture.
+
+Update issue 12
+Introduced beginnings of hexmvc architecture incl. event notification.  App and Controller classes created.  Also a Context class created which holds refs to all important objects.
+------------------------------------------------------------------------
+r427 | abulka@gmail.com | 2012-07-16 00:35:34 +1000 (Mon, 16 Jul 2012) | 4 lines
+
+Refactored edit node properties. Double click on node in broken state.  Created nice UML of current classes to help me think this through.
+
+Update issue 12
+Created nice UML of current classes to help me think this through.
+------------------------------------------------------------------------
+r426 | abulka@gmail.com | 2012-07-15 19:23:13 +1000 (Sun, 15 Jul 2012) | 4 lines
+
+Added more insertion commands.
+
+Update issue 12.
+More insertion commands created - these still delegate out to other methods which are command like, thus the next step is to remove those methods and use the command objects soley.
+------------------------------------------------------------------------
+r425 | abulka@gmail.com | 2012-07-15 18:53:52 +1000 (Sun, 15 Jul 2012) | 4 lines
+
+Finally figured out how to use packages a bit more.
+
+Update issue 12
+For more info on using packages see the addendum to my python course notes at https://docs.google.com/document/d/1qDkta2lJ8f1v542Lfwtm-zWJDvG5OtOr6Z3hcYgI54s/edit and possibly the stackoverflow article http://stackoverflow.com/questions/448271/what-is-init-py-for 
+------------------------------------------------------------------------
+r424 | abulka@gmail.com | 2012-07-15 13:38:45 +1000 (Sun, 15 Jul 2012) | 1 line
+
+Update issue 012.
+------------------------------------------------------------------------
+r423 | abulka@gmail.com | 2012-07-15 13:36:34 +1000 (Sun, 15 Jul 2012) | 1 line
+
+Removed wrong comment. Update issue 12.
+------------------------------------------------------------------------
+r422 | abulka@gmail.com | 2012-07-15 13:33:20 +1000 (Sun, 15 Jul 2012) | 2 lines
+
+Moved redo into base_cmd.py
+Update issue 12.
+------------------------------------------------------------------------
+r421 | abulka@gmail.com | 2012-07-15 13:25:38 +1000 (Sun, 15 Jul 2012) | 2 lines
+
+Starting to pull out deletion and insertion commands.
+Still early days. Issue 12.
+------------------------------------------------------------------------
+r420 | abulka@gmail.com | 2012-07-15 12:25:39 +1000 (Sun, 15 Jul 2012) | 2 lines
+
+Moved bugs into google code issue tracker.
+From todo.txt and also from sourceforge trac.
+------------------------------------------------------------------------
+r419 | abulka@gmail.com | 2012-07-14 13:02:35 +1000 (Sat, 14 Jul 2012) | 2 lines
+
+Added command pattern module.
+Yet to be integrated or used.
+------------------------------------------------------------------------
+r418 | abulka@gmail.com | 2012-07-13 23:19:32 +1000 (Fri, 13 Jul 2012) | 1 line
+
+Began big split of pyNsourceGui.py into smaller files in the gui package.
+------------------------------------------------------------------------
+r415 | abulka | 2012-07-12 16:02:08 +1000 (Thu, 12 Jul 2012) | 2 lines
+
+Migration script. 
+Added back the tags, branches and wiki folders.
+------------------------------------------------------------------------
+r414 | abulka | 2012-07-12 15:57:44 +1000 (Thu, 12 Jul 2012) | 1 line
+
+removed pynsource at one level and pynsource at the lower level - renamed src.
+------------------------------------------------------------------------
+r413 | abulka | 2012-07-12 15:41:53 +1000 (Thu, 12 Jul 2012) | 2 lines
+
+FIRST GOOGLE CODE version.
+Moved trunk into proper location.
+------------------------------------------------------------------------
+r412 | abulka | 2012-07-05 23:17:31 +1000 (Thu, 05 Jul 2012) | 1 line
+
+starting to prepare for 1.6 release.  why is setup.py missing from pynsource/pynsource dir?
+------------------------------------------------------------------------
+r411 | abulka | 2012-06-25 22:58:01 +1000 (Mon, 25 Jun 2012) | 1 line
+
+Tracking down redraw when scrolled problem.  Draw methods are a mess - need to clean them up.
+------------------------------------------------------------------------
+r410 | abulka | 2012-06-25 15:05:25 +1000 (Mon, 25 Jun 2012) | 1 line
+
+Background blackboard layout now perfect. Interruptable, onClose() handled ok. Tuned.
+------------------------------------------------------------------------
+r409 | abulka | 2012-06-25 13:09:11 +1000 (Mon, 25 Jun 2012) | 1 line
+
+Added better deeplayout dialog box.  Auto hides.
+------------------------------------------------------------------------
+r408 | abulka | 2012-06-25 10:58:18 +1000 (Mon, 25 Jun 2012) | 1 line
+
+Fixed background layout bugs.  now can interrupt large layout.
+------------------------------------------------------------------------
+r407 | abulka | 2012-06-19 08:54:02 +1000 (Tue, 19 Jun 2012) | 1 line
+
+Attempt at interruptable blackboard layout.  Not properly working.
+------------------------------------------------------------------------
+r406 | abulka | 2012-06-18 21:06:27 +1000 (Mon, 18 Jun 2012) | 1 line
+
+added ESC to interrupt layout.  now need to do the same with blackboard layout.
+------------------------------------------------------------------------
+r405 | abulka | 2012-05-17 18:14:49 +1000 (Thu, 17 May 2012) | 1 line
+
+multicast.py extracted to better named file with less comments.
+------------------------------------------------------------------------
+r404 | abulka | 2012-04-03 17:02:53 +1000 (Tue, 03 Apr 2012) | 1 line
+
+hexmvc - updates ea diagram
+------------------------------------------------------------------------
+r403 | abulka | 2012-04-02 12:03:36 +1000 (Mon, 02 Apr 2012) | 1 line
+
+hexmvc - make dotnet project user specific config
+------------------------------------------------------------------------
+r402 | abulka | 2012-03-23 17:59:13 +1100 (Fri, 23 Mar 2012) | 1 line
+
+hexmvc - fixed linux thread crashes via mutex
+------------------------------------------------------------------------
+r401 | abulka | 2012-03-23 16:22:46 +1100 (Fri, 23 Mar 2012) | 1 line
+
+hexmvc - abstracted the mutex stuff a bit
+------------------------------------------------------------------------
+r400 | abulka | 2012-03-21 22:42:46 +1100 (Wed, 21 Mar 2012) | 1 line
+
+hexmvc - linux compat for post/put/delete REST via server
+------------------------------------------------------------------------
+r399 | abulka | 2012-03-21 18:49:54 +1100 (Wed, 21 Mar 2012) | 1 line
+
+hexmvc - trying to get json in the request rather than form format
+------------------------------------------------------------------------
+r398 | abulka | 2012-03-21 15:21:36 +1100 (Wed, 21 Mar 2012) | 1 line
+
+hexmvc - form drives rest api nicely
+------------------------------------------------------------------------
+r397 | abulka | 2012-03-20 18:31:10 +1100 (Tue, 20 Mar 2012) | 1 line
+
+hexmvc REST calls all implemented.
+------------------------------------------------------------------------
+r396 | abulka | 2012-03-15 18:56:35 +1100 (Thu, 15 Mar 2012) | 1 line
+
+hexmvc - dotnet json server started
+------------------------------------------------------------------------
+r395 | abulka | 2012-03-15 10:56:25 +1100 (Thu, 15 Mar 2012) | 1 line
+
+hexmvc - uml project ea
+------------------------------------------------------------------------
+r394 | abulka | 2012-03-14 18:41:43 +1100 (Wed, 14 Mar 2012) | 1 line
+
+hexmvc - two REST methods implemented incl. model.FindThing
+------------------------------------------------------------------------
+r393 | abulka | 2012-03-14 15:56:47 +1100 (Wed, 14 Mar 2012) | 1 line
+
+hexmvc - mock server now usable by regular python version.
+------------------------------------------------------------------------
+r392 | abulka | 2012-03-14 15:48:25 +1100 (Wed, 14 Mar 2012) | 1 line
+
+hexmvc - mock server updated
+------------------------------------------------------------------------
+r391 | abulka | 2012-03-14 15:24:10 +1100 (Wed, 14 Mar 2012) | 1 line
+
+hexmvc - python location in config. random now adapted.
+------------------------------------------------------------------------
+r390 | abulka | 2012-03-13 18:40:37 +1100 (Tue, 13 Mar 2012) | 1 line
+
+hexmvc - added id for oo model, for later REST use.  extracted random as injectable function.  todo: path to python26 or python27 should be a config.
+------------------------------------------------------------------------
+r389 | abulka | 2012-03-13 00:11:32 +1100 (Tue, 13 Mar 2012) | 1 line
+
+hexmvc - REST api design
+------------------------------------------------------------------------
+r388 | abulka | 2012-03-11 18:45:53 +1100 (Sun, 11 Mar 2012) | 1 line
+
+hexmvc addthing/ url now works for dotnet version.
+------------------------------------------------------------------------
+r387 | abulka | 2012-03-11 13:00:11 +1100 (Sun, 11 Mar 2012) | 1 line
+
+hexmvc now can add things via web interface
+------------------------------------------------------------------------
+r386 | abulka | 2012-03-08 17:08:24 +1100 (Thu, 08 Mar 2012) | 1 line
+
+hexmvc - server now runs in background thread for dot net version too.
+------------------------------------------------------------------------
+r385 | abulka | 2012-03-07 23:10:53 +1100 (Wed, 07 Mar 2012) | 1 line
+
+hexmvc - hooked up real server but need to sort out background threading so that main form doesn't lock up.
+------------------------------------------------------------------------
+r384 | abulka | 2012-03-07 22:14:17 +1100 (Wed, 07 Mar 2012) | 1 line
+
+hexmvc.  Added server adapter code.  Renamed main form.
+------------------------------------------------------------------------
+r383 | abulka | 2012-02-28 00:07:28 +1100 (Tue, 28 Feb 2012) | 1 line
+
+hexmvc - struggling with ironpython listboxes in .net
+------------------------------------------------------------------------
+r382 | abulka | 2012-02-27 21:39:10 +1100 (Mon, 27 Feb 2012) | 1 line
+
+hexmvc - dotnet gui built.  Button to addthings starting to work.
+------------------------------------------------------------------------
+r381 | abulka | 2012-02-27 15:23:05 +1100 (Mon, 27 Feb 2012) | 1 line
+
+hexmvc - Starting to incorporate dotNet gui
+------------------------------------------------------------------------
+r380 | abulka | 2012-02-26 23:34:43 +1100 (Sun, 26 Feb 2012) | 1 line
+
+Don't load initial thing unless model is empty.
+------------------------------------------------------------------------
+r379 | abulka | 2012-02-26 21:59:29 +1100 (Sun, 26 Feb 2012) | 1 line
+
+Did some work and documentation on the relationship between model and persistence, and the modeladapter.
+------------------------------------------------------------------------
+r378 | abulka | 2012-02-25 15:33:22 +1100 (Sat, 25 Feb 2012) | 1 line
+
+hexmvc - playing around with switching in difference persistence mechanisms
+------------------------------------------------------------------------
+r377 | abulka | 2012-02-23 23:32:10 +1100 (Thu, 23 Feb 2012) | 1 line
+
+Updated hexmvc notes
+------------------------------------------------------------------------
+r376 | abulka | 2012-02-23 22:43:51 +1100 (Thu, 23 Feb 2012) | 1 line
+
+n/a
+------------------------------------------------------------------------
+r375 | abulka | 2012-02-23 22:40:04 +1100 (Thu, 23 Feb 2012) | 1 line
+
+Renamed puremv to Adapter style hexmvc - radical!
+------------------------------------------------------------------------
+r374 | abulka | 2012-02-23 22:14:13 +1100 (Thu, 23 Feb 2012) | 1 line
+
+Split architecture 2 into multiple files.  Runs.
+------------------------------------------------------------------------
+r373 | abulka | 2012-02-23 21:57:37 +1100 (Thu, 23 Feb 2012) | 1 line
+
+fixed typo
+------------------------------------------------------------------------
+r372 | abulka | 2012-02-23 18:31:37 +1100 (Thu, 23 Feb 2012) | 1 line
+
+reorg
+------------------------------------------------------------------------
+r371 | abulka | 2012-02-23 18:29:08 +1100 (Thu, 23 Feb 2012) | 1 line
+
+reorg
+------------------------------------------------------------------------
+r370 | abulka | 2012-02-23 18:15:50 +1100 (Thu, 23 Feb 2012) | 1 line
+
+reorg
+------------------------------------------------------------------------
+r369 | abulka | 2012-02-23 18:02:48 +1100 (Thu, 23 Feb 2012) | 1 line
+
+about to reorg hexmvc directory
+------------------------------------------------------------------------
+r368 | abulka | 2012-02-23 12:39:11 +1100 (Thu, 23 Feb 2012) | 1 line
+
+rebuilt form
+------------------------------------------------------------------------
+r367 | abulka | 2012-02-22 23:41:01 +1100 (Wed, 22 Feb 2012) | 1 line
+
+Starting to move sqlobject initialisation code into the proxy object... still more to do.
+------------------------------------------------------------------------
+r366 | abulka | 2012-02-22 23:18:16 +1100 (Wed, 22 Feb 2012) | 1 line
+
+Fixed delete bug.  Added different model proxy for simple vs. sqlobject models.
+------------------------------------------------------------------------
+r365 | abulka | 2012-02-22 18:33:43 +1100 (Wed, 22 Feb 2012) | 1 line
+
+Added sqlobject model and swapped it in - same ModelProxy.
+------------------------------------------------------------------------
+r364 | abulka | 2012-02-22 00:03:57 +1100 (Wed, 22 Feb 2012) | 1 line
+
+Created a proper modelproxy.
+------------------------------------------------------------------------
+r363 | abulka | 2012-02-21 23:12:04 +1100 (Tue, 21 Feb 2012) | 1 line
+
+Delete thing command added.
+------------------------------------------------------------------------
+r362 | abulka | 2012-02-21 00:13:26 +1100 (Tue, 21 Feb 2012) | 1 line
+
+architecture2.py - MUCH more streamlined working out of ideas.  Transplanting functionality from hexagon 3 and merging in the deep work from puremvcminimalwx2_as_hexmvc
+------------------------------------------------------------------------
+r361 | abulka | 2012-02-20 18:32:26 +1100 (Mon, 20 Feb 2012) | 1 line
+
+Refactored and clarified hexmvc/puremvcminimalwx2_as_hexmvc.py
+------------------------------------------------------------------------
+r360 | abulka | 2012-02-20 14:17:49 +1100 (Mon, 20 Feb 2012) | 5 lines
+
+PureMVC minimalist wxpython example - Converted to HexMVC
+
+Replacing hard to follow pure mvc home-grown eventing with simple multicast
+calling of methods on objects. All objects/subsystems are injected hexagonal
+style, and adhere to abstract interfaces for swappability.
+------------------------------------------------------------------------
+r359 | abulka | 2012-02-20 00:57:12 +1100 (Mon, 20 Feb 2012) | 1 line
+
+Rejigging Hexmvc to use interfaces and multicast eventing.
+------------------------------------------------------------------------
+r358 | abulka | 2012-02-16 00:12:28 +1100 (Thu, 16 Feb 2012) | 1 line
+
+Slowly updating the master windows build batch file to 1.6
+------------------------------------------------------------------------
+r357 | abulka | 2012-02-15 23:55:19 +1100 (Wed, 15 Feb 2012) | 1 line
+
+enhanced mac build script
+------------------------------------------------------------------------
+r356 | abulka | 2012-02-15 18:38:25 +1100 (Wed, 15 Feb 2012) | 1 line
+
+Created windows build script using bb-freeze tool/egg. 
+------------------------------------------------------------------------
+r355 | abulka | 2012-02-15 18:36:14 +1100 (Wed, 15 Feb 2012) | 1 line
+
+updated mac build script
+------------------------------------------------------------------------
+r354 | abulka | 2012-02-15 17:57:22 +1100 (Wed, 15 Feb 2012) | 1 line
+
+mac build script created
+------------------------------------------------------------------------
+r353 | abulka | 2012-01-28 18:12:34 +1100 (Sat, 28 Jan 2012) | 1 line
+
+Image node improvements incl. reset image size.
+------------------------------------------------------------------------
+r352 | abulka | 2012-01-12 11:16:19 +1100 (Thu, 12 Jan 2012) | 1 line
+
+Overview of HexMVC doco
+------------------------------------------------------------------------
+r351 | abulka | 2011-12-24 18:51:01 +1100 (Sat, 24 Dec 2011) | 1 line
+
+Created a resizable image shape.
+------------------------------------------------------------------------
+r350 | abulka | 2011-12-23 00:11:55 +1100 (Fri, 23 Dec 2011) | 1 line
+
+Initial attempt at adding image nodes and comment nodes.
+------------------------------------------------------------------------
+r349 | abulka | 2011-12-20 12:18:05 +1100 (Tue, 20 Dec 2011) | 1 line
+
+Fixed ascii uml tab focus issues.
+------------------------------------------------------------------------
+r348 | abulka | 2011-12-20 00:04:15 +1100 (Tue, 20 Dec 2011) | 1 line
+
+Seem to have fixed weird coord bugs - mainly it was the bootstrap not allowing the frame to size and thus set the calibration of the world coordmapper.
+------------------------------------------------------------------------
+r347 | abulka | 2011-12-19 08:59:46 +1100 (Mon, 19 Dec 2011) | 5 lines
+
+Trying to figure out why getting coord values outside the range -10 to 10
+Got diverted into checking the symmetry of world/layout coord conversions thinking this might be the cause.
+What is the range of the in accuracy - perhaps it is acceptable?
+What is causing the truly wild values ??
+If we accept a slightly larger basic acceptable range eg -20 to 20 hen we may be able to find the wild values rather than being fixated on the smaller inaccuracies.
+------------------------------------------------------------------------
+r346 | abulka | 2011-12-18 19:36:04 +1100 (Sun, 18 Dec 2011) | 1 line
+
+Fixed numerous scroll/recalibration/resize frame issues.  Lots still remaining.
+------------------------------------------------------------------------
+r345 | abulka | 2011-12-17 23:29:07 +1100 (Sat, 17 Dec 2011) | 1 line
+
+added ascii zoom.
+------------------------------------------------------------------------
+r344 | abulka | 2011-12-17 22:07:17 +1100 (Sat, 17 Dec 2011) | 1 line
+
+Improved Dump() of models.
+------------------------------------------------------------------------
+r343 | abulka | 2011-12-17 13:51:27 +1100 (Sat, 17 Dec 2011) | 1 line
+
+select all in ascii view now works via keyboard shortcut.
+------------------------------------------------------------------------
+r342 | abulka | 2011-12-17 13:21:54 +1100 (Sat, 17 Dec 2011) | 1 line
+
+Edit properties menu item added.  Disable/Enable menu items properly.
+------------------------------------------------------------------------
+r341 | abulka | 2011-12-17 12:30:11 +1100 (Sat, 17 Dec 2011) | 1 line
+
+info on http://pyidea.svn.sourceforge.net/svnroot/pyidea/pynsource/trunk/ location
+------------------------------------------------------------------------
+r340 | abulka | 2011-12-11 22:35:13 +1100 (Sun, 11 Dec 2011) | 1 line
+
+Extracted yuml gui into its own app.
+------------------------------------------------------------------------
+r339 | abulka | 2011-12-11 13:48:00 +1100 (Sun, 11 Dec 2011) | 1 line
+
+Disabled yUml tab
+------------------------------------------------------------------------
+r338 | abulka | 2011-12-11 13:09:04 +1100 (Sun, 11 Dec 2011) | 1 line
+
+Moved ascii layout to its own module.
+------------------------------------------------------------------------
+r337 | abulka | 2011-12-11 13:00:36 +1100 (Sun, 11 Dec 2011) | 1 line
+
+Refactoring.
+------------------------------------------------------------------------
+r336 | abulka | 2011-12-11 12:45:33 +1100 (Sun, 11 Dec 2011) | 1 line
+
+ascii layout - Siblings now prioritised by height
+------------------------------------------------------------------------
+r335 | abulka | 2011-12-11 00:56:58 +1100 (Sun, 11 Dec 2011) | 1 line
+
+improced formatting of ascii - put back width repair of parent if fc is wider.  Added extra long generalisation lines if megarow is expanded in height by subsequent siblings.
+------------------------------------------------------------------------
+r334 | abulka | 2011-12-08 23:37:13 +1100 (Thu, 08 Dec 2011) | 1 line
+
+draw extra line to match the 'tab' case where parents are listed, so that child nodes line up horizontally
+------------------------------------------------------------------------
+r333 | abulka | 2011-12-08 23:16:29 +1100 (Thu, 08 Dec 2011) | 1 line
+
+Massive rethink of ascii layout annotation system.  Behaves much better now.
+------------------------------------------------------------------------
+r332 | abulka | 2011-12-08 18:33:32 +1100 (Thu, 08 Dec 2011) | 1 line
+
+annotating node list with format cmds needs logic revision.
+------------------------------------------------------------------------
+r331 | abulka | 2011-12-08 18:17:16 +1100 (Thu, 08 Dec 2011) | 1 line
+
+Refactoring.
+------------------------------------------------------------------------
+r330 | abulka | 2011-12-08 17:55:39 +1100 (Thu, 08 Dec 2011) | 1 line
+
+Duplicate removal enforced at a few places 1) parsing in persisited graph files 2) converting from dodgy parse model into uml workspace model. 3) building temporary parent/child relationship between nodes for ascii out purposes.
+------------------------------------------------------------------------
+r329 | abulka | 2011-12-07 23:54:04 +1100 (Wed, 07 Dec 2011) | 1 line
+
+Ascii Uml Formatting improved.  Noticing duplicate associations in various models, probably caused by parser - added some harsh asserts - need to trace the cause of duplicates.
+------------------------------------------------------------------------
+r328 | abulka | 2011-12-07 22:58:49 +1100 (Wed, 07 Dec 2011) | 1 line
+
+EnsureRootAsWideAsChild - more aesthetic
+------------------------------------------------------------------------
+r327 | abulka | 2011-12-07 22:36:26 +1100 (Wed, 07 Dec 2011) | 1 line
+
+Ascii uml starting to look good.  Keeping parent/child info in graph for the moment...
+------------------------------------------------------------------------
+r326 | abulka | 2011-12-07 18:59:55 +1100 (Wed, 07 Dec 2011) | 1 line
+
+Improved asciiworkspace and initial integration into pyNsourceGui
+------------------------------------------------------------------------
+r325 | abulka | 2011-12-06 23:51:42 +1100 (Tue, 06 Dec 2011) | 1 line
+
+Refactored.
+------------------------------------------------------------------------
+r324 | abulka | 2011-12-06 23:41:29 +1100 (Tue, 06 Dec 2011) | 1 line
+
+Initial asciiworkspace.
+------------------------------------------------------------------------
+r323 | abulka | 2011-12-06 22:43:39 +1100 (Tue, 06 Dec 2011) | 1 line
+
+Refactored nodes_sorted_by_generalisation
+------------------------------------------------------------------------
+r322 | abulka | 2011-12-06 22:37:20 +1100 (Tue, 06 Dec 2011) | 1 line
+
+Added some TODO thoughts.
+------------------------------------------------------------------------
+r321 | abulka | 2011-12-06 22:34:31 +1100 (Tue, 06 Dec 2011) | 1 line
+
+Added graph nodes_sorted_by_generalisation property.  Pretty complex logic to figure out best order of nodes for drawing ascii.
+------------------------------------------------------------------------
+r320 | abulka | 2011-12-06 00:10:07 +1100 (Tue, 06 Dec 2011) | 1 line
+
+Prettier ascii output.
+------------------------------------------------------------------------
+r319 | abulka | 2011-12-05 23:20:57 +1100 (Mon, 05 Dec 2011) | 1 line
+
+Ascii visualisation algorithm working.
+------------------------------------------------------------------------
+r318 | abulka | 2011-12-04 22:41:21 +1100 (Sun, 04 Dec 2011) | 1 line
+
+Beginning model to ascii conversion afresh - not from parse model but from uml workspace model.  Or from graph model, rather.  Geez - so many models!
+------------------------------------------------------------------------
+r317 | abulka | 2011-12-04 21:34:03 +1100 (Sun, 04 Dec 2011) | 1 line
+
+Draw Line between classes exposed on r.click node gui popup menu.
+------------------------------------------------------------------------
+r316 | abulka | 2011-12-04 21:12:30 +1100 (Sun, 04 Dec 2011) | 1 line
+
+Incorporate Insert new class into the menu and popup menu system.
+------------------------------------------------------------------------
+r315 | abulka | 2011-12-04 18:56:56 +1100 (Sun, 04 Dec 2011) | 1 line
+
+node r.click menu now works again.  node properties hooked up.
+------------------------------------------------------------------------
+r314 | abulka | 2011-12-01 00:17:09 +1100 (Thu, 01 Dec 2011) | 2 lines
+
+node edit has ENTER close the dialog - faster for inserting nodes
+overlap removal now more prevalent - when add new nodes and when drag existing nodes.
+------------------------------------------------------------------------
+r313 | abulka | 2011-11-30 23:06:13 +1100 (Wed, 30 Nov 2011) | 1 line
+
+Edit Node via double click now brings up proper dialog.
+------------------------------------------------------------------------
+r312 | abulka | 2011-11-29 19:42:12 +1100 (Tue, 29 Nov 2011) | 1 line
+
+Rudimentary node editing.
+------------------------------------------------------------------------
+r310 | abulka | 2011-11-28 23:20:02 +1100 (Mon, 28 Nov 2011) | 1 line
+
+n/a
+------------------------------------------------------------------------
+r309 | abulka | 2011-11-28 23:16:51 +1100 (Mon, 28 Nov 2011) | 2 lines
+
+Insert new node dialog added.  Yey.
+Used wxFormBuilder to design it.
+------------------------------------------------------------------------
+r308 | abulka | 2011-11-27 22:22:54 +1100 (Sun, 27 Nov 2011) | 1 line
+
+Improved About box.
+------------------------------------------------------------------------
+r307 | abulka | 2011-11-27 19:25:31 +1100 (Sun, 27 Nov 2011) | 2 lines
+
+Ins now inserts UML node with some default method/attr values.  Need to create better gui for this.
+Edge type is still nothing - need to at least specify SOME edge type or my uml persistence doesn't like it.
+------------------------------------------------------------------------
+r306 | abulka | 2011-11-27 00:52:06 +1100 (Sun, 27 Nov 2011) | 1 line
+
+Added config file to remember last file open dialog locations.
+------------------------------------------------------------------------
+r305 | abulka | 2011-11-26 19:01:05 +1100 (Sat, 26 Nov 2011) | 1 line
+
+Made submenu for snapshots.  Reorganised File menu to be more standard.  Remember last file import directory.
+------------------------------------------------------------------------
+r304 | abulka | 2011-11-26 18:59:15 +1100 (Sat, 26 Nov 2011) | 1 line
+
+n/a
+------------------------------------------------------------------------
+r303 | abulka | 2011-11-26 17:48:51 +1100 (Sat, 26 Nov 2011) | 2 lines
+
+Fixed bug if try to expand layout spacing immediately after a LoadGraph.
+Now on load, we set layout coords to be in sync with world coords, so that if expand scale things will work.
+------------------------------------------------------------------------
+r302 | abulka | 2011-11-26 13:42:45 +1100 (Sat, 26 Nov 2011) | 1 line
+
+Hooked mouse wheel to expand and contract workspace
+------------------------------------------------------------------------
+r301 | abulka | 2011-11-26 00:36:15 +1100 (Sat, 26 Nov 2011) | 1 line
+
+Exposed some more layout commands onto the menu bar.
+------------------------------------------------------------------------
+r300 | abulka | 2011-11-25 23:32:12 +1100 (Fri, 25 Nov 2011) | 1 line
+
+generate code functionality moved to a package.
+------------------------------------------------------------------------
+r299 | abulka | 2011-11-25 23:30:14 +1100 (Fri, 25 Nov 2011) | 1 line
+
+partial - generate code functionality about to move to a package.
+------------------------------------------------------------------------
+r298 | abulka | 2011-11-25 23:11:42 +1100 (Fri, 25 Nov 2011) | 1 line
+
+moved old basic layout into layout package - even though its not being used anymore
+------------------------------------------------------------------------
+r297 | abulka | 2011-11-25 22:55:42 +1100 (Fri, 25 Nov 2011) | 1 line
+
+Repaired tests - now work with layout package.
+------------------------------------------------------------------------
+r296 | abulka | 2011-11-25 18:26:38 +1100 (Fri, 25 Nov 2011) | 2 lines
+
+Moved experimental layout code into a proper package - pynsourceGui works OK, layout force spring/gui.py also works OK
+Layout tests still need to be adjusted.
+------------------------------------------------------------------------
+r295 | abulka | 2011-11-25 18:20:32 +1100 (Fri, 25 Nov 2011) | 1 line
+
+About to move experimental layout code into a proper package.
+------------------------------------------------------------------------
+r284 | abulka | 2011-11-07 17:49:02 +1100 (Mon, 07 Nov 2011) | 1 line
+
+epydoc project and commands - starting point for these - not very path friendly at the moment.
+------------------------------------------------------------------------
+r283 | abulka | 2011-10-25 19:46:16 +1100 (Tue, 25 Oct 2011) | 1 line
+
+Attempt to initialise hexmvc db if not initialised. #1
+------------------------------------------------------------------------
+r282 | abulka | 2011-10-25 17:31:45 +1100 (Tue, 25 Oct 2011) | 1 line
+
+Also remove and ignore hexpersistence_sqlobject.db which can also be recreated at any time.
+------------------------------------------------------------------------
+r281 | abulka | 2011-08-21 14:06:02 +1000 (Sun, 21 Aug 2011) | 1 line
+
+remove hexmodel_sqlobject.db database which is always changing anyway.
+------------------------------------------------------------------------
+r280 | abulka | 2011-08-21 14:03:28 +1000 (Sun, 21 Aug 2011) | 2 lines
+
+batch file to run research guis
+
+------------------------------------------------------------------------
+r279 | abulka | 2011-07-08 18:30:43 +1000 (Fri, 08 Jul 2011) | 1 line
+
+Added Flask web framework test.
+------------------------------------------------------------------------
+r278 | abulka | 2011-06-15 23:42:36 +1000 (Wed, 15 Jun 2011) | 1 line
+
+Made model injectable instead of persistence, swappable models work!
+------------------------------------------------------------------------
+r277 | abulka | 2011-06-15 22:14:58 +1000 (Wed, 15 Jun 2011) | 1 line
+
+sqlobject version of model works as standalone - experimenting with various connection techniques
+------------------------------------------------------------------------
+r276 | abulka | 2011-06-15 18:26:46 +1000 (Wed, 15 Jun 2011) | 1 line
+
+playing with alternative persistence for model
+------------------------------------------------------------------------
+r275 | abulka | 2011-06-14 22:59:02 +1000 (Tue, 14 Jun 2011) | 1 line
+
+AddInfoToThing plus notifications added
+------------------------------------------------------------------------
+r274 | abulka | 2011-06-14 22:00:33 +1000 (Tue, 14 Jun 2011) | 1 line
+
+File New and File Load gui notifications added
+------------------------------------------------------------------------
+r273 | abulka | 2011-06-13 23:25:13 +1000 (Mon, 13 Jun 2011) | 1 line
+
+Notify gui of add/delete of things.
+------------------------------------------------------------------------
+r272 | abulka | 2011-06-07 23:12:43 +1000 (Tue, 07 Jun 2011) | 2 lines
+
+Made host and port configurable.
+Added urls to gui for easy launching of browser.
+------------------------------------------------------------------------
+r271 | abulka | 2011-06-07 18:36:41 +1000 (Tue, 07 Jun 2011) | 1 line
+
+slightly less port dependent
+------------------------------------------------------------------------
+r270 | abulka | 2011-06-06 23:56:40 +1000 (Mon, 06 Jun 2011) | 1 line
+
+finally achieved hexmvc with all wiring/injection done in hexagon2.py
+------------------------------------------------------------------------
+r269 | abulka | 2011-06-06 23:06:50 +1000 (Mon, 06 Jun 2011) | 2 lines
+
+gui injected too, boot from hexagon2.py
+server started from boot code using wx.CallAfter()
+------------------------------------------------------------------------
+r268 | abulka | 2011-06-06 00:02:29 +1000 (Mon, 06 Jun 2011) | 1 line
+
+hexserver now responds to ajax
+------------------------------------------------------------------------
+r267 | abulka | 2011-06-05 12:00:14 +1000 (Sun, 05 Jun 2011) | 1 line
+
+Integrated a server into hexmvc gui - used the wonderful bottle server.
+------------------------------------------------------------------------
+r266 | abulka | 2011-06-05 00:11:25 +1000 (Sun, 05 Jun 2011) | 1 line
+
+Integrated a gui into hexmvc
+------------------------------------------------------------------------
+r265 | abulka | 2011-06-04 23:09:47 +1000 (Sat, 04 Jun 2011) | 1 line
+
+HexMvc unit tests begun.  pass.
+------------------------------------------------------------------------
+r264 | abulka | 2011-06-04 22:16:10 +1000 (Sat, 04 Jun 2011) | 1 line
+
+hexmvc prototype begun
+------------------------------------------------------------------------
+r263 | abulka | 2011-05-16 23:19:23 +1000 (Mon, 16 May 2011) | 1 line
+
+source code now editable in pyidea prototype.
+------------------------------------------------------------------------
+r262 | abulka | 2011-05-02 21:25:37 +1000 (Mon, 02 May 2011) | 1 line
+
+pyidea menu structure worked out plus some icons.
+------------------------------------------------------------------------
+r261 | abulka | 2011-04-26 23:15:21 +1000 (Tue, 26 Apr 2011) | 1 line
+
+Collaboration diagram shape worked out.
+------------------------------------------------------------------------
+r260 | abulka | 2011-04-24 23:40:42 +1000 (Sun, 24 Apr 2011) | 1 line
+
+floating windows in pyidea gui prototype
+------------------------------------------------------------------------
+r259 | abulka | 2011-04-24 23:36:24 +1000 (Sun, 24 Apr 2011) | 1 line
+
+floating windows in pyidea gui prototype
+------------------------------------------------------------------------
+r258 | abulka | 2011-04-24 14:13:10 +1000 (Sun, 24 Apr 2011) | 1 line
+
+Basic pyIdea prototype with uml canvas and code editor panel(s)
+------------------------------------------------------------------------
+r257 | abulka | 2011-04-23 17:21:42 +1000 (Sat, 23 Apr 2011) | 1 line
+
+n/a
+------------------------------------------------------------------------
+r256 | abulka | 2011-04-23 16:35:16 +1000 (Sat, 23 Apr 2011) | 1 line
+
+formbuilder research gets it own directory
+------------------------------------------------------------------------
+r255 | abulka | 2011-04-23 16:17:14 +1000 (Sat, 23 Apr 2011) | 1 line
+
+n/a
+------------------------------------------------------------------------
+r254 | abulka | 2011-04-21 17:54:59 +1000 (Thu, 21 Apr 2011) | 1 line
+
+Discovered FormBuilder gui builder.
+------------------------------------------------------------------------
+r253 | abulka | 2011-04-20 18:31:07 +1000 (Wed, 20 Apr 2011) | 1 line
+
+wx aui discovered
+------------------------------------------------------------------------
+r252 | abulka | 2011-04-19 18:23:43 +1000 (Tue, 19 Apr 2011) | 1 line
+
+playing with scite component
+------------------------------------------------------------------------
+r251 | abulka | 2011-04-18 21:53:07 +1000 (Mon, 18 Apr 2011) | 1 line
+
+Persistence from disk added.
+------------------------------------------------------------------------
+r250 | abulka | 2011-04-18 19:15:35 +1000 (Mon, 18 Apr 2011) | 2 lines
+
+Delete is better.  Can now also merge import into exiting workspace.
+Better Dump() diagnostics.
+------------------------------------------------------------------------
+r249 | abulka | 2011-04-18 13:44:08 +1000 (Mon, 18 Apr 2011) | 1 line
+
+Removed DecorateShape().  Verified image node mode still worked.
+------------------------------------------------------------------------
+r248 | abulka | 2011-04-18 13:23:05 +1000 (Mon, 18 Apr 2011) | 3 lines
+
+Fixed invisible text issue - just needed to event.Skip() in OnResizeFrame.
+Shape positions correct after load.
+Refactoring CreateUmlShape() so that single nodes are treated the same as nodes with attrs/meths
+------------------------------------------------------------------------
+r247 | abulka | 2011-04-16 23:21:22 +1000 (Sat, 16 Apr 2011) | 1 line
+
+Layout not bad, some strange invisible typing issue with load graph from text via wx.multiline text control.
+------------------------------------------------------------------------
+r246 | abulka | 2011-04-16 21:52:44 +1000 (Sat, 16 Apr 2011) | 1 line
+
+Layout MUCH better now!
+------------------------------------------------------------------------
+r245 | abulka | 2011-04-16 18:42:16 +1000 (Sat, 16 Apr 2011) | 2 lines
+
+Added persistence to umlworkspace.py
+Uml layout sort of works, but is a bit dodgy for some reason - research gui works much better.
+------------------------------------------------------------------------
+r244 | abulka | 2011-04-16 00:43:18 +1000 (Sat, 16 Apr 2011) | 1 line
+
+First integration of spring Layout into UML.  !!
+------------------------------------------------------------------------
+r243 | abulka | 2011-04-16 00:08:52 +1000 (Sat, 16 Apr 2011) | 1 line
+
+parsing model now converted into proper UmlWorkspace/Node/graph model, which is then rendered.  Includes edge model too.
+------------------------------------------------------------------------
+r242 | abulka | 2011-04-15 22:43:25 +1000 (Fri, 15 Apr 2011) | 1 line
+
+Refactoring to tease apart umlworkspace and node and shape.
+------------------------------------------------------------------------
+r241 | abulka | 2011-04-15 18:21:40 +1000 (Fri, 15 Apr 2011) | 1 line
+
+starting to hook nodes to shapes
+------------------------------------------------------------------------
+r240 | abulka | 2011-04-11 23:22:11 +1000 (Mon, 11 Apr 2011) | 1 line
+
+Fixed bug where old x,y position pre and post drag node was not being reported accurately by gui.
+------------------------------------------------------------------------
+r239 | abulka | 2011-04-11 23:21:17 +1000 (Mon, 11 Apr 2011) | 1 line
+
+Added Graph to UmlWorkspace and INS to add a node to pynsource/pyNsourceGui.py workspace.
+------------------------------------------------------------------------
+r238 | abulka | 2011-04-11 21:33:03 +1000 (Mon, 11 Apr 2011) | 1 line
+
+refactoring finished, LN turned off.  Good riddance.
+------------------------------------------------------------------------
+r237 | abulka | 2011-04-11 20:49:52 +1000 (Mon, 11 Apr 2011) | 1 line
+
+refactoring ApplyBestProposal()
+------------------------------------------------------------------------
+r236 | abulka | 2011-04-11 18:14:07 +1000 (Mon, 11 Apr 2011) | 1 line
+
+Refactoring.  Tests passing.
+------------------------------------------------------------------------
+r235 | abulka | 2011-04-11 14:38:30 +1000 (Mon, 11 Apr 2011) | 1 line
+
+refactoring AddPostMoveProposals - even though am disabling line overlap stuff, need to cleanup what's there
+------------------------------------------------------------------------
+r234 | abulka | 2011-04-11 14:09:55 +1000 (Mon, 11 Apr 2011) | 1 line
+
+Moved stress tests into separate file so they dont slow down main tests.
+------------------------------------------------------------------------
+r233 | abulka | 2011-04-11 13:35:25 +1000 (Mon, 11 Apr 2011) | 2 lines
+
+about to abandon line to node overlap removal - too bloody hard.  code base has swelled a bit hacky.
+on the bright side, have added some better snug behaviour so that nodes jump up/left a bit more.
+------------------------------------------------------------------------
+r232 | abulka | 2011-04-09 23:06:29 +1000 (Sat, 09 Apr 2011) | 1 line
+
+geometry_experiments.py looking good.  But now have to cater for nodes beside nodes and all sorts of variations.  getting complex.  Then I have the idea to use FindLineIntersection() instead... stay tuned...
+------------------------------------------------------------------------
+r231 | abulka | 2011-04-09 19:34:17 +1000 (Sat, 09 Apr 2011) | 1 line
+
+Repair tricky edge case - edge is exactly vertical, nodes centres exactly above each other and create a sensible bounds that has a little bit of width
+------------------------------------------------------------------------
+r230 | abulka | 2011-04-09 19:24:48 +1000 (Sat, 09 Apr 2011) | 1 line
+
+CalcEdgeBounds finally worked out properly and cleanly, and I understand trig again now!
+------------------------------------------------------------------------
+r229 | abulka | 2011-04-06 18:03:25 +1000 (Wed, 06 Apr 2011) | 1 line
+
+misc ogl mucking about
+------------------------------------------------------------------------
+r228 | abulka | 2011-04-06 13:32:52 +1000 (Wed, 06 Apr 2011) | 1 line
+
+refactoring
+------------------------------------------------------------------------
+r227 | abulka | 2011-04-05 23:06:37 +1000 (Tue, 05 Apr 2011) | 1 line
+
+working on some geometry for calculating where line exactly hits edge of node
+------------------------------------------------------------------------
+r226 | abulka | 2011-04-04 22:23:55 +1000 (Mon, 04 Apr 2011) | 1 line
+
+building fake clashing nodes that resemble the line position to encourage the creation of xy proposals to avoid line crossing.  all unit tests pass - but a long way to go yet.
+------------------------------------------------------------------------
+r225 | abulka | 2011-04-04 21:29:06 +1000 (Mon, 04 Apr 2011) | 1 line
+
+line crossing tests 1 and 2 pass.  so added a 3rd one which is snug related and failing.
+------------------------------------------------------------------------
+r224 | abulka | 2011-04-04 20:49:26 +1000 (Mon, 04 Apr 2011) | 1 line
+
+nice bit of refactoring.  all tests passing.
+------------------------------------------------------------------------
+r223 | abulka | 2011-04-04 19:46:59 +1000 (Mon, 04 Apr 2011) | 1 line
+
+made blackboard house the blackboard smart sort function, not the snapshot manager.
+------------------------------------------------------------------------
+r222 | abulka | 2011-04-04 18:15:56 +1000 (Mon, 04 Apr 2011) | 1 line
+
+new lookahead logic is back.  unit tests passing, speed looks ok.
+------------------------------------------------------------------------
+r221 | abulka | 2011-04-04 17:38:54 +1000 (Mon, 04 Apr 2011) | 2 lines
+
+backtracked to faster more stable version.  added smarts so nodes no longer pushed to the right unecessarily.
+found weird python behaviour re initialisation of named parameters.
+------------------------------------------------------------------------
+r220 | abulka | 2011-04-04 10:35:58 +1000 (Mon, 04 Apr 2011) | 1 line
+
+Fixed failing tests - now xy lookahead being used successfully.
+------------------------------------------------------------------------
+r219 | abulka | 2011-04-04 00:12:05 +1000 (Mon, 04 Apr 2011) | 1 line
+
+Trying to get lookahead working on overlap removal.  New ApplyBestProposal() in progress.  New unit tests added.  Some failure in new technique.  Detected some flaws in old technique too.  Work to do.  1 test failing (under old technique).
+------------------------------------------------------------------------
+r218 | abulka | 2011-04-03 18:52:57 +1000 (Sun, 03 Apr 2011) | 1 line
+
+AddPostMoveProposals() messy, but works - predicts the new xy movements and puts them in the proposals list.
+------------------------------------------------------------------------
+r217 | abulka | 2011-04-03 16:39:28 +1000 (Sun, 03 Apr 2011) | 1 line
+
+prepared for radical refactoring with new "xy" proposal objects - 22 passes 1 fail
+------------------------------------------------------------------------
+r216 | abulka | 2011-04-03 15:09:49 +1000 (Sun, 03 Apr 2011) | 1 line
+
+refactoring - shuffle order of methods
+------------------------------------------------------------------------
+r215 | abulka | 2011-04-02 23:09:44 +1100 (Sat, 02 Apr 2011) | 1 line
+
+Cleaned up line crossing "overlap removal" so it is disabled, as it was causing problems.  Refactorings.
+------------------------------------------------------------------------
+r214 | abulka | 2011-04-02 18:17:13 +1100 (Sat, 02 Apr 2011) | 1 line
+
+animation acceptable but still flickery.
+------------------------------------------------------------------------
+r213 | abulka | 2011-04-02 17:26:50 +1100 (Sat, 02 Apr 2011) | 1 line
+
+first animated easing overlap removal working
+------------------------------------------------------------------------
+r212 | abulka | 2011-04-02 16:52:58 +1100 (Sat, 02 Apr 2011) | 1 line
+
+beginnings of animation easing algorithm
+------------------------------------------------------------------------
+r211 | abulka | 2011-04-02 16:05:29 +1100 (Sat, 02 Apr 2011) | 1 line
+
+quick save slots added to gui, to memorise graphs
+------------------------------------------------------------------------
+r210 | abulka | 2011-04-02 13:22:06 +1100 (Sat, 02 Apr 2011) | 1 line
+
+getBounds added on Graph.  blackboard layout now takes it into account.
+------------------------------------------------------------------------
+r209 | abulka | 2011-04-02 12:39:35 +1100 (Sat, 02 Apr 2011) | 1 line
+
+snapshot feature moved to separate file.  blackboard now sorting smarter because I have converted snapshots to dictionary format and thus can control which elements to sort by and whether to maximise or minimise any particular key in that snapshot dictionary.
+------------------------------------------------------------------------
+r208 | abulka | 2011-04-02 10:44:10 +1100 (Sat, 02 Apr 2011) | 1 line
+
+doco
+------------------------------------------------------------------------
+r207 | abulka | 2011-04-02 09:47:59 +1100 (Sat, 02 Apr 2011) | 1 line
+
+refactored CountLineOverLineIntersections
+------------------------------------------------------------------------
+r206 | abulka | 2011-04-02 09:04:41 +1100 (Sat, 02 Apr 2011) | 1 line
+
+refactored CountLineOverLineIntersections and disproved potential theorem that there are no line crossings in world coordinates immediately after a layout.
+------------------------------------------------------------------------
+r205 | abulka | 2011-04-01 18:51:04 +1100 (Fri, 01 Apr 2011) | 2 lines
+
+refactored ScaleUpMadly() to use single scale GetVitalStats() 
+experimental 1 layout axiom proving began.
+------------------------------------------------------------------------
+r204 | abulka | 2011-04-01 17:26:58 +1100 (Fri, 01 Apr 2011) | 1 line
+
+Pulled higher level layout algorithms into blackboard.py
+------------------------------------------------------------------------
+r203 | abulka | 2011-04-01 14:37:14 +1100 (Fri, 01 Apr 2011) | 1 line
+
+cleaned up blackboard logic - still need to sort in a smarter way
+------------------------------------------------------------------------
+r202 | abulka | 2011-03-31 23:18:44 +1100 (Thu, 31 Mar 2011) | 1 line
+
+more debugging of blackboard - wrong line-shape values still appearing in mementos.
+------------------------------------------------------------------------
+r201 | abulka | 2011-03-31 19:00:38 +1100 (Thu, 31 Mar 2011) | 1 line
+
+intelligent 'b' blackboard algorithm in progress.
+------------------------------------------------------------------------
+r200 | abulka | 2011-03-31 15:05:41 +1100 (Thu, 31 Mar 2011) | 1 line
+
+refactor
+------------------------------------------------------------------------
+r199 | abulka | 2011-03-31 14:22:32 +1100 (Thu, 31 Mar 2011) | 1 line
+
+line to line crossings now taken into account during 'b' layout 
+------------------------------------------------------------------------
+r198 | abulka | 2011-03-31 00:08:30 +1100 (Thu, 31 Mar 2011) | 1 line
+
+old b behaviour moved to c - now b chooses best between 3 layouts.  keys 1, 2, 3 restore saved memento graphs.
+------------------------------------------------------------------------
+r197 | abulka | 2011-03-30 22:12:25 +1100 (Wed, 30 Mar 2011) | 1 line
+
+z x and b keys have reasonable intelligent layout behaviours.
+------------------------------------------------------------------------
+r196 | abulka | 2011-03-30 18:35:24 +1100 (Wed, 30 Mar 2011) | 1 line
+
+Working on making spring layout faster with optimisations.  Tricky.
+------------------------------------------------------------------------
+r195 | abulka | 2011-03-29 23:49:41 +1100 (Tue, 29 Mar 2011) | 1 line
+
+'X' and 'Z' algorithms pretty good - untangles my test graphs well.  Breakthrough!
+------------------------------------------------------------------------
+r194 | abulka | 2011-03-29 19:13:31 +1100 (Tue, 29 Mar 2011) | 1 line
+
+'x' gui smart layout based on total line overlaps on graph in progress...
+------------------------------------------------------------------------
+r193 | abulka | 2011-03-29 00:49:24 +1100 (Tue, 29 Mar 2011) | 1 line
+
+first line overlap test passes.  long way to go here.
+------------------------------------------------------------------------
+r192 | abulka | 2011-03-28 22:52:59 +1100 (Mon, 28 Mar 2011) | 1 line
+
+CalcLineIntersections moved into GraphNode
+------------------------------------------------------------------------
+r191 | abulka | 2011-03-28 21:57:41 +1100 (Mon, 28 Mar 2011) | 1 line
+
+beginnings of line crossing with shapes algorithm line_crosses_shape.py
+------------------------------------------------------------------------
+r190 | abulka | 2011-03-28 19:07:54 +1100 (Mon, 28 Mar 2011) | 3 lines
+
+Can create edges in gui by hitting node, 1, node 2
+Faster gui refresh during spring layout
+Misc refactorings.
+------------------------------------------------------------------------
+r189 | abulka | 2011-03-28 18:01:19 +1100 (Mon, 28 Mar 2011) | 4 lines
+
+watch the spring layout work!
+weight of edges supported (load from file only) but doesn't seem to make a difference
+OverlapRemoval now has margin configurable
+CoordinateMapper now has scale configurable (hit <- and ->  in gui.py)
+------------------------------------------------------------------------
+r188 | abulka | 2011-03-28 00:10:36 +1100 (Mon, 28 Mar 2011) | 1 line
+
+gui.py can now spring layout repeatedly :-)
+------------------------------------------------------------------------
+r187 | abulka | 2011-03-27 23:37:49 +1100 (Sun, 27 Mar 2011) | 1 line
+
+CoordinateMapper integrated into gui.py - works!
+------------------------------------------------------------------------
+r186 | abulka | 2011-03-27 23:14:34 +1100 (Sun, 27 Mar 2011) | 1 line
+
+CoordinateMapper invented, put into gui_text.py for starters.
+------------------------------------------------------------------------
+r185 | abulka | 2011-03-27 23:13:44 +1100 (Sun, 27 Mar 2011) | 1 line
+
+Graph methods renamed a little and capitalised as necessary
+------------------------------------------------------------------------
+r184 | abulka | 2011-03-27 19:45:24 +1100 (Sun, 27 Mar 2011) | 1 line
+
+Graph methods renamed a little and capitalised as necessary
+------------------------------------------------------------------------
+r183 | abulka | 2011-03-27 19:19:03 +1100 (Sun, 27 Mar 2011) | 1 line
+
+Div class removed. :-)   No more .value references.  Tests pass.
+------------------------------------------------------------------------
+r182 | abulka | 2011-03-27 17:39:49 +1100 (Sun, 27 Mar 2011) | 2 lines
+
+refactoring - split spring layout and basicrenderer into their own classes.
+about to remove Div.
+------------------------------------------------------------------------
+r181 | abulka | 2011-03-27 00:27:44 +1100 (Sun, 27 Mar 2011) | 1 line
+
+refactoring - OverlapRemoval class now pretty clean.  all tests pass.
+------------------------------------------------------------------------
+r180 | abulka | 2011-03-26 23:02:17 +1100 (Sat, 26 Mar 2011) | 1 line
+
+refactoring - polish the move to being a class
+------------------------------------------------------------------------
+r179 | abulka | 2011-03-26 22:09:41 +1100 (Sat, 26 Mar 2011) | 1 line
+
+all methods converted to methods of the class.  tests pass.
+------------------------------------------------------------------------
+r178 | abulka | 2011-03-26 21:42:55 +1100 (Sat, 26 Mar 2011) | 1 line
+
+refactoring - just a few renamings.  pre more self variables in an attempt to make loop contents a function
+------------------------------------------------------------------------
+r177 | abulka | 2011-03-26 19:14:29 +1100 (Sat, 26 Mar 2011) | 1 line
+
+refactored CalcOverlapAmounts (was called CalcBasicInfo)
+------------------------------------------------------------------------
+r176 | abulka | 2011-03-26 18:36:18 +1100 (Sat, 26 Mar 2011) | 2 lines
+
+GetBounds moved to Node class
+Refactoring in MoveWouldHitSomething functions - much cleaner now.
+------------------------------------------------------------------------
+r175 | abulka | 2011-03-26 17:51:25 +1100 (Sat, 26 Mar 2011) | 2 lines
+
+refactoring - mainly simplified ContractiveMoveWouldClash and ExpansiveMoveWouldClash
+debugging print lines removed.
+------------------------------------------------------------------------
+r174 | abulka | 2011-03-26 16:43:45 +1100 (Sat, 26 Mar 2011) | 1 line
+
+scenario 4 overlaps pass.  I think these tests is now enough, for now.
+------------------------------------------------------------------------
+r173 | abulka | 2011-03-26 14:53:52 +1100 (Sat, 26 Mar 2011) | 1 line
+
+several unit tests added.  all passing.
+------------------------------------------------------------------------
+r172 | abulka | 2011-03-26 12:02:16 +1100 (Sat, 26 Mar 2011) | 1 line
+
+testMoveInsertedVertically1 test works
+------------------------------------------------------------------------
+r171 | abulka | 2011-03-26 11:48:50 +1100 (Sat, 26 Mar 2011) | 4 lines
+
+return if all overlaps removed from overlap removal function.  Put stats in a stats dict.
+added right/bottom accessors to Div class
+gui now shows dragged outline pos in status bar
+unit test improved to test against relative edges, not absolute numbers
+------------------------------------------------------------------------
+r170 | abulka | 2011-03-26 10:17:17 +1100 (Sat, 26 Mar 2011) | 3 lines
+
+Load and Save r.click popup menu better.  Actually saving to disk now too.
+load/save model function moved to graph.py
+First real unit test using persistence loading and running overlap detection - works.
+------------------------------------------------------------------------
+r169 | abulka | 2011-03-25 23:22:14 +1100 (Fri, 25 Mar 2011) | 2 lines
+
+load graph from persistence string fragment via right click
+clear graph
+------------------------------------------------------------------------
+r168 | abulka | 2011-03-25 23:05:32 +1100 (Fri, 25 Mar 2011) | 1 line
+
+right click also selects nodes.
+------------------------------------------------------------------------
+r167 | abulka | 2011-03-25 23:02:01 +1100 (Fri, 25 Mar 2011) | 1 line
+
+clean up.  graph.py deleteNode smarter now, uses shallow copy technique
+------------------------------------------------------------------------
+r166 | abulka | 2011-03-25 22:20:02 +1100 (Fri, 25 Mar 2011) | 1 line
+
+Del key deletes
+------------------------------------------------------------------------
+r165 | abulka | 2011-03-25 22:12:45 +1100 (Fri, 25 Mar 2011) | 1 line
+
+improved delete code - shallow copy of list allows iterating and deleting at the same time.
+------------------------------------------------------------------------
+r164 | abulka | 2011-03-25 21:12:03 +1100 (Fri, 25 Mar 2011) | 1 line
+
+delete node works
+------------------------------------------------------------------------
+r163 | abulka | 2011-03-24 18:12:36 +1100 (Thu, 24 Mar 2011) | 2 lines
+
+Changed hit detection algorithm to be more accurate.
+Added node resizing in the gui.
+------------------------------------------------------------------------
+r162 | abulka | 2011-03-24 16:02:24 +1100 (Thu, 24 Mar 2011) | 2 lines
+
+Cleaned up the way select/unselect of nodes work.
+Added selection of nodes to spring layout research gui.
+------------------------------------------------------------------------
+r161 | abulka | 2011-03-23 23:22:58 +1100 (Wed, 23 Mar 2011) | 1 line
+
+Can insert new nodes
+------------------------------------------------------------------------
+r160 | abulka | 2011-03-23 22:46:26 +1100 (Wed, 23 Mar 2011) | 1 line
+
+loading from persistence works!
+------------------------------------------------------------------------
+r159 | abulka | 2011-03-23 18:39:19 +1100 (Wed, 23 Mar 2011) | 2 lines
+
+Begin load/save for layout graphs.
+Dispose of popup menus to avoid potential memory leak.
+------------------------------------------------------------------------
+r158 | abulka | 2011-03-22 23:18:44 +1100 (Tue, 22 Mar 2011) | 1 line
+
+test_overlap1.py moved to proper tests directory
+------------------------------------------------------------------------
+r157 | abulka | 2011-03-22 22:36:27 +1100 (Tue, 22 Mar 2011) | 1 line
+
+first overlap tests working.
+------------------------------------------------------------------------
+r156 | abulka | 2011-03-22 21:43:53 +1100 (Tue, 22 Mar 2011) | 1 line
+
+moved files
+------------------------------------------------------------------------
+r155 | abulka | 2011-03-22 21:38:47 +1100 (Tue, 22 Mar 2011) | 1 line
+
+Renamed unit tests to use 'test' prefix not 'check' prefix.
+------------------------------------------------------------------------
+r154 | abulka | 2011-03-22 18:31:20 +1100 (Tue, 22 Mar 2011) | 1 line
+
+About to start a new unit test for overlap removal.
+------------------------------------------------------------------------
+r153 | abulka | 2011-03-21 22:03:46 +1100 (Mon, 21 Mar 2011) | 1 line
+
+n/a
+------------------------------------------------------------------------
+r152 | abulka | 2011-03-21 22:03:03 +1100 (Mon, 21 Mar 2011) | 1 line
+
+moved overlap removal into its own class and file.
+------------------------------------------------------------------------
+r151 | abulka | 2011-03-21 21:45:28 +1100 (Mon, 21 Mar 2011) | 1 line
+
+Refactored - works.
+------------------------------------------------------------------------
+r150 | abulka | 2011-03-21 21:12:13 +1100 (Mon, 21 Mar 2011) | 1 line
+
+refactoring into little functions - everything works
+------------------------------------------------------------------------
+r149 | abulka | 2011-03-21 20:36:51 +1100 (Mon, 21 Mar 2011) | 1 line
+
+Refactoring - everything works.
+------------------------------------------------------------------------
+r148 | abulka | 2011-03-21 20:12:11 +1100 (Mon, 21 Mar 2011) | 1 line
+
+Oscillation and optimised second stage overlap detection seems finally to be working! :-)
+------------------------------------------------------------------------
+r147 | abulka | 2011-03-21 18:19:11 +1100 (Mon, 21 Mar 2011) | 1 line
+
+Post Move Algorithm - move the same node again, under certain circumstances, Y axis seems to be working.
+------------------------------------------------------------------------
+r146 | abulka | 2011-03-21 17:19:03 +1100 (Mon, 21 Mar 2011) | 1 line
+
+oscillation problem fixed again (I hope!).  The wouldclash handler repaired to use hit().
+------------------------------------------------------------------------
+r145 | abulka | 2011-03-21 13:00:36 +1100 (Mon, 21 Mar 2011) | 1 line
+
+cleaned up a lot of code but oscillation was never really fixed.  need to get smarter re moving the same node again.
+------------------------------------------------------------------------
+r144 | abulka | 2011-03-21 10:16:27 +1100 (Mon, 21 Mar 2011) | 1 line
+
+overlap detection moves same node twice if possible.  nice idea, but should only use if still clashing with the SAME node again.
+------------------------------------------------------------------------
+r143 | abulka | 2011-03-21 09:09:38 +1100 (Mon, 21 Mar 2011) | 1 line
+
+Fixed oscillation problem.
+------------------------------------------------------------------------
+r142 | abulka | 2011-03-21 00:48:31 +1100 (Mon, 21 Mar 2011) | 1 line
+
+found oscillation problem in overlap removal.
+------------------------------------------------------------------------
+r141 | abulka | 2011-03-20 23:57:57 +1100 (Sun, 20 Mar 2011) | 1 line
+
+two versions of Y negative move upwards algorithm, they seem to work the same.
+------------------------------------------------------------------------
+r140 | abulka | 2011-03-20 23:06:31 +1100 (Sun, 20 Mar 2011) | 1 line
+
+better overlap detection in the y axis.
+------------------------------------------------------------------------
+r139 | abulka | 2011-03-20 19:21:08 +1100 (Sun, 20 Mar 2011) | 2 lines
+
+overlap removal kicking in after ever node move :-)
+event handler added to shape which achieves this.  threaded method disabled for now.
+------------------------------------------------------------------------
+r138 | abulka | 2011-03-20 15:39:57 +1100 (Sun, 20 Mar 2011) | 1 line
+
+threaded node overlap removal - stage 1
+------------------------------------------------------------------------
+r137 | abulka | 2011-03-20 13:50:20 +1100 (Sun, 20 Mar 2011) | 2 lines
+
+Split node overlap removal in a separate stage triggered by mousewheel move.
+Next step is to animate instead.
+------------------------------------------------------------------------
+r136 | abulka | 2011-03-19 18:11:21 +1100 (Sat, 19 Mar 2011) | 1 line
+
+experiment - mousewheel does the overlap removal so can see the difference.
+------------------------------------------------------------------------
+r135 | abulka | 2011-03-19 17:38:59 +1100 (Sat, 19 Mar 2011) | 1 line
+
+spring layout - overlap removal - fancy negative technique works
+------------------------------------------------------------------------
+r134 | abulka | 2011-03-19 17:38:13 +1100 (Sat, 19 Mar 2011) | 1 line
+
+spring layout - graph overlap one dimension per time
+------------------------------------------------------------------------
+r133 | abulka | 2011-03-19 17:37:26 +1100 (Sat, 19 Mar 2011) | 1 line
+
+spring layout - overlap removal horizontal AND vertical works
+------------------------------------------------------------------------
+r132 | abulka | 2011-03-19 17:35:55 +1100 (Sat, 19 Mar 2011) | 1 line
+
+spring layout - overlap removal horizontal works
+------------------------------------------------------------------------
+r131 | abulka | 2011-03-19 17:30:53 +1100 (Sat, 19 Mar 2011) | 1 line
+
+Spring layout initial port from javascript.
+------------------------------------------------------------------------
+r130 | abulka | 2011-03-18 14:21:53 +1100 (Fri, 18 Mar 2011) | 1 line
+
+Fixed coordinate bug.  Turns out that we need to compensate for the fact that x, y for a ogl shape are the centre of the shape, not the top left.
+------------------------------------------------------------------------
+r129 | abulka | 2011-03-17 23:58:46 +1100 (Thu, 17 Mar 2011) | 4 lines
+
+Pulled umlworkspace into separate file.
+Added some tests to basic layout and cleaned it up.
+Tried sizer code on main uml shape canvas window, then retired it - made no difference.
+Still have a major coordinate positioning bug which prevents layout algorithm results (which are accurate) from being reflected visually.  And of course 0,0 is not really 0,0 either...
+------------------------------------------------------------------------
+r128 | abulka | 2011-03-17 21:27:09 +1100 (Thu, 17 Mar 2011) | 4 lines
+
+Fixed layout issue when reloading a small layout onto an existing big layout.  forgot to pass through umlshapes to the layout routine.  Tested with this data:
+size BAD (1965, 1514)	size GOOD 1965 1514    load of core_parser.py  same
+size BAD (1438, 780)	size GOOD 1901 1833    load of gen_delphi.py   why is this different?
+
+------------------------------------------------------------------------
+r127 | abulka | 2011-03-17 18:29:05 +1100 (Thu, 17 Mar 2011) | 3 lines
+
+Layout extracted into external file (finally)
+UmlWorkspace class created for consolidating the stuff that gets created post parsing.
+May have introduced a digram size resize bug post layout.  Repro: import a large python file then a small one and diagram shrinks too much.
+------------------------------------------------------------------------
+r126 | abulka | 2011-03-17 15:41:01 +1100 (Thu, 17 Mar 2011) | 1 line
+
+Improved Ascii art initial text.  Bigger image size helps refresh the screen when switching tabs. 
+------------------------------------------------------------------------
+r125 | abulka | 2011-03-17 15:22:09 +1100 (Thu, 17 Mar 2011) | 1 line
+
+Image save implemented.
+------------------------------------------------------------------------
+r124 | abulka | 2011-03-16 23:45:26 +1100 (Wed, 16 Mar 2011) | 2 lines
+
+CmdLinePythonToYuml wrapper created.  All wrappers now in place.  
+pynsource.py thus now simplified.
+------------------------------------------------------------------------
+r123 | abulka | 2011-03-16 23:21:24 +1100 (Wed, 16 Mar 2011) | 1 line
+
+Created CmdLinePythonToAsciiArt wrapper class.
+------------------------------------------------------------------------
+r122 | abulka | 2011-03-16 22:46:59 +1100 (Wed, 16 Mar 2011) | 2 lines
+
+Refactoring - base class CmdLineGenerator created as parent to java and delphi command line classes
+Delphi unit tests results changed slightly (just some whitespace).
+------------------------------------------------------------------------
+r121 | abulka | 2011-03-16 22:06:09 +1100 (Wed, 16 Mar 2011) | 1 line
+
+Refactored all gen_* classes to use a gen_base.py class ParseReportGenerator instead of using PySourceAsText.
+------------------------------------------------------------------------
+r120 | abulka | 2011-03-16 20:48:18 +1100 (Wed, 16 Mar 2011) | 1 line
+
+moved
+------------------------------------------------------------------------
+r119 | abulka | 2011-03-16 18:25:46 +1100 (Wed, 16 Mar 2011) | 3 lines
+
+Moved uml shapes into gui_umlshapes.py
+Renamed some python and delphi generator classes to reflect that they are used by the command line utility. e.g. CmdLinePythonToDelphi and CmdLinePythonToJava
+Added a PynsourcePythonParser class under the mad parsing hierarchy so that from the outside we have a sane parser class name.
+------------------------------------------------------------------------
+r118 | abulka | 2011-03-16 17:24:25 +1100 (Wed, 16 Mar 2011) | 5 lines
+
+Removed silly onredraw stub stuff which wasn't being used anyway.
+Renamed mainapp.win to mainapp.umlwin
+Renamed mainapp.OnRefresh() to .OnRefreshUmlWindow()
+Renamed UmlShapeCanvas.redraw() to .RedrawEverything()
+
+------------------------------------------------------------------------
+r117 | abulka | 2011-03-16 14:01:45 +1100 (Wed, 16 Mar 2011) | 1 line
+
+Chris's attempt to fix - success.  See http://wiki.wxpython.org/DoubleBufferedDrawing
+------------------------------------------------------------------------
+r116 | abulka | 2011-03-16 14:01:04 +1100 (Wed, 16 Mar 2011) | 2 lines
+
+Chris's attempt to fix again - failed.
+
+------------------------------------------------------------------------
+r115 | abulka | 2011-03-16 14:00:22 +1100 (Wed, 16 Mar 2011) | 1 line
+
+Chris's attempt to fix - failed.
+------------------------------------------------------------------------
+r114 | abulka | 2011-03-15 23:59:17 +1100 (Tue, 15 Mar 2011) | 2 lines
+
+Can now delete nodes from edit menu - ZapShape now is CmdZapShape and holds all the logic in a centralised way.
+UmlShapeCanvas.CmdZapShape(shape) called from both MainApp menu and from MyEvtHandler popup menu
+------------------------------------------------------------------------
+r113 | abulka | 2011-03-15 23:43:20 +1100 (Tue, 15 Mar 2011) | 1 line
+
+Got rid of zapshape stub indirection since can get from MyShapeWvtHandler to UmlShapeCanvas via shape.canvas
+------------------------------------------------------------------------
+r112 | abulka | 2011-03-15 22:48:57 +1100 (Tue, 15 Mar 2011) | 2 lines
+
+Removed UmlShapeCanvas.shapes attribute.  Just use built in GetDiagram().GetShapeList() instead.
+Added convenience property UmlShapeCanvas.umlbox_shapes which is just a getter.
+------------------------------------------------------------------------
+r111 | abulka | 2011-03-15 22:05:36 +1100 (Tue, 15 Mar 2011) | 3 lines
+
+Got rid of diagram pointer from UmlDiagramWindow to Diagram since .GetDiagram() of parent class already has this info.
+Renamed UmlDiagramWindow to UmlShapeCanvas 
+Working on removing the self.shapes attribute too, but not quite yet.
+------------------------------------------------------------------------
+r110 | abulka | 2011-03-14 23:16:33 +1100 (Mon, 14 Mar 2011) | 1 line
+
+Ascii art integration into GUI.  :-)
+------------------------------------------------------------------------
+r109 | abulka | 2011-03-14 22:37:21 +1100 (Mon, 14 Mar 2011) | 1 line
+
+yUml import works and displays in 2nd tab.  !!  :-)
+------------------------------------------------------------------------
+r108 | abulka | 2011-03-14 21:59:58 +1100 (Mon, 14 Mar 2011) | 1 line
+
+yuml tab now loads an image on demand.  almost there.
+------------------------------------------------------------------------
+r107 | abulka | 2011-03-14 21:36:45 +1100 (Mon, 14 Mar 2011) | 1 line
+
+Gui is now multi-tab !!
+------------------------------------------------------------------------
+r106 | abulka | 2011-03-14 14:09:42 +1100 (Mon, 14 Mar 2011) | 1 line
+
+Right Click Menu added to ImageViewer
+------------------------------------------------------------------------
+r105 | abulka | 2011-03-14 13:52:13 +1100 (Mon, 14 Mar 2011) | 1 line
+
+ViewImage now takes proper parameters.
+------------------------------------------------------------------------
+r104 | abulka | 2011-03-14 13:39:03 +1100 (Mon, 14 Mar 2011) | 1 line
+
+ViewImage now extracted.  Init of viewer is now blank black image.
+------------------------------------------------------------------------
+r103 | abulka | 2011-03-14 13:21:53 +1100 (Mon, 14 Mar 2011) | 2 lines
+
+Refactored gui_imageviewer.py to remove diagnostics
+Prototype ViewImage() method to load a different image after initialisation.
+------------------------------------------------------------------------
+r102 | abulka | 2011-03-14 13:02:17 +1100 (Mon, 14 Mar 2011) | 2 lines
+
+Can pull down image from url and display it - without writing to a file.
+Transparency in png's handled by writing to a second bmp.
+------------------------------------------------------------------------
+r101 | abulka | 2011-03-13 21:53:14 +1100 (Sun, 13 Mar 2011) | 1 line
+
+image viewer taken from Research imageviewer7b (took out double buffering code and cleaned it up).
+------------------------------------------------------------------------
+r100 | abulka | 2011-03-13 21:31:38 +1100 (Sun, 13 Mar 2011) | 1 line
+
+renaming
+------------------------------------------------------------------------
+r99 | abulka | 2011-03-13 21:30:30 +1100 (Sun, 13 Mar 2011) | 1 line
+
+renaming
+------------------------------------------------------------------------
+r98 | abulka | 2011-03-13 21:22:21 +1100 (Sun, 13 Mar 2011) | 2 lines
+
+workaround a bug where whole screen doesn't clear if you are scrolled to the right and y is non scrolled, and you zoom out - you see a screen fragment not erased
+Refactored a little.
+------------------------------------------------------------------------
+r97 | abulka | 2011-03-13 20:46:37 +1100 (Sun, 13 Mar 2011) | 4 lines
+
+Constrain scrollbars etc. to bitmap area only so implemented TRIMTO_VIRTSIZE logic which doesn't seem to work with buffered mode very well, so am retiring buffered mode till I understand it more.
+Non buffered mode very good.
+Buffered mode ok on small graphic, falls down with big graphics due to logic (not memory)
+Hook OnResize event.
+------------------------------------------------------------------------
+r96 | abulka | 2011-03-13 12:59:52 +1100 (Sun, 13 Mar 2011) | 2 lines
+
+Fixed line drawing error when in non buffered mode
+Fixed zoom direction reversal when in non buffered mode
+------------------------------------------------------------------------
+r95 | abulka | 2011-03-13 00:04:37 +1100 (Sun, 13 Mar 2011) | 2 lines
+
+Fixed zoom reset on user line erase.  no longer replacing buffer with a new one.  good.  
+quality problems still remain with buffered mode text.
+------------------------------------------------------------------------
+r94 | abulka | 2011-03-12 23:51:43 +1100 (Sat, 12 Mar 2011) | 1 line
+
+clearing user drawn lines when buffering.  causes zoom reset however and is reallocating bitmap - will try to fix
+------------------------------------------------------------------------
+r93 | abulka | 2011-03-12 22:08:38 +1100 (Sat, 12 Mar 2011) | 1 line
+
+Fixed slow mousewheel scroll problem.
+------------------------------------------------------------------------
+r92 | abulka | 2011-03-12 21:49:26 +1100 (Sat, 12 Mar 2011) | 1 line
+
+Can now draw with pen whilst zoomed - see ImageViewer7a.py  :-)
+------------------------------------------------------------------------
+r91 | abulka | 2011-03-12 20:36:27 +1100 (Sat, 12 Mar 2011) | 1 line
+
+n/a
+------------------------------------------------------------------------
+r90 | abulka | 2011-03-12 20:32:44 +1100 (Sat, 12 Mar 2011) | 2 lines
+
+pan and zoom working on prototype ImageViewer7.py
+code contribution re how to do zoom in ogl - zoom_canvas2d-plugin.py
+------------------------------------------------------------------------
+r89 | abulka | 2011-03-11 18:56:55 +1100 (Fri, 11 Mar 2011) | 1 line
+
+wx image viewer and zoom experiments.
+------------------------------------------------------------------------
+r88 | abulka | 2011-03-10 23:23:26 +1100 (Thu, 10 Mar 2011) | 1 line
+
+Starting to research wx image viewers
+------------------------------------------------------------------------
+r87 | abulka | 2011-03-10 22:41:11 +1100 (Thu, 10 Mar 2011) | 2 lines
+
+Refactoring.  Renamed FindIndexRichRhsYuml to be FindRichYumlClass.
+Introduced concept of Enrichment and renamed and refactored accordingly.
+------------------------------------------------------------------------
+r86 | abulka | 2011-03-10 21:51:46 +1100 (Thu, 10 Mar 2011) | 1 line
+
+Refactoring.  Converted GetRhs into properties.  Converted IsRichLhs into generic IsRich on Klass.
+------------------------------------------------------------------------
+r85 | abulka | 2011-03-10 20:59:54 +1100 (Thu, 10 Mar 2011) | 1 line
+
+Created MoveAttrsDefsInto method on Klass.  Refactoring.
+------------------------------------------------------------------------
+r84 | abulka | 2011-03-10 18:30:22 +1100 (Thu, 10 Mar 2011) | 1 line
+
+Deleted old YumlLine_ class, removed yuml optimisation debug code.
+------------------------------------------------------------------------
+r83 | abulka | 2011-03-10 18:14:12 +1100 (Thu, 10 Mar 2011) | 1 line
+
+Refactored YumlLine class to be more OO.  Unit tests passing.
+------------------------------------------------------------------------
+r82 | abulka | 2011-03-10 15:34:39 +1100 (Thu, 10 Mar 2011) | 1 line
+
+updated java and delphi resulting unit test output - just a url change.
+------------------------------------------------------------------------
+r81 | abulka | 2011-03-10 15:33:29 +1100 (Thu, 10 Mar 2011) | 1 line
+
+pynsource split into several files - finally!
+------------------------------------------------------------------------
+r80 | abulka | 2011-03-09 23:22:36 +1100 (Wed, 09 Mar 2011) | 1 line
+
+na
+------------------------------------------------------------------------
+r79 | abulka | 2011-03-09 23:04:35 +1100 (Wed, 09 Mar 2011) | 1 line
+
+yUml optimisation working - 4 unit tests passing.  Needs a good code cleanup though.
+------------------------------------------------------------------------
+r78 | abulka | 2011-03-09 18:48:58 +1100 (Wed, 09 Mar 2011) | 1 line
+
+yUml optimisation in progress
+------------------------------------------------------------------------
+r77 | abulka | 2011-03-09 15:51:35 +1100 (Wed, 09 Mar 2011) | 1 line
+
+New unit test for yuml generation improvements
+------------------------------------------------------------------------
+r76 | abulka | 2011-03-09 14:31:38 +1100 (Wed, 09 Mar 2011) | 1 line
+
+Ascii art batch file, -a option for ascii art
+------------------------------------------------------------------------
+r75 | abulka | 2011-03-09 14:13:20 +1100 (Wed, 09 Mar 2011) | 1 line
+
+n/a
+------------------------------------------------------------------------
+r74 | abulka | 2011-03-09 14:12:05 +1100 (Wed, 09 Mar 2011) | 1 line
+
+pynsource now generates yuml diagrams.
+------------------------------------------------------------------------
+r73 | abulka | 2011-03-08 23:36:14 +1100 (Tue, 08 Mar 2011) | 1 line
+
+yUml parsing ok but need to consolidate the number of lines being emitted.
+------------------------------------------------------------------------
+r72 | abulka | 2011-03-08 22:14:11 +1100 (Tue, 08 Mar 2011) | 1 line
+
+yUml generation works - basic classes and inheritence, attributes and methods.  :-)
+------------------------------------------------------------------------
+r71 | abulka | 2011-03-08 18:24:12 +1100 (Tue, 08 Mar 2011) | 1 line
+
+komodo project file
+------------------------------------------------------------------------
+r70 | abulka | 2011-03-08 18:18:16 +1100 (Tue, 08 Mar 2011) | 1 line
+
+constants and messages moved to new messages.py
+------------------------------------------------------------------------
+r69 | abulka | 2011-03-08 17:42:19 +1100 (Tue, 08 Mar 2011) | 1 line
+
+Consolidated redraw() and centralised Hack To Force The Scrollbar To Show Up code. 
+------------------------------------------------------------------------
+r68 | abulka | 2011-03-08 16:31:08 +1100 (Tue, 08 Mar 2011) | 1 line
+
+File Import Recursively feature removed.
+------------------------------------------------------------------------
+r67 | abulka | 2011-03-08 15:50:33 +1100 (Tue, 08 Mar 2011) | 3 lines
+
+Fixed Import recursive bug - prior to it being removed.  Its not even recursing dirs at the moment and 
+you can select all the files in a dir anyway using shift select within the file open dialog.  Plus you can
+import multiple times onto a workspace, so don't really need this feature.
+------------------------------------------------------------------------
+r66 | abulka | 2011-03-08 15:01:00 +1100 (Tue, 08 Mar 2011) | 1 line
+
+Cleaned out empty lines and old comments, outlining collapses nicely, big messages moved to top of file as constants
+------------------------------------------------------------------------
+r65 | abulka | 2011-03-08 14:30:07 +1100 (Tue, 08 Mar 2011) | 1 line
+
+Refactoring - menus in new handler, deselect logic cleaned
+------------------------------------------------------------------------
+r64 | abulka | 2011-03-07 21:21:56 +1100 (Mon, 07 Mar 2011) | 1 line
+
+Start collecting useful web links for research and announcement purposes.
+------------------------------------------------------------------------
+r63 | abulka | 2011-03-07 20:52:20 +1100 (Mon, 07 Mar 2011) | 1 line
+
+Vers 1.51 with web update check feature.  Upload pynsource-latest.txt to atug to trigger notifications.
+------------------------------------------------------------------------
+r62 | abulka | 2011-03-07 13:33:30 +1100 (Mon, 07 Mar 2011) | 2 lines
+
+1.5 Release. !!
+Also, Better url for pynsource.
+------------------------------------------------------------------------
+r61 | abulka | 2011-03-07 12:15:07 +1100 (Mon, 07 Mar 2011) | 1 line
+
+Added back an Admin dir for doco to myself, todos, uml diagrams etc.
+------------------------------------------------------------------------
+r60 | abulka | 2011-03-07 11:10:44 +1100 (Mon, 07 Mar 2011) | 1 line
+
+tests back, cleaned up
+------------------------------------------------------------------------
+r59 | abulka | 2011-03-07 10:29:22 +1100 (Mon, 07 Mar 2011) | 1 line
+
+delete unneeded
+------------------------------------------------------------------------
+r58 | abulka | 2011-03-07 10:26:16 +1100 (Mon, 07 Mar 2011) | 1 line
+
+deleted sourceforge bits, Todo and UML dirs - will consolidate into another dir.
+------------------------------------------------------------------------
+r57 | abulka | 2011-03-07 10:21:18 +1100 (Mon, 07 Mar 2011) | 1 line
+
+deleted Test dir prior to renaming it.
+------------------------------------------------------------------------
+r56 | abulka | 2011-03-07 10:18:54 +1100 (Mon, 07 Mar 2011) | 1 line
+
+Added runtests.bat
+------------------------------------------------------------------------
+r55 | abulka | 2011-03-07 10:07:28 +1100 (Mon, 07 Mar 2011) | 5 lines
+
+buildAllWin.bat PERFECT and cleaned up.  Builds all 4 targets:
+pyNsource-1.5-setup.exe
+pyNsource-1.5-src.zip
+pyNsource-1.5-standalone.zip
+PyNsource-1.5.win32-py26.exe
+------------------------------------------------------------------------
+r54 | abulka | 2011-03-07 09:37:14 +1100 (Mon, 07 Mar 2011) | 1 line
+
+new inno setup and new buildAllWin.bat in progress with batch IF statement in the works.
+------------------------------------------------------------------------
+r53 | abulka | 2011-03-07 09:22:34 +1100 (Mon, 07 Mar 2011) | 1 line
+
+delete old inno setup location
+------------------------------------------------------------------------
+r52 | abulka | 2011-03-07 09:21:55 +1100 (Mon, 07 Mar 2011) | 1 line
+
+delete old inno setup location
+------------------------------------------------------------------------
+r51 | abulka | 2011-03-07 09:19:37 +1100 (Mon, 07 Mar 2011) | 1 line
+
+delete old inno setup directory location - will now run everything from root dir
+------------------------------------------------------------------------
+r50 | abulka | 2011-03-07 09:13:29 +1100 (Mon, 07 Mar 2011) | 1 line
+
+inno setup automated, subversion build file build.txt now generated.
+------------------------------------------------------------------------
+r49 | abulka | 2011-03-07 00:14:18 +1100 (Mon, 07 Mar 2011) | 2 lines
+
+References to Readme.txt corrected
+pynsource.exe now generated and added to standalone distribution
+------------------------------------------------------------------------
+r48 | abulka | 2011-03-06 23:13:04 +1100 (Sun, 06 Mar 2011) | 2 lines
+
+Added back the buildAllWin.bat script (formerly known as andydobuildall.bat)
+Dont use the svn rename feature or your local stuff will go mad and you have to pull everything down again into a fresh dir.
+------------------------------------------------------------------------
+r47 | abulka | 2011-03-06 23:07:44 +1100 (Sun, 06 Mar 2011) | 1 line
+
+delete root dist from repo
+------------------------------------------------------------------------
+r46 | abulka | 2011-03-06 23:04:50 +1100 (Sun, 06 Mar 2011) | 2 lines
+
+delete old readme, buildnotes - now combined in root readme 
+delete dist/* going to not check that stuff in anymore.
+------------------------------------------------------------------------
+r45 | abulka | 2011-03-06 22:39:43 +1100 (Sun, 06 Mar 2011) | 1 line
+
+New Readme.txt in root dir. Updated komodo projects, updated inno script (untested).
+------------------------------------------------------------------------
+r44 | abulka | 2011-03-06 15:36:37 +1100 (Sun, 06 Mar 2011) | 1 line
+
+1.5 release looking good and tested under windows 7.
+------------------------------------------------------------------------
+r43 | abulka | 2011-03-06 15:08:14 +1100 (Sun, 06 Mar 2011) | 2 lines
+
+updated deployment scripts to include auto zipping with 7zip
+and all in one release script which builds everything incl. standalone exe
+------------------------------------------------------------------------
+r42 | abulka | 2011-03-06 15:05:31 +1100 (Sun, 06 Mar 2011) | 2 lines
+
+Added GPL 3 license
+Cleanup up GUI menus incl adding help, visit website, moved layout menu to its own menu, check if node selected on edit/delete.
+------------------------------------------------------------------------
+r41 | abulka | 2011-03-06 14:58:50 +1100 (Sun, 06 Mar 2011) | 1 line
+
+delete dist because use the parent dist for svn
+------------------------------------------------------------------------
+r40 | abulka | 2011-03-06 14:57:08 +1100 (Sun, 06 Mar 2011) | 1 line
+
+deleted build folder from svn
+------------------------------------------------------------------------
+r39 | abulka | 2011-03-06 14:55:35 +1100 (Sun, 06 Mar 2011) | 1 line
+
+removed build folder contents - old mac stuff
+------------------------------------------------------------------------
+r38 | abulka | 2011-03-06 13:36:42 +1100 (Sun, 06 Mar 2011) | 1 line
+
+deleted old 1.4c files (needed them previously just to debug print framework bugs)
+------------------------------------------------------------------------
+r37 | abulka | 2011-03-06 13:35:12 +1100 (Sun, 06 Mar 2011) | 4 lines
+
+Fixed printframework.py bug by reverting to printframework-14c.py
+and just updating the wx. syntax.
+Also enhanced to add logging.
+Fixed printpreview so it autosizes around all shapes rather than the current window size
+------------------------------------------------------------------------
+r36 | abulka | 2011-03-06 13:31:56 +1100 (Sun, 06 Mar 2011) | 3 lines
+
+don't need our own copy of ogl since it exists exactly the same
+in C:\Python26\Lib\site-packages\wx-2.8-msw-ansi\wx\lib\ogl
+as python source code.
+------------------------------------------------------------------------
+r35 | abulka | 2011-03-05 13:23:56 +1100 (Sat, 05 Mar 2011) | 1 line
+
+preparing for 1.5 release
+------------------------------------------------------------------------
+r34 | abulka | 2011-03-05 12:35:09 +1100 (Sat, 05 Mar 2011) | 3 lines
+
+Deleted old wx2.6 and MAC experiments
+These versions of pyNSourceGui seem buggy anyway under windows.
+If Mac port resurrected, possibly revive and study these.
+------------------------------------------------------------------------
+r33 | abulka | 2011-03-05 12:30:55 +1100 (Sat, 05 Mar 2011) | 2 lines
+
+resurrected networkx graphs 
+also ogllike moved to research dir
+------------------------------------------------------------------------
+r32 | abulka | 2011-03-05 12:28:42 +1100 (Sat, 05 Mar 2011) | 1 line
+
+moved to research dir.
+------------------------------------------------------------------------
+r31 | abulka | 2011-03-05 12:26:51 +1100 (Sat, 05 Mar 2011) | 1 line
+
+layoutuml.py got it running again and added some visualisation
+------------------------------------------------------------------------
+r30 | abulka | 2011-03-05 10:44:07 +1100 (Sat, 05 Mar 2011) | 2 lines
+
+moved OGLlike.py to Research dir
+Added pyNsourceGui2009 (1.4e) which is a what was offered as a Feb 2009 upgrade to work with the new wx but doesn't seem to actually run very well, and on mac crashes.  Not sure why I released it.
+------------------------------------------------------------------------
+r29 | abulka | 2011-03-05 00:23:32 +1100 (Sat, 05 Mar 2011) | 1 line
+
+n/a
+------------------------------------------------------------------------
+r28 | abulka | 2011-03-05 00:21:33 +1100 (Sat, 05 Mar 2011) | 1 line
+
+added back build notes
+------------------------------------------------------------------------
+r27 | abulka | 2011-03-05 00:20:38 +1100 (Sat, 05 Mar 2011) | 1 line
+
+deleted
+------------------------------------------------------------------------
+r26 | abulka | 2011-03-05 00:14:47 +1100 (Sat, 05 Mar 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r25 | abulka | 2011-03-05 00:12:53 +1100 (Sat, 05 Mar 2011) | 3 lines
+
+All supporting research and todo files added.
+The only files left out are some release zips and build/dist files.
+Some locations of the files may have changed from the archive backup zip as I thought to put things in better locations.
+------------------------------------------------------------------------
+r24 | abulka | 2011-03-04 23:56:56 +1100 (Fri, 04 Mar 2011) | 1 line
+
+removed cos had too much info in it
+------------------------------------------------------------------------
+r23 | abulka | 2011-03-04 23:36:12 +1100 (Fri, 04 Mar 2011) | 1 line
+
+Add run.bat
+------------------------------------------------------------------------
+r22 | abulka | 2011-03-04 23:19:51 +1100 (Fri, 04 Mar 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r21 | abulka | 2011-03-04 23:02:28 +1100 (Fri, 04 Mar 2011) | 1 line
+
+clean up
+------------------------------------------------------------------------
+r20 | abulka | 2011-03-04 22:51:26 +1100 (Fri, 04 Mar 2011) | 1 line
+
+deleted
+------------------------------------------------------------------------
+r19 | abulka | 2011-03-04 22:41:19 +1100 (Fri, 04 Mar 2011) | 2 lines
+
+Unification (continued) of mac devel (via dropbox) into vers 1.5
+Getting some subversion errors.
+------------------------------------------------------------------------
+r18 | abulka | 2011-03-04 22:15:09 +1100 (Fri, 04 Mar 2011) | 5 lines
+
+Unification of mac devel (via dropbox) into vers 1.5
+major tweaks to OGLlike.py (a standalone app)
+ogl subdirectory added, not sure why.
+new setup.py for mac named setup_mac.py and assoc. build dir
+All pynsource source code now merged and unified - yey.
+------------------------------------------------------------------------
+r17 | abulka | 2011-03-04 18:37:26 +1100 (Fri, 04 Mar 2011) | 5 lines
+
+Version 1.5 of pynsourceGUI using new wx syntax and new printframework version.
+Added some Mac GUI experimental versions
+Pyhton to Java test cases, some layout experiments, 
+ogllike.py added (standalone ogl app at the moment)
+Was the aa python F drive version 
+------------------------------------------------------------------------
+r11 | abulka | 2006-11-03 17:19:47 +1100 (Fri, 03 Nov 2006) | 1 line
+
+For running under wxPython 2.6 and 2.7
+------------------------------------------------------------------------
+r10 | abulka | 2006-10-31 16:22:43 +1100 (Tue, 31 Oct 2006) | 1 line
+
+
+------------------------------------------------------------------------
+r9 | abulka | 2006-10-31 15:46:40 +1100 (Tue, 31 Oct 2006) | 1 line
+
+
+------------------------------------------------------------------------
+r8 | abulka | 2006-10-31 15:36:43 +1100 (Tue, 31 Oct 2006) | 1 line
+
+
+------------------------------------------------------------------------
+r7 | abulka | 2006-10-31 15:29:16 +1100 (Tue, 31 Oct 2006) | 1 line
+
+
+------------------------------------------------------------------------
