@@ -2,11 +2,8 @@
 # check eval() statement and packages for java.
 
 import unittest
-import os
-
-import sys
-sys.path.append("../src")
 from generate_code.gen_asciiart import PySourceAsText
+from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
 
 class TestCase01(unittest.TestCase):
     def setUp(self):
@@ -23,7 +20,7 @@ class TestCase01(unittest.TestCase):
                 else:
                     self.flagsdict = {}
         """
-        FILE = 'python-in/testmodule06.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule06.py'
         self.p.Parse(FILE)
 
         #print self.p
@@ -51,20 +48,5 @@ class TestCase01(unittest.TestCase):
                 assert len(classentry.defs) == 2
                 assert '__init__' in classentry.defs
                 assert 'SetFlagsFromMemento' in classentry.defs
-
-
-
-def suite():
-    suite1 = unittest.makeSuite(TestCase01, 'test')
-    alltests = unittest.TestSuite((suite1, ))
-    return alltests
-
-def main():
-    runner = unittest.TextTestRunner(descriptions = 0, verbosity = 2) # default is descriptions=1, verbosity=1
-    runner.run(suite())
-
-if __name__ == '__main__':
-    main()
-
 
 

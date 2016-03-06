@@ -2,11 +2,8 @@
 # check that module functions are not treated as classes
 
 import unittest
-import os
-
-import sys
-sys.path.append("../src")
 from generate_code.gen_yuml import PySourceAsYuml
+from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
 
 class TestCaseYuml01(unittest.TestCase):
     def setUp(self):
@@ -22,7 +19,7 @@ class TestCaseYuml01(unittest.TestCase):
 
 
     def test01ParseMeTestUnoptimised(self):
-        FILE = 'python-in/testmodule01.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule01.py'
         self.p.Parse(FILE)
         self.p.CalcYumls(optimise=False)
         expected = """
@@ -35,7 +32,7 @@ class TestCaseYuml01(unittest.TestCase):
         self.assertEquals(expected, str(self.p).strip())
 
     def test02ParseMeTestOptimised(self):
-        FILE = 'python-in/testmodule01.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule01.py'
         self.p.Parse(FILE)
         self.p.CalcYumls(optimise=True)
         expected = """
@@ -47,7 +44,7 @@ class TestCaseYuml01(unittest.TestCase):
         self.assertEquals(expected, str(self.p).strip())
 
     def test01FlagUnoptimised(self):
-        FILE = 'python-in/testmodule66.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule66.py'
         self.p.Parse(FILE)
         self.p.CalcYumls(optimise=False)
         expected = """
@@ -59,7 +56,7 @@ class TestCaseYuml01(unittest.TestCase):
         self.assertEquals(expected, str(self.p).strip())
 
     def test02FlagOptimised(self):
-        FILE = 'python-in/testmodule66.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule66.py'
         self.p.Parse(FILE)
         self.p.CalcYumls(optimise=True)
         expected = """
@@ -67,17 +64,4 @@ class TestCaseYuml01(unittest.TestCase):
         """.strip()
         #self._dump(self.p, expected)
         self.assertEquals(expected, str(self.p).strip())
-
-        
-def suite():
-    suite1 = unittest.makeSuite(TestCaseYuml01, 'test')
-    alltests = unittest.TestSuite((suite1, ))
-    return alltests
-
-def main():
-    runner = unittest.TextTestRunner(descriptions = 0, verbosity = 2) # default is descriptions=1, verbosity=1
-    runner.run(suite())
-
-if __name__ == '__main__':
-    main()
 

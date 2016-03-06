@@ -9,10 +9,8 @@
 
 import unittest
 import os
-
-import sys
-sys.path.append("../src")
 from generate_code.gen_asciiart import PySourceAsText
+from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
 
 class TestCase01(unittest.TestCase):
     def setUp(self):
@@ -43,7 +41,7 @@ class TestCase01(unittest.TestCase):
         """        
         CHECK_MODULE_LEVEL_PARSING = 1
 
-        FILE = 'python-in/testmodule03.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule03.py'
         self.p.optionModuleAsClass = CHECK_MODULE_LEVEL_PARSING
         self.p.Parse(FILE)
 
@@ -136,7 +134,7 @@ class TestCase01(unittest.TestCase):
         """        
         CHECK_MODULE_LEVEL_PARSING = 1
 
-        FILE = 'python-in/testmodule04.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule04.py'
         self.p.optionModuleAsClass = CHECK_MODULE_LEVEL_PARSING
         self.p.Parse(FILE)
 
@@ -215,19 +213,7 @@ class TestCase01(unittest.TestCase):
             assert gotevent7 
             assert gotevent8 
             assert gotevent9
-        
-        
-def suite():
-    suite1 = unittest.makeSuite(TestCase01, 'test')
-    alltests = unittest.TestSuite((suite1, ))
-    return alltests
 
-def main():
-    runner = unittest.TextTestRunner(descriptions = 0, verbosity = 2) # default is descriptions=1, verbosity=1
-    runner.run(suite())
-
-if __name__ == '__main__':
-    main()
 
 
 

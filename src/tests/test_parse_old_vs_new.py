@@ -5,12 +5,10 @@ Compare old and new parsing
 
 import os
 import difflib
-
-import sys
-sys.path.append("../src")
 from common.logwriter import LogWriter, LogWriterNull
 from parsing.dump_pmodel import dump_old_structure
 from parsing.api import old_parser, new_parser
+from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
 
 global log
 
@@ -214,29 +212,29 @@ import unittest
 class TestCase_A(unittest.TestCase):
     def test_1_official_parsing(self):
         reset_tests()    
-        test('python-in/testmodule01.py')
-        test('python-in/testmodule02.py')
-        test('python-in/testmodule03.py')
-        test('python-in/testmodule04.py')
-        test('python-in/testmodule05.py') # (inner classes)
-        test('python-in/testmodule06.py')
-        test('python-in/testmodule07.py')
-        test('python-in/testmodule66.py')
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule01.py')
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule02.py')
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule03.py')
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule04.py')
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule05.py') # (inner classes)
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule06.py')
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule07.py')
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule66.py')
         self.assertTrue(report("official parsing tests"))
 
     def test_2_subsidiary_parsing(self):
         reset_tests()    
-        test('python-in/testmodule_printframework.py')
-        test('python-in/testmodule_asciiworkspace.py')
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_printframework.py')
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_asciiworkspace.py')
         self.assertTrue(report("subsidiary parsing tests"))
 
     def test_3_ast_parsing_is_genuinely_better(self):
         # Expect these to fail cos ast parsing is genuinely better
         reset_tests()    
-        test_not('python-in/testmodule08_multiple_inheritance.py', expected_diffs)
-        test_not('python-in/testmodule_command_pattern.py', expected_diffs)
-        test_not('python-in/testmodule_pynsource.py', expected_diffs)
-        test_not('python-in/testmodule09_intense.py', expected_diffs)
+        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule08_multiple_inheritance.py', expected_diffs)
+        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_command_pattern.py', expected_diffs)
+        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_pynsource.py', expected_diffs)
+        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule09_intense.py', expected_diffs)
         self.assertTrue(report("ast parsing is genuinely better"))
     
 def suite():

@@ -2,11 +2,8 @@
 # check that one to many works in the case of a test submitted by Antonio
 
 import unittest
-import os
-
-import sys
-sys.path.append("../src")
 from parsing.api import old_parser, new_parser
+from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
 
 class TestCase08(unittest.TestCase):
     def setUp(self):
@@ -15,7 +12,7 @@ class TestCase08(unittest.TestCase):
     def test01(self):
         """
         """
-        FILE = 'python-in/testmodule08_multiple_inheritance.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule08_multiple_inheritance.py'
 
         #self.p, debuginfo = old_parser(FILE)
         self.p, debuginfo = new_parser(FILE)
@@ -47,7 +44,7 @@ class TestCase08(unittest.TestCase):
     def test_parse_power_operator(self):
         """
         """
-        FILE = 'python-in/testmodule11_incoming_bugs.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule11_incoming_bugs.py'
 
         #self.p, debuginfo = old_parser(FILE)
         self.p, debuginfo = new_parser(FILE)
@@ -65,21 +62,6 @@ class TestCase08(unittest.TestCase):
 
 
         assert gotevent1
-
-
-
-
-def suite():
-    suite1 = unittest.makeSuite(TestCase08, 'test')
-    alltests = unittest.TestSuite((suite1, ))
-    return alltests
-
-def main():
-    runner = unittest.TextTestRunner(descriptions = 0, verbosity = 2) # default is descriptions=1, verbosity=1
-    runner.run(suite())
-
-if __name__ == '__main__':
-    main()
 
 
 
