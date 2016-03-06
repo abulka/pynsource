@@ -10,7 +10,7 @@ def old_parser(filename):
     p.Parse(filename)
     return p, ''
 
-def new_parser(filename, log=None):
+def new_parser(filename, log=None, options={}):
     if not log:
         log = LogWriterNull()
         
@@ -23,5 +23,5 @@ def new_parser(filename, log=None):
         return node
 
     node = ast_parser(filename)
-    model, debuginfo = convert_ast_to_old_parser(node, filename, log)
+    model, debuginfo = convert_ast_to_old_parser(node, filename, log, options)
     return model, debuginfo

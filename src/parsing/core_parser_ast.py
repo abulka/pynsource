@@ -8,7 +8,7 @@ DEBUGINFO_IMMEDIATE_PRINT = 0
 from common.architecture_support import whosdaddy, whosgranddaddy
 from parsing.class_entry import ClassEntry, Attribute
 from parsing.keywords import pythonbuiltinfunctions
-from parse_rhs_analyser import RhsAnalyser
+from parsing.parse_rhs_analyser import RhsAnalyser
 
 # S
 from ast import *
@@ -64,7 +64,9 @@ PROPERTY_DECORATORS = ['property', '.setattr']
 
 
 
-def convert_ast_to_old_parser(node, filename, _log):
+def convert_ast_to_old_parser(node, filename, _log, options={}):
+
+    treat_property_decorator_as_prop = options.get('TREAT_PROPERTY_DECORATOR_AS_PROP', TREAT_PROPERTY_DECORATOR_AS_PROP)
 
     class OldParseModel(object):
         def __init__(self):
@@ -102,7 +104,7 @@ def convert_ast_to_old_parser(node, filename, _log):
                 self.lhs.append(s)
                 self.write("\nLHS %d %s\n" % (len(self.lhs), self.lhs), mynote=2)
             else:
-                if self.stop_recording_rhs_inside_first_bracket <> None and self.stop_recording_rhs_inside_first_bracket > 1:
+                if self.stop_recording_rhs_inside_first_bracket != None and self.stop_recording_rhs_inside_first_bracket > 1:
                     self.write("\nPrevented RHS %d %s due to stop_recording_rhs_inside_first_bracket\n" % (len(self.rhs), self.rhs), mynote=2)
                 else:
                     self.rhs.append(s)
@@ -366,9 +368,11 @@ def convert_ast_to_old_parser(node, filename, _log):
                 self.model.modulemethods.append(node.name)
                 if node.name not in self.quick_parse.quick_found_module_defs:  # TODO how to repro this failure, it was only reported by Charlie - issue #31
                     print 'Parse assert WARNING: node.name', node.name, 'is not in quick_found_module_defs', self.quick_parse.quick_found_module_defs
+
             # look for decorator @property definition and treat as property
-            elif TREAT_PROPERTY_DECORATOR_AS_PROP and self.current_class() and \
-            len(node.decorator_list):
+            elif treat_property_decorator_as_prop and \
+                    self.current_class() and \
+                    len(node.decorator_list):
                 for decorator in node.decorator_list:
                     for prop_match in PROPERTY_DECORATORS:
                         if hasattr(decorator, 'id') and prop_match in decorator.id:
@@ -377,6 +381,7 @@ def convert_ast_to_old_parser(node, filename, _log):
                             break
                         elif hasattr(decorator, 'attr') and prop_match == decorator.value:
                             pass
+
             elif self.current_class():
                 self.current_class().defs.append(node.name)
 

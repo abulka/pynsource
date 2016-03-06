@@ -17,7 +17,7 @@ LOG_TO_CONSOLE = 0
 
 last_diff_s = ""
 
-def parse_old_and_new(in_filename, print_diffs=True):
+def parse_old_and_new(in_filename, print_diffs=True, options={}):
     global log
     if DEBUGINFO:
         log = LogWriter(in_filename, print_to_console=LOG_TO_CONSOLE)
@@ -30,8 +30,8 @@ def parse_old_and_new(in_filename, print_diffs=True):
         log.out_wrap_in_html(d1, style_class='dump1')
         return d1
         
-    def newparse():
-        model, debuginfo = new_parser(in_filename, log)
+    def newparse(options):
+        model, debuginfo = new_parser(in_filename, log, options)
         d2 = dump_old_structure(model)
         log.out_wrap_in_html(d2, style_class='dump1')
         return d2, debuginfo
@@ -47,7 +47,7 @@ def parse_old_and_new(in_filename, print_diffs=True):
         
         d1 = oldparse()
         log.out_divider()
-        d2, debuginfo = newparse()
+        d2, debuginfo = newparse(options)
         
         comparedok = (d1 == d2)
         log.out("** old vs new method comparison = %s" % comparedok)
@@ -86,11 +86,11 @@ results = []
 def reset_tests():
     global results
     results = []
-def test(filename):
-    results.append(parse_old_and_new(filename))
-def test_not(filename, expected_diffs=None):
+def test(filename, options={}):
+    results.append(parse_old_and_new(filename, options=options))
+def test_not(filename, expected_diffs=None, options={}):
     # expect parse to slightly fail, with a diff matching expected_diff
-    result = parse_old_and_new(filename, print_diffs=False)
+    result = parse_old_and_new(filename, print_diffs=False, options=options)
     if not result:
         # good, we expected this
         successful_test = True
@@ -223,10 +223,43 @@ class TestCase_A(unittest.TestCase):
         self.assertTrue(report("official parsing tests"))
 
     def test_2_subsidiary_parsing(self):
-        reset_tests()    
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_printframework.py')
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_asciiworkspace.py')
+        # Run test with
+        # python -m unittest -v tests.test_parse_old_vs_new.TestCase_A.test_2_subsidiary_parsing
+        reset_tests()
+        options = {'TREAT_PROPERTY_DECORATOR_AS_PROP': False}
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_printframework.py', options=options)
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_asciiworkspace.py', options=options)
         self.assertTrue(report("subsidiary parsing tests"))
+
+    def test_2a_treat_prop_as_prop(self):
+        """
+        Run test with
+        python -m unittest -v tests.test_parse_old_vs_new.TestCase_A.test_2a_treat_prop_as_prop
+
+        Parsing of 'testmodule_asciiworkspace.py' now differs because property decorator is respected
+        and Contents() is now treated as Contents, using the new ast parser.
+
+              contents             (attrtype ['normal'])
+              margin               (attrtype ['normal'])
+              curr                 (attrtype ['normal', 'many'])
+              curr_height          (attrtype ['normal'])
+              curr_width           (attrtype ['normal'])
+        +     Contents             (attrtype ['static'])
+              __init__()
+              _Init()
+              _CalcMargin()
+              _Pad1()
+              _ExpandAndPad2()
+              _Add()
+              Flush()
+              AddColumn()
+        -     Contents()
+              modulemethods []
+
+        """
+        reset_tests()
+        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_asciiworkspace.py')  # we expect the new parser to not match the old parser
+        self.assertTrue(report("treat_prop_as_prop"))
 
     def test_3_ast_parsing_is_genuinely_better(self):
         # Expect these to fail cos ast parsing is genuinely better
