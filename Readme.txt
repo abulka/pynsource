@@ -103,10 +103,39 @@ Run from Source:
     easy_install configobj
   * Run ./rungui.sh
 
-   
+
+More notes on running from source on a mac - el capitan
+-------------------------------------------------------
+
+Assuming you want to run the current version from source code,
+ rather than the older 1.61 binary release.
+
+Installing wxpython3 is impossible on el capitan as of 2016
+So do it via miniconda and a virtual environment within miniconda.
+
+Install miniconda http://conda.pydata.org/miniconda.html or anaconda
+conda create -n py2k python=2.7
+source activate py2k
+conda install wxpython
+conda install configobj
+
+cd /Users/Andy/Devel/pynsource/src
+pythonw pyNsourceGui.py
+(you must use pythonw or you will get an error)
+
+ - You will get the 9999 default pages to be printed bug because it is a mac specific bug.
+ - You will also get the lack of drag outline bug in OGL.
+
+The drag outline bug in OGL library is a very annoying one, if you want to avoid this
+then install the binary release which uses wxpython 2.8 internally.
+
+
 ========================================
  
 Change Log
+
+Version 1.62 (March 2016)
+- fixed main window appearing almost offscreen on mac
 
 Version 1.61 (September 2012)
 - Fixed bug parsing the ** operator
