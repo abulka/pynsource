@@ -3,7 +3,7 @@ PyNSource and PyNSource GUI
 Reverse engineer python source code into UML - optionally display UML as Ascii
 art for pasting into your source code.
 
-Version 1.61
+Version 1.62
 (c) Andy Bulka 2004-2015
 andy@andypatterns.com
 http://www.andypatterns.com/index.php/products/pynsource/
@@ -87,7 +87,7 @@ Windows:
 
 Mac:
   * Drag the pyNsourceGui.app file into your Applications folder and launch
-    pyNsourceGui
+    pyNsourceGui  *NOTE* see below for more info on El Capitan and later.
 
 Linux:
   * Run from source code (see instructions below)
@@ -104,13 +104,14 @@ Run from Source:
   * Run ./rungui.sh
 
 
-More notes on running from source on a mac - el capitan
+More notes on running from source on a mac - El Capitan
 -------------------------------------------------------
 
 Assuming you want to run the current version from source code,
  rather than the older 1.61 binary release.
 
-Installing wxpython3 is impossible on el capitan as of 2016
+Installing wxpython3 is impossible on El Capitan as of 2016 due
+to broken installer (no longer supported by latest OS X) from wxpython.
 So do it via miniconda and a virtual environment within miniconda.
 
 Install miniconda http://conda.pydata.org/miniconda.html or anaconda
@@ -136,6 +137,7 @@ Change Log
 
 Version 1.62 (March 2016)
 - fixed main window appearing almost offscreen on mac
+- methods with property decorator now treated as fields/properties
 
 Version 1.61 (September 2012)
 - Fixed bug parsing the ** operator
