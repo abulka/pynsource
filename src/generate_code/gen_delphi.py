@@ -48,7 +48,7 @@ class PySourceAsDelphi(ReportGenerator):
         self.result += '*)\n\n'
 
     def _OpenNextFile(self):
-        filepath = "%s\\unit_%s.pas" % (self.outdir, self.aclass)
+        filepath = os.path.join(self.outdir, self.aclass) + '.pas'
         self.fp = open(filepath, 'w')
 
 

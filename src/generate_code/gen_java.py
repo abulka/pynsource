@@ -25,7 +25,7 @@ class PySourceAsJava(ReportGenerator):
         self.result += '*/\n'
 
     def _OpenNextFile(self):
-        filepath = "%s\\%s.java" % (self.outdir, self.aclass)
+        filepath = os.path.join(self.outdir, self.aclass) + '.java'
         self.fp = open(filepath, 'w')
 
 
