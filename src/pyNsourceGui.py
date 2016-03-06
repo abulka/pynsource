@@ -175,7 +175,9 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         
         self.InitMenus()
         self.PostOglViewSwitch()    # ensure key bindings kick in under linux
-        
+
+        self.frame.CenterOnScreen()
+
         wx.CallAfter(self.app.run.CmdBootStrap)    # doesn't make a difference calling this via CallAfter
         return True
     
@@ -632,6 +634,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
 def main():
     application = MainApp(0)
+    # application = MainApp(redirect=True, filename='/tmp/pynsource.log')  # to view what's going on
+
     application.MainLoop()
 
 if __name__ == '__main__':
