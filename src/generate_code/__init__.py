@@ -14,11 +14,22 @@ package "parsing/core_parser.py" {
         Parse(self, file):
     }
 
+    class HandleClasses {
+        self.classlist = {}
+        self.modulemethods = []
+    }
+
+    class PynsourcePythonParser {
+        pmodel
+        _extract_pmodel()
+    }
+
 }
 
 package "gen_base.py" #DDDDDD {
-    AndyBasicParseEngine <|-- PynsourcePythonParser
+    HandleClasses <|-- PynsourcePythonParser
     PynsourcePythonParser <|-- ReportGenerator
+    AndyBasicParseEngine <|- HandleClasses
 
     class CmdLineGenerator {
         directories
@@ -154,10 +165,43 @@ note "Represents a line of yUML which is one class (Klass) or two classes in a r
 Yuml .. N2
 
 note as N1
-<b><color:royalBlue>TODO</color>
-Need to <u>clarify</u> the parser representation
-in the base class
+<b><color:royalBlue>Note</color>
+The <u>old parse model</u> is actually
+a couple of attributes on one of the
+middle management parsing classes in the
+AndyBasicParseEngine...PynsourcePythonParser chain
+and is not 'externalised'
 end note
+
+N1 .. HandleClasses
+
+note as N3
+<b><color:royalBlue>Note</color>
+This is the old python parser based
+on increased levels of parsing functionality
+in a huge inheritance chain.  The result
+of which is in <u>classlist</u> and <u>modulemethods</u>
+which can be extracted and externalised
+via the <u>pmodel</u> property.
+
+<b>How to use the old parser:</b>
+    p = PynsourcePythonParser()
+    p.parse(FILE)
+    print p.pmodel
+end note
+N3 .. PynsourcePythonParser
+
+note as N4
+<b>How to use the myriad report generators</b>
+    p = PySourceAsText()
+    p.parse(FILE)
+    print p  # invokes the report printer
+    print p.pmodel  # print just the parse model
+
+If you want to 'pretty print' the old parse model
+    print(dump_old_structure(p.pmodel))
+end note
+N4 .. ReportGenerator
 
 @enduml
 
