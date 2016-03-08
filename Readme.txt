@@ -112,7 +112,9 @@ Assuming you want to run the current version from source code,
 
 Installing wxpython3 is impossible on El Capitan as of 2016 due
 to broken installer (no longer supported by latest OS X) from wxpython.
-So do it via miniconda and a virtual environment within miniconda.
+See http://trac.wxwidgets.org/ticket/17203
+
+So instead, do it via miniconda and a virtual environment within miniconda.
 
 Install miniconda http://conda.pydata.org/miniconda.html or anaconda
 conda create -n py2k python=2.7
