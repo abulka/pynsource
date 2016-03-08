@@ -68,6 +68,7 @@ Usage: pynsource -v -m [-j|d outdir] | [-y outfile.png | nopng] sourcedir_or_pyt
 -v verbose
 -m create psuedo class for each module,
    module attrs/defs etc treated as class attrs/defs
+-x experimental test code (devel only)
 
 Note: pynsource uses an old alpha python parser.  pyNsourceGui.py runs
       a newer, superior, ast based python parser.

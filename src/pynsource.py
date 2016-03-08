@@ -67,13 +67,14 @@ def ParseArgsAndRun():
     optionExportToJava = 0
     optionExportToDelphi = 0
     optionExportToYuml = False
+    option_run_experiment = False
     optionExportTo_outdir = ''
 
     if SIMPLE:
         params = sys.argv[1]
         globbed = glob.glob(params)
     else:
-        listofoptionvaluepairs, params = getopt.getopt(sys.argv[1:], "amvy:j:d:")
+        listofoptionvaluepairs, params = getopt.getopt(sys.argv[1:], "amvy:j:d:x")
         #print listofoptionvaluepairs, params
         #print dict(listofoptionvaluepairs) # turn e.g. [('-v', ''), ('-y', 'fred.png')] into nicer? dict e.g. {'-v': '', '-y': 'fred.png'}
         
@@ -83,6 +84,8 @@ def ParseArgsAndRun():
                 raise RuntimeError, ('Output directory %s for %s file output does not exist.'%(outdir,outlanguagemsg))
 
         for optionvaluepair in listofoptionvaluepairs:
+            if '-x' == optionvaluepair[0]:
+                option_run_experiment = True
             if '-a' == optionvaluepair[0]:
                 pass  # default is asciart, so don't need to specify
             if '-m' == optionvaluepair[0]:
@@ -119,10 +122,13 @@ def ParseArgsAndRun():
             u = CmdLinePythonToAsciiArt(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
             u.ExportTo(None)
     else:
-        print common.messages.HELP_COMMAND_LINE_USAGE
+        if option_run_experiment:
+            test()
+        else:
+            print common.messages.HELP_COMMAND_LINE_USAGE
 
 if __name__ == '__main__':
-    test()
-    exit(0)
-    # ParseArgsAndRun()
+    # test()
+    # exit(0)
+    ParseArgsAndRun()
     
