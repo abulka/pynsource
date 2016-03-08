@@ -516,3 +516,27 @@ class HandleModuleLevelDefsAndAttrs(HandleClassStaticAttrs):
 class PynsourcePythonParser(HandleModuleLevelDefsAndAttrs):
     def __init__(self):
         HandleModuleLevelDefsAndAttrs.__init__(self)
+
+    def _extract_pmodel(self):
+        """
+        The OldParseModel doesn't really exist independently, it is just two attributes on the 'HandleClasses' class of
+        the old parser AndyBasicParseEngine.  And the Reporters are just subclasses of the old parser, thus these
+        attributes are available to them as self.classlist and self.modulemethods
+        This routine extracts the two attributes self.classlist and self.modulemethods as an official old parse model.
+
+        Args:
+            parser_reporter: a PynsourcePythonParser instance or any descendant like a ReportGenerator or one of its
+                descendents e.g. PySourceAsText, PySourceAsYuml etc.
+
+        Returns: pmodel
+        """
+        class OldParseModel(object):
+            def __init__(self):
+                self.classlist = {}
+                self.modulemethods = []
+        pmodel = OldParseModel()
+        pmodel.classlist = self.classlist
+        pmodel.modulemethods = self.modulemethods
+        return pmodel
+
+    pmodel = property(_extract_pmodel)

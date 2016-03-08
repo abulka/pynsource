@@ -16,44 +16,22 @@ def test():
     #FILE = "tests/python-in/testmodule01.py"
     FILE = "tests/python-in/testmodule66.py"
 
-    OLD = False
-    if OLD:
+    strategy = 'ast_via_api' # 'old' or 'old_via_api'
+    if strategy == 'old':
         p = PySourceAsText()
         # p = PySourceAsYuml()
         #p.optionModuleAsClass = True
         p.Parse(FILE)
-        pmodel = extract_pmodel_from_reporter(p)
-    else:
-        # pmodel, debuginfo = old_parser(FILE)
+        pmodel = p.pmodel
+    elif strategy == 'old_via_api':
+        pmodel, debuginfo = old_parser(FILE)
+    elif strategy == 'ast_via_api':
         pmodel, debuginfo = new_parser(FILE)
 
     print(dump_old_structure(pmodel))  # TODO this could be another generate code reporter plugin
 
     # print p
     #print 'Done.'
-
-# TODO make this a method of PynsourcePythonParser 
-def extract_pmodel_from_reporter(parser_reporter):
-        """
-        The OldParseModel doesn't really exist independently, it is just two attributes on the 'HandleClasses' class of
-        the old parser AndyBasicParseEngine.  And the Reporters are just subclasses of the old parser, thus these
-        attributes are available to them as self.classlist and self.modulemethods
-        This routine extracts the two attributes as an official old parse model.
-
-        Args:
-            parser_reporter: a PynsourcePythonParser instance or any descendant like a ReportGenerator or one of its
-                descendents e.g. PySourceAsText, PySourceAsYuml etc.
-
-        Returns: pmodel
-        """
-        class OldParseModel(object):
-            def __init__(self):
-                self.classlist = {}
-                self.modulemethods = []
-        pmodel = OldParseModel()
-        pmodel.classlist = parser_reporter.classlist
-        pmodel.modulemethods = parser_reporter.modulemethods
-        return pmodel
 
 def ParseArgsAndRun():
     import sys, glob
