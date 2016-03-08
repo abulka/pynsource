@@ -46,13 +46,14 @@ def ParseArgsAndRun():
     optionExportToDelphi = 0
     optionExportToYuml = False
     option_run_experiment = False
+    option_show_parse_model = False
     optionExportTo_outdir = ''
 
     if SIMPLE:
         params = sys.argv[1]
         globbed = glob.glob(params)
     else:
-        listofoptionvaluepairs, params = getopt.getopt(sys.argv[1:], "amvy:j:d:x")
+        listofoptionvaluepairs, params = getopt.getopt(sys.argv[1:], "amvy:j:d:xp:")
         #print listofoptionvaluepairs, params
         #print dict(listofoptionvaluepairs) # turn e.g. [('-v', ''), ('-y', 'fred.png')] into nicer? dict e.g. {'-v': '', '-y': 'fred.png'}
         
@@ -64,6 +65,10 @@ def ParseArgsAndRun():
         for optionvaluepair in listofoptionvaluepairs:
             if '-x' == optionvaluepair[0]:
                 option_run_experiment = True
+            if '-p' == optionvaluepair[0]:
+                # print "picked up -p parameter, globbed is", globbed, 'params', params
+                option_show_parse_model = True
+
             if '-a' == optionvaluepair[0]:
                 pass  # default is asciart, so don't need to specify
             if '-m' == optionvaluepair[0]:
@@ -96,6 +101,10 @@ def ParseArgsAndRun():
         elif optionExportToYuml:
             u = CmdLinePythonToYuml(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
             u.ExportTo(optionExportTo_outpng)
+        elif option_show_parse_model:
+            for f in globbed:
+                pmodel, debuginfo = new_parser(f)
+                print(dump_old_structure(pmodel))
         else:
             u = CmdLinePythonToAsciiArt(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
             u.ExportTo(None)

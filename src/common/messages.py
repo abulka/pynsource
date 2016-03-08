@@ -69,6 +69,7 @@ Usage: pynsource -v -m [-j|d outdir] | [-y outfile.png | nopng] sourcedir_or_pyt
 -m create psuedo class for each module,
    module attrs/defs etc treated as class attrs/defs
 -x experimental test code (devel only)
+-p show parse model, no code generated, diagostic
 
 Note: pynsource uses an old alpha python parser.  pyNsourceGui.py runs
       a newer, superior, ast based python parser.
@@ -94,6 +95,11 @@ yUML EXAMPLES
 -------------
 python pynsource.py -y yumlout.png tests\\python-in\\testmodule01.py
 python pynsource.py -y None tests\\python-in\\testmodule01.py
+
+option_show_parse_model EXAMPLES
+-------------
+python pynsource.py -p tests/python-in/*
+python pynsource.py -p None tests/python-in/testmodule01.py
 """
 
 DELPHI_UNIT_FILE_TEMPLATE = """
