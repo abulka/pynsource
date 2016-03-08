@@ -1,4 +1,4 @@
-﻿import random
+import random
 
 def RandomIntFunction(n,m): 
     print "python random"

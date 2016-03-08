@@ -1,4 +1,4 @@
-﻿from architecture_support import *
+from architecture_support import *
 
 class Server(object):
     def __init__(self, host, port):

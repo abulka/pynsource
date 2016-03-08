@@ -1,4 +1,4 @@
-﻿from architecture_support import *
+from architecture_support import *
 
 import System.Diagnostics.Process
 

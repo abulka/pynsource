@@ -1,4 +1,4 @@
-﻿import simplejson as json  # easy_install simplejson
+import simplejson as json  # easy_install simplejson
 
 def JsonFromDictFunction(o): 
     print "python json.dumps"

@@ -1,4 +1,4 @@
-﻿#from System.Runtime.Serialization.Json import DataContractJsonSerializer
+#from System.Runtime.Serialization.Json import DataContractJsonSerializer
 #
 #Whats the proper way to use this class ?
 

@@ -1,4 +1,4 @@
-﻿import System.Drawing
+import System.Drawing
 import System.Windows.Forms
 
 from System.Drawing import *

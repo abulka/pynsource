@@ -1,4 +1,4 @@
-﻿import System.Random
+import System.Random
 
 def RandomIntFunction(n,m):
     print "dot net random"
