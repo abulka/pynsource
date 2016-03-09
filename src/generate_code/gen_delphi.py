@@ -22,8 +22,8 @@ def unique(s):
     raise "uniqueness algorithm failed .. type more of it in please - see http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52560"
 
 class PySourceAsDelphi(ReportGenerator):
-    def __init__(self, outdir=None):
-        ReportGenerator.__init__(self)
+    def __init__(self, ast=True, outdir=None):
+        ReportGenerator.__init__(self, ast=ast)
         self.outdir = outdir
         self.fp = None
 
@@ -187,7 +187,7 @@ class CmdLinePythonToDelphi(CmdLineGenerator):
        return DELPHI_UNIT_FILE_TEMPLATE%(aclass, aclass)
 
     def _CreateLanguageGenerator(self):
-        return PySourceAsDelphi(self.outpath)
+        return PySourceAsDelphi(outdir=self.outpath)
 
 
 

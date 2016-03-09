@@ -3,8 +3,8 @@
 from gen_base import ReportGenerator, CmdLineGenerator
 
 class PySourceAsText(ReportGenerator):
-    def __init__(self):
-        ReportGenerator.__init__(self)
+    def __init__(self, ast=True):
+        ReportGenerator.__init__(self, ast=ast)
 
     def _DumpAttribute(self, attrobj):
         compositescreated = self._GetCompositeCreatedClassesFor(attrobj.attrname)

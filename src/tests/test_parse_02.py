@@ -38,7 +38,9 @@ class TestCase01(unittest.TestCase):
         class ParseMeTest4:
             pass
 
-        """        
+        """
+        self.p = PySourceAsText(ast=False)  # override the setUp() so we force using the old parser
+
         CHECK_MODULE_LEVEL_PARSING = 1
 
         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule03.py'
@@ -131,7 +133,9 @@ class TestCase01(unittest.TestCase):
                 
         x=[1,2]
         y=[]
-        """        
+        """
+        self.p = PySourceAsText(ast=False)  # override the setUp() so we force using the old parser
+
         CHECK_MODULE_LEVEL_PARSING = 1
 
         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule04.py'

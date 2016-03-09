@@ -39,6 +39,9 @@ class TestCase01(unittest.TestCase):
             ParseMeTest_B_C:
             D:
         """
+
+        self.p = PySourceAsText(ast=False)  # override the setUp() so we force using the old parser
+
         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule05.py'
         self.p.Parse(FILE)
 

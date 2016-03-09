@@ -5,8 +5,8 @@ from parsing.keywords import javakeywords
 from gen_base import ReportGenerator, CmdLineGenerator
 
 class PySourceAsJava(ReportGenerator):
-    def __init__(self, outdir=None):
-        ReportGenerator.__init__(self)
+    def __init__(self, ast=True, outdir=None):
+        ReportGenerator.__init__(self, ast=ast)
         self.outdir = outdir
         self.fp = None
 
@@ -102,5 +102,5 @@ class CmdLinePythonToJava(CmdLineGenerator):
        return '\npublic class %s {\n}\n'%aclass
 
     def _CreateLanguageGenerator(self):
-        return PySourceAsJava(self.outpath)
+        return PySourceAsJava(outdir=self.outpath)
 

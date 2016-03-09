@@ -67,8 +67,8 @@ class Yuml:
 
                  
 class PySourceAsYuml(ReportGenerator):
-    def __init__(self):
-        ReportGenerator.__init__(self)
+    def __init__(self, ast=True):
+        ReportGenerator.__init__(self, ast=ast)
         self.yumls = []
         self.enriched_yuml_classes = []
 

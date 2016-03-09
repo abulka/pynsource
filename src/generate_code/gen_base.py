@@ -10,7 +10,7 @@ class ReportGenerator(object):
     it uses a new or old parser instead.
 
     """
-    def __init__(self, ast=False):
+    def __init__(self, ast=True):
         self.ast_parsing = ast
         self.listcompositesatend = 0
         self.embedcompositeswithattributelist = 1
@@ -30,7 +30,9 @@ class ReportGenerator(object):
             options = {'optionModuleAsClass': self.optionModuleAsClass}
             pmodel, debuginfo = old_parser(file, options)
 
-        # break apart pmodel so that its attributes are on the report generator itself
+        self.pmodel = pmodel  # remember the parse model
+
+        # break apart pmodel so that its attributes are on the report generator itself (legacy yukiness)
         self.classlist = pmodel.classlist
         self.modulemethods = pmodel.modulemethods
 
