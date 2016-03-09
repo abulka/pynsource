@@ -101,6 +101,6 @@ class CmdLinePythonToJava(CmdLineGenerator):
     def GenerateSourceFileForAuxClass(self, aclass):
        return '\npublic class %s {\n}\n'%aclass
 
-    def _CreateParser(self):
-        self.p = PySourceAsJava(self.outpath)
+    def _CreateLanguageGenerator(self):
+        return PySourceAsJava(self.outpath)
 

@@ -186,8 +186,8 @@ class CmdLinePythonToDelphi(CmdLineGenerator):
     def GenerateSourceFileForAuxClass(self, aclass):
        return DELPHI_UNIT_FILE_TEMPLATE%(aclass, aclass)
 
-    def _CreateParser(self):
-        self.p = PySourceAsDelphi(self.outpath)
+    def _CreateLanguageGenerator(self):
+        return PySourceAsDelphi(self.outpath)
 
 
 

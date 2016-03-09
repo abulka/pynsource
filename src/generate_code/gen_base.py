@@ -78,7 +78,8 @@ class ReportGenerator(PynsourcePythonParser):
 
     def __str__(self):
         return self.GenReportDump()
-    
+
+
 class CmdLineGenerator:
     def __init__(self, directories, treatmoduleasclass=0, verbose=0):
         self.directories = directories
@@ -112,7 +113,7 @@ class CmdLineGenerator:
             return
         print '%sProcessing %s...'%(padding, thefile)
 
-        self._CreateParser() # overridden by subclasses
+        self.p = self._CreateLanguageGenerator() # overridden by subclasses
         self.p.optionModuleAsClass = self.optionModuleAsClass
         self.p.verbose = self.verbose
         

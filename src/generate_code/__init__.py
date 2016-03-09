@@ -86,7 +86,7 @@ package gen_java.py {
         --
         _GenerateAuxilliaryClasses
         GenerateSourceFileForAuxClass
-        _CreateParser
+        _CreateLanguageGenerator
     }
 
     ReportGenerator <|- PySourceAsJava
@@ -144,7 +144,7 @@ package "gen_yuml.py" {
         p
         --
         _GenerateAuxilliaryClasses
-        _CreateParser
+        _CreateLanguageGenerator
         _Process
         ExportTo
     }

@@ -48,11 +48,11 @@ class CmdLinePythonToAsciiArt(CmdLineGenerator):
     def _GenerateAuxilliaryClasses(self):
         pass
 
-    def _CreateParser(self):
-        self.p = PySourceAsText()
+    def _CreateLanguageGenerator(self):
+        return PySourceAsText()
 
     def _Process(self):
-        self._CreateParser()
+        self.p = self._CreateLanguageGenerator()
         self.p.optionModuleAsClass = self.optionModuleAsClass
         self.p.verbose = self.verbose
 
