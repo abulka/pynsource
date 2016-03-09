@@ -1,11 +1,17 @@
 # base class for output generators and for the cmdline wrappers for those generators
 
-from parsing.core_parser import PynsourcePythonParser
 import os, glob
+from parsing.api import old_parser, new_parser
 
-class ReportGenerator(PynsourcePythonParser):
-    def __init__(self):
-        PynsourcePythonParser.__init__(self)
+
+class ReportGenerator(object):
+    """
+    New ReportGenerator doesn't inherit from the old parser classes,
+    it uses a new or old parser instead.
+
+    """
+    def __init__(self, ast=False):
+        self.ast_parsing = ast
         self.listcompositesatend = 0
         self.embedcompositeswithattributelist = 1
         self.result = ''
@@ -14,6 +20,19 @@ class ReportGenerator(PynsourcePythonParser):
         self.staticmessage = ""
         self.manymessage = ""
         self.verbose = 0
+
+        self.optionModuleAsClass = False
+
+    def Parse(self, file):
+        if self.ast_parsing:
+            pmodel, debuginfo = new_parser(file)
+        else:
+            options = {'optionModuleAsClass': self.optionModuleAsClass}
+            pmodel, debuginfo = old_parser(file, options)
+
+        # break apart pmodel so that its attributes are on the report generator itself
+        self.classlist = pmodel.classlist
+        self.modulemethods = pmodel.modulemethods
 
     def GetCompositeClassesForAttr(self, classname, classentry):
         resultlist = []
