@@ -1,12 +1,11 @@
 import ast
-
+from parsing.core_parser import PynsourcePythonParser
 from parsing.core_parser_ast import convert_ast_to_old_parser
 from common.logwriter import LogWriterNull
 
-def old_parser(filename):
-    from generate_code.gen_asciiart import PySourceAsText
-    
-    p = PySourceAsText()
+def old_parser(filename, options={}):
+    p = PynsourcePythonParser()
+    p.optionModuleAsClass = options.get('optionModuleAsClass', False)
     p.Parse(filename)
     return p, ''
 

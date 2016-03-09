@@ -8,8 +8,7 @@ from generate_code.gen_delphi import CmdLinePythonToDelphi
 from generate_code.gen_java import CmdLinePythonToJava
 import common.messages
 from parsing.dump_pmodel import dump_old_structure
-from generate_code.gen_asciiart import PySourceAsText
-from generate_code.gen_yuml import PySourceAsYuml
+from parsing.core_parser import PynsourcePythonParser
 from parsing.api import old_parser, new_parser
 
 def test():
@@ -18,8 +17,7 @@ def test():
 
     strategy = 'ast_via_api' # 'old' or 'old_via_api'
     if strategy == 'old':
-        p = PySourceAsText()
-        # p = PySourceAsYuml()
+        p = PynsourcePythonParser()
         #p.optionModuleAsClass = True
         p.Parse(FILE)
         pmodel = p.pmodel
