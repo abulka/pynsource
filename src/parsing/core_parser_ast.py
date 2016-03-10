@@ -63,12 +63,48 @@ TREAT_PROPERTY_DECORATOR_AS_PROP = True
 PROPERTY_DECORATORS = ['property', '.setattr']
 
 
+# QuickParse inner class (below) uses there regular expressions
 REGEX_FOR_CLASSES = r'^\s*class (.*)[\(:]'
 REGEX_FOR_METHODS = r'^\s*def (.*?)\(.*\):'  # the ? turns off greedy
 REGEX_FOR_MODULE_ATTRS = r'^(\S.*?)[\.]*.*\s*=.*'
 
 
-def convert_ast_to_old_parser(node, filename, _log, options={}):
+def parse(filename, log=None, options={}):
+    """
+    This is the main entry point for parsing python and getting back a simplified parse model
+
+    Args:
+        filename: python file to parse
+        log:
+        options: pmodel, debuginfo
+
+    Returns:
+
+    """
+    node = _ast_parse(filename)
+    pmodel, debuginfo = _convert_ast_to_old_parser(node, filename, log, options)
+    return pmodel, debuginfo
+
+def _ast_parse(filename):
+    with open(filename,'r') as f:
+        source = f.read()
+
+    node = ast.parse(source)
+    #print ast.dump(node)
+    return node
+
+
+def _convert_ast_to_old_parser(node, filename, _log, options={}):
+    """
+    Args:
+        node: ast node after parsing by python's ast library
+        filename:
+        _log:
+        options:
+
+    Returns:
+
+    """
 
     treat_property_decorator_as_prop = options.get('TREAT_PROPERTY_DECORATOR_AS_PROP', TREAT_PROPERTY_DECORATOR_AS_PROP)
 

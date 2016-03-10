@@ -1,7 +1,7 @@
 """
 @startuml
 
-package "parsing/core_parser.py" {
+package "parsing.core_parser.py" {
 
     class AndyBasicParseEngine {
         meat
@@ -52,17 +52,27 @@ end note
 N1 .. HandleClasses
 
 }
-package ast {
+
+package "parsing.core_parser_ast" {
+    class "core_parser_ast" <<MODULE>> {
+        parse (filename)
+        _ast_parse (filename)
+        _convert_ast_to_old_parser()
+    }
+
+    package ast  #0DCDFD  {
+    }
+    note bottom of ast: Standard Python AST parser library
 }
 
-package "parsing/api.py" {
+package "parsing.api" {
     class "api" <<MODULE>> {
         old_parser (filename, options)
         new_parser (filename, options)
     }
 }
 
-package "gen_base.py" #DDDDDD {
+package "gen_base" #DDDDDD {
     HandleClasses <|-- PynsourcePythonParser
     AndyBasicParseEngine <|- HandleClasses
 
@@ -98,7 +108,7 @@ package "gen_base.py" #DDDDDD {
 
 
 
-package gen_java.py {
+package gen_java {
     class PySourceAsJava {
         fp
         outdir
@@ -129,7 +139,7 @@ package gen_java.py {
 
 }
 
-package "gen_yuml.py" {
+package "gen_yuml" {
 
     class Klass {
         name
@@ -196,15 +206,13 @@ package "gen_yuml.py" {
 }
 
 api --> PynsourcePythonParser : old_parser
-api --> ast : new_parser
+api --> core_parser_ast : new_parser
+core_parser_ast --> ast
 ReportGenerator --> api
 
 
 note "Represents a line of yUML which is one class (Klass) or two classes in a relationship" as N2
 Yuml .. N2
-
-
-
 
 
 note as N4
