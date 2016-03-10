@@ -63,6 +63,7 @@ Usage: pynsource -v -m [-j|d outdir] | [-y outfile.png | nopng] sourcedir_or_pyt
     for superior uml as ascii
 -j generate java files, specify output folder for java files
 -d generate delphi files, specify output folder for delphi files
+-l generate Plant Uml text, specify output png or 'nopng' if you don't want one
 -y generate yUml text, specify output png or 'nopng' if you don't want one
    NOTE: run the pyYumlGui.py for a gui interface to this.
 -v verbose
@@ -95,6 +96,11 @@ yUML EXAMPLES
 -------------
 python pynsource.py -y yumlout.png tests\\python-in\\testmodule01.py
 python pynsource.py -y None tests\\python-in\\testmodule01.py
+
+Plant UML EXAMPLES
+-------------
+python pynsource.py -l out.png tests/python-in/testmodule01.py
+python pynsource.py -l None tests/python-in/testmodule01.py
 
 option_show_parse_model EXAMPLES
 -------------

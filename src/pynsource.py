@@ -6,6 +6,7 @@ from generate_code.gen_asciiart import CmdLinePythonToAsciiArt
 from generate_code.gen_yuml import CmdLinePythonToYuml
 from generate_code.gen_delphi import CmdLinePythonToDelphi
 from generate_code.gen_java import CmdLinePythonToJava
+from generate_code.gen_plantuml import CmdLinePythonToPlantUml
 import common.messages
 from parsing.dump_pmodel import dump_old_structure
 from parsing.core_parser import PynsourcePythonParser
@@ -43,6 +44,7 @@ def ParseArgsAndRun():
     optionExportToJava = 0
     optionExportToDelphi = 0
     optionExportToYuml = False
+    option_export_to_plant_uml = False
     option_run_experiment = False
     option_show_parse_model = False
     optionExportTo_outdir = ''
@@ -51,7 +53,7 @@ def ParseArgsAndRun():
         params = sys.argv[1]
         globbed = glob.glob(params)
     else:
-        listofoptionvaluepairs, params = getopt.getopt(sys.argv[1:], "amvy:j:d:xp:")
+        listofoptionvaluepairs, params = getopt.getopt(sys.argv[1:], "amvy:j:d:xp:l:")
         #print listofoptionvaluepairs, params
         #print dict(listofoptionvaluepairs) # turn e.g. [('-v', ''), ('-y', 'fred.png')] into nicer? dict e.g. {'-v': '', '-y': 'fred.png'}
         
@@ -85,6 +87,9 @@ def ParseArgsAndRun():
             if optionvaluepair[0] in ('-y'):
                 optionExportToYuml = True
                 optionExportTo_outpng = optionvaluepair[1]
+            if optionvaluepair[0] in ('-l'):
+                option_export_to_plant_uml = True
+                optionExportTo_outpng = optionvaluepair[1]
         for param in params:
             files = glob.glob(param)
             globbed += files
@@ -98,6 +103,9 @@ def ParseArgsAndRun():
             u.ExportTo(optionExportTo_outdir)
         elif optionExportToYuml:
             u = CmdLinePythonToYuml(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
+            u.ExportTo(optionExportTo_outpng)
+        elif option_export_to_plant_uml:
+            u = CmdLinePythonToPlantUml(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
             u.ExportTo(optionExportTo_outpng)
         elif option_show_parse_model:
             for f in globbed:
