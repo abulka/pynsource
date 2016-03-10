@@ -1,0 +1,17 @@
+language: python
+python:
+  - "2.7"
+# command to install dependencies
+install: "pip install -r requirements.txt"
+# command to run tests
+script: src/run_all_tests.sh
+
+# Set up notification options
+notifications: 
+  email:
+    recipients:
+      - abulka@gmail.com
+# change is when the repo status goes from pass to fail or vice versa
+    on_success: change
+    on_failure: always
+
