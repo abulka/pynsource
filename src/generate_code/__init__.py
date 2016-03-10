@@ -24,11 +24,46 @@ package "parsing/core_parser.py" {
         _extract_pmodel()
     }
 
+note as N3
+<b><color:royalBlue>Note</color>
+This is the old python parser based
+on increased levels of parsing functionality
+in a huge inheritance chain.  The result
+of which is in <u>classlist</u> and <u>modulemethods</u>
+which can be extracted and externalised
+via the <u>pmodel</u> property.
+
+<b>How to use the old parser:</b>
+    p = PynsourcePythonParser()
+    p.parse(FILE)
+    print p.pmodel
+end note
+N3 .. PynsourcePythonParser
+
+note as N1
+<b><color:royalBlue>Note</color>
+The <u>old parse model</u> is actually
+a couple of attributes on one of the
+middle management parsing classes in the
+AndyBasicParseEngine...PynsourcePythonParser chain
+and is not 'externalised' until the PynsourcePythonParser
+level where a <b>pmodel</b> property is offered.
+end note
+N1 .. HandleClasses
+
+}
+package ast {
+}
+
+package "parsing/api.py" {
+    class "api" <<MODULE>> {
+        old_parser (filename, options)
+        new_parser (filename, options)
+    }
 }
 
 package "gen_base.py" #DDDDDD {
     HandleClasses <|-- PynsourcePythonParser
-    PynsourcePythonParser <|-- ReportGenerator
     AndyBasicParseEngine <|- HandleClasses
 
     class CmdLineGenerator {
@@ -41,25 +76,24 @@ package "gen_base.py" #DDDDDD {
         _Process
     }
 
-}
-
-class ReportGenerator {
-    aclass
-    classentry
-    embedcompositeswithattributelist
-    listcompositesatend
-    manymessage
-    result
-    staticmessage
-    verbose
-    --
-    GetCompositeClassesForAttr
-    _GetCompositeCreatedClassesFor
-    _DumpAttributes
-    _DumpClassHeader
-    _DumpModuleMethods
-    GenReportDump
-    __str__
+    class ReportGenerator {
+        aclass
+        classentry
+        embedcompositeswithattributelist
+        listcompositesatend
+        manymessage
+        result
+        staticmessage
+        verbose
+        --
+        GetCompositeClassesForAttr
+        _GetCompositeCreatedClassesFor
+        _DumpAttributes
+        _DumpClassHeader
+        _DumpModuleMethods
+        GenReportDump
+        __str__
+    }
 }
 
 
@@ -161,35 +195,17 @@ package "gen_yuml.py" {
     CmdLinePythonToYuml -> PySourceAsYuml : p
 }
 
+api --> PynsourcePythonParser : old_parser
+api --> ast : new_parser
+ReportGenerator --> api
+
+
 note "Represents a line of yUML which is one class (Klass) or two classes in a relationship" as N2
 Yuml .. N2
 
-note as N1
-<b><color:royalBlue>Note</color>
-The <u>old parse model</u> is actually
-a couple of attributes on one of the
-middle management parsing classes in the
-AndyBasicParseEngine...PynsourcePythonParser chain
-and is not 'externalised'
-end note
 
-N1 .. HandleClasses
 
-note as N3
-<b><color:royalBlue>Note</color>
-This is the old python parser based
-on increased levels of parsing functionality
-in a huge inheritance chain.  The result
-of which is in <u>classlist</u> and <u>modulemethods</u>
-which can be extracted and externalised
-via the <u>pmodel</u> property.
 
-<b>How to use the old parser:</b>
-    p = PynsourcePythonParser()
-    p.parse(FILE)
-    print p.pmodel
-end note
-N3 .. PynsourcePythonParser
 
 note as N4
 <b>How to use the myriad report generators</b>
