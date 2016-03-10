@@ -63,6 +63,10 @@ TREAT_PROPERTY_DECORATOR_AS_PROP = True
 PROPERTY_DECORATORS = ['property', '.setattr']
 
 
+REGEX_FOR_CLASSES = r'^\s*class (.*)[\(:]'
+REGEX_FOR_METHODS = r'^\s*def (.*?)\(.*\):'  # the ? turns off greedy
+REGEX_FOR_MODULE_ATTRS = r'^(\S.*?)[\.]*.*\s*=.*'
+
 
 def convert_ast_to_old_parser(node, filename, _log, options={}):
 
@@ -875,9 +879,9 @@ def convert_ast_to_old_parser(node, filename, _log, options={}):
             # Feed the file text into findall(); it returns a list of all the found strings
             with open(filename, 'r') as f:
                 source = f.read()
-            self.quick_found_classes = re.findall(r'^\s*class (.*?)[\(:]', source, re.MULTILINE)  
-            self.quick_found_module_defs = re.findall(r'^def (.*)\(.*\):', source, re.MULTILINE)
-            self.quick_found_module_attrs = re.findall(r'^(\S.*?)[\.]*.*\s*=.*', source, re.MULTILINE)
+            self.quick_found_classes = re.findall(REGEX_FOR_CLASSES, source, re.MULTILINE)
+            self.quick_found_module_defs = re.findall(REGEX_FOR_METHODS, source, re.MULTILINE)
+            self.quick_found_module_attrs = re.findall(REGEX_FOR_MODULE_ATTRS, source, re.MULTILINE)
             
             log.out_wrap_in_html("quick_found_classes %s<br>quick_found_module_defs %s<br>quick_found_module_attrs %s<br>" % \
                                 (self.quick_found_classes, self.quick_found_module_defs, self.quick_found_module_attrs),
