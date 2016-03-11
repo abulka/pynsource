@@ -122,6 +122,8 @@ def plant_uml_create_png_and_return_image_url(plant_uml_txt):
         image_url = re.findall(regex, response.text, re.MULTILINE)
         if image_url:
             image_url = image_url[0]
+        else:
+            image_url = None
         return image_url, response
     else:
         return None, response
