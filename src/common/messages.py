@@ -143,3 +143,18 @@ You cannot edit these diagrams, each import overwrites the previous.  You can ho
 You can zoom with CTRL-mousewheel.
 You can annotate with SHIFT right mouse button drawing.
 """
+
+PY_PLANTUML_ABOUT_APPNAME = "PlantUml Gui"
+PY_PLANTUML_APP_VERSION = 1.0
+PY_PLANTUML_HOME_URL = "http://plantuml.com/"
+PY_PLANTUML_ABOUT_MSG = """
+Convert python source code into a UML diagram.
+
+Powered by the web service yUml at http://plantuml.com and the Python source code reverse engineering tool PyNSource.
+
+You cannot edit these diagrams, each import overwrites the previous.  You can however import multiple files at the same time.
+
+You can zoom with CTRL-mousewheel.
+You can annotate with SHIFT right mouse button drawing.
+"""
+

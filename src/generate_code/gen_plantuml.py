@@ -54,10 +54,10 @@ class PySourceAsPlantUml(ReportGenerator):
         We override here to do our own generation rather than the template method design pattern
         approach of ReportGenerator class
         """
-        if not self.result:
-            print "Warning, should call calc_plant_uml() after .Parse() and before str(p) - repairing..."
+        if not self.result:  # Update: THIS MAY BE VALIDLY EMPTY if there are no classes in a file
+            # print "Warning, should call calc_plant_uml() after .Parse() and before str(p) - repairing..."
             self.calc_plant_uml()
-        return "@startuml\n%s@enduml\n" % self.result
+        return self.result
 
 class CmdLinePythonToPlantUml(CmdLineGenerator):
     """
@@ -103,7 +103,8 @@ class CmdLinePythonToPlantUml(CmdLineGenerator):
 
             print 'Done!'
 
-def plant_uml_create_png(plant_uml_txt, output_filename):
+
+def plant_uml_create_png_and_return_image_url(plant_uml_txt):
     plant_uml_server = "http://www.plantuml.com/plantuml/form"
     response = requests.post(plant_uml_server,
                              data={'text': plant_uml_txt})
@@ -121,8 +122,15 @@ def plant_uml_create_png(plant_uml_txt, output_filename):
         image_url = re.findall(regex, response.text, re.MULTILINE)
         if image_url:
             image_url = image_url[0]
-        print image_url
+        return image_url, response
+    else:
+        return None, response
 
+def plant_uml_create_png(plant_uml_txt, output_filename):
+    image_url, response = plant_uml_create_png_and_return_image_url(plant_uml_txt)
+    print image_url
+
+    if image_url:
         """
         Now fetch the image
         """
@@ -133,4 +141,4 @@ def plant_uml_create_png(plant_uml_txt, output_filename):
         else:
             print 'ok getting generating uml but error pulling down image'
     else:
-        print 'error', response.status_code
+        print 'error calling plantuml server', response.status_code

@@ -29,14 +29,12 @@ class TestCasePlantUml01(unittest.TestCase):
         self.p.Parse(FILE)
         self.p.calc_plant_uml(optimise=False)
         expected = """
-@startuml
 
 class Fred {
 }
 
 Mary <|- Fred
 Sam <|- Fred
-@enduml
 """.strip()
         # self._dump(self.p, expected)
         self.assertEquals(expected, str(self.p).strip())
@@ -68,7 +66,6 @@ Sam <|- Fred
         self.p.Parse(FILE)
         self.p.calc_plant_uml(optimise=False)
         expected = """
-@startuml
 
 class ParseMeTest {
     a
@@ -91,7 +88,6 @@ class ParseMeTest2 {
 }
 
 ParseMeTest <|- ParseMeTest2
-@enduml
 """.strip()
         # self._dump(self.p, expected)
         self.assertEquals(expected, str(self.p).strip())
