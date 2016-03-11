@@ -1,3 +1,5 @@
+import os
+import requests
 from gen_base import ReportGenerator, CmdLineGenerator
 
 class PySourceAsPlantUml(ReportGenerator):
@@ -77,15 +79,58 @@ class CmdLinePythonToPlantUml(CmdLineGenerator):
         for f in globbed:
             self.p.Parse(f)
         self.p.calc_plant_uml()
-        print self.p
+        plant_uml_text = str(self.p)
 
-        # optionExportTo_outpng = outpath
-        #
-        # if optionExportTo_outpng <> "nopng" :
-        #     if not '.png' in optionExportTo_outpng.lower():
-        #         print "output filename %s must have .png in the name" % optionExportTo_outpng
-        #         exit(0)
-        #     print 'Generating yuml diagram %s...' % optionExportTo_outpng
-        #     yuml_create_png(','.join(str(self.p).split()), optionExportTo_outpng)
-        #     #os.system(optionExportTo_outpng)  # launch notepad or whatever on it
-        #     print 'Done!'
+        print plant_uml_text
+
+        # Optionally generate image via plant uml server
+        outpng = outpath
+        if outpng != "nopng" :
+            if not '.png' in outpng.lower():
+                print "output filename %s must have .png in the name" % outpng
+                exit(1)
+            print 'Generating plantuml diagram %s...' % outpng
+            plant_uml_create_png(plant_uml_text, outpng)
+
+            # Windows specific solution
+            # os.system(outpng)  # launch notepad or whatever on it
+
+            # Cross platform solution - conda install pillow
+            # This will open the image in your default image viewer.
+            from PIL import Image
+            img = Image.open(outpng)
+            img.show()
+
+            print 'Done!'
+
+def plant_uml_create_png(plant_uml_txt, output_filename):
+    plant_uml_server = "http://www.plantuml.com/plantuml/form"
+    response = requests.post(plant_uml_server,
+                             data={'text': plant_uml_txt})
+    if response.status_code == 200:
+
+        """
+        Need to find the fragment:
+            <p id="diagram">
+                <img src="http://www.plantuml.com:80/plantuml/png/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000" alt="PlantUML diagram" onload="doneLoading()">
+            </p>
+        in the response.
+        """
+        import re
+        regex = r'.*<p id="diagram".*\s*<.*img src=\"(.*?)\"'
+        image_url = re.findall(regex, response.text, re.MULTILINE)
+        if image_url:
+            image_url = image_url[0]
+        print image_url
+
+        """
+        Now fetch the image
+        """
+        response = requests.get(image_url)
+        if response.status_code == 200:
+            with open(output_filename, 'wb') as fp:
+                fp.write(response.content)
+        else:
+            print 'ok getting generating uml but error pulling down image'
+    else:
+        print 'error', response.status_code
