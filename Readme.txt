@@ -121,6 +121,7 @@ conda create -n py2k python=2.7
 source activate py2k
 conda install wxpython
 conda install configobj
+conda install pillow
 
 cd /Users/Andy/Devel/pynsource/src
 pythonw pyNsourceGui.py

@@ -217,7 +217,16 @@ class CmdLinePythonToYuml(CmdLineGenerator):
                 exit(0)
             print 'Generating yuml diagram %s...' % optionExportTo_outpng
             yuml_create_png(','.join(str(self.p).split()), optionExportTo_outpng)
-            #os.system(optionExportTo_outpng)  # launch notepad or whatever on it
+
+            # Windows specific solution
+            # os.system(outpng)  # launch notepad or whatever on it
+
+            # Cross platform solution - conda install pillow
+            # This will open the image in your default image viewer.
+            from PIL import Image
+            img = Image.open(optionExportTo_outpng)
+            img.show()
+
             print 'Done!'
 
 import urllib
