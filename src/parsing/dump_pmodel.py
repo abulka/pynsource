@@ -25,10 +25,11 @@ where
 
 @startuml
 
-class OldParseModel {
+class OldParseModel #AntiqueWhite/Gold {
     classlist : {}
     modulemethods : [method, ...]
 }
+note left #AntiqueWhite/Gold : Abstract Language Structure Model = ALSM
 
 class Classes <<Dict>> #Lavender {
     key
