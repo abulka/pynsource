@@ -18,6 +18,16 @@ LOG_TO_CONSOLE = 0
 last_diff_s = ""
 
 def parse_old_and_new(in_filename, print_diffs=True, options={}):
+    """
+    Runs old and new parsers and compares the result.
+    Logs everything to a special HTML log file using LogWriter instance.
+
+    The ability of the old parser to treat modules as pseudo classes is ignored,
+     since the new parser does not have this mode of operation yet.
+
+    Returns t/f
+    """
+
     global log
     if DEBUGINFO:
         log = LogWriter(in_filename, print_to_console=LOG_TO_CONSOLE)
