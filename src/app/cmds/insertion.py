@@ -80,9 +80,9 @@ class CmdInsertNewNodeClass(CmdInsertOrEditNode):
             umlwin.remove_overlaps()
             umlwin.stateofthenation()
 
-            umlwin.SelectNodeNow(node.shape)        
-        
-            wxapp.RefreshAsciiUmlTab()
+            umlwin.SelectNodeNow(node.shape)
+
+            # wxapp.RefreshAsciiUmlTab()  # Don't do this because somehow the onKeyChar and onKeyPress handlers are unbound from the UmlCanvas shape canvas
 
     def undo(self):  # override
         """ undo insert new node """
