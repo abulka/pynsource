@@ -1,3 +1,4 @@
 *.pyc
 out.png
 venv/
+.idea/
