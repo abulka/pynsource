@@ -49,7 +49,12 @@ class CoordinateMapper:
         self.scale = scale
         self.factorX = -99
         self.factorY = -99
-        self.Recalibrate()
+
+        # Actually it is too soon to call Recalibrate() because wxpython3 (phoenix)
+        # doesn't set canvas size properly till later,
+        # even though frame has been shown, unlike wxpython2.8 which does set canvas size immediately.
+        #
+        # self.Recalibrate()
 
     def Recalibrate(self, new_world_size=None, scale=None):
         #self.DumpCalibrationInfo("is_function_start", new_world_size, scale)
@@ -246,4 +251,3 @@ bounds (303, 795)
     validate_layout_to_world(c2, 5.0, 5.0)
     
     print 'Done'
-

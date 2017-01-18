@@ -129,7 +129,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.umlwin.SetFocus()
         self.SetTopWindow(self.frame)
 
-        self.frame.Show(True)
+        self.frame.Show(True)  # in wxpython2.8 this causes umlwin canvas to grow too, but not in wxpython3 - till much later
         wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
         
         self.popupmenu = None
@@ -649,4 +649,3 @@ if __name__ == '__main__':
     #pprint.pprint(sys.path)
 
     main()
-

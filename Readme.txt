@@ -90,18 +90,22 @@ Mac:
     pyNsourceGui  *NOTE* see below for more info on El Capitan and later.
 
 Linux:
-  * Run from source code (see instructions below)
-    Note that I am working on a ubuntu/debian package to make this easier.
-    Please email to help or to sponser its inclusion in the standard repository
-        
-Run from Source:
-  * Ensure you have python 2.7 installed (should be on ubuntu by default).
-  * The GUI relies on wxpython http://www.wxpython.org so run the wxpython 
-    installer on Windows or Mac.  If you are using Ubuntu Linux install the
-    wxpython package: http://wiki.wxpython.org/InstallingOnUbuntuOrDebian
-  * Install the following python egg like this:
-    easy_install configobj
-  * Run ./rungui.sh
+  Run from source code (easy steps below):
+
+  git clone https://github.com/abulka/pynsource.git
+
+  * If you are on Ubuntu 16.04 which seems to prefer wxpython3 then:
+
+    sudo apt-get install python-wxgtk3.0
+
+  * If you are on Ubuntu 14.04 which seems to prefer wxpython2 then:
+
+    sudo apt-get install python-wxgtk2.8
+
+  sudo apt install python-pip
+  sudo pip install configobj
+  cd pynsource
+  ./rungui.sh
 
 
 More notes on running from source on a mac - El Capitan

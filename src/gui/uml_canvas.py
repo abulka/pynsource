@@ -68,8 +68,15 @@ class UmlCanvas(ogl.ShapeCanvas):
         # Only call this once enclosing frame has been set up, so that get correct world coord dimensions
         
         self.canvas_resizer = CanvasResizer(canvas=self)
-        assert not self.canvas_resizer.canvas_too_small(), "InitSizeAndObjs being called too early - please set up enclosing frame size first"
         
+        # Don't assert canvas size sanity anymore as wxpython3 (phoenix) doesn't set canvas size 
+        # as quickly as wxpython2.8 does, even though frame has been sized and shown
+        # with frame.SetSize(WINDOW_SIZE) and frame.Show(True)
+        # In wxpython3 (phoenix) canvas stays at (20,20) despite the frame increasing in size to (1024,768)
+        # but good ole wxpython2.8 does indeed change canvas size immediately to (1024,768)
+        #
+        # assert not self.canvas_resizer.canvas_too_small(), "InitSizeAndObjs being called too early - please set up enclosing frame size first"
+
         self.umlworkspace = UmlWorkspace()
         self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
         self.snapshot_mgr = GraphSnapshotMgr(graph=self.umlworkspace.graph, umlcanvas=self)
@@ -549,5 +556,3 @@ class UmlCanvas(ogl.ShapeCanvas):
     def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
         # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
         self.app.run.CmdDeselectAllShapes()
-
-
