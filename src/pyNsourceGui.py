@@ -27,7 +27,7 @@ import wx.lib.ogl as ogl
 import os, stat
 from common.messages import *
 
-APP_VERSION = 1.62
+APP_VERSION = 1.63
 WINDOW_SIZE = (1024,768)
 MULTI_TAB_GUI = True
 USE_SIZER = False
@@ -340,7 +340,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         menu1.AppendSeparator()
         Add(menu1, "E&xit", "Alt-X", self.OnButton)
         
-        Add(menu2, "&Insert Class...", "I", self.OnInsertClass)
+        Add(menu2, "&Add Class...", "Ctrl-A", self.OnInsertClass)
         if ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS:
             Add(menu2, "&Insert Image...", "Ctrl-I", self.OnInsertImage)
             Add(menu2, "&Insert Comment...", "Shift-I", self.OnInsertComment)
@@ -348,26 +348,26 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         menu_item_delete_class.Enable(True)  # demo one way to enable/disable.  But better to do via _update function
         Add(menu2, "&Edit Class Properties...", "F2", self.OnEditProperties, self.OnEditProperties_update)
         menu2.AppendSeparator()
-        Add(menu2, "&Refresh", "R", self.OnRefreshUmlWindow)
+        Add(menu2, "&Redraw Screen", "Ctrl-R", self.OnRefreshUmlWindow)
         
-        Add(menu5, "&Toggle Ascii UML", "V", self.OnViewToggleAscii)
+        Add(menu5, "&Toggle Ascii UML", "Ctrl-J", self.OnViewToggleAscii)
         menu5.AppendSeparator()
-        Add(menu5, "Colour &Sibling Subclasses", "F", self.OnColourSiblings)
-        Add(menu5, "&Default Colours", "C", self.OnCycleColoursDefault)
+        Add(menu5, "Colour &Sibling Subclasses", "Ctrl-F", self.OnColourSiblings)
+        Add(menu5, "&Default Colours", "Ctrl-D", self.OnCycleColoursDefault)
         menu5.AppendSeparator()
         
-        Add(menu5sub, "&Change Node Colour", "Shift-C", self.OnCycleColours)
-        Add(menu5sub, "Change &Sibling Subclass Colour Scheme", "Shift-F", self.OnColourSiblingsRandom)
+        Add(menu5sub, "&Change Node Colour", "Ctrl-G", self.OnCycleColours)
+        Add(menu5sub, "Change &Sibling Subclass Colour Scheme", "Ctrl-F", self.OnColourSiblingsRandom)
         AddSubMenu(menu5, menu5sub, "Advanced")
         
-        Add(menu3, "&Layout UML", "L", self.OnLayout)
-        Add(menu3, "&Layout UML Optimally (slower)", "B", self.OnDeepLayout)
+        Add(menu3, "&Layout UML", "Ctrl-L", self.OnLayout)
+        Add(menu3, "&Layout UML Optimally (slower)", "Ctrl-B", self.OnDeepLayout)
         menu3.AppendSeparator()
-        Add(menu3, "&Expand Layout", ".", self.app.run.CmdLayoutExpand)
-        Add(menu3, "&Contract Layout", ",", self.app.run.CmdLayoutContract)
+        Add(menu3, "&Expand Layout", "Ctrl-.", self.app.run.CmdLayoutExpand)
+        Add(menu3, "&Contract Layout", "Ctrl-,", self.app.run.CmdLayoutContract)
         menu3.AppendSeparator()
-        Add(menu3, "&Remember Layout", "Shift-0", self.OnRememberLayout2)
-        Add(menu3, "&Restore Layout", "0", self.OnRestoreLayout2)
+        Add(menu3, "&Remember Layout", "Ctrl-1", self.OnRememberLayout2)
+        Add(menu3, "&Restore Layout", "Ctrl-2", self.OnRestoreLayout2)
         
         Add(menu4, "&Help...", "F1", self.OnHelp)
         Add(menu4, "&Visit PyNSource Website...", "", self.OnVisitWebsite)
@@ -399,12 +399,12 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             self.popupmenu.Destroy()    # wx.Menu objects need to be explicitly destroyed (e.g. menu.Destroy()) in this situation. Otherwise, they will rack up the USER Objects count on Windows; eventually crashing a program when USER Objects is maxed out. -- U. Artie Eoff  http://wiki.wxpython.org/index.cgi/PopupMenuOnRightClick
         self.popupmenu = wx.Menu()     # Create a menu
         
-        item = self.popupmenu.Append(wx.NewId(), "Insert Class...")
+        item = self.popupmenu.Append(wx.NewId(), "Add Class...")
         self.frame.Bind(wx.EVT_MENU, self.OnInsertClass, item)
         if ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS:
-            item = self.popupmenu.Append(wx.NewId(), "Insert Image...")
+            item = self.popupmenu.Append(wx.NewId(), "Add Image...")
             self.frame.Bind(wx.EVT_MENU, self.OnInsertImage, item)
-            item = self.popupmenu.Append(wx.NewId(), "Insert Comment...")
+            item = self.popupmenu.Append(wx.NewId(), "Add Comment...")
             self.frame.Bind(wx.EVT_MENU, self.OnInsertComment, item)
 
         self.popupmenu.AppendSeparator()

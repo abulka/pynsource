@@ -51,7 +51,7 @@ After a (possibly slow) 'Optimal' Layout, there may be layout variants that you 
 
 The 'colour sibling subclasses' feature helps use colour to understand the relationships in your uml diagram.
 
-Hit "v" to toggle between normal UML and Ascii UML - copy and paste ascii uml text into your source code!
+Hit "Ctrl-J" to toggle between normal UML and Ascii UML - you can thus copy and paste ascii uml text into your source code!
 Optionally use Java Ascii Versatile Editor http://www.jave.de to wire up your ascii uml classes nicely before pasting into your source code or documentation.
 """
 
