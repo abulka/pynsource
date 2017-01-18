@@ -432,8 +432,9 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         
     def OnReportBug(self, event):
         import webbrowser
-        webbrowser.open("http://code.google.com/p/pynsource/issues/list")
-        
+        # webbrowser.open("http://code.google.com/p/pynsource/issues/list")
+        webbrowser.open("https://github.com/abulka/pynsource/issues")
+
     def OnRememberLayout1(self, event):
         self.umlwin.CmdRememberLayout1()
     def OnRememberLayout2(self, event):
