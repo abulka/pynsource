@@ -5,6 +5,8 @@ dictionary resource, with the file contentes encoded in base64.
 
 import os, glob
 from base64 import b64encode
+import collections
+ORDERED = True
 
 samplesdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "src", "samples")
 allfiles = glob.glob(os.path.join(samplesdir, "*.pyns"))
@@ -16,8 +18,20 @@ for file in allfiles:
 
 OUTFILE = os.path.join(samplesdir, "files_as_resource.py")
 
-with open(OUTFILE, 'w') as f:
-    f.write("sample_files_dict = ")
-    f.write(repr(samples))
-    
+if not ORDERED:
+    with open(OUTFILE, 'w') as f:
+        f.write("sample_files_dict = ")
+        f.write(repr(samples))
+else:
+    #od = collections.OrderedDict(samples.items())
+    od = collections.OrderedDict()
+    for key in sorted(samples.iterkeys()):
+        od[key] = samples[key]
+
+    with open(OUTFILE, 'w') as f:
+        f.write("from collections import OrderedDict\n")  # allow file to be valid python
+        f.write("sample_files_dict = ")
+        f.write(repr(od))
+
 print "done generating sample uml diagram file resource dictionary."
+

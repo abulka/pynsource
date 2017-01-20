@@ -1,0 +1,14 @@
+# PynSource Version 1.1
+{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin.'}
+{'type':'umlshape', 'id':'Editor', 'x':73, 'y':192, 'width':70, 'height':104, 'attrs':'topHandler|GUI|statechart', 'meths':'__init__|start'}
+{'type':'umlshape', 'id':'TopHandler', 'x':193, 'y':223, 'width':94, 'height':24, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'GUI', 'x':224, 'y':266, 'width':35, 'height':24, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'Statechart', 'x':248, 'y':133, 'width':94, 'height':24, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'D41', 'x':298, 'y':293, 'width':35, 'height':94, 'attrs':'a|b', 'meths':'c|d'}
+{'type':'umlshape', 'id':'D26', 'x':389, 'y':253, 'width':35, 'height':94, 'attrs':'a|b', 'meths':'c|d'}
+{'type':'umlshape', 'id':'ParentClass', 'x':59, 'y':28, 'width':102, 'height':124, 'attrs':'attribute 1|attribute 2|attribute 3', 'meths':'method A|method B|method C|method D'}
+{'type':'edge', 'id':'TopHandler_to_Editor', 'source':'TopHandler', 'target':'Editor', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'GUI_to_Editor', 'source':'GUI', 'target':'Editor', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Statechart_to_Editor', 'source':'Statechart', 'target':'Editor', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'D41_to_D26', 'source':'D41', 'target':'D26', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Editor_to_ParentClass', 'source':'Editor', 'target':'ParentClass', 'uml_edge_type':'generalisation'}
