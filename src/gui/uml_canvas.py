@@ -408,18 +408,59 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler) 
         
     def CreateUmlEdge(self, edge):
+        """
+        @startuml
+
+        class ArrowHead {
+            _arrowType
+            __init__(   type, end, size, xOffset, name, mf, arrowId)
+        }
+        class Shape {
+            SetCanvas()
+            SetPen()
+            SetBrush()
+        }
+        class LineShape <<lib.ogl._lines.py>> {
+            _from
+            _to
+            _arcArrows
+            AddArrow(arrowtype)
+            DrawArrow(self, dc, arrow, XOffset, proportionalOffset)
+            MakeLineControlPoints(2)
+        }
+        class LineShapeCustom <<src.gui.uml_lines.py>> {
+            DrawArrow(self, dc, arrow, XOffset, proportionalOffset)
+        }
+
+        Shape <|-- LineShape
+        LineShape <|-- LineShapeCustom
+        LineShape --> "0..*" ArrowHead : _arcArrows
+
+        note as N1
+            custom line drawing introduced
+                ARROW_UML_GENERALISATION
+                ARROW_UML_COMPOSITION
+        end note
+
+        N1 .. LineShapeCustom
+        @enduml
+
+        """
+        from gui.uml_lines import LineShapeCustom, ARROW_UML_GENERALISATION, ARROW_UML_COMPOSITION
+
         fromShape = edge['source'].shape
         toShape = edge['target'].shape
         
         edge_label = edge.get('uml_edge_type', '')
         if edge_label == 'generalisation':
-            arrowtype = ogl.ARROW_ARROW
+            arrowtype = ARROW_UML_GENERALISATION  # used to be ogl.ARROW_ARROW
         elif edge_label == 'composition':
-            arrowtype = ogl.ARROW_FILLED_CIRCLE
+            arrowtype = ARROW_UML_COMPOSITION  # used to be ogl.ARROW_FILLED_CIRCLE
         else:
             arrowtype = None
 
-        line = ogl.LineShape()
+        line = LineShapeCustom()  # used to be ogl.LineShape()
+
         line.SetCanvas(self)
         line.SetPen(wx.BLACK_PEN)
         line.SetBrush(wx.BLACK_BRUSH)
