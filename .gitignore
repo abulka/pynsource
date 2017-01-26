@@ -2,3 +2,6 @@
 out.png
 venv/
 .idea/
+dist/
+build/
+src/setup.py
