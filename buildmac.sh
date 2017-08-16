@@ -36,7 +36,7 @@ rm -rf build dist
 # Presumably the version of python that gets packaged is the python that is invoked here :-)
 #
 #python setup.py py2app -A  # testing - doesn't actually build much, standalone application not built
-python setup.py py2app      # deployment - makes a universal with 64 bit favoured.
+/usr/bin/python setup.py py2app      # deployment - makes a universal with 64 bit favoured.
 
 # Strip out the 64bit binaries which are run by default, and fail since wxPython 2.8 is 32bit
 ditto -rsrc --arch i386 dist/pyNsourceGui.app/ dist/pyNsourceGui32.app
@@ -46,10 +46,10 @@ ditto -rsrc --arch i386 dist/pyNsourceGui.app/ dist/pyNsourceGui32.app
 # and they have their app.  Note we use -r for recursion since the .app is a dir structure.
 cd dist
 cp ../../Readme.txt .
-zip -r pyNsource-1.61-macosx.zip pyNsourceGui32.app/ Readme.txt
+zip -r pyNsource-1.63-macosx.zip pyNsourceGui32.app/ Readme.txt
 mkdir ../../dist
-mv pyNsource-1.61-macosx.zip ../../dist/
+mv pyNsource-1.63-macosx.zip ../../dist/
 
 cd ../..
 echo 'done, please upload the following file to sourceforge'
-ls -l dist/pyNsource-1.61-macosx.zip
+ls -l dist/pyNsource-1.63-macosx.zip
