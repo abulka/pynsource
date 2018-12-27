@@ -203,7 +203,8 @@ class CmdFileLoadWorkspaceFromQuickPrompt(CmdFileLoadWorkspaceBase):
 
     def execute(self):
         eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
-        dialog = wx.TextEntryDialog (parent=self.context.frame, message='Enter node/edge persistence strings:', caption='Load Graph From Text', defaultValue=eg, style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
+        dialog = wx.TextEntryDialog (parent=self.context.frame, message='Enter node/edge persistence strings:', caption='Load Graph From Text', value=eg, style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
+        dialog.SetClientSize(wx.Size(400, 200))  # make bigger
         if dialog.ShowModal() == wx.ID_OK:
             txt = dialog.GetValue()
             print txt
