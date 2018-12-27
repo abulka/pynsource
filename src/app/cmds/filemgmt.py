@@ -49,7 +49,9 @@ class CmdFileImportBase(CmdBase):   # BASE
 
         # Layout
         self.context.umlwin.layout_and_position_shapes()
-        
+
+        self.context.frame.Layout()  # needed when running phoenix
+
 
 class CmdFileImportFromFilePath(CmdFileImportBase):   # was class CmdFileImportSource(CmdBase):
     def __init__(self, files=None):
@@ -110,6 +112,7 @@ class CmdBootStrap(CmdBase):
 
 class CmdRefreshUmlWindow(CmdBase):
     def execute(self):
+        self.context.frame.Layout()  # needed when running phoenix
         self.context.umlwin.Refresh()
         self.context.wxapp.RefreshAsciiUmlTab()
 
@@ -170,11 +173,13 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
         # set layout coords to be in sync with world, so that if expand scale things will work
         self.context.coordmapper.Recalibrate()
         umlcanvas.AllToLayoutCoords()
-        
+
+        self.context.frame.Layout()  # needed when running phoenix
+
         # refresh view
         umlcanvas.GetDiagram().ShowAll(1) # need this, yes
         umlcanvas.stateofthenation()
-        
+
         self.context.wxapp.RefreshAsciiUmlTab()
         self.context.wxapp.set_app_title(self.filepath)
 

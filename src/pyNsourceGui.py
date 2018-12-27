@@ -278,6 +278,10 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnLoadGraphSample(self, event):
         self.app.run.CmdFileLoadWorkspaceSampleViaPickList() # CmdFileLoadWorkspaceSampleViaDialog()
 
+        # phoenix hack to get things to appear
+        # self.app.run.CmdRefreshUmlWindow()
+        # self.umlwin.stateofthenation()
+
     def set_app_title(self, title):
         self.frame.SetTitle(self.andyapptitle + " - " + title)        
 
@@ -441,9 +445,12 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.umlwin.CmdRememberLayout2()
     def OnRestoreLayout1(self, event):
         self.umlwin.CmdRestoreLayout1()
+        self.frame.Layout()  # needed when running phoenix
+
     def OnRestoreLayout2(self, event):
         self.umlwin.CmdRestoreLayout2()
-        
+        self.frame.Layout()  # needed when running phoenix
+
     def OnCycleColours(self, event):
         self.app.run.CmdCycleColours()
     def OnCycleColoursDefault(self, event):

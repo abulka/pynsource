@@ -7,7 +7,9 @@ class CmdLayout(CmdBase):
         if canvas.GetDiagram().GetCount() == 0:
             return
         canvas.layout_and_position_shapes()
-        
+
+        self.context.frame.Layout()  # needed when running phoenix
+
     def undo(self):  # override
         """ Docstring """
         # not implemented
@@ -26,7 +28,8 @@ class CmdLayoutExpandContractBase(CmdBase):   # BASE
         if self.remove_overlaps:
             self.context.umlwin.remove_overlaps(watch_removals=False)
         self.context.umlwin.stateofthenation()
-            
+        self.context.frame.Layout()  # needed when running phoenix
+
 class CmdLayoutExpand(CmdLayoutExpandContractBase):
     def execute(self):
         if self.context.coordmapper.scale > 0.8:
