@@ -583,9 +583,15 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             def OnCancelClick(self, event):
                 self.Close()
         f = Help(parent=self.frame)
-        # f.m_textCtrl1.AppendText(HELP_MSG.strip())
-        f.m_richText1.Value = HELP_MSG.strip()
-        # f.SetClientSize(wx.Size(900, 400))  # make bigger
+
+        page = r"""
+        <HTML>
+        <BODY>
+        %s
+        </BODY>
+        </HTML>
+        """ % HELP_MSG_HTML.strip()
+        f.m_htmlWin1.SetPage(page)
         f.Show(True)
 
         # Old

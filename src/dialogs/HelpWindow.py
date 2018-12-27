@@ -9,7 +9,7 @@
 
 import wx
 import wx.xrc
-import wx.richtext
+import wx.html
 
 ###########################################################################
 ## Class HelpWindow
@@ -24,11 +24,8 @@ class HelpWindow ( wx.Frame ):
 
 		bSizer1 = wx.BoxSizer( wx.VERTICAL )
 
-
-		bSizer1.Add( ( 0, 0), 1, wx.EXPAND, 5 )
-
-		self.m_richText1 = wx.richtext.RichTextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY|wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER|wx.WANTS_CHARS )
-		bSizer1.Add( self.m_richText1, 25, wx.EXPAND |wx.ALL, 5 )
+		self.m_htmlWin1 = wx.html.HtmlWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.html.HW_SCROLLBAR_AUTO )
+		bSizer1.Add( self.m_htmlWin1, 25, wx.ALL|wx.EXPAND, 5 )
 
 
 		bSizer1.Add( ( 0, 0), 1, wx.EXPAND, 5 )
