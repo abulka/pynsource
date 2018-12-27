@@ -4,6 +4,14 @@ import wx
 import os
 from parsing.api import old_parser, new_parser
 
+try:
+    OPEN = wx.OPEN  # classic
+    MULTIPLE = wx.MULTIPLE
+except AttributeError:
+    OPEN = wx.FD_OPEN  # pheonix
+    MULTIPLE = wx.FD_MULTIPLE
+
+
 class CmdFileNew(CmdBase):
     def execute(self):
         self.context.umlwin.Clear()
@@ -55,7 +63,7 @@ class CmdFileImportViaDialog(CmdFileImportBase):    # was class CmdFileImport(Cm
         thisdir = self.context.config.get('LastDirFileImport', os.getcwd()) # remember dir path
         
         dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir=thisdir,
-            defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
+            defaultFile="", wildcard="*.py", style=OPEN|MULTIPLE, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             
             self.context.config['LastDirFileImport'] = dlg.GetDirectory()  # remember dir path
@@ -201,9 +209,9 @@ class CmdFileLoadWorkspaceFromQuickPrompt(CmdFileLoadWorkspaceBase):
 class CmdFileLoadWorkspaceViaDialog(CmdFileLoadWorkspaceBase):
     def execute(self):
         thisdir = self.context.config.get('LastDirFileOpen', '..\\tests\\saved uml workspaces') # remember dir path
-        
+
         dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir=thisdir,
-            defaultFile="", wildcard="*.pyns", style=wx.OPEN, pos=wx.DefaultPosition)
+            defaultFile="", wildcard="*.pyns", style=OPEN, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             self.filepath = dlg.GetPath()
 
@@ -225,7 +233,7 @@ class CmdFileLoadWorkspaceSampleViaDialog(CmdFileLoadWorkspaceBase):
         thisdir = os.path.join(thisdir, "../../samples")
         
         dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir=thisdir,
-            defaultFile="", wildcard="*.pyns", style=wx.OPEN, pos=wx.DefaultPosition)
+            defaultFile="", wildcard="*.pyns", style=OPEN, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             self.filepath = dlg.GetPath()
             super(CmdFileLoadWorkspaceSampleViaDialog, self).execute()
