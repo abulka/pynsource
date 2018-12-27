@@ -35,10 +35,11 @@ Do you wish to visit the download page now?
 """
 
 HELP_MSG = """
-PyNSource Gui Help:
-
 Import a python file and it will be reverse engineered and represented as UML.
 
+Known Bugs in Mac version: When you drag UML classes they do not redraw till you let the mouse go.  Annoying, I know.  When printing, the default page range is 1-9999, you need to change the 9999 into a 1.  These are both wxPython bugs. 
+
+USAGE:
 Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.
 You can import repeatedly and incoming classes will be added and wired up to existing classes on the workspace.
 
@@ -52,6 +53,7 @@ After a (possibly slow) 'Optimal' Layout, there may be layout variants that you 
 The 'colour sibling subclasses' feature helps use colour to understand the relationships in your uml diagram.
 
 Hit "Ctrl-J" (or Cmd-J on Mac) to toggle between normal UML and Ascii UML - you can thus copy and paste ascii uml text into your source code!
+
 Optionally use Java Ascii Versatile Editor http://www.jave.de to wire up your ascii uml classes nicely before pasting into your source code or documentation.
 """
 

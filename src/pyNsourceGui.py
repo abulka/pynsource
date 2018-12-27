@@ -577,7 +577,19 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             self.MessageBox("You already have the latest version:  %s" % APP_VERSION)
     
     def OnHelp(self, event):
-        self.MessageBox(HELP_MSG.strip())
+        from dialogs.HelpWindow import HelpWindow
+        class Help(HelpWindow):
+            # Virtual event handlers, overide them in your derived class (this class)
+            def OnCancelClick(self, event):
+                self.Close()
+        f = Help(parent=self.frame)
+        # f.m_textCtrl1.AppendText(HELP_MSG.strip())
+        f.m_richText1.Value = HELP_MSG.strip()
+        # f.SetClientSize(wx.Size(900, 400))  # make bigger
+        f.Show(True)
+
+        # Old
+        # self.MessageBox(HELP_MSG.strip())
 
     def Enable_if_node_selected(self, event):
         selected = [s for s in self.umlwin.GetDiagram().GetShapeList() if s.Selected()]
