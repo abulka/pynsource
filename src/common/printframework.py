@@ -60,7 +60,10 @@ class MyPrintout(wx.Printout):
         maxY = canvasMaxY + (2 * marginY)
 
         # Get the size of the DC in pixels
-        (w, h) = dc.GetSizeTuple()
+        try:
+            (w, h) = dc.GetSizeTuple()  # classic wxpython
+        except AttributeError:
+            (w, h) = dc.GetSize()  # pheonix - see https://wxpython.org/Phoenix/docs/html/classic_vs_phoenix.html
 
         # Calculate a suitable scaling factor
         scaleX = float(w) / maxX
