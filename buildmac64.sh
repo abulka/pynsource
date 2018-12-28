@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Builds a standalone 64 bit pyNsourceGui for mac
 
 # Need to use a brew python (which is a proper framework installation), not a virtual env
@@ -5,6 +7,7 @@
 # in development mode).  Virtualenv python no good for either running nor deploying (cos of wxpython)
 PYTHON=/usr/local/bin/python2
 PY2APPLET=/usr/local/bin/py2applet
+DESTZIP=pyNsource-1.63-macosx.zip
 
 $PYTHON buildsamples.py
 
@@ -26,7 +29,7 @@ rm -rf build dist
 #/usr/local/bin/python2 setup.py py2app -A     # deployment - makes a universal with 64 bit favoured.
 
 # Hacks cos py2app doesn't copy things into the right directories.
-# Also ensure you remove references to "import wx.xrc" from dialog/*.py that wxFormBuilder inserts
+# Also ensure you remove references to "import wx.xrc" from dialog/*.py that wxFormBuilder inserts - see https://github.com/pyinstaller/pyinstaller/issues/2295
 FROM=dist/pyNsourceGui.app/Contents/Frameworks
 DEST=dist/pyNsourceGui.app/Contents/Resources/lib/python2.7/lib-dynload/wx
 #CMD=ln -s
@@ -43,7 +46,6 @@ $CMD $FROM/libwx_osx_cocoau_stc-3.0.0.4.0.dylib $DEST
 # The resulting .app is a directory structure and is only
 # treated as a single file on a Mac.  So we need to zip it.  Mac users simply unzip
 # and they have their app.  Note we use -r for recursion since the .app is a dir structure.
-DESTZIP=pyNsource-1.64-macosx.zip
 cd dist
 cp ../../Readme.txt .
 zip -r $DESTZIP pyNsourceGui.app/ Readme.txt

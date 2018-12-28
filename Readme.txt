@@ -3,15 +3,18 @@ PyNSource and PyNSource GUI
 Reverse engineer python source code into UML - optionally display UML as Ascii
 art for pasting into your source code.
 
-Version 1.62
-(c) Andy Bulka 2004-2015
+Version 1.63
+(c) Andy Bulka 2004-2018
 andy@andypatterns.com
 http://www.andypatterns.com/index.php/products/pynsource/
 License: GPL 3
 
 ========================================
 
-Features:
+** 2018 News: For an exciting new, online version of pynsource, please email abulka@gmail.com and
+   get onto the beta program.
+
+========================================
 
 pyNsourceGui.py
 
@@ -23,7 +26,7 @@ pyNsourceGui.py
  - Print and Print preview
  - Persistence
  - Now uses standard ast python parsing
- - Windows 7, Mac os x, Linux compatibility
+ - Windows 10, Mac OSX Mojave, Linux compatibility
  - Open Source
 
 Unlike most off the shelf uml python code importers, pyNsource attempts to
@@ -32,15 +35,16 @@ development. The expression "self.somevar" is correctly recognised as a UML
 attribute "somevar". pyNsource attempts to guess the cardinality of associations
 - if you use arrays or use .append then "one to many" is assumed.
 
-Use the built in layout algorithm to help you get started in arranging your
+Use the built-in layout algorithm to help you get started in arranging your
 classes on the workspace. The layout algorithm uses "spring layout" and animates
 during layout. Overlap removal means your nodes won't overlap (unless you drag
 them with the SHIFT key held down). A multipass (slower) 'Optimal' Layout is
 also available which tries to find the best possible layout, within the
 constraints of not being able to 'bend' lines.
 
-Hit "v" to toggle between normal UML and Ascii UML view. Ascii UML lets you copy
-and paste ascii uml text into your source code and text based documentation.
+Hit "v" (or CMD J on Mac) to toggle between normal UML and Ascii UML view.
+The generation of ascii UML diagrams allows you to copy
+and paste UML ascii diagram text into your source code and text based documentation.
 Optionally use something like the Java Ascii Versatile Editor http://www.jave.de
 to wire up your ascii uml classes nicely before pasting into your source code or
 documentation.  See an example of ascii UML at the bottom of this readme.
@@ -75,6 +79,9 @@ pyYumlGui.py
 This was mainly a fun experiment but seems to work ok. The pynsource.py command
 line tool can also generate Yuml text from python source code (use the -y option).
 
+pyPlantumlGui.py
+
+ - See above, but uses the more advanced and popular plantuml service.
 
 ========================================
 
@@ -107,6 +114,15 @@ Linux:
   cd pynsource
   ./rungui.sh
 
+
+More notes on running from source on a mac - Mojave
+---------------------------------------------------
+Install a brew python2 or a pyenv python2 or just use the built in system python
+Do not use virtual environment (sorry - wxpython limitation).
+Ensuring the relevant python2 is in the path:
+
+pip install -r requirements.txt
+./rungui_mac.sh
 
 More notes on running from source on a mac - El Capitan
 -------------------------------------------------------
@@ -141,6 +157,10 @@ then install the binary release which uses wxpython 2.8 internally.
 ========================================
  
 Change Log
+
+Version 1.63 (December 2019)
+- compatibility with latest wxpython 4.0.3
+- new Mac OSX build script to generate 64bit mac .app - Mojave compatible
 
 Version 1.62 (March 2016)
 - fixed main window appearing almost offscreen on mac
