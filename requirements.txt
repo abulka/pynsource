@@ -1,2 +1,4 @@
+wxpython
 configobj
 requests
+py2app
