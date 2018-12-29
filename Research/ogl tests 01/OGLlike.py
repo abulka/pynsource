@@ -8,7 +8,8 @@
 ##########################################
 
 import wx #ANDY
-from wxPython.wx import *
+# from wxPython.wx import *
+from wx import *
 import pickle
 import os
 import sys
@@ -22,12 +23,12 @@ ANDYMAIN = None
 ##############
 
 def menuMaker(frame, menus):
-    menubar = wxMenuBar()
+    menubar = MenuBar()
     for m,n in menus.items():
-        menu = wxMenu()
+        menu = Menu()
         menubar.Append(menu,m)
         for x in n:
-            id = wxNewId()
+            id = NewId()
             menu.Append(id,x[0],x[1])
             EVT_MENU(frame, id,  x[2])
     frame.SetMenuBar(menubar)
@@ -135,8 +136,8 @@ class Shape(ShapeEvtHandler):
         self.fill= ['WHITE']            # fill color
 
     def draw(self,dc):
-        dc.SetPen(wxPen(self.pen[0], self.pen[1], wxSOLID))
-        dc.SetBrush(wxBrush(self.fill[0], wxSOLID))
+        dc.SetPen(Pen(self.pen[0], self.pen[1], SOLID))
+        dc.SetBrush(Brush(self.fill[0], SOLID))
 
     def move(self,x,y):
         self.x = map((lambda v: v+x), self.x)
@@ -155,10 +156,10 @@ class LineShape(Shape):
         dc.DrawLine(self.x[0], self.y[0],self.x[1], self.y[1])
 
     def HitTest(self, x, y):
-        if x < min(self.x)-3:return false
-        if x > max(self.x)+3:return false
-        if y < min(self.y)-3:return false
-        if y > max(self.y)+3:return false
+        if x < min(self.x)-3:return False
+        if x > max(self.x)+3:return False
+        if y < min(self.y)-3:return False
+        if y > max(self.y)+3:return False
             
         top= (x-self.x[0]) *(self.x[1] - self.x[0]) + (y-self.y[0])*(self.y[1]-self.y[0])
         distsqr=pow(self.x[0]-self.x[1],2)+pow(self.y[0]-self.y[1],2)
@@ -169,8 +170,8 @@ class LineShape(Shape):
        
         dist=pow(pow(newx-x,2) +  pow(newy-y,2),.5)
 
-        if dist>7: return false
-        return true
+        if dist>7: return False
+        return True
 
 class RectangleShape(Shape):
     def __init__(self,x=20, y=20, x2=90, y2=90):
@@ -196,11 +197,11 @@ class RectangleShape(Shape):
         dc.DrawRectangle(int(self.x[0]), int(self.y[0]),int(self.x[1]-self.x[0]), int(self.y[1]-self.y[0]))
         
     def HitTest(self, x, y):
-        if x < self.x[0]: return false
-        if x > self.x[1]: return false
-        if y < self.y[0]: return false
-        if y > self.y[1]: return false
-        return true
+        if x < self.x[0]: return False
+        if x > self.x[1]: return False
+        if y < self.y[0]: return False
+        if y > self.y[1]: return False
+        return True
 
 class PointShape(Shape):
     def __init__(self,x=20,y=20,size=4,type='rect'):
@@ -235,7 +236,7 @@ class PointShape(Shape):
 
 
 
-class ShapeCanvas(wxScrolledWindow):
+class ShapeCanvas(ScrolledWindow):
     def __init__(self,
         parent,
         id=-1,
@@ -244,7 +245,7 @@ class ShapeCanvas(wxScrolledWindow):
         style=0,
         name="",
         ):
-        wxScrolledWindow.__init__(self,parent,id,pos,size,style,name)
+        ScrolledWindow.__init__(self,parent,id,pos,size,style,name)
         self.diagram=None
         self.nodes=[]
         self.currentPoint = [0,0] # x and y of last mouse click
@@ -312,13 +313,13 @@ class ShapeCanvas(wxScrolledWindow):
         self.Refresh()
 
     def onPaintEvent(self, event):   
-        dc = wxPaintDC(self)
+        dc = PaintDC(self)
         self.PrepareDC(dc)
         dc.SetUserScale(self.scalex,self.scaley)
-        dc.BeginDrawing()
+        # dc.BeginDrawing()
         for item in self.diagram.shapes + self.nodes:
             item.draw(dc)
-        dc.EndDrawing()
+        # dc.EndDrawing()
 
     def OnRightDown(self,event):
         #ANDY
@@ -337,11 +338,11 @@ class ShapeCanvas(wxScrolledWindow):
             self.getCurrentShape(event).OnRightUp(event)
         else:
             #
-            self.popupmenu = wx.Menu()
+            self.popupmenu = Menu()
             item = self.popupmenu.Append(2021, "Properties...")
-            self.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+            self.Bind(EVT_MENU, self.OnPopupItemSelected, item)
             item = self.popupmenu.Append(2022, "Cancel")
-            self.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+            self.Bind(EVT_MENU, self.OnPopupItemSelected, item)
             
             pos = event.GetPosition()
             pos = self.ScreenToClient(pos)
@@ -352,7 +353,7 @@ class ShapeCanvas(wxScrolledWindow):
     def OnPopupItemSelected(self, event): 
         item = self.popupmenu.FindItemById(event.GetId()) 
         text = item.GetText() 
-        wx.MessageBox("You selected item '%s'" % text)
+        MessageBox("You selected item '%s'" % text)
     ################        
         
     def OnRightDClick(self,event):
@@ -541,10 +542,10 @@ class LinesShape(Shape,Resizeable):
         
     def HitTest(self, x, y):
 
-        if x < min(self.x)-3:return false
-        if x > max(self.x)+3:return false
-        if y < min(self.y)-3:return false
-        if y > max(self.y)+3:return false
+        if x < min(self.x)-3:return False
+        if x > max(self.x)+3:return False
+        if y < min(self.y)-3:return False
+        if y > max(self.y)+3:return False
         
         ind=0
         try:
@@ -564,11 +565,11 @@ class LinesShape(Shape,Resizeable):
                 dist=pow(pow(newx-x,2) +  pow(newy-y,2),.5)
     
                 if dist<7: 
-                    return true
+                    return True
                 ind = ind +1
         except IndexError:
             pass
-        return false
+        return False
 
 
 
@@ -615,24 +616,24 @@ class Block(RectangleShape,Connectable,Resizeable,Selectable,Attributable):
 
     def OnLeftDown(self,event):
         if isinstance(self,Block) and event.ControlDown():
-            d=wxTextEntryDialog(None,'Block Label',defaultValue=self.label,style=wxOK)
+            d=TextEntryDialog(None,'Block Label',defaultValue=self.label,style=OK)
             d.ShowModal()
             self.label = d.GetValue()
 
     #ANDY
     #def OnRightDown(self,event):
     #    f = AttributeEditor(NULL, -1, "props",self)
-    #    f.Show(true)
+    #    f.Show(True)
     
     #ANDY
     def OnRightDown(self,event):
-        self.popupmenu = wx.Menu()
+        self.popupmenu = Menu()
         item = self.popupmenu.Append(2011, "Properties...")
-        ANDYMAIN.canvas.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
         item = self.popupmenu.Append(2012, "Delete Node")
-        ANDYMAIN.canvas.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
         item = self.popupmenu.Append(2013, "Cancel")
-        ANDYMAIN.canvas.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+        ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
         #
         pos = event.GetPosition()
         pos = ANDYMAIN.canvas.ScreenToClient(pos)
@@ -645,8 +646,8 @@ class Block(RectangleShape,Connectable,Resizeable,Selectable,Attributable):
         text = item.GetText() 
         #wx.MessageBox("You selected item '%s'" % text)
         if text == "Properties...":
-            f = AttributeEditor(NULL, -1, "props",self)
-            f.Show(true)
+            f = AttributeEditor(None, -1, "props",self)
+            f.Show(True)
     ################
     
 class CodeBlock(Block):
@@ -673,7 +674,7 @@ class ContainerBlock(Block,Diagram):
     def OnLeftDClick(self,event):
         f = CodeFrame(self)
         f.SetTitle(self.label)
-        f.Show(true)
+        f.Show(True)
 
 # Nodes
 class Node(PointShape):
@@ -754,23 +755,23 @@ class ResizeableNode(Node):
 
 #---------------------------------------------------------------------------------------------------------
 
-class AttributeEditor(wxFrame):
+class AttributeEditor(Frame):
     def __init__(self, parent, ID, title,item):
-        wxFrame.__init__(self, parent, ID, title,
-                         wxDefaultPosition, wxSize(200, 450))
+        Frame.__init__(self, parent, ID, title,
+                         DefaultPosition,Size(200, 450))
         self.item = item
         # Create a box sizer for self
-        box = wxBoxSizer(wxVERTICAL)
+        box =BoxSizer(VERTICAL)
         self.SetSizer(box)
         
-        tID = wxNewId()
-        self.list = wxListCtrl(self, tID, wxDefaultPosition, wxDefaultSize, wxLC_REPORT)
+        tID = NewId()
+        self.list = ListCtrl(self, tID, DefaultPosition, DefaultSize, LC_REPORT)
         self.SetSize(self.GetSize())
  
         self.list.InsertColumn(0, "Attribute")
         self.list.InsertColumn(1, "Value")
 
-        accept = wxButton(self, wxNewId(), "Accept",size=(40,20))
+        accept = Button(self, NewId(), "Accept",size=(40,20))
 
         for c in range(len(item.attributes)):
             self.list.InsertStringItem(c , "")
@@ -778,11 +779,11 @@ class AttributeEditor(wxFrame):
             temp = str( eval("item." + str(item.attributes[c])))
             self.list.SetStringItem(c, 1, temp)
         
-        self.text    = wxTextCtrl(self,wxNewId(), "", style=wxTE_MULTILINE)
+        self.text    = TextCtrl(self,NewId(), "", style=TE_MULTILINE)
         
-        box.Add(self.list, 1,wxEXPAND) 
-        box.Add(accept, 0,wxEXPAND) 
-        box.Add(self.text, 1,wxEXPAND) 
+        box.Add(self.list, 1,EXPAND)
+        box.Add(accept, 0,EXPAND)
+        box.Add(self.text, 1,EXPAND)
 
         EVT_LIST_ITEM_SELECTED(self.list,tID, self.selectProp)
         EVT_BUTTON(accept, accept.GetId(), self.acceptProp)
@@ -806,9 +807,9 @@ class AttributeEditor(wxFrame):
         self.list.SetStringItem(idx, 1, str(getattr(self.item,prop)))
 
 
-class CodeFrame(wxFrame):
+class CodeFrame(Frame):
     def __init__(self,diagram):
-        wxFrame.__init__(self,None, -1, 'Untitled', size=(500,300))
+        Frame.__init__(self,None, -1, 'Untitled', size=(500,300))
         
         self.file=None
         menus={}
@@ -830,7 +831,7 @@ class CodeFrame(wxFrame):
         # Canvas Stuff
         self.canvas=ShapeCanvas(self,-1)
         self.canvas.SetDiagram(diagram)
-        self.canvas.SetBackgroundColour(wxWHITE)
+        self.canvas.SetBackgroundColour(WHITE)
 
         #ANDY
         global ANDYMAIN
@@ -840,7 +841,7 @@ class CodeFrame(wxFrame):
         self.canvas.SetVirtualSize((600, 400))
         ################
       
-        self.Show(true)
+        self.Show(True)
 
     #ANDY
     #def OnPopupItemSelected(self, event):
@@ -851,7 +852,7 @@ class CodeFrame(wxFrame):
     #    wx.MessageBox("You selected item '%s'" % text)
     #    if text == "Properties...":
     #        f = AttributeEditor(NULL, -1, "props",self)
-    #        f.Show(true)
+    #        f.Show(True)
     ################
     
     
@@ -903,10 +904,10 @@ class CodeFrame(wxFrame):
         self.canvas.Refresh()
         
         
-class MyApp(wxApp):
+class MyApp(App):
     def OnInit(self):
         frame = CodeFrame(ContainerBlock())
-        return true
+        return True
 
 ##########################################
 

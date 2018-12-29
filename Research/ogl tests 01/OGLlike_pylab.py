@@ -51,9 +51,9 @@
 # ***********************************************************************
 
 import wx
-import PyLab_Works_Globals as PG
-from   menu_support    import *
-from   utility_support import *
+# import PyLab_Works_Globals as PG
+# from   menu_support    import *
+# from   utility_support import *
 
 import pickle
 import os
@@ -1577,5 +1577,4 @@ class DB_Table_Shape ( Shape ) : #t_BaseShape ):
       dc.DrawCircle ( x, y, r )
 
 # ***********************************************************************
-
 
