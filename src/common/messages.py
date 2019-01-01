@@ -61,13 +61,6 @@ HELP_MSG_HTML = """
 <h2>What is PyNSource?</h2>
 <p>Import one or more python files and they will be reverse engineered and represented as a UML diagram.&nbsp; Layout the diagram as you like and print it to paper or to pdf.</p>
 <p>For an online version of pynsource, please email <span style="text-decoration: underline;">abulka@gmail.com</span> and get onto the beta program.</p>
-<h2><strong>Known Bugs in Mac version</strong></h2>
-<ul>
-<li>When you drag UML classes they do not redraw till you let the mouse go. Annoying, I know.</li>
-<li>When printing, the default page range is 1-9999, you need to change the 9999 into a 1.</li>
-</ul>
-<p>These are both due to bugs in the underlying wxPython GUI toolkit on Mac.</p>
-<h2>USAGE:</h2>
 <h3>Importing Python files</h3>
 <p>Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.</p>
 <p>You can import repeatedly and incoming classes will be <strong>added</strong> and wired up to existing classes on the workspace.</p>
@@ -95,7 +88,11 @@ HELP_MSG_HTML = """
 <h3>UML as Ascii</h3>
 <p>Hit "Ctrl-J" (or Cmd-J on Mac) to toggle between normal UML and Ascii UML - you can thus copy and paste ascii uml text into your source code!</p>
 <p>Optionally use Java Ascii Versatile Editor <span style="text-decoration: underline;">http://www.jave.de</span> to wire up your ascii uml classes nicely before pasting into your source code or documentation.</p>
-<p>&nbsp;</p>
+<h3>Known Bugs in Mac version</h3>
+<ul>
+<li>When printing, the default page range is 1-9999, you need to change the 9999 into a 1.</li>
+</ul>
+<p>This is due to a bug in the underlying wxPython GUI toolkit on Mac.</p>
 """
 
 HELP_COMMAND_LINE_USAGE = """

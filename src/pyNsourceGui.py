@@ -586,10 +586,28 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     
     def OnHelp(self, event):
         from dialogs.HelpWindow import HelpWindow
+
         class Help(HelpWindow):
             # Virtual event handlers, overide them in your derived class (this class)
+
+            def __init__(self,  parent):
+                HelpWindow.__init__(self,  parent)
+
+                # CMD-W to close Frame by attaching the key bind event to accellerator table
+                randomId = wx.NewId()
+                self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=randomId)
+                accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('W'), randomId)])
+                self.SetAcceleratorTable(accel_tbl)
+
             def OnCancelClick(self, event):
                 self.Close()
+
+            def OnCloseMe(self, event):
+                self.Close(True)
+
+            def OnCloseWindow(self, event):
+                self.Destroy()
+
         f = Help(parent=self.frame)
 
         page = r"""
