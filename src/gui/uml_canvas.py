@@ -31,11 +31,168 @@ from common.architecture_support import *
 
 ogl.Shape.Move2 = Move2
 
+from gui.repair_ogl import repairOGL
+repairOGL()
+
+# class DiagramAndy(ogl.Diagram):
+#
+#     def RedrawORI(self, dc):
+#         """Redraw the shapes in the diagram on the specified device context."""
+#         if self._shapeList:
+#             for object in self._shapeList:
+#                 object.Draw(dc)
+#
+#     # def Redraw(self, dc):
+#     #     """Redraw the shapes in the diagram on the specified device context."""
+#     #     if self._shapeList:
+#     #         for object in self._shapeList:
+#     #             print "redrawing", object, object.GetX(), object.GetY()
+#     #             object.Draw(dc)
+#
+# class ShapeCanvasAndy(ogl.ShapeCanvas):
+#     """Custom ogl canvas for mucking around"""
+#
+#     def DrawORI(self):
+#         """
+#         Update the buffer with the background and redraw the full diagram.
+#         """
+#         dc = wx.MemoryDC(self._buffer)
+#
+#         dc.SetBackground(wx.Brush(self.GetBackgroundColour(), wx.BRUSHSTYLE_SOLID))
+#         dc.Clear() # make sure you clear the bitmap!
+#
+#         if self.GetDiagram():
+#             self.GetDiagram().Redraw(dc)
+#         print("andy draw ori")
+#
+#     def OnPaintORI(self, evt):
+#         """
+#         The paint handler, uses :class:`BufferedPaintDC` to draw the
+#         buffer to the screen.
+#         """
+#         dc = wx.PaintDC(self)
+#         self.PrepareDC(dc)
+#         dc.DrawBitmap(self._buffer, 0, 0)
+#         print("andy onPaint ori")
+#
+#     def DrawNEW(self):
+#         """
+#         Update the buffer with the background and redraw the full diagram.
+#         """
+#         # dc = wx.MemoryDC(self._buffer)
+#         #
+#         # dc.SetBackground(wx.Brush(self.GetBackgroundColour(), wx.BRUSHSTYLE_SOLID))
+#         # dc.Clear() # make sure you clear the bitmap!
+#         #
+#         # if self.GetDiagram():
+#         #     self.GetDiagram().Redraw(dc)
+#         # print("andy draw")
+#
+#     def OnPaintNEWNEW(self, evt):
+#
+#         dc = wx.PaintDC(self)
+#         self.PrepareDC(dc)
+#         dc.SetUserScale(self.scalex,self.scaley)
+#         dc.DrawBitmap(self._buffer, 0, 0)
+#
+#         # # dc.BeginDrawing()
+#         # # for item in self.diagram.shapes + self.nodes:
+#         # #     item.draw(dc)
+#         # dc.SetBackground(wx.Brush(self.GetBackgroundColour(), wx.BRUSHSTYLE_SOLID))
+#         #
+#         # dc.SetBrush(wx.CYAN_BRUSH)
+#         # dc.SetPen(wx.Pen('MEDIUM FOREST GREEN', 4))
+#         #
+#         # if self.GetDiagram():
+#         #     self.GetDiagram().Redraw(dc)
+#         #
+#
+#         # if self.GetDiagram()._shapeList:
+#         #     for object in self.GetDiagram()._shapeList:
+#         #         print "shapelist item", object
+#         #         # object.Draw(dc)
+#         #         dc.SetBrush(wx.RED_BRUSH)
+#         #         dc.SetPen(wx.Pen('MEDIUM FOREST GREEN', 4))
+#         #
+#         #         # last_x = object.GetX()
+#         #         # last_y = object.GetY()
+#         #         # last_width = object.GetWidth()
+#         #         # last_height = object.GetHeight()
+#         #         # dc.DrawRectangle(object.GetX(),object.GetY(),object.GetWidth(), object.GetHeight())
+#
+#         # Big
+#         # dc.SetBrush(wx.CYAN_BRUSH)
+#         # dc.SetPen(wx.Pen('MEDIUM FOREST GREEN', 4))
+#         # r = float(random.randint(200,400))
+#         # print "random width is", r
+#         # dc.DrawRectangle(320.0,320.0,r,400.0)
+#
+#         # dc.SetBrush(wx.YELLOW_BRUSH)
+#         # rx = float(random.randint(250,450))
+#         # ry = float(random.randint(50,150))
+#         # rwidth = float(random.randint(50,150))
+#         # rheight = float(random.randint(50,150))
+#         # dc.DrawRectangle(rx, ry, rwidth, rheight)
+#
+#         # dc.SetBrush(wx.BLUE_BRUSH)
+#         # dc.DrawRectangle(last_x, last_y, last_width, last_height)
+#         # print "last", last_x, last_y, last_width, last_height
+#
+#         print("andy onPaint")
+#
+#         # dc.EndDrawing()
+#
+#     def OnMouseEvent(self, evt):
+#         ogl.ShapeCanvas.OnMouseEvent(self, evt)
+#         # print "mouse stuff..."  # Andy
+#         self.Refresh()  # Andy
+
+# class RectangleShapeAndy(ogl.RectangleShape):
+#     # def Draw(self, dc):
+#     #     ogl.RectangleShape.Draw(self, dc)
+#     #     # print "RectangleShapeAndy Draw ...... ", self._visible
+#     #
+#     # def OnDraw(self, dc):
+#     #     ogl.RectangleShape.OnDraw(self, dc)
+#     #     # print "RectangleShapeAndy OnDraw ,,,, ", self._visible
+#     #     #
+#     #     # dc.SetBrush(wx.GREEN_BRUSH)
+#     #     # dc.SetPen(wx.Pen('MEDIUM FOREST GREEN', 4))
+#     #     # dc.DrawRectangle(self.GetX(),self.GetY(),self.GetWidth(), self.GetHeight())
+#
+#     def OnDragLeft(self, draw, x, y, keys = 0, attachment = 0):
+#         # ogl.RectangleShape.OnDragLeft(self, draw, x, y, keys = 0, attachment = 0)  # useless these days
+#
+#         # xx, yy = self._canvas.Snap(x, y)
+#         # xx, yy = x, y  # if don't want snapping
+#         #
+#         # w, h = self.GetBoundingBoxMax()
+#         # dc = wx.ClientDC(self.GetCanvas())  # wx.ClientDC doesn't work these days
+#         # self.GetCanvas().PrepareDC(dc)
+#         # self.Move(dc, xx, yy)
+#
+#         self.SetX(x)
+#         self.SetY(y)
+#
+#     def OnBeginDragLeft(self, x, y, keys = 0, attachment = 0):
+#         self.SetX(x)
+#         self.SetY(y)
+#
+#     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
+#         self.SetX(x)
+#         self.SetY(y)
+
+# repairOGL()
+
 class UmlCanvas(ogl.ShapeCanvas):
+# class UmlCanvas(ShapeCanvasAndy):
 
     def __init__(self, parent, log, frame):
         ogl.ShapeCanvas.__init__(self, parent)
-        
+        # ShapeCanvasAndy.__init__(self, parent)  # ANDY HACK OGL
+        # self.scalex =2.0  # ANDY HACK OGL
+        # self.scaley =2.0  # ANDY HACK OGL
+
         self.observers = multicast()
         self.app = None  # assigned later by app boot
         
@@ -44,6 +201,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.SetBackgroundColour("LIGHT BLUE")
 
         self.SetDiagram(ogl.Diagram())
+        # self.SetDiagram(DiagramAndy())  # ANDY HACK OGL
         self.GetDiagram().SetCanvas(self)
 
         wx.EVT_WINDOW_DESTROY(self, self.OnDestroy)
@@ -101,7 +259,16 @@ class UmlCanvas(ogl.ShapeCanvas):
         if keycode == wx.WXK_ESCAPE:
             print "ESC key detected: Abort Layout"
             self.kill_layout = True
-        
+
+            # # HACK PLAY
+            # shape = RectangleShapeAndy(50,50)
+            # self.AddShape(shape)
+            # shape.SetX(random.randint(40,80))
+            # shape.SetY(random.randint(40,80))
+            # shape.Show(True)
+            # self.Refresh()
+            # # END HACK PLAY
+
         if keycode == wx.WXK_RIGHT:
             self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
                 

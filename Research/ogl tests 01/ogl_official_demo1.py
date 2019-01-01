@@ -15,8 +15,12 @@
 
 import wx
 import wx.lib.ogl as ogl
-
+import sys
 import  images
+
+sys.path.append('../../src/gui')
+from repair_ogl import repairOGL
+repairOGL()
 
 #----------------------------------------------------------------------
 
@@ -478,7 +482,6 @@ class MainApp(wx.App):
         
         # END OPTIONAL
         
-
 def main():
     application = MainApp(0)
     application.MainLoop()

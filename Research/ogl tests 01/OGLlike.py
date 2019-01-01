@@ -1,6 +1,7 @@
 ##########################################
 # OGLlike - OGL like library for wxPython 
 #
+# Phoenix compatibility and various improvements Andy Bulka 2018.
 # Copyright (C) 2003-2004  Erik R. Lechak
 # Feel free to use it, modify it, distribute it.  All I ask is:
 #   1)  If you improve it, please send me a copy of the improved version.  
@@ -14,12 +15,17 @@ import pickle
 import os
 import sys
 import copy
+import random
 
 #Global Stuff   -------------------------------------------------------------------------
 clipboard=[]
 
 #ANDY
-ANDYMAIN = None
+# ANDYMAIN = None
+DEBUG_DRAG = False
+DEBUG_DRAWLINE = False
+DEBUG_CONNECT = False
+DEBUG_INODE_CONNECT = False
 ##############
 
 def menuMaker(frame, menus):
@@ -28,9 +34,11 @@ def menuMaker(frame, menus):
         menu = Menu()
         menubar.Append(menu,m)
         for x in n:
+            menu_text, help, handler = x[0], x[1], x[2]
             id = NewId()
-            menu.Append(id,x[0],x[1])
-            EVT_MENU(frame, id,  x[2])
+            menu.Append(id, menu_text, help)
+            frame.Bind(EVT_MENU, handler, id=id)
+            # EVT_MENU(frame, id,  handler)  # old deprecated way
     frame.SetMenuBar(menubar)
 
 #------------------------------------------------------------------------------------------
@@ -154,6 +162,8 @@ class LineShape(Shape):
     def draw(self,dc):
         Shape.draw(self,dc)
         dc.DrawLine(self.x[0], self.y[0],self.x[1], self.y[1])
+        if DEBUG_DRAWLINE:
+            print "DrawLine", self.x[0], self.y[0],self.x[1], self.y[1]
 
     def HitTest(self, x, y):
         if x < min(self.x)-3:return False
@@ -177,20 +187,22 @@ class RectangleShape(Shape):
     def __init__(self,x=20, y=20, x2=90, y2=90):
         
         #ANDY
-        if ANDYMAIN:
-            topx,topy = ANDYMAIN.canvas.GetViewStart() # The positions are in logical scroll units, not pixels, so to convert to pixels you will have to multiply by the number of pixels per scroll increment.
-            print topx,topy
-            px,py = ANDYMAIN.canvas.GetScrollPixelsPerUnit() 
-            print topx,topy, px,py, topx*px, topy*py
-            topx,topy = ANDYMAIN.canvas.CalcUnscrolledPosition(topx*px,topy*py) 
-            print topx,topy
-            Shape.__init__(self, [topx+x,topx+x2] ,  [topy+y,topy+y2])
-        else:
-            Shape.__init__(self, [x,x2] ,  [y,y2])
+        # if False and ANDYMAIN:
+        #     # print "ANDYMAIN is set within %s %s %s" % (type(self), self.x, self.y)
+        #     print "ANDYMAIN is set within %s %s" % (type(self), self)
+        #     topx,topy = ANDYMAIN.canvas.GetViewStart() # The positions are in logical scroll units, not pixels, so to convert to pixels you will have to multiply by the number of pixels per scroll increment.
+        #     # print topx,topy
+        #     px,py = ANDYMAIN.canvas.GetScrollPixelsPerUnit()
+        #     print "topx", topx, "topy", topy, px, py, topx*px, topy*py
+        #     topx,topy = ANDYMAIN.canvas.CalcUnscrolledPosition(topx*px,topy*py)
+        #     print topx,topy
+        #     Shape.__init__(self, [topx+x,topx+x2] ,  [topy+y,topy+y2])
+        # else:
+        #     Shape.__init__(self, [x,x2] ,  [y,y2])
         ######
         
         #ANDY
-        #Shape.__init__(self, [x,x2] ,  [y,y2])
+        Shape.__init__(self, [x,x2] ,  [y,y2])
 
     def draw(self,dc):
         Shape.draw(self,dc)
@@ -221,8 +233,16 @@ class PointShape(Shape):
         self.graphic.y=[y-size,y+size]
 
     def move(self,x,y):
-        self.x = map((lambda v: v+x), self.x)
-        self.y = map((lambda v: v+y), self.y)
+        # self.x and self.y are lists of x coords and y coords
+        # in the case of default PointShape that list only has one member
+        if self.x == 1:
+            # Simpler to understand code
+            self.x[0] += x
+            self.y[0] += y
+        else:
+            # Future possibility (original code)
+            self.x = map((lambda v: v+x), self.x)   # add x to each member of list self.x
+            self.y = map((lambda v: v+y), self.y)   # add y to each member of list self.y
         self.graphic.move(x,y)
 
     def HitTest(self, x, y):
@@ -248,25 +268,25 @@ class ShapeCanvas(ScrolledWindow):
         ScrolledWindow.__init__(self,parent,id,pos,size,style,name)
         self.diagram=None
         self.nodes=[]
-        self.currentPoint = [0,0] # x and y of last mouse click
+        self.currentPoint = [0,0] # x and y of last mouse click or mouse drag
         self.selectedShapes=[]
         self.scalex =1.0
         self.scaley =1.0
 
         #Window Events        
-        EVT_PAINT(self, self.onPaintEvent)
+        self.Bind(EVT_PAINT, self.onPaintEvent)  # was EVT_PAINT(self, self.onPaintEvent)
         #Mouse Events
-        EVT_LEFT_DOWN(self, self.OnLeftDown)
-        EVT_LEFT_UP(self, self.OnLeftUp)
-        EVT_LEFT_DCLICK(self, self.OnLeftDClick)
+        self.Bind(EVT_LEFT_DOWN, self.OnLeftDown)
+        self.Bind(EVT_LEFT_UP, self.OnLeftUp)
+        self.Bind(EVT_LEFT_DCLICK, self.OnLeftDClick)
         
-        EVT_RIGHT_DOWN(self, self.OnRightDown)
-        EVT_RIGHT_UP(self, self.OnRightUp)
-        EVT_RIGHT_DCLICK(self, self.OnRightDClick)
+        self.Bind(EVT_RIGHT_DOWN, self.OnRightDown)
+        self.Bind(EVT_RIGHT_UP, self.OnRightUp)
+        self.Bind(EVT_RIGHT_DCLICK, self.OnRightDClick)
         
-        EVT_MOTION(self, self.OnMotion)
+        self.Bind(EVT_MOTION, self.OnMotion)
         #Key Events
-        EVT_KEY_DOWN(self,self.keyPress)
+        self.Bind(EVT_KEY_DOWN,self.keyPress)
 
     def AddShape(self, shape, after=None):
         self.diagram.AddShape(shape,after)
@@ -310,6 +330,13 @@ class ShapeCanvas(ScrolledWindow):
                     self.select(self.diagram.shapes[0])
             else:
                     self.select(self.diagram.shapes[0])
+        elif key ==68 and event.ControlDown():  # CMD_D INFO
+            pt = GetMousePosition()
+            mouseX = pt[0] - self.GetScreenPosition().x
+            mouseY = pt[1] - self.GetScreenPosition().y
+            point = (mouseX, mouseY)
+            # print "pt=%s mouse=%s,%s" % (pt, mouseX, mouseY)
+            print "%s,%s %s" % (mouseX, mouseY, self.shapeFromPoint(point))
         self.Refresh()
 
     def onPaintEvent(self, event):   
@@ -326,7 +353,7 @@ class ShapeCanvas(ScrolledWindow):
         #self.getCurrentShape(event).OnRightDown(event)
 
         #ANDY
-        if self.getCurrentShape(event):
+        if False and self.getCurrentShape(event):
             self.getCurrentShape(event).OnRightDown(event)
         
     def OnRightUp(self,event):
@@ -334,26 +361,39 @@ class ShapeCanvas(ScrolledWindow):
         #self.getCurrentShape(event).OnRightUp(event)
 
         #ANDY
-        if self.getCurrentShape(event):
+        if False and self.getCurrentShape(event):
             self.getCurrentShape(event).OnRightUp(event)
         else:
             #
+            self.shape_popup_menu_is_of = self.getCurrentShape(event)
             self.popupmenu = Menu()
             item = self.popupmenu.Append(2021, "Properties...")
             self.Bind(EVT_MENU, self.OnPopupItemSelected, item)
-            item = self.popupmenu.Append(2022, "Cancel")
+            item = self.popupmenu.Append(2022, "Delete Node")
+            self.Bind(EVT_MENU, self.OnDelete, item)
+            item = self.popupmenu.Append(2023, "Cancel")
             self.Bind(EVT_MENU, self.OnPopupItemSelected, item)
             
             pos = event.GetPosition()
-            pos = self.ScreenToClient(pos)
+            # pos = self.ScreenToClient(pos)
             self.PopupMenu(self.popupmenu, pos)
         ########
 
     #ANDY
-    def OnPopupItemSelected(self, event): 
-        item = self.popupmenu.FindItemById(event.GetId()) 
+    def OnDelete(self, event):
+        s = self.shape_popup_menu_is_of
+        # MessageBox("You want to delete shape '%s'" % s)
+        self.diagram.DeleteShape(s)
+        self.deselect() #remove nodes
+        self.Refresh()
+
+    def OnPopupItemSelected(self, event):
+        item = self.popupmenu.FindItemById(event.GetId())
         text = item.GetText() 
-        MessageBox("You selected item '%s'" % text)
+        # MessageBox("You selected item '%s'" % text)
+        if text == "Properties...":
+            f = AttributeEditor(None, -1, "props", self.shape_popup_menu_is_of)
+            f.Show(True)
     ################        
         
     def OnRightDClick(self,event):
@@ -366,7 +406,14 @@ class ShapeCanvas(ScrolledWindow):
         if item is None:   #clicked on empty space deselect all
             self.deselect()
             return
-            
+
+        # ANDY
+        # print('OnLeftDown', item, type(item), type(ResizeableNode), isinstance(item, Node))
+        if not isinstance(item, Node):
+            """bring node to the front"""
+            # print('ChangeShapeOrder', item)
+            self.diagram.ChangeShapeOrder(item,999) # ANDY bring selected shape to top
+
         item.OnLeftDown(event) # send leftdown event to current shape
         
         if isinstance(item,Selectable): 
@@ -379,17 +426,26 @@ class ShapeCanvas(ScrolledWindow):
     def OnLeftUp(self,event):
         try:
             shape = self.getCurrentShape(event)
+            # print "master OnLeftUp", shape
             shape.OnLeftUp(event)
             shape.leftUp(self.select())
-        except:
-            pass 
+        except AttributeError:  # catch exceptions re shapes not implementing OnLeftUp or leftUp methods
+            pass
+        self.avoid_dangling_lines(shape, event, self.select())
         self.Refresh()
 
+    def avoid_dangling_lines(self, shape, event, items):
+        if len(items) == 1 and isinstance(items[0], ConnectionShape) and items[0].output is None:
+            self.diagram.DeleteShape(items[0])
+            self.deselect()  # remove nodes
+
     def OnMotion(self,event):
-        if event.Dragging():            
+        if event.Dragging():
             point = self.getEventCoordinates(event)
             x = point[0] - self.currentPoint[0]
             y = point[1] - self.currentPoint[1]
+            if DEBUG_DRAG:
+                print 'Dragging %s mouse at %s currentPoint is %s thus moveto difference is %s,%s' % (self.getSelectedShapes(), point, self.currentPoint, x, y)
             for i in self.getSelectedShapes():
                 i.move(x,y)
             self.currentPoint = point
@@ -403,8 +459,14 @@ class ShapeCanvas(ScrolledWindow):
         point = self.getEventCoordinates(event)
         self.currentPoint = point
         # Look to see if an item is selected
-        for item in self.nodes + self.diagram.shapes:
-            if item.HitTest(point[0],point[1]) :
+        return self.shapeFromPoint(point)
+
+    def shapeFromPoint(self, point):
+        for item in self.nodes:
+            if item.HitTest(point[0], point[1]):
+                return item
+        for item in reversed(self.diagram.shapes):
+            if item.HitTest(point[0], point[1]):
                 return item
         return None
 
@@ -480,7 +542,7 @@ class Resizeable:
     def __init__(self):
         pass
     
-class Connectable:
+class ConnectableOriginal:
     '''
     Creates connection nodes or ports 
     '''
@@ -490,6 +552,19 @@ class Connectable:
         self.connections=[] # this will be the list containing downstream connections
 
     def getPort(self,type,num):
+        """
+        Calculate port location as (x,y).  Dynamically calculated based on the number
+        of inputs and number of outputs.  Just divide the shape length by the number of
+        ports and spread them evenly.
+
+        Args:
+            type: 'input' or 'output' where inputs are on the left of the shape
+                    and outputs are on the rhs of the shape.
+            num: port number
+
+        Returns: port location as (x,y)
+
+        """
         if type=='input':
             div = float(self.input+1.0)
             x=self.x[0]
@@ -500,6 +575,56 @@ class Connectable:
         dy=float(self.y[1] - self.y[0])/div
         y= self.y[0]+dy*(num+1)
         return(x,y)
+
+class Connectable:
+    '''
+    Creates connection nodes or ports
+    New version only has one port for in and one for out
+    '''
+    def __init__(self):
+        self.input=1
+        self.output=1
+        self.connections=[] # this will be the list containing downstream connections
+
+    def getPortXX(self,type,num):
+        if type=='input':
+            x=self.x[0]
+        elif type=='output':
+            x=self.x[1]
+        y= self.y[0]
+        return (x, y)
+
+    def getPortXXXX(self,type,num):
+        # calc centre - the problem is that input node and output node on the same point
+        # and cannot be distinguished, meaning often try to drag from an input node, which
+        # is 'undefined' and buggy.
+        x = self.x[0] + (self.x[1] - self.x[0]) / 2
+        y = self.y[0] + (self.y[1] - self.y[0]) / 2
+        return (x, y)
+
+    def getPortZ(self,type,num):
+        # calc almost centre
+        x = self.x[0] + (self.x[1] - self.x[0]) / 2
+        y = self.y[0] + (self.y[1] - self.y[0]) / 2
+        if type=='input':
+            x -= 10
+        return (x, y)
+
+    def getPort(self,type,num):
+        # centre of left and right sides
+        if type=='input':
+            x=self.x[0]
+        elif type=='output':
+            x=self.x[1]
+        y = self.y[0] + (self.y[1] - self.y[0]) / 2
+        return (x, y)
+
+    def getCentre(self):
+        # calc centre
+        x = self.x[0] + (self.x[1] - self.x[0]) / 2
+        y = self.y[0] + (self.y[1] - self.y[0]) / 2
+        return (x, y)
+
 
 class Attributable:
     '''
@@ -583,30 +708,63 @@ class ConnectionShape(LineShape,Resizeable,Selectable):
         self.input = None
         self.output= None
 
-    def setInput(self,item,index):
-        self.input=(item,index)
+    def setInput(self, shape, portnum):
+        """
+        Set the object and port you are dragging/connecting from
+        Assign to self.input which is a tuple comprising (shape, portnum) where the portnum
+        is a rhs output portnum, since we draw from an output port to an input port.
+
+        Args:
+            shape: the shape you are dragging from
+            portnum: the port number 0..n you are dragging from
+
+        Returns: -
+
+        """
+        self.input=(shape, portnum)
         
-    def setOutput(self,item,index):
-        self.output=(item,index)
+    def setOutput(self,shape,portnum):
+        self.output=(shape,portnum)
         
-    def draw(self,dc):   
+    def draw(self,dc):
+        # SHAPE = 0
+        # PORT = 1
         if self.input:
-            self.x[0],self.y[0] = self.input[0].getPort('output',self.input[1])
+            # self.x[0],self.y[0] = self.input[SHAPE].getPort('output',self.input[PORT])  # Original code
+
+            shape, portnum = self.input
+            if not self.output:
+                # if haven't connected to something yet, keep drawing from node, not centre
+                point = shape.getPort('output',portnum)
+            else:
+                point = shape.getCentre()
+            self.x[0],self.y[0] = point
+            if DEBUG_CONNECT:
+                print "from shape output port %s at %s" % (portnum, point),
+                if not self.output: print
         if self.output:
-            self.x[1],self.y[1] = self.output[0].getPort('input',self.output[1])
+            # self.x[1],self.y[1] = self.output[SHAPE].getPort('input',self.output[PORT])
+
+            shape, portnum = self.output
+            # point = shape.getPort('input',portnum)
+            point = shape.getCentre()
+            self.x[1],self.y[1] = point
+            if DEBUG_CONNECT:
+                print "to shape input port %s at %s" % (portnum, point)
         LineShape.draw(self,dc)
 
 
 class Block(RectangleShape,Connectable,Resizeable,Selectable,Attributable):
    
     def __init__(self):
-        RectangleShape.__init__(self)
+        x, y, x2, y2 = rand_bounds()
+        RectangleShape.__init__(self, x, y, x2, y2)
         Resizeable.__init__(self)
         Connectable.__init__(self)
         Attributable.__init__(self)
         self.AddAttributes(['label','pen','fill','input','output'])
         self.label='Block' 
-      
+
     def draw(self,dc):
         RectangleShape.draw(self,dc)
         w,h =  dc.GetTextExtent(self.label)
@@ -620,34 +778,112 @@ class Block(RectangleShape,Connectable,Resizeable,Selectable,Attributable):
             d.ShowModal()
             self.label = d.GetValue()
 
-    #ANDY
-    #def OnRightDown(self,event):
-    #    f = AttributeEditor(NULL, -1, "props",self)
-    #    f.Show(True)
-    
-    #ANDY
+    # Original - pops up attribute properties editor instantly
     def OnRightDown(self,event):
-        self.popupmenu = Menu()
-        item = self.popupmenu.Append(2011, "Properties...")
-        ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
-        item = self.popupmenu.Append(2012, "Delete Node")
-        ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
-        item = self.popupmenu.Append(2013, "Cancel")
-        ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
-        #
-        pos = event.GetPosition()
-        pos = ANDYMAIN.canvas.ScreenToClient(pos)
-        ANDYMAIN.canvas.PopupMenu(self.popupmenu, pos)
-    ##########
+        # f = AttributeEditor(None, -1, "props",self)
+        # f.Show(True)
+        wx.MessageBox("You r. down on shape '%s' event is %s" % (self, event))
 
+    """
+    Attempt to have a r.click menu on the shape, but this needs to be done in the shapecanvas window
+    not in the individual shape because only the shape window has access to the .diagram object 
+    which allows shape deletion.  Shapes don't have a back pointer to the shapecanvas window or to 
+    the diagram which houses it, unfortunately.  
+        - We need the shapecanvas window in order to bind popup menu etc. events
+        - We need the shapecanvas window .diagram to access delete shape method 
+    ANDYMAIN was a failed attempt to record the last shapecanvas window, which was hacky, and 
+    also failed since there are nested containers in this demo.
+    """
     #ANDY
-    def OnPopupItemSelected(self, event): 
-        item = self.popupmenu.FindItemById(event.GetId()) 
-        text = item.GetText() 
-        #wx.MessageBox("You selected item '%s'" % text)
-        if text == "Properties...":
-            f = AttributeEditor(None, -1, "props",self)
-            f.Show(True)
+    # def OnRightDown(self,event):
+    #     self.popupmenu = Menu()
+    #     item = self.popupmenu.Append(2011, "Properties...")
+    #     ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
+    #     item = self.popupmenu.Append(2012, "Delete Node")
+    #     ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
+    #     item = self.popupmenu.Append(2013, "Cancel")
+    #     ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
+    #     #
+    #     pos = event.GetPosition()
+    #     # pos = ANDYMAIN.canvas.ScreenToClient(pos)
+    #     ANDYMAIN.canvas.PopupMenu(self.popupmenu, pos)
+    # ##########
+    #
+    # #ANDY
+    # def OnPopupItemSelected(self, event):
+    #     item = self.popupmenu.FindItemById(event.GetId())
+    #     text = item.GetText()
+    #     #wx.MessageBox("You selected item '%s'" % text)
+    #     if text == "Properties...":
+    #         f = AttributeEditor(None, -1, "props",self)
+    #         # f.moveto(item.x, item.y)  # ANDY
+    #         f.Show(True)
+    #     elif text == "Delete Node":
+    #         print "Delete Node"
+    #         # Block is a shape, but we need to get to the diagram which this shape is part of
+    #         # we cannot, so move this logic into the ShapeCanvas not the Shape
+    #         # self.diagram.DeleteShape(s)
+    #         # self.deselect() #remove nodes
+
+################ New Shapes
+
+class EllipseShape(Shape):
+    def __init__(self, x=20, y=20, x2=90, y2=90):
+        Shape.__init__(self, [x, x2], [y, y2])
+        self._width = x2-x
+        self._height = y2-y
+
+    def GetWidth(self):
+        return self.x[1] - self.x[0]
+
+    def GetHeight(self):
+        return self.y[1] - self.y[0]
+
+    def draw(self,dc):
+        """The draw handler."""
+        # if self._shadowMode != SHADOW_NONE:
+        #     if self._shadowBrush:
+        #         dc.SetBrush(self._shadowBrush)
+        #     dc.SetPen(TransparentPen)
+        #     dc.DrawEllipse(self._xpos - self.GetWidth() / 2.0 + self._shadowOffsetX,
+        #                    self._ypos - self.GetHeight() / 2.0 + self._shadowOffsetY,
+        #                    self.GetWidth(), self.GetHeight())
+
+        # if self._pen:
+        #     if self._pen.GetWidth() == 0:
+        #         dc.SetPen(TransparentPen)
+        #     else:
+        #         dc.SetPen(self._pen)
+
+        # if self._brush:
+        #     dc.SetBrush(self._brush)
+
+        # Drawn so it fits inside rectangle
+        dc.DrawEllipse(self.x[0],
+                       self.y[0],
+                       self.GetWidth(),
+                       self.GetHeight())
+
+    def HitTest(self, x, y):
+        # Crude copy of Rectangle test
+        if x < self.x[0]: return False
+        if x > self.x[1]: return False
+        if y < self.y[0]: return False
+        if y > self.y[1]: return False
+        return True
+
+
+class EllipseShapeAndy(EllipseShape, Connectable, Resizeable, Selectable, Attributable):
+    def __init__(self):
+        x, y, x2, y2 = rand_bounds()
+        EllipseShape.__init__(self, x, y, x2, y2)
+        Resizeable.__init__(self)
+        Connectable.__init__(self)
+        Attributable.__init__(self)
+        # self.AddAttributes(['label', 'pen', 'fill', 'input', 'output'])
+        # self.label = 'Block'
+
+
     ################
     
 class CodeBlock(Block):
@@ -672,16 +908,23 @@ class ContainerBlock(Block,Diagram):
         self.fill= ['GREEN']
 
     def OnLeftDClick(self,event):
+        print "OnLeftDClick"
         f = CodeFrame(self)
         f.SetTitle(self.label)
+
+        # Open new frame near container object click
+        pos = event.GetEventObject().ClientToScreen(event.GetPosition())
+        f.SetPosition(pos)
+
         f.Show(True)
 
 # Nodes
 class Node(PointShape):
     def __init__(self,item,index,cf):
-        self.item=item
-        self.index = index
-        self.cf =cf
+        # print "Node creation item=%s index=%s cf=%s" % (item,index,cf)
+        self.item=item      # shape to which node is attached
+        self.index = index  # portnum
+        self.cf =cf         # shape canvas
         PointShape.__init__(self)
 
     def showProperties(self):
@@ -696,11 +939,28 @@ class INode(ConnectableNode):
         ConnectableNode.__init__(self,item,index,cf)
 
     def leftUp(self,items):
+        """
+        This gets called when you release the mouse when connecting to a destination input port
+        The ConnectionShape item has .input and .output containing (shape, portnum) each.
+
+        To know the 'from' shape you look at the ConnectionShape.input[0] which has an output node on a portnum
+         and to know the 'to' shape you look at the ConnectionShape.output[0] which has an input node
+
+        Args:
+            items: list of ConnectionShape instances (really, only one)
+        """
+        if DEBUG_INODE_CONNECT:
+            print "inode leftup", items, "ConnectionShape.input", items[0].input, "ConnectionShape.output", items[0].output
         if len(items)==1 and isinstance(items[0],ConnectionShape):
-            if items[0].output is None:
-                items[0].setOutput(self.item,self.index)
+            connection_shape = items[0]
+            if connection_shape.output is None:  # means its not connected to anything
+                connection_shape.setOutput(self.item,self.index)
 
     def move(self,x,y):
+        """
+        Dragging from an input doesn't make sense?
+        """
+        print "INode - Dragging from an input doesn't make sense? unless repositioning to re-attach?", self
         self.cf.deselect()
         ci = ConnectionShape()
         self.cf.container.shapes.insert(0, ci)
@@ -710,6 +970,8 @@ class INode(ConnectableNode):
         self.cf.select(ci)
 
     def draw(self,dc):
+        # Each node instance has a property index (portnum) baked into it, as well as the item (shape)
+        # Draw yourself on the shape at coords of the portnum on the input side (cos this is an INode)
         x,y=self.item.getPort('input',self.index)
         self.moveto(x,y)
         PointShape.draw(self,dc)
@@ -719,6 +981,14 @@ class ONode(ConnectableNode):
         ConnectableNode.__init__(self,item,index,cf)
 
     def move(self,x,y):
+        """
+        initiating a connection from output node, creating the shape and adding it to the
+        shapecanvas, setting the input, output to be set later when leftUp over INode
+
+        Note the subsequent multiple move() calls due to the OnMotion() goes to the
+        ConnectionShape not to the ONode.
+        """
+        print "ONode initiating a connection from output node", self
         self.cf.deselect()
         ci = ConnectionShape()
         self.cf.diagram.shapes.insert(0, ci)
@@ -728,8 +998,11 @@ class ONode(ConnectableNode):
         self.cf.select(ci)
 
     def leftUp(self,items):
+        # Not sure the use of this, I don't think the setInput() ever gets executed
+        print "onode leftup", items
         if len(items)==1 and isinstance(items[0],ConnectionShape):
             if items[0].input is None:
+                print "onode leftup, setting input", items
                 items[0].setInput(self.item,self.index)
 
 
@@ -757,9 +1030,11 @@ class ResizeableNode(Node):
 
 class AttributeEditor(Frame):
     def __init__(self, parent, ID, title,item):
+        """Edits properties of 'item' as defined by the list of properties in item.attributes"""
         Frame.__init__(self, parent, ID, title,
                          DefaultPosition,Size(200, 450))
-        self.item = item
+        self.item = item  # type Block
+
         # Create a box sizer for self
         box =BoxSizer(VERTICAL)
         self.SetSizer(box)
@@ -771,40 +1046,72 @@ class AttributeEditor(Frame):
         self.list.InsertColumn(0, "Attribute")
         self.list.InsertColumn(1, "Value")
 
-        accept = Button(self, NewId(), "Accept",size=(40,20))
+        self.accept = Button(self, NewId(), "Apply",size=(40,20))
 
         for c in range(len(item.attributes)):
-            self.list.InsertStringItem(c , "")
-            self.list.SetStringItem(c, 0, str(item.attributes[c]))
-            temp = str( eval("item." + str(item.attributes[c])))
-            self.list.SetStringItem(c, 1, temp)
-        
-        self.text    = TextCtrl(self,NewId(), "", style=TE_MULTILINE)
-        
-        box.Add(self.list, 1,EXPAND)
-        box.Add(accept, 0,EXPAND)
-        box.Add(self.text, 1,EXPAND)
+            self.list.InsertItem(c , "")  # insert the list control item
+            self.list.SetItem(c, 0, str(item.attributes[c]))  # set the list control item's 0 col
 
-        EVT_LIST_ITEM_SELECTED(self.list,tID, self.selectProp)
-        EVT_BUTTON(accept, accept.GetId(), self.acceptProp)
-        
+            # set the list control item's 1 col to actual value of the attribute, converted into
+            # a string for display purposes
+            temp = str( eval("item." + str(item.attributes[c])))
+            self.list.SetItem(c, 1, temp)
+
+        # This is the area we edit in - first select the attribute and then edit in here
+        self.text    = TextCtrl(self,NewId(), "", style=TE_MULTILINE)
+        self.text.SetBackgroundColour((255, 255, 230))  # set text back color
+
+        # Close button
+        button = wx.Button(self, label="Close")
+
+        # The layout
+        box.Add(self.list, 1,EXPAND)
+        box.Add(self.text, 1,EXPAND)
+        box.Add(self.accept, 0,EXPAND)
+        box.Add(button, 0,EXPAND)
+
+        self.Bind(EVT_LIST_ITEM_SELECTED, self.selectProp, self.list,tID)
+        self.Bind(EVT_BUTTON, self.acceptProp, self.accept, self.accept.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, button)
+        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
+
+        self.accept.Disable()
+
+        # CMD-W to close Frame by attaching the key bind event to accellerator table
+        randomId = wx.NewId()
+        self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=randomId)
+        accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('W'), randomId )])
+        self.SetAcceleratorTable(accel_tbl)
+
+    def OnCloseMe(self, event):
+        self.Close(True)
+
+    def OnCloseWindow(self, event):
+        self.Destroy()
+
     def selectProp(self,event):
+        """When you click on an item in the list control, populate the edit text area with its content"""
         idx=self.list.GetFocusedItem()
         prop = self.list.GetItem(idx,0).GetText()
         val = self.list.GetItem(idx,1).GetText()
         self.text.Clear()
         self.text.WriteText(val)
-        
+
+        self.accept.Enable()
+
     def acceptProp(self,event):
+        """Write the edited value back into the property"""
         idx=self.list.GetFocusedItem()
-        prop = self.list.GetItem(idx,0).GetText()
-        lines = self.text.GetNumberOfLines()
-        if lines ==1:
-            exec 'self.item.' + prop +'='+self.text.GetValue()
+        print idx
+        prop = self.list.GetItem(idx,0).GetText()  # calc property name
+
+        if get_type(self.text.GetValue()) == str or self.text.GetNumberOfLines() > 1:
+            val = self.text.GetValue()  # string
         else:
-            p=setattr(self.item,prop,self.text.GetValue())
-            
-        self.list.SetStringItem(idx, 1, str(getattr(self.item,prop)))
+            val = eval(self.text.GetValue())  # convert string back into Python data e.g int or list
+        setattr(self.item, prop, val)
+
+        self.list.SetItem(idx, 1, str(getattr(self.item,prop)))
 
 
 class CodeFrame(Frame):
@@ -815,10 +1122,11 @@ class CodeFrame(Frame):
         menus={}
 
         menus['&Add']=[
-            ('Code' , "Block that holds code",self.newCodeBlock),
-            ('Container', 'Block that holds blocks', self.newContBlock),
+            ('Code\tCtrl+n' , "Block that holds Python code",self.newCodeBlock),
+            ('Container\tCtrl+f', 'Container of blocks', self.newContBlock),
             ('Point', 'Playing with points', self.newPointShape),
             ('Lines', 'Plotting', self.newLinesShape),
+            ('Ellipse\tCtrl+l', 'Ellipse', self.newEllipseShape),
             ]
 
         menus['&Zoom']=[
@@ -834,8 +1142,8 @@ class CodeFrame(Frame):
         self.canvas.SetBackgroundColour(WHITE)
 
         #ANDY
-        global ANDYMAIN
-        ANDYMAIN = self
+        # global ANDYMAIN
+        # ANDYMAIN = self
         #
         self.canvas.SetScrollbars(1, 1, 600, 400)
         self.canvas.SetVirtualSize((600, 400))
@@ -855,7 +1163,14 @@ class CodeFrame(Frame):
     #        f.Show(True)
     ################
     
-    
+        # CMD-W to close Frame by attaching the key bind event to accellerator table
+        randomId = wx.NewId()
+        self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=randomId)
+        accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('W'), randomId )])
+        self.SetAcceleratorTable(accel_tbl)
+
+    def OnCloseWindow(self, event):
+        self.Destroy()
     
     def zoomin(self,event):
         self.canvas.scalex=max(self.canvas.scalex+.05,.3)
@@ -874,7 +1189,8 @@ class CodeFrame(Frame):
 
     def newCodeBlock(self, event):
         i = CodeBlock()
-        self.canvas.AddShape(i)
+        # self.canvas.AddShape(i)
+        self.canvas.InsertShape(i, 999)
         self.canvas.deselect()
         self.canvas.Refresh()
 
@@ -890,6 +1206,14 @@ class CodeFrame(Frame):
         self.canvas.deselect()
         self.canvas.Refresh()
         
+    def newEllipseShape(self, event):
+        # x, y, x2, y2 = rand_bounds()
+        # i = EllipseShape(x, y, x2, y2)
+        i = EllipseShapeAndy()  # random happens within
+        self.canvas.InsertShape(i, 9999)
+        self.canvas.deselect()
+        self.canvas.Refresh()
+
     def newLinesShape(self, event):
         points=[
             (5,30),(10,20),(20,25),(30,50),(40,70),
@@ -902,16 +1226,57 @@ class CodeFrame(Frame):
         self.canvas.AddShape(i)
         self.canvas.deselect()
         self.canvas.Refresh()
-        
-        
-class MyApp(App):
-    def OnInit(self):
-        frame = CodeFrame(ContainerBlock())
-        return True
 
-##########################################
+# Util - ANDY
 
-app = MyApp(0)
-app.MainLoop()
+def rand_bounds():
+    x = random.randint(20, 350)
+    y = random.randint(20, 150)
+    x2 = x + 70
+    y2 = y + 70
+    return x, y, x2, y2
+
+def rand_brush():
+    brushes = [BLUE_BRUSH, GREEN_BRUSH, YELLOW_BRUSH, WHITE_BRUSH, BLACK_BRUSH, GREY_BRUSH, MEDIUM_GREY_BRUSH, LIGHT_GREY_BRUSH, TRANSPARENT_BRUSH, CYAN_BRUSH, RED_BRUSH]
+    return random.choice(brushes)
+
+from ast import literal_eval
+
+
+def get_type(input_data):
+    """
+    Guess type of input string
+
+    print(get_type("1"))        # <class 'int'>
+    print(get_type("1.2354"))   # <class 'float'>
+    print(get_type("True"))     # <class 'bool'>
+    print(get_type("abcd"))     # <class 'str'>
+
+    See https://stackoverflow.com/questions/22199741/identifying-the-data-type-of-an-input
+
+    Args:
+        input_data: str
+
+    Returns: type class
+    """
+    try:
+        return type(literal_eval(input_data))
+    except (ValueError, SyntaxError):
+        # A string, so return str
+        return str
+
+################################
+
+if __name__ == '__main__':
+
+    class MyApp(App):
+        def OnInit(self):
+            frame = CodeFrame(ContainerBlock())
+            return True
+
+    ##########################################
+
+    app = MyApp(0)
+    app.MainLoop()
 
 
