@@ -57,7 +57,7 @@ class MyApp(wx.App):
     def OnInit(self):
         # add the image to the MemoryFileSystem:
         mfs = wx.MemoryFSHandler()
-        wx.FileSystem_AddHandler(mfs)
+        # wx.FileSystem_AddHandler(mfs)  # Doesn't seem to work anymore?
         mfs.AddFile("smalltest.png", smalltest.GetImage(), wx.BITMAP_TYPE_PNG)
 
 
