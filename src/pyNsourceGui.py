@@ -178,9 +178,17 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         self.frame.CenterOnScreen()
 
+        self.Bind(wx.EVT_ACTIVATE_APP, self.OnActivate)  # start up non-minimised when packaged
+
         wx.CallAfter(self.app.run.CmdBootStrap)    # doesn't make a difference calling this via CallAfter
         return True
-    
+
+    def OnActivate(self, event):
+        print "OnActivate"
+        if event.GetActive():
+            self.frame.Raise()
+        event.Skip()
+
     def InitConfig(self):
         config_dir = os.path.join(wx.StandardPaths.Get().GetUserConfigDir(), PYNSOURCE_CONFIG_DIR)
         try:
