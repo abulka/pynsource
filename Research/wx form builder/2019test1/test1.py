@@ -2,8 +2,8 @@ import wx
 from test1_gen import *
 
 
-# class MyFrame1A(MyFrame1):
-class MyFrame1A(MyFrame2):
+class MyFrame1A(MyFrame1):
+# class MyFrame1A(MyFrame2):
     """test"""
 
     def __init__(self, parent):
@@ -39,10 +39,15 @@ class MyFrame1A(MyFrame2):
         self.statusbar = self.CreateStatusBar()
         self.statusbar.SetStatusText('Ready')
 
+
         # self.SetSize((450, 350))
         # self.SetTitle('Check menu item')
         # self.Centre()
 
+
+    def do_popup(self, event):
+        f = MyFrame2(parent=self)  # or can use parent of None
+        f.Show()
 
 	# def OnButton1(self, event):
     #     print "button pushed"

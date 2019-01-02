@@ -25,8 +25,8 @@ class MyFrame1 ( wx.Frame ):
 
 		bSizer5 = wx.BoxSizer( wx.HORIZONTAL )
 
-		self.m_button1 = wx.Button( self, wx.ID_ANY, u"AAAA", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer5.Add( self.m_button1, 0, wx.ALL, 5 )
+		self.btn_showpopup = wx.Button( self, wx.ID_ANY, u"POPUP FRAME", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer5.Add( self.btn_showpopup, 0, wx.ALL, 5 )
 
 		self.m_button2 = wx.Button( self, wx.ID_ANY, u"BBBBB", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer5.Add( self.m_button2, 0, wx.ALL, 5 )
@@ -116,8 +116,16 @@ class MyFrame1 ( wx.Frame ):
 
 		self.Centre( wx.BOTH )
 
+		# Connect Events
+		self.btn_showpopup.Bind( wx.EVT_BUTTON, self.do_popup )
+
 	def __del__( self ):
 		pass
+
+
+	# Virtual event handlers, overide them in your derived class
+	def do_popup( self, event ):
+		event.Skip()
 
 
 ###########################################################################
