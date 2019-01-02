@@ -589,38 +589,33 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         else:
             self.MessageBox("You already have the latest version:  %s" % APP_VERSION)
 
-    # WORKS IN POPUP FRAME OK
     def OnHelpAlt(self, event):
+        # manually build a frame with inner html window, no sizer involved
+        # class MyHtmlFrame(wx.Frame):
+        #     def __init__(self, parent, title):
+        #         wx.Frame.__init__(self, parent, -1, title, size=(600, 400))
+        #         html = wx.html.HtmlWindow(self)
+        #         if "gtk2" in wx.PlatformInfo:
+        #             html.SetStandardFonts()
+        #         wx.CallAfter(html.LoadPage, "dialogs/HelpWindow.html")
+        # frm = MyHtmlFrame(None, "Simple HTML Browser")
+        # frm.Show()
+
         class MyHtmlFrame(wx.Frame):
             def __init__(self, parent, title):
-                wx.Frame.__init__(self, parent, -1, title, size=(600, 400))
-                html = wx.html.HtmlWindow(self)
+                super(MyHtmlFrame, self).__init__(parent=self)  # why does , size=(600, 400) not work?
+                self.SetSize()
+                html = wx.html.HtmlWindow(parent=self)
                 if "gtk2" in wx.PlatformInfo:
                     html.SetStandardFonts()
-                wx.CallAfter(html.LoadPage, "dialogs/HelpWindow.html")
-        frm = MyHtmlFrame(None, "Simple HTML Browser")
+                wx.CallAfter(html.LoadPage,
+                             os.path.join("dialogs/HelpWindow.html")
+                             )
+        frm = MyHtmlFrame(parent=None, title="Simple HTML Browser")
         frm.Show()
 
-    # HELP DISPLAYS STUCK ON PAGE ITSELF
-    # def OnHelp(self, event):
-    #     class MyHtmlWindow(html.HtmlWindow):
-    #         def __init__(self, parent, id):
-    #             html.HtmlWindow.__init__(self, parent, id, style=wx.NO_FULL_REPAINT_ON_RESIZE)
-    #             if "gtk2" in wx.PlatformInfo or "gtk3" in wx.PlatformInfo:
-    #                 self.SetStandardFonts()
-    #     h = MyHtmlWindow(self.frame, -1)
-    #     h.LoadPage("dialogs/HelpWindow.html")
-    #     h.SetSize(300,300)
-
-    # DOES NOT WORK
-    # def OnHelp(self, event):
-    #     import wx.html as htmlX
-    #     html = htmlX.HtmlWindow(self)
-    #     if "gtk2" in wx.PlatformInfo:
-    #         html.SetStandardFonts()
-    #     html.LoadPage("dialogs/HelpWindow.html")
-
     def OnHelp(self, event):
+        """Uses a frame with inner html window"""
         from dialogs.HelpWindow import HelpWindow
 
         class Help(HelpWindow):
