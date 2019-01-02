@@ -34,66 +34,6 @@ There is a newer version of PyNSource GUI available:  %s
 Do you wish to visit the download page now?
 """
 
-HELP_MSG = """
-Import a python file and it will be reverse engineered and represented as UML.
-
-Known Bugs in Mac version: When you drag UML classes they do not redraw till you let the mouse go.  Annoying, I know.  When printing, the default page range is 1-9999, you need to change the 9999 into a 1.  These are both wxPython bugs. 
-
-USAGE:
-Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.
-You can import repeatedly and incoming classes will be added and wired up to existing classes on the workspace.
-
-Whilst this is mainly a reverse engineering tool, you can delete classes add new classes.  
-To draw lines between classes: Select the first class, hit 'q', select the second class, hit 'w' (association) or 'e' (generalisation).
-
-Use -> (right arrow) to expand the layout spacing and <- (left arrow) to contract.  Or use the CTRL-MouseWheel.  Laying out lots of classes does better with an increased layout spacing, but takes up more room.
-
-After a (possibly slow) 'Optimal' Layout, there may be layout variants that you can access by pressing keys 1, 2 ... 8 in decreasing order of layout perfection.
-
-The 'colour sibling subclasses' feature helps use colour to understand the relationships in your uml diagram.
-
-Hit "Ctrl-J" (or Cmd-J on Mac) to toggle between normal UML and Ascii UML - you can thus copy and paste ascii uml text into your source code!
-
-Optionally use Java Ascii Versatile Editor http://www.jave.de to wire up your ascii uml classes nicely before pasting into your source code or documentation.
-"""
-
-HELP_MSG_HTML = """
-<h2>What is PyNSource?</h2>
-<p>Import one or more python files and they will be reverse engineered and represented as a UML diagram.&nbsp; Layout the diagram as you like and print it to paper or to pdf.</p>
-<p>For an online version of pynsource, please email <span style="text-decoration: underline;">abulka@gmail.com</span> and get onto the beta program.</p>
-<h3>Importing Python files</h3>
-<p>Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.</p>
-<p>You can import repeatedly and incoming classes will be <strong>added</strong> and wired up to existing classes on the workspace.</p>
-<h3>Creating new classes</h3>
-<p>Whilst PyNSource is mainly a reverse engineering tool, you can delete classes add new classes.&nbsp;</p>
-<p>Drawing lines between classes is a bit fiddly but works in a pinch. To draw lines between classes:</p>
-<ol>
-<li>Select the first class,</li>
-<li>hit 'q',</li>
-<li>select the second class,</li>
-<li>hit 'w' (association) or 'e' (generalisation).</li>
-</ol>
-<h3>Zooming</h3>
-<p>Use</p>
-<ul>
-<li>-&gt; (right arrow) to expand the layout spacing</li>
-<li>&lt;- (left arrow) to contract.</li>
-<li>Or use the CTRL-MouseWheel.</li>
-</ul>
-<p>Laying out lots of classes does better with an increased layout spacing, but takes up more room.</p>
-<h3>Optimal Layout</h3>
-<p>After a (possibly slow) 'Optimal' Layout, there may be layout variants that you can access by pressing keys 1, 2 ... 8 in decreasing order of layout perfection.</p>
-<h3>Colour</h3>
-<p>The 'colour sibling subclasses' feature helps use colour to understand the relationships in your uml diagram.</p>
-<h3>UML as Ascii</h3>
-<p>Hit "Ctrl-J" (or Cmd-J on Mac) to toggle between normal UML and Ascii UML - you can thus copy and paste ascii uml text into your source code!</p>
-<p>Optionally use Java Ascii Versatile Editor <span style="text-decoration: underline;">http://www.jave.de</span> to wire up your ascii uml classes nicely before pasting into your source code or documentation.</p>
-<h3>Known Bugs in Mac version</h3>
-<ul>
-<li>When printing, the default page range is 1-9999, you need to change the 9999 into a 1.</li>
-</ul>
-<p>This is due to a bug in the underlying wxPython GUI toolkit on Mac.</p>
-"""
 
 HELP_COMMAND_LINE_USAGE = """
 Usage: pynsource -v -m [-j|d outdir] | [-y outfile.png | nopng] sourcedir_or_pythonfiles...

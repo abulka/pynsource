@@ -95,7 +95,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             # asciiart_sizer.Add(self.multiText, 1, wx.ALL, 0)
 
             self.multiText = wx.TextCtrl(self.asciiart, wx.ID_ANY, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE | wx.HSCROLL)
-            self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))  # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
+            self.multiText.SetFont(wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False))  # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
             asciiart_sizer.Add(self.multiText, 1, wx.EXPAND | wx.ALL, 0)
             self.asciiart.SetSizer(asciiart_sizer)
             self.asciiart.Layout()
@@ -599,17 +599,17 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         else:
             self.MessageBox("You already have the latest version:  %s" % APP_VERSION)
 
-    def OnHelpAlt(self, event):  # not used
-        """manually build a frame with inner html window, no sizer involved"""
-        class MyHtmlFrame(wx.Frame):
-            def __init__(self, parent, title):
-                super(MyHtmlFrame, self).__init__(parent, title=title)
-                html = wx.html.HtmlWindow(parent=self)
-                if "gtk2" in wx.PlatformInfo:
-                    html.SetStandardFonts()
-                wx.CallAfter(html.LoadPage, os.path.join("dialogs/HelpWindow.html"))
-        frm = MyHtmlFrame(parent=self.frame, title="Simple HTML Browser")
-        frm.Show()
+    # def OnHelpAlt(self, event):  # not used
+    #     """manually build a frame with inner html window, no sizer involved"""
+    #     class MyHtmlFrame(wx.Frame):
+    #         def __init__(self, parent, title):
+    #             super(MyHtmlFrame, self).__init__(parent, title=title)
+    #             html = wx.html.HtmlWindow(parent=self)
+    #             if "gtk2" in wx.PlatformInfo:
+    #                 html.SetStandardFonts()
+    #             wx.CallAfter(html.LoadPage, os.path.join("dialogs/HelpWindow.html"))
+    #     frm = MyHtmlFrame(parent=self.frame, title="Simple HTML Browser")
+    #     frm.Show()
 
     def OnHelp(self, event):
         """Uses a wxformbuilder frame with inner html window"""
@@ -645,19 +645,6 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         f.m_htmlWin1.LoadPage(os.path.join("dialogs/HelpWindow.html"))
         f.Show(True)
-
-        # Old
-        # page = r"""
-        # <HTML>
-        # <BODY>
-        # %s
-        # </BODY>
-        # </HTML>
-        # """ % HELP_MSG_HTML.strip()
-        # f.m_htmlWin1.SetPage(page)
-
-        # Old
-        # self.MessageBox(HELP_MSG.strip())
 
     def Enable_if_node_selected(self, event):
         selected = [s for s in self.umlwin.GetDiagram().GetShapeList() if s.Selected()]
