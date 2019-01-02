@@ -1,6 +1,7 @@
 import wx
 from test1_gen import *
-
+import os
+from wx.html import HtmlWindow
 
 class MyFrame1A(MyFrame1):
 # class MyFrame1A(MyFrame2):
@@ -48,6 +49,48 @@ class MyFrame1A(MyFrame1):
     def do_popup(self, event):
         f = MyFrame2(parent=self)  # or can use parent of None
         f.Show()
+
+    def do_popup_html(self, event):
+
+        # Manual non sizer technique - Works OK
+        class MyHtmlFrame(wx.Frame):
+            def __init__(self, parent, title):
+                super(MyHtmlFrame, self).__init__(parent)
+                html = HtmlWindow(parent=self)
+                if "gtk2" in wx.PlatformInfo:
+                    html.SetStandardFonts()
+                wx.CallAfter(html.LoadPage,
+                             os.path.join("../../../src/", "dialogs/HelpWindow.html")
+                             )
+        # frm = MyHtmlFrame(parent=None, title="Simple HTML Browser")
+        # frm.Show()
+
+        # Manual sizer technique - Works OK (nice centering behaviour, too)
+        class MyHtmlFrame2(wx.Frame):
+            def __init__(self, parent, title):
+                super(MyHtmlFrame2, self).__init__(parent)
+
+                bSizer15 = wx.BoxSizer(wx.VERTICAL)
+                self.m_htmlWin1 = wx.html.HtmlWindow(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
+                                                     wx.html.HW_SCROLLBAR_AUTO)
+                bSizer15.Add(self.m_htmlWin1, 1, wx.ALL | wx.EXPAND, 5)
+                self.SetSizer(bSizer15)
+                self.Layout()
+                self.Centre(wx.BOTH)
+                wx.CallAfter(self.m_htmlWin1.LoadPage,
+                             os.path.join("../../../src/", "dialogs/HelpWindow.html")
+                             )
+        # frm = MyHtmlFrame2(parent=None, title="Simple HTML Browser")
+        # frm.Show()
+
+        # wxformbuilder technique - Works OK
+        frm = MyFrame3(parent=self)
+        wx.CallAfter(frm.m_htmlWin1.LoadPage,
+                     os.path.join("../../../src/", "dialogs/HelpWindow.html")
+                     )
+        frm.Show()
+
+
 
 	# def OnButton1(self, event):
     #     print "button pushed"

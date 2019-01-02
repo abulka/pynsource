@@ -9,6 +9,7 @@
 
 import wx
 import wx.xrc
+import wx.html
 
 ###########################################################################
 ## Class MyFrame1
@@ -28,7 +29,7 @@ class MyFrame1 ( wx.Frame ):
 		self.btn_showpopup = wx.Button( self, wx.ID_ANY, u"POPUP FRAME", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer5.Add( self.btn_showpopup, 0, wx.ALL, 5 )
 
-		self.m_button2 = wx.Button( self, wx.ID_ANY, u"BBBBB", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button2 = wx.Button( self, wx.ID_ANY, u"popup html", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer5.Add( self.m_button2, 0, wx.ALL, 5 )
 
 		self.m_button3 = wx.Button( self, wx.ID_ANY, u"CCCCC", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -118,6 +119,7 @@ class MyFrame1 ( wx.Frame ):
 
 		# Connect Events
 		self.btn_showpopup.Bind( wx.EVT_BUTTON, self.do_popup )
+		self.m_button2.Bind( wx.EVT_BUTTON, self.do_popup_html )
 
 	def __del__( self ):
 		pass
@@ -127,37 +129,8 @@ class MyFrame1 ( wx.Frame ):
 	def do_popup( self, event ):
 		event.Skip()
 
-
-###########################################################################
-## Class MyPanel1
-###########################################################################
-
-class MyPanel1 ( wx.Panel ):
-
-	def __init__( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL, name = wx.EmptyString ):
-		wx.Panel.__init__ ( self, parent, id = id, pos = pos, size = size, style = style, name = name )
-
-
-	def __del__( self ):
-		pass
-
-
-###########################################################################
-## Class MyDialog1
-###########################################################################
-
-class MyDialog1 ( wx.Dialog ):
-
-	def __init__( self, parent ):
-		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
-
-		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
-
-
-		self.Centre( wx.BOTH )
-
-	def __del__( self ):
-		pass
+	def do_popup_html( self, event ):
+		event.Skip()
 
 
 ###########################################################################
@@ -304,6 +277,32 @@ class MyFrame2 ( wx.Frame ):
 
 
 		self.SetSizer( bSizer13 )
+		self.Layout()
+
+		self.Centre( wx.BOTH )
+
+	def __del__( self ):
+		pass
+
+
+###########################################################################
+## Class MyFrame3
+###########################################################################
+
+class MyFrame3 ( wx.Frame ):
+
+	def __init__( self, parent ):
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"A bit of html", pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+
+		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+
+		bSizer15 = wx.BoxSizer( wx.VERTICAL )
+
+		self.m_htmlWin1 = wx.html.HtmlWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.html.HW_SCROLLBAR_AUTO )
+		bSizer15.Add( self.m_htmlWin1, 1, wx.ALL|wx.EXPAND, 5 )
+
+
+		self.SetSizer( bSizer15 )
 		self.Layout()
 
 		self.Centre( wx.BOTH )
