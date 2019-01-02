@@ -640,6 +640,25 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
                 accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('W'), randomId)])
                 self.SetAcceleratorTable(accel_tbl)
 
+                # COMBINE ACCELERATOR TABLES - DOESN'T COMPILE - needs more understanding
+                # # CMD-W to close Frame by attaching the key bind event to accellerator table
+                # randomId = wx.NewId()
+                # self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=randomId)
+                # self.Bind(wx.ID_EXIT, self.OnCloseWindow, id=wx.ID_EXIT)
+                # accel_tbl = wx.AcceleratorTable([
+                #     (wx.ACCEL_CTRL, ord('W'), randomId),
+                #     (wx.ACCEL_NORMAL, wx.K_ESC, wx.ID_EXIT)
+                # ],)
+                # self.SetAcceleratorTable(accel_tbl)
+
+                self.Bind(wx.EVT_CHAR_HOOK, self.OnKeyUP)  # Close on ESC
+
+            def OnKeyUP(self, event):  # Close on ESC
+                keyCode = event.GetKeyCode()
+                if keyCode == wx.WXK_ESCAPE:
+                    self.Close()
+                event.Skip()
+
             def OnCancelClick(self, event):
                 self.Close()
 
