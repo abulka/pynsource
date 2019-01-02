@@ -33,8 +33,8 @@ MULTI_TAB_GUI = True
 USE_SIZER = False
 ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS = False
 
-if 'wxMac' in wx.PlatformInfo:
-    MULTI_TAB_GUI = False
+# if 'wxMac' in wx.PlatformInfo:
+#     MULTI_TAB_GUI = False
     
 from gui.coord_utils import setpos, getpos
 from gui.uml_canvas import UmlCanvas
@@ -59,76 +59,182 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
                         style=wx.NO_FULL_REPAINT_ON_RESIZE|wx.DEFAULT_FRAME_STYLE)
         self.frame.CreateStatusBar()
 
-        # # ANDY HACK SECTION
+
+        # ANDY CREATE AN ALTERNATE NOTEBOOK TO CHECK SCROLLING BUGS
+        # # self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        # sizer = wx.BoxSizer( wx.VERTICAL )
+        # self.notebook = wx.Notebook( self.frame, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
+        # 
+        # # Page 1
+        # self.entry0 = wx.ScrolledWindow(self.notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL | wx.VSCROLL)
+        # self.entry0.SetScrollRate(5, 5)
+        # entry_sizer0 = wx.BoxSizer(wx.VERTICAL)
+        # self.text0 = wx.StaticText(self.entry0, wx.ID_ANY, u"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,", wx.DefaultPosition, wx.DefaultSize, 0)
+        # self.text0.Wrap(600)
+        # entry_sizer0.Add(self.text0, 1, wx.ALL, 0)
+        # self.entry0.SetSizer(entry_sizer0)
+        # self.entry0.Layout()
+        # entry_sizer0.Fit(self.entry0)
+        # self.notebook.AddPage(self.entry0, u"Entry0", True)
+        # 
+        # # Page 2
+        # self.login = wx.Panel( self.notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+        # self.notebook.AddPage( self.login, u"Login", False )
+        # 
+        # # Page 3
+        # self.entry = wx.ScrolledWindow( self.notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.VSCROLL )
+        # self.entry.SetScrollRate( 5, 5 )
+        # entry_sizer = wx.BoxSizer( wx.VERTICAL )
+        # self.text = wx.StaticText( self.entry, wx.ID_ANY, u"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,", wx.DefaultPosition, wx.DefaultSize, 0 )
+        # self.text.Wrap( 600 )
+        # entry_sizer.Add( self.text, 1, wx.ALL, 0 )
+        # self.entry.SetSizer( entry_sizer )
+        # self.entry.Layout()
+        # entry_sizer.Fit( self.entry )
+        # self.notebook.AddPage( self.entry, u"Entry", True )
+        # 
+        # sizer.Add( self.notebook, 1, wx.EXPAND |wx.ALL, 0 )
+        # self.frame.SetSizer( sizer )
+        # self.frame.Layout()
+        # self.frame.Centre( wx.BOTH )
+        # # self.frame.Show()
+        # END ANDY CREATE AN ALTERNATE NOTEBOOK TO CHECK SCROLLING BUGS
+
+
+
+
+
+        # ANDY HACK SECTION - STOP BUILDING THE REST OF THE UI AND SHOW THE FRAME NOW!
         # self.frame.SetPosition((40, 40))
         # self.frame.SetSize((400, 400))
         # self.frame.Show()
         # self.OnHelp(None)  # attempt to trigger help window instantly - works!  And mouse scrolling works.
         # return True
-        # # END HACK SECTION
+        # END HACK SECTION
 
-        if MULTI_TAB_GUI:
-            self.notebook = wx.Notebook(self.frame, -1)
-         
-            if USE_SIZER:
-                # create the chain of real objects
-                panel = wx.Panel(self.notebook, -1)
-                self.umlwin = UmlCanvas(panel, Log(), self.frame)
-                # add children to sizers and set the sizer to the parent
-                sizer = wx.BoxSizer( wx.VERTICAL )
-                sizer.Add(self.umlwin, 1, wx.GROW)
-                panel.SetSizer(sizer)
-            else:
-                self.umlwin = UmlCanvas(self.notebook, Log(), self.frame)
+        # self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.notebook = wx.Notebook(self.frame, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0)
 
-            #self.yuml = ImageViewer(self.notebook) # wx.Panel(self.notebook, -1)
-            
-            self.asciiart = wx.Panel(self.notebook, -1)
-    
-            if USE_SIZER:
-                self.notebook.AddPage(panel, "UML")
-            else:
-                self.notebook.AddPage(self.umlwin, "UML")
-            #self.notebook.AddPage(self.yuml, "yUml")
-            self.notebook.AddPage(self.asciiart, "Ascii Art")
-    
-            # Modify my own page http://www.andypatterns.com/index.php/products/pynsource/asciiart/
-            # Some other ideas here http://c2.com/cgi/wiki?UmlAsciiArt 
-            self.multiText = wx.TextCtrl(self.asciiart, -1, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE|wx.HSCROLL)
-            bsizer = wx.BoxSizer()
-            bsizer.Add(self.multiText, 1, wx.EXPAND)
-            self.asciiart.SetSizerAndFit(bsizer)
-            self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))   # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
-            self.multiText.Bind( wx.EVT_CHAR, self.onKeyChar_Ascii_Text_window)
-            self.multiText.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom_ascii)
+        # Page 1
+        self.umlwin = self.umlwin = UmlCanvas(self.notebook, Log(), self.frame)
+        self.umlwin.SetScrollRate(5, 5)
+        # entry_sizer0 = wx.BoxSizer(wx.VERTICAL)
+        # self.text0 = wx.StaticText(self.umlwin, wx.ID_ANY,
+        #                            u"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,",
+        #                            wx.DefaultPosition, wx.DefaultSize, 0)
+        # self.text0.Wrap(600)
+        # entry_sizer0.Add(self.text0, 1, wx.ALL, 0)
+        # self.umlwin.SetSizer(entry_sizer0)
+        # self.umlwin.Layout()
+        # entry_sizer0.Fit(self.umlwin)
+        self.notebook.AddPage(self.umlwin, u"UML", True)
 
-            self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabPageChanged)
-            
-        else:
-            self.notebook = None
+        # # Page 2
+        # self.login = wx.Panel(self.notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
+        #                       wx.TAB_TRAVERSAL)
+        # self.notebook.AddPage(self.login, u"Login", False)
 
-            self.panel_one = wx.Panel(self.frame, -1)
-            self.umlwin = UmlCanvas(self.panel_one, Log(), self.frame)
-            #
-            sizer = wx.BoxSizer(wx.VERTICAL)
-            sizer.Add(self.umlwin, 1, wx.EXPAND)
-            self.panel_one.SetSizer(sizer)
-        
-            self.panel_two = self.asciiart = wx.Panel(self.frame, -1)
-            self.multiText = wx.TextCtrl(self.panel_two, -1, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE|wx.HSCROLL)
-            self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))   # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
-            self.multiText.Bind( wx.EVT_CHAR, self.onKeyChar_Ascii_Text_window)
+        # Page 3
+        self.asciiart = wx.ScrolledWindow(self.notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
+                                       wx.HSCROLL | wx.VSCROLL)
+        self.asciiart.SetScrollRate(5, 5)
+        asciiart_sizer = wx.BoxSizer(wx.VERTICAL)
+        # txt = u"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, \n" * 10
+        # self.multiText = wx.StaticText(self.asciiart, wx.ID_ANY, txt, wx.DefaultPosition, wx.DefaultSize, 0)
+        # self.multiText.Wrap(600)
+        # asciiart_sizer.Add(self.multiText, 1, wx.ALL, 0)
+        self.multiText = wx.TextCtrl(self.asciiart, wx.ID_ANY, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE|wx.HSCROLL)
+        self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))   # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
+        asciiart_sizer.Add(self.multiText, 1, wx.EXPAND |wx.ALL, 0)
+        self.asciiart.SetSizer(asciiart_sizer)
+        self.asciiart.Layout()
+        asciiart_sizer.Fit(self.asciiart)
+        self.notebook.AddPage(self.asciiart, u"Ascii Art", True)
 
-            sizer = wx.BoxSizer(wx.VERTICAL)
-            sizer.Add(self.multiText, 1, wx.EXPAND)
-            self.panel_two.SetSizer(sizer)
-            
-            self.panel_two.Hide()
-     
-            self.sizer = wx.BoxSizer(wx.VERTICAL)
-            self.sizer.Add(self.panel_one, 1, wx.EXPAND)
-            self.sizer.Add(self.panel_two, 1, wx.EXPAND)
-            self.frame.SetSizer(self.sizer)
+        sizer.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 0)
+        self.frame.SetSizer(sizer)
+        self.frame.Layout()
+        self.frame.Centre(wx.BOTH)
+        # self.frame.Show()
+        self.notebook.ChangeSelection(0)
+
+
+        # ANDY HACK SECTION - STOP BUILDING THE REST OF THE UI AND SHOW THE FRAME NOW!
+        # self.frame.SetPosition((40, 40))
+        # self.frame.SetSize((400, 400))
+        # self.frame.Show()
+        # # self.OnHelp(None)  # attempt to trigger help window instantly - works!  And mouse scrolling works.
+        # return True
+        # END HACK SECTION
+
+
+
+
+        # Original
+        #
+        # if MULTI_TAB_GUI:
+        #     self.notebook = wx.Notebook(self.frame, -1)
+        #
+        #     if USE_SIZER:
+        #         # create the chain of real objects
+        #         panel = wx.Panel(self.notebook, -1)
+        #         self.umlwin = UmlCanvas(panel, Log(), self.frame)
+        #         # add children to sizers and set the sizer to the parent
+        #         sizer = wx.BoxSizer( wx.VERTICAL )
+        #         sizer.Add(self.umlwin, 1, wx.GROW)
+        #         panel.SetSizer(sizer)
+        #     else:
+        #         self.umlwin = UmlCanvas(self.notebook, Log(), self.frame)
+        #
+        #     #self.yuml = ImageViewer(self.notebook) # wx.Panel(self.notebook, -1)
+        #
+        #     self.asciiart = wx.Panel(self.notebook, -1)
+        #
+        #     if USE_SIZER:
+        #         self.notebook.AddPage(panel, "UML")
+        #     else:
+        #         self.notebook.AddPage(self.umlwin, "UML")
+        #     #self.notebook.AddPage(self.yuml, "yUml")
+        #     self.notebook.AddPage(self.asciiart, "Ascii Art")
+        #
+        #     # Modify my own page http://www.andypatterns.com/index.php/products/pynsource/asciiart/
+        #     # Some other ideas here http://c2.com/cgi/wiki?UmlAsciiArt
+        #     self.multiText = wx.TextCtrl(self.asciiart, -1, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE|wx.HSCROLL)
+        #     bsizer = wx.BoxSizer()
+        #     bsizer.Add(self.multiText, 1, wx.EXPAND)
+        #     self.asciiart.SetSizerAndFit(bsizer)
+        #     self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))   # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
+        #     self.multiText.Bind( wx.EVT_CHAR, self.onKeyChar_Ascii_Text_window)
+        #     self.multiText.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom_ascii)
+        #
+        #     self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabPageChanged)
+        #
+        # else:
+        #     self.notebook = None
+        #
+        #     self.panel_one = wx.Panel(self.frame, -1)
+        #     self.umlwin = UmlCanvas(self.panel_one, Log(), self.frame)
+        #     #
+        #     sizer = wx.BoxSizer(wx.VERTICAL)
+        #     sizer.Add(self.umlwin, 1, wx.EXPAND)
+        #     self.panel_one.SetSizer(sizer)
+        #
+        #     self.panel_two = self.asciiart = wx.Panel(self.frame, -1)
+        #     self.multiText = wx.TextCtrl(self.panel_two, -1, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE|wx.HSCROLL)
+        #     self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))   # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
+        #     self.multiText.Bind( wx.EVT_CHAR, self.onKeyChar_Ascii_Text_window)
+        #
+        #     sizer = wx.BoxSizer(wx.VERTICAL)
+        #     sizer.Add(self.multiText, 1, wx.EXPAND)
+        #     self.panel_two.SetSizer(sizer)
+        #
+        #     self.panel_two.Hide()
+        #
+        #     self.sizer = wx.BoxSizer(wx.VERTICAL)
+        #     self.sizer.Add(self.panel_one, 1, wx.EXPAND)
+        #     self.sizer.Add(self.panel_two, 1, wx.EXPAND)
+        #     self.frame.SetSizer(self.sizer)
         
         
         ogl.OGLInitialize()  # creates some pens and brushes that the OGL library uses.

@@ -5,3 +5,4 @@ venv/
 dist/
 build/
 src/setup.py
+.eggs
