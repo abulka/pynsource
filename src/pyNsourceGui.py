@@ -59,6 +59,14 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
                         style=wx.NO_FULL_REPAINT_ON_RESIZE|wx.DEFAULT_FRAME_STYLE)
         self.frame.CreateStatusBar()
 
+        # # ANDY HACK SECTION
+        # self.frame.SetPosition((40, 40))
+        # self.frame.SetSize((400, 400))
+        # self.frame.Show()
+        # self.OnHelp(None)  # attempt to trigger help window instantly - works!  And mouse scrolling works.
+        # return True
+        # # END HACK SECTION
+
         if MULTI_TAB_GUI:
             self.notebook = wx.Notebook(self.frame, -1)
          
@@ -110,8 +118,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             self.multiText = wx.TextCtrl(self.panel_two, -1, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE|wx.HSCROLL)
             self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))   # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
             self.multiText.Bind( wx.EVT_CHAR, self.onKeyChar_Ascii_Text_window)
-            self.multiText.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom_ascii)
-            #
+
             sizer = wx.BoxSizer(wx.VERTICAL)
             sizer.Add(self.multiText, 1, wx.EXPAND)
             self.panel_two.SetSizer(sizer)
@@ -138,9 +145,6 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.umlwin.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)  # WARNING: takes over all righclick events - need to event.skip() to let through things to UmlShapeHandler 
         self.Bind(wx.EVT_SIZE, self.OnResizeFrame)
 
-        #self.umlwin.Bind(wx.EVT_SET_FOCUS, self.onFocus)  # attempt at making mousewheel auto scroll the workspace
-        #self.frame.Bind(wx.EVT_SET_FOCUS, self.onFocus)   # attempt at making mousewheel auto scroll the workspace
-        
         self.umlwin.InitSizeAndObjs()  # Now that frame is visible and calculated, there should be sensible world coords to use
         
         self.InitConfig()
@@ -310,7 +314,6 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         wx.CallAfter(self.multiText.SetFocus)
         wx.CallAfter(self.multiText.SetInsertionPoint, 0) 
     def PostOglViewSwitch(self):
-        self.Bind(wx.EVT_MOUSEWHEEL, self.umlwin.OnWheelZoom)  # rebind as it seems to get unbound when switch to ascii tab
         wx.CallAfter(self.umlwin.SetFocus)
         self.menuBar.EnableTop(2, True)  # enable layout menu
         
@@ -598,7 +601,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         frm = MyHtmlFrame(None, "Simple HTML Browser")
         frm.Show()
 
-    # HELP DISPALYS STUCK ON PAGE ITSELF
+    # HELP DISPLAYS STUCK ON PAGE ITSELF
     # def OnHelp(self, event):
     #     class MyHtmlWindow(html.HtmlWindow):
     #         def __init__(self, parent, id):
