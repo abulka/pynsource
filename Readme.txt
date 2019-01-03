@@ -158,9 +158,12 @@ then install the binary release which uses wxpython 2.8 internally.
  
 Change Log
 
-Version 1.63 (December 2019)
+Version 1.63 (Jan 2019)
 - compatibility with latest wxpython 4.0.3
 - new Mac OSX build script to generate 64bit mac .app - Mojave compatible
+- fixed lack of drag outline on Mac OS
+- multi-page notebook on Mac OS to match other platforms, showing UML and Ascii UML
+- HTML help window
 
 Version 1.62 (March 2016)
 - fixed main window appearing almost offscreen on mac

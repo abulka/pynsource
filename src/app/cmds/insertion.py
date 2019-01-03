@@ -145,7 +145,7 @@ class CmdInsertImage(CmdBase):
         
         thisdir = config.get('LastDirInsertImage', '.') # remember dir path
         dlg = wx.FileDialog(parent=frame, message="choose", defaultDir=thisdir,
-            defaultFile="", wildcard="*.jpg", style=wx.OPEN, pos=wx.DefaultPosition)
+            defaultFile="", wildcard="*.jpg", style=wx.FC_OPEN, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
 
