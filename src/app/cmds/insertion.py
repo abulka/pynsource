@@ -6,10 +6,25 @@ class CmdInsertComment(CmdBase):
     """ Insert node """
     def execute(self):
         """ insert comment node """
+
         id = 'D' + str(random.randint(1,9999))
-        dialog = wx.TextEntryDialog ( None, 'Enter a comment:', 'New Comment', "hello\nthere") #, wx.TE_MULTILINE )
+
+        # Old single line dialog - using built in dialog
+        # dialog = wx.TextEntryDialog ( None, 'Enter a comment:', 'New Comment', "hello\nthere", style=wx.TE_MULTILINE)
+        # dialog.SetSize((200, 100))
+
+        # Custom dialog built via wxformbuilder - subclass it first, to hook up event handlers
+        from dialogs.DialogComment import DialogComment
+        class EditDialog(DialogComment):
+            def OnClassNameEnter( self, event ):
+                self.EndModal(wx.ID_OK)
+        dialog = EditDialog(None)
+        dialog.txt_comment.SetFocus()
+
         if dialog.ShowModal() == wx.ID_OK:
-            comment = dialog.GetValue() + "\nfred"
+            comment = dialog.txt_comment.GetValue()
+            # wx.MessageBox("got wx.ID_OK " + comment)
+
             node = self.context.model.AddCommentNode(id, comment)
             shape = self.context.umlwin.createCommentShape(node)
             self.context.model.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.

@@ -550,6 +550,8 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.SetPen(wx.BLACK_PEN)
         shape.SetBrush(wx.LIGHT_GREY_BRUSH)
         shape.SetBrush(wx.RED_BRUSH)
+        font2 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+        shape.SetFont(font2)
         for line in node.comment.split('\n'):
             shape.AddText(line)
         
