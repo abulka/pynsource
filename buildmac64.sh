@@ -43,6 +43,9 @@ then
     read ok
 fi
 
+# Check all references to "import wx.xrc" have been removed
+echo Ensure all references to \"import wx.xrc\" have been removed!!
+grep "import wx.xrc" dialogs/*.py
 
 # Clean up your build directories
 rm -rf build dist
