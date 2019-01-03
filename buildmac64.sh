@@ -18,13 +18,31 @@ $PYTHON buildsamples.py
 
 cd src
 
-# Build the setup.py file (note, cannot change the name of the output file, it must be setup.py)
-$PY2APPLET --make-setup pyNsourceGui.py      # pip install py2app
+# Change to "Y" to regenerate src/setup.py
+# Not usually necessary but on first run of a new install you will need to.  And do the
+# suggested edits.  Note src/setup.py is not in source control.
+REGEN_SETUP_PY="N"
+if [ "$REGEN_SETUP_PY" == "Y" ]
+then
+    echo "regenerating...."
+    # Build the setup.py file (note, cannot change the name of the output file, it must be setup.py)
+    $PY2APPLET --make-setup pyNsourceGui.py      # pip install py2app
 
-echo Ensure you edit the src/setup.py as follows:
-echo
-echo DATA_FILES = \[\'dialogs/HelpWindow.html\', \'dialogs/help-images\' \]
-echo
+    echo If you have regenerated src/setup.py ensure you edit it as follows:
+    echo
+    echo DATA_FILES = \[\'dialogs/HelpWindow.html\', \'dialogs/help-images\' \]
+
+    # argv_emulation must be set to False to avoid mac bug where app starts minimised
+    # or simply not have that option at all (which is the new default with latest py2app)
+    # see https://bitbucket.org/ronaldoussoren/py2app/issues/140/app-starts-minimized
+    echo OPTIONS = {\'argv_emulation\': False}   or just
+    echo OPTIONS = {}
+
+    echo
+    echo hit enter to confirm
+    read ok
+fi
+
 
 # Clean up your build directories
 rm -rf build dist
