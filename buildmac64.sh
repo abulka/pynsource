@@ -21,6 +21,11 @@ cd src
 # Build the setup.py file (note, cannot change the name of the output file, it must be setup.py)
 $PY2APPLET --make-setup pyNsourceGui.py      # pip install py2app
 
+echo Ensure you edit the src/setup.py as follows:
+echo
+echo DATA_FILES = \[\'dialogs/HelpWindow.html\', \'dialogs/help-images\' \]
+echo
+
 # Clean up your build directories
 rm -rf build dist
 

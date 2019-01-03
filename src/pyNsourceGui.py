@@ -194,7 +194,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         self.frame.CenterOnScreen()
 
-        self.Bind(wx.EVT_ACTIVATE_APP, self.OnActivate)  # start up non-minimised when packaged
+        self.Bind(wx.EVT_ACTIVATE_APP, self.OnActivate)  # start up non-minimised when packaged - doesn't work
+        self.frame.Iconize(False) # start up non-minimised when packaged
 
         wx.CallAfter(self.app.run.CmdBootStrap)    # doesn't make a difference calling this via CallAfter
         return True
@@ -643,7 +644,11 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         f = Help(parent=self.frame)
 
-        f.m_htmlWin1.LoadPage(os.path.join("dialogs/HelpWindow.html"))
+        if os.path.exists("../Resources"):
+            dir = "../Resources"
+        else:
+            dir = "dialogs/"
+        f.m_htmlWin1.LoadPage(os.path.join(dir, "HelpWindow.html"))
         f.Show(True)
 
     def Enable_if_node_selected(self, event):
