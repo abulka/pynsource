@@ -15,7 +15,7 @@ class OverlapTests(unittest.TestCase):
     def setUp(self):
 
         class FakeGui:
-            def stateofthenation(self, recalibrate=False, auto_resize_canvas=True):
+            def mega_refresh(self, recalibrate=False, auto_resize_canvas=True):
                 pass
 
         self.g = Graph()

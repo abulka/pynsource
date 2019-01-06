@@ -134,7 +134,7 @@ class CmdBuildColourChartWorkspace(CmdBase):
         
         # refresh view
         umlcanvas.GetDiagram().ShowAll(1) # need this, yes
-        umlcanvas.stateofthenation()
+        umlcanvas.mega_refresh()
         
         self.context.wxapp.set_app_title("(Untitled)")
         umlcanvas.CmdTrimScrollbars()

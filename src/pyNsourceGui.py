@@ -314,7 +314,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         # phoenix hack to get things to appear
         # self.app.run.CmdRefreshUmlWindow()
-        # self.umlwin.stateofthenation()
+        # self.umlwin.mega_refresh()
 
     def set_app_title(self, title):
         self.frame.SetTitle(self.andyapptitle + " - " + title)        

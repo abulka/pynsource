@@ -38,7 +38,7 @@ class GraphLayoutSpring:
             if i%100==0: # i%50==0:
                 if self.gui:
                     self.layoutCalcBounds()         # this is the only time you need to call this explicitly since are in the MIDDLE of a layout and about to visualise
-                    self.gui.stateofthenation(recalibrate=True, auto_resize_canvas=False) # refresh gui
+                    self.gui.mega_refresh(recalibrate=True, auto_resize_canvas=False) # refresh gui
                     
                     if self.gui.kill_layout:
                         print "Layout aborted early, due to user interrupt"

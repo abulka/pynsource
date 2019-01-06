@@ -412,7 +412,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         #edge['uml_edge_type'] = ''
         edge['uml_edge_type'] = edge_type
         self.CreateUmlEdge(edge)
-        self.stateofthenation()
+        self.mega_refresh()
               
     def CreateImageShape(self, F):
         #shape = ogl.BitmapShape()
@@ -724,11 +724,9 @@ class UmlCanvas(ogl.ShapeCanvas):
     #UmlShapeHandler.OnEndDragLeft
     #UmlShapeHandler.OnSizingEndDragLeft
     #
-    # recalibrate = True - called by core spring layout self.gui.stateofthenation()
+    # recalibrate = True - called by core spring layout self.gui.mega_refresh()
     #
-    # RENAME?: dc_DiagramClearAndRedraw
-    #
-    def stateofthenation(self, recalibrate=False, auto_resize_canvas=True):
+    def mega_refresh(self, recalibrate=False, auto_resize_canvas=True):  # was stateofthenation
         if recalibrate:  # was stateofthespring
             self.coordmapper.Recalibrate()
             self.AllToWorldCoords()
@@ -747,12 +745,12 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     # UTILITY - used by CmdLayout and CmdFileImportBase
     def layout_and_position_shapes(self):
-        self.canvas_resizer.frame_calibration(auto_resize_virtualcanvas=False)  # going to do a stateofthenation later so no point changing virt canvas now
+        self.canvas_resizer.frame_calibration(auto_resize_virtualcanvas=False)  # going to do a mega_refresh later so no point changing virt canvas now
         self.AllToLayoutCoords()
         self.layouter.layout(keep_current_positions=False, optimise=True)
         self.AllToWorldCoords()
         if self.remove_overlaps():
-            self.stateofthenation()
+            self.mega_refresh()
        
     def get_umlboxshapes(self):
         #return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]

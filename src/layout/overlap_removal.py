@@ -533,7 +533,7 @@ class OverlapRemoval:
                 
             if num_overlaps_fixed > 0:
                 if self.gui and watch_removals:
-                    self.gui.stateofthenation(auto_resize_canvas=False)     # refresh gui
+                    self.gui.mega_refresh(auto_resize_canvas=False)     # refresh gui
 
             if not found_overlaps:
                 break  # job done

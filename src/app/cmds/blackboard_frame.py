@@ -94,8 +94,8 @@ class MainBlackboardFrame(FrameDeepLayout):
             if event.cmd == 'snapshot_mgr_restore_0':
                 wx.CallAfter(self.blackboard.umlwin.snapshot_mgr.Restore, 0)
                 wx.CallAfter(self.btnCancelClose.SetFocus)
-            elif event.cmd == 'stateofthenation':
-                wx.CallAfter(self.blackboard.umlwin.stateofthenation)
+            elif event.cmd == 'mega_refresh':
+                wx.CallAfter(self.blackboard.umlwin.mega_refresh)
 
         if event.statusmsg:
             wx.CallAfter(self.status.SetLabel, event.statusmsg)

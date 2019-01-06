@@ -41,7 +41,7 @@ class CanvasResizer(object):
         if auto_resize_virtualcanvas:
             self.resize_virtual_canvas_tofit_bounds(shrinkage_leeway=0, bounds_dirty=False)
 
-    # UTILITY - used by 's' key, stateofthenation, frame_calibration, OnEndDragLeft
+    # UTILITY - used by 's' key, mega_refresh, frame_calibration, OnEndDragLeft
     def resize_virtual_canvas_tofit_bounds(self, shrinkage_leeway=40, bounds_dirty=False):
         """
         Set canvas virtual size to the bounds of all the shapes.
@@ -149,7 +149,7 @@ but the virtualsize remains the same.
 
 When bounds become dirty
 -------------------------
-After a programmatic change of "all shapes bounds" e.g. via stateofthenation
+After a programmatic change of "all shapes bounds" e.g. via mega_refresh
 or when move a node via the mouse
 
 "all shapes bounds" area doesn't change when resizing a frame, thus the

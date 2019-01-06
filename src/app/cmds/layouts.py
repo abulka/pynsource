@@ -27,7 +27,7 @@ class CmdLayoutExpandContractBase(CmdBase):   # BASE
 
         if self.remove_overlaps:
             self.context.umlwin.remove_overlaps(watch_removals=False)
-        self.context.umlwin.stateofthenation()
+        self.context.umlwin.mega_refresh()
         self.context.frame.Layout()  # needed when running phoenix
 
 class CmdLayoutExpand(CmdLayoutExpandContractBase):

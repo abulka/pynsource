@@ -41,7 +41,7 @@ class GraphSnapshotMgr:
         
     def RestoreGraph(self, memento, scale):
         self.graph.RestoreWorldPositions(memento)
-        self.umlcanvas.stateofthenation()
+        self.umlcanvas.mega_refresh()
 
         # Unecessary, but just in case you choose to <- or -> "scale from layout" next
         self.umlcanvas.coordmapper.Recalibrate(scale=scale)

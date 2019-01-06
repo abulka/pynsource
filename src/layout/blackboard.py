@@ -12,19 +12,19 @@ class LayoutBlackboard(object):
         self.graph = graph
         self.umlwin = umlwin
 
-    def stateofthenation(self, recalibrate=False, auto_resize_canvas=True):
+    def mega_refresh(self, recalibrate=False, auto_resize_canvas=True):
         # Stub so that when we call GraphLayoutSpring.layout() and it calls back
-        # into us to do a stateofthenation, either nothing happens or, if we DO
+        # into us to do a mega_refresh, either nothing happens or, if we DO
         # want to show each intermediate stage of the layout, we send a custom
         # message using POST MESSAGE to the main gui frame to do it. Doing it in
         # here is wrong since this LayoutBlackboard class is typically an object
         # inside a worker thread, and we can't have any wx gui operations
         # ocurring inside a thread.
         if ANIMATE_LAYOUTS:
-            self.outer_thread.Cmd("stateofthenation")
+            self.outer_thread.Cmd("mega_refresh")
 
-    def stateofthenation_inside_blackboard(self):
-        self.outer_thread.Cmd("stateofthenation")
+    def mega_refresh_inside_blackboard(self):
+        self.outer_thread.Cmd("mega_refresh")
 
     @property
     def kill_layout(self):
@@ -123,7 +123,7 @@ class LayoutBlackboard(object):
         """
         can't do the snapshot restore
             self.umlwin.snapshot_mgr.Restore(0)
-        here since it will call stateofthenation(), and that is wx gui activity
+        here since it will call mega_refresh(), and that is wx gui activity
         which is not allowed from inside a thread.
         So send a special message to trigger that call.
         """
@@ -208,7 +208,7 @@ class LayoutBlackboard(object):
                 break
 
         if animate:
-            self.stateofthenation_inside_blackboard()
+            self.mega_refresh_inside_blackboard()
         
         return num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings
 
@@ -224,7 +224,7 @@ class LayoutBlackboard(object):
         self.umlwin.AllToWorldCoords()
 
         if animate:
-            self.stateofthenation_inside_blackboard()
+            self.mega_refresh_inside_blackboard()
         
         """Pre Overlap Removal"""
         

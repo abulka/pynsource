@@ -56,12 +56,12 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         # Invoke overlap removal (unless hold down shift key)
         KEY_SHIFT = 1
         if keys & KEY_SHIFT:
-            #shape.GetCanvas().stateofthenation()   # do we need this?  did quite well without it before
+            #shape.GetCanvas().mega_refresh()   # do we need this?  did quite well without it before
             pass
         else:
             canvas = shape.GetCanvas()
             if canvas.remove_overlaps():
-                canvas.stateofthenation()
+                canvas.mega_refresh()
 
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
         shape = self.GetShape()
@@ -82,7 +82,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
 
         canvas = shape.GetCanvas()
         if canvas.remove_overlaps():
-            canvas.stateofthenation()
+            canvas.mega_refresh()
         
     def OnEndSize(self, width, height):
         #print "OnEndSize", width, height

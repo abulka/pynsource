@@ -29,7 +29,7 @@ class CmdInsertComment(CmdBase):
             shape = self.context.umlwin.createCommentShape(node)
             self.context.model.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             node.shape.Show(True)
-            self.context.umlwin.stateofthenation()
+            self.context.umlwin.mega_refresh()
         dialog.Destroy()
         
 
@@ -93,7 +93,7 @@ class CmdInsertNewNodeClass(CmdInsertOrEditNode):
             node.shape.Show(True)
             
             umlwin.remove_overlaps()
-            umlwin.stateofthenation()
+            umlwin.mega_refresh()
 
             umlwin.SelectNodeNow(node.shape)
 
@@ -137,11 +137,11 @@ class CmdEditClass(CmdInsertOrEditNode):
                 umlwin.CreateUmlEdge(edge)
                 
             node.shape.Show(True)
-            umlwin.stateofthenation()
+            umlwin.mega_refresh()
 
             # TODO Why doesn't this select the node?
             #self.SelectNodeNow(node.shape)
-            #self.stateofthenation()
+            #self.mega_refresh()
 
     def undo(self):  # override
         """ undo insert new node """
@@ -179,7 +179,7 @@ class CmdInsertImage(CmdBase):
             
         self.context.umlwin.CreateImageShape(filename)
         self.context.umlwin.remove_overlaps()
-        self.context.umlwin.stateofthenation()
+        self.context.umlwin.mega_refresh()
         #self.SelectNodeNow(node.shape)
         
     def undo(self):  # override

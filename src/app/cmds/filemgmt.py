@@ -178,7 +178,7 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
 
         # refresh view
         umlcanvas.GetDiagram().ShowAll(1) # need this, yes
-        umlcanvas.stateofthenation()
+        umlcanvas.mega_refresh()
 
         self.context.wxapp.RefreshAsciiUmlTab()
         self.context.wxapp.set_app_title(self.filepath)
