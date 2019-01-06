@@ -687,12 +687,12 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.app.run.CmdInsertImage()
                 
     def OnInsertClass(self, event):
-        self.app.run.CmdInsertNewNodeClass()
+        self.app.run.CmdInsertUmlClass()
         
     def OnEditProperties(self, event):
         for shape in self.umlwin.GetDiagram().GetShapeList():
             if shape.Selected():
-                self.app.run.CmdEditClass(shape)
+                self.app.run.CmdEditUmlClass(shape)
                 break
             
     def OnEditProperties_update(self, event):

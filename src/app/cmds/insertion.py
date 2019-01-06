@@ -11,7 +11,7 @@ Inserting and editing regular UML Class nodes/shapes
 
 """
 
-class InsertOrEditNode(CmdBase):  # Not Used directly, please subclass
+class UtilCmdInsertOrEditUmlClass(CmdBase):  # Not Used directly, please subclass
     def DisplayDialogUmlNodeEdit(self, id, attrs, methods):
         """
         id, attrs, methods are lists of strings
@@ -44,7 +44,7 @@ class InsertOrEditNode(CmdBase):  # Not Used directly, please subclass
         return (result, id, attrs, methods)
 
 
-class CmdInsertNewNodeClass(InsertOrEditNode):
+class CmdInsertUmlClass(UtilCmdInsertOrEditUmlClass):
     """ Insert new node """
     def execute(self):
         """ insert the new node and refresh the ascii tab too """
@@ -81,7 +81,7 @@ class CmdInsertNewNodeClass(InsertOrEditNode):
         # not implemented
 
 
-class CmdEditClass(InsertOrEditNode):  # TODO rename CmdEditUmlItem cos can apply to classes or comments
+class CmdEditUmlClass(UtilCmdInsertOrEditUmlClass):  # TODO rename CmdEditUmlItem cos can apply to classes or comments
     """ Edit node properties """
 
     def __init__(self, shape):

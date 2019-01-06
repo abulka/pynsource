@@ -142,10 +142,10 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self.app.run.CmdNodeDelete(self.GetShape())
 
     def OnLeftDoubleClick(self, x, y, keys, attachment):
-        self.app.run.CmdEditClass(self.GetShape())
+        self.app.run.CmdEditUmlClass(self.GetShape())
 
     def NodeProperties(self, event):
-        self.app.run.CmdEditClass(self.GetShape())
+        self.app.run.CmdEditUmlClass(self.GetShape())
 
     def OnDrawBegin(self, event):
         self.GetShape().GetCanvas().NewEdgeMarkFrom()

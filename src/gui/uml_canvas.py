@@ -687,7 +687,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     # UTILITY - called by
     #
-    #CmdInsertNewNodeClass, CmdInsertImage, CmdLayoutExpandContractBase, 
+    #CmdInsertUmlClass, CmdInsertImage, CmdLayoutExpandContractBase,
     #umlwin.OnWheelZoom_OverlapRemoval_Defunct, 
     #umlwin.layout_and_position_shapes, 
     #UmlShapeHandler.OnEndDragLeft
@@ -704,9 +704,9 @@ class UmlCanvas(ogl.ShapeCanvas):
    
     # UTILITY - called by everyone!!??
     #
-    #CmdFileLoadWorkspaceBase, CmdInsertComment, CmdEditClass
+    #CmdFileLoadWorkspaceBase, CmdInsertComment, CmdEditUmlClass
     #CmdLayoutExpandContractBase, 
-    #CmdInsertNewNodeClass
+    #CmdInsertUmlClass
     #umlwin.NewEdgeMarkTo
     #umlwin.OnWheelZoom_OverlapRemoval_Defunct
     #LayoutBlackboard.LayoutThenPickBestScale
