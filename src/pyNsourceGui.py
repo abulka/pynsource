@@ -379,7 +379,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         
         Add(menu2, "&Add Class...", "Ctrl-A", self.OnInsertClass)
         if ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS:
-            Add(menu2, "&Insert Image...", "Ctrl-I", self.OnInsertImage)
+            Add(menu2, "&Insert Image...", "Ctrl-M", self.OnInsertImage)
             Add(menu2, "&Insert Comment...", "Shift-I", self.OnInsertComment)
         menu_item_delete_class = Add(menu2, "&Delete", "Del", self.OnDeleteNode, self.OnDeleteNode_update)
         menu_item_delete_class.Enable(True)  # demo one way to enable/disable.  But better to do via _update function
