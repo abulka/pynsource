@@ -11,11 +11,20 @@ Inserting and editing regular UML Class nodes/shapes
 
 """
 
-class UtilCmdInsertOrEditUmlClass(CmdBase):  # Not Used directly, please subclass
-    def DisplayDialogUmlNodeEdit(self, id, attrs, methods):
+class UtilCmdUmlClass(CmdBase):  # Not Used directly, please subclass
+    def display_dialog(self, id, attrs, methods):
         """
-        id, attrs, methods are lists of strings
-        returns id, attrs, methods as lists of strings
+        Show uml class editor dialog
+
+        Args:
+            id: id of node (txtClassName - I think this is the name of the class !!)
+            attrs: lists of strings
+            methods: lists of strings
+
+        Returns: (result, id, attrs, methods) where
+            result is whether there was a successful edit?
+            attrs, methods as lists of strings
+
         """
         class EditDialog(DialogUmlNodeEdit):
             def OnClassNameEnter( self, event ):
@@ -44,7 +53,7 @@ class UtilCmdInsertOrEditUmlClass(CmdBase):  # Not Used directly, please subclas
         return (result, id, attrs, methods)
 
 
-class CmdInsertUmlClass(UtilCmdInsertOrEditUmlClass):
+class CmdInsertUmlClass(UtilCmdUmlClass):
     """ Insert new node """
     def execute(self):
         """ insert the new node and refresh the ascii tab too """
@@ -54,7 +63,7 @@ class CmdInsertUmlClass(UtilCmdInsertOrEditUmlClass):
         
         #self.umlwin.CmdInsertNewNode()
         
-        result, id, attrs, methods = self.DisplayDialogUmlNodeEdit(id='D' + str(random.randint(1,99)),
+        result, id, attrs, methods = self.display_dialog(id='D' + str(random.randint(1,99)),
                                             attrs=['attribute 1', 'attribute 2', 'attribute 3'],
                                             methods=['method A', 'method B', 'method C', 'method D'])
 
@@ -81,7 +90,7 @@ class CmdInsertUmlClass(UtilCmdInsertOrEditUmlClass):
         # not implemented
 
 
-class CmdEditUmlClass(UtilCmdInsertOrEditUmlClass):  # TODO rename CmdEditUmlItem cos can apply to classes or comments
+class CmdEditUmlClass(UtilCmdUmlClass):  # TODO rename CmdEditUmlItem cos can apply to classes or comments
     """ Edit node properties """
 
     def __init__(self, shape):
@@ -99,7 +108,7 @@ class CmdEditUmlClass(UtilCmdInsertOrEditUmlClass):  # TODO rename CmdEditUmlIte
 
         # node is a regular node, its the node.shape that is different for a comment
         if isinstance(node.shape, DividedShape):
-            result, id, attrs, methods = self.DisplayDialogUmlNodeEdit(node.id, node.attrs,
+            result, id, attrs, methods = self.display_dialog(node.id, node.attrs,
                                                                        node.meths)
             if result:
                 model.graph.RenameNode(node,
@@ -137,11 +146,36 @@ class CmdEditUmlClass(UtilCmdInsertOrEditUmlClass):  # TODO rename CmdEditUmlIte
 Insert and edit Comment nodes/shapes
 """
 
+class UtilCmdComment(CmdBase):  # Not Used directly, please subclass
+    def display_dialog(self, comment):
+        """
+        Displays dialog for editing comments
 
-class CmdInsertComment(CmdBase):
+        Args:
+            comment: comment string
+
+        Returns: (result, comment)
+        """
+        class EditDialog(DialogComment):
+            # Custom dialog built via wxformbuilder - subclass it first, to hook up event handlers
+            def OnClassNameEnter(self, event):
+                self.EndModal(wx.ID_OK)
+        dialog = EditDialog(None)
+        dialog.txt_comment.Value = comment
+        dialog.txt_comment.SetFocus()
+        if dialog.ShowModal() == wx.ID_OK:
+            comment = dialog.txt_comment.GetValue()
+            result = True
+        else:
+            result, comment = False, None
+        dialog.Destroy()
+        return (result, comment)
+
+
+class CmdInsertComment(UtilCmdComment):
     """ Insert comment """
 
-    def execute(self):
+    def execute_v1(self):
         """
         Pops up a comment dialog box, creates both a graph node and a shape,
         associates them, then adds them to the `self.context.model.classnametoshape` mapping.
@@ -173,6 +207,24 @@ class CmdInsertComment(CmdBase):
             self.context.umlwin.mega_refresh()
         dialog.Destroy()
 
+    def execute(self):
+        """
+        Pops up a comment dialog box, creates both a graph node and a shape,
+        associates them, then adds them to the `self.context.model.classnametoshape` mapping.
+        """
+
+        id = 'C' + str(random.randint(1, 9999))
+        result, comment = self.display_dialog(comment="initial comment")
+        if result:
+            # Ensure unique name
+            while self.context.model.graph.FindNodeById(id):
+                id += '2'
+            node = self.context.model.AddCommentNode(id, comment)
+            shape = self.context.umlwin.createCommentShape(node)
+            self.context.model.classnametoshape[
+                node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+            node.shape.Show(True)
+            self.context.umlwin.mega_refresh()
 
 
 """
