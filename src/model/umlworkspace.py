@@ -57,19 +57,32 @@ class CommentNode(GraphNode):
         self.id = val
     classname = property(get_id, set_id)
     
-class UmlWorkspace:
+class UmlWorkspace:  # TODO rename UmlDisplayModel
+    """
+    This is the Display Model
+    Referred to by context.model TODO rename to 'context.display_model'
+    Not to be confused with context.umlwin which is the UmlCanvas object which is a OGL visual thing
+
+    The 'graph' of 'nodes' is the abstract stuff, used in layout, but also containing
+    the method, attributes, comment info.  Each node points to a visual shape,
+    and vice versa.
+    """
     def __init__(self):
         self.graph = UmlGraph()
+        self.classnametoshape = {}             # dict of classname => shape entries
+        self.associations_generalisation = []  # list of (classname, parentclassname) tuples
+        self.associations_composition = []     # list of (rhs, lhs) tuples
+
         self.Clear()
         
     def Clear(self):
-        self.classnametoshape = {}             # dict of classname => shape entries
+        self.classnametoshape = {}
         self.ClearAssociations()
         self.graph.Clear()
 
     def ClearAssociations(self):
-        self.associations_generalisation = []  # list of (classname, parentclassname) tuples
-        self.associations_composition = []     # list of (rhs, lhs) tuples
+        self.associations_generalisation = []
+        self.associations_composition = []
         
     def decouple_node_from_shape(self, shape):
         classname = (classname for classname,shaperef in self.classnametoshape.items() if shaperef==shape).next()  # see http://johnstachurski.net/lectures/generators.html on how generators work, which can be built from list comprehension syntax
@@ -143,6 +156,21 @@ class UmlWorkspace:
         return node
         
     def AddCommentNode(self, id, comment):
+        """
+        Adds a graph node of subtype CommentNode to the graph.
+
+        Note: A graph node is not a ogl shape!
+
+        Args:
+            id: random string id, randomised by the called e.g. D1788.
+                For example CmdInsertComment allocates the id, pops up
+                 a dialog box editor and then calls here to create the graph node.
+                If an existing node with that id exists, it is further randomised.
+            comment: text
+
+        Returns: graph node
+        """
+        print "incoming id", id
         if self.graph.FindNodeById(id):
             id += str(random.randint(1,9999))
         t,l,w,h = random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160)

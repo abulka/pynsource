@@ -26,7 +26,7 @@ class CmdInvoker:   # version 4 - see pyNsource\trunk\Research\python advanced\c
     """
     When you call any method on an instance of this invoker class, the method is
     interpreted as the name of a command class to be instantiated. Parameters in
-    the method call are used as paramters to the constructor. After the command
+    the method call are used as parameters to the constructor. After the command
     class is instantiated, a context object is attached, and the command passed
     to a command manager to be run. No extra parameters are injected into the
     constructor or to the execute() call.
