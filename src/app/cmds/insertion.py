@@ -90,7 +90,7 @@ class CmdInsertUmlClass(UtilCmdUmlClass):
         # not implemented
 
 
-class CmdEditUmlClass(UtilCmdUmlClass):  # TODO rename CmdEditUmlItem cos can apply to classes or comments
+class CmdEditUmlClass(UtilCmdUmlClass):
     """ Edit node properties """
 
     def __init__(self, shape):
@@ -175,37 +175,37 @@ class UtilCmdComment(CmdBase):  # Not Used directly, please subclass
 class CmdInsertComment(UtilCmdComment):
     """ Insert comment """
 
-    def execute_v1(self):
-        """
-        Pops up a comment dialog box, creates both a graph node and a shape,
-        associates them, then adds them to the `self.context.model.classnametoshape` mapping.
-        """
-
-        id = 'D' + str(random.randint(1, 9999))
-
-        # Old single line dialog - using built in dialog
-        # dialog = wx.TextEntryDialog ( None, 'Enter a comment:', 'New Comment', "hello\nthere", style=wx.TE_MULTILINE)
-        # dialog.SetSize((200, 100))
-
-        # Custom dialog built via wxformbuilder - subclass it first, to hook up event handlers
-        class EditDialog(DialogComment):
-            def OnClassNameEnter(self, event):
-                self.EndModal(wx.ID_OK)
-
-        dialog = EditDialog(None)
-        dialog.txt_comment.SetFocus()
-
-        if dialog.ShowModal() == wx.ID_OK:
-            comment = dialog.txt_comment.GetValue()
-            # wx.MessageBox("got wx.ID_OK " + comment)
-
-            node = self.context.model.AddCommentNode(id, comment)
-            shape = self.context.umlwin.createCommentShape(node)
-            self.context.model.classnametoshape[
-                node.id] = shape  # Record the name to shape map so that we can wire up the links later.
-            node.shape.Show(True)
-            self.context.umlwin.mega_refresh()
-        dialog.Destroy()
+    # def execute_v1(self):
+    #     """
+    #     Pops up a comment dialog box, creates both a graph node and a shape,
+    #     associates them, then adds them to the `self.context.model.classnametoshape` mapping.
+    #     """
+    #
+    #     id = 'D' + str(random.randint(1, 9999))
+    #
+    #     # Old single line dialog - using built in dialog
+    #     # dialog = wx.TextEntryDialog ( None, 'Enter a comment:', 'New Comment', "hello\nthere", style=wx.TE_MULTILINE)
+    #     # dialog.SetSize((200, 100))
+    #
+    #     # Custom dialog built via wxformbuilder - subclass it first, to hook up event handlers
+    #     class EditDialog(DialogComment):
+    #         def OnClassNameEnter(self, event):
+    #             self.EndModal(wx.ID_OK)
+    #
+    #     dialog = EditDialog(None)
+    #     dialog.txt_comment.SetFocus()
+    #
+    #     if dialog.ShowModal() == wx.ID_OK:
+    #         comment = dialog.txt_comment.GetValue()
+    #         # wx.MessageBox("got wx.ID_OK " + comment)
+    #
+    #         node = self.context.model.AddCommentNode(id, comment)
+    #         shape = self.context.umlwin.createCommentShape(node)
+    #         self.context.model.classnametoshape[
+    #             node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+    #         node.shape.Show(True)
+    #         self.context.umlwin.mega_refresh()
+    #     dialog.Destroy()
 
     def execute(self):
         """
@@ -225,6 +225,53 @@ class CmdInsertComment(UtilCmdComment):
                 node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             node.shape.Show(True)
             self.context.umlwin.mega_refresh()
+
+
+class CmdEditComment(UtilCmdComment):
+    """ Edit node properties """
+
+    def __init__(self, shape):
+        self.shape = shape
+
+    def execute(self):
+        """  """
+        umlwin = self.context.umlwin
+        wxapp = self.context.wxapp
+        model = self.context.model
+        shape = self.shape
+        gui = self.context.umlwin
+
+        node = shape.node
+
+        # node is a regular node, its the node.shape that is different for a comment
+        assert not isinstance(node.shape, DividedShape)
+
+        result, comment = self.display_dialog(node.comment)
+
+        # TODO review this code !!!!! and also need to call this class instead of the above umlclass class
+        # somehow - perhaps by checking in the GUI invoker of the type.
+        # also make comment shape unique - not just a rectangle.
+        if result:
+            node.comment = comment
+
+            model.decouple_node_from_shape(shape)
+            gui.delete_shape_view(shape)
+
+            shape = umlwin.CreateCommentShape(node)
+            model.classnametoshape[
+                node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+
+            # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
+            for edge in model.graph.edges:
+                umlwin.CreateUmlEdge(edge)
+
+            node.shape.Show(True)
+            umlwin.mega_refresh()
+
+
+    def undo(self):  # override
+        """ undo insert new node """
+        # not implemented
 
 
 """
