@@ -544,12 +544,14 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.new_evthandler_housekeeping(evthandler)
 
     def createCommentShape(self, node):
-        shape = ogl.TextShape( node.width, node.height )
-            
+        # shape = ogl.TextShape( node.width, node.height )
+        shape = ogl.RectangleShape( node.width, node.height )
+        shape.SetCentreResize(False)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
+        shape.GetRegions()[0].SetFormatMode(ogl.FORMAT_NONE)  # left justify
         shape.SetCanvas(self)
         shape.SetPen(wx.BLACK_PEN)
         shape.SetBrush(wx.LIGHT_GREY_BRUSH)
-        shape.SetBrush(wx.RED_BRUSH)
+        shape.SetBrush(wx.YELLOW_BRUSH)
         font2 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         shape.SetFont(font2)
         for line in node.comment.split('\n'):
