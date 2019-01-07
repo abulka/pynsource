@@ -167,7 +167,7 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
             self.context.wxapp.MessageBox("Open failed.")
             return
                 
-        # build view from model
+        # build view from display model
         umlcanvas.build_view(translatecoords=False)
 
         # set layout coords to be in sync with world, so that if expand scale things will work

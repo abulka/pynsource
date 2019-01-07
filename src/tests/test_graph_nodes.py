@@ -1,6 +1,6 @@
 import sys
 sys.path.append("../src")
-from model.graph import Graph, GraphNode
+from view.graph import Graph, GraphNode
 from layout.line_intersection import FindLineIntersection
 
 import os

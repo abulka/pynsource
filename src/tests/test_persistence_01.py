@@ -3,8 +3,8 @@
 import sys
 sys.path.append("../src")
 from common.architecture_support import whosdaddy, whosgranddaddy
-from model.graph import Graph, GraphNode
-import model.graph_persistence
+from view.graph import Graph, GraphNode
+import view.graph_persistence
 
 import unittest
 
@@ -31,7 +31,7 @@ class TestCase_A(unittest.TestCase):
         assert len(g.nodes) == 0
         #assert g.GraphToString().strip() == ""
         
-        model.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.0
+        view.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.0
         #g.LoadGraphFromStrings(filedata)
         self.assertTrue(g.persistence.UpgradeToLatestFileFormatVersion(filedata))
         #print g.persistence.filedata_list
@@ -49,7 +49,7 @@ class TestCase_A(unittest.TestCase):
 {'type':'node', 'id':'c1', 'x':130, 'y':174, 'width':60, 'height':120}
 {'type':'edge', 'id':'c_to_c1', 'source':'c', 'target':'c1'}
     """
-        model.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.1
+        view.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.1
         self.assertTrue(g.persistence.UpgradeToLatestFileFormatVersion(filedata))
         #print g.persistence.filedata_list
 
@@ -76,7 +76,7 @@ class TestCase_A(unittest.TestCase):
 {'type':'edge', 'id':'ImageViewer_to_MainApp', 'source':'ImageViewer', 'target':'MainApp', 'uml_edge_type':'composition'}
 {'type':'edge', 'id':'UmlShapeCanvas_to_MainApp', 'source':'UmlShapeCanvas', 'target':'MainApp', 'uml_edge_type':'composition'}
     """
-        model.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.1
+        view.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.1
         self.assertTrue(g.persistence.UpgradeToLatestFileFormatVersion(filedata))
         #print g.persistence.filedata_list
 
@@ -100,7 +100,7 @@ class TestCase_A(unittest.TestCase):
 {'type':'umlshape', 'id':'Log', 'x':1089, 'y':222, 'width':82, 'height':67, 'attrs':'', 'meths':'WriteText'}
 {'type':'edge', 'id':'UmlShapeCanvas_to_MainApp', 'source':'UmlShapeCanvas', 'target':'MainApp', 'uml_edge_type':'composition'}
     """
-        model.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.1
+        view.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.1
         self.assertTrue(g.persistence.UpgradeToLatestFileFormatVersion(filedata))
         #print g.persistence.filedata_list
 
@@ -125,7 +125,7 @@ class TestCase_A(unittest.TestCase):
 {'type':'umlshape', 'id':'Log', 'x':1089, 'y':222, 'width':82, 'height':67, 'attrs':'', 'meths':'WriteText'}
 {'type':'edge', 'id':'UmlShapeCanvas_to_MainApp', 'source':'UmlShapeCanvas', 'target':'MainApp', 'uml_edge_type':'composition'}
     """
-        model.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.0
+        view.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.0
         self.assertFalse(g.persistence.UpgradeToLatestFileFormatVersion(filedata))
         self.assertFalse(g.persistence.can_I_read(filedata)[0])
 
@@ -136,7 +136,7 @@ class TestCase_A(unittest.TestCase):
         g = Graph()
         filedata = """
     """
-        model.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.1
+        view.graph_persistence.PERSISTENCE_CURRENT_VERSION = 1.1
         self.assertFalse(g.persistence.can_I_read(filedata)[0])
         self.assertFalse(g.persistence.UpgradeToLatestFileFormatVersion(filedata))
 

@@ -4,7 +4,7 @@ import sys
 
 sys.path.append("../src")
 from layout.overlap_removal import OverlapRemoval
-from model.graph import Graph, GraphNode
+from view.graph import Graph, GraphNode
 import pprint
 
 sys.path.append("../Research/layout force spring")

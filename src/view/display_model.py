@@ -57,7 +57,7 @@ class CommentNode(GraphNode):
         self.id = val
     classname = property(get_id, set_id)
     
-class UmlWorkspace:  # TODO rename UmlDisplayModel
+class DisplayModel:
     """
     This is the Display Model
     Referred to by context.model TODO rename to 'context.display_model'
@@ -111,7 +111,7 @@ class UmlWorkspace:  # TODO rename UmlDisplayModel
             return ch*70
         from pprint import pprint
         print
-        print "     UmlWorkspace Model     "
+        print "     DisplayModel    "
         print
         print line('*'), "DUMP UML KNOWLEDGE: classnametoshape"
         pprint(self.classnametoshape)

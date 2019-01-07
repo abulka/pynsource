@@ -4,7 +4,7 @@
 #    http://search.cpan.org/~pasky/Graph-Layderer-0.02/
 #    https://gist.github.com/heckj/324039 - javascript version
 
-from model.graph import Graph, GraphNode
+from view.graph import Graph, GraphNode
 import random
 import math
 

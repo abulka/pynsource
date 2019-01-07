@@ -8,7 +8,7 @@ import random
 
 from generate_code.gen_java import PySourceAsJava
 
-from model.umlworkspace import UmlWorkspace
+from view.display_model import DisplayModel
 
 from uml_shapes import *
 from coord_utils import setpos, getpos, Move2
@@ -235,7 +235,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         #
         # assert not self.canvas_resizer.canvas_too_small(), "InitSizeAndObjs being called too early - please set up enclosing frame size first"
 
-        self.umlworkspace = UmlWorkspace()
+        self.umlworkspace = DisplayModel()
         self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
         self.snapshot_mgr = GraphSnapshotMgr(graph=self.umlworkspace.graph, umlcanvas=self)
         self.coordmapper = CoordinateMapper(self.umlworkspace.graph, self.GetSize())

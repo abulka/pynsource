@@ -1,6 +1,6 @@
 # basic layout
 
-from model.umlworkspace import UmlWorkspace
+from view.display_model import DisplayModel
 
 class LayoutBasic:
     def __init__(self, leftmargin=200, topmargin=230, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=5):
@@ -85,7 +85,7 @@ if __name__ == '__main__':
             return 10, 10
     
     layout = LayoutBasic(leftmargin=0, topmargin=0, verticalwhitespace=0, horizontalwhitespace=0, maxclassesperline=5)
-    umlworkspace = UmlWorkspace()
+    umlworkspace = DisplayModel()
     umlboxshapes = [Shape(), Shape(), Shape()]
     positions, shapeslist, newdiagramsize = layout.Layout(umlworkspace, umlboxshapes)
     print "positions", positions
