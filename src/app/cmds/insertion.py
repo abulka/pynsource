@@ -164,12 +164,16 @@ class UtilCmdComment(CmdBase):  # Not Used directly, please subclass
         dialog.txt_comment.Value = comment
         dialog.txt_comment.SetFocus()
         if dialog.ShowModal() == wx.ID_OK:
-            comment = dialog.txt_comment.GetValue()
+            comment = self.sanitise_comment(dialog.txt_comment.GetValue())
             result = True
         else:
             result, comment = False, None
         dialog.Destroy()
         return (result, comment)
+
+    def sanitise_comment(self, txt):
+        """Remove any tabs and trailing cr from comments, as they mess up shape text display"""
+        return txt.replace("\t", "    ").rstrip()
 
 
 class CmdInsertComment(UtilCmdComment):
@@ -257,13 +261,13 @@ class CmdEditComment(UtilCmdComment):
             model.decouple_node_from_shape(shape)
             gui.delete_shape_view(shape)
 
-            shape = umlwin.CreateCommentShape(node)
+            shape = umlwin.createCommentShape(node)
             model.classnametoshape[
                 node.id] = shape  # Record the name to shape map so that we can wire up the links later.
 
-            # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
-            for edge in model.graph.edges:
-                umlwin.CreateUmlEdge(edge)
+            # # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
+            # for edge in model.graph.edges:
+            #     umlwin.CreateUmlEdge(edge)
 
             node.shape.Show(True)
             umlwin.mega_refresh()

@@ -142,10 +142,10 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self.app.run.CmdNodeDelete(self.GetShape())
 
     def OnLeftDoubleClick(self, x, y, keys, attachment):
-        self.app.run.CmdEditUmlClass(self.GetShape())
+        node_edit_multi_purpose(self.GetShape(), self.app)
 
     def NodeProperties(self, event):
-        self.app.run.CmdEditUmlClass(self.GetShape())
+        node_edit_multi_purpose(self.GetShape(), self.app)
 
     def OnDrawBegin(self, event):
         self.GetShape().GetCanvas().NewEdgeMarkFrom()
@@ -165,3 +165,24 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         
     def OnPopupMenuCancel(self, event):
         pass
+
+def node_edit_multi_purpose(shape, app):
+    """
+    Edit a uml class node or a comment node
+
+    Main menu calls this from pynsourcegui or
+    Or uml shape handler (above) calls this when right click on a shape
+
+    Args:
+        shape:
+        app:
+
+    Returns: -
+
+    """
+    # node is a regular node, its the node.shape that is different for a comment
+    from gui.uml_shapes import DividedShape
+    if isinstance(shape, DividedShape):
+        app.run.CmdEditUmlClass(shape)
+    else:
+        app.run.CmdEditComment(shape)

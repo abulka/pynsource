@@ -690,9 +690,11 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.app.run.CmdInsertUmlClass()
         
     def OnEditProperties(self, event):
+        from gui.uml_shape_handler import node_edit_multi_purpose
+        # not sure why we are looping cos currently cannot select more than one shape
         for shape in self.umlwin.GetDiagram().GetShapeList():
             if shape.Selected():
-                self.app.run.CmdEditUmlClass(shape)
+                node_edit_multi_purpose(shape, self.app)
                 break
             
     def OnEditProperties_update(self, event):

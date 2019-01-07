@@ -569,6 +569,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
         self.new_evthandler_housekeeping(evthandler)
+        return shape
 
     def new_evthandler_housekeeping(self, evthandler):
         # notify app of this new evthandler so app can
