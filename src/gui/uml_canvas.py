@@ -757,9 +757,17 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.mega_refresh()
        
     def get_umlboxshapes(self):
+        """
+        Return list of all uml classes and comment shapes
+
+        TODO take into account images and other future shapes
+
+        Returns: list of all shapes
+        """
         #return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
-        return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]  # TODO take into account images and other shapes
-        
+        # return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]
+        return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape) or isinstance(s, ogl.RectangleShape) ]
+
     umlboxshapes = property(get_umlboxshapes)
     
     def OnDestroy(self, evt):

@@ -52,6 +52,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self.UpdateStatusBar(shape)
         
         shape.GetCanvas().canvas_resizer.resize_virtual_canvas_tofit_bounds(bounds_dirty=True)
+        print "ssss"
 
         # Invoke overlap removal (unless hold down shift key)
         KEY_SHIFT = 1
