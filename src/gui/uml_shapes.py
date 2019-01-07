@@ -215,3 +215,61 @@ class BitmapShapeResizable(ogl.BitmapShape):
     def SetBitmap(self, bitmap):    # Override
         ogl.BitmapShape.SetBitmap(self, bitmap)
         self._ori_bmp = bitmap  # ANDY ADDED
+
+
+# Comment Shape
+
+# class DiamondShape(ogl.PolygonShape):
+#     def __init__(self, w=0.0, h=0.0):
+#         ogl.PolygonShape.__init__(self)
+#         if w == 0.0:
+#             w = 60.0
+#         if h == 0.0:
+#             h = 60.0
+#
+#         points = [ (0.0,    -h/2.0),
+#                    (w/2.0,  0.0),
+#                    (0.0,    h/2.0),
+#                    (-w/2.0, 0.0),
+#                    ]
+#
+#         self.Create(points)
+
+class CommentShape(ogl.RectangleShape):
+    def __init__(self, w=0.0, h=0.0):
+        ogl.RectangleShape.__init__(self, w, h)
+        # self.SetCornerRadius(-0.3)
+
+    def OnDraw(self, dc):
+        """The draw handler."""
+        ogl.RectangleShape.OnDraw(self, dc)
+
+        print "extra drawing here...."
+
+        x1 = self._xpos - self._width / 2.0
+        y1 = self._ypos - self._height / 2.0
+        x2 = x1 + self._width
+        y2 = y1 + self._height
+
+        # simple box corner, but need to erase top right triangle portion of it - see below
+        dc.DrawRectangle(x2-10, y1, 10, 10)
+
+        """
+        Bit of a hacky way of doing it - draw a triangle to make it appear that the
+        top right corner of the desktop is visible, whereas it is not.
+        The proper solution is not to draw a rectangle for the comment shape in the first place
+        and leave the top right corner undrawn.  This will do for now, though.
+        """
+        my_points = [
+            (x2, y1),
+            (x2-10, y1),
+            (x2, y1+10),
+            (x2, y1)
+        ]
+        uml_canvas_blue = wx.TheColourDatabase.Find("LIGHT BLUE")
+        dc.SetBrush(wx.Brush(uml_canvas_blue))  # fill
+        dc.SetPen(wx.Pen(uml_canvas_blue, 1, wx.PENSTYLE_SOLID))  # line
+        dc.DrawPolygon(my_points)
+
+        dc.SetPen(wx.Pen(wx.BLACK, 1, wx.PENSTYLE_SOLID))  # line
+        dc.DrawLine(x2-10, y1, x2, y1+10)

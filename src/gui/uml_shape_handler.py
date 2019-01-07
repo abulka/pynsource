@@ -4,6 +4,8 @@ import wx
 import wx.lib.ogl as ogl
 from coord_utils import setpos, getpos
 from common.architecture_support import *
+from gui.uml_shapes import CommentShape
+
 
 class UmlShapeHandler(ogl.ShapeEvtHandler):
     def __init__(self, log, frame, shapecanvas):
@@ -191,5 +193,7 @@ def node_edit_multi_purpose(shape, app):
     from gui.uml_shapes import DividedShape
     if isinstance(shape, DividedShape):
         app.run.CmdEditUmlClass(shape)
-    else:
+    elif isinstance(shape, CommentShape):
         app.run.CmdEditComment(shape)
+    else:
+        print "Unknown Shape", shape

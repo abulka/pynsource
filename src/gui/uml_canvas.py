@@ -545,7 +545,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def createCommentShape(self, node):
         # shape = ogl.TextShape( node.width, node.height )
-        shape = ogl.RectangleShape( node.width, node.height )
+        shape = CommentShape( node.width, node.height )
         shape.SetCentreResize(False)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
         shape.GetRegions()[0].SetFormatMode(ogl.FORMAT_NONE)  # left justify
         shape.SetCanvas(self)
@@ -766,7 +766,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         """
         #return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
         # return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]
-        return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape) or isinstance(s, ogl.RectangleShape) ]
+        return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape) or isinstance(s, CommentShape) ]
 
     umlboxshapes = property(get_umlboxshapes)
     
