@@ -235,12 +235,12 @@ class UmlCanvas(ogl.ShapeCanvas):
         #
         # assert not self.canvas_resizer.canvas_too_small(), "InitSizeAndObjs being called too early - please set up enclosing frame size first"
 
-        self.umlworkspace = DisplayModel()
+        self.displaymodel = DisplayModel()
         self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
-        self.snapshot_mgr = GraphSnapshotMgr(graph=self.umlworkspace.graph, umlcanvas=self)
-        self.coordmapper = CoordinateMapper(self.umlworkspace.graph, self.GetSize())
-        self.layouter = GraphLayoutSpring(self.umlworkspace.graph, gui=self)
-        self.overlap_remover = OverlapRemoval(self.umlworkspace.graph, margin=50, gui=self)
+        self.snapshot_mgr = GraphSnapshotMgr(graph=self.displaymodel.graph, umlcanvas=self)
+        self.coordmapper = CoordinateMapper(self.displaymodel.graph, self.GetSize())
+        self.layouter = GraphLayoutSpring(self.displaymodel.graph, gui=self)
+        self.overlap_remover = OverlapRemoval(self.displaymodel.graph, margin=50, gui=self)
         
     def AllToLayoutCoords(self):
         self.coordmapper.AllToLayoutCoords()
@@ -369,7 +369,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         dc = wx.ClientDC(self)
         self.GetDiagram().Clear(dc)   # Clears screen - don't prepare the dc or it will only clear the top scrolled bit (see my mailing list discussion)
 
-        self.umlworkspace.Clear()
+        self.displaymodel.Clear()
 
         if "wxMac" in wx.PlatformInfo:      # Hack on Mac so that onKeyChar bindings take hold properly. 
             wx.CallAfter(self.SetFocus)
@@ -403,11 +403,11 @@ class UmlCanvas(ogl.ShapeCanvas):
             print "Can't link to self"
             return
         
-        if not self.umlworkspace.graph.FindNodeById(self.new_edge_from.id):
+        if not self.displaymodel.graph.FindNodeById(self.new_edge_from.id):
             print "From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id
             return
         
-        edge = self.umlworkspace.graph.AddEdge(tonode, self.new_edge_from, weight=None) # swap direction as is a directional composition.
+        edge = self.displaymodel.graph.AddEdge(tonode, self.new_edge_from, weight=None) # swap direction as is a directional composition.
         # TODO should also arguably add to umlworkspace's associations_composition or associations_generalisation list (or create a new one for unlabelled associations like the one we are creating here)
         #edge['uml_edge_type'] = ''
         edge['uml_edge_type'] = edge_type
@@ -558,6 +558,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             shape.AddText(line)
         
         setpos(shape, node.left, node.top)
+        shape.SetSize(200,90)
         #shape.SetDraggable(True, True)
         self.AddShape( shape )
         node.shape = shape
@@ -671,18 +672,18 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.AllToWorldCoords()
 
         # Clear existing visualisation
-        for node in self.umlworkspace.graph.nodes:
+        for node in self.displaymodel.graph.nodes:
             if node.shape:
                 self.delete_shape_view(node.shape)
                 node.shape = None
 
         # Create fresh visualisation
-        for node in self.umlworkspace.graph.nodes:
+        for node in self.displaymodel.graph.nodes:
             assert not node.shape
             shape = self.CreateUmlShape(node)
-            self.umlworkspace.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+            self.displaymodel.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             
-        for edge in self.umlworkspace.graph.edges:
+        for edge in self.displaymodel.graph.edges:
             self.CreateUmlEdge(edge)
 
 
@@ -735,7 +736,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         dc = wx.ClientDC(self)
         self.PrepareDC(dc)
 
-        for node in self.umlworkspace.graph.nodes:
+        for node in self.displaymodel.graph.nodes:
             node.shape.Move2(dc, node.left, node.top, display=False)
         self.Refresh()
 

@@ -78,7 +78,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
                                         0)
 
             # Page 0
-            self.umlwin = self.umlwin = UmlCanvas(self.notebook, Log(), self.frame)
+            self.umlwin = UmlCanvas(self.notebook, Log(), self.frame)
             self.umlwin.SetScrollRate(5, 5)
             self.notebook.AddPage(self.umlwin, u"UML", True)
 
@@ -167,7 +167,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         context.wxapp = self
         context.config = self.config
         context.umlwin = self.umlwin
-        context.displaymodel = self.umlwin.umlworkspace
+        context.displaymodel = self.umlwin.displaymodel
         context.snapshot_mgr = self.umlwin.snapshot_mgr
         context.coordmapper = self.umlwin.coordmapper
         context.layouter = self.umlwin.layouter
@@ -532,7 +532,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         m = model_to_ascii_builder()
         try:
             wx.SafeYield()
-            s = m.main(self.umlwin.umlworkspace.graph)
+            s = m.main(self.umlwin.displaymodel.graph)
             self.multiText.SetValue(str(s))
             if str(s).strip() == "":
                 self.multiText.SetValue(ASCII_UML_HELP_MSG)
