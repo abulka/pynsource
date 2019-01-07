@@ -146,7 +146,7 @@ if __name__ == '__main__':
             self.frame.Show(True)
             self.SetTopWindow(self.frame)
             
-            b = MockLayoutBlackboard()    # LayoutBlackboard(graph=self.context.model.graph, umlwin=self.context.umlwin)
+            b = MockLayoutBlackboard()    # LayoutBlackboard(graph=self.context.displaymodel.graph, umlwin=self.context.umlwin)
             
             self.frame.SetBlackboardObject(b)
         

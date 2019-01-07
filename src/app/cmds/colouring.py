@@ -23,13 +23,13 @@ class CmdColourSiblings(CmdBase):
         else:
             offset = 0
 
-        self.context.model.graph.colour_mark_siblings()
+        self.context.displaymodel.graph.colour_mark_siblings()
         
         clrs = official2.strip().split('\n')
 
         dc = wx.ClientDC(umlwin)
         umlwin.PrepareDC(dc)
-        for node in self.context.model.graph.nodes:
+        for node in self.context.displaymodel.graph.nodes:
             clr = clrs[(node.colour_index + offset) % len(clrs)]
             colour=wx.Brush(clr)
             
@@ -64,7 +64,7 @@ class CmdCycleColours(CmdBase):
         
         dc = wx.ClientDC(umlwin)
         umlwin.PrepareDC(dc)
-        for node in self.context.model.graph.nodes:
+        for node in self.context.displaymodel.graph.nodes:
             node.shape.SetBrush(self.colour)
         umlwin.Redraw(dc)
 
@@ -84,7 +84,7 @@ class CmdColourSequential(CmdBase):
         index = 0 + offset
         index_max = len(official2)
         
-        for node in self.context.model.graph.nodes:
+        for node in self.context.displaymodel.graph.nodes:
             node.colour_index = index
             index += 1
             if index > index_max:
@@ -94,7 +94,7 @@ class CmdColourSequential(CmdBase):
 
         dc = wx.ClientDC(umlwin)
         umlwin.PrepareDC(dc)
-        for node in self.context.model.graph.nodes:
+        for node in self.context.displaymodel.graph.nodes:
             clr = clrs[(node.colour_index + offset) % len(clrs)]
             colour=wx.Brush(clr)
             node.shape.SetBrush(colour)
@@ -107,7 +107,7 @@ class CmdBuildColourChartWorkspace(CmdBase):
         umlcanvas = self.context.umlwin
         umlcanvas.Clear()
         
-        graph = self.context.model.graph
+        graph = self.context.displaymodel.graph
         
         clrs = official2.strip().split('\n')
         

@@ -167,7 +167,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         context.wxapp = self
         context.config = self.config
         context.umlwin = self.umlwin
-        context.model = self.umlwin.umlworkspace
+        context.displaymodel = self.umlwin.umlworkspace
         context.snapshot_mgr = self.umlwin.snapshot_mgr
         context.coordmapper = self.umlwin.coordmapper
         context.layouter = self.umlwin.layouter

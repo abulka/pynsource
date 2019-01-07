@@ -56,7 +56,7 @@ class CmdDeepLayout(CmdBase):
         f = MainBlackboardFrame(parent=self.context.frame)
         f.Show(True)
         
-        b = LayoutBlackboard(graph=self.context.model.graph, umlwin=self.context.umlwin)
+        b = LayoutBlackboard(graph=self.context.displaymodel.graph, umlwin=self.context.umlwin)
         f.SetBlackboardObject(b)
         f.Start(num_attempts=3)
         

@@ -4,10 +4,10 @@ from base_cmd import CmdBase
 
 class CmdNodeDeleteBase(CmdBase):
     def delete_shape(self, shape):
-        model = self.context.model
+        displaymodel = self.context.displaymodel
         gui = self.context.umlwin
         
-        model.delete_node_for_shape(shape)
+        displaymodel.delete_node_for_shape(shape)
         gui.delete_shape_view(shape)
 
         self.context.frame.Layout()  # needed when running phoenix

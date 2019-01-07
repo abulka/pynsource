@@ -60,7 +60,7 @@ class CommentNode(GraphNode):
 class DisplayModel:
     """
     This is the Display Model
-    Referred to by context.model TODO rename to 'context.display_model'
+    Referred to by context.displaymodel
     Not to be confused with context.umlwin which is the UmlCanvas object which is a OGL visual thing
 
     The 'graph' of 'nodes' is the abstract stuff, used in layout, but also containing

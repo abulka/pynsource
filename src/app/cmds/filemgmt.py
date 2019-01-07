@@ -27,7 +27,7 @@ class CmdFileImportBase(CmdBase):   # BASE
         assert self.files
         
         # these are tuples between class names.
-        self.context.model.ClearAssociations()       # WHY DO WE WANT TO DESTROY THIS VALUABLE INFO?
+        self.context.displaymodel.ClearAssociations()       # WHY DO WE WANT TO DESTROY THIS VALUABLE INFO?
 
         if self.files:
             for f in self.files:
@@ -37,13 +37,13 @@ class CmdFileImportBase(CmdBase):   # BASE
                 #from parsing.dump_pmodel import dump_old_structure
                 #print dump_old_structure(pmodel)
                 
-                self.context.model.ConvertParseModelToUmlModel(pmodel)
+                self.context.displaymodel.ConvertParseModelToUmlModel(pmodel)
 
                 #p = PySourceAsJava()
                 #p.optionModuleAsClass = 0
                 #p.verbose = 0
                 #p.Parse(f)
-                #self.context.model.ConvertParseModelToUmlModel(p)
+                #self.context.displaymodel.ConvertParseModelToUmlModel(p)
 
         self.context.umlwin.build_view()
 
@@ -128,7 +128,7 @@ class CmdFileSaveWorkspace(CmdBase):
             filename = dlg.GetPath()
             
             fp = open(filename, "w")
-            fp.write(self.context.model.graph.GraphToString())
+            fp.write(self.context.displaymodel.graph.GraphToString())
             fp.close()
             
             self.context.wxapp.set_app_title(filename)
@@ -138,7 +138,7 @@ class CmdFileSaveWorkspace(CmdBase):
 
 class CmdFileSaveWorkspaceToConsole(CmdBase):
     def execute(self):
-        print self.context.model.graph.GraphToString()
+        print self.context.displaymodel.graph.GraphToString()
 
 
 # ------- Loading from persistence
@@ -152,7 +152,7 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
         umlcanvas = self.context.umlwin
         
         force = False
-        canread, msg = self.context.model.graph.persistence.can_I_read(filedata)
+        canread, msg = self.context.displaymodel.graph.persistence.can_I_read(filedata)
         if not canread:
             #self.context.wxapp.MessageBox(msg)
             retCode = wx.MessageBox(msg + "\n\nTry anyway?", "File Open Error", wx.YES_NO | wx.ICON_QUESTION)  # MessageBox simpler than MessageDialog
@@ -163,7 +163,7 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
 
         umlcanvas.Clear()
         
-        if not self.context.model.graph.LoadGraphFromStrings(filedata, force):
+        if not self.context.displaymodel.graph.LoadGraphFromStrings(filedata, force):
             self.context.wxapp.MessageBox("Open failed.")
             return
                 

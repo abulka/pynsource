@@ -59,7 +59,7 @@ class CmdInsertUmlClass(UtilCmdUmlClass):
         """ insert the new node and refresh the ascii tab too """
         umlwin = self.context.umlwin
         wxapp = self.context.wxapp
-        model = self.context.model
+        displaymodel = self.context.displaymodel
         
         #self.umlwin.CmdInsertNewNode()
         
@@ -69,12 +69,12 @@ class CmdInsertUmlClass(UtilCmdUmlClass):
 
         if result:
             # Ensure unique name
-            while model.graph.FindNodeById(id):
+            while displaymodel.graph.FindNodeById(id):
                 id += '2'
 
-            node = model.AddUmlNode(id, attrs, methods)
+            node = displaymodel.AddUmlNode(id, attrs, methods)
             shape = umlwin.CreateUmlShape(node)
-            model.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+            displaymodel.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             
             node.shape.Show(True)
             
@@ -100,7 +100,7 @@ class CmdEditUmlClass(UtilCmdUmlClass):
         """  """
         umlwin = self.context.umlwin
         wxapp = self.context.wxapp
-        model = self.context.model
+        displaymodel = self.context.displaymodel
         shape = self.shape
         gui = self.context.umlwin
 
@@ -111,20 +111,20 @@ class CmdEditUmlClass(UtilCmdUmlClass):
             result, id, attrs, methods = self.display_dialog(node.id, node.attrs,
                                                                        node.meths)
             if result:
-                model.graph.RenameNode(node,
+                displaymodel.graph.RenameNode(node,
                                        id)  # need special rename cos of underlying graph plumbing - perhaps put setter on id?
                 node.attrs = attrs
                 node.meths = methods
 
-                model.decouple_node_from_shape(shape)
+                displaymodel.decouple_node_from_shape(shape)
                 gui.delete_shape_view(shape)
 
                 shape = umlwin.CreateUmlShape(node)
-                model.classnametoshape[
+                displaymodel.classnametoshape[
                     node.id] = shape  # Record the name to shape map so that we can wire up the links later.
 
                 # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
-                for edge in model.graph.edges:
+                for edge in displaymodel.graph.edges:
                     umlwin.CreateUmlEdge(edge)
 
                 node.shape.Show(True)
@@ -182,18 +182,18 @@ class CmdInsertComment(UtilCmdComment):
     def execute(self):
         """
         Pops up a comment dialog box, creates both a graph node and a shape,
-        associates them, then adds them to the `self.context.model.classnametoshape` mapping.
+        associates them, then adds them to the `self.context.displaymodel.classnametoshape` mapping.
         """
 
         id = 'C' + str(random.randint(1, 9999))
         result, comment = self.display_dialog(comment="initial comment")
         if result:
             # Ensure unique name
-            while self.context.model.graph.FindNodeById(id):
+            while self.context.displaymodel.graph.FindNodeById(id):
                 id += '2'
-            node = self.context.model.AddCommentNode(id, comment)
+            node = self.context.displaymodel.AddCommentNode(id, comment)
             shape = self.context.umlwin.createCommentShape(node)
-            self.context.model.classnametoshape[
+            self.context.displaymodel.classnametoshape[
                 node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             node.shape.Show(True)
             self.context.umlwin.mega_refresh()
@@ -209,7 +209,7 @@ class CmdEditComment(UtilCmdComment):
         """  """
         umlwin = self.context.umlwin  # TODO rename context.umlcanvas
         wxapp = self.context.wxapp
-        model = self.context.model  # TODO rename context.displaymodel
+        displaymodel = self.context.displaymodel
         shape = self.shape
         gui = self.context.umlwin
 
@@ -226,11 +226,11 @@ class CmdEditComment(UtilCmdComment):
         if result:
             node.comment = comment
 
-            model.decouple_node_from_shape(shape)
+            displaymodel.decouple_node_from_shape(shape)
             gui.delete_shape_view(shape)
 
             shape = umlwin.createCommentShape(node)
-            model.classnametoshape[
+            displaymodel.classnametoshape[
                 node.id] = shape  # Record the name to shape map so that we can wire up the links later.
 
             # # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
