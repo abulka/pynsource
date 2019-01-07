@@ -179,38 +179,6 @@ class UtilCmdComment(CmdBase):  # Not Used directly, please subclass
 class CmdInsertComment(UtilCmdComment):
     """ Insert comment """
 
-    # def execute_v1(self):
-    #     """
-    #     Pops up a comment dialog box, creates both a graph node and a shape,
-    #     associates them, then adds them to the `self.context.model.classnametoshape` mapping.
-    #     """
-    #
-    #     id = 'D' + str(random.randint(1, 9999))
-    #
-    #     # Old single line dialog - using built in dialog
-    #     # dialog = wx.TextEntryDialog ( None, 'Enter a comment:', 'New Comment', "hello\nthere", style=wx.TE_MULTILINE)
-    #     # dialog.SetSize((200, 100))
-    #
-    #     # Custom dialog built via wxformbuilder - subclass it first, to hook up event handlers
-    #     class EditDialog(DialogComment):
-    #         def OnClassNameEnter(self, event):
-    #             self.EndModal(wx.ID_OK)
-    #
-    #     dialog = EditDialog(None)
-    #     dialog.txt_comment.SetFocus()
-    #
-    #     if dialog.ShowModal() == wx.ID_OK:
-    #         comment = dialog.txt_comment.GetValue()
-    #         # wx.MessageBox("got wx.ID_OK " + comment)
-    #
-    #         node = self.context.model.AddCommentNode(id, comment)
-    #         shape = self.context.umlwin.createCommentShape(node)
-    #         self.context.model.classnametoshape[
-    #             node.id] = shape  # Record the name to shape map so that we can wire up the links later.
-    #         node.shape.Show(True)
-    #         self.context.umlwin.mega_refresh()
-    #     dialog.Destroy()
-
     def execute(self):
         """
         Pops up a comment dialog box, creates both a graph node and a shape,
@@ -239,9 +207,9 @@ class CmdEditComment(UtilCmdComment):
 
     def execute(self):
         """  """
-        umlwin = self.context.umlwin
+        umlwin = self.context.umlwin  # TODO rename context.umlcanvas
         wxapp = self.context.wxapp
-        model = self.context.model
+        model = self.context.model  # TODO rename context.displaymodel
         shape = self.shape
         gui = self.context.umlwin
 
