@@ -61,7 +61,9 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         else:
             canvas = shape.GetCanvas()
             if canvas.remove_overlaps():
-                canvas.mega_refresh()
+                pass
+
+        canvas.mega_refresh()
 
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
         shape = self.GetShape()
@@ -80,9 +82,13 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         
         self.UpdateStatusBar(self.GetShape())
 
+        shape.GetCanvas().canvas_resizer.resize_virtual_canvas_tofit_bounds(bounds_dirty=True)
+
         canvas = shape.GetCanvas()
         if canvas.remove_overlaps():
-            canvas.mega_refresh()
+            pass
+
+        canvas.mega_refresh()
         
     def OnEndSize(self, width, height):
         #print "OnEndSize", width, height

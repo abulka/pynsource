@@ -744,6 +744,9 @@ class UmlCanvas(ogl.ShapeCanvas):
         if auto_resize_canvas:
             self.canvas_resizer.resize_virtual_canvas_tofit_bounds(bounds_dirty=True)
 
+        # This cures so many phoenix refresh issues that I'm throwing it in here for fun too.
+        self.frame.Layout()  # needed when running phoenix
+
     # UTILITY - used by CmdLayout and CmdFileImportBase
     def layout_and_position_shapes(self):
         self.canvas_resizer.frame_calibration(auto_resize_virtualcanvas=False)  # going to do a mega_refresh later so no point changing virt canvas now
