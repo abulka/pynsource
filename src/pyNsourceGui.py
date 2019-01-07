@@ -676,7 +676,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         
     def OnDeleteNode(self, event):
         self.app.run.CmdNodeDeleteSelected()
-                
+
     def OnDeleteNode_update(self, event):
         self.Enable_if_node_selected(event)
 

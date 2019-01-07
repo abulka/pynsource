@@ -9,8 +9,11 @@ class CmdNodeDeleteBase(CmdBase):
         
         model.delete_node_for_shape(shape)
         gui.delete_shape_view(shape)
-        
-        
+
+        self.context.frame.Layout()  # needed when running phoenix
+        # self.context.umlwin.Refresh()
+        # self.context.wxapp.RefreshAsciiUmlTab()
+
 class CmdNodeDelete(CmdNodeDeleteBase):
     """ Delete specific shape/node. """
     def __init__(self, shape):
