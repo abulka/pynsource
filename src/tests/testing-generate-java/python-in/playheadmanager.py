@@ -51,18 +51,18 @@ class PlayAPI:
     def _GetCurrentPosition(self):
         return self.playhead.Position
     def GetCurrentValue(self):
-        raise 'Not Implemented'
+        raise RuntimeError('Not Implemented')
 
     def _GetMaxPosition(self):
         return self.playhead.MaxPosition
     def GetMaxValue(self):
-        raise 'Not Implemented'
+        raise RuntimeError('Not Implemented')
 
     def _JumpToPosition(self, position):
         self.playhead.Go(position)
         self.SynchroniseOtherPlayheads()
     def JumpToValue(self, value):
-        raise 'Not Implemented'
+        raise RuntimeError('Not Implemented')
 
     def NotifyOfInsert(self, pos):
         self.playhead.NotifyOfInsert(pos)
@@ -123,7 +123,7 @@ class PlayAPI:
         There are similar arbitary decisions when synching to time, I think.  There is another function
                    _FindLatestEventWithTime() which makes this decision.
         """
-        raise 'Not Implemented'
+        raise RuntimeError('Not Implemented')
 
     def _FindLastEventWithTimeElseMostRecentEventLessthanTime(self, timeToFind):
         timepostofind = self.turnMgr.TimeToTimePosition(timeToFind)

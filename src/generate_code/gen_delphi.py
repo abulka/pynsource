@@ -19,7 +19,7 @@ def unique(s):
     else:
           return u.keys()
 
-    raise "uniqueness algorithm failed .. type more of it in please - see http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52560"
+    raise RuntimeError("uniqueness algorithm failed .. type more of it in please - see http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52560")
 
 class PySourceAsDelphi(ReportGenerator):
     def __init__(self, ast=True, outdir=None):
