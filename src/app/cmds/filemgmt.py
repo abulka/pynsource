@@ -32,8 +32,9 @@ class CmdFileImportBase(CmdBase):   # BASE
         if self.files:
             for f in self.files:
                 #pmodel, debuginfo = old_parser(f)
-                pmodel, debuginfo = new_parser(f)
-                
+                # pmodel, debuginfo = new_parser(f)
+                pmodel, debuginfo = new_parser(f, options={'mode': 3})
+
                 #from parsing.dump_pmodel import dump_old_structure
                 #print dump_old_structure(pmodel)
                 

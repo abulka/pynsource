@@ -417,7 +417,12 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         menuBar.Append(menu1, "&File")
         menuBar.Append(menu2, "&Edit")
         menuBar.Append(menu3, "&Layout")
-        menuBar.Append(menu5, "&View")
+
+        # Super Stoopid Hack (TM) is to just name the menu "View " instead of "View"
+        # https://github.com/itsayellow/marcam/issues/52
+        # https://github.com/wxWidgets/Phoenix/issues/347
+        menuBar.Append(menu5, "&View ")  # the name "View" causes weird mac dock auto items
+
         menuBar.Append(menu4, "&Help")
         self.frame.SetMenuBar(menuBar)
 
