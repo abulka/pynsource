@@ -27,7 +27,7 @@ import wx.lib.ogl as ogl
 import os, stat
 from common.messages import *
 
-APP_VERSION = 1.63
+APP_VERSION = 1.62
 WINDOW_SIZE = (1024,768)
 MULTI_TAB_GUI = True
 USE_SIZER = False
@@ -572,7 +572,9 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         #self.MessageBox(ABOUT_MSG.strip() %  APP_VERSION)
         
         from wx.lib.wordwrap import wordwrap
-        info = wx.AboutDialogInfo()
+        from wx.adv import AboutDialogInfo, AboutBox
+
+        info = AboutDialogInfo()
         #info.SetIcon(wx.Icon('Images\\img_uml01.png', wx.BITMAP_TYPE_PNG))
         info.SetName(ABOUT_APPNAME)
         info.SetVersion(str(APP_VERSION))
@@ -587,7 +589,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         #info.AddArtist('Blah')
         #info.AddTranslator('Blah')
 
-        wx.AboutBox(info)
+        AboutBox(info)
 
     def OnVisitWebsite(self, event):
         import webbrowser

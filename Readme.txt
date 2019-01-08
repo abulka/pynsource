@@ -3,7 +3,7 @@ PyNSource and PyNSource GUI
 Reverse engineer python source code into UML - optionally display UML as Ascii
 art for pasting into your source code.
 
-Version 1.63
+Version 1.62
 (c) Andy Bulka 2004-2018
 andy@andypatterns.com
 http://www.andypatterns.com/index.php/products/pynsource/
