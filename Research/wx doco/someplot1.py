@@ -48,9 +48,9 @@ class PolyPoints:
         self.scaled = self.points
         self.attributes = {}
         self.attributes.update(self._attributes)
-        for name, value in attr.items():
-            if name not in self._attributes.keys():
-                raise KeyError, "Style attribute incorrect. Should be one of %s" %self._attributes.keys()
+        for name, value in list(attr.items()):
+            if name not in list(self._attributes.keys()):
+                raise KeyError("Style attribute incorrect. Should be one of %s" %list(self._attributes.keys()))
             self.attributes[name] = value
 
     def boundingBox(self):
@@ -224,7 +224,7 @@ class PlotGraphics:
         yLabel - label shown on y-axis
         """
         if type(objects) not in [list,tuple]:
-            raise TypeError, "objects argument should be list or tuple"
+            raise TypeError("objects argument should be list or tuple")
         self.objects = objects
 
     def boundingBox(self):
@@ -433,7 +433,7 @@ class PlotCanvas(wx.Window):
             else:
                 return upper, lower
         else:
-            raise ValueError, str(spec) + ': illegal axis specification'
+            raise ValueError(str(spec) + ': illegal axis specification')
 
 #-------------------------------------------------------------------------------
 
@@ -611,8 +611,8 @@ def __test():
             start = time.clock()
             for x in range(30):
                 self.client.Draw(_draw4Objects(data1))
-                print x,
-            print "\n30 plots of Draw4 took: %f sec."%(time.clock() - start)
+                print(x, end=' ')
+            print("\n30 plots of Draw4 took: %f sec."%(time.clock() - start))
             #profile end
 
         def OnPlotDraw5(self, event):

@@ -130,10 +130,10 @@ class GraphWindow(ogl.ShapeCanvas):
             newNode = self.AddNode(obj, info)
 
             oldLinesFrom, oldLinesTo = self.getAllLinesOfNode( id )                
-            for name, line in oldLinesFrom.items():
+            for name, line in list(oldLinesFrom.items()):
                 self.removeLineFromTo( id, name, line[0][0], line[0][1] )
                 self.addLineFromTo( id, name, line[0][0], line[0][1], newNode, self.nodeShapes[line[0][0]] )
-            for name, line in oldLinesTo.items():
+            for name, line in list(oldLinesTo.items()):
                 self.removeLineFromTo( line[0][0], line[0][1], id, name )
                 self.addLineFromTo( line[0][0], line[0][1], id, name, self.nodeShapes[line[0][0]], newNode )
 
@@ -172,9 +172,9 @@ class GraphWindow(ogl.ShapeCanvas):
     def DeleteNode(self, id, deleteConnections = True):        
         if deleteConnections:
             oldLinesFrom, oldLinesTo = self.getAllLinesOfNode( id )                
-            for name, line in oldLinesFrom.items():
+            for name, line in list(oldLinesFrom.items()):
                 self.removeLineFromTo( id, name, line[0][0], line[0][1] )
-            for name, line in oldLinesTo.items():
+            for name, line in list(oldLinesTo.items()):
                 self.removeLineFromTo( line[0][0], line[0][1], id, name )
     
         shape = self.nodeShapes[id]
@@ -262,7 +262,7 @@ class GraphWindow(ogl.ShapeCanvas):
         elif mode == 'dynamic':
             self.SetBackgroundColour( wx.Color(*Config.backgroundColorDynamic) )
         
-        for id, shape in self.nodeShapes.items():
+        for id, shape in list(self.nodeShapes.items()):
             shape.SetViewMode( mode )
 
 
@@ -271,7 +271,7 @@ class GraphWindow(ogl.ShapeCanvas):
     def OnChangePropertyValue(self, id, name, value, kind = 'static'):
         if kind == 'dynamic':
             def x():
-                for id, shape in self.nodeShapes.items():
+                for id, shape in list(self.nodeShapes.items()):
                     shape.update()
                 
             wx.CallAfter( x )
@@ -289,7 +289,7 @@ class GraphWindow(ogl.ShapeCanvas):
         
     def UpdateLines(self, shape, refresh = True):
         fromTo = self.getAllLinesOfNode( shape.node.id )
-        lines = fromTo[0].values() + fromTo[1].values()
+        lines = list(fromTo[0].values()) + list(fromTo[1].values())
         
         allLinesFrom = [ line[1] for line in lines ]
 
@@ -302,12 +302,12 @@ class GraphWindow(ogl.ShapeCanvas):
             self.Refresh()
     
     def UpdateAllLines(self, refresh = True):    
-        for shape in self.nodeShapes.values():
+        for shape in list(self.nodeShapes.values()):
             self.UpdateLines(shape, False)
         if refresh: self.Refresh()
 
     def Clear(self):
-        for id in self.nodeShapes.keys():
+        for id in list(self.nodeShapes.keys()):
             self.DeleteNode(id)
 
     def SetZoom(self, zoom):
@@ -344,12 +344,12 @@ class ConnectionShape(ogl.LineShape):
             
             lineLabels = { 'Start' : upProp, 'Middle' : '%s - %s' % (upProp, downProp), 'End' : downProp }
             
-            for label, value in lineLabels.iteritems():
+            for label, value in lineLabels.items():
                 rgnId = self.GetRegionId(label)
                 self.FormatText(dc, value, rgnId)
                 
             for rgn in self.GetRegions():
-                if rgn.GetName() in lineLabels.keys():
+                if rgn.GetName() in list(lineLabels.keys()):
                     rgn.SetSize(70,10)
                     rgn.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL))
         
@@ -508,7 +508,7 @@ class PresenterInfo(object):
         return presenterinfo
 
 
-import cPickle as pickle
+import pickle as pickle
 
 class DropData(wx.CustomDataObject):
     def __init__(self):

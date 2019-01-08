@@ -4,7 +4,7 @@
 
 # Andy hack
 def JsonFromDictFunction(o): 
-    print "dotnet json.dumps"
+    print("dotnet json.dumps")
     s = str(o)
     return s.replace("\'", "\"")  # json require double quotes, not single
     

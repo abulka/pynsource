@@ -111,7 +111,7 @@ class MyEvtHandler(wxShapeEvtHandler):
 
     def OnLeftClick(self, x, y, keys = 0, attachment = 0):
         shape = self.GetShape()
-        print shape.__class__, shape.GetClassName()
+        print(shape.__class__, shape.GetClassName())
         canvas = shape.GetCanvas()
         dc = wxClientDC(canvas)
         canvas.PrepareDC(dc)
@@ -239,7 +239,7 @@ DoSomething2343()
         ds1.SetCentreResize(0)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
         # for some reason, the shapes have to be resized to re-format theior container text
         #ds1.SetSize(200, 500)
-        print ds1.GetBoundingBoxMax()
+        print(ds1.GetBoundingBoxMax())
         ds1.SetSize(ds1.GetBoundingBoxMax()[0]+1, ds1.GetBoundingBoxMax()[1])
         ds1.ReformatRegions()
         #self.redraw()
@@ -339,12 +339,20 @@ DoSomething2343()
         height = height * whiteSpaceFactor
         verticalWhiteSpace = (height-rawHeight)/(len(self.shapes)-1.0 or 2.0)
         # self.setSize(wxSize(int(width+50), int(height+50))) # fudge factors to keep some extra space
-        print 'massive size is', int(width+50), int(height+50)
+        print('massive size is', int(width+50), int(height+50))
         # DONT ACTUALLY DO ANYTHING WITH THIS INFO - yet.
 
         # distribute each generation across the width
         # and the generations across height
         y = 0
+        """
+        Converted to python3 but not converted to phoenix, thus not run for a long time.  Plus this 
+        is a dangling conversion error that still would need to be understood and fixed.
+        
+        RefactoringTool: ### In file Research/ogl tests 01/andyOgl02_oldwx.py ###
+        RefactoringTool: Line 348: cannot convert map(None, ...) with multiple arguments because map() now truncates to the shortest sequence
+        RefactoringTool: Line 348: cannot convert map(None, ...) with multiple arguments because map() now truncates to the shortest sequence
+        """
         for currentWidth, currentHeight, shape in map( None, widths, heights, self.shapes ):
             x = 0
             # whiteSpace is the space between any two elements...

@@ -12,7 +12,7 @@ def InitConfig():
     except OSError:
         pass        
     user_config_file = os.path.join(config_dir, PYNSOURCE_CONFIG_FILE)
-    print "Pynsource config file", user_config_file
+    print("Pynsource config file", user_config_file)
     
     #shelf = shelve.open(user_config_file)
     #shelf["users"] = ["David", "Abraham"]
@@ -20,14 +20,14 @@ def InitConfig():
     
     from configobj import ConfigObj # easy_install configobj 
     config = ConfigObj(user_config_file) # doco at http://www.voidspace.org.uk/python/configobj.html
-    print config
+    print(config)
     config['keyword1'] = 100
     config['keyword2'] = "hi there"
     value1 = config['keyword1']
     value2 = config['keyword2']
     #config['section1']['keyword3'] = "hi there"
-    print config
+    print(config)
     config.write()
 
-print "hi"
+print("hi")
 InitConfig()

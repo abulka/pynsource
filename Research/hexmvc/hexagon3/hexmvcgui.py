@@ -1,6 +1,6 @@
 import wx
 from hexmvcgui_gen import HexMvcGuiFrame1
-import thread, time
+import _thread, time
 import random
 
 class MyFrame(HexMvcGuiFrame1):
@@ -10,7 +10,7 @@ class MyFrame(HexMvcGuiFrame1):
 
     def SetApp(self, app):
         self.app = app
-        print "app has been set"
+        print("app has been set")
         self._InitHyperlinks()
         
     def _InitHyperlinks(self):
@@ -112,22 +112,22 @@ class MyFrame(HexMvcGuiFrame1):
         self.need_abort = False
         self.m_gauge1.Range = 5
         self.m_gauge1.Value = 0
-        thread.start_new_thread(self._DoSomeLongTask, ())
+        _thread.start_new_thread(self._DoSomeLongTask, ())
 
     def StopBackgroundTask1( self, event ):
         self.need_abort = True
 
     def _DoSomeLongTask(self):
-        print "Background Task started"
+        print("Background Task started")
         for i in range(0,5):
             if self.need_abort:
-                print "aborted."
+                print("aborted.")
                 return
             wx.CallAfter(self._AddJunkText)
             wx.CallAfter(self._IncrGuage)
-            print '*',
+            print('*', end=' ')
             time.sleep(1)   # lets events through to the main wx thread and paints/messages get through ok
-        print "Done Background Task."
+        print("Done Background Task.")
         self.m_gauge1.Value = 0
 
     def StartServer( self, event ):

@@ -35,9 +35,9 @@ symdir={}
 def tokeneater(type, tokstr, start, end, line, symdir=symdir):
     if (type==token.NAME):
         TOKSTR = tokstr.upper()  #should show up for this file
-        if symdir.has_key(TOKSTR):
+        if TOKSTR in symdir:
             d = symdir[TOKSTR]
-            if d.has_key(tokstr):
+            if tokstr in d:
                 d[tokstr] += 1
             else:
                 d[tokstr] = 1
@@ -51,30 +51,30 @@ for fileglob in sys.argv[1:]:
 
         header = '\n====< '+filename+' >===='
         singlecase = []
-        multicase = [key for key in symdir.keys()
+        multicase = [key for key in list(symdir.keys())
                         if len(symdir[key])>1 or singlecase.append(key)]
         for key in multicase:
             if header:
-                print header
-                print '  (Multicase symbols)'
+                print(header)
+                print('  (Multicase symbols)')
                 header = None
-            for name, freq in symdir[key].items():
-                print '%15s:%-3s'% (name, freq),
-            print
-        if header: print header; header = None
-        print '  (Singlecase symbols)'
-        byfreq = [symdir[k].items()[0] for k in singlecase]
+            for name, freq in list(symdir[key].items()):
+                print('%15s:%-3s'% (name, freq), end=' ')
+            print()
+        if header: print(header); header = None
+        print('  (Singlecase symbols)')
+        byfreq = [list(symdir[k].items())[0] for k in singlecase]
         byfreq = [(n,k) for k,n in byfreq]
         byfreq.sort()
         npr = 0
         for freq, key in byfreq:
                 if header:
-                    print header
+                    print(header)
                     header = None
-                print '%15s:%-3s'% (key, freq),
-                if npr%4==3: print
+                print('%15s:%-3s'% (key, freq), end=' ')
+                if npr%4==3: print()
                 npr +=1
-        print
+        print()
 
 """
 ========================================================================

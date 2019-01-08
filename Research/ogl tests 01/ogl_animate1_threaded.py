@@ -3,7 +3,7 @@
 
 import wx
 import wx.lib.ogl as ogl
-import thread
+import _thread
 
 class AppFrame(wx.Frame):
     def __init__(self):
@@ -41,11 +41,11 @@ class AppFrame(wx.Frame):
 
     def Start(self):
         self.need_abort = False
-        thread.start_new_thread(self.DoSomeLongTask, ())
+        _thread.start_new_thread(self.DoSomeLongTask, ())
         
     def OnRightButtonEvent(self, event):
         if event.ShiftDown():
-            print "aborting"
+            print("aborting")
             self.need_abort = True
         else:
             self.Start()
@@ -55,15 +55,15 @@ class AppFrame(wx.Frame):
 
         for i in range(1,40):
             if self.need_abort:
-                print "aborted."
+                print("aborted.")
                 return
             wx.CallAfter(self.DoStuff)
             time.sleep(0.2)   # lets events through to the main wx thread and paints/messages get through ok
-        print "Done."
+        print("Done.")
             
 
     def DoStuff(self):
-        print ".",
+        print(".", end=' ')
         TECHNIQUE = "simple" # "hybrid" # "smart" # "simple"
         shape = self.mycircle
         

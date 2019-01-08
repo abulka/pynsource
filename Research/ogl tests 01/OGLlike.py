@@ -30,7 +30,7 @@ DEBUG_INODE_CONNECT = False
 
 def menuMaker(frame, menus):
     menubar = MenuBar()
-    for m,n in menus.items():
+    for m,n in list(menus.items()):
         menu = Menu()
         menubar.Append(menu,m)
         for x in n:
@@ -54,7 +54,7 @@ class Diagram:
         try:
             pickle.dump(self.shapes,open(self.file,'w'))
         except:
-            print "problem saving this diagram"
+            print("problem saving this diagram")
  
     def LoadFile(self,file=None):
         if file is None:
@@ -62,7 +62,7 @@ class Diagram:
         try:
             self.shapes = pickle.load(open(file))
         except:
-            print "problem loading this diagram"
+            print("problem loading this diagram")
 
     def AddShape(self, shape, after=None):
         if after:
@@ -148,8 +148,8 @@ class Shape(ShapeEvtHandler):
         dc.SetBrush(Brush(self.fill[0], SOLID))
 
     def move(self,x,y):
-        self.x = map((lambda v: v+x), self.x)
-        self.y = map((lambda v: v+y), self.y)
+        self.x = list(map((lambda v: v+x), self.x))
+        self.y = list(map((lambda v: v+y), self.y))
 
     def Copy(self):
         return copy.deepcopy(self)
@@ -163,7 +163,7 @@ class LineShape(Shape):
         Shape.draw(self,dc)
         dc.DrawLine(self.x[0], self.y[0],self.x[1], self.y[1])
         if DEBUG_DRAWLINE:
-            print "DrawLine", self.x[0], self.y[0],self.x[1], self.y[1]
+            print("DrawLine", self.x[0], self.y[0],self.x[1], self.y[1])
 
     def HitTest(self, x, y):
         if x < min(self.x)-3:return False
@@ -241,8 +241,8 @@ class PointShape(Shape):
             self.y[0] += y
         else:
             # Future possibility (original code)
-            self.x = map((lambda v: v+x), self.x)   # add x to each member of list self.x
-            self.y = map((lambda v: v+y), self.y)   # add y to each member of list self.y
+            self.x = list(map((lambda v: v+x), self.x))   # add x to each member of list self.x
+            self.y = list(map((lambda v: v+y), self.y))   # add y to each member of list self.y
         self.graphic.move(x,y)
 
     def HitTest(self, x, y):
@@ -336,7 +336,7 @@ class ShapeCanvas(ScrolledWindow):
             mouseY = pt[1] - self.GetScreenPosition().y
             point = (mouseX, mouseY)
             # print "pt=%s mouse=%s,%s" % (pt, mouseX, mouseY)
-            print "%s,%s %s" % (mouseX, mouseY, self.shapeFromPoint(point))
+            print("%s,%s %s" % (mouseX, mouseY, self.shapeFromPoint(point)))
         self.Refresh()
 
     def onPaintEvent(self, event):   
@@ -445,7 +445,7 @@ class ShapeCanvas(ScrolledWindow):
             x = point[0] - self.currentPoint[0]
             y = point[1] - self.currentPoint[1]
             if DEBUG_DRAG:
-                print 'Dragging %s mouse at %s currentPoint is %s thus moveto difference is %s,%s' % (self.getSelectedShapes(), point, self.currentPoint, x, y)
+                print('Dragging %s mouse at %s currentPoint is %s thus moveto difference is %s,%s' % (self.getSelectedShapes(), point, self.currentPoint, x, y))
             for i in self.getSelectedShapes():
                 i.move(x,y)
             self.currentPoint = point
@@ -740,8 +740,8 @@ class ConnectionShape(LineShape,Resizeable,Selectable):
                 point = shape.getCentre()
             self.x[0],self.y[0] = point
             if DEBUG_CONNECT:
-                print "from shape output port %s at %s" % (portnum, point),
-                if not self.output: print
+                print("from shape output port %s at %s" % (portnum, point), end=' ')
+                if not self.output: print()
         if self.output:
             # self.x[1],self.y[1] = self.output[SHAPE].getPort('input',self.output[PORT])
 
@@ -750,7 +750,7 @@ class ConnectionShape(LineShape,Resizeable,Selectable):
             point = shape.getCentre()
             self.x[1],self.y[1] = point
             if DEBUG_CONNECT:
-                print "to shape input port %s at %s" % (portnum, point)
+                print("to shape input port %s at %s" % (portnum, point))
         LineShape.draw(self,dc)
 
 
@@ -895,7 +895,7 @@ class CodeBlock(Block):
         self.label='Code'
                 
     def OnLeftDClick(self,event):
-        exec str(self.code)
+        exec(str(self.code))
 
 class ContainerBlock(Block,Diagram):
 
@@ -908,7 +908,7 @@ class ContainerBlock(Block,Diagram):
         self.fill= ['GREEN']
 
     def OnLeftDClick(self,event):
-        print "OnLeftDClick"
+        print("OnLeftDClick")
         f = CodeFrame(self)
         f.SetTitle(self.label)
 
@@ -950,7 +950,7 @@ class INode(ConnectableNode):
             items: list of ConnectionShape instances (really, only one)
         """
         if DEBUG_INODE_CONNECT:
-            print "inode leftup", items, "ConnectionShape.input", items[0].input, "ConnectionShape.output", items[0].output
+            print("inode leftup", items, "ConnectionShape.input", items[0].input, "ConnectionShape.output", items[0].output)
         if len(items)==1 and isinstance(items[0],ConnectionShape):
             connection_shape = items[0]
             if connection_shape.output is None:  # means its not connected to anything
@@ -960,7 +960,7 @@ class INode(ConnectableNode):
         """
         Dragging from an input doesn't make sense?
         """
-        print "INode - Dragging from an input doesn't make sense? unless repositioning to re-attach?", self
+        print("INode - Dragging from an input doesn't make sense? unless repositioning to re-attach?", self)
         self.cf.deselect()
         ci = ConnectionShape()
         self.cf.container.shapes.insert(0, ci)
@@ -988,7 +988,7 @@ class ONode(ConnectableNode):
         Note the subsequent multiple move() calls due to the OnMotion() goes to the
         ConnectionShape not to the ONode.
         """
-        print "ONode initiating a connection from output node", self
+        print("ONode initiating a connection from output node", self)
         self.cf.deselect()
         ci = ConnectionShape()
         self.cf.diagram.shapes.insert(0, ci)
@@ -999,10 +999,10 @@ class ONode(ConnectableNode):
 
     def leftUp(self,items):
         # Not sure the use of this, I don't think the setInput() ever gets executed
-        print "onode leftup", items
+        print("onode leftup", items)
         if len(items)==1 and isinstance(items[0],ConnectionShape):
             if items[0].input is None:
-                print "onode leftup, setting input", items
+                print("onode leftup, setting input", items)
                 items[0].setInput(self.item,self.index)
 
 
@@ -1102,7 +1102,7 @@ class AttributeEditor(Frame):
     def acceptProp(self,event):
         """Write the edited value back into the property"""
         idx=self.list.GetFocusedItem()
-        print idx
+        print(idx)
         prop = self.list.GetItem(idx,0).GetText()  # calc property name
 
         if get_type(self.text.GetValue()) == str or self.text.GetNumberOfLines() > 1:

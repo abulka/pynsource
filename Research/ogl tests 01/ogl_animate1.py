@@ -44,7 +44,7 @@ class AppFrame(wx.Frame):
         
     def OnRightButtonEvent(self, event):
         if event.ShiftDown():
-            print "aborting"
+            print("aborting")
             self.need_abort = True
         else:
             self.Start()
@@ -62,12 +62,12 @@ class AppFrame(wx.Frame):
             if x > 0 and not self.need_abort:
                 wx.FutureCall(1, self.DoSomeLongTask, (x,y,z))
             else:
-                print "Done."
+                print("Done.")
         else:
-            print "aborted."
+            print("aborted.")
 
     def DoStuff(self):
-        print ".",
+        print(".", end=' ')
         TECHNIQUE = "simple" # "hybrid" # "smart" # "simple"
         shape = self.mycircle
         

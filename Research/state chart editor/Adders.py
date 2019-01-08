@@ -1,4 +1,4 @@
-from Tkinter import *
+from tkinter import *
 from Globals import *
 from Handler import Handler
 from Separator import Separator

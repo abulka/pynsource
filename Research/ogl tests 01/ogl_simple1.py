@@ -36,7 +36,7 @@ class AppFrame(wx.Frame):
                 'Eh??', 'Python')
         dlg.SetValue("Python is the best!")
         if dlg.ShowModal() == wx.ID_OK:
-            print('You entered: %s\n' % dlg.GetValue())
+            print(('You entered: %s\n' % dlg.GetValue()))
 
         dlg.Destroy()
 

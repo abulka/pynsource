@@ -11,7 +11,7 @@ Plus hard to disentangle from the pylab project https://code.google.com/archive/
 
 def menuMaker(frame, menus):
   menubar = wx.MenuBar()
-  for m, n in menus.items():
+  for m, n in list(menus.items()):
     menu = wx.Menu()
     menubar.Append(menu, m)
     for x in n:
@@ -27,11 +27,11 @@ class RectangleShape(Shape):
         # ANDY
         if ANDYMAIN:
             topx, topy = ANDYMAIN.canvas.GetViewStart()  # The positions are in logical scroll units, not pixels, so to convert to pixels you will have to multiply by the number of pixels per scroll increment.
-            print topx, topy
+            print(topx, topy)
             px, py = ANDYMAIN.canvas.GetScrollPixelsPerUnit()
-            print topx, topy, px, py, topx * px, topy * py
+            print(topx, topy, px, py, topx * px, topy * py)
             topx, topy = ANDYMAIN.canvas.CalcUnscrolledPosition(topx * px, topy * py)
-            print topx, topy
+            print(topx, topy)
             Shape.__init__(self, [topx + x, topx + x2], [topy + y, topy + y2])
         else:
             Shape.__init__(self, [x, x2], [y, y2])

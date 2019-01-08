@@ -105,7 +105,7 @@ class SourceGenerator(NodeVisitor):
         self.new_lines = 0
 
     def write(self, x):
-        print "%-20s %s%s" % (whosdaddy(), self.indent_with * self.indentation, x)
+        print("%-20s %s%s" % (whosdaddy(), self.indent_with * self.indentation, x))
         assert(isinstance(x, str))
         if self.new_lines:
             if self.result:
@@ -690,6 +690,6 @@ class ParseMeTest2(ParseMeTest):
         self._secretinfo = 2
 """    
     round1 = to_source(ast.parse(code6))
-    print round1
+    print(round1)
     round2 = to_source(ast.parse(round1))
-    print round1 == round2
+    print(round1 == round2)

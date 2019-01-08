@@ -78,28 +78,28 @@ if __name__ == '__main__':
     ngames=G.number_of_edges()
     nplayers=G.number_of_nodes()
 
-    print("Loaded %d chess games between %d players\n"\
-                   % (ngames,nplayers))
+    print(("Loaded %d chess games between %d players\n"\
+                   % (ngames,nplayers)))
 
     # identify connected components
     # of the undirected version
     Gcc=nx.connected_component_subgraphs(G.to_undirected())
     if len(Gcc)>1:
         print("Note the disconnected component consisting of:")
-        print(Gcc[1].nodes())    
+        print((Gcc[1].nodes()))    
 
     # find all games with B97 opening (as described in ECO)
     openings=set([game_info['ECO'] 
                   for (white,black,game_info) in G.edges(data=True)])
-    print("\nFrom a total of %d different openings,"%len(openings))
+    print(("\nFrom a total of %d different openings,"%len(openings)))
     print('the following games used the Sicilian opening')
     print('with the Najdorff 7...Qb6 "Poisoned Pawn" variation.\n')
 
     for (white,black,game_info) in G.edges(data=True):
         if game_info['ECO']=='B97':
-           print(white,"vs",black)
+           print((white,"vs",black))
            for k,v in list(game_info.items()):
-               print("   ",k,": ",v)
+               print(("   ",k,": ",v))
            print("\n")
 
 

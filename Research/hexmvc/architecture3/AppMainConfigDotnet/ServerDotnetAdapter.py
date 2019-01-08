@@ -16,13 +16,13 @@ class Server(SimpleServer):
         return "http://%s:%s" % (self.host, self.port)
 
     def StopServer(self):
-        print "stopping server thread..."
+        print("stopping server thread...")
         if self.thread_id:
             self.thread_id.Abort()
             self.thread_id = None
 
     def StartServer(self):
-        print "starting server thread..."
+        print("starting server thread...")
         self.thread_id = Thread(ThreadStart(self.serveforever))
         self.thread_id.Start()
 
@@ -33,7 +33,7 @@ class Server(SimpleServer):
 
         def report_error(inst):
             msg = "Server exception: %s" % inst
-            print msg
+            print(msg)
             return msg
         
         if cmd == '':
@@ -60,7 +60,7 @@ class Server(SimpleServer):
             try:
                 response.ContentType = "application/json"
                 return self.json_from_dict(self.app.controller.CmdGetThingsAsDict())
-            except Exception, inst:
+            except Exception as inst:
                 return report_error(inst)
 
         elif cmd == 'things' and len(path) == 2:
@@ -68,7 +68,7 @@ class Server(SimpleServer):
                 id = path[1]
                 response.ContentType = "application/json"
                 return self.json_from_dict(self.app.controller.CmdGetThingAsDict(id))
-            except Exception, inst:
+            except Exception as inst:
                 return report_error(inst)
 
         

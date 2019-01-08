@@ -27,7 +27,7 @@ class Events:
     __str__ = __repr__
     def __len__(self): return NotImplemented
     def __iter__(self):
-        def gen(dictitems=self.__dict__.items()):
+        def gen(dictitems=list(self.__dict__.items())):
             for attr, val in dictitems:
                 if isinstance(val, _EventSlot):
                     yield val
@@ -78,25 +78,25 @@ if __name__ == '__main__':
             model.events.OnChange += self.DisplayValue
             ##model.events.OnChange2 += self.DisplayValue # would raise exeception
         def DisplayValue(self):
-            print self.model.Value
+            print(self.model.Value)
 
 
     model = ValueModel()
     view = SillyView(model)
 
-    print '\n--- Events Demo ---'
+    print('\n--- Events Demo ---')
     # Events in action
     for i in range(5):
         model.Value = 2*i + 1
     # Events introspection
-    print model.events
+    print(model.events)
     for event in model.events:
-        print event
+        print(event)
 ## end of http://code.activestate.com/recipes/410686/ }}}
 
     # Andy's tests
 
-    print "Andy's tests:"
+    print("Andy's tests:")
     
     class AndyEvents(Events):
         __events__ = ('OnChange', )
@@ -113,7 +113,7 @@ if __name__ == '__main__':
             
     class Observer1:
         def notifyOfModelValueChange(self, value, new_total_value):
-            print "Observer1 got notified, added value %(value)4d - total now %(new_total_value)4d" % vars()
+            print("Observer1 got notified, added value %(value)4d - total now %(new_total_value)4d" % vars())
                 
     model = Model()
     o1 = Observer1()
@@ -126,7 +126,7 @@ if __name__ == '__main__':
             self.num_calls = 0
         def notifyOfModelValueChange(self, value, new_total_value):
             self.num_calls += 1
-            print "Observer2 got notified %2d times" % self.num_calls
+            print("Observer2 got notified %2d times" % self.num_calls)
     
     o2 = Observer2()
     model.observers.OnChange += o2.notifyOfModelValueChange # Or access the multicast directly.

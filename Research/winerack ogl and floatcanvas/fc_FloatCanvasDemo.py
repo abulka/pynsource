@@ -1385,11 +1385,11 @@ def BuildDrawFrame(): # this gets called when needed, rather than on import
             for i in range(1000):
                 Point = (random.uniform(BigRange[0],BigRange[1]),random.uniform(BigRange[0],BigRange[1]))
                 coords.append( (Point) )
-            print "Drawing the Points"
+            print("Drawing the Points")
             start = time.clock()
             for Point in coords:
                 Canvas.AddPoint(Point, Diameter = 4)
-            print "It took %s seconds to add the points"%(time.clock() - start)
+            print("It took %s seconds to add the points"%(time.clock() - start))
             Canvas.ZoomToBB()
 
         def PropertiesChangeTest(self,event=None):
@@ -1515,11 +1515,11 @@ def BuildDrawFrame(): # this gets called when needed, rather than on import
                 Object.SetFillColor(colors[random.randint(0,len(colors)-1)])
                 Object.SetLineColor(colors[random.randint(0,len(colors)-1)])
                 Object.SetLineWidth(random.randint(1,7))
-                Object.SetLineStyle(FloatCanvas.DrawObject.LineStyleList.keys()[random.randint(0,5)])
+                Object.SetLineStyle(list(FloatCanvas.DrawObject.LineStyleList.keys())[random.randint(0,5)])
             for Object in self.ColorObjectsLine:
                 Object.SetLineColor(colors[random.randint(0,len(colors)-1)])
                 Object.SetLineWidth(random.randint(1,7))
-                Object.SetLineStyle(FloatCanvas.DrawObject.LineStyleList.keys()[random.randint(0,5)])
+                Object.SetLineStyle(list(FloatCanvas.DrawObject.LineStyleList.keys())[random.randint(0,5)])
             for Object in self.ColorObjectsColor:
                 Object.SetColor(colors[random.randint(0,len(colors)-1)])
             for Object in self.ColorObjectsText:
@@ -1724,7 +1724,7 @@ def BuildDrawFrame(): # this gets called when needed, rather than on import
             import string
             file = open(filename,'rt')
             data = file.readlines()
-            data = map(string.strip,data)
+            data = list(map(string.strip,data))
 
             Shorelines = []
             segment = []
@@ -1734,7 +1734,7 @@ def BuildDrawFrame(): # this gets called when needed, rather than on import
                         if segment: Shorelines.append(N.array(segment))
                         segment = []
                     else:
-                        segment.append(map(float,string.split(line)))
+                        segment.append(list(map(float,string.split(line))))
             if segment: Shorelines.append(N.array(segment))
 
             if stats:
@@ -1743,8 +1743,8 @@ def BuildDrawFrame(): # this gets called when needed, rather than on import
                 for segment in Shorelines:
                     NumPoints = NumPoints + len(segment)
                 AvgPoints = NumPoints / NumSegments
-                print "Number of Segments: ", NumSegments
-                print "Average Number of Points per segment: ",AvgPoints
+                print("Number of Segments: ", NumSegments)
+                print("Average Number of Points per segment: ",AvgPoints)
             if AllLines:
                 Lines = []
                 for segment in Shorelines:

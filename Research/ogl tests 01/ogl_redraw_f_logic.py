@@ -239,9 +239,9 @@ def process_key(keycode, frame, canvas, shapes):
             canvas.GetDiagram().Clear(dc)
             
         elif keycode == 'd':
-            print "GetVirtualSize()", canvas.GetVirtualSize()
-            print "frame.GetClientSize()", canvas.frame.GetClientSize()
-            print "frame.GetSize()", canvas.frame.GetSize()
+            print("GetVirtualSize()", canvas.GetVirtualSize())
+            print("frame.GetClientSize()", canvas.frame.GetClientSize())
+            print("frame.GetSize()", canvas.frame.GetSize())
         
         elif keycode in ['1','2','3','4','5','6','7','8','9']:
             technique = keycode

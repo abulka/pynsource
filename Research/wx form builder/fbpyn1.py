@@ -32,9 +32,9 @@ class FramePyIdea(FramePyIdea_gen):
         from random import randint
         m_code2 = PythonSTC(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.WANTS_CHARS)
         if dofloat:
-            self.m_mgr.AddPane( m_code2, wx.aui.AuiPaneInfo() .Name( u"pane_code"+`randint(1,1000)` ).Right() .Caption( u"Source Code"+`randint(1,1000)` ).MaximizeButton( False ).MinimizeButton( False ).PinButton( True ).Float().Resizable().FloatingPosition((350,100)).FloatingSize( (350,500) ).DockFixed( False ) )
+            self.m_mgr.AddPane( m_code2, wx.aui.AuiPaneInfo() .Name( "pane_code"+repr(randint(1,1000)) ).Right() .Caption( "Source Code"+repr(randint(1,1000)) ).MaximizeButton( False ).MinimizeButton( False ).PinButton( True ).Float().Resizable().FloatingPosition((350,100)).FloatingSize( (350,500) ).DockFixed( False ) )
         else:
-            self.m_mgr.AddPane( m_code2, wx.aui.AuiPaneInfo() .Name( u"pane_code"+`randint(1,1000)` ).Right() .Caption( u"Source Code"+`randint(1,1000)` ).MaximizeButton( False ).MinimizeButton( False ).PinButton( True ).Dock().Resizable().FloatingSize( wx.DefaultSize ).DockFixed( False ) )
+            self.m_mgr.AddPane( m_code2, wx.aui.AuiPaneInfo() .Name( "pane_code"+repr(randint(1,1000)) ).Right() .Caption( "Source Code"+repr(randint(1,1000)) ).MaximizeButton( False ).MinimizeButton( False ).PinButton( True ).Dock().Resizable().FloatingSize( wx.DefaultSize ).DockFixed( False ) )
         m_code2.SetText(open(r'fbpyn1.py').read())
         m_code2.Colourise(0, m_code2.GetTextLength()) #make sure everything is lexed. or use (0, -1)
         self.andycollapsetodefs(m_code2)
@@ -50,7 +50,7 @@ class FramePyIdea(FramePyIdea_gen):
     def OnFold1( self, event ):
         frame.m_code.ToggleFold(frame.m_code.GetCurrentLine())
         for i in range(0, 30):
-            print i, frame.m_code.GetLineVisible(i)
+            print(i, frame.m_code.GetLineVisible(i))
             
     def OnFoldAll( self, event ):
         frame.m_code.FoldAll()

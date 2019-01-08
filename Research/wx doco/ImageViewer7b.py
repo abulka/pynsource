@@ -33,7 +33,7 @@ class MyCanvas(wx.ScrolledWindow):
         
         if TRIMTO_VIRTUALSIZE:
             self.maxWidth, self.maxHeight = bmp.GetSize()[0], bmp.GetSize()[1]
-        print self.maxWidth, self.maxHeight
+        print(self.maxWidth, self.maxHeight)
         
         mask = wx.Mask(bmp, wx.BLUE)
         bmp.SetMask(mask)
@@ -173,7 +173,7 @@ class MyCanvas(wx.ScrolledWindow):
             self.andyscale = 1.0
             self.bufferedzoom = 1.0
         #print "zoom %f bufferedzoom %f" % (self.andyscale, self.bufferedzoom)
-        print "zoom %f " % self.andyscale
+        print("zoom %f " % self.andyscale)
 
         if TRIMTO_VIRTUALSIZE:
             if BUFFERED:
@@ -217,8 +217,8 @@ class MyCanvas(wx.ScrolledWindow):
             msg = "!!!!!!! "
         else:
             msg = "!       "
-        print msg + "(%s) NeedToClear %s GetVirtualSize %d getWidth %d GetClientSize %d self.GetViewStart() %d self.maxWidth %d " % \
-        (fromwheremsg, self.NeedToClear(), self.GetVirtualSize()[0], self.getWidth(), self.GetClientSize()[0], self.GetViewStart()[0], self.maxWidth)
+        print(msg + "(%s) NeedToClear %s GetVirtualSize %d getWidth %d GetClientSize %d self.GetViewStart() %d self.maxWidth %d " % \
+        (fromwheremsg, self.NeedToClear(), self.GetVirtualSize()[0], self.getWidth(), self.GetClientSize()[0], self.GetViewStart()[0], self.maxWidth))
         
     def OnPaint(self, event):   # ANDY
         if BUFFERED:
@@ -404,7 +404,7 @@ class MyCanvas(wx.ScrolledWindow):
         dc.SetPen(wx.Pen('MEDIUM FOREST GREEN', 4))
         for line in self.lines:
             for coords in line:
-                apply(dc.DrawLine, coords)
+                dc.DrawLine(*coords)
 
 
     def SetXY(self, event):   # PEN DRAWING

@@ -64,7 +64,7 @@ class MainHost(wx.Frame):
         setpos(shape, 100, 60)
         canvas.AddShape( shape )
 
-        print [getpos(shape) for shape in canvas.GetDiagram().GetShapeList()]
+        print([getpos(shape) for shape in canvas.GetDiagram().GetShapeList()])
         
         diagram.ShowAll( 1 )
 

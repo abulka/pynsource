@@ -67,7 +67,7 @@ class App( wxPySimpleApp ):
 
         ### 2. Launcher creates wxMenu. ###
         menu = wxMenu()
-        for (id,title) in menu_title_by_id.items():
+        for (id,title) in list(menu_title_by_id.items()):
             ### 3. Launcher packs menu with Append. ###
             menu.Append( id, title )
             ### 4. Launcher registers menu handlers with EVT_MENU, on the menu. ###
@@ -81,7 +81,7 @@ class App( wxPySimpleApp ):
         # do something
         operation = menu_title_by_id[ event.GetId() ]
         target    = self.list_item_clicked
-        print 'Perform "%(operation)s" on "%(target)s."' % vars()
+        print('Perform "%(operation)s" on "%(target)s."' % vars())
 
 app = App()
 app.MainLoop()

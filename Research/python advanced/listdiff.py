@@ -76,28 +76,28 @@ a = [1,2,3]
 b = [2,3,4]
 
 res = listdiff(a,b)
-print res
+print(res)
 assert res == [1,4]
 
 res = listdiff(b,a)
-print res
+print(res)
 assert res == [1, 4]
 
 c = [3,4,5,6,7]
 res = listdiff(a,c)
-print res
+print(res)
 assert res == [1,2,4,5,6,7]
 
 a = [1,2,3]
 b = [2,3,3,4]
 res = listdiff(a,b)
-print res
+print(res)
 assert res == [1,4,3], res
 
 a = ['MainApp', 'MainApp_Context', 'wx.App', 'wx.Appwx.lib.mixins.inspection.InspectionMixin', 'object', 'Log', 'UmlCanvas', 'App', 'ConfigObj']
 b = ['wx.App', 'MainApp', 'wx.Appwx.lib.mixins.inspection.InspectionMixin', 'MainApp', 'object', 'MainApp_Context', 'Log', 'UmlCanvas', 'App', 'ConfigObj']
 res = listdiff(a,b)
-print res
+print(res)
 assert res == ['MainApp']
 
-print 'done'
+print('done')

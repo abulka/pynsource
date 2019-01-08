@@ -61,7 +61,7 @@ try:
     app = App(model, server, gui)
     gui.callAfter = app.Boot
 
-except Exception, inst:
-    print inst
+except Exception as inst:
+    print(inst)
 
 Application.Run(form)

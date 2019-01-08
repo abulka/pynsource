@@ -60,7 +60,7 @@ class ImageFrame(wx.Frame):
     	self.imageBox.Bind(wx.EVT_KEY_DOWN, self.keyEvent)
     	self.imageBox.Bind(wx.EVT_MIDDLE_UP, self.endDrag)
     	self.imageBox.SetBackgroundColour((0,0,0,0))
-    	self.imageBox.Bind(wx.EVT_LEFT_DOWN, self.next)
+    	self.imageBox.Bind(wx.EVT_LEFT_DOWN, self.__next__)
     	self.imageBox.Bind(wx.EVT_RIGHT_DOWN, self.prev)
 
     def nameFromUrl(self,url):
@@ -120,7 +120,7 @@ class ImageFrame(wx.Frame):
     	x = (self.imageBox.Size[0] - self.width)/2.0
     	y = (self.imageBox.Size[1] - self.height)/2.0
     	tmp = wx.StaticBitmap(self.imageBox,wx.ID_ANY,bmp,(x,y))
-    	tmp.Bind(wx.EVT_LEFT_DOWN, self.next)
+    	tmp.Bind(wx.EVT_LEFT_DOWN, self.__next__)
     	tmp.Bind(wx.EVT_RIGHT_DOWN, self.prev)
     	tmp.Bind(wx.EVT_MOTION, self.drag)
     	tmp.Bind(wx.EVT_MIDDLE_UP, self.endDrag)

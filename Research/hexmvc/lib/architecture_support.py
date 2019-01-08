@@ -5,6 +5,7 @@
 # Multicasting based on objects
 
 import operator
+from functools import reduce
 
 class multicast(dict):
     "Class multiplexes messages to registered objects"
@@ -17,23 +18,23 @@ class multicast(dict):
     def __call__(self, *args, **kwargs):
         "Invoke method attributes and return results through another multicast"
         return self.__class__( [ (alias, obj(*args, **kwargs) ) \
-                for alias, obj in self.items() if callable(obj) ] )
+                for alias, obj in list(self.items()) if callable(obj) ] )
 
-    def __nonzero__(self):
+    def __bool__(self):
         "A multicast is logically true if all delegate attributes are logically true"
 
-        return operator.truth(reduce(lambda a, b: a and b, self.values(), 1))
+        return operator.truth(reduce(lambda a, b: a and b, list(self.values()), 1))
 
     def __getattr__(self, name):
         "Wrap requested attributes for further processing"
         return self.__class__( [ (alias, getattr(obj, name) ) \
-                for alias, obj in self.items() if hasattr(obj, name) ] )
+                for alias, obj in list(self.items()) if hasattr(obj, name) ] )
 
     def __setattr__(self, name, value):
         """Wrap setting of requested attributes for further
         processing"""
 
-        for o in self.values():
+        for o in list(self.values()):
             o.setdefault(name, value)
 
     # Andy Modifications
@@ -76,15 +77,15 @@ dodumpargs = True
 
 def dump_args(func):
     "This decorator dumps out the arguments passed to a function before calling it"
-    argnames = func.func_code.co_varnames[:func.func_code.co_argcount]
-    fname = func.func_name
+    argnames = func.__code__.co_varnames[:func.__code__.co_argcount]
+    fname = func.__name__
 
     if not dodumpargs:
         return func
 
     def echo_func(*args,**kwargs):
-        print fname, ":", ', '.join(
+        print(fname, ":", ', '.join(
             '%s=%r' % entry
-            for entry in zip(argnames,args) + kwargs.items())
+            for entry in list(zip(argnames,args)) + list(kwargs.items())))
         return func(*args, **kwargs)
     return echo_func

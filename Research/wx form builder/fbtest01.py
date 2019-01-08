@@ -3,7 +3,7 @@ from fbtest01_gen import *
 	
 class MyFrame1A ( MyFrame1 ):
 	def OnButton1( self, event ):
-		print "button pushed"
+		print("button pushed")
 	
 	def OnHtml2( self, event ):
 		url = "http://www.wxpython.org/docs/api/wx.html.HtmlWindow-class.html"

@@ -3,7 +3,7 @@
 import wx
 import wx.lib.ogl as ogl
 import time
-import thread
+import _thread
 import random
 
 import sys
@@ -74,7 +74,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         
         newpos = getpos(shape) # (int(shape.GetX()), int(shape.GetY()))
 
-        print shape.node.id, "moved from", oldpos, "to", newpos
+        print(shape.node.id, "moved from", oldpos, "to", newpos)
         
         # Adjust the GraphNode to match the shape x,y
         shape.node.left, shape.node.top = newpos
@@ -97,7 +97,7 @@ class MyEvtHandler(ogl.ShapeEvtHandler):
         ogl.ShapeEvtHandler.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
         
         width, height = shape.GetBoundingBoxMin()
-        print shape.node, "resized to", width, height
+        print(shape.node, "resized to", width, height)
         #print shape.node.id, shape.node.left, shape.node.top, "resized to", width, height
         # Adjust the GraphNode to match the shape x,y
         shape.node.width, shape.node.height = width, height
@@ -163,7 +163,7 @@ class GraphRendererOgl:
 
     def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
         frame = self.oglcanvas.GetTopLevelParent()
-        print "frame resize", frame.GetClientSize()
+        print("frame resize", frame.GetClientSize())
         self.coordmapper.Recalibrate(frame.GetClientSize()) # may need to call self.CalcVirtSize() if scrolled window
    
     def DeselectAllShapes(self):
@@ -194,7 +194,7 @@ class GraphRendererOgl:
         selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
         if selected:
             shape = selected[0]
-            print 'delete', shape.node.id
+            print('delete', shape.node.id)
 
             # model
             self.graph.DeleteNodeById(shape.node.id)
@@ -208,31 +208,31 @@ class GraphRendererOgl:
     def NewEdgeMarkFrom(self):
         selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
         if not selected:
-            print "Please select a node"
+            print("Please select a node")
             return
         
         self.new_edge_from = selected[0].node
-        print "From", self.new_edge_from.id
+        print("From", self.new_edge_from.id)
 
     def NewEdgeMarkTo(self):
         selected = [s for s in self.oglcanvas.GetDiagram().GetShapeList() if s.Selected()]
         if not selected:
-            print "Please select a node"
+            print("Please select a node")
             return
         
         tonode = selected[0].node
-        print "To", tonode.id
+        print("To", tonode.id)
         
         if self.new_edge_from == None:
-            print "Please set from node first"
+            print("Please set from node first")
             return
         
         if self.new_edge_from.id == tonode.id:
-            print "Can't link to self"
+            print("Can't link to self")
             return
         
         if not self.graph.FindNodeById(self.new_edge_from.id):
-            print "From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id
+            print("From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id)
             return
         
         edge = self.graph.AddEdge(self.new_edge_from, tonode, weight=None)
@@ -245,7 +245,7 @@ class GraphRendererOgl:
 
         if event.GetWheelRotation() < 0:
             self.stage2()
-            print self.overlap_remover.GetStats()
+            print(self.overlap_remover.GetStats())
         else:
             self.stateofthenation()
 
@@ -270,20 +270,20 @@ class GraphRendererOgl:
         elif keycode == wx.WXK_RIGHT:
             if self.coordmapper.scale > 0.8:
                 self.ChangeScale(-0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
-                print "expansion ", self.coordmapper.scale
+                print("expansion ", self.coordmapper.scale)
             else:
-                print "Max expansion prevented.", self.coordmapper.scale
-            print "LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_nodes=False)), \
-                                                len(self.graph.CountLineOverLineIntersections(ignore_nodes=True)))
+                print("Max expansion prevented.", self.coordmapper.scale)
+            print("LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_nodes=False)), \
+                                                len(self.graph.CountLineOverLineIntersections(ignore_nodes=True))))
             
         elif keycode == wx.WXK_LEFT:
             if self.coordmapper.scale < 3:
                 self.ChangeScale(0.2, remap_world_to_layout=event.ShiftDown(), removeoverlaps=not event.ControlDown())
-                print "contraction ", self.coordmapper.scale
+                print("contraction ", self.coordmapper.scale)
             else:
-                print "Min expansion thwarted.", self.coordmapper.scale
-            print "LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_nodes=False)), \
-                                                len(self.graph.CountLineOverLineIntersections(ignore_nodes=True)))
+                print("Min expansion thwarted.", self.coordmapper.scale)
+            print("LL/raw %d/%d" % (len(self.graph.CountLineOverLineIntersections(ignore_nodes=False)), \
+                                                len(self.graph.CountLineOverLineIntersections(ignore_nodes=True))))
             
         elif keycode == wx.WXK_DELETE:
             self.DeleteSelectedNode()
@@ -357,11 +357,11 @@ class GraphRendererOgl:
 
     def DumpStatus(self):
         #print "-"*50
-        print "scale", self.coordmapper.scale
-        print "line-line intersections", len(self.graph.CountLineOverLineIntersections())
-        print "node-node overlaps", self.overlap_remover.CountOverlaps()
-        print "line-node crossings", self.graph.CountLineOverNodeCrossings()['ALL']/2 #, self.graph.CountLineOverNodeCrossings()
-        print "bounds", self.graph.GetBounds()
+        print("scale", self.coordmapper.scale)
+        print("line-line intersections", len(self.graph.CountLineOverLineIntersections()))
+        print("node-node overlaps", self.overlap_remover.CountOverlaps())
+        print("line-node crossings", self.graph.CountLineOverNodeCrossings()['ALL']/2) #, self.graph.CountLineOverNodeCrossings()
+        print("bounds", self.graph.GetBounds())
         
     def draw(self, translatecoords=True):
         self.stage1(translatecoords=translatecoords)
@@ -590,7 +590,7 @@ class GraphRendererOgl:
         self.LoadGraph(GRAPH_INITIALBOOT)
  
     def OnSaveGraphToConsole(self, event):
-        print self.graph.GraphToString()
+        print(self.graph.GraphToString())
 
     def OnSaveGraph(self, event):
         frame = self.oglcanvas.GetTopLevelParent()
@@ -657,13 +657,13 @@ class GraphRendererOgl:
         
         for i in range(1,50):
             if self.need_abort:
-                print "aborted."
+                print("aborted.")
                 return
             wx.CallAfter(self.stage2)
             #print '*',
             #wx.CallAfter(self.DoStuff)
             time.sleep(2)   # lets events through to the main wx thread and paints/messages get through ok
-        print "Done."
+        print("Done.")
         
         """
         print "Task started"

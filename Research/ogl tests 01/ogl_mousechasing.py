@@ -20,7 +20,7 @@ if CLICK_TO_DRAG:
                         The dragging is done here. 
                         """
                         shape = self.GetShape()
-                        print shape.__class__, shape.GetClassName(), shape.a
+                        print(shape.__class__, shape.GetClassName(), shape.a)
                         canvas = shape.GetCanvas()
                         dc = wx.ClientDC(canvas)
                         canvas.PrepareDC(dc)

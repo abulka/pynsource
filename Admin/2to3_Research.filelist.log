@@ -1,0 +1,395 @@
+Andys-iMac-2:pynsource andy$ 2to3 -wn Research/ > Admin/2to3_Research.log
+RefactoringTool: Skipping optional fixer: buffer
+RefactoringTool: Skipping optional fixer: idioms
+RefactoringTool: Skipping optional fixer: set_literal
+RefactoringTool: Skipping optional fixer: ws_comma
+RefactoringTool: Refactored Research/config techniques/testConfigObj.py
+RefactoringTool: Refactored Research/hexmvc/architecture2/architecture1.py
+RefactoringTool: Refactored Research/hexmvc/architecture2/architecture2.py
+RefactoringTool: Refactored Research/hexmvc/architecture2/architecture2_gui_gen.py
+RefactoringTool: No changes to Research/hexmvc/architecture3/App.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/AppMainConfigOo.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/AppMainConfigSql.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/Controller.py
+RefactoringTool: No changes to Research/hexmvc/architecture3/ModelAdapterBase.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/ModelOo.py
+RefactoringTool: No changes to Research/hexmvc/architecture3/ModelOoAdapter.py
+RefactoringTool: No changes to Research/hexmvc/architecture3/ModelSql.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/ModelSqlAdapter.py
+RefactoringTool: No changes to Research/hexmvc/architecture3/PersistenceOoHomegrown.py
+RefactoringTool: No changes to Research/hexmvc/architecture3/PersistenceOoPickle.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/ServerBottleAdapter.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/ServerMockAdapter.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/UtilJsonStdpythonAdapter.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/UtilRandomStdpythonAdapter.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/ViewWx.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/ViewWxAdapter.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/AppMainConfigDotnet/Program.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/AppMainConfigDotnet/ServerDotnet.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/AppMainConfigDotnet/ServerDotnetAdapter.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/AppMainConfigDotnet/UtilJsonDotnetAdapter.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/AppMainConfigDotnet/UtilRandomDotnetAdapter.py
+RefactoringTool: No changes to Research/hexmvc/architecture3/AppMainConfigDotnet/ViewDotnetWinForm.py
+RefactoringTool: Refactored Research/hexmvc/architecture3/AppMainConfigDotnet/ViewDotnetWinFormAdapter.py
+RefactoringTool: No changes to Research/hexmvc/bottle tests/bottle1.py
+RefactoringTool: No changes to Research/hexmvc/bottle tests/bottle1_bug.py
+RefactoringTool: Refactored Research/hexmvc/bottle tests/bottle3.py
+RefactoringTool: No changes to Research/hexmvc/bottle tests/flask1.py
+RefactoringTool: Refactored Research/hexmvc/hexagon3/hexagon1.py
+RefactoringTool: Refactored Research/hexmvc/hexagon3/hexagon2.py
+RefactoringTool: Refactored Research/hexmvc/hexagon3/hexagon3.py
+RefactoringTool: No changes to Research/hexmvc/hexagon3/hexapp.py
+RefactoringTool: No changes to Research/hexmvc/hexagon3/hexappmodel.py
+RefactoringTool: No changes to Research/hexmvc/hexagon3/hexmodel_simple.py
+RefactoringTool: Refactored Research/hexmvc/hexagon3/hexmodel_sqlobject.py
+RefactoringTool: Refactored Research/hexmvc/hexagon3/hexmvcgui.py
+RefactoringTool: Refactored Research/hexmvc/hexagon3/hexmvcgui_gen.py
+RefactoringTool: No changes to Research/hexmvc/hexagon3/hexpersistence.py
+RefactoringTool: Refactored Research/hexmvc/hexagon3/hexpersistence_sqlobject.py
+RefactoringTool: Refactored Research/hexmvc/hexagon3/hexserver.py
+RefactoringTool: Refactored Research/hexmvc/hexagon3/junk.py
+RefactoringTool: Refactored Research/hexmvc/hexagon3/scrapswx.py
+RefactoringTool: Refactored Research/hexmvc/hexagon3/tests/test_hexmvc01.py
+RefactoringTool: Refactored Research/hexmvc/lib/architecture_support.py
+RefactoringTool: Refactored Research/hexmvc/orm copycat test/copycat1.py
+RefactoringTool: Refactored Research/hexmvc/orm sqlobject test/andyormtest1.py
+RefactoringTool: Refactored Research/hexmvc/puremv_minimal_to_hexmvc/puremvcminimalwx0nostartupcmd.py
+RefactoringTool: Refactored Research/hexmvc/puremv_minimal_to_hexmvc/puremvcminimalwx1_puremvc_stripped_out.py
+RefactoringTool: Refactored Research/hexmvc/puremv_minimal_to_hexmvc/puremvcminimalwx2_as_hexmvc.py
+RefactoringTool: No changes to Research/layout force spring/data_testgraphs.py
+RefactoringTool: Refactored Research/layout force spring/geometry_experiments.py
+RefactoringTool: Refactored Research/layout force spring/gui.py
+RefactoringTool: Refactored Research/layout force spring/gui_text.py
+RefactoringTool: Refactored Research/layout force spring/somepythonbug1.py
+RefactoringTool: Refactored Research/misc/colorizePython.py
+RefactoringTool: Refactored Research/misc/prtok.py
+RefactoringTool: Refactored Research/misc information and doco/ppcomp.py
+RefactoringTool: Refactored Research/networkx graphs/andylayoutuml.py
+RefactoringTool: Refactored Research/networkx graphs/atlas.py
+RefactoringTool: Refactored Research/networkx graphs/chess_masters.py
+RefactoringTool: No changes to Research/networkx graphs/weighted_graph.py
+RefactoringTool: Refactored Research/ogl tests 01/OGLlike.py
+RefactoringTool: Refactored Research/ogl tests 01/OGLlike_original.py
+RefactoringTool: Refactored Research/ogl tests 01/OGLlike_pylab.py
+RefactoringTool: Refactored Research/ogl tests 01/andyOgl01_oldwx.py
+RefactoringTool: Refactored Research/ogl tests 01/andyOgl02_oldwx.py
+RefactoringTool: No changes to Research/ogl tests 01/images.py
+RefactoringTool: Refactored Research/ogl tests 01/images_oldwx.py
+RefactoringTool: Refactored Research/ogl tests 01/ogl_andyshape1.py
+RefactoringTool: Refactored Research/ogl tests 01/ogl_animate1.py
+RefactoringTool: Refactored Research/ogl tests 01/ogl_animate1_threaded.py
+RefactoringTool: Refactored Research/ogl tests 01/ogl_mousechasing.py
+RefactoringTool: Refactored Research/ogl tests 01/ogl_official_demo1.py
+RefactoringTool: Refactored Research/ogl tests 01/ogl_redraw_f_logic.py
+RefactoringTool: Refactored Research/ogl tests 01/ogl_resize_frame1.py
+RefactoringTool: No changes to Research/ogl tests 01/ogl_scroll1.py
+RefactoringTool: No changes to Research/ogl tests 01/ogl_scroll2.py
+RefactoringTool: No changes to Research/ogl tests 01/ogl_scroll_for_maillist.py
+RefactoringTool: No changes to Research/ogl tests 01/ogl_scroll_for_maillist2.py
+RefactoringTool: Refactored Research/ogl tests 01/ogl_simple1.py
+RefactoringTool: Refactored Research/ogl tests 01/ogl_simple2.py
+RefactoringTool: Refactored Research/ogl tests 01/ogl_simple3.py
+RefactoringTool: Refactored Research/ogl tests 01/ogllike_pylab_test.py
+RefactoringTool: No changes to Research/ogl tests 01/ogllike_uml.py
+RefactoringTool: Refactored Research/parsing/codegen.py
+RefactoringTool: Refactored Research/parsing/codegen_with_diagnostics.py
+RefactoringTool: Refactored Research/parsing/misc_parsing_play1.py
+RefactoringTool: Refactored Research/python advanced/command_invokers1.py
+RefactoringTool: Refactored Research/python advanced/decorator_dump_params1.py
+RefactoringTool: Refactored Research/python advanced/decorator_function_call_counter1.py
+RefactoringTool: Refactored Research/python advanced/decorator_function_call_counter2.py
+RefactoringTool: Refactored Research/python advanced/interfaces1.py
+RefactoringTool: Refactored Research/python advanced/interfaces2.py
+RefactoringTool: Refactored Research/python advanced/listdiff.py
+RefactoringTool: Refactored Research/python advanced/multicast.py
+RefactoringTool: Refactored Research/python advanced/multicast_csharp_style1.py
+RefactoringTool: Refactored Research/python advanced/multicast_csharp_style2 - threaded.py
+RefactoringTool: Refactored Research/python advanced/multicast_csharp_style2.py
+RefactoringTool: Refactored Research/python advanced/multicast_simplified_style2.py
+RefactoringTool: Refactored Research/python advanced/properties1.py
+RefactoringTool: Refactored Research/state chart editor/Adders.py
+RefactoringTool: No changes to Research/state chart editor/Editor.py
+RefactoringTool: Refactored Research/state chart editor/GUI.py
+RefactoringTool: No changes to Research/state chart editor/Globals.py
+RefactoringTool: Refactored Research/state chart editor/Link.py
+RefactoringTool: Refactored Research/state chart editor/Separator.py
+RefactoringTool: Refactored Research/state chart editor/State.py
+RefactoringTool: No changes to Research/state chart editor/Statechart.py
+RefactoringTool: No changes to Research/state chart editor/TopHandler.py
+RefactoringTool: No changes to Research/state chart editor/TransformHandlers.py
+RefactoringTool: Refactored Research/state chart editor/Transition.py
+RefactoringTool: Refactored Research/winerack ogl and floatcanvas/fc_FloatCanvasDemo.py
+RefactoringTool: Refactored Research/winerack ogl and floatcanvas/fc_MiniDemo.py
+RefactoringTool: Refactored Research/winerack ogl and floatcanvas/fc_PolyEditor.py
+RefactoringTool: Refactored Research/winerack ogl and floatcanvas/fc_ProcessDiagram.py
+RefactoringTool: No changes to Research/winerack ogl and floatcanvas/fc_ScaleDemo.py
+RefactoringTool: Refactored Research/winerack ogl and floatcanvas/fc_ScaledBitmap2Demo.py
+RefactoringTool: Refactored Research/winerack ogl and floatcanvas/myimages.py
+RefactoringTool: Refactored Research/winerack ogl and floatcanvas/rackdesigner.py
+RefactoringTool: Refactored Research/winerack ogl and floatcanvas/rackdesignerFC.py
+RefactoringTool: No changes to Research/wx doco/ImageInHtml.py
+RefactoringTool: No changes to Research/wx doco/ImageViewer0.py
+RefactoringTool: No changes to Research/wx doco/ImageViewer0a.py
+RefactoringTool: Refactored Research/wx doco/ImageViewer0b.py
+RefactoringTool: Refactored Research/wx doco/ImageViewer1_pil.py
+RefactoringTool: No changes to Research/wx doco/ImageViewer2.py
+RefactoringTool: Refactored Research/wx doco/ImageViewer3.py
+RefactoringTool: No changes to Research/wx doco/ImageViewer4.py
+RefactoringTool: No changes to Research/wx doco/ImageViewer4scaled.py
+RefactoringTool: No changes to Research/wx doco/ImageViewer6.py
+RefactoringTool: Refactored Research/wx doco/ImageViewer7.py
+RefactoringTool: Refactored Research/wx doco/ImageViewer7a.py
+RefactoringTool: Refactored Research/wx doco/ImageViewer7b.py
+RefactoringTool: No changes to Research/wx doco/about01.py
+RefactoringTool: No changes to Research/wx doco/bootstrap_for_wxdemos.py
+RefactoringTool: No changes to Research/wx doco/custom_dialog01.py
+RefactoringTool: Refactored Research/wx doco/frameshow1.py
+RefactoringTool: Refactored Research/wx doco/html_demo.py
+RefactoringTool: No changes to Research/wx doco/images.py
+RefactoringTool: Refactored Research/wx doco/rclick_popup_menu1.py
+RefactoringTool: No changes to Research/wx doco/resize_scroll_01.py
+RefactoringTool: Refactored Research/wx doco/scroll_window_in_action1.py
+RefactoringTool: No changes to Research/wx doco/scrolling_panel01.py
+RefactoringTool: Refactored Research/wx doco/someStyledTextCtrl1.py
+RefactoringTool: No changes to Research/wx doco/someStyledTextCtrl2.py
+RefactoringTool: No changes to Research/wx doco/someStyledTextCtrl3.py
+RefactoringTool: Refactored Research/wx doco/someStyledTextCtrl4_spe1.py
+RefactoringTool: No changes to Research/wx doco/some_wxaui1.py
+RefactoringTool: No changes to Research/wx doco/some_wxaui2.py
+RefactoringTool: Refactored Research/wx doco/somedoodle.py
+RefactoringTool: Refactored Research/wx doco/somedoublebufferingdemo.py
+RefactoringTool: No changes to Research/wx doco/somelongthread1.py
+RefactoringTool: Refactored Research/wx doco/somelongthread1_main.py
+RefactoringTool: No changes to Research/wx doco/somelongthread2_yield.py
+RefactoringTool: No changes to Research/wx doco/somelongthread3_idle.py
+RefactoringTool: Refactored Research/wx doco/somelongthread4_easy.py
+RefactoringTool: Refactored Research/wx doco/somelongthread4_easy_interruptable.py
+RefactoringTool: No changes to Research/wx doco/somenotebook0.py
+RefactoringTool: No changes to Research/wx doco/somenotebook1.py
+RefactoringTool: No changes to Research/wx doco/somepanelswitcher1.py
+RefactoringTool: Refactored Research/wx doco/someplot1.py
+RefactoringTool: Refactored Research/wx doco/someplot2_scroll.py
+RefactoringTool: No changes to Research/wx doco/somesimple1.py
+RefactoringTool: Refactored Research/wx doco/zoom_canvas2d-plugin.py
+RefactoringTool: No changes to Research/wx doco/wxglade1/wxgladeapp1.py
+RefactoringTool: No changes to Research/wx doco/wxglade1/wxgladeapp2.py
+RefactoringTool: No changes to Research/wx form builder/fbogl1.py
+RefactoringTool: Refactored Research/wx form builder/fbpyn1.py
+RefactoringTool: Refactored Research/wx form builder/fbpyn1_gen.py
+RefactoringTool: No changes to Research/wx form builder/fbpyn1_scintilla.py
+RefactoringTool: Refactored Research/wx form builder/fbtest01.py
+RefactoringTool: Refactored Research/wx form builder/fbtest01_gen.py
+RefactoringTool: No changes to Research/wx form builder/images.py
+RefactoringTool: No changes to Research/wx form builder/someStyledTextCtrl2.py
+RefactoringTool: Refactored Research/wx form builder/some_fb2_1.py
+RefactoringTool: No changes to Research/wx form builder/some_fb2_2.py
+RefactoringTool: No changes to Research/wx form builder/some_fb2_2_altered.py
+RefactoringTool: Refactored Research/wx form builder/some_fb2_3.py
+RefactoringTool: Refactored Research/wx form builder/some_fb2_gen.py
+RefactoringTool: Refactored Research/wx form builder/some_fb2_gen_altered.py
+RefactoringTool: No changes to Research/wx form builder/splitwin01.py
+RefactoringTool: No changes to Research/wx form builder/2019test1/test1.py
+RefactoringTool: Refactored Research/wx form builder/2019test1/test1_gen.py
+RefactoringTool: Refactored Research/yuml_python/copypng.py
+RefactoringTool: Refactored Research/yuml_python/create_yuml_class_diagram.py
+RefactoringTool: Refactored Research/yuml_python/png.py
+RefactoringTool: No changes to Research/yuml_python/read_yuml_from_png.py
+RefactoringTool: Refactored Research/yuml_python/write_end_of_png.py
+RefactoringTool: Files that were modified:
+RefactoringTool: Research/config techniques/testConfigObj.py
+RefactoringTool: Research/hexmvc/architecture2/architecture1.py
+RefactoringTool: Research/hexmvc/architecture2/architecture2.py
+RefactoringTool: Research/hexmvc/architecture2/architecture2_gui_gen.py
+RefactoringTool: Research/hexmvc/architecture3/App.py
+RefactoringTool: Research/hexmvc/architecture3/AppMainConfigOo.py
+RefactoringTool: Research/hexmvc/architecture3/AppMainConfigSql.py
+RefactoringTool: Research/hexmvc/architecture3/Controller.py
+RefactoringTool: Research/hexmvc/architecture3/ModelAdapterBase.py
+RefactoringTool: Research/hexmvc/architecture3/ModelOo.py
+RefactoringTool: Research/hexmvc/architecture3/ModelOoAdapter.py
+RefactoringTool: Research/hexmvc/architecture3/ModelSql.py
+RefactoringTool: Research/hexmvc/architecture3/ModelSqlAdapter.py
+RefactoringTool: Research/hexmvc/architecture3/PersistenceOoHomegrown.py
+RefactoringTool: Research/hexmvc/architecture3/PersistenceOoPickle.py
+RefactoringTool: Research/hexmvc/architecture3/ServerBottleAdapter.py
+RefactoringTool: Research/hexmvc/architecture3/ServerMockAdapter.py
+RefactoringTool: Research/hexmvc/architecture3/UtilJsonStdpythonAdapter.py
+RefactoringTool: Research/hexmvc/architecture3/UtilRandomStdpythonAdapter.py
+RefactoringTool: Research/hexmvc/architecture3/ViewWx.py
+RefactoringTool: Research/hexmvc/architecture3/ViewWxAdapter.py
+RefactoringTool: Research/hexmvc/architecture3/AppMainConfigDotnet/Program.py
+RefactoringTool: Research/hexmvc/architecture3/AppMainConfigDotnet/ServerDotnet.py
+RefactoringTool: Research/hexmvc/architecture3/AppMainConfigDotnet/ServerDotnetAdapter.py
+RefactoringTool: Research/hexmvc/architecture3/AppMainConfigDotnet/UtilJsonDotnetAdapter.py
+RefactoringTool: Research/hexmvc/architecture3/AppMainConfigDotnet/UtilRandomDotnetAdapter.py
+RefactoringTool: Research/hexmvc/architecture3/AppMainConfigDotnet/ViewDotnetWinForm.py
+RefactoringTool: Research/hexmvc/architecture3/AppMainConfigDotnet/ViewDotnetWinFormAdapter.py
+RefactoringTool: Research/hexmvc/bottle tests/bottle1.py
+RefactoringTool: Research/hexmvc/bottle tests/bottle1_bug.py
+RefactoringTool: Research/hexmvc/bottle tests/bottle3.py
+RefactoringTool: Research/hexmvc/bottle tests/flask1.py
+RefactoringTool: Research/hexmvc/hexagon3/hexagon1.py
+RefactoringTool: Research/hexmvc/hexagon3/hexagon2.py
+RefactoringTool: Research/hexmvc/hexagon3/hexagon3.py
+RefactoringTool: Research/hexmvc/hexagon3/hexapp.py
+RefactoringTool: Research/hexmvc/hexagon3/hexappmodel.py
+RefactoringTool: Research/hexmvc/hexagon3/hexmodel_simple.py
+RefactoringTool: Research/hexmvc/hexagon3/hexmodel_sqlobject.py
+RefactoringTool: Research/hexmvc/hexagon3/hexmvcgui.py
+RefactoringTool: Research/hexmvc/hexagon3/hexmvcgui_gen.py
+RefactoringTool: Research/hexmvc/hexagon3/hexpersistence.py
+RefactoringTool: Research/hexmvc/hexagon3/hexpersistence_sqlobject.py
+RefactoringTool: Research/hexmvc/hexagon3/hexserver.py
+RefactoringTool: Research/hexmvc/hexagon3/junk.py
+RefactoringTool: Research/hexmvc/hexagon3/scrapswx.py
+RefactoringTool: Research/hexmvc/hexagon3/tests/test_hexmvc01.py
+RefactoringTool: Research/hexmvc/lib/architecture_support.py
+RefactoringTool: Research/hexmvc/orm copycat test/copycat1.py
+RefactoringTool: Research/hexmvc/orm sqlobject test/andyormtest1.py
+RefactoringTool: Research/hexmvc/puremv_minimal_to_hexmvc/puremvcminimalwx0nostartupcmd.py
+RefactoringTool: Research/hexmvc/puremv_minimal_to_hexmvc/puremvcminimalwx1_puremvc_stripped_out.py
+RefactoringTool: Research/hexmvc/puremv_minimal_to_hexmvc/puremvcminimalwx2_as_hexmvc.py
+RefactoringTool: Research/layout force spring/data_testgraphs.py
+RefactoringTool: Research/layout force spring/geometry_experiments.py
+RefactoringTool: Research/layout force spring/gui.py
+RefactoringTool: Research/layout force spring/gui_text.py
+RefactoringTool: Research/layout force spring/somepythonbug1.py
+RefactoringTool: Research/misc/colorizePython.py
+RefactoringTool: Research/misc/prtok.py
+RefactoringTool: Research/misc information and doco/ppcomp.py
+RefactoringTool: Research/networkx graphs/andylayoutuml.py
+RefactoringTool: Research/networkx graphs/atlas.py
+RefactoringTool: Research/networkx graphs/chess_masters.py
+RefactoringTool: Research/networkx graphs/weighted_graph.py
+RefactoringTool: Research/ogl tests 01/OGLlike.py
+RefactoringTool: Research/ogl tests 01/OGLlike_original.py
+RefactoringTool: Research/ogl tests 01/OGLlike_pylab.py
+RefactoringTool: Research/ogl tests 01/andyOgl01_oldwx.py
+RefactoringTool: Research/ogl tests 01/andyOgl02_oldwx.py
+RefactoringTool: Research/ogl tests 01/images.py
+RefactoringTool: Research/ogl tests 01/images_oldwx.py
+RefactoringTool: Research/ogl tests 01/ogl_andyshape1.py
+RefactoringTool: Research/ogl tests 01/ogl_animate1.py
+RefactoringTool: Research/ogl tests 01/ogl_animate1_threaded.py
+RefactoringTool: Research/ogl tests 01/ogl_mousechasing.py
+RefactoringTool: Research/ogl tests 01/ogl_official_demo1.py
+RefactoringTool: Research/ogl tests 01/ogl_redraw_f_logic.py
+RefactoringTool: Research/ogl tests 01/ogl_resize_frame1.py
+RefactoringTool: Research/ogl tests 01/ogl_scroll1.py
+RefactoringTool: Research/ogl tests 01/ogl_scroll2.py
+RefactoringTool: Research/ogl tests 01/ogl_scroll_for_maillist.py
+RefactoringTool: Research/ogl tests 01/ogl_scroll_for_maillist2.py
+RefactoringTool: Research/ogl tests 01/ogl_simple1.py
+RefactoringTool: Research/ogl tests 01/ogl_simple2.py
+RefactoringTool: Research/ogl tests 01/ogl_simple3.py
+RefactoringTool: Research/ogl tests 01/ogllike_pylab_test.py
+RefactoringTool: Research/ogl tests 01/ogllike_uml.py
+RefactoringTool: Research/parsing/codegen.py
+RefactoringTool: Research/parsing/codegen_with_diagnostics.py
+RefactoringTool: Research/parsing/misc_parsing_play1.py
+RefactoringTool: Research/python advanced/command_invokers1.py
+RefactoringTool: Research/python advanced/decorator_dump_params1.py
+RefactoringTool: Research/python advanced/decorator_function_call_counter1.py
+RefactoringTool: Research/python advanced/decorator_function_call_counter2.py
+RefactoringTool: Research/python advanced/interfaces1.py
+RefactoringTool: Research/python advanced/interfaces2.py
+RefactoringTool: Research/python advanced/listdiff.py
+RefactoringTool: Research/python advanced/multicast.py
+RefactoringTool: Research/python advanced/multicast_csharp_style1.py
+RefactoringTool: Research/python advanced/multicast_csharp_style2 - threaded.py
+RefactoringTool: Research/python advanced/multicast_csharp_style2.py
+RefactoringTool: Research/python advanced/multicast_simplified_style2.py
+RefactoringTool: Research/python advanced/properties1.py
+RefactoringTool: Research/state chart editor/Adders.py
+RefactoringTool: Research/state chart editor/Editor.py
+RefactoringTool: Research/state chart editor/GUI.py
+RefactoringTool: Research/state chart editor/Globals.py
+RefactoringTool: Research/state chart editor/Link.py
+RefactoringTool: Research/state chart editor/Separator.py
+RefactoringTool: Research/state chart editor/State.py
+RefactoringTool: Research/state chart editor/Statechart.py
+RefactoringTool: Research/state chart editor/TopHandler.py
+RefactoringTool: Research/state chart editor/TransformHandlers.py
+RefactoringTool: Research/state chart editor/Transition.py
+RefactoringTool: Research/winerack ogl and floatcanvas/fc_FloatCanvasDemo.py
+RefactoringTool: Research/winerack ogl and floatcanvas/fc_MiniDemo.py
+RefactoringTool: Research/winerack ogl and floatcanvas/fc_PolyEditor.py
+RefactoringTool: Research/winerack ogl and floatcanvas/fc_ProcessDiagram.py
+RefactoringTool: Research/winerack ogl and floatcanvas/fc_ScaleDemo.py
+RefactoringTool: Research/winerack ogl and floatcanvas/fc_ScaledBitmap2Demo.py
+RefactoringTool: Research/winerack ogl and floatcanvas/myimages.py
+RefactoringTool: Research/winerack ogl and floatcanvas/rackdesigner.py
+RefactoringTool: Research/winerack ogl and floatcanvas/rackdesignerFC.py
+RefactoringTool: Research/wx doco/ImageInHtml.py
+RefactoringTool: Research/wx doco/ImageViewer0.py
+RefactoringTool: Research/wx doco/ImageViewer0a.py
+RefactoringTool: Research/wx doco/ImageViewer0b.py
+RefactoringTool: Research/wx doco/ImageViewer1_pil.py
+RefactoringTool: Research/wx doco/ImageViewer2.py
+RefactoringTool: Research/wx doco/ImageViewer3.py
+RefactoringTool: Research/wx doco/ImageViewer4.py
+RefactoringTool: Research/wx doco/ImageViewer4scaled.py
+RefactoringTool: Research/wx doco/ImageViewer6.py
+RefactoringTool: Research/wx doco/ImageViewer7.py
+RefactoringTool: Research/wx doco/ImageViewer7a.py
+RefactoringTool: Research/wx doco/ImageViewer7b.py
+RefactoringTool: Research/wx doco/about01.py
+RefactoringTool: Research/wx doco/bootstrap_for_wxdemos.py
+RefactoringTool: Research/wx doco/custom_dialog01.py
+RefactoringTool: Research/wx doco/frameshow1.py
+RefactoringTool: Research/wx doco/html_demo.py
+RefactoringTool: Research/wx doco/images.py
+RefactoringTool: Research/wx doco/rclick_popup_menu1.py
+RefactoringTool: Research/wx doco/resize_scroll_01.py
+RefactoringTool: Research/wx doco/scroll_window_in_action1.py
+RefactoringTool: Research/wx doco/scrolling_panel01.py
+RefactoringTool: Research/wx doco/someStyledTextCtrl1.py
+RefactoringTool: Research/wx doco/someStyledTextCtrl2.py
+RefactoringTool: Research/wx doco/someStyledTextCtrl3.py
+RefactoringTool: Research/wx doco/someStyledTextCtrl4_spe1.py
+RefactoringTool: Research/wx doco/some_wxaui1.py
+RefactoringTool: Research/wx doco/some_wxaui2.py
+RefactoringTool: Research/wx doco/somedoodle.py
+RefactoringTool: Research/wx doco/somedoublebufferingdemo.py
+RefactoringTool: Research/wx doco/somelongthread1.py
+RefactoringTool: Research/wx doco/somelongthread1_main.py
+RefactoringTool: Research/wx doco/somelongthread2_yield.py
+RefactoringTool: Research/wx doco/somelongthread3_idle.py
+RefactoringTool: Research/wx doco/somelongthread4_easy.py
+RefactoringTool: Research/wx doco/somelongthread4_easy_interruptable.py
+RefactoringTool: Research/wx doco/somenotebook0.py
+RefactoringTool: Research/wx doco/somenotebook1.py
+RefactoringTool: Research/wx doco/somepanelswitcher1.py
+RefactoringTool: Research/wx doco/someplot1.py
+RefactoringTool: Research/wx doco/someplot2_scroll.py
+RefactoringTool: Research/wx doco/somesimple1.py
+RefactoringTool: Research/wx doco/zoom_canvas2d-plugin.py
+RefactoringTool: Research/wx doco/wxglade1/wxgladeapp1.py
+RefactoringTool: Research/wx doco/wxglade1/wxgladeapp2.py
+RefactoringTool: Research/wx form builder/fbogl1.py
+RefactoringTool: Research/wx form builder/fbpyn1.py
+RefactoringTool: Research/wx form builder/fbpyn1_gen.py
+RefactoringTool: Research/wx form builder/fbpyn1_scintilla.py
+RefactoringTool: Research/wx form builder/fbtest01.py
+RefactoringTool: Research/wx form builder/fbtest01_gen.py
+RefactoringTool: Research/wx form builder/images.py
+RefactoringTool: Research/wx form builder/someStyledTextCtrl2.py
+RefactoringTool: Research/wx form builder/some_fb2_1.py
+RefactoringTool: Research/wx form builder/some_fb2_2.py
+RefactoringTool: Research/wx form builder/some_fb2_2_altered.py
+RefactoringTool: Research/wx form builder/some_fb2_3.py
+RefactoringTool: Research/wx form builder/some_fb2_gen.py
+RefactoringTool: Research/wx form builder/some_fb2_gen_altered.py
+RefactoringTool: Research/wx form builder/splitwin01.py
+RefactoringTool: Research/wx form builder/2019test1/test1.py
+RefactoringTool: Research/wx form builder/2019test1/test1_gen.py
+RefactoringTool: Research/yuml_python/copypng.py
+RefactoringTool: Research/yuml_python/create_yuml_class_diagram.py
+RefactoringTool: Research/yuml_python/png.py
+RefactoringTool: Research/yuml_python/read_yuml_from_png.py
+RefactoringTool: Research/yuml_python/write_end_of_png.py
+RefactoringTool: Warnings/messages while refactoring:
+RefactoringTool: ### In file Research/ogl tests 01/andyOgl02_oldwx.py ###
+RefactoringTool: Line 348: cannot convert map(None, ...) with multiple arguments because map() now truncates to the shortest sequence
+RefactoringTool: Line 348: cannot convert map(None, ...) with multiple arguments because map() now truncates to the shortest sequence
+

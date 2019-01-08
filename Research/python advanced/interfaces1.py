@@ -4,9 +4,7 @@
 
 import abc
 
-class PluginBase(object):
-    __metaclass__ = abc.ABCMeta
-    
+class PluginBase(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def load(self, input):
         """Retrieve data from the input source and return an object."""
@@ -27,7 +25,7 @@ class SubclassImplementation(PluginBase):
 
 #o = PluginBase()  # Can't instantiate base class
 o = SubclassImplementation()
-print o
+print(o)
 
 class IncompleteImplementation(PluginBase):
     
@@ -37,4 +35,4 @@ class IncompleteImplementation(PluginBase):
 #o = IncompleteImplementation() # Can't instantiate Incomplete Implementation
 #print o
         
-print "done"
+print("done")

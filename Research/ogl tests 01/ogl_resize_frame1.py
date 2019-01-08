@@ -170,12 +170,12 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             y += 70
 
         self.umlwin.GetDiagram().ShowAll( 1 )
-        print "bounds", self.GetBoundsAllShapes()
-        print "canvas.GetVirtualSize()", self.umlwin.GetVirtualSize()
-        print "canvas.GetSize()", self.umlwin.GetSize()
-        print "frame.GetVirtualSize()", self.frame.GetVirtualSize()
-        print "frame.GetSize()", self.frame.GetSize()
-        print "frame.GetClientSize()", self.frame.GetClientSize()
+        print("bounds", self.GetBoundsAllShapes())
+        print("canvas.GetVirtualSize()", self.umlwin.GetVirtualSize())
+        print("canvas.GetSize()", self.umlwin.GetSize())
+        print("frame.GetVirtualSize()", self.frame.GetVirtualSize())
+        print("frame.GetSize()", self.frame.GetSize())
+        print("frame.GetClientSize()", self.frame.GetClientSize())
         
         # MAGIC solution !!!
         width, height = self.GetBoundsAllShapes()

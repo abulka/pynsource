@@ -80,7 +80,7 @@ class MyFormMediator(puremvc.patterns.mediator.Mediator, puremvc.interfaces.IMed
 
     def handleNotification(self, notification):
         if notification.getName() == AppFacade.DATA_CHANGED:
-            print "handleNotification (mediator) got", notification.getBody()
+            print("handleNotification (mediator) got", notification.getBody())
             mydata = notification.getBody()
             self.viewComponent.inputFieldTxt.SetValue(mydata)
 
@@ -90,7 +90,7 @@ class MyFormMediator(puremvc.patterns.mediator.Mediator, puremvc.interfaces.IMed
 
 class DataSubmittedCommand(puremvc.patterns.command.SimpleCommand, puremvc.interfaces.ICommand):
     def execute(self, notification):
-        print "submit execute (command)", notification.getBody()
+        print("submit execute (command)", notification.getBody())
         mydata = notification.getBody()
         self.datamodelProxy = self.facade.retrieveProxy(DataModelProxy.NAME)
         self.datamodelProxy.setData(mydata.upper())
@@ -105,7 +105,7 @@ class DataModelProxy(puremvc.patterns.proxy.Proxy):
 
     def setData(self, data):
         self.realdata.data = data
-        print "setData (model) to", data
+        print("setData (model) to", data)
         self.sendNotification(AppFacade.DATA_CHANGED, self.realdata.data)
 
 class Data:

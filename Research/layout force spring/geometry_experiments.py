@@ -41,7 +41,7 @@ class Node:
         def remove_duplicates(lzt):
             d = {}
             for x in lzt: d[tuple(x)]=x
-            return d.values()
+            return list(d.values())
         result = [r for r in result if r != None]
         result = remove_duplicates(result)
         return result
@@ -80,7 +80,7 @@ def CalcEdgeBounds(a, c, vertical_edge_aware=True):
         point1[Y] -= 1
         point2[Y] += 1
     
-    print point1, point2
+    print(point1, point2)
     return point1[X], point1[Y], point2[X], point2[Y], 
 
 
@@ -113,7 +113,7 @@ def CalcEdgeBounds_FromCrossingPoints(crossings):
         point1[Y] -= 1
         point2[Y] += 1
     
-    print point1, point2
+    print(point1, point2)
     return point1[X], point1[Y], point2[X], point2[Y], 
 
 
@@ -235,14 +235,14 @@ if __name__ == "__main__":
     a = Node('A', 0, 0, 4, 4)
     c = Node('C', 2, 6, 4, 2)
     res = CalcEdgeBounds_USING_TRIG(a,c)
-    print res
+    print(res)
     assert [str(round(f,2)) for f in res ] == ['2.8', '4.0', '3.6', '6.0']
     CalcEdgeBounds(a,c)
     
     # Handle feeding in swapped around parameters - algorithm should be
     # resilient and figure out who is on top
     res = CalcEdgeBounds_USING_TRIG(c,a)
-    print res
+    print(res)
     assert [str(round(f,2)) for f in res ] == ['2.8', '4.0', '3.6', '6.0']
     CalcEdgeBounds(c,a)
     
@@ -250,7 +250,7 @@ if __name__ == "__main__":
     a = Node('A', 2, 0, 4, 4)
     c = Node('C', 0, 6, 4, 2)
     res = CalcEdgeBounds_USING_TRIG(a,c)
-    print res
+    print(res)
     assert [str(round(f,2)) for f in res ] == ['2.4', '4.0', '3.2', '6.0']
     CalcEdgeBounds(a,c)
 
@@ -258,12 +258,12 @@ if __name__ == "__main__":
     a = Node('A', 0, 0, 4, 4)
     c = Node('C', 0, 6, 4, 4)
     res = CalcEdgeBounds_USING_TRIG(a,c,vertical_edge_aware=False)
-    print res
+    print(res)
     assert [str(round(f,2)) for f in res ] == ['2.0', '4.0', '2.0', '6.0']
     CalcEdgeBounds(a,c)
 
     res = CalcEdgeBounds_USING_TRIG(a,c,)
-    print res
+    print(res)
     assert [str(round(f,2)) for f in res ] == ['1.0', '4.0', '3.0', '6.0']
     CalcEdgeBounds(a,c)
 
@@ -274,14 +274,14 @@ if __name__ == "__main__":
     a = Node('A', 0, 0, 4, 4)
     c = Node('C', 6, 1, 4, 4)
     res = CalcEdgeBounds_USING_TRIG(a,c,vertical_edge_aware=False)
-    print res
+    print(res)
     #assert [str(round(f,2)) for f in res ] == ['4.0', '1.8', '6.0', '2.2']  # 1.8 and 2.2 are guesses
     CalcEdgeBounds(a,c)
 
     # two nodes side by side case 2, c slightly higer than a - just swap params to test -  - TRIG version not
     # handling this yet, abandoned as CalcEdgeBounds() handles it nicely.
     res = CalcEdgeBounds_USING_TRIG(c,a,vertical_edge_aware=False)
-    print res
+    print(res)
     #assert [str(round(f,2)) for f in res ] == ['4.0', '1.8', '6.0', '2.2']  # 1.8 and 2.2 are guesses
     CalcEdgeBounds(c,a)
 
@@ -289,7 +289,7 @@ if __name__ == "__main__":
     a = Node('A', 0, 0, 4, 4)
     c = Node('C', 6, 0, 4, 4)
     res = CalcEdgeBounds_USING_TRIG(a,c,vertical_edge_aware=False)
-    print res
+    print(res)
     # would otherwise be (4, 2, 6, 2) with both y's the same
     assert [str(round(f,2)) for f in res ] == ['4.0', '1.0', '6.0', '3.0']
     CalcEdgeBounds(a,c)
@@ -298,6 +298,6 @@ if __name__ == "__main__":
     c = Node('C', 6, 3, 4, 2)
     CalcEdgeBounds(a,c)
     
-    print "-"*80
+    print("-"*80)
         
-    print "done"
+    print("done")

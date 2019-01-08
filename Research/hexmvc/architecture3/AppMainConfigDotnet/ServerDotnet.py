@@ -40,7 +40,7 @@ class SimpleServer(object):
         response = context.Response
         path = self.pathComponents(context)
         method = context.Request.HttpMethod
-        print method, path
+        print(method, path)
         """
         if you call with http://localhost:8081 path='' method=GET
         if you call with http://localhost:8081/fred path='fred' method=GET

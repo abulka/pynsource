@@ -12,7 +12,7 @@ with the GUI via wx.CallAfter.
 """
 
 import wx
-import thread
+import _thread
 from time import sleep
 
 class MainFrame(wx.Frame):
@@ -37,7 +37,7 @@ class MainFrame(wx.Frame):
         self.btn.Enable(False)
         self.gauge.SetValue(0)
         self.label.SetLabel("Running")
-        thread.start_new_thread(self.longRunning, ())
+        _thread.start_new_thread(self.longRunning, ())
 
     def onLongRunDone(self):
         self.gauge.SetValue(100)

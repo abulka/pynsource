@@ -22,6 +22,7 @@ SUMMARY: csharp2 implementation seems cleaner.  Don't need to define 'event' con
 """
 
 import operator
+from functools import reduce
 
 class multicast(dict):
     "Class multiplexes messages to registered objects"
@@ -34,7 +35,7 @@ class multicast(dict):
     def __call__(self, *args, **kwargs):
         "Invoke method attributes and return results through another multicast"
         return self.__class__( [ (alias, obj(*args, **kwargs) ) \
-                for alias, obj in self.items() if callable(obj) ] )
+                for alias, obj in list(self.items()) if callable(obj) ] )
     def __callZ__(self, *args, **kwargs):
         import threading
         lock = threading.RLock()
@@ -48,28 +49,28 @@ class multicast(dict):
 
         threadlist = [threading.Thread(
                       target=invoke, args=item)
-                      for item in self.items()]
+                      for item in list(self.items())]
         for thread in threadlist:
             thread.start()
         for thread in threadlist:
             thread.join()
         return self.__class__(result)
     
-    def __nonzero__(self):
+    def __bool__(self):
         "A multicast is logically true if all delegate attributes are logically true"
 
-        return operator.truth(reduce(lambda a, b: a and b, self.values(), 1))
+        return operator.truth(reduce(lambda a, b: a and b, list(self.values()), 1))
 
     def __getattr__(self, name):
         "Wrap requested attributes for further processing"
         return self.__class__( [ (alias, getattr(obj, name) ) \
-                for alias, obj in self.items() if hasattr(obj, name) ] )
+                for alias, obj in list(self.items()) if hasattr(obj, name) ] )
 
     def __setattr__(self, name, value):
         """Wrap setting of requested attributes for further
         processing"""
 
-        for o in self.values():
+        for o in list(self.values()):
             o.setdefault(name, value)
 
     # Andy Modifications
@@ -91,10 +92,10 @@ class multicast(dict):
     #    
 
 if __name__ == "__main__":
-    import StringIO
+    import io
 
-    file1 = StringIO.StringIO()
-    file2 = StringIO.StringIO()
+    file1 = io.StringIO()
+    file2 = io.StringIO()
 
     m = multicast()
     m[id(file1)] = file1
@@ -108,11 +109,11 @@ if __name__ == "__main__":
     m.close()
     assert m.closed
 
-    print "Test complete"
+    print("Test complete")
 
     # Andy's tests
 
-    print "Andy's tests:"
+    print("Andy's tests:")
     
     class Model:
         def __init__(self):
@@ -126,7 +127,7 @@ if __name__ == "__main__":
             
     class Observer1:
         def notifyOfModelValueChange(self, value, new_total_value):
-            print "Observer1 got notified, added value %(value)4d - total now %(new_total_value)4d" % vars()
+            print("Observer1 got notified, added value %(value)4d - total now %(new_total_value)4d" % vars())
                 
     model = Model()
     o1 = Observer1()
@@ -139,7 +140,7 @@ if __name__ == "__main__":
             self.num_calls = 0
         def notifyOfModelValueChange(self, value, new_total_value):
             self.num_calls += 1
-            print "Observer2 got notified %2d times" % self.num_calls
+            print("Observer2 got notified %2d times" % self.num_calls)
 
     o2 = Observer2()
     model.observers.addObserver(o2)                         # Or access the multicast directly. 

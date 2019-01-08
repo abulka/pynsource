@@ -16,18 +16,18 @@ G.add_edge("hello", "there",weight=0.6)
 G.add_edge("there", "again",weight=0.4)
 G.add_edge("there", "please",weight=0.2)
 G.add_edge("hello", "aa",weight=0.2)
-print G.nodes()
-print G.edges()
+print(G.nodes())
+print(G.edges())
 #print G.info()
 
-print dir(lay)
+print(dir(lay))
 res01 = lay.circular_layout(G)
-print "res01", res01
-print
+print("res01", res01)
+print()
 res02 = lay.spring_layout(G)
-print "res02", res02
-print
-print "sorted! "
+print("res02", res02)
+print()
+print("sorted! ")
 
 #P.topological_sort(G)
 #P.topological_sort_recursive(G)
@@ -98,7 +98,7 @@ plt.show() # display
 
 def calcMinMax(res):
     maxx = maxy = minx = miny = 0
-    for k in res.keys():
+    for k in list(res.keys()):
         arr = res[k]
         x, y = arr[0], arr[1]
         if x > maxx:
@@ -109,8 +109,8 @@ def calcMinMax(res):
             maxy = y
         if y < miny:
             miny = y
-    print "x ranges from " + str(minx) + " to " + str(maxx)
-    print "y ranges from " + str(miny) + " to " + str(maxy)
+    print("x ranges from " + str(minx) + " to " + str(maxx))
+    print("y ranges from " + str(miny) + " to " + str(maxy))
     
 """
 G2=NX.Graph()
@@ -139,7 +139,7 @@ calcMinMax(res2)
 
 
 def CollectY(res):
-    ys = [ v[1] for v in res.values() ]
+    ys = [ v[1] for v in list(res.values()) ]
 
     # remove duplicates
     
@@ -150,15 +150,15 @@ def CollectY(res):
     ys.sort()
     ys.reverse()
     return ys
-print CollectY(res02)
+print(CollectY(res02))
 
 def CollectXsAtY(res, y):
-    xs = [ v[0] for v in res.values() if v[1] == y ]
+    xs = [ v[0] for v in list(res.values()) if v[1] == y ]
     xs.sort()
     return xs
 
 def FindName(res, x, y):
-    for (k,v) in res.iteritems():
+    for (k,v) in res.items():
         if v[0] == x and v[1] == y:
             return k
     return None
@@ -185,12 +185,12 @@ def ReMap(res, sizes):
     nexty = 200
     newres = {}
     
-    print "ReMap"
+    print("ReMap")
     myres = SortRes(res)
     for (y, xs) in myres:
         for (node, x) in xs:
-            print node, x, y, "   => ",
-            print nextx, nexty
+            print(node, x, y, "   => ", end=' ')
+            print(nextx, nexty)
             newres[node] = (nextx, nexty)
             nextx += sizes[node][0] + SPACING
 
@@ -201,10 +201,10 @@ def ReMap(res, sizes):
     return newres
 
 
-print
-print "SortRes02"
-print SortRes(res02)
-print
+print()
+print("SortRes02")
+print(SortRes(res02))
+print()
 
 
 res55 = { 'A' : (0.0, 0.0),
@@ -215,18 +215,18 @@ sizes55 = { 'A' : (50, 50),
             'C' : (10, 10) }
 
 import pprint
-print "SortRes55"
+print("SortRes55")
 pprint.pprint( SortRes(res55) )
-print
+print()
 
 
 coords55 = ReMap(res55, sizes55)
-print
-print coords55
+print()
+print(coords55)
 
 sizes55 = {'wxPrintout': (106.0, 36.0), 'MyPrintout': (152.0, 227.0)}
 res55 = {'wxPrintout': [ 0.71233445,  3.11540857], 'MyPrintout': [-0.58540195, -2.45158964]}
 coords55 = ReMap(res55, sizes55)
-print
-print coords55
+print()
+print(coords55)
 

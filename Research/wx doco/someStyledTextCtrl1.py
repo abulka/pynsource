@@ -48,7 +48,7 @@ class Log(stc.StyledTextCtrl):
 
         """
         free = self._free
-        if c and isinstance(c, (str, unicode)):
+        if c and isinstance(c, str):
             c = c.lower()
         else:
             c = 'black'
