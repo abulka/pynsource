@@ -122,10 +122,10 @@ def dump_old_structure(pmodel):
             return classentry.name
         
     # repair old parse models #TODO build this into the old parser so that we don't have to do this
-    for classname, classentry in  pmodel.classlist.items():
+    for classname, classentry in  list(pmodel.classlist.items()):
         classentry.name = classname
     
-    for classname, classentry in  sorted(pmodel.classlist.items(), key=lambda kv: calc_classname(kv[1])):
+    for classname, classentry in  sorted(list(pmodel.classlist.items()), key=lambda kv: calc_classname(kv[1])):
         res += "%s (is module=%s) inherits from %s class dependencies %s\n" % \
                                     (calc_classname(classentry),
                                      classentry.ismodulenotrealclass,

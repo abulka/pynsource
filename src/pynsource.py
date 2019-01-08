@@ -27,7 +27,7 @@ def test():
     elif strategy == 'ast_via_api':
         pmodel, debuginfo = new_parser(FILE)
 
-    print(dump_old_structure(pmodel))  # TODO this could be another generate code reporter plugin
+    print((dump_old_structure(pmodel)))  # TODO this could be another generate code reporter plugin
 
     # print p
     #print 'Done.'
@@ -60,7 +60,7 @@ def ParseArgsAndRun():
         def EnsurePathExists(outdir, outlanguagemsg):
             assert outdir, 'Need to specify output folder for %s output - got %s.'%(outlanguagemsg, outdir)
             if not os.path.exists(outdir):
-                raise RuntimeError, ('Output directory %s for %s file output does not exist.'%(outdir,outlanguagemsg))
+                raise RuntimeError('Output directory %s for %s file output does not exist.'%(outdir,outlanguagemsg))
 
         for optionvaluepair in listofoptionvaluepairs:
             if '-x' == optionvaluepair[0]:
@@ -110,7 +110,7 @@ def ParseArgsAndRun():
         elif option_show_parse_model:
             for f in globbed:
                 pmodel, debuginfo = new_parser(f)
-                print(dump_old_structure(pmodel))
+                print((dump_old_structure(pmodel)))
         else:
             u = CmdLinePythonToAsciiArt(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
             u.ExportTo(None)
@@ -118,7 +118,7 @@ def ParseArgsAndRun():
         if option_run_experiment:
             test()
         else:
-            print common.messages.HELP_COMMAND_LINE_USAGE
+            print(common.messages.HELP_COMMAND_LINE_USAGE)
 
 if __name__ == '__main__':
     # test()

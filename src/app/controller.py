@@ -9,13 +9,13 @@ if __name__ == '__main__':
 
 from common.command_pattern import CommandManager
 
-from cmds.diagnostics import *
-from cmds.deletion import *
-from cmds.insertion import *
-from cmds.selection import *
-from cmds.filemgmt import *
-from cmds.layouts import *
-from cmds.colouring import *
+from .cmds.diagnostics import *
+from .cmds.deletion import *
+from .cmds.insertion import *
+from .cmds.selection import *
+from .cmds.filemgmt import *
+from .cmds.layouts import *
+from .cmds.colouring import *
 # TODO: Perhaps can add these modules to the globals within the
 # invoker class, to avoid having to import each module explicitly?
 
@@ -150,7 +150,7 @@ if __name__ == '__main__':
             self.num = num
             self.num2 = num2
         def execute(self):
-            print "hi from Woody and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__
+            print("hi from Woody and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__)
      
     invoker.CmdWoody(100)  # instantiates class CmdWoody with constructor value (100) and calls execute() on it
     invoker.CmdWoody(100, 97)
@@ -171,7 +171,7 @@ if __name__ == '__main__':
             self.num2 = num2
         def execute(self):
             assert self.context
-            print "hi from Bob and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__
+            print("hi from Bob and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__)
     
     invoker.CmdBob(100)  # instantiates class CmdBob with constructor value (100) and calls execute() on it
     invoker.CmdBob(100, 97)
@@ -181,4 +181,4 @@ if __name__ == '__main__':
     c.setContext({'a':44})   # Need to do this if not using the framework
     c.execute()
     
-    print "done"        
+    print("done")        

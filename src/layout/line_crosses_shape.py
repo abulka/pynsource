@@ -2,7 +2,7 @@
 # testing only
 
 from graph import GraphNode
-from line_intersection import FindLineIntersection
+from .line_intersection import FindLineIntersection
 
 # This function was migrated into GraphNode
 
@@ -15,7 +15,7 @@ def CalcLineIntersectionsWithNode(line_start_point, line_end_point, node):
     def remove_duplicates(lzt):
         d = {}
         for x in lzt: d[tuple(x)]=x
-        return d.values()
+        return list(d.values())
     result = [r for r in result if r != None]
     result = remove_duplicates(result)
     return result
@@ -48,4 +48,4 @@ if __name__ == '__main__':
     assert [20.0, 10.0] in res
     assert [20.0, 50.0] in res
     
-    print "Done, tests passed"
+    print("Done, tests passed")

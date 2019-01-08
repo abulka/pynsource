@@ -167,7 +167,7 @@ class PlayAPI:
                 break
                 # pos should now be positioned at the insertion point
 
-        if lastoccurenceoftime<>-1:
+        if lastoccurenceoftime!=-1:
             return lastoccurenceoftime
         maxpos = len(self.mediator.story)-1
         return min(maxpos, pos)
@@ -178,7 +178,7 @@ class PlayAPI:
         maxturn is.
         """
         maxturnsofar = self.mediator.byTurn.GetMaxValue()
-        if maxturnsofar<>-1:
+        if maxturnsofar!=-1:
             # find out what the maximum time for that turn is
             timetuple, day = self.turnMgr.TurnToTime(maxturnsofar)
             maxtime = timetuple[1]

@@ -1,6 +1,6 @@
 import wx
 import random
-from DialogUmlNodeEdit import DialogUmlNodeEdit
+from .DialogUmlNodeEdit import DialogUmlNodeEdit
 
 class TestApp(wx.Frame):
     def __init__(self, *args, **kwargs):

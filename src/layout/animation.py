@@ -23,10 +23,10 @@ def GeneratePoints(point1, point2, steps=8):
     X, Y = 0, 1
     xs = doValChangeMem(startval=point1[X], endval=point2[X], steps=steps)
     ys = doValChangeMem(startval=point1[Y], endval=point2[Y], steps=steps)
-    return zip(xs, ys)
+    return list(zip(xs, ys))
 
 if __name__ == "__main__":
-    print GeneratePoints((0,0), (10,10))
-    print GeneratePoints((10,0), (100,10))
+    print(GeneratePoints((0,0), (10,10)))
+    print(GeneratePoints((10,0), (100,10)))
     
-    print "Done"
+    print("Done")

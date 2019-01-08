@@ -18,7 +18,7 @@ import wx.html
 class HelpWindow ( wx.Frame ):
 
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"PyNSource Quick Help", pos = wx.DefaultPosition, size = wx.Size( 637,679 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "PyNSource Quick Help", pos = wx.DefaultPosition, size = wx.Size( 637,679 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
 		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
@@ -30,7 +30,7 @@ class HelpWindow ( wx.Frame ):
 
 		bSizer1.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 
-		self.btnCancelClose = wx.Button( self, wx.ID_ANY, u"Close", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.btnCancelClose = wx.Button( self, wx.ID_ANY, "Close", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer1.Add( self.btnCancelClose, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
 

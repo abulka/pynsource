@@ -47,15 +47,15 @@ class PyYumlGuiFrame ( MyFrame1 ):
         
     def OnImport( self, event ):
         from generate_code.gen_plantuml import PySourceAsPlantUml
-        import urllib
+        import urllib.request, urllib.parse, urllib.error
         
         dlg = wx.FileDialog(parent=self, message="choose", defaultDir='.',
             defaultFile="", wildcard="*.py", style=wx.OPEN|wx.FD_MULTIPLE, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             filenames = dlg.GetPaths()
-            print 'Importing...'
+            print('Importing...')
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
-            print filenames
+            print(filenames)
             
             files=filenames
             p = PySourceAsPlantUml()
@@ -70,7 +70,7 @@ class PyYumlGuiFrame ( MyFrame1 ):
 
             plant_uml_txt = "@startuml\n%s@enduml\n" % plant_uml_txt  # just for fun, server doesn't need it
 
-            print plant_uml_txt
+            print(plant_uml_txt)
 
             image_url, response = plant_uml_create_png_and_return_image_url(plant_uml_txt)
 
@@ -78,7 +78,7 @@ class PyYumlGuiFrame ( MyFrame1 ):
                 self.puml.ViewImage(url=image_url)
 
             wx.EndBusyCursor()
-            print 'Import - Done.'
+            print('Import - Done.')
             
             
 APP_SIZE = (600,600)

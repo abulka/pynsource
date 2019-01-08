@@ -2,8 +2,8 @@
 
 import tokenize, token
 import pprint
-from keywords import pythonbuiltinfunctions, javakeywords, delphikeywords
-from class_entry import ClassEntry, Attribute
+from .keywords import pythonbuiltinfunctions, javakeywords, delphikeywords
+from .class_entry import ClassEntry, Attribute
 import os
 
 DEBUG_DUMPTOKENS = False
@@ -355,7 +355,7 @@ class HandleComposites(HandleClassAttributes):
         self.dummy2 = [()]
 
     def JustGotASelfAttr(self, selfattrname):
-        assert selfattrname <> 'self'
+        assert selfattrname != 'self'
         self.lastselfattrname = selfattrname
         self.waitingforclassname = 1
         self.waitingforOpenBracket = 0

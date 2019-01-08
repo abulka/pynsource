@@ -1,6 +1,6 @@
 import os
 import requests
-from gen_base import ReportGenerator, CmdLineGenerator
+from .gen_base import ReportGenerator, CmdLineGenerator
 
 class PySourceAsPlantUml(ReportGenerator):
     def __init__(self, ast=True):
@@ -10,7 +10,7 @@ class PySourceAsPlantUml(ReportGenerator):
     def calc_plant_uml(self, optimise=False):
         self.result = ''
 
-        classnames = self.pmodel.classlist.keys()
+        classnames = list(self.pmodel.classlist.keys())
         for self.aclass in classnames:
             self.classentry = self.pmodel.classlist[self.aclass]
 
@@ -81,15 +81,15 @@ class CmdLinePythonToPlantUml(CmdLineGenerator):
         self.p.calc_plant_uml()
         plant_uml_text = str(self.p)
 
-        print plant_uml_text
+        print(plant_uml_text)
 
         # Optionally generate image via plant uml server
         outpng = outpath
         if outpng != "nopng" :
             if not '.png' in outpng.lower():
-                print "output filename %s must have .png in the name" % outpng
+                print("output filename %s must have .png in the name" % outpng)
                 exit(1)
-            print 'Generating plantuml diagram %s...' % outpng
+            print('Generating plantuml diagram %s...' % outpng)
             plant_uml_create_png(plant_uml_text, outpng)
 
             # Windows specific solution
@@ -101,7 +101,7 @@ class CmdLinePythonToPlantUml(CmdLineGenerator):
             img = Image.open(outpng)
             img.show()
 
-            print 'Done!'
+            print('Done!')
 
 
 def plant_uml_create_png_and_return_image_url(plant_uml_txt):
@@ -130,7 +130,7 @@ def plant_uml_create_png_and_return_image_url(plant_uml_txt):
 
 def plant_uml_create_png(plant_uml_txt, output_filename):
     image_url, response = plant_uml_create_png_and_return_image_url(plant_uml_txt)
-    print image_url
+    print(image_url)
 
     if image_url:
         """
@@ -141,6 +141,6 @@ def plant_uml_create_png(plant_uml_txt, output_filename):
             with open(output_filename, 'wb') as fp:
                 fp.write(response.content)
         else:
-            print 'ok getting generating uml but error pulling down image'
+            print('ok getting generating uml but error pulling down image')
     else:
-        print 'error calling plantuml server', response.status_code
+        print('error calling plantuml server', response.status_code)

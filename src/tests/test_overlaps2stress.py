@@ -29,7 +29,7 @@ class OverlapTests(unittest.TestCase):
 
         for i in range(10):
             self.g.LoadGraphFromStrings(TEST_GRAPH5_STRESS)
-            print i,
+            print(i, end=' ')
             were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
             self.assertTrue(were_all_overlaps_removed)
             
@@ -55,7 +55,7 @@ class OverlapTests(unittest.TestCase):
             coordmapper.AllToWorldCoords()
 
         for i in range(8):
-            print i,
+            print(i, end=' ')
             
             AllToLayoutCoords()
             layouter.layout(keep_current_positions=False)

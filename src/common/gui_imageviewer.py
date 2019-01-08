@@ -2,8 +2,8 @@
 
 import wx
 import sys
-import urllib
-from cStringIO import StringIO
+import urllib.request, urllib.parse, urllib.error
+from io import StringIO
 
 ALLOW_DRAWING = True
 ZOOM_INCR = 1.3
@@ -75,24 +75,24 @@ class ImageViewer(wx.ScrolledWindow):
         if thefile:
             try:
                 img = wx.Image(thefile, wx.BITMAP_TYPE_ANY)
-            except Exception, e:
-                print e
+            except Exception as e:
+                print(e)
                 fallback()
                 
         elif url:
             try:
-                fp = urllib.urlopen(url)
+                fp = urllib.request.urlopen(url)
                 data = fp.read()
                 fp.close()
                 img = wx.ImageFromStream(StringIO(data))
-            except Exception, e:
-                print e
+            except Exception as e:
+                print(e)
                 fallback()
             
         try:
             bmp = img.ConvertToBitmap()
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
             return
 
         self.maxWidth, self.maxHeight = bmp.GetWidth(), bmp.GetHeight()
@@ -140,7 +140,7 @@ class ImageViewer(wx.ScrolledWindow):
         elif text == "Quick Load Image from Url":
             baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
             yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
-            url = baseUrl + urllib.quote(yuml_txt)
+            url = baseUrl + urllib.parse.quote(yuml_txt)
             self.ViewImage(url=url)
         elif text == "Save Image as PNG...":
             self.SaveImage(self.bmp, format="png")
@@ -326,8 +326,8 @@ class ImageViewer(wx.ScrolledWindow):
             msg = "!!!!!!! "
         else:
             msg = "!       "
-        print msg + "(%s) visible %d NeedToClear %s GetVirtualSize %d getWidth %d GetClientSize %d self.GetViewStart() %d self.maxWidth %d " % \
-        (fromwheremsg, self.IsShownOnScreen(), self.NeedToClear(), self.GetVirtualSize()[0], self.getWidth(), self.GetClientSize()[0], self.GetViewStart()[0], self.maxWidth)
+        print(msg + "(%s) visible %d NeedToClear %s GetVirtualSize %d getWidth %d GetClientSize %d self.GetViewStart() %d self.maxWidth %d " % \
+        (fromwheremsg, self.IsShownOnScreen(), self.NeedToClear(), self.GetVirtualSize()[0], self.getWidth(), self.GetClientSize()[0], self.GetViewStart()[0], self.maxWidth))
         
     def OnPaint(self, event):   # ANDY
         dc = wx.PaintDC(self)
@@ -420,7 +420,7 @@ class ImageViewer(wx.ScrolledWindow):
         dc.SetPen(wx.Pen('MEDIUM FOREST GREEN', 4))
         for line in self.lines:
             for coords in line:
-                apply(dc.DrawLine, coords)
+                dc.DrawLine(*coords)
 
     def SetXY(self, event):   # PEN DRAWING
         self.x, self.y = self.ConvertEventCoords(event)

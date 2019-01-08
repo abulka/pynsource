@@ -1,0 +1,255 @@
+Andys-iMac-2:pynsource andy$ 2to3 -wn src/ > Admin/2to3_src.log
+RefactoringTool: Skipping optional fixer: buffer
+RefactoringTool: Skipping optional fixer: idioms
+RefactoringTool: Skipping optional fixer: set_literal
+RefactoringTool: Skipping optional fixer: ws_comma
+RefactoringTool: Refactored src/pyNsourceGui.py
+RefactoringTool: Refactored src/pyPlantumlGui.py
+RefactoringTool: Refactored src/pyYumlGui.py
+RefactoringTool: Refactored src/pynsource.py
+RefactoringTool: No changes to src/setup.py
+RefactoringTool: Refactored src/app/app.py
+RefactoringTool: Refactored src/app/controller.py
+RefactoringTool: No changes to src/app/cmds/__init__.py
+RefactoringTool: No changes to src/app/cmds/base_cmd.py
+RefactoringTool: Refactored src/app/cmds/blackboard_frame.py
+RefactoringTool: No changes to src/app/cmds/blackboard_thread.py
+RefactoringTool: Refactored src/app/cmds/colouring.py
+RefactoringTool: Refactored src/app/cmds/deletion.py
+RefactoringTool: Refactored src/app/cmds/diagnostics.py
+RefactoringTool: Refactored src/app/cmds/filemgmt.py
+RefactoringTool: Refactored src/app/cmds/insertion.py
+RefactoringTool: Refactored src/app/cmds/layouts.py
+RefactoringTool: Refactored src/app/cmds/selection.py
+RefactoringTool: Refactored src/ascii_uml/asciiworkspace.py
+RefactoringTool: Refactored src/ascii_uml/layout_ascii.py
+RefactoringTool: No changes to src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/test/subprocessdata/sigchild_ignore.py
+RefactoringTool: No changes to src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/wx/py/tests/test_interpreter.py
+RefactoringTool: Refactored src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/wx/py/tests/test_introspect.py
+RefactoringTool: No changes to src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/wx/py/tests/test_pseudo.py
+RefactoringTool: No changes to src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/wx/py/tests/test_version.py
+RefactoringTool: No changes to src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/wx/py/tests/testall.py
+RefactoringTool: No changes to src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/temp/wx/_core.py
+RefactoringTool: No changes to src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/temp/wx/_html.py
+RefactoringTool: No changes to src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/temp/wx/_stc.py
+RefactoringTool: No changes to src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/temp/wx/siplib.py
+RefactoringTool: Refactored src/common/architecture_support.py
+RefactoringTool: Refactored src/common/command_pattern.py
+RefactoringTool: Refactored src/common/gui_imageviewer.py
+RefactoringTool: Refactored src/common/logwriter.py
+RefactoringTool: No changes to src/common/messages.py
+RefactoringTool: Refactored src/common/png.py
+RefactoringTool: No changes to src/common/printframework.py
+RefactoringTool: No changes to src/common/uml_colours.py
+RefactoringTool: Refactored src/dialogs/DialogChooseFromList.py
+RefactoringTool: Refactored src/dialogs/DialogChooseFromList_test.py
+RefactoringTool: Refactored src/dialogs/DialogComment.py
+RefactoringTool: Refactored src/dialogs/DialogUmlNodeEdit.py
+RefactoringTool: Refactored src/dialogs/DialogUmlNodeEdit_test.py
+RefactoringTool: Refactored src/dialogs/FrameDeepLayout.py
+RefactoringTool: Refactored src/dialogs/FrameDeepLayout_test.py
+RefactoringTool: Refactored src/dialogs/FramePyYuml.py
+RefactoringTool: Refactored src/dialogs/HelpWindow.py
+RefactoringTool: No changes to src/dialogs/HelpWindow2.py
+RefactoringTool: No changes to src/dist/pyNsourceGui.app/Contents/Resources/__boot__.py
+RefactoringTool: No changes to src/dist/pyNsourceGui.app/Contents/Resources/pyNsourceGui.py
+RefactoringTool: No changes to src/generate_code/__init__.py
+RefactoringTool: Refactored src/generate_code/gen_asciiart.py
+RefactoringTool: Refactored src/generate_code/gen_base.py
+RefactoringTool: Refactored src/generate_code/gen_delphi.py
+RefactoringTool: Refactored src/generate_code/gen_java.py
+RefactoringTool: Refactored src/generate_code/gen_plantuml.py
+RefactoringTool: Refactored src/generate_code/gen_yuml.py
+RefactoringTool: Refactored src/gui/canvas_resizer.py
+RefactoringTool: Refactored src/gui/coord_utils.py
+RefactoringTool: No changes to src/gui/repair_ogl.py
+RefactoringTool: Refactored src/gui/uml_canvas.py
+RefactoringTool: No changes to src/gui/uml_lines.py
+RefactoringTool: Refactored src/gui/uml_shape_handler.py
+RefactoringTool: Refactored src/gui/uml_shapes.py
+RefactoringTool: No changes to src/gui/wx_log.py
+RefactoringTool: Refactored src/layout/animation.py
+RefactoringTool: Refactored src/layout/blackboard.py
+RefactoringTool: Refactored src/layout/coordinate_mapper.py
+RefactoringTool: Refactored src/layout/layout_basic.py
+RefactoringTool: Refactored src/layout/layout_spring.py
+RefactoringTool: Refactored src/layout/line_crosses_shape.py
+RefactoringTool: No changes to src/layout/line_intersection.py
+RefactoringTool: Refactored src/layout/overlap_removal.py
+RefactoringTool: Refactored src/layout/permutations.py
+RefactoringTool: Refactored src/layout/snapshots.py
+RefactoringTool: No changes to src/parsing/api.py
+RefactoringTool: No changes to src/parsing/class_entry.py
+RefactoringTool: Refactored src/parsing/core_parser.py
+RefactoringTool: Refactored src/parsing/core_parser_ast.py
+RefactoringTool: Refactored src/parsing/dump_pmodel.py
+RefactoringTool: No changes to src/parsing/keywords.py
+RefactoringTool: No changes to src/parsing/parse_rhs_analyser.py
+RefactoringTool: No changes to src/samples/files_as_resource.py
+RefactoringTool: No changes to src/tests/alltests.py
+RefactoringTool: No changes to src/tests/settings.py
+RefactoringTool: No changes to src/tests/test_asciiworkspace_01.py
+RefactoringTool: No changes to src/tests/test_asciiworkspace_02.py
+RefactoringTool: No changes to src/tests/test_ast_quickparse.py
+RefactoringTool: Refactored src/tests/test_graph_nodes.py
+RefactoringTool: No changes to src/tests/test_java_delphi_gen.py
+RefactoringTool: Refactored src/tests/test_overlaps1.py
+RefactoringTool: Refactored src/tests/test_overlaps2stress.py
+RefactoringTool: Refactored src/tests/test_parse_01.py
+RefactoringTool: Refactored src/tests/test_parse_02.py
+RefactoringTool: Refactored src/tests/test_parse_03.py
+RefactoringTool: Refactored src/tests/test_parse_04.py
+RefactoringTool: Refactored src/tests/test_parse_05.py
+RefactoringTool: Refactored src/tests/test_parse_06.py
+RefactoringTool: Refactored src/tests/test_parse_07.py
+RefactoringTool: Refactored src/tests/test_parse_08.py
+RefactoringTool: Refactored src/tests/test_parse_old_vs_new.py
+RefactoringTool: Refactored src/tests/test_parse_plantuml.py
+RefactoringTool: Refactored src/tests/test_parse_yuml_01.py
+RefactoringTool: Refactored src/tests/test_persistence_01.py
+RefactoringTool: No changes to src/tests/test_rhs_analyser.py
+RefactoringTool: No changes to src/tests/python-in/testmodule01.py
+RefactoringTool: No changes to src/tests/python-in/testmodule03.py
+RefactoringTool: No changes to src/tests/python-in/testmodule09_intense.py
+RefactoringTool: Refactored src/tests/python-in/testmodule11_incoming_bugs.py
+RefactoringTool: No changes to src/tests/python-in/testmodule66.py
+RefactoringTool: No changes to src/tests/python-in/testmodule67clippy.py
+RefactoringTool: Refactored src/tests/python-in/testmodule_asciiworkspace.py
+RefactoringTool: Refactored src/tests/python-in/testmodule_command_pattern.py
+RefactoringTool: No changes to src/tests/python-in/testmodule_printframework.py
+RefactoringTool: Refactored src/tests/python-in/testmodule_pynsource.py
+RefactoringTool: No changes to src/tests/testing-generate-delphi/python-in/playhead.py
+RefactoringTool: Refactored src/tests/testing-generate-delphi/python-in/playheadmanager.py
+RefactoringTool: Refactored src/tests/testing-generate-delphi/python-in/utilcc.py
+RefactoringTool: No changes to src/tests/testing-generate-java/python-in/playhead.py
+RefactoringTool: Refactored src/tests/testing-generate-java/python-in/playheadmanager.py
+RefactoringTool: Refactored src/tests/testing-generate-java/python-in/utilcc.py
+RefactoringTool: Refactored src/view/display_model.py
+RefactoringTool: Refactored src/view/graph.py
+RefactoringTool: Refactored src/view/graph_persistence.py
+RefactoringTool: Files that were modified:
+RefactoringTool: src/pyNsourceGui.py
+RefactoringTool: src/pyPlantumlGui.py
+RefactoringTool: src/pyYumlGui.py
+RefactoringTool: src/pynsource.py
+RefactoringTool: src/setup.py
+RefactoringTool: src/app/app.py
+RefactoringTool: src/app/controller.py
+RefactoringTool: src/app/cmds/__init__.py
+RefactoringTool: src/app/cmds/base_cmd.py
+RefactoringTool: src/app/cmds/blackboard_frame.py
+RefactoringTool: src/app/cmds/blackboard_thread.py
+RefactoringTool: src/app/cmds/colouring.py
+RefactoringTool: src/app/cmds/deletion.py
+RefactoringTool: src/app/cmds/diagnostics.py
+RefactoringTool: src/app/cmds/filemgmt.py
+RefactoringTool: src/app/cmds/insertion.py
+RefactoringTool: src/app/cmds/layouts.py
+RefactoringTool: src/app/cmds/selection.py
+RefactoringTool: src/ascii_uml/asciiworkspace.py
+RefactoringTool: src/ascii_uml/layout_ascii.py
+RefactoringTool: src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/test/subprocessdata/sigchild_ignore.py
+RefactoringTool: src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/wx/py/tests/test_interpreter.py
+RefactoringTool: src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/wx/py/tests/test_introspect.py
+RefactoringTool: src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/wx/py/tests/test_pseudo.py
+RefactoringTool: src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/wx/py/tests/test_version.py
+RefactoringTool: src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/wx/py/tests/testall.py
+RefactoringTool: src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/temp/wx/_core.py
+RefactoringTool: src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/temp/wx/_html.py
+RefactoringTool: src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/temp/wx/_stc.py
+RefactoringTool: src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/temp/wx/siplib.py
+RefactoringTool: src/common/architecture_support.py
+RefactoringTool: src/common/command_pattern.py
+RefactoringTool: src/common/gui_imageviewer.py
+RefactoringTool: src/common/logwriter.py
+RefactoringTool: src/common/messages.py
+RefactoringTool: src/common/png.py
+RefactoringTool: src/common/printframework.py
+RefactoringTool: src/common/uml_colours.py
+RefactoringTool: src/dialogs/DialogChooseFromList.py
+RefactoringTool: src/dialogs/DialogChooseFromList_test.py
+RefactoringTool: src/dialogs/DialogComment.py
+RefactoringTool: src/dialogs/DialogUmlNodeEdit.py
+RefactoringTool: src/dialogs/DialogUmlNodeEdit_test.py
+RefactoringTool: src/dialogs/FrameDeepLayout.py
+RefactoringTool: src/dialogs/FrameDeepLayout_test.py
+RefactoringTool: src/dialogs/FramePyYuml.py
+RefactoringTool: src/dialogs/HelpWindow.py
+RefactoringTool: src/dialogs/HelpWindow2.py
+RefactoringTool: src/dist/pyNsourceGui.app/Contents/Resources/__boot__.py
+RefactoringTool: src/dist/pyNsourceGui.app/Contents/Resources/pyNsourceGui.py
+RefactoringTool: src/generate_code/__init__.py
+RefactoringTool: src/generate_code/gen_asciiart.py
+RefactoringTool: src/generate_code/gen_base.py
+RefactoringTool: src/generate_code/gen_delphi.py
+RefactoringTool: src/generate_code/gen_java.py
+RefactoringTool: src/generate_code/gen_plantuml.py
+RefactoringTool: src/generate_code/gen_yuml.py
+RefactoringTool: src/gui/canvas_resizer.py
+RefactoringTool: src/gui/coord_utils.py
+RefactoringTool: src/gui/repair_ogl.py
+RefactoringTool: src/gui/uml_canvas.py
+RefactoringTool: src/gui/uml_lines.py
+RefactoringTool: src/gui/uml_shape_handler.py
+RefactoringTool: src/gui/uml_shapes.py
+RefactoringTool: src/gui/wx_log.py
+RefactoringTool: src/layout/animation.py
+RefactoringTool: src/layout/blackboard.py
+RefactoringTool: src/layout/coordinate_mapper.py
+RefactoringTool: src/layout/layout_basic.py
+RefactoringTool: src/layout/layout_spring.py
+RefactoringTool: src/layout/line_crosses_shape.py
+RefactoringTool: src/layout/line_intersection.py
+RefactoringTool: src/layout/overlap_removal.py
+RefactoringTool: src/layout/permutations.py
+RefactoringTool: src/layout/snapshots.py
+RefactoringTool: src/parsing/api.py
+RefactoringTool: src/parsing/class_entry.py
+RefactoringTool: src/parsing/core_parser.py
+RefactoringTool: src/parsing/core_parser_ast.py
+RefactoringTool: src/parsing/dump_pmodel.py
+RefactoringTool: src/parsing/keywords.py
+RefactoringTool: src/parsing/parse_rhs_analyser.py
+RefactoringTool: src/samples/files_as_resource.py
+RefactoringTool: src/tests/alltests.py
+RefactoringTool: src/tests/settings.py
+RefactoringTool: src/tests/test_asciiworkspace_01.py
+RefactoringTool: src/tests/test_asciiworkspace_02.py
+RefactoringTool: src/tests/test_ast_quickparse.py
+RefactoringTool: src/tests/test_graph_nodes.py
+RefactoringTool: src/tests/test_java_delphi_gen.py
+RefactoringTool: src/tests/test_overlaps1.py
+RefactoringTool: src/tests/test_overlaps2stress.py
+RefactoringTool: src/tests/test_parse_01.py
+RefactoringTool: src/tests/test_parse_02.py
+RefactoringTool: src/tests/test_parse_03.py
+RefactoringTool: src/tests/test_parse_04.py
+RefactoringTool: src/tests/test_parse_05.py
+RefactoringTool: src/tests/test_parse_06.py
+RefactoringTool: src/tests/test_parse_07.py
+RefactoringTool: src/tests/test_parse_08.py
+RefactoringTool: src/tests/test_parse_old_vs_new.py
+RefactoringTool: src/tests/test_parse_plantuml.py
+RefactoringTool: src/tests/test_parse_yuml_01.py
+RefactoringTool: src/tests/test_persistence_01.py
+RefactoringTool: src/tests/test_rhs_analyser.py
+RefactoringTool: src/tests/python-in/testmodule01.py
+RefactoringTool: src/tests/python-in/testmodule03.py
+RefactoringTool: src/tests/python-in/testmodule09_intense.py
+RefactoringTool: src/tests/python-in/testmodule11_incoming_bugs.py
+RefactoringTool: src/tests/python-in/testmodule66.py
+RefactoringTool: src/tests/python-in/testmodule67clippy.py
+RefactoringTool: src/tests/python-in/testmodule_asciiworkspace.py
+RefactoringTool: src/tests/python-in/testmodule_command_pattern.py
+RefactoringTool: src/tests/python-in/testmodule_printframework.py
+RefactoringTool: src/tests/python-in/testmodule_pynsource.py
+RefactoringTool: src/tests/testing-generate-delphi/python-in/playhead.py
+RefactoringTool: src/tests/testing-generate-delphi/python-in/playheadmanager.py
+RefactoringTool: src/tests/testing-generate-delphi/python-in/utilcc.py
+RefactoringTool: src/tests/testing-generate-java/python-in/playhead.py
+RefactoringTool: src/tests/testing-generate-java/python-in/playheadmanager.py
+RefactoringTool: src/tests/testing-generate-java/python-in/utilcc.py
+RefactoringTool: src/view/display_model.py
+RefactoringTool: src/view/graph.py
+RefactoringTool: src/view/graph_persistence.py
+

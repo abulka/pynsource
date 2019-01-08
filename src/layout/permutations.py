@@ -8,7 +8,7 @@ def getpermutations(lzt):
     return result
      
 if __name__ == "__main__":
-    print getpermutations(['a'])
-    print getpermutations(['a', 'b'])
-    print getpermutations(['a', 'b', 'c', 'd'])
-    print getpermutations(['a', 'b', 'c', 'd', 'e'])
+    print(getpermutations(['a']))
+    print(getpermutations(['a', 'b']))
+    print(getpermutations(['a', 'b', 'c', 'd']))
+    print(getpermutations(['a', 'b', 'c', 'd', 'e']))

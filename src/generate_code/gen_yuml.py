@@ -1,6 +1,6 @@
 # generate Yuml (both text and png)
 
-from gen_base import ReportGenerator, CmdLineGenerator
+from .gen_base import ReportGenerator, CmdLineGenerator
 
 class Klass:
     def __init__(self, name, parent=None, connectsto=None, connectorstyle=None, attrs="", defs=""):
@@ -17,7 +17,7 @@ class Klass:
         self.attrs = self.defs = ""
 
     def IsRich(self):
-        return (self.attrs <> "" or self.defs <> "")
+        return (self.attrs != "" or self.defs != "")
     
 class Yuml:
     # A line of yUML which is one class or two classes in a relationship
@@ -96,7 +96,7 @@ class PySourceAsYuml(ReportGenerator):
     def Enrich(self, YY):    
         if not YY.IsRich() and not self.HasBeenEnriched(YY):
             index = self.FindRichYumlClass(YY.name) 
-            if index <> None:
+            if index != None:
                 self.yumls[index].rhs.MoveAttrsDefsInto(YY)
                 self.MarkAsEnriched(YY)
                 
@@ -118,7 +118,7 @@ class PySourceAsYuml(ReportGenerator):
         self.yumls = []
         self.enriched_yuml_classes = []
         
-        classnames = self.classlist.keys()
+        classnames = list(self.classlist.keys())
         for self.aclass in classnames:
             self.classentry = self.classlist[self.aclass]
 
@@ -175,7 +175,7 @@ class PySourceAsYuml(ReportGenerator):
 
     def GenReportDump(self):            # Override template method entirely and do it ourselves
         if not self.yumls:
-            print "Warning, should call CalcYumls() after .Parse() and before str(p) - repairing..."
+            print("Warning, should call CalcYumls() after .Parse() and before str(p) - repairing...")
             self.CalcYumls()
         self.result = ''
         self.YumlDump()
@@ -207,15 +207,15 @@ class CmdLinePythonToYuml(CmdLineGenerator):
         for f in globbed:
             self.p.Parse(f)
         self.p.CalcYumls()
-        print self.p  # triggers the complex output behaviour on the generator
+        print(self.p)  # triggers the complex output behaviour on the generator
         
         optionExportTo_outpng = outpath
         
-        if optionExportTo_outpng <> "nopng" :
+        if optionExportTo_outpng != "nopng" :
             if not '.png' in optionExportTo_outpng.lower():
-                print "output filename %s must have .png in the name" % optionExportTo_outpng
+                print("output filename %s must have .png in the name" % optionExportTo_outpng)
                 exit(0)
-            print 'Generating yuml diagram %s...' % optionExportTo_outpng
+            print('Generating yuml diagram %s...' % optionExportTo_outpng)
             yuml_create_png(','.join(str(self.p).split()), optionExportTo_outpng)
 
             # Windows specific solution
@@ -227,10 +227,10 @@ class CmdLinePythonToYuml(CmdLineGenerator):
             img = Image.open(optionExportTo_outpng)
             img.show()
 
-            print 'Done!'
+            print('Done!')
 
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 from common import png    # codeproject version, not the "easy_install pypng" version.
 
 def _yuml_write_to_png(yuml, in_stream, out_stream):
@@ -251,9 +251,9 @@ def _yuml_write_to_png(yuml, in_stream, out_stream):
 def yuml_create_png(yuml_txt, output_filename):
     #baseUrl = 'http://yuml.me/diagram/scruffy/class/'
     baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
-    url = baseUrl + urllib.quote(yuml_txt)
+    url = baseUrl + urllib.parse.quote(yuml_txt)
     
-    original_png = urllib2.urlopen(url)
+    original_png = urllib.request.urlopen(url)
     output_file = file(output_filename, 'wb')
 
     _yuml_write_to_png(yuml_txt, original_png, output_file)
@@ -262,7 +262,7 @@ def yuml_create_png(yuml_txt, output_filename):
 
 if __name__ == '__main__':
     y = Yuml('a','->','b', "fielda", "doa;dob")
-    print y
-    print Yuml('a','^','b', "fielda", "doa;dob")
+    print(y)
+    print(Yuml('a','^','b', "fielda", "doa;dob"))
     
     

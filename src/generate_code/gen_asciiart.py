@@ -1,6 +1,6 @@
 # generate asciiart
 
-from gen_base import ReportGenerator, CmdLineGenerator
+from .gen_base import ReportGenerator, CmdLineGenerator
 
 class PySourceAsText(ReportGenerator):
     def __init__(self, ast=True):
@@ -65,5 +65,5 @@ class CmdLinePythonToAsciiArt(CmdLineGenerator):
         self._Process()
         for f in globbed:
             self.p.Parse(f)
-        print self.p  # triggers the complex output behaviour on the generator
+        print(self.p)  # triggers the complex output behaviour on the generator
         

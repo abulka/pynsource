@@ -290,7 +290,7 @@ def _convert_ast_to_old_parser(node, filename, _log, options={}):
             x = "<span class=mynote%d>%s</span>" % (mynote,x)
             self.result.append(x)
             if DEBUGINFO_IMMEDIATE_PRINT:
-                print x
+                print(x)
                 
         def newline(self, node=None, extra=0):
             self.new_lines = max(self.new_lines, 1 + extra)
@@ -407,7 +407,7 @@ def _convert_ast_to_old_parser(node, filename, _log, options={}):
             if not self.current_class() and not self.am_inside_module_function():
                 self.model.modulemethods.append(node.name)
                 if node.name not in self.quick_parse.quick_found_module_defs:  # TODO how to repro this failure, it was only reported by Charlie - issue #31
-                    print 'Parse assert WARNING: node.name', node.name, 'is not in quick_found_module_defs', self.quick_parse.quick_found_module_defs
+                    print('Parse assert WARNING: node.name', node.name, 'is not in quick_found_module_defs', self.quick_parse.quick_found_module_defs)
 
             # look for decorator @property definition and treat as property
             elif treat_property_decorator_as_prop and \
@@ -629,7 +629,7 @@ def _convert_ast_to_old_parser(node, filename, _log, options={}):
 
             # A
             self.detect_append_or_rhs_call()
-            if self.stop_recording_rhs_inside_first_bracket <> None:
+            if self.stop_recording_rhs_inside_first_bracket != None:
                 self.stop_recording_rhs_inside_first_bracket += 1
                 self.write("stop_recording_rhs_inside_first_bracket INCREMENTED %s" % self.stop_recording_rhs_inside_first_bracket, mynote=1)
                 
@@ -652,7 +652,7 @@ def _convert_ast_to_old_parser(node, filename, _log, options={}):
             self.write(')')
 
             # A
-            if self.stop_recording_rhs_inside_first_bracket <> None:
+            if self.stop_recording_rhs_inside_first_bracket != None:
                 self.stop_recording_rhs_inside_first_bracket -= 1
                 self.write("stop_recording_rhs_inside_first_bracket decremented %s" % self.stop_recording_rhs_inside_first_bracket, mynote=1)
             

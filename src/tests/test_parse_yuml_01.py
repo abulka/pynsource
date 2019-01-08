@@ -10,12 +10,12 @@ class TestCaseYuml01(unittest.TestCase):
         self.p = PySourceAsYuml()
 
     def _dump(self, p, expected):
-        print
-        print "_"*80 + " yUML CALCULATED:"
-        print str(p).strip()
-        print "-"*80 + " yUML EXPECTED:"
-        print expected
-        print "_"*80 + " yUML END DUMP"
+        print()
+        print("_"*80 + " yUML CALCULATED:")
+        print(str(p).strip())
+        print("-"*80 + " yUML EXPECTED:")
+        print(expected)
+        print("_"*80 + " yUML END DUMP")
 
 
     def test01ParseMeTestUnoptimised(self):
@@ -29,7 +29,7 @@ class TestCaseYuml01(unittest.TestCase):
 [ParseMeTest]^[ParseMeTest2|_secretinfo|DoB()]
 """.strip()
         #self._dump(self.p, expected)
-        self.assertEquals(expected, str(self.p).strip())
+        self.assertEqual(expected, str(self.p).strip())
 
     def test02ParseMeTestOptimised(self):
         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule01.py'
@@ -41,7 +41,7 @@ class TestCaseYuml01(unittest.TestCase):
 [ParseMeTest]^[ParseMeTest2|_secretinfo|DoB()]
 """.strip()
         #self._dump(self.p, expected)
-        self.assertEquals(expected, str(self.p).strip())
+        self.assertEqual(expected, str(self.p).strip())
 
     def test01FlagUnoptimised(self):
         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule66.py'
@@ -53,7 +53,7 @@ class TestCaseYuml01(unittest.TestCase):
 [Flags|flags;numberOfFlags|__init__();readFlags();AddFlag();__repr__()]
         """.strip()
         #self._dump(self.p, expected)
-        self.assertEquals(expected, str(self.p).strip())
+        self.assertEqual(expected, str(self.p).strip())
 
     def test02FlagOptimised(self):
         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule66.py'
@@ -63,5 +63,5 @@ class TestCaseYuml01(unittest.TestCase):
 [Flags|flags;numberOfFlags|__init__();readFlags();AddFlag();__repr__()]flags++-*[Flag|flagx;flagy;owner|__init__();readflag();__repr__()]
         """.strip()
         #self._dump(self.p, expected)
-        self.assertEquals(expected, str(self.p).strip())
+        self.assertEqual(expected, str(self.p).strip())
 

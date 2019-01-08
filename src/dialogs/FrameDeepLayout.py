@@ -17,7 +17,7 @@ import wx
 class FrameDeepLayout ( wx.Frame ):
 
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Layout Progress", pos = wx.DefaultPosition, size = wx.Size( 274,228 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "Layout Progress", pos = wx.DefaultPosition, size = wx.Size( 274,228 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
 		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
@@ -49,7 +49,7 @@ class FrameDeepLayout ( wx.Frame ):
 
 		bSizer1.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 
-		self.btnCancelClose = wx.Button( self, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.btnCancelClose = wx.Button( self, wx.ID_ANY, "Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer1.Add( self.btnCancelClose, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
 

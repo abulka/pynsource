@@ -111,7 +111,7 @@ class GraphPersistence:
             for i in range(2, len(self.filedata_list)):
                 self.filedata_list[i] = re.sub("'node'", "'umlshape'", self.filedata_list[i])
         else:
-            print "Don't know how to upgrade persistence format to %f" % to_vers
+            print("Don't know how to upgrade persistence format to %f" % to_vers)
 
     def Load(self, filedata_str, force=False):
         """
@@ -146,10 +146,10 @@ class GraphPersistence:
                 sourcenode = self.graph.FindNodeById(source_id)
                 targetnode = self.graph.FindNodeById(target_id)
                 if not sourcenode:
-                    print "Couldn't load source from persistence", source_id
+                    print("Couldn't load source from persistence", source_id)
                     continue
                 if not targetnode:
-                    print "Couldn't load target from persistence", target_id
+                    print("Couldn't load target from persistence", target_id)
                     continue
                 weight = data.get('weight', None)
                 edge = self.graph.AddEdge(sourcenode, targetnode, weight)  # AddEdge takes node objects as parameters

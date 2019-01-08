@@ -4,7 +4,7 @@
 
 import random
 import sys
-from graph import Graph, GraphNode
+from .graph import Graph, GraphNode
 
 class UmlGraph(Graph):
 
@@ -85,8 +85,8 @@ class DisplayModel:
         self.associations_composition = []
         
     def decouple_node_from_shape(self, shape):
-        classname = (classname for classname,shaperef in self.classnametoshape.items() if shaperef==shape).next()  # see http://johnstachurski.net/lectures/generators.html on how generators work, which can be built from list comprehension syntax
-        print 'found class to decouple: ', classname
+        classname = next((classname for classname,shaperef in list(self.classnametoshape.items()) if shaperef==shape))  # see http://johnstachurski.net/lectures/generators.html on how generators work, which can be built from list comprehension syntax
+        print('found class to decouple: ', classname)
 
         del self.classnametoshape[classname]
         """
@@ -102,7 +102,7 @@ class DisplayModel:
         self.decouple_node_from_shape(shape)
 
         self.graph.DeleteNodeById(shape.node.id)
-        print 'deleted node shape.node.id', shape.node.id
+        print('deleted node shape.node.id', shape.node.id)
     
 
 
@@ -110,30 +110,30 @@ class DisplayModel:
         def line(ch='-'):
             return ch*70
         from pprint import pprint
-        print
-        print "     DisplayModel    "
-        print
-        print line('*'), "DUMP UML KNOWLEDGE: classnametoshape"
+        print()
+        print("     DisplayModel    ")
+        print()
+        print(line('*'), "DUMP UML KNOWLEDGE: classnametoshape")
         pprint(self.classnametoshape)
-        print line(), "associations_generalisation (class, parent)"
+        print(line(), "associations_generalisation (class, parent)")
         pprint(self.associations_generalisation)
-        print line(), "associations_composition (to, from)"
+        print(line(), "associations_composition (to, from)")
         pprint(self.associations_composition)
-        print
-        print "     GRAPH Model     "
-        print
-        print line('-'), 'graph.nodeSet is'
-        pprint(self.graph.nodeSet.keys())
-        print line('-'), 'self.graph.nodes'
-        print
+        print()
+        print("     GRAPH Model     ")
+        print()
+        print(line('-'), 'graph.nodeSet is')
+        pprint(list(self.graph.nodeSet.keys()))
+        print(line('-'), 'self.graph.nodes')
+        print()
         for node in self.graph.nodes:
-            print node
-        print line('-'), 'self.graph.edges'
+            print(node)
+        print(line('-'), 'self.graph.edges')
         for edge in self.graph.edges:
             source = edge['source'].id
             target = edge['target'].id
             edgetype = edge['uml_edge_type']
-            print "from %40s --> %-40s  (%s)" % (source, target, edgetype)
+            print("from %40s --> %-40s  (%s)" % (source, target, edgetype))
 
 
     def AddUmlNode(self, id, attrs=[], meths=[]):
@@ -170,7 +170,7 @@ class DisplayModel:
 
         Returns: graph node
         """
-        print "incoming id", id
+        print("incoming id", id)
         if self.graph.FindNodeById(id):
             id += str(random.randint(1,9999))
         t,l,w,h = random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160)
@@ -199,7 +199,7 @@ class DisplayModel:
                 return
             self.associations_composition.append((otherclass, classname))  # reverse direction so round black arrows look ok
 
-        for classname, classentry in p.classlist.items():
+        for classname, classentry in list(p.classlist.items()):
             """
             These are a list of (attr, otherclass) however they imply that THIS class
             owns all those other classes.

@@ -1,4 +1,4 @@
-from asciiworkspace import AsciiWorkspace
+from .asciiworkspace import AsciiWorkspace
 
 """
 HOW IT WORKS

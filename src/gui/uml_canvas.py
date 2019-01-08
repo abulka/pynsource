@@ -10,8 +10,8 @@ from generate_code.gen_java import PySourceAsJava
 
 from view.display_model import DisplayModel
 
-from uml_shapes import *
-from coord_utils import setpos, getpos, Move2
+from .uml_shapes import *
+from .coord_utils import setpos, getpos, Move2
 
 from layout.layout_basic import LayoutBasic
 
@@ -20,12 +20,12 @@ from layout.layout_spring import GraphLayoutSpring
 from layout.overlap_removal import OverlapRemoval
 from layout.coordinate_mapper import CoordinateMapper
 
-from canvas_resizer import CanvasResizer
+from .canvas_resizer import CanvasResizer
 
 import wx
 import wx.lib.ogl as ogl
 
-from uml_shape_handler import UmlShapeHandler
+from .uml_shape_handler import UmlShapeHandler
 
 from common.architecture_support import *
 
@@ -257,7 +257,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.working = True
 
         if keycode == wx.WXK_ESCAPE:
-            print "ESC key detected: Abort Layout"
+            print("ESC key detected: Abort Layout")
             self.kill_layout = True
 
             # # HACK PLAY
@@ -363,7 +363,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.Delete()
 
     def Clear(self):
-        print "Draw: Clear"
+        print("Draw: Clear")
         self.GetDiagram().DeleteAllShapes()
 
         dc = wx.ClientDC(self)
@@ -380,31 +380,31 @@ class UmlCanvas(ogl.ShapeCanvas):
     def NewEdgeMarkFrom(self):
         selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
         if not selected:
-            print "Please select a node"
+            print("Please select a node")
             return
         
         self.new_edge_from = selected[0].node
-        print "From", self.new_edge_from.id
+        print("From", self.new_edge_from.id)
 
     def NewEdgeMarkTo(self, edge_type='composition'):
         selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
         if not selected:
-            print "Please select a node"
+            print("Please select a node")
             return
         
         tonode = selected[0].node
-        print "To", tonode.id
+        print("To", tonode.id)
         
         if self.new_edge_from == None:
-            print "Please set from node first"
+            print("Please set from node first")
             return
         
         if self.new_edge_from.id == tonode.id:
-            print "Can't link to self"
+            print("Can't link to self")
             return
         
         if not self.displaymodel.graph.FindNodeById(self.new_edge_from.id):
-            print "From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id
+            print("From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id)
             return
         
         edge = self.displaymodel.graph.AddEdge(tonode, self.new_edge_from, weight=None) # swap direction as is a directional composition.

@@ -18,7 +18,7 @@ def test():
     p.Parse(FILE)
 
     #print '*'*20, 'parsing', FILE, '*'*20
-    print p
+    print(p)
     #print 'Done.'
 
 def ParseArgsAndRun():
@@ -46,7 +46,7 @@ def ParseArgsAndRun():
         def EnsurePathExists(outdir, outlanguagemsg):
             assert outdir, 'Need to specify output folder for %s output - got %s.'%(outlanguagemsg, outdir)
             if not os.path.exists(outdir):
-                raise RuntimeError, ('Output directory %s for %s file output does not exist.'%(outdir,outlanguagemsg))
+                raise RuntimeError('Output directory %s for %s file output does not exist.'%(outdir,outlanguagemsg))
 
         for optionvaluepair in listofoptionvaluepairs:
             if '-a' == optionvaluepair[0]:
@@ -85,7 +85,7 @@ def ParseArgsAndRun():
             u = CmdLinePythonToAsciiArt(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
             u.ExportTo(None)
     else:
-        print messages.HELP_COMMAND_LINE_USAGE
+        print(messages.HELP_COMMAND_LINE_USAGE)
 
 if __name__ == '__main__':
     #test()

@@ -1,4 +1,4 @@
-from base_cmd import CmdBase
+from .base_cmd import CmdBase
 import wx
 import random
 from dialogs.DialogComment import DialogComment
@@ -46,7 +46,7 @@ class UtilCmdUmlClass(CmdBase):  # Not Used directly, please subclass
 
             attrs = string_to_list_smart(dialog.txtAttrs.Value)
             methods = string_to_list_smart(dialog.txtMethods.Value)
-            print id, attrs, methods
+            print(id, attrs, methods)
         else:
             result, id, attrs, methods = False, None, None, None
         dialog.Destroy()
@@ -276,7 +276,7 @@ class CmdInsertImage(CmdBase):
         if not filename:
             curr_dir = os.path.dirname( os.path.abspath( __file__ ) )
             filename = os.path.join(curr_dir, '..\\..\..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP')
-            print filename
+            print(filename)
             
         self.context.umlcanvas.CreateImageShape(filename)
         self.context.umlcanvas.remove_overlaps()
