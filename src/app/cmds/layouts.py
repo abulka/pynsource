@@ -2,7 +2,7 @@ from base_cmd import CmdBase
 
 class CmdLayout(CmdBase):
     def execute(self):
-        canvas = self.context.umlwin
+        canvas = self.context.umlcanvas
         
         if canvas.GetDiagram().GetCount() == 0:
             return
@@ -26,8 +26,8 @@ class CmdLayoutExpandContractBase(CmdBase):   # BASE
         coordmapper.AllToWorldCoords()
 
         if self.remove_overlaps:
-            self.context.umlwin.remove_overlaps(watch_removals=False)
-        self.context.umlwin.mega_refresh()
+            self.context.umlcanvas.remove_overlaps(watch_removals=False)
+        self.context.umlcanvas.mega_refresh()
         self.context.frame.Layout()  # needed when running phoenix
 
 class CmdLayoutExpand(CmdLayoutExpandContractBase):
@@ -56,7 +56,7 @@ class CmdDeepLayout(CmdBase):
         f = MainBlackboardFrame(parent=self.context.frame)
         f.Show(True)
         
-        b = LayoutBlackboard(graph=self.context.displaymodel.graph, umlwin=self.context.umlwin)
+        b = LayoutBlackboard(graph=self.context.displaymodel.graph, umlcanvas=self.context.umlcanvas)
         f.SetBlackboardObject(b)
         f.Start(num_attempts=3)
         

@@ -78,9 +78,9 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
                                         0)
 
             # Page 0
-            self.umlwin = UmlCanvas(self.notebook, Log(), self.frame)
-            self.umlwin.SetScrollRate(5, 5)
-            self.notebook.AddPage(self.umlwin, u"UML", True)
+            self.umlcanvas = UmlCanvas(self.notebook, Log(), self.frame)
+            self.umlcanvas.SetScrollRate(5, 5)
+            self.notebook.AddPage(self.umlcanvas, u"UML", True)
 
             # Page 1
             self.asciiart = wx.ScrolledWindow(self.notebook, wx.ID_ANY, wx.DefaultPosition,
@@ -118,10 +118,10 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             self.notebook = None
 
             self.panel_one = wx.Panel(self.frame, -1)
-            self.umlwin = UmlCanvas(self.panel_one, Log(), self.frame)
+            self.umlcanvas = UmlCanvas(self.panel_one, Log(), self.frame)
             #
             sizer = wx.BoxSizer(wx.VERTICAL)
-            sizer.Add(self.umlwin, 1, wx.EXPAND)
+            sizer.Add(self.umlcanvas, 1, wx.EXPAND)
             self.panel_one.SetSizer(sizer)
 
             self.panel_two = self.asciiart = wx.Panel(self.frame, -1)
@@ -145,17 +145,17 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         
         # Set the frame to a good size for showing stuff
         self.frame.SetSize(WINDOW_SIZE)
-        self.umlwin.SetFocus()
+        self.umlcanvas.SetFocus()
         self.SetTopWindow(self.frame)
 
-        self.frame.Show(True)  # in wxpython2.8 this causes umlwin canvas to grow too, but not in wxpython3 - till much later
+        self.frame.Show(True)  # in wxpython2.8 this causes umlcanvas canvas to grow too, but not in wxpython3 - till much later
         wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
         
         self.popupmenu = None
-        self.umlwin.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)  # WARNING: takes over all righclick events - need to event.skip() to let through things to UmlShapeHandler 
+        self.umlcanvas.Bind(wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu)  # WARNING: takes over all righclick events - need to event.skip() to let through things to UmlShapeHandler
         self.Bind(wx.EVT_SIZE, self.OnResizeFrame)
 
-        self.umlwin.InitSizeAndObjs()  # Now that frame is visible and calculated, there should be sensible world coords to use
+        self.umlcanvas.InitSizeAndObjs()  # Now that frame is visible and calculated, there should be sensible world coords to use
         
         self.InitConfig()
 
@@ -166,12 +166,12 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         # init the context
         context.wxapp = self
         context.config = self.config
-        context.umlwin = self.umlwin
-        context.displaymodel = self.umlwin.displaymodel
-        context.snapshot_mgr = self.umlwin.snapshot_mgr
-        context.coordmapper = self.umlwin.coordmapper
-        context.layouter = self.umlwin.layouter
-        context.overlap_remover = self.umlwin.overlap_remover
+        context.umlcanvas = self.umlcanvas
+        context.displaymodel = self.umlcanvas.displaymodel
+        context.snapshot_mgr = self.umlcanvas.snapshot_mgr
+        context.coordmapper = self.umlcanvas.coordmapper
+        context.layouter = self.umlcanvas.layouter
+        context.overlap_remover = self.umlcanvas.overlap_remover
         context.frame = self.frame
         if MULTI_TAB_GUI:
             context.multiText = self.multiText
@@ -232,14 +232,14 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.config.write()
 
     def OnResizeFrame (self, event):   # ANDY  interesting - GetVirtualSize grows when resize frame
-        if event.EventObject == self.umlwin:
+        if event.EventObject == self.umlcanvas:
 
             # Proportionally constrained resize.  Nice trick from http://stackoverflow.com/questions/6005960/resizing-a-wxpython-window
             #hsize = event.GetSize()[0] * 0.75
             #self.frame.SetSizeHints(minW=-1, minH=hsize, maxH=hsize)
             #self.frame.SetTitle(str(event.GetSize()))
         
-            self.umlwin.canvas_resizer.frame_calibration()
+            self.umlcanvas.canvas_resizer.frame_calibration()
             
         event.Skip()
         
@@ -314,7 +314,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         # phoenix hack to get things to appear
         # self.app.run.CmdRefreshUmlWindow()
-        # self.umlwin.mega_refresh()
+        # self.umlcanvas.mega_refresh()
 
     def set_app_title(self, title):
         self.frame.SetTitle(self.andyapptitle + " - " + title)        
@@ -334,7 +334,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         wx.CallAfter(self.multiText.SetFocus)
         wx.CallAfter(self.multiText.SetInsertionPoint, 0) 
     def PostOglViewSwitch(self):
-        wx.CallAfter(self.umlwin.SetFocus)
+        wx.CallAfter(self.umlcanvas.SetFocus)
         self.menuBar.EnableTop(2, True)  # enable layout menu
         
     def InitMenus(self):
@@ -427,7 +427,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         # Since our binding of wx.EVT_RIGHT_DOWN to here takes over all right click events
         # we have to manually figure out if we have clicked on shape 
         # then allow natural shape node menu to kick in via UmlShapeHandler (defined above)
-        hit_which_shapes = [s for s in self.umlwin.GetDiagram().GetShapeList() if s.HitTest(x,y)]
+        hit_which_shapes = [s for s in self.umlcanvas.GetDiagram().GetShapeList() if s.HitTest(x,y)]
         if hit_which_shapes:
             event.Skip()
             return
@@ -473,15 +473,15 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         webbrowser.open("https://github.com/abulka/pynsource/issues")
 
     def OnRememberLayout1(self, event):
-        self.umlwin.CmdRememberLayout1()
+        self.umlcanvas.CmdRememberLayout1()
     def OnRememberLayout2(self, event):
-        self.umlwin.CmdRememberLayout2()
+        self.umlcanvas.CmdRememberLayout2()
     def OnRestoreLayout1(self, event):
-        self.umlwin.CmdRestoreLayout1()
+        self.umlcanvas.CmdRestoreLayout1()
         self.frame.Layout()  # needed when running phoenix
 
     def OnRestoreLayout2(self, event):
-        self.umlwin.CmdRestoreLayout2()
+        self.umlcanvas.CmdRestoreLayout2()
         self.frame.Layout()  # needed when running phoenix
 
     def OnCycleColours(self, event):
@@ -532,7 +532,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         m = model_to_ascii_builder()
         try:
             wx.SafeYield()
-            s = m.main(self.umlwin.displaymodel.graph)
+            s = m.main(self.umlcanvas.displaymodel.graph)
             self.multiText.SetValue(str(s))
             if str(s).strip() == "":
                 self.multiText.SetValue(ASCII_UML_HELP_MSG)
@@ -551,7 +551,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.printData.SetPaperId(wx.PAPER_LETTER)
 
         self.box = wx.BoxSizer(wx.VERTICAL)
-        self.canvas = self.umlwin.GetDiagram().GetCanvas()
+        self.canvas = self.umlcanvas.GetDiagram().GetCanvas()
 
         #self.log.WriteText("OnPrintPreview\n")
         printout = MyPrintout(self.canvas, self.log)
@@ -661,7 +661,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         f.Show(True)
 
     def Enable_if_node_selected(self, event):
-        selected = [s for s in self.umlwin.GetDiagram().GetShapeList() if s.Selected()]
+        selected = [s for s in self.umlcanvas.GetDiagram().GetShapeList() if s.Selected()]
         event.Enable(len(selected) > 0 and self.viewing_uml_tab)
 
     @property
@@ -692,7 +692,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnEditProperties(self, event):
         from gui.uml_shape_handler import node_edit_multi_purpose
         # not sure why we are looping cos currently cannot select more than one shape
-        for shape in self.umlwin.GetDiagram().GetShapeList():
+        for shape in self.umlcanvas.GetDiagram().GetShapeList():
             if shape.Selected():
                 node_edit_multi_purpose(shape, self.app)
                 break
@@ -720,7 +720,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnCloseFrame(self, evt):
         if hasattr(self, "window") and hasattr(self.window, "ShutdownDemo"):
-            self.umlwin.ShutdownDemo()
+            self.umlcanvas.ShutdownDemo()
         evt.Skip()
 
 def main():

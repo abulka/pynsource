@@ -1,6 +1,6 @@
 {'type':'node', 'id':'CmdFileImportViaDialog', 'x':19, 'y':361, 'width':252, 'height':109, 'attrs':'context|files', 'meths':'execute'}
 {'type':'node', 'id':'CmdFileImportBase', 'x':197, 'y':97, 'width':197, 'height':67, 'attrs':'', 'meths':'execute'}
-{'type':'node', 'id':'CmdBootStrap', 'x':14, 'y':100, 'width':142, 'height':221, 'attrs':'frame|app|umlwin', 'meths':'execute|bootstrap01|bootstrap02|bootstrap03|bootstrap04|bootstrap05|bootstrap06'}
+{'type':'node', 'id':'CmdBootStrap', 'x':14, 'y':100, 'width':142, 'height':221, 'attrs':'frame|app|umlcanvas', 'meths':'execute|bootstrap01|bootstrap02|bootstrap03|bootstrap04|bootstrap05|bootstrap06'}
 {'type':'node', 'id':'CmdFileImportFromFilePath', 'x':293, 'y':359, 'width':285, 'height':93, 'attrs':'files', 'meths':'__init__'}
 {'type':'node', 'id':'CmdBase', 'x':187, 'y':10, 'width':87, 'height':31, 'attrs':'', 'meths':''}
 {'type':'edge', 'id':'CmdFileImportViaDialog_to_CmdFileImportBase', 'source':'CmdFileImportViaDialog', 'target':'CmdFileImportBase', 'uml_edge_type':'generalisation'}

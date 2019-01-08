@@ -61,7 +61,7 @@ class DisplayModel:
     """
     This is the Display Model
     Referred to by context.displaymodel
-    Not to be confused with context.umlwin which is the UmlCanvas object which is a OGL visual thing
+    Not to be confused with context.umlcanvas which is the UmlCanvas object which is a OGL visual thing
 
     The 'graph' of 'nodes' is the abstract stuff, used in layout, but also containing
     the method, attributes, comment info.  Each node points to a visual shape,

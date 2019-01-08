@@ -122,7 +122,7 @@ class TestCaseAscii_01(unittest.TestCase):
 | andyapptitle                 |  ---->  [ Log ]
 | frame                        |  ---->  [ UmlShapeCanvas ]
 | notebook                     |  ---->  [ Frame ]
-| umlwin                       |
+| umlcanvas                       |
 | yuml                         |
 | asciiart                     |
 | multiText                    |

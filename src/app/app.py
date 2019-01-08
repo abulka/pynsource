@@ -13,7 +13,7 @@ class App(object):
         #model.app = self.controller.app = gui.app = server.app = self
         
         # Inject multicast dependencies / observers
-        self.context.umlwin.observers.add(self)
+        self.context.umlcanvas.observers.add(self)
         
         # Inject normal dependencies
         #self.server.model = model
@@ -31,7 +31,7 @@ class App(object):
         ## Everyone knows app - hmm some of these may not be necessary
         #self.context.wxapp.app = \
         #self.config.app = \
-        #self.umlwin.app = \
+        #self.umlcanvas.app = \
         #self.model.app = \
         #self.snapshot_mgr.app = \
         #self.coordmapper.app = \
@@ -42,7 +42,7 @@ class App(object):
         #self.asciiart.app = \
         #                    self
 
-        self.context.umlwin.app = self
+        self.context.umlcanvas.app = self
         
         #self.gui.Boot()
         #self.model.Boot()

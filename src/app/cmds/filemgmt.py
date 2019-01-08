@@ -14,7 +14,7 @@ except AttributeError:
 
 class CmdFileNew(CmdBase):
     def execute(self):
-        self.context.umlwin.Clear()
+        self.context.umlcanvas.Clear()
         self.context.wxapp.RefreshAsciiUmlTab()
         self.context.wxapp.set_app_title("(Untitled)")
 
@@ -45,10 +45,10 @@ class CmdFileImportBase(CmdBase):   # BASE
                 #p.Parse(f)
                 #self.context.displaymodel.ConvertParseModelToUmlModel(p)
 
-        self.context.umlwin.build_view()
+        self.context.umlcanvas.build_view()
 
         # Layout
-        self.context.umlwin.layout_and_position_shapes()
+        self.context.umlcanvas.layout_and_position_shapes()
 
         self.context.frame.Layout()  # needed when running phoenix
 
@@ -87,7 +87,7 @@ class CmdBootStrap(CmdBase):
     def execute(self):
         self.frame = self.context.frame
         self.app = self.context.wxapp.app
-        self.umlwin = self.context.umlwin
+        self.umlcanvas = self.context.umlcanvas
         
         def bootstrap01():
             self.frame.SetSize((1024,768))
@@ -104,7 +104,7 @@ class CmdBootStrap(CmdBase):
             self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("gui/uml_shapes.py")])
             
         #bootstrap03()
-        #self.umlwin.set_uml_canvas_size((9000,9000))
+        #self.umlcanvas.set_uml_canvas_size((9000,9000))
         
 
 # ------- Refresh
@@ -113,7 +113,7 @@ class CmdBootStrap(CmdBase):
 class CmdRefreshUmlWindow(CmdBase):
     def execute(self):
         self.context.frame.Layout()  # needed when running phoenix
-        self.context.umlwin.Refresh()
+        self.context.umlcanvas.Refresh()
         self.context.wxapp.RefreshAsciiUmlTab()
 
 
@@ -149,7 +149,7 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
         self.filepath = None
     
     def load_model_from_text_and_build_shapes(self, filedata=""):
-        umlcanvas = self.context.umlwin
+        umlcanvas = self.context.umlcanvas
         
         force = False
         canread, msg = self.context.displaymodel.graph.persistence.can_I_read(filedata)

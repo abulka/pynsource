@@ -690,8 +690,8 @@ class UmlCanvas(ogl.ShapeCanvas):
     # UTILITY - called by
     #
     #CmdInsertUmlClass, CmdInsertImage, CmdLayoutExpandContractBase,
-    #umlwin.OnWheelZoom_OverlapRemoval_Defunct, 
-    #umlwin.layout_and_position_shapes, 
+    #umlcanvas.OnWheelZoom_OverlapRemoval_Defunct,
+    #umlcanvas.layout_and_position_shapes,
     #UmlShapeHandler.OnEndDragLeft
     #UmlShapeHandler.OnSizingEndDragLeft
     #LayoutBlackboard.LayoutLoopTillNoChange
@@ -709,8 +709,8 @@ class UmlCanvas(ogl.ShapeCanvas):
     #CmdFileLoadWorkspaceBase, CmdInsertComment, CmdEditUmlClass
     #CmdLayoutExpandContractBase, 
     #CmdInsertUmlClass
-    #umlwin.NewEdgeMarkTo
-    #umlwin.OnWheelZoom_OverlapRemoval_Defunct
+    #umlcanvas.NewEdgeMarkTo
+    #umlcanvas.OnWheelZoom_OverlapRemoval_Defunct
     #LayoutBlackboard.LayoutThenPickBestScale
     #LayoutBlackboard.Experiment1
     #LayoutBlackboard.LayoutLoopTillNoChange
@@ -722,7 +722,7 @@ class UmlCanvas(ogl.ShapeCanvas):
     # these do an overlap removal first before calling here
     #
     #CmdInsertImage
-    #umlwin.layout_and_position_shapes, 
+    #umlcanvas.layout_and_position_shapes,
     #UmlShapeHandler.OnEndDragLeft
     #UmlShapeHandler.OnSizingEndDragLeft
     #

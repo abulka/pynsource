@@ -57,11 +57,11 @@ class CmdInsertUmlClass(UtilCmdUmlClass):
     """ Insert new node """
     def execute(self):
         """ insert the new node and refresh the ascii tab too """
-        umlwin = self.context.umlwin
+        umlcanvas = self.context.umlcanvas
         wxapp = self.context.wxapp
         displaymodel = self.context.displaymodel
         
-        #self.umlwin.CmdInsertNewNode()
+        #self.umlcanvas.CmdInsertNewNode()
         
         result, id, attrs, methods = self.display_dialog(id='D' + str(random.randint(1,99)),
                                             attrs=['attribute 1', 'attribute 2', 'attribute 3'],
@@ -73,15 +73,15 @@ class CmdInsertUmlClass(UtilCmdUmlClass):
                 id += '2'
 
             node = displaymodel.AddUmlNode(id, attrs, methods)
-            shape = umlwin.CreateUmlShape(node)
+            shape = umlcanvas.CreateUmlShape(node)
             displaymodel.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             
             node.shape.Show(True)
             
-            umlwin.remove_overlaps()
-            umlwin.mega_refresh()
+            umlcanvas.remove_overlaps()
+            umlcanvas.mega_refresh()
 
-            umlwin.SelectNodeNow(node.shape)
+            umlcanvas.SelectNodeNow(node.shape)
 
             # wxapp.RefreshAsciiUmlTab()  # Don't do this because somehow the onKeyChar and onKeyPress handlers are unbound from the UmlCanvas shape canvas
 
@@ -98,11 +98,10 @@ class CmdEditUmlClass(UtilCmdUmlClass):
 
     def execute(self):
         """  """
-        umlwin = self.context.umlwin
+        umlcanvas = gui = self.context.umlcanvas
         wxapp = self.context.wxapp
         displaymodel = self.context.displaymodel
         shape = self.shape
-        gui = self.context.umlwin
 
         node = shape.node
 
@@ -119,16 +118,16 @@ class CmdEditUmlClass(UtilCmdUmlClass):
                 displaymodel.decouple_node_from_shape(shape)
                 gui.delete_shape_view(shape)
 
-                shape = umlwin.CreateUmlShape(node)
+                shape = umlcanvas.CreateUmlShape(node)
                 displaymodel.classnametoshape[
                     node.id] = shape  # Record the name to shape map so that we can wire up the links later.
 
                 # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
                 for edge in displaymodel.graph.edges:
-                    umlwin.CreateUmlEdge(edge)
+                    umlcanvas.CreateUmlEdge(edge)
 
                 node.shape.Show(True)
-                umlwin.mega_refresh()
+                umlcanvas.mega_refresh()
 
                 # TODO Why doesn't this select the node?
                 # self.SelectNodeNow(node.shape)
@@ -192,11 +191,11 @@ class CmdInsertComment(UtilCmdComment):
             while self.context.displaymodel.graph.FindNodeById(id):
                 id += '2'
             node = self.context.displaymodel.AddCommentNode(id, comment)
-            shape = self.context.umlwin.createCommentShape(node)
+            shape = self.context.umlcanvas.createCommentShape(node)
             self.context.displaymodel.classnametoshape[
                 node.id] = shape  # Record the name to shape map so that we can wire up the links later.
             node.shape.Show(True)
-            self.context.umlwin.mega_refresh()
+            self.context.umlcanvas.mega_refresh()
 
 
 class CmdEditComment(UtilCmdComment):
@@ -207,11 +206,10 @@ class CmdEditComment(UtilCmdComment):
 
     def execute(self):
         """  """
-        umlwin = self.context.umlwin  # TODO rename context.umlcanvas
+        umlcanvas = gui = self.context.umlcanvas
         wxapp = self.context.wxapp
         displaymodel = self.context.displaymodel
         shape = self.shape
-        gui = self.context.umlwin
 
         node = shape.node
 
@@ -229,16 +227,16 @@ class CmdEditComment(UtilCmdComment):
             displaymodel.decouple_node_from_shape(shape)
             gui.delete_shape_view(shape)
 
-            shape = umlwin.createCommentShape(node)
+            shape = umlcanvas.createCommentShape(node)
             displaymodel.classnametoshape[
                 node.id] = shape  # Record the name to shape map so that we can wire up the links later.
 
             # # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
             # for edge in model.graph.edges:
-            #     umlwin.CreateUmlEdge(edge)
+            #     umlcanvas.CreateUmlEdge(edge)
 
             node.shape.Show(True)
-            umlwin.mega_refresh()
+            umlcanvas.mega_refresh()
 
 
     def undo(self):  # override
@@ -280,9 +278,9 @@ class CmdInsertImage(CmdBase):
             filename = os.path.join(curr_dir, '..\\..\..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP')
             print filename
             
-        self.context.umlwin.CreateImageShape(filename)
-        self.context.umlwin.remove_overlaps()
-        self.context.umlwin.mega_refresh()
+        self.context.umlcanvas.CreateImageShape(filename)
+        self.context.umlcanvas.remove_overlaps()
+        self.context.umlcanvas.mega_refresh()
         #self.SelectNodeNow(node.shape)
         
     def undo(self):  # override

@@ -8,7 +8,7 @@
 {'type':'node', 'id':'CmdFileLoadWorkspaceViaDialog', 'x':151, 'y':10, 'width':329, 'height':109, 'attrs':'filepath|context', 'meths':'execute'}
 {'type':'node', 'id':'CmdFileNew', 'x':290, 'y':367, 'width':120, 'height':67, 'attrs':'', 'meths':'execute'}
 {'type':'node', 'id':'CmdFileSaveWorkspaceToConsole', 'x':108, 'y':802, 'width':329, 'height':67, 'attrs':'', 'meths':'execute'}
-{'type':'node', 'id':'CmdBootStrap', 'x':762, 'y':286, 'width':142, 'height':221, 'attrs':'frame|app|umlwin', 'meths':'execute|bootstrap01|bootstrap02|bootstrap03|bootstrap04|bootstrap05|bootstrap06'}
+{'type':'node', 'id':'CmdBootStrap', 'x':762, 'y':286, 'width':142, 'height':221, 'attrs':'frame|app|umlcanvas', 'meths':'execute|bootstrap01|bootstrap02|bootstrap03|bootstrap04|bootstrap05|bootstrap06'}
 {'type':'node', 'id':'CmdFileImportFromFilePath', 'x':864, 'y':143, 'width':285, 'height':93, 'attrs':'files', 'meths':'__init__'}
 {'type':'node', 'id':'CmdFileLoadWorkspaceFromFilepath', 'x':315, 'y':526, 'width':362, 'height':93, 'attrs':'filepath', 'meths':'__init__'}
 {'type':'node', 'id':'CmdFileLoadWorkspaceBase', 'x':508, 'y':70, 'width':306, 'height':109, 'attrs':'filepath', 'meths':'load_model_from_text_and_build_shapes|execute'}

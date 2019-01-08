@@ -7,9 +7,9 @@ class Torture1:
     #    self.log = Log()
     #    from self.frame = wx.Frame    ? should pick up more?
     #    self.notebook = wx.Notebook
-    #    self.umlwin = UmlCanvas(panel, Log(), self.frame)
-    #    self.umlwin = UmlCanvas(self.notebook, Log(), self.frame)
-    #    self.umlwin = UmlCanvas(self.frame, Log(), self.frame)
+    #    self.umlcanvas = UmlCanvas(panel, Log(), self.frame)
+    #    self.umlcanvas = UmlCanvas(self.notebook, Log(), self.frame)
+    #    self.umlcanvas = UmlCanvas(self.frame, Log(), self.frame)
     #    self.multiText = wx.TextCtrl
     #    self.app = App(context)
     #    self.user_config_file = os.path.join(config_dir, PYNSOURCE_CONFIG_FILE)
@@ -19,6 +19,6 @@ class Torture1:
     #    self.printData = wx.PrintData()
     #    self.printData = wx.PrintData()
     #    self.box = wx.BoxSizer(wx.VERTICAL)
-    #    self.canvas = self.umlwin.GetDiagram().GetCanvas()
+    #    self.canvas = self.umlcanvas.GetDiagram().GetCanvas()
     
 a = Torture1()

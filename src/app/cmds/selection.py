@@ -3,7 +3,7 @@ import wx
 
 class CmdDeselectAllShapes(CmdBase):
     def execute(self):
-        selected = [s for s in self.context.umlwin.GetDiagram().GetShapeList() if s.Selected()]
+        selected = [s for s in self.context.umlcanvas.GetDiagram().GetShapeList() if s.Selected()]
         if selected:
             assert len(selected) == 1
             s = selected[0]

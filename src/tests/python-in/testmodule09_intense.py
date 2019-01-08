@@ -9,12 +9,12 @@ class Torture1:
         self.log = Log()
         self.frame = wx.Frame()
         self.notebook = wx.Notebook(self.frame, -1)
-        self.umlwin = UmlCanvas(panel, Log(), self.frame)
-        self.umlwin = UmlCanvas(panel, Log(), self.frame)
-        self.umlwin = UmlCanvas(panel, Log(), self.frame)
-        self.umlwin = UmlCanvas(panel, Log(), self.frame)
-        self.umlwin = UmlCanvas(self.notebook, Log(), self.frame)
-        self.umlwin = UmlCanvas(self.frame, Log(), self.frame)
+        self.umlcanvas = UmlCanvas(panel, Log(), self.frame)
+        self.umlcanvas = UmlCanvas(panel, Log(), self.frame)
+        self.umlcanvas = UmlCanvas(panel, Log(), self.frame)
+        self.umlcanvas = UmlCanvas(panel, Log(), self.frame)
+        self.umlcanvas = UmlCanvas(self.notebook, Log(), self.frame)
+        self.umlcanvas = UmlCanvas(self.frame, Log(), self.frame)
         self.multiText = wx.TextCtrl
         self.app = App(context)
         self.user_config_file = os.path.join(config_dir, PYNSOURCE_CONFIG_FILE)
@@ -26,7 +26,7 @@ class Torture1:
         self.box = wx.BoxSizer(wx.VERTICAL)
         
         # trickier cases
-        self.canvas = self.umlwin.GetDiagram().GetCanvas()
+        self.canvas = self.umlcanvas.GetDiagram().GetCanvas()
         self.curr.append(" "*self.curr_width)
         
     

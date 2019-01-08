@@ -5,13 +5,13 @@ from base_cmd import CmdBase
 class CmdNodeDeleteBase(CmdBase):
     def delete_shape(self, shape):
         displaymodel = self.context.displaymodel
-        gui = self.context.umlwin
+        gui = self.context.umlcanvas
         
         displaymodel.delete_node_for_shape(shape)
         gui.delete_shape_view(shape)
 
         self.context.frame.Layout()  # needed when running phoenix
-        # self.context.umlwin.Refresh()
+        # self.context.umlcanvas.Refresh()
         # self.context.wxapp.RefreshAsciiUmlTab()
 
 class CmdNodeDelete(CmdNodeDeleteBase):
@@ -28,7 +28,7 @@ class CmdNodeDeleteSelected(CmdNodeDeleteBase):
     """ Delete selected node """
     def execute(self):
         """ Delete selected node. """
-        selected = [s for s in self.context.umlwin.GetDiagram().GetShapeList() if s.Selected()]
+        selected = [s for s in self.context.umlcanvas.GetDiagram().GetShapeList() if s.Selected()]
         if selected:
             shape = selected[0]
             self.delete_shape(shape)

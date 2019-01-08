@@ -92,10 +92,10 @@ class MainBlackboardFrame(FrameDeepLayout):
 
         if event.cmd:
             if event.cmd == 'snapshot_mgr_restore_0':
-                wx.CallAfter(self.blackboard.umlwin.snapshot_mgr.Restore, 0)
+                wx.CallAfter(self.blackboard.umlcanvas.snapshot_mgr.Restore, 0)
                 wx.CallAfter(self.btnCancelClose.SetFocus)
             elif event.cmd == 'mega_refresh':
-                wx.CallAfter(self.blackboard.umlwin.mega_refresh)
+                wx.CallAfter(self.blackboard.umlcanvas.mega_refresh)
 
         if event.statusmsg:
             wx.CallAfter(self.status.SetLabel, event.statusmsg)
@@ -146,7 +146,7 @@ if __name__ == '__main__':
             self.frame.Show(True)
             self.SetTopWindow(self.frame)
             
-            b = MockLayoutBlackboard()    # LayoutBlackboard(graph=self.context.displaymodel.graph, umlwin=self.context.umlwin)
+            b = MockLayoutBlackboard()    # LayoutBlackboard(graph=self.context.displaymodel.graph, umlcanvas=self.context.umlcanvas)
             
             self.frame.SetBlackboardObject(b)
         

@@ -168,7 +168,7 @@ SHOULD GET THE FOLLOWING RESULTS:
 ('log', 'Log'),             OK
 ('frame', 'Frame'),         MORE should be wx.Frame ** fixed **
 ????                        MISSING - should have ('notebook', 'wx.Notebook')
-('umlwin', 'UmlCanvas'),    OK
+('umlcanvas', 'UmlCanvas'),    OK
 ('app', 'App'),             OK
 ('config', 'ConfigObj'),    OK
 ('popupmenu', 'Menu'),      MORE should be wx.Menu** fixed **
@@ -184,7 +184,7 @@ latest is ok
 ('log', 'Log')
 ('frame', 'wx.Frame')
 ('notebook', 'wx.Notebook')
-('umlwin', 'UmlCanvas')
+('umlcanvas', 'UmlCanvas')
 ('app', 'App')
 ('config', 'ConfigObj')
 ('popupmenu', 'wx.Menu')
@@ -198,14 +198,14 @@ expected_diffs['testmodule09_intense.py'] = """
 --- before.py
 +++ after.py
 @@ -1 +1 @@
--Torture1 (is module=0) inherits from [] class dependencies [('a', 'UmlCanvas'), ('b', 'UmlCanvas'), ('log', 'Log'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('umlwin', 'UmlCanvas'), ('app', 'App'), ('config', 'ConfigObj')]
-+Torture1 (is module=0) inherits from [] class dependencies [('a', 'UmlCanvas'), ('b', 'UmlCanvas'), ('log', 'Log'), ('frame', 'wx.Frame'), ('notebook', 'wx.Notebook'), ('umlwin', 'UmlCanvas'), ('app', 'App'), ('config', 'ConfigObj'), ('popupmenu', 'wx.Menu'), ('next_menu_id', 'wx.NewId'), ('printData', 'wx.PrintData'), ('box', 'wx.BoxSizer')]
+-Torture1 (is module=0) inherits from [] class dependencies [('a', 'UmlCanvas'), ('b', 'UmlCanvas'), ('log', 'Log'), ('umlcanvas', 'UmlCanvas'), ('umlcanvas', 'UmlCanvas'), ('umlcanvas', 'UmlCanvas'), ('umlcanvas', 'UmlCanvas'), ('umlcanvas', 'UmlCanvas'), ('umlcanvas', 'UmlCanvas'), ('app', 'App'), ('config', 'ConfigObj')]
++Torture1 (is module=0) inherits from [] class dependencies [('a', 'UmlCanvas'), ('b', 'UmlCanvas'), ('log', 'Log'), ('frame', 'wx.Frame'), ('notebook', 'wx.Notebook'), ('umlcanvas', 'UmlCanvas'), ('app', 'App'), ('config', 'ConfigObj'), ('popupmenu', 'wx.Menu'), ('next_menu_id', 'wx.NewId'), ('printData', 'wx.PrintData'), ('box', 'wx.BoxSizer')]
 @@ -5,5 +5,2 @@
--('umlwin', 'UmlCanvas')
--('umlwin', 'UmlCanvas')
--('umlwin', 'UmlCanvas')
--('umlwin', 'UmlCanvas')
--('umlwin', 'UmlCanvas')
+-('umlcanvas', 'UmlCanvas')
+-('umlcanvas', 'UmlCanvas')
+-('umlcanvas', 'UmlCanvas')
+-('umlcanvas', 'UmlCanvas')
+-('umlcanvas', 'UmlCanvas')
 +('frame', 'wx.Frame')
 +('notebook', 'wx.Notebook')
 @@ -12,0 +10,4 @@

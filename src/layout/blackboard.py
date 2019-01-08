@@ -8,9 +8,9 @@ ANIMATE_EVERY_DETAIL = False
 ANIMATE_LAYOUTS = False
 
 class LayoutBlackboard(object):
-    def __init__(self, graph, umlwin):
+    def __init__(self, graph, umlcanvas):
         self.graph = graph
-        self.umlwin = umlwin
+        self.umlcanvas = umlcanvas
 
     def mega_refresh(self, recalibrate=False, auto_resize_canvas=True):
         # Stub so that when we call GraphLayoutSpring.layout() and it calls back
@@ -47,10 +47,10 @@ class LayoutBlackboard(object):
         Coordinate scaling runs 3.2 to max within ScaleUpMadly()
         Finish at the best scale as chosen by this algorithm
         """
-        self.umlwin.AllToLayoutCoords()    # doesn't matter what scale the layout starts with
+        self.umlcanvas.AllToLayoutCoords()    # doesn't matter what scale the layout starts with
         layouter = GraphLayoutSpring(self.graph, gui=self)
-        self.umlwin.snapshot_mgr.Clear()
-        oriscale = self.umlwin.coordmapper.scale
+        self.umlcanvas.snapshot_mgr.Clear()
+        oriscale = self.umlcanvas.coordmapper.scale
 
         def ThinkAndAddSnapshot(res):
             num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = res
@@ -59,12 +59,12 @@ class LayoutBlackboard(object):
             score = 0
             bounds = self.graph.GetBounds()
             
-            self.umlwin.snapshot_mgr.AddSnapshot(\
+            self.umlcanvas.snapshot_mgr.AddSnapshot(\
                 layout_score=score,
                 LL=num_line_line_crossings,
                 NN=num_node_node_overlaps,
                 LN=num_line_node_crossings,
-                scale=self.umlwin.coordmapper.scale,
+                scale=self.umlcanvas.coordmapper.scale,
                 bounds=bounds,
                 bounds_area_simple=bounds[0]*bounds[1]/10000,
                 graph_memento=self.graph.GetMementoOfPositions())
@@ -101,7 +101,7 @@ class LayoutBlackboard(object):
             if res[0] == 0 and res[2] <= 0:     # LL crossings solved and LN reasonable, so optimise and break - save time
                 break
         
-        #self.umlwin.snapshot_mgr.DumpSnapshots(label='Unsorted')
+        #self.umlcanvas.snapshot_mgr.DumpSnapshots(label='Unsorted')
             
         """
         blackboard now sorting smarter because I have converted snapshots to
@@ -113,16 +113,16 @@ class LayoutBlackboard(object):
             # this does the thinking!
           return (d['LL'], d['LN'], d['bounds_area_simple'], -d['scale'], d['NN_pre_OR'])        
 
-        #self.umlwin.snapshot_mgr.Sort()
-        self.umlwin.snapshot_mgr.Sort(sortfunc)  # this does the thinking!
-        #self.umlwin.snapshot_mgr.Sort(lambda d: (d['scale'], -d['LL'], -d['LN']))   # pick biggest with most line crossings! - Ha ha          
+        #self.umlcanvas.snapshot_mgr.Sort()
+        self.umlcanvas.snapshot_mgr.Sort(sortfunc)  # this does the thinking!
+        #self.umlcanvas.snapshot_mgr.Sort(lambda d: (d['scale'], -d['LL'], -d['LN']))   # pick biggest with most line crossings! - Ha ha
 
         """Diagnostic"""        
-        #self.umlwin.snapshot_mgr.DumpSnapshots('Sorted')
+        #self.umlcanvas.snapshot_mgr.DumpSnapshots('Sorted')
         
         """
         can't do the snapshot restore
-            self.umlwin.snapshot_mgr.Restore(0)
+            self.umlcanvas.snapshot_mgr.Restore(0)
         here since it will call mega_refresh(), and that is wx gui activity
         which is not allowed from inside a thread.
         So send a special message to trigger that call.
@@ -178,10 +178,10 @@ class LayoutBlackboard(object):
         SCALE_STEP = 0.2
         SCALE_START = 3.2
         
-        self.umlwin.coordmapper.Recalibrate(scale=SCALE_START)
+        self.umlcanvas.coordmapper.Recalibrate(scale=SCALE_START)
         for i in range(15):
             
-            res = self.GetVitalStats(scale=self.umlwin.coordmapper.scale - SCALE_STEP, animate=ANIMATE_EVERY_DETAIL)
+            res = self.GetVitalStats(scale=self.umlcanvas.coordmapper.scale - SCALE_STEP, animate=ANIMATE_EVERY_DETAIL)
             
             num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = res
 
@@ -203,8 +203,8 @@ class LayoutBlackboard(object):
             else:
                 assert False, "Mad: unknown strategy"
     
-            if self.umlwin.coordmapper.scale < MAX_SCALE:
-                #print "Mad: Aborting expansion - gone too far.", self.umlwin.coordmapper.scale
+            if self.umlcanvas.coordmapper.scale < MAX_SCALE:
+                #print "Mad: Aborting expansion - gone too far.", self.umlcanvas.coordmapper.scale
                 break
 
         if animate:
@@ -220,8 +220,8 @@ class LayoutBlackboard(object):
         NN Overlap Removal performed.
         """
         
-        self.umlwin.coordmapper.Recalibrate(scale=scale)
-        self.umlwin.AllToWorldCoords()
+        self.umlcanvas.coordmapper.Recalibrate(scale=scale)
+        self.umlcanvas.AllToWorldCoords()
 
         if animate:
             self.mega_refresh_inside_blackboard()
@@ -235,10 +235,10 @@ class LayoutBlackboard(object):
         # worked out
 
         # count NN (pre overlap removal)
-        num_node_node_overlaps = self.umlwin.overlap_remover.CountOverlaps()
+        num_node_node_overlaps = self.umlcanvas.overlap_remover.CountOverlaps()
 
         """Remove Node Overlaps"""
-        self.umlwin.overlap_remover.RemoveOverlaps(watch_removals=False)
+        self.umlcanvas.overlap_remover.RemoveOverlaps(watch_removals=False)
 
         """Post Overlap Removal"""
 
@@ -248,7 +248,7 @@ class LayoutBlackboard(object):
         # How many LL reduced (or perhaps increased) after expansion & post removing NN overlaps
         num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
 
-        #print "GetVitalStats: At scale %.1f NN_pre %d LN %d LL %d" % (self.umlwin.coordmapper.scale, num_node_node_overlaps, num_line_node_crossings, num_line_line_crossings)
+        #print "GetVitalStats: At scale %.1f NN_pre %d LN %d LL %d" % (self.umlcanvas.coordmapper.scale, num_node_node_overlaps, num_line_node_crossings, num_line_line_crossings)
     
         return num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings
 

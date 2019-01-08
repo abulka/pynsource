@@ -14,7 +14,7 @@ class CmdColourSiblings(CmdBase):
     def execute(self):
         from common.uml_colours import official2
         
-        umlwin = self.context.umlwin
+        umlcanvas = self.context.umlcanvas
         
         if self.color_range_offset:
             #offset = random.randint(1, 10)
@@ -27,15 +27,15 @@ class CmdColourSiblings(CmdBase):
         
         clrs = official2.strip().split('\n')
 
-        dc = wx.ClientDC(umlwin)
-        umlwin.PrepareDC(dc)
+        dc = wx.ClientDC(umlcanvas)
+        umlcanvas.PrepareDC(dc)
         for node in self.context.displaymodel.graph.nodes:
             clr = clrs[(node.colour_index + offset) % len(clrs)]
             colour=wx.Brush(clr)
             
             node.shape.SetBrush(colour)
             #print "colour_index", node.id, node.colour_index, clr
-        umlwin.Redraw(dc)
+        umlcanvas.Redraw(dc)
 
 class CmdCycleColours(CmdBase):
     
@@ -46,7 +46,7 @@ class CmdCycleColours(CmdBase):
 
     def execute(self):
         from common.uml_colours import official2
-        umlwin = self.context.umlwin
+        umlcanvas = self.context.umlcanvas
 
         if self.colour == None:
             #colour=wx.WHITE_BRUSH
@@ -62,11 +62,11 @@ class CmdCycleColours(CmdBase):
             
             self.colour=wx.Brush(clr)  # colour=wx.Brush(clr, wx.SOLID)
         
-        dc = wx.ClientDC(umlwin)
-        umlwin.PrepareDC(dc)
+        dc = wx.ClientDC(umlcanvas)
+        umlcanvas.PrepareDC(dc)
         for node in self.context.displaymodel.graph.nodes:
             node.shape.SetBrush(self.colour)
-        umlwin.Redraw(dc)
+        umlcanvas.Redraw(dc)
 
 class CmdColourSequential(CmdBase):
     def __init__(self, color_range_offset=False):
@@ -74,7 +74,7 @@ class CmdColourSequential(CmdBase):
         
     def execute(self):
         from common.uml_colours import official2
-        umlwin = self.context.umlwin
+        umlcanvas = self.context.umlcanvas
         
         if self.color_range_offset:
             offset = random.randint(1, 10)
@@ -92,19 +92,19 @@ class CmdColourSequential(CmdBase):
 
         clrs = official2.strip().split('\n')
 
-        dc = wx.ClientDC(umlwin)
-        umlwin.PrepareDC(dc)
+        dc = wx.ClientDC(umlcanvas)
+        umlcanvas.PrepareDC(dc)
         for node in self.context.displaymodel.graph.nodes:
             clr = clrs[(node.colour_index + offset) % len(clrs)]
             colour=wx.Brush(clr)
             node.shape.SetBrush(colour)
             #print "colour_index", node.id, node.colour_index, clr
-        umlwin.Redraw(dc)
+        umlcanvas.Redraw(dc)
 
 class CmdBuildColourChartWorkspace(CmdBase):
     def execute(self):
 
-        umlcanvas = self.context.umlwin
+        umlcanvas = self.context.umlcanvas
         umlcanvas.Clear()
         
         graph = self.context.displaymodel.graph
