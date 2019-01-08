@@ -115,7 +115,7 @@ class HandleClasses(AndyBasicParseEngine):
         self.inbetweenClassAndFirstDef = 0
 
     def On_deindent(self):
-        if self.indentlevel <= self.currclassindentlevel:
+        if self.currclassindentlevel != None and self.indentlevel <= self.currclassindentlevel:
 ##            print 'popping class', self.currclass, 'from', self.currclasslist
             self.PopCurrClass()
 ##        print
@@ -140,7 +140,7 @@ class HandleClasses(AndyBasicParseEngine):
 
     def GetCurrClassIndentLevel(self):
         if not self.currclasslist:
-            print("AHA - returning None as an indent level!??")
+            # a bit dodgy, but Python 2 used to be able to compare None and int and say it was false
             return None
         currclassandindentlevel = self.currclasslist[-1]
         return currclassandindentlevel[1]

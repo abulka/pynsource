@@ -561,9 +561,12 @@ class Visitor(T):
             if not self.current_class() and not self.am_inside_module_function():
                 self.model.modulemethods.append(node.name)
                 if node.name not in self.quick_parse.quick_found_module_defs:  # TODO how to repro this failure, it was only reported by Charlie - issue #31
-                    print('Parse assert WARNING: node.name', node.name,
-                          'is not in quick_found_module_defs',
-                          self.quick_parse.quick_found_module_defs)
+                    # raise RuntimeError("quickfound ref issue %s should be in %s" % (node.name, self.quick_parse.quick_found_module_defs))
+                    pass
+                    # print('Parse assert WARNING: node.name', node.name,
+                    #       'is not in quick_found_module_defs - its probably indented due to a'
+                    #       'wrapping if or try structure - no way quick parsing can detect this.',
+                    #       self.quick_parse.quick_found_module_defs)
 
             # look for decorator @property definition and treat as property
             elif self.treat_property_decorator_as_prop and \

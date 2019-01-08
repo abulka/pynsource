@@ -48,9 +48,9 @@ class TestCaseYuml01(unittest.TestCase):
         self.p.Parse(FILE)
         self.p.CalcYumls(optimise=False)
         expected = """
-[Flag|flagx;flagy;owner|__init__();readflag();__repr__()]
 [Flags]flags++-*[Flag]
 [Flags|flags;numberOfFlags|__init__();readFlags();AddFlag();__repr__()]
+[Flag|flagx;flagy;owner|__init__();readflag();__repr__()]
         """.strip()
         #self._dump(self.p, expected)
         self.assertEqual(expected, str(self.p).strip())

@@ -475,7 +475,7 @@ class TestCase00(unittest.TestCase):
         apath = DeriveScenarioFolderPath()
 ##        print apath
         assert apath.lower() in list(map(str.lower,[
-            'C:\\Documents and Settings\\Administrator\Desktop\\Combat Mission Campaign Devel\\Devel\\Scenarios',
+            'C:\\Documents and Settings\\Administrator\\Desktop\\Combat Mission Campaign Devel\\Devel\\Scenarios',
             'C:\\CC\\Devel\\Scenarios',
             'D:\\CC\\Devel\\Scenarios',
             ]))
@@ -483,7 +483,7 @@ class TestCase00(unittest.TestCase):
         apath = FilenameToFullScenarioPathName('Alpha3')
 ##        print apath
         assert apath.lower() in list(map(str.lower,[
-            'C:\\Documents and Settings\\Administrator\Desktop\\Combat Mission Campaign Devel\\Devel\\Scenarios\\Alpha3.py',
+            'C:\\Documents and Settings\\Administrator\\Desktop\\Combat Mission Campaign Devel\\Devel\\Scenarios\\Alpha3.py',
             'C:\\CC\\Devel\\Scenarios\\Alpha3.py',
             'D:\\CC\\Devel\\Scenarios\\Alpha3.py',
             ]))

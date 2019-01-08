@@ -326,7 +326,7 @@ class TestCase_A(unittest.TestCase):
         m = model_to_ascii_builder()
         s = m.main(g, nodes_annotated_and_sorted=mycustom_ordering)
 
-        expected_s = """
+        expected_s = r"""
 +---+
 | M |
 +---+
@@ -360,8 +360,8 @@ class TestCase_A(unittest.TestCase):
         
         if s.strip() != expected_s.strip():
             # Write to file
-            with open('logs/test_8_out_actual_.txt','w') as f: f.write(s)
-            with open('logs/test_8_out_expected.txt','w') as f: f.write(expected_s)
+            with open(os.path.abspath('tests/logs/test_8_out_actual_.txt'),'w') as f: f.write(s)
+            with open(os.path.abspath('tests/logs/test_8_out_expected.txt'),'w') as f: f.write(expected_s)
 
             import difflib
             # delta = difflib.ndiff(s.strip(), expected_s.strip()) # this will always emit something, a visual of the original with changes.
