@@ -182,7 +182,7 @@ class CmdBase:
     def setContext(self, context):
         self.context = context
     def execute(self):
-        raise "virtual"
+        raise RuntimeError("virtual")
     def redo(self):
         self.execute()
         
