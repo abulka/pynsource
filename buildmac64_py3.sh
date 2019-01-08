@@ -5,7 +5,9 @@
 # Need to use a brew python (which is a proper framework installation), not a virtual env
 # Not even a pyenv version of python is good enough for building via py2app (pyenv version ok for running
 # in development mode).  Virtualenv python no good for either running nor deploying (cos of wxpython)
-PYTHON=/usr/local/bin/python3
+#PYTHON=/usr/local/bin/python3
+PYTHON=/usr/local/Cellar/python/3.7.0/bin/python3
+#PYTHON=/usr/local/Cellar/python/3.7.2/bin/python3
 PY2APPLET=/usr/local/bin/py2applet
 DESTZIP=pyNsource-1.7-macosx.zip
 
