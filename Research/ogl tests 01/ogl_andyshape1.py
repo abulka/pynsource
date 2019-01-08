@@ -70,7 +70,7 @@ class AppFrame(wx.Frame):
         shape.AddText("Hello there")
 
 
-        print [getpos(shape) for shape in canvas.GetDiagram().GetShapeList()]
+        print([getpos(shape) for shape in canvas.GetDiagram().GetShapeList()])
         
         
         F = 'img_uml01.png'

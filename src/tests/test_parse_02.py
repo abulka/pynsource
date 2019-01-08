@@ -55,7 +55,7 @@ class TestCase01(unittest.TestCase):
         gotevent6 = 0
         gotevent7 = 0
         gotevent8 = 0
-        for classname, classentry in self.p.classlist.items():
+        for classname, classentry in list(self.p.classlist.items()):
             if classname == 'ParseMeTest':
                 gotevent1 = 1
                 assert classentry.classesinheritsfrom == []
@@ -151,7 +151,7 @@ class TestCase01(unittest.TestCase):
         gotevent7 = 0
         gotevent8 = 0
         gotevent9 = 0
-        for classname, classentry in self.p.classlist.items():
+        for classname, classentry in list(self.p.classlist.items()):
             if classname == 'ParseMeTest':
                 gotevent1 = 1
                 assert classentry.classesinheritsfrom == []
@@ -178,7 +178,7 @@ class TestCase01(unittest.TestCase):
                     if attrname == 'f':
                         gotevent6 = 1
                         assert 'static' not in attrobj.attrtype
-                assert len(classentry.attrs) == 6, 'Only got ' + `len(classentry.attrs)` + ' attributes'
+                assert len(classentry.attrs) == 6, 'Only got ' + repr(len(classentry.attrs)) + ' attributes'
 
                 for adef in classentry.defs:
                     pass
@@ -203,7 +203,7 @@ class TestCase01(unittest.TestCase):
                             gotevent8 = 1
                         if attrname == 'y':
                             gotevent9 = 1
-                    assert len(classentry.attrs) == 2, 'Only got ' + `len(classentry.attrs)` + ' attributes'
+                    assert len(classentry.attrs) == 2, 'Only got ' + repr(len(classentry.attrs)) + ' attributes'
 
 
 

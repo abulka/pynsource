@@ -26,7 +26,7 @@ class WinFormAdapter(MainForm):
         self.app.Shutdown()
 
     def Boot(self):
-        print "BOOT"
+        print("BOOT")
         self._InitHyperlinks()
 
     # Util
@@ -54,7 +54,7 @@ class WinFormAdapter(MainForm):
     # Gui Generated Events, override the handler here
         
     def BtnDebug1Click(self, sender, e):
-        print 'self.app.server.StartServer_real'
+        print('self.app.server.StartServer_real')
         self.app.server.StopServer()
 
 #        print "got debug event"
@@ -69,14 +69,14 @@ class WinFormAdapter(MainForm):
 
     
     def OnLinkClicked(self, sender, e):
-        print "link clicked", sender.Text
+        print("link clicked", sender.Text)
         System.Diagnostics.Process.Start(self.app.url_server + sender.Text)
     
     def OnAddThing(self, sender, e):
         assert self.random
         info = str(self.random(0,99999)) + " " + self._inputFieldTxt.Text
         self.observers.CMD_ADD_THING(info)
-        print info
+        print(info)
 
     # Non Gui Incoming Events
 

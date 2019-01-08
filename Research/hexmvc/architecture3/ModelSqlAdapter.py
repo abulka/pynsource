@@ -18,7 +18,7 @@ class ModelSqlObjectAdapter(ModelAdapterBase):
             model = Model.get(1)
             #a_thing = Thing.get(1)
         except:
-            print "Oops - possibly no database - creating one now..."
+            print("Oops - possibly no database - creating one now...")
             Model.dropTable(True)
             Model.createTable()
             Thing.dropTable(True)

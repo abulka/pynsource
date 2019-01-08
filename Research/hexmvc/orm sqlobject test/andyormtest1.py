@@ -110,7 +110,7 @@ assert tom.cubicle == cubicle2
 
 # Now SQLOBJECT lets us do other magic things, that leverage relational db technology
 p = Person.get(1)
-print p
+print(p)
 
 #ps = Person.select(Person.q.firstName=="John")
 #print list(ps)
@@ -120,10 +120,10 @@ print p
 #                      clauseTables=['address'])
 ps = Person.select("""address.postcode LIKE '3186'""",
                       clauseTables=['address'])
-print list(ps)
+print(list(ps))
 
-print 'all people'
+print('all people')
 ps = Person.select()
-print list(ps)
+print(list(ps))
 
-print 'Done!'
+print('Done!')

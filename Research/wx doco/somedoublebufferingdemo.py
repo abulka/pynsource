@@ -104,7 +104,7 @@ class DrawWindow(BufferedWindow):
         dc.Clear() # make sure you clear the bitmap!
 
         # Here's the actual drawing code.
-        for key, data in self.DrawData.items():
+        for key, data in list(self.DrawData.items()):
             if key == "Rectangles":
                 dc.SetBrush(wx.BLUE_BRUSH)
                 dc.SetPen(wx.Pen('VIOLET', 4))

@@ -244,7 +244,7 @@ class CommentShape(ogl.RectangleShape):
         """The draw handler."""
         ogl.RectangleShape.OnDraw(self, dc)
 
-        print "extra drawing here...."
+        print("extra drawing here....")
 
         x1 = self._xpos - self._width / 2.0
         y1 = self._ypos - self._height / 2.0

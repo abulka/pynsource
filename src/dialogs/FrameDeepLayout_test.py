@@ -1,11 +1,11 @@
 import wx
 import random
-from FrameDeepLayout import FrameDeepLayout
+from .FrameDeepLayout import FrameDeepLayout
 
 class FrameDeepLayout2(FrameDeepLayout):
 
     def OnCancelClick( self, event ):
-        print "got cancel"
+        print("got cancel")
         self.Destroy()
 
 class TestFrame(wx.Frame):
@@ -18,7 +18,7 @@ class TestFrame(wx.Frame):
         self.SetTitle("Andy's Custom dialog tester")
         self.Centre()
         
-        self.m_button1 = wx.Button( self, wx.ID_ANY, u"Launch", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_button1 = wx.Button( self, wx.ID_ANY, "Launch", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_button1.Bind( wx.EVT_BUTTON, self.OnCancelClick )
 
         self.Show(True)

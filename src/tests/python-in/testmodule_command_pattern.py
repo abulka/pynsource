@@ -319,7 +319,7 @@ class TestCase01(unittest.TestCase):
 
 def suite():
     allchecks = []
-    allchecks += TestCase01.__dict__.keys()
+    allchecks += list(TestCase01.__dict__.keys())
     # allchecks += TestCase02.__dict__.keys()
 
     def numbersuffix(x, y):
@@ -328,7 +328,7 @@ def suite():
 
     for i in allchecks:
         if i.startswith('_check'):
-            print "WARNING - only running tests prepended with underscore"
+            print("WARNING - only running tests prepended with underscore")
             testprefix = '_check'
             break
     else:

@@ -3,7 +3,7 @@
 #
 from wx import ImageFromStream, BitmapFromImage
 from wx import EmptyIcon
-import cStringIO
+import io
 #----------------------------------------------------------------------
 def getwrDeleteData():
     return \
@@ -51,7 +51,7 @@ def getwrDeleteBitmap():
     return BitmapFromImage(getwrDeleteImage())
 
 def getwrDeleteImage():
-    stream = cStringIO.StringIO(getwrDeleteData())
+    stream = io.StringIO(getwrDeleteData())
     return ImageFromStream(stream)
 
 def getwrDeleteIcon():
@@ -86,7 +86,7 @@ def getwrRectangleBitmap():
     return BitmapFromImage(getwrRectangleImage())
 
 def getwrRectangleImage():
-    stream = cStringIO.StringIO(getwrRectangleData())
+    stream = io.StringIO(getwrRectangleData())
     return ImageFromStream(stream)
 
 def getwrRectangleIcon():
@@ -127,7 +127,7 @@ def getwrTriangle1Bitmap():
     return BitmapFromImage(getwrTriangle1Image())
 
 def getwrTriangle1Image():
-    stream = cStringIO.StringIO(getwrTriangle1Data())
+    stream = io.StringIO(getwrTriangle1Data())
     return ImageFromStream(stream)
 
 def getwrTriangle1Icon():
@@ -169,7 +169,7 @@ def getwrTriangle2Bitmap():
     return BitmapFromImage(getwrTriangle2Image())
 
 def getwrTriangle2Image():
-    stream = cStringIO.StringIO(getwrTriangle2Data())
+    stream = io.StringIO(getwrTriangle2Data())
     return ImageFromStream(stream)
 
 def getwrTriangle2Icon():
@@ -208,7 +208,7 @@ def getwrTriangle3Bitmap():
     return BitmapFromImage(getwrTriangle3Image())
 
 def getwrTriangle3Image():
-    stream = cStringIO.StringIO(getwrTriangle3Data())
+    stream = io.StringIO(getwrTriangle3Data())
     return ImageFromStream(stream)
 
 def getwrTriangle3Icon():
@@ -249,7 +249,7 @@ def getwrTriangle4Bitmap():
     return BitmapFromImage(getwrTriangle4Image())
 
 def getwrTriangle4Image():
-    stream = cStringIO.StringIO(getwrTriangle4Data())
+    stream = io.StringIO(getwrTriangle4Data())
     return ImageFromStream(stream)
 
 def getwrTriangle4Icon():
@@ -292,7 +292,7 @@ def getwrTriangle5Bitmap():
     return BitmapFromImage(getwrTriangle5Image())
 
 def getwrTriangle5Image():
-    stream = cStringIO.StringIO(getwrTriangle5Data())
+    stream = io.StringIO(getwrTriangle5Data())
     return ImageFromStream(stream)
 
 def getwrTriangle5Icon():
@@ -335,7 +335,7 @@ def getwrTriangle6Bitmap():
     return BitmapFromImage(getwrTriangle6Image())
 
 def getwrTriangle6Image():
-    stream = cStringIO.StringIO(getwrTriangle6Data())
+    stream = io.StringIO(getwrTriangle6Data())
     return ImageFromStream(stream)
 
 def getwrTriangle6Icon():
@@ -378,7 +378,7 @@ def getwrTriangle7Bitmap():
     return BitmapFromImage(getwrTriangle7Image())
 
 def getwrTriangle7Image():
-    stream = cStringIO.StringIO(getwrTriangle7Data())
+    stream = io.StringIO(getwrTriangle7Data())
     return ImageFromStream(stream)
 
 def getwrTriangle7Icon():
@@ -421,7 +421,7 @@ def getwrTriangle8Bitmap():
     return BitmapFromImage(getwrTriangle8Image())
 
 def getwrTriangle8Image():
-    stream = cStringIO.StringIO(getwrTriangle8Data())
+    stream = io.StringIO(getwrTriangle8Data())
     return ImageFromStream(stream)
 
 def getwrTriangle8Icon():
@@ -448,7 +448,7 @@ def getopenBitmap():
     return BitmapFromImage(getopenImage())
 
 def getopenImage():
-    stream = cStringIO.StringIO(getopenData())
+    stream = io.StringIO(getopenData())
     return ImageFromStream(stream)
 
 def getopenIcon():
@@ -508,7 +508,7 @@ def getsaveBitmap():
     return BitmapFromImage(getsaveImage())
 
 def getsaveImage():
-    stream = cStringIO.StringIO(getsaveData())
+    stream = io.StringIO(getsaveData())
     return ImageFromStream(stream)
 
 def getsaveIcon():
@@ -534,7 +534,7 @@ def getcloseBitmap():
     return BitmapFromImage(getcloseImage())
 
 def getcloseImage():
-    stream = cStringIO.StringIO(getcloseData())
+    stream = io.StringIO(getcloseData())
     return ImageFromStream(stream)
 
 def getcloseIcon():

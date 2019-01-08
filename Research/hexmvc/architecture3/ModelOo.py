@@ -7,7 +7,7 @@ class Model(object):
 
     def Clear(self):
         self.things = []
-        print "simple model cleared"
+        print("simple model cleared")
 
     def AddThing(self, info, id=None):
         thing = Thing(info)

@@ -59,13 +59,13 @@ class DoodleWindow(wx.Window):
             self.colours)
         self.bindMenuEvents(menuHandler=self.onMenuSetColour,
             updateUIHandler=self.onCheckMenuColours,
-            ids=self.idToColourMap.keys())
+            ids=list(self.idToColourMap.keys()))
         self.menu.Break() # Next menu items go in a new column of the menu
         self.idToThicknessMap = self.addCheckableMenuItems(self.menu,
             self.thicknesses)
         self.bindMenuEvents(menuHandler=self.onMenuSetThickness,
             updateUIHandler=self.onCheckMenuThickness,
-            ids=self.idToThicknessMap.keys())
+            ids=list(self.idToThicknessMap.keys()))
 
     @staticmethod
     def addCheckableMenuItems(menu, items):

@@ -33,7 +33,7 @@ else:
         model = Model.get(1)
         thing = Thing.get(1)
     except:
-        print "Oops - possible no database - creating..."
+        print("Oops - possible no database - creating...")
         Model.dropTable(True)
         Model.createTable()
         Thing.dropTable(True)
@@ -54,4 +54,4 @@ wx.CallAfter(app.Boot)
 # Start Gui
 wxapp.MainLoop()
 
-print "DONE"
+print("DONE")

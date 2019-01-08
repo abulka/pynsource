@@ -27,7 +27,7 @@ class Controller():
     # Other events
     
     def MODEL_THING_ADDED(self, thing, modelsize):
-        print "App observer got notified, added value %(thing)s - modelsize now %(modelsize)d" % vars()
+        print("App observer got notified, added value %(thing)s - modelsize now %(modelsize)d" % vars())
 
     # Methods that adapters need, which require immediate response vs.
     # using the multicasting / eventing approach.  Typically these are

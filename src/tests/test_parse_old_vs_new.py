@@ -65,7 +65,7 @@ def parse_old_and_new(in_filename, print_diffs=True, options={}):
         diff_s = dodiff(d1, d2)
         log.out_wrap_in_html(diff_s, style_class='dumpdiff')
         if not comparedok and print_diffs:
-            print diff_s
+            print(diff_s)
 
         #dd = difflib.HtmlDiff()
         #diff_table = dd.make_table(d1.splitlines(1),d2.splitlines(1))
@@ -115,7 +115,7 @@ def report(msg):
         #print "%s OK" % msg
         return True
     else:
-        print "oooops %s broken" % msg, results
+        print("oooops %s broken" % msg, results)
         return False
         
 

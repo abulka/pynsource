@@ -79,15 +79,15 @@ class multicast:
 class Fred:
     ugg = 1
     def hi(self):
-        print "hi from Fred"
+        print("hi from Fred")
     def count(self, n):
-      for i in range(n): print i
+      for i in range(n): print(i)
 
 class Mary:
     def hi(self):
-        print "hi from Mary"
+        print("hi from Mary")
     def count(self, n):
-      for i in range(n): print i+100
+      for i in range(n): print(i+100)
   
 observers = multicast()
 observers.add(Fred())
@@ -98,5 +98,5 @@ observers.ugg()   # ugg method doesn't exist, so no calls made
 
 #observers.someattr = 100
 
-print "done"
+print("done")
 

@@ -5,7 +5,7 @@ import time
 from threading import *
 import wx
 
-from blackboard_thread import WorkerThread, ResultEvent, EVT_RESULT
+from .blackboard_thread import WorkerThread, ResultEvent, EVT_RESULT
 
 if __name__ == '__main__':
     import sys
@@ -54,7 +54,7 @@ class MainBlackboardFrame(FrameDeepLayout):
         self.working = True
 
         if keycode == wx.WXK_ESCAPE:
-            print "ESC key detected in Blackboard: Abort Layout"
+            print("ESC key detected in Blackboard: Abort Layout")
             self.OnClose(None)
             
         self.working = False
@@ -101,7 +101,7 @@ class MainBlackboardFrame(FrameDeepLayout):
             wx.CallAfter(self.status.SetLabel, event.statusmsg)
             log("** " + event.statusmsg)
 
-        if event.progress <> -1:
+        if event.progress != -1:
             wx.CallAfter(self.progressbar.SetValue, event.progress)
         
         if event.shouldStop:

@@ -18,10 +18,10 @@ class GraphSnapshotMgr:
                     bounds=(-1,-1), bounds_area_simple=-1,
                     graph_memento=self.graph.GetMementoOfPositions(),
                     quicksave=True)
-        self.quick_save_slots['slot'+`slot`] = snapshot
+        self.quick_save_slots['slot'+repr(slot)] = snapshot
     
     def QuickRestore(self, slot=1):
-        snapshot = self.quick_save_slots.get('slot'+`slot`, None)
+        snapshot = self.quick_save_slots.get('slot'+repr(slot), None)
         if snapshot:
             self.RestoreGraph(snapshot['memento'], snapshot['scale'])
 
@@ -37,7 +37,7 @@ class GraphSnapshotMgr:
             #self.umlcanvas.app.run.CmdDumpUmlWorkspace()
             
         else:
-            print "No such snapshot", snapshot_number+1
+            print("No such snapshot", snapshot_number+1)
         
     def RestoreGraph(self, memento, scale):
         self.graph.RestoreWorldPositions(memento)
@@ -50,14 +50,14 @@ class GraphSnapshotMgr:
     def DumpSnapshots(self, current_snapshot_index=None, label=""):
         # If supplied, current_snapshot is 0 based
         header = '-'*40 + label + '-'*40
-        print header
+        print(header)
         for i, snapshot in enumerate(self.snapshots):
             msg = "Snapshot %d [%d] " % ((i+1), snapshot['_original_add_index'])
             msg += "LL %(LL)2d   NN pre rm overlaps %(NN_pre_OR)2d   LN %(LN)2d   scale %(scale).1f   bounds %(bounds_area_simple)2d  %(bounds)s" % snapshot
-            if current_snapshot_index <> None and i == current_snapshot_index:
+            if current_snapshot_index != None and i == current_snapshot_index:
                 msg += " <---"
-            print msg
-        print '-'*len(header)
+            print(msg)
+        print('-'*len(header))
 
     def AddSnapshot(self, layout_score, LL, NN, LN, scale, bounds, bounds_area_simple, graph_memento, quicksave=False):
         

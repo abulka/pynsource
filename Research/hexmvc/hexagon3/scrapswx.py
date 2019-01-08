@@ -22,7 +22,7 @@ class MyFrame2 ( wx.Frame ):
 		
 		bSizer6 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_hyperlink2 = wx.HyperlinkCtrl( self, wx.ID_ANY, u"wxFB Website", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
+		self.m_hyperlink2 = wx.HyperlinkCtrl( self, wx.ID_ANY, "wxFB Website", "http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
 		bSizer6.Add( self.m_hyperlink2, 0, wx.ALL, 5 )
 		
 		self.SetSizer( bSizer6 )

@@ -4,8 +4,7 @@
 
 import abc
 
-class IPersist(object):
-    __metaclass__ = abc.ABCMeta
+class IPersist(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def load(self, input):
         return
@@ -13,8 +12,7 @@ class IPersist(object):
     def save(self, output, data):
         return
 
-class ISing(object):
-    __metaclass__ = abc.ABCMeta
+class ISing(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def sing(self):
         return
@@ -33,6 +31,6 @@ class MyClass(IPersist, ISing):
         return
 
 o = MyClass()
-print o
+print(o)
 
-print "done"
+print("done")

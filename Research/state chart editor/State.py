@@ -1,4 +1,4 @@
-from Tkinter import *
+from tkinter import *
 import sys
 import math
 from Globals import *
@@ -206,7 +206,7 @@ class State:
 	minSep = self._getMinSep()
         maxSep = self._getMaxSep()
 	scalingMethods = {"N":self._scaleN,"S":self._scaleS,"E":self._scaleE,"W":self._scaleW,"NW":self._scaleNW,"NE":self._scaleNE,"SW":self._scaleSW,"SE":self._scaleSE}
-	apply(scalingMethods[border], [x, y, minSep, maxSep])
+	scalingMethods[border](*[x, y, minSep, maxSep])
 	self._setRadius()
         self.updateDisplay()
 

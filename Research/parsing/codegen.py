@@ -643,6 +643,6 @@ class NameFlash_AppDelegate(NSObject):
 """
 
     round1 = to_source(ast.parse(code))
-    print round1
+    print(round1)
     round2 = to_source(ast.parse(round1))
-    print round1 == round2
+    print(round1 == round2)

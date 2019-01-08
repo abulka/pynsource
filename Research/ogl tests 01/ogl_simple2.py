@@ -22,7 +22,7 @@ class AppFrame(wx.Frame):
         shape = ogl.RectangleShape( 60, 60 )
         shape.SetX( 30 )
         shape.SetY( 30 )
-        print shape.GetBoundingBoxMax()
+        print(shape.GetBoundingBoxMax())
         canvas.AddShape( shape )
 
         shape = ogl.RectangleShape( 60, 60 )

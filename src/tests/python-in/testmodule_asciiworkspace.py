@@ -88,9 +88,9 @@ if __name__ == '__main__':
     w.AddColumn(s)
 
     w.Flush()
-    print w.Contents
+    print(w.Contents)
     
-    print "="*50
+    print("="*50)
 
     w = AsciiWorkspace()
 
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     w.AddColumn(s)
 
     w.Flush()
-    print w.Contents
+    print(w.Contents)
 
-    print "done"
+    print("done")
     

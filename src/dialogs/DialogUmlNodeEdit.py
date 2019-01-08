@@ -16,7 +16,7 @@ import wx
 class DialogUmlNodeEdit ( wx.Dialog ):
 	
 	def __init__( self, parent ):
-		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Uml Node Properties", pos = wx.DefaultPosition, size = wx.Size( 264,286 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Uml Node Properties", pos = wx.DefaultPosition, size = wx.Size( 264,286 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
@@ -27,7 +27,7 @@ class DialogUmlNodeEdit ( wx.Dialog ):
 		
 		bSizer12 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_staticText1 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Class Name", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText1 = wx.StaticText( self.m_panel2, wx.ID_ANY, "Class Name", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText1.Wrap( -1 )
 		self.m_staticText1.SetMinSize( wx.Size( 55,-1 ) )
 		
@@ -40,7 +40,7 @@ class DialogUmlNodeEdit ( wx.Dialog ):
 		
 		bSizer14 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_staticText2 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Attributes", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText2 = wx.StaticText( self.m_panel2, wx.ID_ANY, "Attributes", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText2.Wrap( -1 )
 		self.m_staticText2.SetMinSize( wx.Size( 55,-1 ) )
 		
@@ -53,7 +53,7 @@ class DialogUmlNodeEdit ( wx.Dialog ):
 		
 		bSizer13 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_staticText3 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Methods", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText3 = wx.StaticText( self.m_panel2, wx.ID_ANY, "Methods", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText3.Wrap( -1 )
 		self.m_staticText3.SetMinSize( wx.Size( 55,-1 ) )
 		

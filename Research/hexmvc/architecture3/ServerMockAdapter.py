@@ -15,8 +15,8 @@ class Server(object):
         return "http://%s:%s" % (self.host, self.port)
         
     def StartServer(self):
-    	print "Mock server started"
+    	print("Mock server started")
 
     def StopServer(self):
-        print "Stopped Mock server"
+        print("Stopped Mock server")
         

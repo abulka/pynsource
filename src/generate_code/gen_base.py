@@ -61,7 +61,7 @@ class ReportGenerator(object):
 
     def _DumpModuleMethods(self):
         if self.modulemethods:
-            self.result += '  ModuleMethods = %s\n' % `self.modulemethods`
+            self.result += '  ModuleMethods = %s\n' % repr(self.modulemethods)
 
     def GenReportDump(self):   # DESIGN PATTERN: Template method, subclasses override the _methods to vary
         self.result = ''
@@ -69,12 +69,12 @@ class ReportGenerator(object):
         self._DumpModuleMethods()
 
         optionAlphabetic = 0
-        classnames = self.classlist.keys()
+        classnames = list(self.classlist.keys())
         if optionAlphabetic:
             classnames.sort()
         else:
             def cmpfunc(a,b):
-                if a.find('Module_') <> -1:
+                if a.find('Module_') != -1:
                     return -1
                 else:
                     if a < b:
@@ -118,7 +118,7 @@ class CmdLineGenerator:
             else:
                 filepath = os.path.join(directory, "*.py")
             if self.verbose:
-                print 'Processing directory', filepath
+                print('Processing directory', filepath)
             globbed = glob.glob(filepath)
             for f in globbed:
                 self._Process(f)
@@ -130,9 +130,9 @@ class CmdLineGenerator:
             padding = ''
         thefile = os.path.basename(filepath)
         if thefile[0] == '_':
-            print '  ', 'Skipped', thefile, 'cos begins with underscore.'
+            print('  ', 'Skipped', thefile, 'cos begins with underscore.')
             return
-        print '%sProcessing %s...'%(padding, thefile)
+        print('%sProcessing %s...'%(padding, thefile))
 
         self.p = self._CreateLanguageGenerator() # overridden by subclasses
         self.p.optionModuleAsClass = self.optionModuleAsClass

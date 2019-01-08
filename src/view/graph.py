@@ -4,7 +4,7 @@
 from layout.line_intersection import FindLineIntersection
 from layout.permutations import getpermutations
 from common.architecture_support import listdiff
-from graph_persistence import GraphPersistence
+from .graph_persistence import GraphPersistence
 
 global_colour_index = 1
 
@@ -65,7 +65,7 @@ class Graph:
     def DeleteNode(self, node):
         if node:
             self.nodes.remove(node)
-            if node.id in self.nodeSet.keys():
+            if node.id in list(self.nodeSet.keys()):
                 del self.nodeSet[node.id]
         for edge in self.edges[:]:
             if edge['source'].id == node.id or edge['target'].id == node.id:
@@ -181,7 +181,7 @@ class Graph:
             node.parents = []
             node.children = []
         for edge in self.edges:
-            if edge.has_key('uml_edge_type') and edge['uml_edge_type'] == 'generalisation':
+            if 'uml_edge_type' in edge and edge['uml_edge_type'] == 'generalisation':
                 parent = edge['target']
                 child = edge['source']
                 if parent not in child.parents:
@@ -275,7 +275,7 @@ class Graph:
 
     @classmethod
     def MementosEqual(self, memento1, memento2, tolerance=5):
-        for id, point in memento1.items():
+        for id, point in list(memento1.items()):
             point2 = memento2.get(id, None)
             #if tolerance == 0.01:
             #    print "point %s diff %f greater than %f = %s" % (point, abs(point[0] - point2[0]), tolerance, abs(point[0] - point2[0]) > tolerance)
@@ -284,7 +284,7 @@ class Graph:
         return True
     
     def RestoreWorldPositions(self, memento):
-        for id, point in memento.items():
+        for id, point in list(memento.items()):
             node = self.FindNodeById(id)
             node.left, node.top = point
 
@@ -352,7 +352,7 @@ class Graph:
         def remove_duplicates(lzt):
             d = {}
             for x in lzt: d[tuple(x)]=x
-            return d.values()
+            return list(d.values())
         result = remove_duplicates(result)
         return result
             
@@ -432,7 +432,7 @@ class GraphNode:
         def remove_duplicates(lzt):
             d = {}
             for x in lzt: d[tuple(x)]=x
-            return d.values()
+            return list(d.values())
         result = [r for r in result if r != None]
         result = remove_duplicates(result)
         return result

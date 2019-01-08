@@ -18,7 +18,7 @@ clipboard=[]
 
 def menuMaker(frame, menus):
     menubar = wxMenuBar()
-    for m,n in menus.items():
+    for m,n in list(menus.items()):
         menu = wxMenu()
         menubar.Append(menu,m)
         for x in n:
@@ -40,7 +40,7 @@ class Diagram:
         try:
             pickle.dump(self.shapes,open(self.file,'w'))
         except:
-            print "problem saving this diagram"
+            print("problem saving this diagram")
  
     def LoadFile(self,file=None):
         if file is None:
@@ -48,7 +48,7 @@ class Diagram:
         try:
             self.shapes = pickle.load(open(file))
         except:
-            print "problem loading this diagram"
+            print("problem loading this diagram")
 
     def AddShape(self, shape, after=None):
         if after:
@@ -134,8 +134,8 @@ class Shape(ShapeEvtHandler):
         dc.SetBrush(wxBrush(self.fill[0], wxSOLID))
 
     def move(self,x,y):
-        self.x = map((lambda v: v+x), self.x)
-        self.y = map((lambda v: v+y), self.y)
+        self.x = list(map((lambda v: v+x), self.x))
+        self.y = list(map((lambda v: v+y), self.y))
 
     def Copy(self):
         return copy.deepcopy(self)
@@ -201,8 +201,8 @@ class PointShape(Shape):
         self.graphic.y=[y-size,y+size]
 
     def move(self,x,y):
-        self.x = map((lambda v: v+x), self.x)
-        self.y = map((lambda v: v+y), self.y)
+        self.x = list(map((lambda v: v+x), self.x))
+        self.y = list(map((lambda v: v+y), self.y))
         self.graphic.move(x,y)
 
     def HitTest(self, x, y):
@@ -583,7 +583,7 @@ class CodeBlock(Block):
         self.label='Code'
                 
     def OnLeftDClick(self,event):
-        exec str(self.code)
+        exec(str(self.code))
 
 class ContainerBlock(Block,Diagram):
 
@@ -724,7 +724,7 @@ class AttributeEditor(wxFrame):
         prop = self.list.GetItem(idx,0).GetText()
         lines = self.text.GetNumberOfLines()
         if lines ==1:
-            exec 'self.item.' + prop +'='+self.text.GetValue()
+            exec('self.item.' + prop +'='+self.text.GetValue())
         else:
             p=setattr(self.item,prop,self.text.GetValue())
             

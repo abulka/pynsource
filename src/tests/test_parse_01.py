@@ -50,7 +50,7 @@ class TestCase01(unittest.TestCase):
         gotevent1 = 0
         gotevent2 = 0
         gotevents = 0
-        for classname, classentry in self.p.classlist.items():
+        for classname, classentry in list(self.p.classlist.items()):
             if classname == 'ParseMeTest':
                 gotevent1 = 1
                 assert classentry.classesinheritsfrom == []
@@ -123,7 +123,7 @@ class TestCase01(unittest.TestCase):
         gotevent2 = 0
         gotevent3 = 0
         gotevent4 = 0
-        for classname, classentry in self.p.classlist.items():
+        for classname, classentry in list(self.p.classlist.items()):
             if classname == 'ParseMeTest':
                 gotevent1 = 1
                 assert classentry.classesinheritsfrom == []

@@ -2,7 +2,7 @@ import sys; sys.path.append("../lib")
 from architecture_support import *
 
 from bottle import route, run, template, request, response, get, post, put, delete  # easy_install -U bottle
-import thread
+import _thread
 import wx # for mutex under linux so can update gui via app
 
 class Server(object):
@@ -20,17 +20,17 @@ class Server(object):
         return "http://%s:%s" % (self.host, self.port)
         
     def StartServer(self):
-        self.thread_id = thread.start_new_thread(self._Serve, ())
+        self.thread_id = _thread.start_new_thread(self._Serve, ())
 
     def StopServer(self):
-        print "stopping server thread..." # actually cannot kill python threads!?
+        print("stopping server thread...") # actually cannot kill python threads!?
         
     def _Serve(self):
-        print "starting server thread..."
+        print("starting server thread...")
 
         def report_error(inst):
             msg = "Server exception: %s" % inst
-            print msg
+            print(msg)
             return msg
 
         @route('/')
@@ -74,7 +74,7 @@ class Server(object):
             """
             try:
                 return self.app.controller.CmdGetThingsAsDict()  # no need to call self.json_from_dict as bottle handles it
-            except Exception, inst:
+            except Exception as inst:
                 return report_error(inst)
 
         @get('/things/:id')
@@ -87,7 +87,7 @@ class Server(object):
             """
             try:
                 return self.app.controller.CmdGetThingAsDict(id)  # no need to call self.json_from_dict as bottle handles it
-            except Exception, inst:
+            except Exception as inst:
                 return report_error(inst)
 
         @post('/things')
@@ -100,8 +100,8 @@ class Server(object):
             Note: Is there a way to send json to the server? e.g. {"info":"thing info content here"}
             """
             try:
-                print request.headers.get('X-Requested-With') # typically 'XMLHttpRequest'
-                print request.headers.get('Content-Type')
+                print(request.headers.get('X-Requested-With')) # typically 'XMLHttpRequest'
+                print(request.headers.get('Content-Type'))
                 content_type = request.headers.get('Content-Type');
 
                 if content_type == 'application/json':
@@ -111,7 +111,7 @@ class Server(object):
 
                 dict = self.app.controller.CmdAddThing(info)  # no need to call self.json_from_dict as bottle handles it
                 return dict
-            except Exception, inst:
+            except Exception as inst:
                 return report_error(inst)
 
         @put('/things')
@@ -125,17 +125,17 @@ class Server(object):
             try:
                 content_type = request.headers.get('Content-Type');
                 if content_type == 'application/json':
-                    print 'JSON REQUEST'
+                    print('JSON REQUEST')
                     id = request.json.get("id")
                     info = request.json.get("info")
                 else:
-                    print 'FORM REQUEST'
+                    print('FORM REQUEST')
                     id = request.forms.get("id")
                     info = request.forms.get("info")
 
                 dict = self.app.controller.CmdModifyThing(id, info)  # no need to call self.json_from_dict as bottle handles it
                 return dict
-            except Exception, inst:
+            except Exception as inst:
                 return report_error(inst)
 
         @delete('/things/:id')
@@ -147,7 +147,7 @@ class Server(object):
             """
             try:
                 return self.app.controller.CmdDeleteThing(id)
-            except Exception, inst:
+            except Exception as inst:
                 return report_error(inst)
             
             

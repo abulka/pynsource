@@ -2,8 +2,8 @@
 
 import struct
 import sys
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import zlib
 
 def read_signature(stream):
@@ -49,7 +49,7 @@ class iTXtChunk(Chunk):
         Chunk.__init__(self, chunk.size, chunk.chunk_type, chunk.data, chunk.crc)
         keyword_length = self.data.find('\0')
         self.keyword = self.data[:keyword_length]
-        self.text = unicode(self.data[keyword_length+5:], 'utf-8')
+        self.text = str(self.data[keyword_length+5:], 'utf-8')
 
     @staticmethod
     def create(keyword, text):
@@ -65,7 +65,7 @@ class iTXtChunk(Chunk):
         chunk_data += null
         # no translated keyword
         chunk_data += null
-        chunk_data += unicode(text).encode('utf-8')
+        chunk_data += str(text).encode('utf-8')
 
         return Chunk.create('iTXt', chunk_data)
 
@@ -84,4 +84,4 @@ if __name__ == '__main__':
     read_signature(inputFile)
 
     for chunk in all_chunks(inputFile):
-        print chunk
+        print(chunk)

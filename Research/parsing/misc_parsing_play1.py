@@ -21,7 +21,7 @@ pprint.pprint(parser.st2tuple(o))
 
 
 
-print "-"*88
+print("-"*88)
 
 
 
@@ -38,46 +38,46 @@ import ast
 
 class Py2Neko(ast.NodeVisitor):
     def generic_visit(self, node):
-        print type(node).__name__
+        print(type(node).__name__)
         ast.NodeVisitor.generic_visit(self, node)
 
     def visit_Name(self, node):
-        print 'Name :', node.id
+        print('Name :', node.id)
 
     def visit_Num(self, node):
-        print 'Num :', node.__dict__['n']
+        print('Num :', node.__dict__['n'])
 
     def visit_Str(self, node):
-        print "Str :", node.s
+        print("Str :", node.s)
 
     def visit_Print(self, node):
-        print "Print :"
+        print("Print :")
         ast.NodeVisitor.generic_visit(self, node)
 
     def visit_Assign(self, node):
-        print "Assign :"
+        print("Assign :")
         ast.NodeVisitor.generic_visit(self, node)
 
     def visit_Expr(self, node):
-        print "Expr :"
+        print("Expr :")
         ast.NodeVisitor.generic_visit(self, node)
 
     def visit_Str(self, node):
-        print 'Found string "%s"' % node.s
+        print('Found string "%s"' % node.s)
         
     def visit_ClassDef(self, node):
         have_args = []
         def paren_or_comma():
             if have_args:
-                print ', ',
+                print(', ', end=' ')
             else:
                 have_args.append(True)
-                print '(',
+                print('(', end=' ')
 
         #self.newline(extra=2)
         #self.decorators(node)
         #self.newline(node)
-        print 'class %s' % node.name,
+        print('class %s' % node.name, end=' ')
         for base in node.bases:
             paren_or_comma()
             self.visit(base)
@@ -90,14 +90,14 @@ if __name__ == '__main__':
     
     # Andy
     node = ast.parse(source)
-    print ast.dump(node)
+    print(ast.dump(node))
     v = Py2Neko()
     v.visit(node)
 
-    print
-    print "from ast to source code"    
+    print()
+    print("from ast to source code")    
     import codegen   # http://stackoverflow.com/questions/768634/python-parse-a-py-file-read-the-ast-modify-it-then-write-back-the-modified
-    print codegen.to_source(node)
+    print(codegen.to_source(node))
     
     
     

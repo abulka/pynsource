@@ -1,6 +1,6 @@
 import wx
 import random
-from DialogChooseFromList import MyDialogChooseFromList
+from .DialogChooseFromList import MyDialogChooseFromList
 
 test_data = ['test a', 'test aa', 'test aab', 'test ab',
         'test abc', 'test abcc',
@@ -13,7 +13,7 @@ class MyDialog(MyDialogChooseFromList):
         self.m_listBox1.InsertItems(data, 0)
         
     def OnListDoubleClick( self, event ):
-        print self.GetChosenItem()
+        print(self.GetChosenItem())
         #self.Destroy()
         self.Close()
 
@@ -39,7 +39,7 @@ class TestApp(wx.Frame):
         dialog.SetMyData(test_data)
 
         if dialog.ShowModal() == wx.ID_OK:
-            print dialog.GetChosenItem()
+            print(dialog.GetChosenItem())
             #wx.MessageBox("Got the following\n%s\n%s\n%s" % (id, attrs, methods))
             
         dialog.Destroy()

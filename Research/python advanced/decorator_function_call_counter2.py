@@ -32,23 +32,23 @@ if __name__ == "__main__":
    
    @countcalls
    def f():
-      print 'f called'
+      print('f called')
    
    @countcalls
    def g():
-      print 'g called'
+      print('g called')
    
    f()
    f()
    f()
-   print f.count() # prints 3
+   print(f.count()) # prints 3
    
-   print countcalls.counts() # same as f.counts() or g.counts()
-   print f.counts()
+   print(countcalls.counts()) # same as f.counts() or g.counts()
+   print(f.counts())
    
    g()
-   print g.count() # prints 1
+   print(g.count()) # prints 1
 
-   print countcalls.counts()
+   print(countcalls.counts())
    
-   print "done"
+   print("done")

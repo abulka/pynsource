@@ -1,4 +1,4 @@
-from base_cmd import CmdBase
+from .base_cmd import CmdBase
 from generate_code.gen_java import PySourceAsJava
 import wx
 import os
@@ -32,8 +32,9 @@ class CmdFileImportBase(CmdBase):   # BASE
         if self.files:
             for f in self.files:
                 #pmodel, debuginfo = old_parser(f)
-                pmodel, debuginfo = new_parser(f)
-                
+                # pmodel, debuginfo = new_parser(f)
+                pmodel, debuginfo = new_parser(f, options={'mode': 3})
+
                 #from parsing.dump_pmodel import dump_old_structure
                 #print dump_old_structure(pmodel)
                 
@@ -72,7 +73,7 @@ class CmdFileImportViaDialog(CmdFileImportBase):    # was class CmdFileImport(Cm
             self.context.config.write()
             
             self.files = dlg.GetPaths()
-            print 'Importing...', self.files
+            print('Importing...', self.files)
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
             
             super(CmdFileImportViaDialog, self).execute()
@@ -138,7 +139,7 @@ class CmdFileSaveWorkspace(CmdBase):
 
 class CmdFileSaveWorkspaceToConsole(CmdBase):
     def execute(self):
-        print self.context.displaymodel.graph.GraphToString()
+        print(self.context.displaymodel.graph.GraphToString())
 
 
 # ------- Loading from persistence
@@ -207,7 +208,7 @@ class CmdFileLoadWorkspaceFromQuickPrompt(CmdFileLoadWorkspaceBase):
         dialog.SetClientSize(wx.Size(400, 200))  # make bigger
         if dialog.ShowModal() == wx.ID_OK:
             txt = dialog.GetValue()
-            print txt
+            print(txt)
             self.load_model_from_text_and_build_shapes(txt)
         dialog.Destroy()
 
@@ -279,7 +280,7 @@ class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
 
         dlg = wx.SingleChoiceDialog(
                 self.context.frame, 'Choice:', 'Choose a Sample Uml Diagram',
-                sample_files_dict.keys(), 
+                list(sample_files_dict.keys()), 
                 wx.CHOICEDLG_STYLE
                 )
 
@@ -288,7 +289,7 @@ class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
             k = dlg.GetStringSelection()
             self.filepath = "(Sample %s)" % k
         
-            s = b64decode(sample_files_dict[k])
+            s = b64decode(sample_files_dict[k]).decode('utf-8')
             self.load_model_from_text_and_build_shapes(s)
         dlg.Destroy()
         

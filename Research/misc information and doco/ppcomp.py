@@ -5,7 +5,7 @@ rxb = re.compile(r'([\[\](),])')
 IND = '  '
 def ppcomp(s):
     out = []; wrout = out.append # sys.stdout.write
-    sp = [s.strip() for s in rxb.split(`compiler.transformer.parse(s)`)]
+    sp = [s.strip() for s in rxb.split(repr(compiler.transformer.parse(s)))]
     nest = 0
     for t in sp:
         if not t: continue
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     import sys
     s=''
     if len(sys.argv)<2:
-        print 'Enter Python source and end with ^Z'
+        print('Enter Python source and end with ^Z')
         s = sys.stdin.read()
     elif sys.argv[1]=='-f' and len(sys.argv)>2:
         f = file(sys.argv[2])
@@ -50,15 +50,15 @@ if __name__ == '__main__':
         f.close()
     elif sys.argv[1]=='-i':
         s='anything'
-        print 'Enter expression (or just press Enter to quit):'
+        print('Enter expression (or just press Enter to quit):')
         while s:
-            s = raw_input('Expr> ').rstrip()
-            if s: print ppcomp(s)
+            s = input('Expr> ').rstrip()
+            if s: print(ppcomp(s))
     elif sys.argv[1]=='-h':
-        print """
+        print("""
 Usage:  python ppcomp.py [-i | -h | -f filename | expression ]
         (nothing specified reads stdin, -i prompts, -h prints this, else the obvious)
-"""
+""")
     else:
         s = sys.argv[1]
-    if s: print ppcomp(s)
+    if s: print(ppcomp(s))

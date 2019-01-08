@@ -1,4 +1,4 @@
-from base_cmd import CmdBase
+from .base_cmd import CmdBase
 import wx
 import os
 import random

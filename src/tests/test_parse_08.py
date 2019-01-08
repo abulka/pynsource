@@ -29,7 +29,7 @@ class TestCase08(unittest.TestCase):
         gotevent6 = 0
         gotevent7 = 0
 
-        for classname, classentry in self.p.classlist.items():
+        for classname, classentry in list(self.p.classlist.items()):
             if classname == 'Fred':
                 gotevent1 = 1
                 assert classentry.classesinheritsfrom == ['Mary', 'Sam'], classentry.classesinheritsfrom
@@ -56,7 +56,7 @@ class TestCase08(unittest.TestCase):
         gotevent1 = 0
         gotevent2 = 0
 
-        for classname, classentry in self.p.classlist.items():
+        for classname, classentry in list(self.p.classlist.items()):
             if classname == 'Incoming1':
                 gotevent1 = 1
 

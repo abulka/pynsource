@@ -137,7 +137,7 @@ class Editor(stc.StyledTextCtrl):
         return root
     
     def selectNode(self,node):
-        print "clciked!!!"
+        print("clciked!!!")
         """If a tree item is right clicked select the corresponding code"""
         self.GotoLine(node.start)
         self.SetSelection(
@@ -241,8 +241,8 @@ class Frame(wx.Frame):
         self.Show()
     
 if __name__ == '__main__':
-    print 'This scintilla supports %d languages.'%len(STC_LANGUAGES)
-    print ', '.join(STC_LANGUAGES)
+    print('This scintilla supports %d languages.'%len(STC_LANGUAGES))
+    print(', '.join(STC_LANGUAGES))
     #app     = wx.PySimpleApp()
     app     = MyApp()
     frame   = Frame("Fold Explorer Demo")

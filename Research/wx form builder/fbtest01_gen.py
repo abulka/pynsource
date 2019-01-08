@@ -33,19 +33,19 @@ class MyFrame1 ( wx.Frame ):
 		self.m_panel1.SetSizer( bSizer4 )
 		self.m_panel1.Layout()
 		bSizer4.Fit( self.m_panel1 )
-		self.m_notebook2.AddPage( self.m_panel1, u"a page", True )
+		self.m_notebook2.AddPage( self.m_panel1, "a page", True )
 		self.m_panel6 = wx.Panel( self.m_notebook2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer5 = wx.BoxSizer( wx.VERTICAL )
 		
 		bSizer6 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_button5 = wx.Button( self.m_panel6, wx.ID_ANY, u"MyButton", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button5 = wx.Button( self.m_panel6, wx.ID_ANY, "MyButton", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer6.Add( self.m_button5, 0, wx.ALL, 5 )
 		
-		self.m_button6 = wx.Button( self.m_panel6, wx.ID_ANY, u"MyButton", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button6 = wx.Button( self.m_panel6, wx.ID_ANY, "MyButton", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer6.Add( self.m_button6, 0, wx.ALL, 5 )
 		
-		self.m_button7 = wx.Button( self.m_panel6, wx.ID_ANY, u"MyButton", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button7 = wx.Button( self.m_panel6, wx.ID_ANY, "MyButton", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer6.Add( self.m_button7, 0, wx.ALL, 5 )
 		
 		bSizer5.Add( bSizer6, 1, wx.EXPAND, 5 )
@@ -67,14 +67,14 @@ class MyFrame1 ( wx.Frame ):
 		self.m_panel6.SetSizer( bSizer5 )
 		self.m_panel6.Layout()
 		bSizer5.Fit( self.m_panel6 )
-		self.m_notebook2.AddPage( self.m_panel6, u"a page", False )
+		self.m_notebook2.AddPage( self.m_panel6, "a page", False )
 		self.m_panel7 = wx.Panel( self.m_notebook2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer8 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_panel7.SetSizer( bSizer8 )
 		self.m_panel7.Layout()
 		bSizer8.Fit( self.m_panel7 )
-		self.m_notebook2.AddPage( self.m_panel7, u"a page", False )
+		self.m_notebook2.AddPage( self.m_panel7, "a page", False )
 		
 		bSizer1.Add( self.m_notebook2, 1, wx.EXPAND |wx.ALL, 5 )
 		
@@ -86,10 +86,10 @@ class MyFrame1 ( wx.Frame ):
 		
 		bSizer2 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_button1 = wx.Button( self.m_panel4, wx.ID_ANY, u"Load Html", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button1 = wx.Button( self.m_panel4, wx.ID_ANY, "Load Html", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer2.Add( self.m_button1, 0, wx.ALL|wx.EXPAND, 5 )
 		
-		self.m_button2 = wx.Button( self.m_panel4, wx.ID_ANY, u"Load Html 2", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button2 = wx.Button( self.m_panel4, wx.ID_ANY, "Load Html 2", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer2.Add( self.m_button2, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		self.m_panel4.SetSizer( bSizer2 )
@@ -108,7 +108,7 @@ class MyFrame1 ( wx.Frame ):
 		bSizer3.Add( self.m_slider2, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		m_comboBox1Choices = []
-		self.m_comboBox1 = wx.ComboBox( self.m_scrolledWindow1, wx.ID_ANY, u"Combo!", wx.DefaultPosition, wx.DefaultSize, m_comboBox1Choices, 0 )
+		self.m_comboBox1 = wx.ComboBox( self.m_scrolledWindow1, wx.ID_ANY, "Combo!", wx.DefaultPosition, wx.DefaultSize, m_comboBox1Choices, 0 )
 		bSizer3.Add( self.m_comboBox1, 0, wx.ALL, 5 )
 		
 		self.m_gauge1 = wx.Gauge( self.m_scrolledWindow1, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
@@ -118,7 +118,7 @@ class MyFrame1 ( wx.Frame ):
 		self.m_slider3 = wx.Slider( self.m_scrolledWindow1, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL )
 		bSizer3.Add( self.m_slider3, 0, wx.ALL, 5 )
 		
-		self.m_button3 = wx.Button( self.m_scrolledWindow1, wx.ID_ANY, u"MyButton", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button3 = wx.Button( self.m_scrolledWindow1, wx.ID_ANY, "MyButton", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer3.Add( self.m_button3, 0, wx.ALL, 5 )
 		
 		self.m_scrolledWindow1.SetSizer( bSizer3 )

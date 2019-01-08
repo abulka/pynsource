@@ -3,7 +3,7 @@
 """
 
 # Imports
-import cgi, string, sys, cStringIO
+import cgi, string, sys, io
 import keyword, token, tokenize
 
 
@@ -50,23 +50,25 @@ class Parser:
 
         # parse the source and write it
         self.pos = 0
-        text = cStringIO.StringIO(self.raw)
+        text = io.StringIO(self.raw)
         self.out.write('<pre><font face="Lucida,Courier New">')
         try:
             tokenize.tokenize(text.readline, self)
-        except tokenize.TokenError, ex:
+        except tokenize.TokenError as ex:
             msg = ex[0]
             line = ex[1][0]
             self.out.write("<h3>ERROR: %s</h3>%s\n" % (
                 msg, self.raw[self.lines[line]:]))
         self.out.write('</font></pre>')
 
-    def __call__(self, toktype, toktext, (srow,scol), (erow,ecol), line):
+    def __call__(self, toktype, toktext, xxx_todo_changeme, xxx_todo_changeme1, line):
         """ Token handler.
         """
+        (srow,scol) = xxx_todo_changeme
+        (erow,ecol) = xxx_todo_changeme1
         if 0:
-            print "type", toktype, token.tok_name[toktype], "text", toktext,
-            print "start", srow,scol, "end", erow,ecol, "<br>"
+            print("type", toktype, token.tok_name[toktype], "text", toktext, end=' ')
+            print("start", srow,scol, "end", erow,ecol, "<br>")
 
         # calculate new positions
         oldpos = self.pos
@@ -110,7 +112,7 @@ if __name__ == "__main__":
     FILENAME_PY = FILENAME+'.py'
     FILENAME_HTML = FILENAME+'.html'
     
-    print "Formatting..."
+    print("Formatting...")
 
     # open own source
     source = open(FILENAME_PY).read()

@@ -93,7 +93,7 @@ class Link(Handler):
         return self
 
     def onCanvasShiftMotion(self, event):
-        print "onCanvasShiftMotion"
+        print("onCanvasShiftMotion")
         return self
 
     def onCanvasButtonMotion(self, event):

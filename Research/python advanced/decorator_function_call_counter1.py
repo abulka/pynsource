@@ -30,16 +30,16 @@ if __name__ == "__main__":
 
    @countcalls
    def andy1():
-       print "andy1 called"
+       print("andy1 called")
        
    andy1()
    andy1()
    andy1()
    
    # same
-   print countcalls.counts()
-   print andy1.counts()
+   print(countcalls.counts())
+   print(andy1.counts())
 
    #print countcalls.count(andy1)  # this doesn't work - why?
-   print countcalls.counts()
-   print "done"
+   print(countcalls.counts())
+   print("done")

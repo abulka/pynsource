@@ -166,7 +166,7 @@ class OverlapRemoval:
     
     def ApplyProposal(self, proposal):
         node = proposal['node']
-        assert node.id <> 'temp'
+        assert node.id != 'temp'
         #print 'APPLYING PROPOSAL: ', self.dumpproposal(proposal, doing=True)
         
         x,y = 0,0
@@ -481,7 +481,7 @@ class OverlapRemoval:
         we don't actually know.  But we increase the chance of success by not
         caring about - or + directions.  This seems to help us match, probably snug moves.
         """
-        if final_proposal['xory'] <> 'xy':
+        if final_proposal['xory'] != 'xy':
             upgrade = UpgradeSingleMoveToCombo(final_proposal, ignoreNegatives=True)
             if upgrade:
                 final_proposal = upgrade

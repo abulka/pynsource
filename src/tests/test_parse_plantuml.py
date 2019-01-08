@@ -12,12 +12,12 @@ class TestCasePlantUml01(unittest.TestCase):
         self.p = PySourceAsPlantUml()
 
     def _dump(self, p, expected):
-        print
-        print "_"*80 + " PlantUml CALCULATED:"
-        print str(p).strip()
-        print "-"*80 + " PlantUml EXPECTED:"
-        print expected
-        print "_"*80 + " PlantUml END DUMP"
+        print()
+        print("_"*80 + " PlantUml CALCULATED:")
+        print(str(p).strip())
+        print("-"*80 + " PlantUml EXPECTED:")
+        print(expected)
+        print("_"*80 + " PlantUml END DUMP")
 
 
     def test01(self):
@@ -37,7 +37,7 @@ Mary <|- Fred
 Sam <|- Fred
 """.strip()
         # self._dump(self.p, expected)
-        self.assertEquals(expected, str(self.p).strip())
+        self.assertEqual(expected, str(self.p).strip())
 
     def test01ParseMeTestUnoptimised(self):
         """
@@ -90,4 +90,4 @@ class ParseMeTest2 {
 ParseMeTest <|- ParseMeTest2
 """.strip()
         # self._dump(self.p, expected)
-        self.assertEquals(expected, str(self.p).strip())
+        self.assertEqual(expected, str(self.p).strip())

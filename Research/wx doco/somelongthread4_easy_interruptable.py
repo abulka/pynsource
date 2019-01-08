@@ -14,7 +14,7 @@ Can't get this to be interruptable!!!
 """
 
 import wx
-import thread
+import _thread
 from time import sleep
 
 class MainFrame(wx.Frame):
@@ -48,7 +48,7 @@ class MainFrame(wx.Frame):
         self.working = True
 
         if keycode == wx.WXK_ESCAPE:
-            print "ESC key detected: Abort"
+            print("ESC key detected: Abort")
             self.kill_layout = True
 
         self.working = False
@@ -59,7 +59,7 @@ class MainFrame(wx.Frame):
         self.gauge.SetValue(0)
         self.label.SetLabel("Running")
         self.kill_layout = False
-        thread.start_new_thread(self.longRunning, ())
+        _thread.start_new_thread(self.longRunning, ())
 
     def onLongRunDone(self):
         self.gauge.SetValue(100)

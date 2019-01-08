@@ -27,7 +27,7 @@ class TestCase01(unittest.TestCase):
         gotevent6 = 0
         gotevent7 = 0
 
-        for classname, classentry in self.p.classlist.items():
+        for classname, classentry in list(self.p.classlist.items()):
             if classname == 'Flag':
                 gotevent1 = 1
                 assert classentry.classesinheritsfrom == []

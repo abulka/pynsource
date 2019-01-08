@@ -1,8 +1,8 @@
 # http://www.codeproject.com/KB/web-image/pnggammastrip.aspx
 
 import sys
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 
 import pnglib
 

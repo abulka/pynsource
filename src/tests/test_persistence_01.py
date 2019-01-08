@@ -59,7 +59,7 @@ class TestCase_A(unittest.TestCase):
         
         # now check type node has been converted to type umlshape 
         data = eval(g.persistence.filedata_list[2])
-        self.assertEquals('umlshape', data.get('type'))
+        self.assertEqual('umlshape', data.get('type'))
 
     def test_3(self):
         """
@@ -86,7 +86,7 @@ class TestCase_A(unittest.TestCase):
         
         # now check type node has been converted to type umlshape 
         data = eval(g.persistence.filedata_list[2])
-        self.assertEquals('umlshape', data.get('type'))
+        self.assertEqual('umlshape', data.get('type'))
 
     def test_4(self):
         """
@@ -110,7 +110,7 @@ class TestCase_A(unittest.TestCase):
         
         # now check type node has been converted to type umlshape 
         data = eval(g.persistence.filedata_list[2])
-        self.assertEquals('umlshape', data.get('type'))
+        self.assertEqual('umlshape', data.get('type'))
 
     def test_5(self):
         """

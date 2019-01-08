@@ -1,4 +1,4 @@
-from controller import Controller
+from .controller import Controller
 
 class App(object):
     def __init__(self, context):

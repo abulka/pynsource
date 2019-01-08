@@ -70,7 +70,7 @@ class TestFrame(wx.Frame):
 
 def GetJpgList(dir):
     jpgs = [f for f in os.listdir(dir) if f[-4:] == ".jpg"]
-    print "JPGS are:", jpgs
+    print("JPGS are:", jpgs)
 
     return [os.path.join(dir, f) for f in jpgs]
 

@@ -31,7 +31,7 @@ class MyFormMediator:
     #        mydata = notification.getBody()
     #        self.viewComponent.inputFieldTxt.SetValue(mydata)
     def DATA_CHANGED(self, mydata):
-        print "handleNotification (mediator) got", mydata
+        print("handleNotification (mediator) got", mydata)
         self.viewComponent.inputFieldTxt.SetValue(mydata)
 
     def onSubmit(self, evt):
@@ -46,7 +46,7 @@ class DataSubmittedCommand():
     #    self.datamodelProxy = self.facade.retrieveProxy(DataModelProxy.NAME)
     #    self.datamodelProxy.setData(mydata.upper())
     def DATA_SUBMITTED(self, mydata):
-        print "submit execute (command)", mydata
+        print("submit execute (command)", mydata)
         self.datamodelProxy.setData(mydata.upper())
 
 class DataModelProxy():
@@ -63,7 +63,7 @@ class DataModelProxy():
 
     def setData(self, data):
         self.realdata.data = data
-        print "setData (model) to", data
+        print("setData (model) to", data)
 #        self.sendNotification(AppFacade.DATA_CHANGED, self.realdata.data)
         self.observers.DATA_CHANGED(self.realdata.data)
 

@@ -1,6 +1,6 @@
 
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 
 import png
 
@@ -23,9 +23,9 @@ def add_yuml_to_png(yuml, in_stream, out_stream):
 def create(yuml, output_filename):
     #baseUrl = 'http://yuml.me/diagram/scruffy/class/'
     baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
-    url = baseUrl + urllib.quote(yuml)
+    url = baseUrl + urllib.parse.quote(yuml)
     
-    original_png = urllib2.urlopen(url)
+    original_png = urllib.request.urlopen(url)
     output_file = file(output_filename, 'wb')
 
     add_yuml_to_png(yuml, original_png, output_file)

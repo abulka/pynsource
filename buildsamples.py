@@ -14,7 +14,7 @@ allfiles = glob.glob(os.path.join(samplesdir, "*.pyns"))
 samples = {}
 for file in allfiles:
     with open(os.path.join(samplesdir, file),'r') as f:
-        samples[os.path.basename(file)] = b64encode(f.read())
+        samples[os.path.basename(file)] = b64encode(f.read().encode('utf-8'))
 
 OUTFILE = os.path.join(samplesdir, "files_as_resource.py")
 
@@ -25,7 +25,7 @@ if not ORDERED:
 else:
     #od = collections.OrderedDict(samples.items())
     od = collections.OrderedDict()
-    for key in sorted(samples.iterkeys()):
+    for key in sorted(samples.keys()):
         od[key] = samples[key]
 
     with open(OUTFILE, 'w') as f:
@@ -33,5 +33,5 @@ else:
         f.write("sample_files_dict = ")
         f.write(repr(od))
 
-print "done generating sample uml diagram file resource dictionary."
+print("done generating sample uml diagram file resource dictionary.")
 

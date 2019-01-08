@@ -24,16 +24,16 @@ class MyFrame1 ( wx.Frame ):
 		bSizer1 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_auiToolBar1 = wx.aui.AuiToolBar( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.aui.AUI_TB_HORZ_LAYOUT ) 
-		self.m_button1 = wx.Button( self.m_auiToolBar1, wx.ID_ANY, u"MyButton", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button1 = wx.Button( self.m_auiToolBar1, wx.ID_ANY, "MyButton", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_auiToolBar1.AddControl( self.m_button1 )
 		self.m_bpButton1 = wx.BitmapButton( self.m_auiToolBar1, wx.ID_ANY, wx.NullBitmap, wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW )
 		self.m_auiToolBar1.AddControl( self.m_bpButton1 )
-		self.m_staticText1 = wx.StaticText( self.m_auiToolBar1, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText1 = wx.StaticText( self.m_auiToolBar1, wx.ID_ANY, "MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText1.Wrap( -1 )
 		self.m_auiToolBar1.AddControl( self.m_staticText1 )
 		self.m_slider1 = wx.Slider( self.m_auiToolBar1, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL )
 		self.m_auiToolBar1.AddControl( self.m_slider1 )
-		self.m_button2 = wx.Button( self.m_auiToolBar1, wx.ID_ANY, u"MyButton", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button2 = wx.Button( self.m_auiToolBar1, wx.ID_ANY, "MyButton", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_auiToolBar1.AddControl( self.m_button2 )
 		self.m_auiToolBar1.Realize() 
 		
@@ -41,9 +41,9 @@ class MyFrame1 ( wx.Frame ):
 		
 		self.m_auinotebook1 = wx.aui.AuiNotebook( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.aui.AUI_NB_DEFAULT_STYLE )
 		self.m_panel4 = wx.Panel( self.m_auinotebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		self.m_auinotebook1.AddPage( self.m_panel4, u"a page", True, wx.NullBitmap )
+		self.m_auinotebook1.AddPage( self.m_panel4, "a page", True, wx.NullBitmap )
 		self.m_panel5 = wx.Panel( self.m_auinotebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		self.m_auinotebook1.AddPage( self.m_panel5, u"a page", False, wx.NullBitmap )
+		self.m_auinotebook1.AddPage( self.m_panel5, "a page", False, wx.NullBitmap )
 		
 		bSizer1.Add( self.m_auinotebook1, 1, wx.EXPAND |wx.ALL, 5 )
 		
@@ -52,28 +52,28 @@ class MyFrame1 ( wx.Frame ):
 		self.m_statusBar1 = self.CreateStatusBar( 1, wx.ST_SIZEGRIP, wx.ID_ANY )
 		self.m_menubar1 = wx.MenuBar( 0 )
 		self.m_menu1 = wx.Menu()
-		self.m_menuItem1 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"MyMenuItem", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem1 = wx.MenuItem( self.m_menu1, wx.ID_ANY, "MyMenuItem", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu1.AppendItem( self.m_menuItem1 )
 		
-		self.m_menuItem2 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"MyMenuItem", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem2 = wx.MenuItem( self.m_menu1, wx.ID_ANY, "MyMenuItem", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu1.AppendItem( self.m_menuItem2 )
 		
-		self.m_menuItem3 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"MyMenuItem", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem3 = wx.MenuItem( self.m_menu1, wx.ID_ANY, "MyMenuItem", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu1.AppendItem( self.m_menuItem3 )
 		
-		self.m_menubar1.Append( self.m_menu1, u"MyMenu" ) 
+		self.m_menubar1.Append( self.m_menu1, "MyMenu" ) 
 		
 		self.m_menu3 = wx.Menu()
 		self.m_menu11 = wx.Menu()
-		self.m_menuItem4 = wx.MenuItem( self.m_menu11, wx.ID_ANY, u"MyMenuItem", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem4 = wx.MenuItem( self.m_menu11, wx.ID_ANY, "MyMenuItem", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu11.AppendItem( self.m_menuItem4 )
 		
-		self.m_menuItem5 = wx.MenuItem( self.m_menu11, wx.ID_ANY, u"MyMenuItem", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem5 = wx.MenuItem( self.m_menu11, wx.ID_ANY, "MyMenuItem", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu11.AppendItem( self.m_menuItem5 )
 		
-		self.m_menu3.AppendSubMenu( self.m_menu11, u"MyMenu" )
+		self.m_menu3.AppendSubMenu( self.m_menu11, "MyMenu" )
 		
-		self.m_menubar1.Append( self.m_menu3, u"MyMenu" ) 
+		self.m_menubar1.Append( self.m_menu3, "MyMenu" ) 
 		
 		self.SetMenuBar( self.m_menubar1 )
 		
@@ -111,11 +111,11 @@ class MyFrame2 ( wx.Frame ):
 		self.m_panel1.SetSizer( bSizer4 )
 		self.m_panel1.Layout()
 		bSizer4.Fit( self.m_panel1 )
-		self.m_notebook1.AddPage( self.m_panel1, u"Ed", True )
+		self.m_notebook1.AddPage( self.m_panel1, "Ed", True )
 		self.m_panel2 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		self.m_notebook1.AddPage( self.m_panel2, u"a page", False )
+		self.m_notebook1.AddPage( self.m_panel2, "a page", False )
 		self.m_panel3 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		self.m_notebook1.AddPage( self.m_panel3, u"a page", False )
+		self.m_notebook1.AddPage( self.m_panel3, "a page", False )
 		
 		bSizer2.Add( self.m_notebook1, 1, wx.EXPAND |wx.ALL, 5 )
 		
@@ -135,21 +135,21 @@ class MyFrame2 ( wx.Frame ):
 class MyFrame3 ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"AUI Andy Demo", pos = wx.DefaultPosition, size = wx.Size( 535,348 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "AUI Andy Demo", pos = wx.DefaultPosition, size = wx.Size( 535,348 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		self.m_mgr = wx.aui.AuiManager()
 		self.m_mgr.SetManagedWindow( self )
 		
 		self.m_panel6 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		self.m_mgr.AddPane( self.m_panel6, wx.aui.AuiPaneInfo() .Left() .Caption( u"Tools" ).MaximizeButton( False ).MinimizeButton( False ).PinButton( True ).Dock().Resizable().FloatingSize( wx.Size( 116,154 ) ).DockFixed( False ).Row( 1 ).BestSize( wx.Size( 100,-1 ) ) )
+		self.m_mgr.AddPane( self.m_panel6, wx.aui.AuiPaneInfo() .Left() .Caption( "Tools" ).MaximizeButton( False ).MinimizeButton( False ).PinButton( True ).Dock().Resizable().FloatingSize( wx.Size( 116,154 ) ).DockFixed( False ).Row( 1 ).BestSize( wx.Size( 100,-1 ) ) )
 		
 		bSizer3 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_button3 = wx.Button( self.m_panel6, wx.ID_ANY, u"Import", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button3 = wx.Button( self.m_panel6, wx.ID_ANY, "Import", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer3.Add( self.m_button3, 0, wx.ALL|wx.EXPAND, 5 )
 		
-		self.m_button4 = wx.Button( self.m_panel6, wx.ID_ANY, u"Say", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button4 = wx.Button( self.m_panel6, wx.ID_ANY, "Say", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer3.Add( self.m_button4, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		self.m_panel6.SetSizer( bSizer3 )
@@ -160,10 +160,10 @@ class MyFrame3 ( wx.Frame ):
 		
 		self.m_menubar2 = wx.MenuBar( 0 )
 		self.m_menu4 = wx.Menu()
-		self.m_menuItem6 = wx.MenuItem( self.m_menu4, wx.ID_ANY, u"Hi", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem6 = wx.MenuItem( self.m_menu4, wx.ID_ANY, "Hi", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu4.AppendItem( self.m_menuItem6 )
 		
-		self.m_menubar2.Append( self.m_menu4, u"MyMenu" ) 
+		self.m_menubar2.Append( self.m_menu4, "MyMenu" ) 
 		
 		self.SetMenuBar( self.m_menubar2 )
 		

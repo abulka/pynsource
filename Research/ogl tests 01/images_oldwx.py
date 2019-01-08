@@ -3,7 +3,7 @@
 #
 from wxPython.wx import wxImageFromStream, wxBitmapFromImage
 from wxPython.wx import wxEmptyIcon
-import cStringIO
+import io
 
 
 def getMondrianData():
@@ -20,7 +20,7 @@ def getMondrianBitmap():
     return wxBitmapFromImage(getMondrianImage())
 
 def getMondrianImage():
-    stream = cStringIO.StringIO(getMondrianData())
+    stream = io.StringIO(getMondrianData())
     return wxImageFromStream(stream)
 
 def getMondrianIcon():
@@ -70,7 +70,7 @@ def get_10s_Bitmap():
     return wxBitmapFromImage(get_10s_Image())
 
 def get_10s_Image():
-    stream = cStringIO.StringIO(get_10s_Data())
+    stream = io.StringIO(get_10s_Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -106,7 +106,7 @@ def get_01c_Bitmap():
     return wxBitmapFromImage(get_01c_Image())
 
 def get_01c_Image():
-    stream = cStringIO.StringIO(get_01c_Data())
+    stream = io.StringIO(get_01c_Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -197,7 +197,7 @@ def get_12h_Bitmap():
     return wxBitmapFromImage(get_12h_Image())
 
 def get_12h_Image():
-    stream = cStringIO.StringIO(get_12h_Data())
+    stream = io.StringIO(get_12h_Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -283,7 +283,7 @@ def get_13d_Bitmap():
     return wxBitmapFromImage(get_13d_Image())
 
 def get_13d_Image():
-    stream = cStringIO.StringIO(get_13d_Data())
+    stream = io.StringIO(get_13d_Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -1777,7 +1777,7 @@ def getBackgroundBitmap():
     return wxBitmapFromImage(getBackgroundImage())
 
 def getBackgroundImage():
-    stream = cStringIO.StringIO(getBackgroundData())
+    stream = io.StringIO(getBackgroundData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -1893,7 +1893,7 @@ def getTestStarBitmap():
     return wxBitmapFromImage(getTestStarImage())
 
 def getTestStarImage():
-    stream = cStringIO.StringIO(getTestStarData())
+    stream = io.StringIO(getTestStarData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -2007,7 +2007,7 @@ def getTestStar2Bitmap():
     return wxBitmapFromImage(getTestStar2Image())
 
 def getTestStar2Image():
-    stream = cStringIO.StringIO(getTestStar2Data())
+    stream = io.StringIO(getTestStar2Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -2058,7 +2058,7 @@ def getTestMaskBitmap():
     return wxBitmapFromImage(getTestMaskImage())
 
 def getTestMaskImage():
-    stream = cStringIO.StringIO(getTestMaskData())
+    stream = io.StringIO(getTestMaskData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -2166,7 +2166,7 @@ def getTest2Bitmap():
     return wxBitmapFromImage(getTest2Image())
 
 def getTest2Image():
-    stream = cStringIO.StringIO(getTest2Data())
+    stream = io.StringIO(getTest2Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3202,7 +3202,7 @@ def getRobinBitmap():
     return wxBitmapFromImage(getRobinImage())
 
 def getRobinImage():
-    stream = cStringIO.StringIO(getRobinData())
+    stream = io.StringIO(getRobinData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3225,7 +3225,7 @@ def getBulb1Bitmap():
     return wxBitmapFromImage(getBulb1Image())
 
 def getBulb1Image():
-    stream = cStringIO.StringIO(getBulb1Data())
+    stream = io.StringIO(getBulb1Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3255,7 +3255,7 @@ def getBulb2Bitmap():
     return wxBitmapFromImage(getBulb2Image())
 
 def getBulb2Image():
-    stream = cStringIO.StringIO(getBulb2Data())
+    stream = io.StringIO(getBulb2Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3285,7 +3285,7 @@ def getCalendarBitmap():
     return wxBitmapFromImage(getCalendarImage())
 
 def getCalendarImage():
-    stream = cStringIO.StringIO(getCalendarData())
+    stream = io.StringIO(getCalendarData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3304,7 +3304,7 @@ def getDbDecBitmap():
     return wxBitmapFromImage(getDbDecImage())
 
 def getDbDecImage():
-    stream = cStringIO.StringIO(getDbDecData())
+    stream = io.StringIO(getDbDecData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3323,7 +3323,7 @@ def getDecBitmap():
     return wxBitmapFromImage(getDecImage())
 
 def getDecImage():
-    stream = cStringIO.StringIO(getDecData())
+    stream = io.StringIO(getDecData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3340,7 +3340,7 @@ def getPtBitmap():
     return wxBitmapFromImage(getPtImage())
 
 def getPtImage():
-    stream = cStringIO.StringIO(getPtData())
+    stream = io.StringIO(getPtData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3359,7 +3359,7 @@ def getDbIncBitmap():
     return wxBitmapFromImage(getDbIncImage())
 
 def getDbIncImage():
-    stream = cStringIO.StringIO(getDbIncData())
+    stream = io.StringIO(getDbIncData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3377,7 +3377,7 @@ def getIncBitmap():
     return wxBitmapFromImage(getIncImage())
 
 def getIncImage():
-    stream = cStringIO.StringIO(getIncData())
+    stream = io.StringIO(getIncData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3395,7 +3395,7 @@ def getNewBitmap():
     return wxBitmapFromImage(getNewImage())
 
 def getNewImage():
-    stream = cStringIO.StringIO(getNewData())
+    stream = io.StringIO(getNewData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3415,7 +3415,7 @@ def getOpenBitmap():
     return wxBitmapFromImage(getOpenImage())
 
 def getOpenImage():
-    stream = cStringIO.StringIO(getOpenData())
+    stream = io.StringIO(getOpenData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3436,7 +3436,7 @@ def getCopyBitmap():
     return wxBitmapFromImage(getCopyImage())
 
 def getCopyImage():
-    stream = cStringIO.StringIO(getCopyData())
+    stream = io.StringIO(getCopyData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3456,7 +3456,7 @@ def getPasteBitmap():
     return wxBitmapFromImage(getPasteImage())
 
 def getPasteImage():
-    stream = cStringIO.StringIO(getPasteData())
+    stream = io.StringIO(getPasteData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3473,7 +3473,7 @@ def getTog1Bitmap():
     return wxBitmapFromImage(getTog1Image())
 
 def getTog1Image():
-    stream = cStringIO.StringIO(getTog1Data())
+    stream = io.StringIO(getTog1Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3490,7 +3490,7 @@ def getTog2Bitmap():
     return wxBitmapFromImage(getTog2Image())
 
 def getTog2Image():
-    stream = cStringIO.StringIO(getTog2Data())
+    stream = io.StringIO(getTog2Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3530,7 +3530,7 @@ def getSmilesBitmap():
     return wxBitmapFromImage(getSmilesImage())
 
 def getSmilesImage():
-    stream = cStringIO.StringIO(getSmilesData())
+    stream = io.StringIO(getSmilesData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3559,7 +3559,7 @@ def getGridBGBitmap():
     return wxBitmapFromImage(getGridBGImage())
 
 def getGridBGImage():
-    stream = cStringIO.StringIO(getGridBGData())
+    stream = io.StringIO(getGridBGData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3576,7 +3576,7 @@ def getSmallUpArrowBitmap():
     return wxBitmapFromImage(getSmallUpArrowImage())
 
 def getSmallUpArrowImage():
-    stream = cStringIO.StringIO(getSmallUpArrowData())
+    stream = io.StringIO(getSmallUpArrowData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3593,7 +3593,7 @@ def getSmallDnArrowBitmap():
     return wxBitmapFromImage(getSmallDnArrowImage())
 
 def getSmallDnArrowImage():
-    stream = cStringIO.StringIO(getSmallDnArrowData())
+    stream = io.StringIO(getSmallDnArrowData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3614,7 +3614,7 @@ def getFolder1Bitmap():
     return wxBitmapFromImage(getFolder1Image())
 
 def getFolder1Image():
-    stream = cStringIO.StringIO(getFolder1Data())
+    stream = io.StringIO(getFolder1Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3634,7 +3634,7 @@ def getFolder2Bitmap():
     return wxBitmapFromImage(getFolder2Image())
 
 def getFolder2Image():
-    stream = cStringIO.StringIO(getFolder2Data())
+    stream = io.StringIO(getFolder2Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3653,7 +3653,7 @@ def getFolder3Bitmap():
     return wxBitmapFromImage(getFolder3Image())
 
 def getFolder3Image():
-    stream = cStringIO.StringIO(getFolder3Data())
+    stream = io.StringIO(getFolder3Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3671,7 +3671,7 @@ def getFile1Bitmap():
     return wxBitmapFromImage(getFile1Image())
 
 def getFile1Image():
-    stream = cStringIO.StringIO(getFile1Data())
+    stream = io.StringIO(getFile1Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3689,7 +3689,7 @@ def getFile2Bitmap():
     return wxBitmapFromImage(getFile2Image())
 
 def getFile2Image():
-    stream = cStringIO.StringIO(getFile2Data())
+    stream = io.StringIO(getFile2Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3709,7 +3709,7 @@ def getNoIconBitmap():
     return wxBitmapFromImage(getNoIconImage())
 
 def getNoIconImage():
-    stream = cStringIO.StringIO(getNoIconData())
+    stream = io.StringIO(getNoIconData())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -3878,7 +3878,7 @@ def getWizTest1Bitmap():
     return wxBitmapFromImage(getWizTest1Image())
 
 def getWizTest1Image():
-    stream = cStringIO.StringIO(getWizTest1Data())
+    stream = io.StringIO(getWizTest1Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -4057,7 +4057,7 @@ def getWizTest2Bitmap():
     return wxBitmapFromImage(getWizTest2Image())
 
 def getWizTest2Image():
-    stream = cStringIO.StringIO(getWizTest2Data())
+    stream = io.StringIO(getWizTest2Data())
     return wxImageFromStream(stream)
 
 #----------------------------------------------------------------------
@@ -5368,6 +5368,6 @@ def getTuxBitmap():
     return wxBitmapFromImage(getTuxImage())
 
 def getTuxImage():
-    stream = cStringIO.StringIO(getTuxData())
+    stream = io.StringIO(getTuxData())
     return wxImageFromStream(stream)
 

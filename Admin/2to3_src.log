@@ -1,0 +1,2553 @@
+--- src/pyNsourceGui.py	(original)
++++ src/pyNsourceGui.py	(refactored)
+@@ -80,7 +80,7 @@
+             # Page 0
+             self.umlcanvas = UmlCanvas(self.notebook, Log(), self.frame)
+             self.umlcanvas.SetScrollRate(5, 5)
+-            self.notebook.AddPage(self.umlcanvas, u"UML", True)
++            self.notebook.AddPage(self.umlcanvas, "UML", True)
+ 
+             # Page 1
+             self.asciiart = wx.ScrolledWindow(self.notebook, wx.ID_ANY, wx.DefaultPosition,
+@@ -100,7 +100,7 @@
+             self.asciiart.SetSizer(asciiart_sizer)
+             self.asciiart.Layout()
+             asciiart_sizer.Fit(self.asciiart)
+-            self.notebook.AddPage(self.asciiart, u"Ascii Art", True)
++            self.notebook.AddPage(self.asciiart, "Ascii Art", True)
+ 
+             sizer.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 0)
+             self.frame.SetSizer(sizer)
+@@ -594,8 +594,8 @@
+         webbrowser.open(WEB_PYNSOURCE_HOME_URL)
+ 
+     def OnCheckForUpdates(self, event):
+-        import urllib2
+-        s = urllib2.urlopen(WEB_VERSION_CHECK_URL).read()
++        import urllib.request, urllib.error, urllib.parse
++        s = urllib.request.urlopen(WEB_VERSION_CHECK_URL).read()
+         s = s.replace("\r", "")
+         info = eval(s)
+         ver = info["latest_version"]
+--- src/pyPlantumlGui.py	(original)
++++ src/pyPlantumlGui.py	(refactored)
+@@ -47,15 +47,15 @@
+         
+     def OnImport( self, event ):
+         from generate_code.gen_plantuml import PySourceAsPlantUml
+-        import urllib
++        import urllib.request, urllib.parse, urllib.error
+         
+         dlg = wx.FileDialog(parent=self, message="choose", defaultDir='.',
+             defaultFile="", wildcard="*.py", style=wx.OPEN|wx.FD_MULTIPLE, pos=wx.DefaultPosition)
+         if dlg.ShowModal() == wx.ID_OK:
+             filenames = dlg.GetPaths()
+-            print 'Importing...'
++            print('Importing...')
+             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
+-            print filenames
++            print(filenames)
+             
+             files=filenames
+             p = PySourceAsPlantUml()
+@@ -70,7 +70,7 @@
+ 
+             plant_uml_txt = "@startuml\n%s@enduml\n" % plant_uml_txt  # just for fun, server doesn't need it
+ 
+-            print plant_uml_txt
++            print(plant_uml_txt)
+ 
+             image_url, response = plant_uml_create_png_and_return_image_url(plant_uml_txt)
+ 
+@@ -78,7 +78,7 @@
+                 self.puml.ViewImage(url=image_url)
+ 
+             wx.EndBusyCursor()
+-            print 'Import - Done.'
++            print('Import - Done.')
+             
+             
+ APP_SIZE = (600,600)
+--- src/pyYumlGui.py	(original)
++++ src/pyYumlGui.py	(refactored)
+@@ -45,15 +45,15 @@
+         
+     def OnImport( self, event ):
+         from generate_code.gen_yuml import PySourceAsYuml
+-        import urllib
++        import urllib.request, urllib.parse, urllib.error
+         
+         dlg = wx.FileDialog(parent=self, message="choose", defaultDir='.',
+             defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
+         if dlg.ShowModal() == wx.ID_OK:
+             filenames = dlg.GetPaths()
+-            print 'Importing...'
++            print('Importing...')
+             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
+-            print filenames
++            print(filenames)
+             
+             files=filenames
+             p = PySourceAsYuml()
+@@ -63,16 +63,16 @@
+                 for f in files:
+                     p.Parse(f)
+             p.CalcYumls()
+-            print p
++            print(p)
+ 
+             #yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
+             yuml_txt = ','.join(str(p).split())
+             baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
+-            url = baseUrl + urllib.quote(yuml_txt)
++            url = baseUrl + urllib.parse.quote(yuml_txt)
+             self.yuml.ViewImage(url=url)
+ 
+             wx.EndBusyCursor()
+-            print 'Import - Done.'
++            print('Import - Done.')
+             
+             
+ APP_SIZE = (600,600)
+--- src/pynsource.py	(original)
++++ src/pynsource.py	(refactored)
+@@ -27,7 +27,7 @@
+     elif strategy == 'ast_via_api':
+         pmodel, debuginfo = new_parser(FILE)
+ 
+-    print(dump_old_structure(pmodel))  # TODO this could be another generate code reporter plugin
++    print((dump_old_structure(pmodel)))  # TODO this could be another generate code reporter plugin
+ 
+     # print p
+     #print 'Done.'
+@@ -60,7 +60,7 @@
+         def EnsurePathExists(outdir, outlanguagemsg):
+             assert outdir, 'Need to specify output folder for %s output - got %s.'%(outlanguagemsg, outdir)
+             if not os.path.exists(outdir):
+-                raise RuntimeError, ('Output directory %s for %s file output does not exist.'%(outdir,outlanguagemsg))
++                raise RuntimeError('Output directory %s for %s file output does not exist.'%(outdir,outlanguagemsg))
+ 
+         for optionvaluepair in listofoptionvaluepairs:
+             if '-x' == optionvaluepair[0]:
+@@ -110,7 +110,7 @@
+         elif option_show_parse_model:
+             for f in globbed:
+                 pmodel, debuginfo = new_parser(f)
+-                print(dump_old_structure(pmodel))
++                print((dump_old_structure(pmodel)))
+         else:
+             u = CmdLinePythonToAsciiArt(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
+             u.ExportTo(None)
+@@ -118,7 +118,7 @@
+         if option_run_experiment:
+             test()
+         else:
+-            print common.messages.HELP_COMMAND_LINE_USAGE
++            print(common.messages.HELP_COMMAND_LINE_USAGE)
+ 
+ if __name__ == '__main__':
+     # test()
+--- src/app/app.py	(original)
++++ src/app/app.py	(refactored)
+@@ -1,4 +1,4 @@
+-from controller import Controller
++from .controller import Controller
+ 
+ class App(object):
+     def __init__(self, context):
+--- src/app/controller.py	(original)
++++ src/app/controller.py	(refactored)
+@@ -9,13 +9,13 @@
+ 
+ from common.command_pattern import CommandManager
+ 
+-from cmds.diagnostics import *
+-from cmds.deletion import *
+-from cmds.insertion import *
+-from cmds.selection import *
+-from cmds.filemgmt import *
+-from cmds.layouts import *
+-from cmds.colouring import *
++from .cmds.diagnostics import *
++from .cmds.deletion import *
++from .cmds.insertion import *
++from .cmds.selection import *
++from .cmds.filemgmt import *
++from .cmds.layouts import *
++from .cmds.colouring import *
+ # TODO: Perhaps can add these modules to the globals within the
+ # invoker class, to avoid having to import each module explicitly?
+ 
+@@ -150,7 +150,7 @@
+             self.num = num
+             self.num2 = num2
+         def execute(self):
+-            print "hi from Woody and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__
++            print("hi from Woody and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__)
+      
+     invoker.CmdWoody(100)  # instantiates class CmdWoody with constructor value (100) and calls execute() on it
+     invoker.CmdWoody(100, 97)
+@@ -171,7 +171,7 @@
+             self.num2 = num2
+         def execute(self):
+             assert self.context
+-            print "hi from Bob and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__
++            print("hi from Bob and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__)
+     
+     invoker.CmdBob(100)  # instantiates class CmdBob with constructor value (100) and calls execute() on it
+     invoker.CmdBob(100, 97)
+@@ -181,4 +181,4 @@
+     c.setContext({'a':44})   # Need to do this if not using the framework
+     c.execute()
+     
+-    print "done"        
++    print("done")        
+--- src/app/cmds/blackboard_frame.py	(original)
++++ src/app/cmds/blackboard_frame.py	(refactored)
+@@ -5,7 +5,7 @@
+ from threading import *
+ import wx
+ 
+-from blackboard_thread import WorkerThread, ResultEvent, EVT_RESULT
++from .blackboard_thread import WorkerThread, ResultEvent, EVT_RESULT
+ 
+ if __name__ == '__main__':
+     import sys
+@@ -54,7 +54,7 @@
+         self.working = True
+ 
+         if keycode == wx.WXK_ESCAPE:
+-            print "ESC key detected in Blackboard: Abort Layout"
++            print("ESC key detected in Blackboard: Abort Layout")
+             self.OnClose(None)
+             
+         self.working = False
+@@ -101,7 +101,7 @@
+             wx.CallAfter(self.status.SetLabel, event.statusmsg)
+             log("** " + event.statusmsg)
+ 
+-        if event.progress <> -1:
++        if event.progress != -1:
+             wx.CallAfter(self.progressbar.SetValue, event.progress)
+         
+         if event.shouldStop:
+--- src/app/cmds/colouring.py	(original)
++++ src/app/cmds/colouring.py	(refactored)
+@@ -1,4 +1,4 @@
+-from base_cmd import CmdBase
++from .base_cmd import CmdBase
+ import wx
+ import os
+ import random
+--- src/app/cmds/deletion.py	(original)
++++ src/app/cmds/deletion.py	(refactored)
+@@ -1,4 +1,4 @@
+-from base_cmd import CmdBase
++from .base_cmd import CmdBase
+ 
+ # Cannot multi-select nodes at present.
+ 
+--- src/app/cmds/diagnostics.py	(original)
++++ src/app/cmds/diagnostics.py	(refactored)
+@@ -1,4 +1,4 @@
+-from base_cmd import CmdBase
++from .base_cmd import CmdBase
+ import wx
+ 
+ class CmdDumpUmlWorkspace(CmdBase):
+@@ -8,21 +8,21 @@
+         import locale
+         locale.setlocale(locale.LC_ALL, '')  # http://stackoverflow.com/questions/1823058/how-to-print-number-with-commas-as-thousands-separators-in-python-2-x
+         
+-        print "v" * 50
++        print("v" * 50)
+         self.context.displaymodel.Dump()
+-        print
+-        print "  MISC Scaling etc info "
+-        print
++        print()
++        print("  MISC Scaling etc info ")
++        print()
+         self.context.coordmapper.DumpCalibrationInfo(dump_nodes=False)
+-        print "line-line intersections", len(self.context.displaymodel.graph.CountLineOverLineIntersections())
+-        print "node-node overlaps", self.context.overlap_remover.CountOverlaps()
+-        print "line-node crossings", self.context.displaymodel.graph.CountLineOverNodeCrossings()['ALL']/2 #, self.graph.CountLineOverNodeCrossings()
+-        print "bounds", self.context.displaymodel.graph.GetBounds()
++        print("line-line intersections", len(self.context.displaymodel.graph.CountLineOverLineIntersections()))
++        print("node-node overlaps", self.context.overlap_remover.CountOverlaps())
++        print("line-node crossings", self.context.displaymodel.graph.CountLineOverNodeCrossings()['ALL']/2) #, self.graph.CountLineOverNodeCrossings()
++        print("bounds", self.context.displaymodel.graph.GetBounds())
+ 
+ 
+         #print "SHAPE to classname list: -------------------"
+         #for shape in self.umlboxshapes:
+         #    print 'shape', shape, shape.node.classname
+ 
+-        print
+-        print "^" * 50
++        print()
++        print("^" * 50)
+--- src/app/cmds/filemgmt.py	(original)
++++ src/app/cmds/filemgmt.py	(refactored)
+@@ -1,4 +1,4 @@
+-from base_cmd import CmdBase
++from .base_cmd import CmdBase
+ from generate_code.gen_java import PySourceAsJava
+ import wx
+ import os
+@@ -72,7 +72,7 @@
+             self.context.config.write()
+             
+             self.files = dlg.GetPaths()
+-            print 'Importing...', self.files
++            print('Importing...', self.files)
+             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
+             
+             super(CmdFileImportViaDialog, self).execute()
+@@ -138,7 +138,7 @@
+ 
+ class CmdFileSaveWorkspaceToConsole(CmdBase):
+     def execute(self):
+-        print self.context.displaymodel.graph.GraphToString()
++        print(self.context.displaymodel.graph.GraphToString())
+ 
+ 
+ # ------- Loading from persistence
+@@ -207,7 +207,7 @@
+         dialog.SetClientSize(wx.Size(400, 200))  # make bigger
+         if dialog.ShowModal() == wx.ID_OK:
+             txt = dialog.GetValue()
+-            print txt
++            print(txt)
+             self.load_model_from_text_and_build_shapes(txt)
+         dialog.Destroy()
+ 
+@@ -279,7 +279,7 @@
+ 
+         dlg = wx.SingleChoiceDialog(
+                 self.context.frame, 'Choice:', 'Choose a Sample Uml Diagram',
+-                sample_files_dict.keys(), 
++                list(sample_files_dict.keys()), 
+                 wx.CHOICEDLG_STYLE
+                 )
+ 
+--- src/app/cmds/insertion.py	(original)
++++ src/app/cmds/insertion.py	(refactored)
+@@ -1,4 +1,4 @@
+-from base_cmd import CmdBase
++from .base_cmd import CmdBase
+ import wx
+ import random
+ from dialogs.DialogComment import DialogComment
+@@ -46,7 +46,7 @@
+ 
+             attrs = string_to_list_smart(dialog.txtAttrs.Value)
+             methods = string_to_list_smart(dialog.txtMethods.Value)
+-            print id, attrs, methods
++            print(id, attrs, methods)
+         else:
+             result, id, attrs, methods = False, None, None, None
+         dialog.Destroy()
+@@ -276,7 +276,7 @@
+         if not filename:
+             curr_dir = os.path.dirname( os.path.abspath( __file__ ) )
+             filename = os.path.join(curr_dir, '..\\..\..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP')
+-            print filename
++            print(filename)
+             
+         self.context.umlcanvas.CreateImageShape(filename)
+         self.context.umlcanvas.remove_overlaps()
+--- src/app/cmds/layouts.py	(original)
++++ src/app/cmds/layouts.py	(refactored)
+@@ -1,4 +1,4 @@
+-from base_cmd import CmdBase
++from .base_cmd import CmdBase
+ 
+ class CmdLayout(CmdBase):
+     def execute(self):
+@@ -36,7 +36,7 @@
+             self.ChangeScale(-0.2)
+             #print "expansion ", self.coordmapper.scale
+         else:
+-            print "Max expansion prevented.", self.context.coordmapper.scale
++            print("Max expansion prevented.", self.context.coordmapper.scale)
+ 
+ class CmdLayoutContract(CmdLayoutExpandContractBase):
+     def execute(self):
+@@ -44,10 +44,10 @@
+             self.ChangeScale(0.2)
+             #print "contraction ", self.coordmapper.scale
+         else:
+-            print "Min expansion thwarted.", self.context.coordmapper.scale
++            print("Min expansion thwarted.", self.context.coordmapper.scale)
+ 
+ 
+-from blackboard_frame import MainBlackboardFrame
++from .blackboard_frame import MainBlackboardFrame
+ from layout.blackboard import LayoutBlackboard
+ 
+ class CmdDeepLayout(CmdBase):
+--- src/app/cmds/selection.py	(original)
++++ src/app/cmds/selection.py	(refactored)
+@@ -1,4 +1,4 @@
+-from base_cmd import CmdBase
++from .base_cmd import CmdBase
+ import wx
+ 
+ class CmdDeselectAllShapes(CmdBase):
+--- src/ascii_uml/asciiworkspace.py	(original)
++++ src/ascii_uml/asciiworkspace.py	(refactored)
+@@ -93,9 +93,9 @@
+     w.AddColumn(s)
+ 
+     w.Flush()
+-    print w.Contents
++    print(w.Contents)
+     
+-    print "="*50
++    print("="*50)
+ 
+     w = AsciiWorkspace()
+ 
+@@ -114,7 +114,7 @@
+     w.AddColumn(s)
+ 
+     w.Flush()
+-    print w.Contents
++    print(w.Contents)
+ 
+-    print "done"
++    print("done")
+     
+--- src/ascii_uml/layout_ascii.py	(original)
++++ src/ascii_uml/layout_ascii.py	(refactored)
+@@ -1,4 +1,4 @@
+-from asciiworkspace import AsciiWorkspace
++from .asciiworkspace import AsciiWorkspace
+ 
+ """
+ HOW IT WORKS
+--- src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/wx/py/tests/test_introspect.py	(original)
++++ src/build/bdist.macosx-10.13-x86_64/python2.7-standalone/app/collect/wx/py/tests/test_introspect.py	(refactored)
+@@ -639,7 +639,7 @@
+             str(""),
+             [],
+             (),
+-            range(0),
++            list(range(0)),
+             {},
+             # Builtin function.
+             len,
+--- src/common/architecture_support.py	(original)
++++ src/common/architecture_support.py	(refactored)
+@@ -107,15 +107,15 @@
+ 
+ def dump_args(func):
+     "This decorator dumps out the arguments passed to a function before calling it"
+-    argnames = func.func_code.co_varnames[:func.func_code.co_argcount]
+-    fname = func.func_name
++    argnames = func.__code__.co_varnames[:func.__code__.co_argcount]
++    fname = func.__name__
+ 
+     if not dodumpargs:
+         return func
+ 
+     def echo_func(*args,**kwargs):
+-        print fname, ":", ', '.join(
++        print(fname, ":", ', '.join(
+             '%s=%r' % entry
+-            for entry in zip(argnames,args) + kwargs.items())
++            for entry in list(zip(argnames,args)) + list(kwargs.items())))
+         return func(*args, **kwargs)
+     return echo_func
+--- src/common/command_pattern.py	(original)
++++ src/common/command_pattern.py	(refactored)
+@@ -319,7 +319,7 @@
+ 
+ def suite():
+     allchecks = []
+-    allchecks += TestCase01.__dict__.keys()
++    allchecks += list(TestCase01.__dict__.keys())
+     # allchecks += TestCase02.__dict__.keys()
+ 
+     def numbersuffix(x, y):
+@@ -328,7 +328,7 @@
+ 
+     for i in allchecks:
+         if i.startswith('_check'):
+-            print "WARNING - only running tests prepended with underscore"
++            print("WARNING - only running tests prepended with underscore")
+             testprefix = '_check'
+             break
+     else:
+--- src/common/gui_imageviewer.py	(original)
++++ src/common/gui_imageviewer.py	(refactored)
+@@ -2,8 +2,8 @@
+ 
+ import wx
+ import sys
+-import urllib
+-from cStringIO import StringIO
++import urllib.request, urllib.parse, urllib.error
++from io import StringIO
+ 
+ ALLOW_DRAWING = True
+ ZOOM_INCR = 1.3
+@@ -75,24 +75,24 @@
+         if thefile:
+             try:
+                 img = wx.Image(thefile, wx.BITMAP_TYPE_ANY)
+-            except Exception, e:
+-                print e
++            except Exception as e:
++                print(e)
+                 fallback()
+                 
+         elif url:
+             try:
+-                fp = urllib.urlopen(url)
++                fp = urllib.request.urlopen(url)
+                 data = fp.read()
+                 fp.close()
+                 img = wx.ImageFromStream(StringIO(data))
+-            except Exception, e:
+-                print e
++            except Exception as e:
++                print(e)
+                 fallback()
+             
+         try:
+             bmp = img.ConvertToBitmap()
+-        except Exception, e:
+-            print e
++        except Exception as e:
++            print(e)
+             return
+ 
+         self.maxWidth, self.maxHeight = bmp.GetWidth(), bmp.GetHeight()
+@@ -140,7 +140,7 @@
+         elif text == "Quick Load Image from Url":
+             baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
+             yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
+-            url = baseUrl + urllib.quote(yuml_txt)
++            url = baseUrl + urllib.parse.quote(yuml_txt)
+             self.ViewImage(url=url)
+         elif text == "Save Image as PNG...":
+             self.SaveImage(self.bmp, format="png")
+@@ -326,8 +326,8 @@
+             msg = "!!!!!!! "
+         else:
+             msg = "!       "
+-        print msg + "(%s) visible %d NeedToClear %s GetVirtualSize %d getWidth %d GetClientSize %d self.GetViewStart() %d self.maxWidth %d " % \
+-        (fromwheremsg, self.IsShownOnScreen(), self.NeedToClear(), self.GetVirtualSize()[0], self.getWidth(), self.GetClientSize()[0], self.GetViewStart()[0], self.maxWidth)
++        print(msg + "(%s) visible %d NeedToClear %s GetVirtualSize %d getWidth %d GetClientSize %d self.GetViewStart() %d self.maxWidth %d " % \
++        (fromwheremsg, self.IsShownOnScreen(), self.NeedToClear(), self.GetVirtualSize()[0], self.getWidth(), self.GetClientSize()[0], self.GetViewStart()[0], self.maxWidth))
+         
+     def OnPaint(self, event):   # ANDY
+         dc = wx.PaintDC(self)
+@@ -420,7 +420,7 @@
+         dc.SetPen(wx.Pen('MEDIUM FOREST GREEN', 4))
+         for line in self.lines:
+             for coords in line:
+-                apply(dc.DrawLine, coords)
++                dc.DrawLine(*coords)
+ 
+     def SetXY(self, event):   # PEN DRAWING
+         self.x, self.y = self.ConvertEventCoords(event)
+--- src/common/logwriter.py	(original)
++++ src/common/logwriter.py	(refactored)
+@@ -23,12 +23,12 @@
+         
+     def out(self, s, force_print=False):
+         if self.print_to_console or force_print:
+-            print s
++            print(s)
+         self.f.write("%s\n"%s)
+ 
+     def out_divider(self):
+         if self.print_to_console:
+-            print "-"*80
++            print("-"*80)
+         self.f.write("<HR>\n")
+         
+     def out_wrap_in_html(self, s, style_class='dump1'):
+--- src/common/png.py	(original)
++++ src/common/png.py	(refactored)
+@@ -2,8 +2,8 @@
+ 
+ import struct
+ import sys
+-import urllib
+-import urllib2
++import urllib.request, urllib.parse, urllib.error
++import urllib.request, urllib.error, urllib.parse
+ import zlib
+ 
+ def read_signature(stream):
+@@ -49,7 +49,7 @@
+         Chunk.__init__(self, chunk.size, chunk.chunk_type, chunk.data, chunk.crc)
+         keyword_length = self.data.find('\0')
+         self.keyword = self.data[:keyword_length]
+-        self.text = unicode(self.data[keyword_length+5:], 'utf-8')
++        self.text = str(self.data[keyword_length+5:], 'utf-8')
+ 
+     @staticmethod
+     def create(keyword, text):
+@@ -65,7 +65,7 @@
+         chunk_data += null
+         # no translated keyword
+         chunk_data += null
+-        chunk_data += unicode(text).encode('utf-8')
++        chunk_data += str(text).encode('utf-8')
+ 
+         return Chunk.create('iTXt', chunk_data)
+ 
+@@ -84,4 +84,4 @@
+     read_signature(inputFile)
+ 
+     for chunk in all_chunks(inputFile):
+-        print chunk
++        print(chunk)
+--- src/dialogs/DialogChooseFromList.py	(original)
++++ src/dialogs/DialogChooseFromList.py	(refactored)
+@@ -23,7 +23,7 @@
+ 		
+ 		bSizer1 = wx.BoxSizer( wx.VERTICAL )
+ 		
+-		self.m_staticTextInstruction = wx.StaticText( self, wx.ID_ANY, u"Choose a Sample UML diagram:", wx.DefaultPosition, wx.DefaultSize, 0 )
++		self.m_staticTextInstruction = wx.StaticText( self, wx.ID_ANY, "Choose a Sample UML diagram:", wx.DefaultPosition, wx.DefaultSize, 0 )
+ 		self.m_staticTextInstruction.Wrap( -1 )
+ 		bSizer1.Add( self.m_staticTextInstruction, 0, wx.ALL, 5 )
+ 		
+--- src/dialogs/DialogChooseFromList_test.py	(original)
++++ src/dialogs/DialogChooseFromList_test.py	(refactored)
+@@ -1,6 +1,6 @@
+ import wx
+ import random
+-from DialogChooseFromList import MyDialogChooseFromList
++from .DialogChooseFromList import MyDialogChooseFromList
+ 
+ test_data = ['test a', 'test aa', 'test aab', 'test ab',
+         'test abc', 'test abcc',
+@@ -13,7 +13,7 @@
+         self.m_listBox1.InsertItems(data, 0)
+         
+     def OnListDoubleClick( self, event ):
+-        print self.GetChosenItem()
++        print(self.GetChosenItem())
+         #self.Destroy()
+         self.Close()
+ 
+@@ -39,7 +39,7 @@
+         dialog.SetMyData(test_data)
+ 
+         if dialog.ShowModal() == wx.ID_OK:
+-            print dialog.GetChosenItem()
++            print(dialog.GetChosenItem())
+             #wx.MessageBox("Got the following\n%s\n%s\n%s" % (id, attrs, methods))
+             
+         dialog.Destroy()
+--- src/dialogs/DialogComment.py	(original)
++++ src/dialogs/DialogComment.py	(refactored)
+@@ -17,7 +17,7 @@
+ class DialogComment ( wx.Dialog ):
+ 
+ 	def __init__( self, parent ):
+-		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Comment", pos = wx.DefaultPosition, size = wx.Size( 372,286 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
++		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Comment", pos = wx.DefaultPosition, size = wx.Size( 372,286 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
+ 
+ 		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+ 
+--- src/dialogs/DialogUmlNodeEdit.py	(original)
++++ src/dialogs/DialogUmlNodeEdit.py	(refactored)
+@@ -16,7 +16,7 @@
+ class DialogUmlNodeEdit ( wx.Dialog ):
+ 	
+ 	def __init__( self, parent ):
+-		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Uml Node Properties", pos = wx.DefaultPosition, size = wx.Size( 264,286 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
++		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Uml Node Properties", pos = wx.DefaultPosition, size = wx.Size( 264,286 ), style = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER )
+ 		
+ 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+ 		
+@@ -27,7 +27,7 @@
+ 		
+ 		bSizer12 = wx.BoxSizer( wx.HORIZONTAL )
+ 		
+-		self.m_staticText1 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Class Name", wx.DefaultPosition, wx.DefaultSize, 0 )
++		self.m_staticText1 = wx.StaticText( self.m_panel2, wx.ID_ANY, "Class Name", wx.DefaultPosition, wx.DefaultSize, 0 )
+ 		self.m_staticText1.Wrap( -1 )
+ 		self.m_staticText1.SetMinSize( wx.Size( 55,-1 ) )
+ 		
+@@ -40,7 +40,7 @@
+ 		
+ 		bSizer14 = wx.BoxSizer( wx.HORIZONTAL )
+ 		
+-		self.m_staticText2 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Attributes", wx.DefaultPosition, wx.DefaultSize, 0 )
++		self.m_staticText2 = wx.StaticText( self.m_panel2, wx.ID_ANY, "Attributes", wx.DefaultPosition, wx.DefaultSize, 0 )
+ 		self.m_staticText2.Wrap( -1 )
+ 		self.m_staticText2.SetMinSize( wx.Size( 55,-1 ) )
+ 		
+@@ -53,7 +53,7 @@
+ 		
+ 		bSizer13 = wx.BoxSizer( wx.HORIZONTAL )
+ 		
+-		self.m_staticText3 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Methods", wx.DefaultPosition, wx.DefaultSize, 0 )
++		self.m_staticText3 = wx.StaticText( self.m_panel2, wx.ID_ANY, "Methods", wx.DefaultPosition, wx.DefaultSize, 0 )
+ 		self.m_staticText3.Wrap( -1 )
+ 		self.m_staticText3.SetMinSize( wx.Size( 55,-1 ) )
+ 		
+--- src/dialogs/DialogUmlNodeEdit_test.py	(original)
++++ src/dialogs/DialogUmlNodeEdit_test.py	(refactored)
+@@ -1,6 +1,6 @@
+ import wx
+ import random
+-from DialogUmlNodeEdit import DialogUmlNodeEdit
++from .DialogUmlNodeEdit import DialogUmlNodeEdit
+ 
+ class TestApp(wx.Frame):
+     def __init__(self, *args, **kwargs):
+--- src/dialogs/FrameDeepLayout.py	(original)
++++ src/dialogs/FrameDeepLayout.py	(refactored)
+@@ -17,7 +17,7 @@
+ class FrameDeepLayout ( wx.Frame ):
+ 
+ 	def __init__( self, parent ):
+-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Layout Progress", pos = wx.DefaultPosition, size = wx.Size( 274,228 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
++		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "Layout Progress", pos = wx.DefaultPosition, size = wx.Size( 274,228 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+ 
+ 		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+ 
+@@ -49,7 +49,7 @@
+ 
+ 		bSizer1.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+ 
+-		self.btnCancelClose = wx.Button( self, wx.ID_ANY, u"Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
++		self.btnCancelClose = wx.Button( self, wx.ID_ANY, "Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
+ 		bSizer1.Add( self.btnCancelClose, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+ 
+ 
+--- src/dialogs/FrameDeepLayout_test.py	(original)
++++ src/dialogs/FrameDeepLayout_test.py	(refactored)
+@@ -1,11 +1,11 @@
+ import wx
+ import random
+-from FrameDeepLayout import FrameDeepLayout
++from .FrameDeepLayout import FrameDeepLayout
+ 
+ class FrameDeepLayout2(FrameDeepLayout):
+ 
+     def OnCancelClick( self, event ):
+-        print "got cancel"
++        print("got cancel")
+         self.Destroy()
+ 
+ class TestFrame(wx.Frame):
+@@ -18,7 +18,7 @@
+         self.SetTitle("Andy's Custom dialog tester")
+         self.Centre()
+         
+-        self.m_button1 = wx.Button( self, wx.ID_ANY, u"Launch", wx.DefaultPosition, wx.DefaultSize, 0 )
++        self.m_button1 = wx.Button( self, wx.ID_ANY, "Launch", wx.DefaultPosition, wx.DefaultSize, 0 )
+         self.m_button1.Bind( wx.EVT_BUTTON, self.OnCancelClick )
+ 
+         self.Show(True)
+--- src/dialogs/FramePyYuml.py	(original)
++++ src/dialogs/FramePyYuml.py	(refactored)
+@@ -18,35 +18,35 @@
+ class MyFrame1 ( wx.Frame ):
+ 	
+ 	def __init__( self, parent ):
+-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"PyYuml Gui", pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
++		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "PyYuml Gui", pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+ 		
+ 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+ 		
+ 		self.m_menubar1 = wx.MenuBar( 0 )
+ 		self.m_menu1 = wx.Menu()
+-		self.m_menuItem5 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Import Python Code..."+ u"\t" + u"CTRL+I", wx.EmptyString, wx.ITEM_NORMAL )
++		self.m_menuItem5 = wx.MenuItem( self.m_menu1, wx.ID_ANY, "Import Python Code..."+ "\t" + "CTRL+I", wx.EmptyString, wx.ITEM_NORMAL )
+ 		self.m_menu1.AppendItem( self.m_menuItem5 )
+ 		
+ 		self.m_menu1.AppendSeparator()
+ 		
+-		self.m_menuItem3 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Open..."+ u"\t" + u"CTRL+O", wx.EmptyString, wx.ITEM_NORMAL )
++		self.m_menuItem3 = wx.MenuItem( self.m_menu1, wx.ID_ANY, "Open..."+ "\t" + "CTRL+O", wx.EmptyString, wx.ITEM_NORMAL )
+ 		self.m_menu1.AppendItem( self.m_menuItem3 )
+ 		
+-		self.m_menuItem4 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Save As..."+ u"\t" + u"CTRL+S", wx.EmptyString, wx.ITEM_NORMAL )
++		self.m_menuItem4 = wx.MenuItem( self.m_menu1, wx.ID_ANY, "Save As..."+ "\t" + "CTRL+S", wx.EmptyString, wx.ITEM_NORMAL )
+ 		self.m_menu1.AppendItem( self.m_menuItem4 )
+ 		
+ 		self.m_menu1.AppendSeparator()
+ 		
+-		self.m_menuItem6 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Exit", wx.EmptyString, wx.ITEM_NORMAL )
++		self.m_menuItem6 = wx.MenuItem( self.m_menu1, wx.ID_ANY, "Exit", wx.EmptyString, wx.ITEM_NORMAL )
+ 		self.m_menu1.AppendItem( self.m_menuItem6 )
+ 		
+-		self.m_menubar1.Append( self.m_menu1, u"File" ) 
++		self.m_menubar1.Append( self.m_menu1, "File" ) 
+ 		
+ 		self.m_menu2 = wx.Menu()
+-		self.m_menuItem2 = wx.MenuItem( self.m_menu2, wx.ID_ANY, u"About...", wx.EmptyString, wx.ITEM_NORMAL )
++		self.m_menuItem2 = wx.MenuItem( self.m_menu2, wx.ID_ANY, "About...", wx.EmptyString, wx.ITEM_NORMAL )
+ 		self.m_menu2.AppendItem( self.m_menuItem2 )
+ 		
+-		self.m_menubar1.Append( self.m_menu2, u"Help" ) 
++		self.m_menubar1.Append( self.m_menu2, "Help" ) 
+ 		
+ 		self.SetMenuBar( self.m_menubar1 )
+ 		
+--- src/dialogs/HelpWindow.py	(original)
++++ src/dialogs/HelpWindow.py	(refactored)
+@@ -18,7 +18,7 @@
+ class HelpWindow ( wx.Frame ):
+ 
+ 	def __init__( self, parent ):
+-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"PyNSource Quick Help", pos = wx.DefaultPosition, size = wx.Size( 637,679 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
++		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "PyNSource Quick Help", pos = wx.DefaultPosition, size = wx.Size( 637,679 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+ 
+ 		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+ 
+@@ -30,7 +30,7 @@
+ 
+ 		bSizer1.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+ 
+-		self.btnCancelClose = wx.Button( self, wx.ID_ANY, u"Close", wx.DefaultPosition, wx.DefaultSize, 0 )
++		self.btnCancelClose = wx.Button( self, wx.ID_ANY, "Close", wx.DefaultPosition, wx.DefaultSize, 0 )
+ 		bSizer1.Add( self.btnCancelClose, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+ 
+ 
+--- src/generate_code/gen_asciiart.py	(original)
++++ src/generate_code/gen_asciiart.py	(refactored)
+@@ -1,6 +1,6 @@
+ # generate asciiart
+ 
+-from gen_base import ReportGenerator, CmdLineGenerator
++from .gen_base import ReportGenerator, CmdLineGenerator
+ 
+ class PySourceAsText(ReportGenerator):
+     def __init__(self, ast=True):
+@@ -65,5 +65,5 @@
+         self._Process()
+         for f in globbed:
+             self.p.Parse(f)
+-        print self.p  # triggers the complex output behaviour on the generator
++        print(self.p)  # triggers the complex output behaviour on the generator
+         
+--- src/generate_code/gen_base.py	(original)
++++ src/generate_code/gen_base.py	(refactored)
+@@ -61,7 +61,7 @@
+ 
+     def _DumpModuleMethods(self):
+         if self.modulemethods:
+-            self.result += '  ModuleMethods = %s\n' % `self.modulemethods`
++            self.result += '  ModuleMethods = %s\n' % repr(self.modulemethods)
+ 
+     def GenReportDump(self):   # DESIGN PATTERN: Template method, subclasses override the _methods to vary
+         self.result = ''
+@@ -69,12 +69,12 @@
+         self._DumpModuleMethods()
+ 
+         optionAlphabetic = 0
+-        classnames = self.classlist.keys()
++        classnames = list(self.classlist.keys())
+         if optionAlphabetic:
+             classnames.sort()
+         else:
+             def cmpfunc(a,b):
+-                if a.find('Module_') <> -1:
++                if a.find('Module_') != -1:
+                     return -1
+                 else:
+                     if a < b:
+@@ -118,7 +118,7 @@
+             else:
+                 filepath = os.path.join(directory, "*.py")
+             if self.verbose:
+-                print 'Processing directory', filepath
++                print('Processing directory', filepath)
+             globbed = glob.glob(filepath)
+             for f in globbed:
+                 self._Process(f)
+@@ -130,9 +130,9 @@
+             padding = ''
+         thefile = os.path.basename(filepath)
+         if thefile[0] == '_':
+-            print '  ', 'Skipped', thefile, 'cos begins with underscore.'
++            print('  ', 'Skipped', thefile, 'cos begins with underscore.')
+             return
+-        print '%sProcessing %s...'%(padding, thefile)
++        print('%sProcessing %s...'%(padding, thefile))
+ 
+         self.p = self._CreateLanguageGenerator() # overridden by subclasses
+         self.p.optionModuleAsClass = self.optionModuleAsClass
+--- src/generate_code/gen_delphi.py	(original)
++++ src/generate_code/gen_delphi.py	(refactored)
+@@ -2,7 +2,7 @@
+ 
+ import os
+ from parsing.keywords import delphikeywords
+-from gen_base import ReportGenerator, CmdLineGenerator
++from .gen_base import ReportGenerator, CmdLineGenerator
+ from common.messages import DELPHI_UNIT_FILE_TEMPLATE
+ 
+ def unique(s):
+@@ -17,7 +17,7 @@
+     except TypeError:
+          del u   # move onto the next record
+     else:
+-          return u.keys()
++          return list(u.keys())
+ 
+     raise RuntimeError("uniqueness algorithm failed .. type more of it in please - see http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52560")
+ 
+@@ -57,7 +57,7 @@
+         Prevent compiler errors on the java side by checking and modifying attribute name
+         """
+         # only emit the rhs of a multi part name e.g. undo.UndoItem will appear only as UndoItem
+-        if attrname.find('.') <> -1:
++        if attrname.find('.') != -1:
+             attrname = attrname.split('.')[-1] # take the last
+ 
+         # Prevent compiler errors on the Delphi side by avoiding the generating of delphi keywords as attribute names
+@@ -102,7 +102,7 @@
+ 
+     def _DumpClassNameAndGeneralisations(self):
+         if self.verbose:
+-            print '  Generating Delphi class', self.aclass
++            print('  Generating Delphi class', self.aclass)
+         self._OpenNextFile()
+ 
+         self.result += "// Generated by PyNSource http://www.andypatterns.com/index.php/products/pynsource/ \n\n"
+--- src/generate_code/gen_java.py	(original)
++++ src/generate_code/gen_java.py	(refactored)
+@@ -2,7 +2,7 @@
+ 
+ import os
+ from parsing.keywords import javakeywords
+-from gen_base import ReportGenerator, CmdLineGenerator
++from .gen_base import ReportGenerator, CmdLineGenerator
+ 
+ class PySourceAsJava(ReportGenerator):
+     def __init__(self, ast=True, outdir=None):
+@@ -34,7 +34,7 @@
+         Prevent compiler errors on the java side by checking and modifying attribute name
+         """
+         # only emit the rhs of a multi part name e.g. undo.UndoItem will appear only as UndoItem
+-        if attrname.find('.') <> -1:
++        if attrname.find('.') != -1:
+             attrname = attrname.split('.')[-1] # take the last
+         # Prevent compiler errors on the java side by avoiding the generating of java keywords as attribute names
+         if attrname in javakeywords:
+@@ -71,7 +71,7 @@
+ 
+     def _DumpClassNameAndGeneralisations(self):
+         if self.verbose:
+-            print '  Generating Java class', self.aclass
++            print('  Generating Java class', self.aclass)
+         self._OpenNextFile()
+ 
+         self.result += "// Generated by PyNSource http://www.andypatterns.com/index.php/products/pynsource/ \n\n"
+--- src/generate_code/gen_plantuml.py	(original)
++++ src/generate_code/gen_plantuml.py	(refactored)
+@@ -1,6 +1,6 @@
+ import os
+ import requests
+-from gen_base import ReportGenerator, CmdLineGenerator
++from .gen_base import ReportGenerator, CmdLineGenerator
+ 
+ class PySourceAsPlantUml(ReportGenerator):
+     def __init__(self, ast=True):
+@@ -10,7 +10,7 @@
+     def calc_plant_uml(self, optimise=False):
+         self.result = ''
+ 
+-        classnames = self.pmodel.classlist.keys()
++        classnames = list(self.pmodel.classlist.keys())
+         for self.aclass in classnames:
+             self.classentry = self.pmodel.classlist[self.aclass]
+ 
+@@ -81,15 +81,15 @@
+         self.p.calc_plant_uml()
+         plant_uml_text = str(self.p)
+ 
+-        print plant_uml_text
++        print(plant_uml_text)
+ 
+         # Optionally generate image via plant uml server
+         outpng = outpath
+         if outpng != "nopng" :
+             if not '.png' in outpng.lower():
+-                print "output filename %s must have .png in the name" % outpng
++                print("output filename %s must have .png in the name" % outpng)
+                 exit(1)
+-            print 'Generating plantuml diagram %s...' % outpng
++            print('Generating plantuml diagram %s...' % outpng)
+             plant_uml_create_png(plant_uml_text, outpng)
+ 
+             # Windows specific solution
+@@ -101,7 +101,7 @@
+             img = Image.open(outpng)
+             img.show()
+ 
+-            print 'Done!'
++            print('Done!')
+ 
+ 
+ def plant_uml_create_png_and_return_image_url(plant_uml_txt):
+@@ -130,7 +130,7 @@
+ 
+ def plant_uml_create_png(plant_uml_txt, output_filename):
+     image_url, response = plant_uml_create_png_and_return_image_url(plant_uml_txt)
+-    print image_url
++    print(image_url)
+ 
+     if image_url:
+         """
+@@ -141,6 +141,6 @@
+             with open(output_filename, 'wb') as fp:
+                 fp.write(response.content)
+         else:
+-            print 'ok getting generating uml but error pulling down image'
++            print('ok getting generating uml but error pulling down image')
+     else:
+-        print 'error calling plantuml server', response.status_code
++        print('error calling plantuml server', response.status_code)
+--- src/generate_code/gen_yuml.py	(original)
++++ src/generate_code/gen_yuml.py	(refactored)
+@@ -1,6 +1,6 @@
+ # generate Yuml (both text and png)
+ 
+-from gen_base import ReportGenerator, CmdLineGenerator
++from .gen_base import ReportGenerator, CmdLineGenerator
+ 
+ class Klass:
+     def __init__(self, name, parent=None, connectsto=None, connectorstyle=None, attrs="", defs=""):
+@@ -17,7 +17,7 @@
+         self.attrs = self.defs = ""
+ 
+     def IsRich(self):
+-        return (self.attrs <> "" or self.defs <> "")
++        return (self.attrs != "" or self.defs != "")
+     
+ class Yuml:
+     # A line of yUML which is one class or two classes in a relationship
+@@ -96,7 +96,7 @@
+     def Enrich(self, YY):    
+         if not YY.IsRich() and not self.HasBeenEnriched(YY):
+             index = self.FindRichYumlClass(YY.name) 
+-            if index <> None:
++            if index != None:
+                 self.yumls[index].rhs.MoveAttrsDefsInto(YY)
+                 self.MarkAsEnriched(YY)
+                 
+@@ -118,7 +118,7 @@
+         self.yumls = []
+         self.enriched_yuml_classes = []
+         
+-        classnames = self.classlist.keys()
++        classnames = list(self.classlist.keys())
+         for self.aclass in classnames:
+             self.classentry = self.classlist[self.aclass]
+ 
+@@ -175,7 +175,7 @@
+ 
+     def GenReportDump(self):            # Override template method entirely and do it ourselves
+         if not self.yumls:
+-            print "Warning, should call CalcYumls() after .Parse() and before str(p) - repairing..."
++            print("Warning, should call CalcYumls() after .Parse() and before str(p) - repairing...")
+             self.CalcYumls()
+         self.result = ''
+         self.YumlDump()
+@@ -207,15 +207,15 @@
+         for f in globbed:
+             self.p.Parse(f)
+         self.p.CalcYumls()
+-        print self.p  # triggers the complex output behaviour on the generator
++        print(self.p)  # triggers the complex output behaviour on the generator
+         
+         optionExportTo_outpng = outpath
+         
+-        if optionExportTo_outpng <> "nopng" :
++        if optionExportTo_outpng != "nopng" :
+             if not '.png' in optionExportTo_outpng.lower():
+-                print "output filename %s must have .png in the name" % optionExportTo_outpng
++                print("output filename %s must have .png in the name" % optionExportTo_outpng)
+                 exit(0)
+-            print 'Generating yuml diagram %s...' % optionExportTo_outpng
++            print('Generating yuml diagram %s...' % optionExportTo_outpng)
+             yuml_create_png(','.join(str(self.p).split()), optionExportTo_outpng)
+ 
+             # Windows specific solution
+@@ -227,10 +227,10 @@
+             img = Image.open(optionExportTo_outpng)
+             img.show()
+ 
+-            print 'Done!'
+-
+-import urllib
+-import urllib2
++            print('Done!')
++
++import urllib.request, urllib.parse, urllib.error
++import urllib.request, urllib.error, urllib.parse
+ from common import png    # codeproject version, not the "easy_install pypng" version.
+ 
+ def _yuml_write_to_png(yuml, in_stream, out_stream):
+@@ -251,9 +251,9 @@
+ def yuml_create_png(yuml_txt, output_filename):
+     #baseUrl = 'http://yuml.me/diagram/scruffy/class/'
+     baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
+-    url = baseUrl + urllib.quote(yuml_txt)
+-    
+-    original_png = urllib2.urlopen(url)
++    url = baseUrl + urllib.parse.quote(yuml_txt)
++    
++    original_png = urllib.request.urlopen(url)
+     output_file = file(output_filename, 'wb')
+ 
+     _yuml_write_to_png(yuml_txt, original_png, output_file)
+@@ -262,7 +262,7 @@
+ 
+ if __name__ == '__main__':
+     y = Yuml('a','->','b', "fielda", "doa;dob")
+-    print y
+-    print Yuml('a','^','b', "fielda", "doa;dob")
+-    
+-    
++    print(y)
++    print(Yuml('a','^','b', "fielda", "doa;dob"))
++    
++    
+--- src/gui/canvas_resizer.py	(original)
++++ src/gui/canvas_resizer.py	(refactored)
+@@ -1,6 +1,6 @@
+ # CanvasResizer looks after canvas resizing and virtual size of canvas
+ 
+-from coord_utils import percent_change
++from .coord_utils import percent_change
+ 
+ import wx
+ import wx.lib.ogl as ogl
+@@ -95,7 +95,7 @@
+         oldscrollx = self.canvas.GetScrollPos(wx.HORIZONTAL)
+         oldscrolly = self.canvas.GetScrollPos(wx.VERTICAL)
+ 
+-        print "Setting virtual size to %d,%d" % (bounds_width, bounds_height)
++        print("Setting virtual size to %d,%d" % (bounds_width, bounds_height))
+ 
+         self.canvas.SetScrollbars(1, 1, bounds_width, bounds_height, oldscrollx, oldscrolly, noRefresh = True)
+         
+--- src/gui/coord_utils.py	(original)
++++ src/gui/coord_utils.py	(refactored)
+@@ -59,5 +59,5 @@
+         return 0
+ 
+ if __name__ == '__main__':
+-    print percent_change(9,10)
+-    print percent_change(5, 10)    
++    print(percent_change(9,10))
++    print(percent_change(5, 10))    
+--- src/gui/uml_canvas.py	(original)
++++ src/gui/uml_canvas.py	(refactored)
+@@ -10,8 +10,8 @@
+ 
+ from view.display_model import DisplayModel
+ 
+-from uml_shapes import *
+-from coord_utils import setpos, getpos, Move2
++from .uml_shapes import *
++from .coord_utils import setpos, getpos, Move2
+ 
+ from layout.layout_basic import LayoutBasic
+ 
+@@ -20,12 +20,12 @@
+ from layout.overlap_removal import OverlapRemoval
+ from layout.coordinate_mapper import CoordinateMapper
+ 
+-from canvas_resizer import CanvasResizer
++from .canvas_resizer import CanvasResizer
+ 
+ import wx
+ import wx.lib.ogl as ogl
+ 
+-from uml_shape_handler import UmlShapeHandler
++from .uml_shape_handler import UmlShapeHandler
+ 
+ from common.architecture_support import *
+ 
+@@ -257,7 +257,7 @@
+         self.working = True
+ 
+         if keycode == wx.WXK_ESCAPE:
+-            print "ESC key detected: Abort Layout"
++            print("ESC key detected: Abort Layout")
+             self.kill_layout = True
+ 
+             # # HACK PLAY
+@@ -363,7 +363,7 @@
+         shape.Delete()
+ 
+     def Clear(self):
+-        print "Draw: Clear"
++        print("Draw: Clear")
+         self.GetDiagram().DeleteAllShapes()
+ 
+         dc = wx.ClientDC(self)
+@@ -380,31 +380,31 @@
+     def NewEdgeMarkFrom(self):
+         selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
+         if not selected:
+-            print "Please select a node"
++            print("Please select a node")
+             return
+         
+         self.new_edge_from = selected[0].node
+-        print "From", self.new_edge_from.id
++        print("From", self.new_edge_from.id)
+ 
+     def NewEdgeMarkTo(self, edge_type='composition'):
+         selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
+         if not selected:
+-            print "Please select a node"
++            print("Please select a node")
+             return
+         
+         tonode = selected[0].node
+-        print "To", tonode.id
++        print("To", tonode.id)
+         
+         if self.new_edge_from == None:
+-            print "Please set from node first"
++            print("Please set from node first")
+             return
+         
+         if self.new_edge_from.id == tonode.id:
+-            print "Can't link to self"
++            print("Can't link to self")
+             return
+         
+         if not self.displaymodel.graph.FindNodeById(self.new_edge_from.id):
+-            print "From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id
++            print("From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id)
+             return
+         
+         edge = self.displaymodel.graph.AddEdge(tonode, self.new_edge_from, weight=None) # swap direction as is a directional composition.
+--- src/gui/uml_shape_handler.py	(original)
++++ src/gui/uml_shape_handler.py	(refactored)
+@@ -2,7 +2,7 @@
+ 
+ import wx
+ import wx.lib.ogl as ogl
+-from coord_utils import setpos, getpos
++from .coord_utils import setpos, getpos
+ from common.architecture_support import *
+ from gui.uml_shapes import CommentShape
+ 
+@@ -24,7 +24,7 @@
+         node = getattr(shape, "node", None)
+         if node:
+             colour_index = getattr(node, "colour_index", None)
+-            if colour_index <> None:
++            if colour_index != None:
+                 msg += "colour_index %d" % colour_index
+             
+         self.frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d) %s" % (x, y, width, height, msg))
+@@ -49,7 +49,7 @@
+             # Adjust the GraphNode to match the shape x,y
+             shape.node.left, shape.node.top = newpos
+         except:
+-            print "no node model attached to this shape!"
++            print("no node model attached to this shape!")
+             
+         self.UpdateStatusBar(shape)
+         
+@@ -195,4 +195,4 @@
+     elif isinstance(shape, CommentShape):
+         app.run.CmdEditComment(shape)
+     else:
+-        print "Unknown Shape", shape
++        print("Unknown Shape", shape)
+--- src/gui/uml_shapes.py	(original)
++++ src/gui/uml_shapes.py	(refactored)
+@@ -244,7 +244,7 @@
+         """The draw handler."""
+         ogl.RectangleShape.OnDraw(self, dc)
+ 
+-        print "extra drawing here...."
++        print("extra drawing here....")
+ 
+         x1 = self._xpos - self._width / 2.0
+         y1 = self._ypos - self._height / 2.0
+--- src/layout/animation.py	(original)
++++ src/layout/animation.py	(refactored)
+@@ -23,10 +23,10 @@
+     X, Y = 0, 1
+     xs = doValChangeMem(startval=point1[X], endval=point2[X], steps=steps)
+     ys = doValChangeMem(startval=point1[Y], endval=point2[Y], steps=steps)
+-    return zip(xs, ys)
++    return list(zip(xs, ys))
+ 
+ if __name__ == "__main__":
+-    print GeneratePoints((0,0), (10,10))
+-    print GeneratePoints((10,0), (100,10))
++    print(GeneratePoints((0,0), (10,10)))
++    print(GeneratePoints((10,0), (100,10)))
+     
+-    print "Done"
++    print("Done")
+--- src/layout/blackboard.py	(original)
++++ src/layout/blackboard.py	(refactored)
+@@ -1,7 +1,7 @@
+ # blackboard
+ 
+ from view.graph import Graph
+-from layout_spring import GraphLayoutSpring
++from .layout_spring import GraphLayoutSpring
+ 
+ ANIMATE_BLACKBOARD_ATTEMPTS = True
+ ANIMATE_EVERY_DETAIL = False
+--- src/layout/coordinate_mapper.py	(original)
++++ src/layout/coordinate_mapper.py	(refactored)
+@@ -15,28 +15,28 @@
+     if abs(abs(val1) - abs(val2)) < 2:
+         return True
+     else:
+-        print "** Lost something in the conversion", val1, val2
++        print("** Lost something in the conversion", val1, val2)
+         return False
+ 
+ def compare_loose_float(val1, val2):
+     if abs(abs(val1) - abs(val2)) < 0.1:
+         return True
+     else:
+-        print "** Lost something in the conversion", val1, val2
++        print("** Lost something in the conversion", val1, val2)
+         return False
+     
+ def validate_world_to_layout(cc, x,y):  # x, y are int
+     res = cc.WorldToLayout((x, y))
+-    print "WorldToLayout((%d, %d)) = %s" % (x, y, res)
++    print("WorldToLayout((%d, %d)) = %s" % (x, y, res))
+     res2 = cc.LayoutToWorld((res[0], res[1]))
+-    print "LayoutToWorld((%f, %f)) = %s" % (res[0], res[1], res2)
++    print("LayoutToWorld((%f, %f)) = %s" % (res[0], res[1], res2))
+     return compare_loose_int(x, res2[0]) and compare_loose_int(y, res2[1])
+ 
+ def validate_layout_to_world(cc, x,y):  # x, y are floats
+     res = cc.LayoutToWorld((x, y))
+-    print "LayoutToWorld((%f, %f)) = %s" % (x, y, res)
++    print("LayoutToWorld((%f, %f)) = %s" % (x, y, res))
+     res2 = cc.WorldToLayout((res[0], res[1]))
+-    print "WorldToLayout((%d, %d)) = %s" % (res[0], res[1], res2)
++    print("WorldToLayout((%d, %d)) = %s" % (res[0], res[1], res2))
+     return compare_loose_float(x, res2[0]) and compare_loose_float(y, res2[1])
+ 
+ #####################
+@@ -91,20 +91,20 @@
+     def DumpCalibrationInfo(self, dump_mode=None, new_world_size=None, scale=None, dump_nodes=True):
+         indent = ""
+         if dump_mode == "is_function_start":
+-            print
+-            print indent+"CoordinateMapper.Recalibrate START, calling with new_world_size=%s, scale=%s" %(new_world_size, scale)
++            print()
++            print(indent+"CoordinateMapper.Recalibrate START, calling with new_world_size=%s, scale=%s" %(new_world_size, scale))
+         elif dump_mode == "is_function_end":
+             indent = "\t"
+-            print indent+"CoordinateMapper.Recalibrate END"
+-
+-        print indent+"scale and radius \t\t\t", self.scale, "\t\t", self.radius
+-        print indent+"world_size\t\t\t", self.world_size
+-        print indent+"layout (MinX/MinY)(MaxX/Maxy)\t(%2.2f,%2.2f) (%2.2f,%2.2f)" % (self.graph.layoutMinX, self.graph.layoutMinY, self.graph.layoutMaxX, self.graph.layoutMaxY)
+-        print indent+"layout width height\t\t%2.2f %2.2f" % (self.graph.layoutMaxX - self.graph.layoutMinX, self.graph.layoutMaxY - self.graph.layoutMinY)
+-        print indent+"factorX factorY\t\t\t", locale.format("%d", self.factorX, grouping=True), locale.format("%d", self.factorY, grouping=True)
++            print(indent+"CoordinateMapper.Recalibrate END")
++
++        print(indent+"scale and radius \t\t\t", self.scale, "\t\t", self.radius)
++        print(indent+"world_size\t\t\t", self.world_size)
++        print(indent+"layout (MinX/MinY)(MaxX/Maxy)\t(%2.2f,%2.2f) (%2.2f,%2.2f)" % (self.graph.layoutMinX, self.graph.layoutMinY, self.graph.layoutMaxX, self.graph.layoutMaxY))
++        print(indent+"layout width height\t\t%2.2f %2.2f" % (self.graph.layoutMaxX - self.graph.layoutMinX, self.graph.layoutMaxY - self.graph.layoutMinY))
++        print(indent+"factorX factorY\t\t\t", locale.format("%d", self.factorX, grouping=True), locale.format("%d", self.factorY, grouping=True))
+         if dump_nodes:
+             for node in self.graph.nodes:
+-                print node
++                print(node)
+ 
+ 
+     def LayoutToWorld(self, point):
+@@ -126,16 +126,16 @@
+             layoutPosX, layoutPosY = self.WorldToLayout([node.left, node.top])
+             
+             if abs(layoutPosX) > 50.0:
+-                print "??!", "About to set Big layoutPosX?", layoutPosX, "for",  node
++                print("??!", "About to set Big layoutPosX?", layoutPosX, "for",  node)
+                 something_wrong = True
+             if abs(layoutPosY) > 50.0:
+-                print "??!", "About to set Big layoutPosY?", layoutPosY, "for",  node
++                print("??!", "About to set Big layoutPosY?", layoutPosY, "for",  node)
+                 something_wrong = True
+                 
+             node.layoutPosX, node.layoutPosY = layoutPosX, layoutPosY
+             
+         if something_wrong:
+-            print "\nSomething went wrong with AllToLayoutCoords - DumpCalibrationInfo\n"
++            print("\nSomething went wrong with AllToLayoutCoords - DumpCalibrationInfo\n")
+             self.DumpCalibrationInfo(False)
+     
+     def AllToWorldCoords(self):
+@@ -157,8 +157,8 @@
+             #print
+             
+             if node.left > 20000:
+-                print '-'*40, "Something's gone wrong!"
+-                print "node.layoutPosX, node.layoutPosY", node.layoutPosX, node.layoutPosY
++                print('-'*40, "Something's gone wrong!")
++                print("node.layoutPosX, node.layoutPosY", node.layoutPosX, node.layoutPosY)
+                 self.DumpCalibrationInfo(False)
+                 raise CustomException("Insane x values being generated")
+ 
+@@ -186,12 +186,12 @@
+     # LayoutToWorld
+     
+     res = c.LayoutToWorld((-2.7556504645221258, 0.39995144721675263))
+-    print res
++    print(res)
+     assert res[0] == 149, res
+     assert res[1] == 221, res
+ 
+     res = c.LayoutToWorld((-5.4927475878590482, -1.7573960183470871))
+-    print res
++    print(res)
+     assert res[0] == 61, res
+     assert res[1] == 147, res
+ 
+@@ -203,19 +203,19 @@
+         return str(f)[:slen]
+     
+     res = c.WorldToLayout((149, 221))
+-    print res
+-    print "results should approximate -2.7556504645221258, 0.39995144721675263"
++    print(res)
++    print("results should approximate -2.7556504645221258, 0.39995144721675263")
+     assert trunc(res[0], 1) == "-2.7", trunc(res[0], 1)
+     assert trunc(res[1], 1) == "0.3", trunc(res[1], 1)
+     
+     res = c.WorldToLayout(( 61, 147))
+-    print res
++    print(res)
+     assert trunc(res[0], 0) == "-5", trunc(res[0], 0)
+     assert trunc(res[1], 1) == "-1.7", trunc(res[1], 1)
+ 
+     # Symmetry Validation
+ 
+-    print "Symmetry Validation"
++    print("Symmetry Validation")
+ 
+     validate_world_to_layout(c, 100, 200)
+     validate_world_to_layout(c, 0, 0)
+@@ -250,4 +250,4 @@
+     validate_layout_to_world(c2, -5.0, -5.0)
+     validate_layout_to_world(c2, 5.0, 5.0)
+     
+-    print 'Done'
++    print('Done')
+--- src/layout/layout_basic.py	(original)
++++ src/layout/layout_basic.py	(refactored)
+@@ -88,16 +88,16 @@
+     umlworkspace = DisplayModel()
+     umlboxshapes = [Shape(), Shape(), Shape()]
+     positions, shapeslist, newdiagramsize = layout.Layout(umlworkspace, umlboxshapes)
+-    print "positions", positions
++    print("positions", positions)
+     #print "shapeslist", shapeslist
+-    print "newdiagramsize", newdiagramsize
++    print("newdiagramsize", newdiagramsize)
+     assert positions == [(0, 0), (10, 0), (20, 0)]
+     assert newdiagramsize == (30, 10)
+     
+     umlboxshapes = [Shape(), Shape(), Shape(), Shape(), Shape(), Shape()]
+     positions, shapeslist, newdiagramsize = layout.Layout(umlworkspace, umlboxshapes)
+-    print "positions", positions
++    print("positions", positions)
+     #print "shapeslist", shapeslist
+-    print "newdiagramsize", newdiagramsize
++    print("newdiagramsize", newdiagramsize)
+     assert positions == [(0, 0), (10, 0), (20, 0), (30, 0), (0, 10), (10, 10)]
+     assert newdiagramsize == (40, 20)
+--- src/layout/layout_spring.py	(original)
++++ src/layout/layout_spring.py	(refactored)
+@@ -20,7 +20,7 @@
+        
+     def layout(self, keep_current_positions=False, optimise=True):
+         if len(self.graph.nodes) == 0:
+-            print "Layout aborted - nothing to lay out."
++            print("Layout aborted - nothing to lay out.")
+             return 
+         
+         if not keep_current_positions:
+@@ -41,7 +41,7 @@
+                     self.gui.mega_refresh(recalibrate=True, auto_resize_canvas=False) # refresh gui
+                     
+                     if self.gui.kill_layout:
+-                        print "Layout aborted early, due to user interrupt"
++                        print("Layout aborted early, due to user interrupt")
+                         break
+ 
+             if i%20==0:
+@@ -172,7 +172,7 @@
+     layouter.layout()
+ 
+     for node in g.nodes:
+-        print node, "layout info:", (node.layoutPosX, node.layoutPosY)
++        print(node, "layout info:", (node.layoutPosX, node.layoutPosY))
+     
+     
+-    print 'Done'
++    print('Done')
+--- src/layout/line_crosses_shape.py	(original)
++++ src/layout/line_crosses_shape.py	(refactored)
+@@ -2,7 +2,7 @@
+ # testing only
+ 
+ from graph import GraphNode
+-from line_intersection import FindLineIntersection
++from .line_intersection import FindLineIntersection
+ 
+ # This function was migrated into GraphNode
+ 
+@@ -15,7 +15,7 @@
+     def remove_duplicates(lzt):
+         d = {}
+         for x in lzt: d[tuple(x)]=x
+-        return d.values()
++        return list(d.values())
+     result = [r for r in result if r != None]
+     result = remove_duplicates(result)
+     return result
+@@ -48,4 +48,4 @@
+     assert [20.0, 10.0] in res
+     assert [20.0, 50.0] in res
+     
+-    print "Done, tests passed"
++    print("Done, tests passed")
+--- src/layout/overlap_removal.py	(original)
++++ src/layout/overlap_removal.py	(refactored)
+@@ -166,7 +166,7 @@
+     
+     def ApplyProposal(self, proposal):
+         node = proposal['node']
+-        assert node.id <> 'temp'
++        assert node.id != 'temp'
+         #print 'APPLYING PROPOSAL: ', self.dumpproposal(proposal, doing=True)
+         
+         x,y = 0,0
+@@ -481,7 +481,7 @@
+         we don't actually know.  But we increase the chance of success by not
+         caring about - or + directions.  This seems to help us match, probably snug moves.
+         """
+-        if final_proposal['xory'] <> 'xy':
++        if final_proposal['xory'] != 'xy':
+             upgrade = UpgradeSingleMoveToCombo(final_proposal, ignoreNegatives=True)
+             if upgrade:
+                 final_proposal = upgrade
+--- src/layout/permutations.py	(original)
++++ src/layout/permutations.py	(refactored)
+@@ -8,7 +8,7 @@
+     return result
+      
+ if __name__ == "__main__":
+-    print getpermutations(['a'])
+-    print getpermutations(['a', 'b'])
+-    print getpermutations(['a', 'b', 'c', 'd'])
+-    print getpermutations(['a', 'b', 'c', 'd', 'e'])
++    print(getpermutations(['a']))
++    print(getpermutations(['a', 'b']))
++    print(getpermutations(['a', 'b', 'c', 'd']))
++    print(getpermutations(['a', 'b', 'c', 'd', 'e']))
+--- src/layout/snapshots.py	(original)
++++ src/layout/snapshots.py	(refactored)
+@@ -18,10 +18,10 @@
+                     bounds=(-1,-1), bounds_area_simple=-1,
+                     graph_memento=self.graph.GetMementoOfPositions(),
+                     quicksave=True)
+-        self.quick_save_slots['slot'+`slot`] = snapshot
++        self.quick_save_slots['slot'+repr(slot)] = snapshot
+     
+     def QuickRestore(self, slot=1):
+-        snapshot = self.quick_save_slots.get('slot'+`slot`, None)
++        snapshot = self.quick_save_slots.get('slot'+repr(slot), None)
+         if snapshot:
+             self.RestoreGraph(snapshot['memento'], snapshot['scale'])
+ 
+@@ -37,7 +37,7 @@
+             #self.umlcanvas.app.run.CmdDumpUmlWorkspace()
+             
+         else:
+-            print "No such snapshot", snapshot_number+1
++            print("No such snapshot", snapshot_number+1)
+         
+     def RestoreGraph(self, memento, scale):
+         self.graph.RestoreWorldPositions(memento)
+@@ -50,14 +50,14 @@
+     def DumpSnapshots(self, current_snapshot_index=None, label=""):
+         # If supplied, current_snapshot is 0 based
+         header = '-'*40 + label + '-'*40
+-        print header
++        print(header)
+         for i, snapshot in enumerate(self.snapshots):
+             msg = "Snapshot %d [%d] " % ((i+1), snapshot['_original_add_index'])
+             msg += "LL %(LL)2d   NN pre rm overlaps %(NN_pre_OR)2d   LN %(LN)2d   scale %(scale).1f   bounds %(bounds_area_simple)2d  %(bounds)s" % snapshot
+-            if current_snapshot_index <> None and i == current_snapshot_index:
++            if current_snapshot_index != None and i == current_snapshot_index:
+                 msg += " <---"
+-            print msg
+-        print '-'*len(header)
++            print(msg)
++        print('-'*len(header))
+ 
+     def AddSnapshot(self, layout_score, LL, NN, LN, scale, bounds, bounds_area_simple, graph_memento, quicksave=False):
+         
+--- src/parsing/core_parser.py	(original)
++++ src/parsing/core_parser.py	(refactored)
+@@ -2,8 +2,8 @@
+ 
+ import tokenize, token
+ import pprint
+-from keywords import pythonbuiltinfunctions, javakeywords, delphikeywords
+-from class_entry import ClassEntry, Attribute
++from .keywords import pythonbuiltinfunctions, javakeywords, delphikeywords
++from .class_entry import ClassEntry, Attribute
+ import os
+ 
+ DEBUG_DUMPTOKENS = False
+@@ -355,7 +355,7 @@
+         self.dummy2 = [()]
+ 
+     def JustGotASelfAttr(self, selfattrname):
+-        assert selfattrname <> 'self'
++        assert selfattrname != 'self'
+         self.lastselfattrname = selfattrname
+         self.waitingforclassname = 1
+         self.waitingforOpenBracket = 0
+--- src/parsing/core_parser_ast.py	(original)
++++ src/parsing/core_parser_ast.py	(refactored)
+@@ -290,7 +290,7 @@
+             x = "<span class=mynote%d>%s</span>" % (mynote,x)
+             self.result.append(x)
+             if DEBUGINFO_IMMEDIATE_PRINT:
+-                print x
++                print(x)
+                 
+         def newline(self, node=None, extra=0):
+             self.new_lines = max(self.new_lines, 1 + extra)
+@@ -407,7 +407,7 @@
+             if not self.current_class() and not self.am_inside_module_function():
+                 self.model.modulemethods.append(node.name)
+                 if node.name not in self.quick_parse.quick_found_module_defs:  # TODO how to repro this failure, it was only reported by Charlie - issue #31
+-                    print 'Parse assert WARNING: node.name', node.name, 'is not in quick_found_module_defs', self.quick_parse.quick_found_module_defs
++                    print('Parse assert WARNING: node.name', node.name, 'is not in quick_found_module_defs', self.quick_parse.quick_found_module_defs)
+ 
+             # look for decorator @property definition and treat as property
+             elif treat_property_decorator_as_prop and \
+@@ -629,7 +629,7 @@
+ 
+             # A
+             self.detect_append_or_rhs_call()
+-            if self.stop_recording_rhs_inside_first_bracket <> None:
++            if self.stop_recording_rhs_inside_first_bracket != None:
+                 self.stop_recording_rhs_inside_first_bracket += 1
+                 self.write("stop_recording_rhs_inside_first_bracket INCREMENTED %s" % self.stop_recording_rhs_inside_first_bracket, mynote=1)
+                 
+@@ -652,7 +652,7 @@
+             self.write(')')
+ 
+             # A
+-            if self.stop_recording_rhs_inside_first_bracket <> None:
++            if self.stop_recording_rhs_inside_first_bracket != None:
+                 self.stop_recording_rhs_inside_first_bracket -= 1
+                 self.write("stop_recording_rhs_inside_first_bracket decremented %s" % self.stop_recording_rhs_inside_first_bracket, mynote=1)
+             
+--- src/parsing/dump_pmodel.py	(original)
++++ src/parsing/dump_pmodel.py	(refactored)
+@@ -122,10 +122,10 @@
+             return classentry.name
+         
+     # repair old parse models #TODO build this into the old parser so that we don't have to do this
+-    for classname, classentry in  pmodel.classlist.items():
++    for classname, classentry in  list(pmodel.classlist.items()):
+         classentry.name = classname
+     
+-    for classname, classentry in  sorted(pmodel.classlist.items(), key=lambda kv: calc_classname(kv[1])):
++    for classname, classentry in  sorted(list(pmodel.classlist.items()), key=lambda kv: calc_classname(kv[1])):
+         res += "%s (is module=%s) inherits from %s class dependencies %s\n" % \
+                                     (calc_classname(classentry),
+                                      classentry.ismodulenotrealclass,
+--- src/tests/test_graph_nodes.py	(original)
++++ src/tests/test_graph_nodes.py	(refactored)
+@@ -21,11 +21,11 @@
+         #print g.GraphToString().strip()
+     
+         assert len(g.nodes) == 2
+-        assert len(g.nodeSet.keys()) == 2
++        assert len(list(g.nodeSet.keys())) == 2
+         assert len(g.edges) == 1
+         g.DeleteNodeById('B')
+         assert len(g.nodes) == 1
+-        assert len(g.nodeSet.keys()) == 1
++        assert len(list(g.nodeSet.keys())) == 1
+         assert len(g.edges) == 0
+ 
+         # Old persistence format - very simple, I call this 0.9 format.    
+@@ -358,7 +358,7 @@
+         #print s
+         #print "*"*88
+         
+-        if s.strip() <> expected_s.strip():
++        if s.strip() != expected_s.strip():
+             # Write to file
+             with open('logs/test_8_out_actual_.txt','w') as f: f.write(s)
+             with open('logs/test_8_out_expected.txt','w') as f: f.write(expected_s)
+@@ -368,7 +368,7 @@
+             delta = difflib.unified_diff(s.strip(), expected_s.strip(), n=0,
+                                 fromfile='actual', tofile='expected')
+             diff_s = ''.join(delta)
+-            print diff_s
++            print(diff_s)
+         
+         assert s.strip() == expected_s.strip()
+         
+--- src/tests/test_overlaps1.py	(original)
++++ src/tests/test_overlaps1.py	(refactored)
+@@ -480,7 +480,7 @@
+     def test6_1LineCrossingNotNeeded(self):
+         
+         if not LINE_NODE_OVERLAP_REMOVAL_ENABLED:
+-            print "Test passed (disabled)",
++            print("Test passed (disabled)", end=' ')
+             return
+ 
+         self._LoadScenario6_linecrossing()
+@@ -503,7 +503,7 @@
+     def test6_2LineCrossingAvoided(self):
+ 
+         if not LINE_NODE_OVERLAP_REMOVAL_ENABLED:
+-            print "Test passed (disabled)",
++            print("Test passed (disabled)", end=' ')
+             return
+ 
+         self._LoadScenario6_linecrossing()
+@@ -529,7 +529,7 @@
+     def test6_3LineCrossingAvoidedGoSnug(self):
+ 
+         if not LINE_NODE_OVERLAP_REMOVAL_ENABLED:
+-            print "Test passed (disabled)",
++            print("Test passed (disabled)", end=' ')
+             return
+ 
+         self._LoadScenario6_linecrossing()
+--- src/tests/test_overlaps2stress.py	(original)
++++ src/tests/test_overlaps2stress.py	(refactored)
+@@ -29,7 +29,7 @@
+ 
+         for i in range(10):
+             self.g.LoadGraphFromStrings(TEST_GRAPH5_STRESS)
+-            print i,
++            print(i, end=' ')
+             were_all_overlaps_removed = self.overlap_remover.RemoveOverlaps()
+             self.assertTrue(were_all_overlaps_removed)
+             
+@@ -55,7 +55,7 @@
+             coordmapper.AllToWorldCoords()
+ 
+         for i in range(8):
+-            print i,
++            print(i, end=' ')
+             
+             AllToLayoutCoords()
+             layouter.layout(keep_current_positions=False)
+--- src/tests/test_parse_01.py	(original)
++++ src/tests/test_parse_01.py	(refactored)
+@@ -50,7 +50,7 @@
+         gotevent1 = 0
+         gotevent2 = 0
+         gotevents = 0
+-        for classname, classentry in self.p.classlist.items():
++        for classname, classentry in list(self.p.classlist.items()):
+             if classname == 'ParseMeTest':
+                 gotevent1 = 1
+                 assert classentry.classesinheritsfrom == []
+@@ -123,7 +123,7 @@
+         gotevent2 = 0
+         gotevent3 = 0
+         gotevent4 = 0
+-        for classname, classentry in self.p.classlist.items():
++        for classname, classentry in list(self.p.classlist.items()):
+             if classname == 'ParseMeTest':
+                 gotevent1 = 1
+                 assert classentry.classesinheritsfrom == []
+--- src/tests/test_parse_02.py	(original)
++++ src/tests/test_parse_02.py	(refactored)
+@@ -55,7 +55,7 @@
+         gotevent6 = 0
+         gotevent7 = 0
+         gotevent8 = 0
+-        for classname, classentry in self.p.classlist.items():
++        for classname, classentry in list(self.p.classlist.items()):
+             if classname == 'ParseMeTest':
+                 gotevent1 = 1
+                 assert classentry.classesinheritsfrom == []
+@@ -151,7 +151,7 @@
+         gotevent7 = 0
+         gotevent8 = 0
+         gotevent9 = 0
+-        for classname, classentry in self.p.classlist.items():
++        for classname, classentry in list(self.p.classlist.items()):
+             if classname == 'ParseMeTest':
+                 gotevent1 = 1
+                 assert classentry.classesinheritsfrom == []
+@@ -178,7 +178,7 @@
+                     if attrname == 'f':
+                         gotevent6 = 1
+                         assert 'static' not in attrobj.attrtype
+-                assert len(classentry.attrs) == 6, 'Only got ' + `len(classentry.attrs)` + ' attributes'
++                assert len(classentry.attrs) == 6, 'Only got ' + repr(len(classentry.attrs)) + ' attributes'
+ 
+                 for adef in classentry.defs:
+                     pass
+@@ -203,7 +203,7 @@
+                             gotevent8 = 1
+                         if attrname == 'y':
+                             gotevent9 = 1
+-                    assert len(classentry.attrs) == 2, 'Only got ' + `len(classentry.attrs)` + ' attributes'
++                    assert len(classentry.attrs) == 2, 'Only got ' + repr(len(classentry.attrs)) + ' attributes'
+ 
+ 
+ 
+--- src/tests/test_parse_03.py	(original)
++++ src/tests/test_parse_03.py	(refactored)
+@@ -52,7 +52,7 @@
+         gotevent5 = 0
+         gotevent6 = 0
+         gotevent7 = 0
+-        for classname, classentry in self.p.classlist.items():
++        for classname, classentry in list(self.p.classlist.items()):
+             if classname == 'ParseMeTest':
+                 gotevent1 = 1
+                 assert classentry.classesinheritsfrom == []
+--- src/tests/test_parse_04.py	(original)
++++ src/tests/test_parse_04.py	(refactored)
+@@ -28,7 +28,7 @@
+ 
+         # -------------------------------------------------------
+ 
+-        for classname, classentry in self.p.classlist.items():
++        for classname, classentry in list(self.p.classlist.items()):
+             if classname == 'ParseMeTest':
+                 gotevent1 = 1
+                 assert classentry.classesinheritsfrom == ['undo.UndoItem']
+--- src/tests/test_parse_05.py	(original)
++++ src/tests/test_parse_05.py	(refactored)
+@@ -35,7 +35,7 @@
+         gotevent2 = 0
+         gotevent3 = 0
+ 
+-        for classname, classentry in self.p.classlist.items():
++        for classname, classentry in list(self.p.classlist.items()):
+             if classname == 'ParseMeTest':
+                 gotevent1 = 1
+                 assert classentry.classesinheritsfrom == ['undo.UndoItem']
+--- src/tests/test_parse_06.py	(original)
++++ src/tests/test_parse_06.py	(refactored)
+@@ -27,7 +27,7 @@
+         gotevent6 = 0
+         gotevent7 = 0
+ 
+-        for classname, classentry in self.p.classlist.items():
++        for classname, classentry in list(self.p.classlist.items()):
+             if classname == 'Flag':
+                 gotevent1 = 1
+                 assert classentry.classesinheritsfrom == []
+--- src/tests/test_parse_07.py	(original)
++++ src/tests/test_parse_07.py	(refactored)
+@@ -27,7 +27,7 @@
+         gotevent6 = 0
+         gotevent7 = 0
+ 
+-        for classname, classentry in self.p.classlist.items():
++        for classname, classentry in list(self.p.classlist.items()):
+             if classname == 'Polygon':
+                 gotevent1 = 1
+                 assert classentry.classesinheritsfrom == []
+--- src/tests/test_parse_08.py	(original)
++++ src/tests/test_parse_08.py	(refactored)
+@@ -29,7 +29,7 @@
+         gotevent6 = 0
+         gotevent7 = 0
+ 
+-        for classname, classentry in self.p.classlist.items():
++        for classname, classentry in list(self.p.classlist.items()):
+             if classname == 'Fred':
+                 gotevent1 = 1
+                 assert classentry.classesinheritsfrom == ['Mary', 'Sam'], classentry.classesinheritsfrom
+@@ -56,7 +56,7 @@
+         gotevent1 = 0
+         gotevent2 = 0
+ 
+-        for classname, classentry in self.p.classlist.items():
++        for classname, classentry in list(self.p.classlist.items()):
+             if classname == 'Incoming1':
+                 gotevent1 = 1
+ 
+--- src/tests/test_parse_old_vs_new.py	(original)
++++ src/tests/test_parse_old_vs_new.py	(refactored)
+@@ -65,7 +65,7 @@
+         diff_s = dodiff(d1, d2)
+         log.out_wrap_in_html(diff_s, style_class='dumpdiff')
+         if not comparedok and print_diffs:
+-            print diff_s
++            print(diff_s)
+ 
+         #dd = difflib.HtmlDiff()
+         #diff_table = dd.make_table(d1.splitlines(1),d2.splitlines(1))
+@@ -115,7 +115,7 @@
+         #print "%s OK" % msg
+         return True
+     else:
+-        print "oooops %s broken" % msg, results
++        print("oooops %s broken" % msg, results)
+         return False
+         
+ 
+--- src/tests/test_parse_plantuml.py	(original)
++++ src/tests/test_parse_plantuml.py	(refactored)
+@@ -12,12 +12,12 @@
+         self.p = PySourceAsPlantUml()
+ 
+     def _dump(self, p, expected):
+-        print
+-        print "_"*80 + " PlantUml CALCULATED:"
+-        print str(p).strip()
+-        print "-"*80 + " PlantUml EXPECTED:"
+-        print expected
+-        print "_"*80 + " PlantUml END DUMP"
++        print()
++        print("_"*80 + " PlantUml CALCULATED:")
++        print(str(p).strip())
++        print("-"*80 + " PlantUml EXPECTED:")
++        print(expected)
++        print("_"*80 + " PlantUml END DUMP")
+ 
+ 
+     def test01(self):
+@@ -37,7 +37,7 @@
+ Sam <|- Fred
+ """.strip()
+         # self._dump(self.p, expected)
+-        self.assertEquals(expected, str(self.p).strip())
++        self.assertEqual(expected, str(self.p).strip())
+ 
+     def test01ParseMeTestUnoptimised(self):
+         """
+@@ -90,4 +90,4 @@
+ ParseMeTest <|- ParseMeTest2
+ """.strip()
+         # self._dump(self.p, expected)
+-        self.assertEquals(expected, str(self.p).strip())
++        self.assertEqual(expected, str(self.p).strip())
+--- src/tests/test_parse_yuml_01.py	(original)
++++ src/tests/test_parse_yuml_01.py	(refactored)
+@@ -10,12 +10,12 @@
+         self.p = PySourceAsYuml()
+ 
+     def _dump(self, p, expected):
+-        print
+-        print "_"*80 + " yUML CALCULATED:"
+-        print str(p).strip()
+-        print "-"*80 + " yUML EXPECTED:"
+-        print expected
+-        print "_"*80 + " yUML END DUMP"
++        print()
++        print("_"*80 + " yUML CALCULATED:")
++        print(str(p).strip())
++        print("-"*80 + " yUML EXPECTED:")
++        print(expected)
++        print("_"*80 + " yUML END DUMP")
+ 
+ 
+     def test01ParseMeTestUnoptimised(self):
+@@ -29,7 +29,7 @@
+ [ParseMeTest]^[ParseMeTest2|_secretinfo|DoB()]
+ """.strip()
+         #self._dump(self.p, expected)
+-        self.assertEquals(expected, str(self.p).strip())
++        self.assertEqual(expected, str(self.p).strip())
+ 
+     def test02ParseMeTestOptimised(self):
+         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule01.py'
+@@ -41,7 +41,7 @@
+ [ParseMeTest]^[ParseMeTest2|_secretinfo|DoB()]
+ """.strip()
+         #self._dump(self.p, expected)
+-        self.assertEquals(expected, str(self.p).strip())
++        self.assertEqual(expected, str(self.p).strip())
+ 
+     def test01FlagUnoptimised(self):
+         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule66.py'
+@@ -53,7 +53,7 @@
+ [Flags|flags;numberOfFlags|__init__();readFlags();AddFlag();__repr__()]
+         """.strip()
+         #self._dump(self.p, expected)
+-        self.assertEquals(expected, str(self.p).strip())
++        self.assertEqual(expected, str(self.p).strip())
+ 
+     def test02FlagOptimised(self):
+         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule66.py'
+@@ -63,5 +63,5 @@
+ [Flags|flags;numberOfFlags|__init__();readFlags();AddFlag();__repr__()]flags++-*[Flag|flagx;flagy;owner|__init__();readflag();__repr__()]
+         """.strip()
+         #self._dump(self.p, expected)
+-        self.assertEquals(expected, str(self.p).strip())
++        self.assertEqual(expected, str(self.p).strip())
+ 
+--- src/tests/test_persistence_01.py	(original)
++++ src/tests/test_persistence_01.py	(refactored)
+@@ -59,7 +59,7 @@
+         
+         # now check type node has been converted to type umlshape 
+         data = eval(g.persistence.filedata_list[2])
+-        self.assertEquals('umlshape', data.get('type'))
++        self.assertEqual('umlshape', data.get('type'))
+ 
+     def test_3(self):
+         """
+@@ -86,7 +86,7 @@
+         
+         # now check type node has been converted to type umlshape 
+         data = eval(g.persistence.filedata_list[2])
+-        self.assertEquals('umlshape', data.get('type'))
++        self.assertEqual('umlshape', data.get('type'))
+ 
+     def test_4(self):
+         """
+@@ -110,7 +110,7 @@
+         
+         # now check type node has been converted to type umlshape 
+         data = eval(g.persistence.filedata_list[2])
+-        self.assertEquals('umlshape', data.get('type'))
++        self.assertEqual('umlshape', data.get('type'))
+ 
+     def test_5(self):
+         """
+--- src/tests/python-in/testmodule11_incoming_bugs.py	(original)
++++ src/tests/python-in/testmodule11_incoming_bugs.py	(refactored)
+@@ -1,7 +1,7 @@
+ class Incoming1:
+     def HandlePowerOperator(self):
+         x = 10**2
+-        print x
++        print(x)
+     
+ a = Incoming1()
+ a.HandlePowerOperator()
+--- src/tests/python-in/testmodule_asciiworkspace.py	(original)
++++ src/tests/python-in/testmodule_asciiworkspace.py	(refactored)
+@@ -88,9 +88,9 @@
+     w.AddColumn(s)
+ 
+     w.Flush()
+-    print w.Contents
++    print(w.Contents)
+     
+-    print "="*50
++    print("="*50)
+ 
+     w = AsciiWorkspace()
+ 
+@@ -109,7 +109,7 @@
+     w.AddColumn(s)
+ 
+     w.Flush()
+-    print w.Contents
++    print(w.Contents)
+ 
+-    print "done"
++    print("done")
+     
+--- src/tests/python-in/testmodule_command_pattern.py	(original)
++++ src/tests/python-in/testmodule_command_pattern.py	(refactored)
+@@ -319,7 +319,7 @@
+ 
+ def suite():
+     allchecks = []
+-    allchecks += TestCase01.__dict__.keys()
++    allchecks += list(TestCase01.__dict__.keys())
+     # allchecks += TestCase02.__dict__.keys()
+ 
+     def numbersuffix(x, y):
+@@ -328,7 +328,7 @@
+ 
+     for i in allchecks:
+         if i.startswith('_check'):
+-            print "WARNING - only running tests prepended with underscore"
++            print("WARNING - only running tests prepended with underscore")
+             testprefix = '_check'
+             break
+     else:
+--- src/tests/python-in/testmodule_pynsource.py	(original)
++++ src/tests/python-in/testmodule_pynsource.py	(refactored)
+@@ -18,7 +18,7 @@
+     p.Parse(FILE)
+ 
+     #print '*'*20, 'parsing', FILE, '*'*20
+-    print p
++    print(p)
+     #print 'Done.'
+ 
+ def ParseArgsAndRun():
+@@ -46,7 +46,7 @@
+         def EnsurePathExists(outdir, outlanguagemsg):
+             assert outdir, 'Need to specify output folder for %s output - got %s.'%(outlanguagemsg, outdir)
+             if not os.path.exists(outdir):
+-                raise RuntimeError, ('Output directory %s for %s file output does not exist.'%(outdir,outlanguagemsg))
++                raise RuntimeError('Output directory %s for %s file output does not exist.'%(outdir,outlanguagemsg))
+ 
+         for optionvaluepair in listofoptionvaluepairs:
+             if '-a' == optionvaluepair[0]:
+@@ -85,7 +85,7 @@
+             u = CmdLinePythonToAsciiArt(globbed, treatmoduleasclass=optionModuleAsClass, verbose=optionVerbose)
+             u.ExportTo(None)
+     else:
+-        print messages.HELP_COMMAND_LINE_USAGE
++        print(messages.HELP_COMMAND_LINE_USAGE)
+ 
+ if __name__ == '__main__':
+     #test()
+--- src/tests/testing-generate-delphi/python-in/playheadmanager.py	(original)
++++ src/tests/testing-generate-delphi/python-in/playheadmanager.py	(refactored)
+@@ -167,7 +167,7 @@
+                 break
+                 # pos should now be positioned at the insertion point
+ 
+-        if lastoccurenceoftime<>-1:
++        if lastoccurenceoftime!=-1:
+             return lastoccurenceoftime
+         maxpos = len(self.mediator.story)-1
+         return min(maxpos, pos)
+@@ -178,7 +178,7 @@
+         maxturn is.
+         """
+         maxturnsofar = self.mediator.byTurn.GetMaxValue()
+-        if maxturnsofar<>-1:
++        if maxturnsofar!=-1:
+             # find out what the maximum time for that turn is
+             timetuple, day = self.turnMgr.TurnToTime(maxturnsofar)
+             maxtime = timetuple[1]
+--- src/tests/testing-generate-delphi/python-in/utilcc.py	(original)
++++ src/tests/testing-generate-delphi/python-in/utilcc.py	(refactored)
+@@ -17,7 +17,7 @@
+ try:
+     from _utilcc import eventStrToList
+ except:
+-    print "utilcc: Failed to load compiled extension (eventStrToList)"
++    print("utilcc: Failed to load compiled extension (eventStrToList)")
+     def eventStrToList(eventstr):
+         """
+             Input a string e.g. (1,1,0),o2,AT,2,(2,2,2),(3,3,3)
+@@ -50,12 +50,12 @@
+     import traceback
+     file, line, func, parms = traceback.extract_stack(limit=2)[0]
+     names = parms[5:-1].split(',')
+-    print 'File "%s", line %s %s'%(file, line, func)
++    print('File "%s", line %s %s'%(file, line, func))
+     result = ""
+-    for name, value in zip(names, args) + kw.items():
+-        if result: print '|%s'%result
++    for name, value in list(zip(names, args)) + list(kw.items()):
++        if result: print('|%s'%result)
+         result = '%s = %s'%(name.strip(), value)
+-    if result: print '`%s'%result
++    if result: print('`%s'%result)
+ if type(__builtins__) is dict:
+     __builtins__['show'] = show
+ else:
+@@ -132,11 +132,11 @@
+ def ImportScenarioFile(filename):
+     filename = FilenameToFullScenarioPathName(filename)
+     globalsdict = {}
+-    execfile(filename, globalsdict)
++    exec(compile(open(filename).read(), filename, 'exec'), globalsdict)
+     return globalsdict
+ 
+ def repr_SortedDict(thedict):
+-    items = thedict.items()
++    items = list(thedict.items())
+     items.sort()
+ 
+     def safeconvert(k,v):
+@@ -148,7 +148,7 @@
+     return '{'+(", ".join([ safeconvert(*i) for i in items ]))+'}'
+ 
+ def repr_SortedDictEx(thedict, *listofkeys):
+-    return repr_SortedDict(dict([ (k,v) for k,v in thedict.items() if k in listofkeys]))
++    return repr_SortedDict(dict([ (k,v) for k,v in list(thedict.items()) if k in listofkeys]))
+ 
+ def DeriveScenarioFolderPath():
+     """
+@@ -164,7 +164,7 @@
+     folderstofind = ('Client', 'Storyline', 'Ai', 'MapEditor')
+     def PopFoldersTillFind(currentmoduledir, folders):
+         currentmoduledir = currentmoduledir.lower()
+-        folders = map(str.lower, folders)
++        folders = list(map(str.lower, folders))
+ 
+         for failsafe in range(10): # maximum number of loops
+             currentmoduledir, current = os.path.split(currentmoduledir)
+@@ -172,7 +172,7 @@
+                 return currentmoduledir
+             if current == '': # top of the tree
+                 break
+-        raise RuntimeError, ('PopFoldersTillFind cannot find any one of' + `folderstofind`)
++        raise RuntimeError('PopFoldersTillFind cannot find any one of' + repr(folderstofind))
+ 
+ 
+     currentmoduledir = os.path.dirname(os.path.abspath(sys.argv[0]))  # better to use os.path.abspath(".")
+@@ -376,7 +376,7 @@
+     return CoordXYonly(coord1) == CoordXYonly(coord2)
+ 
+ def CoordXYonly(coord):
+-    if not isinstance(coord, types.TupleType):
++    if not isinstance(coord, tuple):
+         return coord
+     return coord[0:2]
+ 
+@@ -474,19 +474,19 @@
+     def checkScenarioPath(self):
+         apath = DeriveScenarioFolderPath()
+ ##        print apath
+-        assert apath.lower() in map(str.lower,[
++        assert apath.lower() in list(map(str.lower,[
+             'C:\\Documents and Settings\\Administrator\Desktop\\Combat Mission Campaign Devel\\Devel\\Scenarios',
+             'C:\\CC\\Devel\\Scenarios',
+             'D:\\CC\\Devel\\Scenarios',
+-            ])
++            ]))
+     def checkFullPathForSingleFile(self):
+         apath = FilenameToFullScenarioPathName('Alpha3')
+ ##        print apath
+-        assert apath.lower() in map(str.lower,[
++        assert apath.lower() in list(map(str.lower,[
+             'C:\\Documents and Settings\\Administrator\Desktop\\Combat Mission Campaign Devel\\Devel\\Scenarios\\Alpha3.py',
+             'C:\\CC\\Devel\\Scenarios\\Alpha3.py',
+             'D:\\CC\\Devel\\Scenarios\\Alpha3.py',
+-            ])
++            ]))
+         try:
+             FilenameToFullScenarioPathName('Alpha3.py')
+             assert 0, 'Should not be able to pass in a single filename with an extension cos the import never allowed it so neither should we'
+--- src/tests/testing-generate-java/python-in/playheadmanager.py	(original)
++++ src/tests/testing-generate-java/python-in/playheadmanager.py	(refactored)
+@@ -167,7 +167,7 @@
+                 break
+                 # pos should now be positioned at the insertion point
+ 
+-        if lastoccurenceoftime<>-1:
++        if lastoccurenceoftime!=-1:
+             return lastoccurenceoftime
+         maxpos = len(self.mediator.story)-1
+         return min(maxpos, pos)
+@@ -178,7 +178,7 @@
+         maxturn is.
+         """
+         maxturnsofar = self.mediator.byTurn.GetMaxValue()
+-        if maxturnsofar<>-1:
++        if maxturnsofar!=-1:
+             # find out what the maximum time for that turn is
+             timetuple, day = self.turnMgr.TurnToTime(maxturnsofar)
+             maxtime = timetuple[1]
+--- src/tests/testing-generate-java/python-in/utilcc.py	(original)
++++ src/tests/testing-generate-java/python-in/utilcc.py	(refactored)
+@@ -17,7 +17,7 @@
+ try:
+     from _utilcc import eventStrToList
+ except:
+-    print "utilcc: Failed to load compiled extension (eventStrToList)"
++    print("utilcc: Failed to load compiled extension (eventStrToList)")
+     def eventStrToList(eventstr):
+         """
+             Input a string e.g. (1,1,0),o2,AT,2,(2,2,2),(3,3,3)
+@@ -50,12 +50,12 @@
+     import traceback
+     file, line, func, parms = traceback.extract_stack(limit=2)[0]
+     names = parms[5:-1].split(',')
+-    print 'File "%s", line %s %s'%(file, line, func)
++    print('File "%s", line %s %s'%(file, line, func))
+     result = ""
+-    for name, value in zip(names, args) + kw.items():
+-        if result: print '|%s'%result
++    for name, value in list(zip(names, args)) + list(kw.items()):
++        if result: print('|%s'%result)
+         result = '%s = %s'%(name.strip(), value)
+-    if result: print '`%s'%result
++    if result: print('`%s'%result)
+ if type(__builtins__) is dict:
+     __builtins__['show'] = show
+ else:
+@@ -132,11 +132,11 @@
+ def ImportScenarioFile(filename):
+     filename = FilenameToFullScenarioPathName(filename)
+     globalsdict = {}
+-    execfile(filename, globalsdict)
++    exec(compile(open(filename).read(), filename, 'exec'), globalsdict)
+     return globalsdict
+ 
+ def repr_SortedDict(thedict):
+-    items = thedict.items()
++    items = list(thedict.items())
+     items.sort()
+ 
+     def safeconvert(k,v):
+@@ -148,7 +148,7 @@
+     return '{'+(", ".join([ safeconvert(*i) for i in items ]))+'}'
+ 
+ def repr_SortedDictEx(thedict, *listofkeys):
+-    return repr_SortedDict(dict([ (k,v) for k,v in thedict.items() if k in listofkeys]))
++    return repr_SortedDict(dict([ (k,v) for k,v in list(thedict.items()) if k in listofkeys]))
+ 
+ def DeriveScenarioFolderPath():
+     """
+@@ -164,7 +164,7 @@
+     folderstofind = ('Client', 'Storyline', 'Ai', 'MapEditor')
+     def PopFoldersTillFind(currentmoduledir, folders):
+         currentmoduledir = currentmoduledir.lower()
+-        folders = map(str.lower, folders)
++        folders = list(map(str.lower, folders))
+ 
+         for failsafe in range(10): # maximum number of loops
+             currentmoduledir, current = os.path.split(currentmoduledir)
+@@ -172,7 +172,7 @@
+                 return currentmoduledir
+             if current == '': # top of the tree
+                 break
+-        raise RuntimeError, ('PopFoldersTillFind cannot find any one of' + `folderstofind`)
++        raise RuntimeError('PopFoldersTillFind cannot find any one of' + repr(folderstofind))
+ 
+ 
+     currentmoduledir = os.path.dirname(os.path.abspath(sys.argv[0]))  # better to use os.path.abspath(".")
+@@ -376,7 +376,7 @@
+     return CoordXYonly(coord1) == CoordXYonly(coord2)
+ 
+ def CoordXYonly(coord):
+-    if not isinstance(coord, types.TupleType):
++    if not isinstance(coord, tuple):
+         return coord
+     return coord[0:2]
+ 
+@@ -474,19 +474,19 @@
+     def checkScenarioPath(self):
+         apath = DeriveScenarioFolderPath()
+ ##        print apath
+-        assert apath.lower() in map(str.lower,[
++        assert apath.lower() in list(map(str.lower,[
+             'C:\\Documents and Settings\\Administrator\Desktop\\Combat Mission Campaign Devel\\Devel\\Scenarios',
+             'C:\\CC\\Devel\\Scenarios',
+             'D:\\CC\\Devel\\Scenarios',
+-            ])
++            ]))
+     def checkFullPathForSingleFile(self):
+         apath = FilenameToFullScenarioPathName('Alpha3')
+ ##        print apath
+-        assert apath.lower() in map(str.lower,[
++        assert apath.lower() in list(map(str.lower,[
+             'C:\\Documents and Settings\\Administrator\Desktop\\Combat Mission Campaign Devel\\Devel\\Scenarios\\Alpha3.py',
+             'C:\\CC\\Devel\\Scenarios\\Alpha3.py',
+             'D:\\CC\\Devel\\Scenarios\\Alpha3.py',
+-            ])
++            ]))
+         try:
+             FilenameToFullScenarioPathName('Alpha3.py')
+             assert 0, 'Should not be able to pass in a single filename with an extension cos the import never allowed it so neither should we'
+--- src/view/display_model.py	(original)
++++ src/view/display_model.py	(refactored)
+@@ -4,7 +4,7 @@
+ 
+ import random
+ import sys
+-from graph import Graph, GraphNode
++from .graph import Graph, GraphNode
+ 
+ class UmlGraph(Graph):
+ 
+@@ -85,8 +85,8 @@
+         self.associations_composition = []
+         
+     def decouple_node_from_shape(self, shape):
+-        classname = (classname for classname,shaperef in self.classnametoshape.items() if shaperef==shape).next()  # see http://johnstachurski.net/lectures/generators.html on how generators work, which can be built from list comprehension syntax
+-        print 'found class to decouple: ', classname
++        classname = next((classname for classname,shaperef in list(self.classnametoshape.items()) if shaperef==shape))  # see http://johnstachurski.net/lectures/generators.html on how generators work, which can be built from list comprehension syntax
++        print('found class to decouple: ', classname)
+ 
+         del self.classnametoshape[classname]
+         """
+@@ -102,7 +102,7 @@
+         self.decouple_node_from_shape(shape)
+ 
+         self.graph.DeleteNodeById(shape.node.id)
+-        print 'deleted node shape.node.id', shape.node.id
++        print('deleted node shape.node.id', shape.node.id)
+     
+ 
+ 
+@@ -110,30 +110,30 @@
+         def line(ch='-'):
+             return ch*70
+         from pprint import pprint
+-        print
+-        print "     DisplayModel    "
+-        print
+-        print line('*'), "DUMP UML KNOWLEDGE: classnametoshape"
++        print()
++        print("     DisplayModel    ")
++        print()
++        print(line('*'), "DUMP UML KNOWLEDGE: classnametoshape")
+         pprint(self.classnametoshape)
+-        print line(), "associations_generalisation (class, parent)"
++        print(line(), "associations_generalisation (class, parent)")
+         pprint(self.associations_generalisation)
+-        print line(), "associations_composition (to, from)"
++        print(line(), "associations_composition (to, from)")
+         pprint(self.associations_composition)
+-        print
+-        print "     GRAPH Model     "
+-        print
+-        print line('-'), 'graph.nodeSet is'
+-        pprint(self.graph.nodeSet.keys())
+-        print line('-'), 'self.graph.nodes'
+-        print
++        print()
++        print("     GRAPH Model     ")
++        print()
++        print(line('-'), 'graph.nodeSet is')
++        pprint(list(self.graph.nodeSet.keys()))
++        print(line('-'), 'self.graph.nodes')
++        print()
+         for node in self.graph.nodes:
+-            print node
+-        print line('-'), 'self.graph.edges'
++            print(node)
++        print(line('-'), 'self.graph.edges')
+         for edge in self.graph.edges:
+             source = edge['source'].id
+             target = edge['target'].id
+             edgetype = edge['uml_edge_type']
+-            print "from %40s --> %-40s  (%s)" % (source, target, edgetype)
++            print("from %40s --> %-40s  (%s)" % (source, target, edgetype))
+ 
+ 
+     def AddUmlNode(self, id, attrs=[], meths=[]):
+@@ -170,7 +170,7 @@
+ 
+         Returns: graph node
+         """
+-        print "incoming id", id
++        print("incoming id", id)
+         if self.graph.FindNodeById(id):
+             id += str(random.randint(1,9999))
+         t,l,w,h = random.randint(0, 100),random.randint(0,100),random.randint(60, 160),random.randint(60,160)
+@@ -199,7 +199,7 @@
+                 return
+             self.associations_composition.append((otherclass, classname))  # reverse direction so round black arrows look ok
+ 
+-        for classname, classentry in p.classlist.items():
++        for classname, classentry in list(p.classlist.items()):
+             """
+             These are a list of (attr, otherclass) however they imply that THIS class
+             owns all those other classes.
+--- src/view/graph.py	(original)
++++ src/view/graph.py	(refactored)
+@@ -4,7 +4,7 @@
+ from layout.line_intersection import FindLineIntersection
+ from layout.permutations import getpermutations
+ from common.architecture_support import listdiff
+-from graph_persistence import GraphPersistence
++from .graph_persistence import GraphPersistence
+ 
+ global_colour_index = 1
+ 
+@@ -65,7 +65,7 @@
+     def DeleteNode(self, node):
+         if node:
+             self.nodes.remove(node)
+-            if node.id in self.nodeSet.keys():
++            if node.id in list(self.nodeSet.keys()):
+                 del self.nodeSet[node.id]
+         for edge in self.edges[:]:
+             if edge['source'].id == node.id or edge['target'].id == node.id:
+@@ -181,7 +181,7 @@
+             node.parents = []
+             node.children = []
+         for edge in self.edges:
+-            if edge.has_key('uml_edge_type') and edge['uml_edge_type'] == 'generalisation':
++            if 'uml_edge_type' in edge and edge['uml_edge_type'] == 'generalisation':
+                 parent = edge['target']
+                 child = edge['source']
+                 if parent not in child.parents:
+@@ -275,7 +275,7 @@
+ 
+     @classmethod
+     def MementosEqual(self, memento1, memento2, tolerance=5):
+-        for id, point in memento1.items():
++        for id, point in list(memento1.items()):
+             point2 = memento2.get(id, None)
+             #if tolerance == 0.01:
+             #    print "point %s diff %f greater than %f = %s" % (point, abs(point[0] - point2[0]), tolerance, abs(point[0] - point2[0]) > tolerance)
+@@ -284,7 +284,7 @@
+         return True
+     
+     def RestoreWorldPositions(self, memento):
+-        for id, point in memento.items():
++        for id, point in list(memento.items()):
+             node = self.FindNodeById(id)
+             node.left, node.top = point
+ 
+@@ -352,7 +352,7 @@
+         def remove_duplicates(lzt):
+             d = {}
+             for x in lzt: d[tuple(x)]=x
+-            return d.values()
++            return list(d.values())
+         result = remove_duplicates(result)
+         return result
+             
+@@ -432,7 +432,7 @@
+         def remove_duplicates(lzt):
+             d = {}
+             for x in lzt: d[tuple(x)]=x
+-            return d.values()
++            return list(d.values())
+         result = [r for r in result if r != None]
+         result = remove_duplicates(result)
+         return result
+--- src/view/graph_persistence.py	(original)
++++ src/view/graph_persistence.py	(refactored)
+@@ -111,7 +111,7 @@
+             for i in range(2, len(self.filedata_list)):
+                 self.filedata_list[i] = re.sub("'node'", "'umlshape'", self.filedata_list[i])
+         else:
+-            print "Don't know how to upgrade persistence format to %f" % to_vers
++            print("Don't know how to upgrade persistence format to %f" % to_vers)
+ 
+     def Load(self, filedata_str, force=False):
+         """
+@@ -146,10 +146,10 @@
+                 sourcenode = self.graph.FindNodeById(source_id)
+                 targetnode = self.graph.FindNodeById(target_id)
+                 if not sourcenode:
+-                    print "Couldn't load source from persistence", source_id
++                    print("Couldn't load source from persistence", source_id)
+                     continue
+                 if not targetnode:
+-                    print "Couldn't load target from persistence", target_id
++                    print("Couldn't load target from persistence", target_id)
+                     continue
+                 weight = data.get('weight', None)
+                 edge = self.graph.AddEdge(sourcenode, targetnode, weight)  # AddEdge takes node objects as parameters

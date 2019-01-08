@@ -18,35 +18,35 @@ from common.gui_imageviewer import ImageViewer
 class MyFrame1 ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"PyYuml Gui", pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "PyYuml Gui", pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
 		self.m_menubar1 = wx.MenuBar( 0 )
 		self.m_menu1 = wx.Menu()
-		self.m_menuItem5 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Import Python Code..."+ u"\t" + u"CTRL+I", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem5 = wx.MenuItem( self.m_menu1, wx.ID_ANY, "Import Python Code..."+ "\t" + "CTRL+I", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu1.AppendItem( self.m_menuItem5 )
 		
 		self.m_menu1.AppendSeparator()
 		
-		self.m_menuItem3 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Open..."+ u"\t" + u"CTRL+O", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem3 = wx.MenuItem( self.m_menu1, wx.ID_ANY, "Open..."+ "\t" + "CTRL+O", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu1.AppendItem( self.m_menuItem3 )
 		
-		self.m_menuItem4 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Save As..."+ u"\t" + u"CTRL+S", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem4 = wx.MenuItem( self.m_menu1, wx.ID_ANY, "Save As..."+ "\t" + "CTRL+S", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu1.AppendItem( self.m_menuItem4 )
 		
 		self.m_menu1.AppendSeparator()
 		
-		self.m_menuItem6 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Exit", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem6 = wx.MenuItem( self.m_menu1, wx.ID_ANY, "Exit", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu1.AppendItem( self.m_menuItem6 )
 		
-		self.m_menubar1.Append( self.m_menu1, u"File" ) 
+		self.m_menubar1.Append( self.m_menu1, "File" ) 
 		
 		self.m_menu2 = wx.Menu()
-		self.m_menuItem2 = wx.MenuItem( self.m_menu2, wx.ID_ANY, u"About...", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem2 = wx.MenuItem( self.m_menu2, wx.ID_ANY, "About...", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu2.AppendItem( self.m_menuItem2 )
 		
-		self.m_menubar1.Append( self.m_menu2, u"Help" ) 
+		self.m_menubar1.Append( self.m_menu2, "Help" ) 
 		
 		self.SetMenuBar( self.m_menubar1 )
 		

@@ -47,12 +47,12 @@ the x-direction; likewise for y_major and y_minor."""
  
         first, last = self.xRange
         if first >= last:
-            raise ValueError, "Illegal xRange: %s" % (str(xRange))
+            raise ValueError("Illegal xRange: %s" % (str(xRange)))
         self.dx = last - first
  
         first, last = self.yRange
         if first >= last:
-            raise ValueError, "Illegal yRange: %s" % (str(yRange))
+            raise ValueError("Illegal yRange: %s" % (str(yRange)))
         self.dy = last - first
  
         self._ppx = self.UX/self.dx
@@ -245,7 +245,7 @@ The middle mouse button toggles the axes on and off."""
  
     def MouseClick(self, event):
         if not event:
-            print "there!"
+            print("there!")
             return
         self.last_event = event
         self.NewGraph()

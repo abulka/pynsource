@@ -59,5 +59,5 @@ def percent_change(end, start):
         return 0
 
 if __name__ == '__main__':
-    print percent_change(9,10)
-    print percent_change(5, 10)    
+    print(percent_change(9,10))
+    print(percent_change(5, 10))    

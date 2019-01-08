@@ -17,17 +17,17 @@ import wx.xrc
 class GuiFrame ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"HexMvc Architecture2 Gui", pos = wx.DefaultPosition, size = wx.Size( 500,439 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "HexMvc Architecture2 Gui", pos = wx.DefaultPosition, size = wx.Size( 500,439 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
 		
 		self.m_menubar1 = wx.MenuBar( 0 )
 		self.m_menu1 = wx.Menu()
-		self.m_menuItem1FileNew = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"New", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem1FileNew = wx.MenuItem( self.m_menu1, wx.ID_ANY, "New", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu1.AppendItem( self.m_menuItem1FileNew )
 		
-		self.m_menubar1.Append( self.m_menu1, u"File" ) 
+		self.m_menubar1.Append( self.m_menu1, "File" ) 
 		
 		self.SetMenuBar( self.m_menubar1 )
 		
@@ -36,13 +36,13 @@ class GuiFrame ( wx.Frame ):
 		
 		bSizer10NewLoadSave = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_button12 = wx.Button( self, wx.ID_ANY, u"New / Clear", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button12 = wx.Button( self, wx.ID_ANY, "New / Clear", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer10NewLoadSave.Add( self.m_button12, 0, wx.ALL, 5 )
 		
-		self.m_button13 = wx.Button( self, wx.ID_ANY, u"Load", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button13 = wx.Button( self, wx.ID_ANY, "Load", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer10NewLoadSave.Add( self.m_button13, 0, wx.ALL, 5 )
 		
-		self.m_button20 = wx.Button( self, wx.ID_ANY, u"Save", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button20 = wx.Button( self, wx.ID_ANY, "Save", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer10NewLoadSave.Add( self.m_button20, 0, wx.ALL, 5 )
 		
 		bSizer6 = wx.BoxSizer( wx.VERTICAL )
@@ -65,7 +65,7 @@ class GuiFrame ( wx.Frame ):
 		
 		bSizer5 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_button11 = wx.Button( self, wx.ID_ANY, u"Dump Model", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button11 = wx.Button( self, wx.ID_ANY, "Dump Model", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer5.Add( self.m_button11, 0, wx.ALL, 5 )
 		
 		
@@ -73,13 +73,13 @@ class GuiFrame ( wx.Frame ):
 		
 		bSizer8Hyperlinks = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_hyperlink1 = wx.HyperlinkCtrl( self, wx.ID_ANY, u"/", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
+		self.m_hyperlink1 = wx.HyperlinkCtrl( self, wx.ID_ANY, "/", "http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
 		bSizer8Hyperlinks.Add( self.m_hyperlink1, 0, wx.ALL, 5 )
 		
-		self.m_hyperlink2 = wx.HyperlinkCtrl( self, wx.ID_ANY, u"/modelsize", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
+		self.m_hyperlink2 = wx.HyperlinkCtrl( self, wx.ID_ANY, "/modelsize", "http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
 		bSizer8Hyperlinks.Add( self.m_hyperlink2, 0, wx.ALL, 5 )
 		
-		self.m_hyperlink3 = wx.HyperlinkCtrl( self, wx.ID_ANY, u"/dumpthings", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
+		self.m_hyperlink3 = wx.HyperlinkCtrl( self, wx.ID_ANY, "/dumpthings", "http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
 		bSizer8Hyperlinks.Add( self.m_hyperlink3, 0, wx.ALL, 5 )
 		
 		
@@ -97,7 +97,7 @@ class GuiFrame ( wx.Frame ):
 		
 		bSizer102Add = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_button122 = wx.Button( self, wx.ID_ANY, u"Add Thing", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button122 = wx.Button( self, wx.ID_ANY, "Add Thing", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer102Add.Add( self.m_button122, 0, wx.ALL, 5 )
 		
 		self.inputFieldTxt = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -108,7 +108,7 @@ class GuiFrame ( wx.Frame ):
 		
 		bSizer101AddInfo = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_button121 = wx.Button( self, wx.ID_ANY, u"Add Info to Thing", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button121 = wx.Button( self, wx.ID_ANY, "Add Info to Thing", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer101AddInfo.Add( self.m_button121, 0, wx.ALL, 5 )
 		
 		self.inputFieldTxtZ = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -119,7 +119,7 @@ class GuiFrame ( wx.Frame ):
 		
 		bSizer20 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_button131 = wx.Button( self, wx.ID_ANY, u"Delete Thing", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button131 = wx.Button( self, wx.ID_ANY, "Delete Thing", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer20.Add( self.m_button131, 0, wx.ALL, 5 )
 		
 		

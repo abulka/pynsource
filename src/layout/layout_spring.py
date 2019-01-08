@@ -20,7 +20,7 @@ class GraphLayoutSpring:
        
     def layout(self, keep_current_positions=False, optimise=True):
         if len(self.graph.nodes) == 0:
-            print "Layout aborted - nothing to lay out."
+            print("Layout aborted - nothing to lay out.")
             return 
         
         if not keep_current_positions:
@@ -41,7 +41,7 @@ class GraphLayoutSpring:
                     self.gui.mega_refresh(recalibrate=True, auto_resize_canvas=False) # refresh gui
                     
                     if self.gui.kill_layout:
-                        print "Layout aborted early, due to user interrupt"
+                        print("Layout aborted early, due to user interrupt")
                         break
 
             if i%20==0:
@@ -172,7 +172,7 @@ if __name__ == '__main__':
     layouter.layout()
 
     for node in g.nodes:
-        print node, "layout info:", (node.layoutPosX, node.layoutPosY)
+        print(node, "layout info:", (node.layoutPosX, node.layoutPosY))
     
     
-    print 'Done'
+    print('Done')

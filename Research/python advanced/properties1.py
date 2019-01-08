@@ -9,11 +9,11 @@ class C(object):
     self.x = x
 
 obj = C(5)
-print "x is currently", obj.x
+print("x is currently", obj.x)
 obj.x = 6    # set
-print obj.x  # get
+print(obj.x)  # get
 
-print "-----"
+print("-----")
 
 #Later, you can change it to allow getter, setter
 class C(object):
@@ -23,19 +23,19 @@ class C(object):
   def get_x(self):
     return self._x
   def set_x(self, x):
-    print "x is being set (old style setter)"
+    print("x is being set (old style setter)")
     self._x = x
   x = property(get_x, set_x)
 
 obj = C(5)
-print "x is currently", obj.x
+print("x is currently", obj.x)
 obj.x = 6    # set
-print obj.x  # get
+print(obj.x)  # get
 
 #You can use class C in almost the same way, but you
 #can add anything else you want to do to get_x, set_x.
 
-print "-----"
+print("-----")
 
 #
 # new-style properties
@@ -50,10 +50,10 @@ class C(object):
     return self._x
   @x.setter
   def x(self, value):
-    print "x is being set (new style)"
+    print("x is being set (new style)")
     self._x = value
 
 c = C(5)
-print "x is currently", c.x
+print("x is currently", c.x)
 c.x = 6
-print c.x
+print(c.x)

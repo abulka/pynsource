@@ -2,11 +2,11 @@
 
 import wx
 from bottle import route, run
-import thread
+import _thread
 
 HOST='localhost'
 PORT="8081"
-LOCALURL = u"http://"+HOST+":"+PORT
+LOCALURL = "http://"+HOST+":"+PORT
 
 class MyForm(wx.Panel):
 
@@ -14,7 +14,7 @@ class MyForm(wx.Panel):
         wx.Panel.__init__(self,parent,id=3)
         self.inputFieldTxt = wx.TextCtrl(self, -1, size=(200,-1), pos=(5, 10), style=wx.TE_PROCESS_ENTER)
         wx.StaticText(self, -1, "enter text and hit ENTER", size=(170,-1), pos=(5, 35))
-        wx.HyperlinkCtrl(self, wx.ID_ANY, u"view", LOCALURL, pos=(5, 60) )
+        wx.HyperlinkCtrl(self, wx.ID_ANY, "view", LOCALURL, pos=(5, 60) )
 
 class AppFrame(wx.Frame):
     myForm = None
@@ -28,13 +28,13 @@ class AppFrame(wx.Frame):
 
     def onGuiHitEnter(self, evt):
         self.currentData = self.myForm.inputFieldTxt.GetValue().upper()
-        print "wx gui got", self.currentData
+        print("wx gui got", self.currentData)
         
     def StartServer(self):
-        thread.start_new_thread(self._Serve, ())
+        _thread.start_new_thread(self._Serve, ())
         
     def _Serve(self):
-        print "starting server thread..."
+        print("starting server thread...")
         
         @route('/')
         def index():

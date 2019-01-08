@@ -77,7 +77,7 @@ class DrawFrame(wx.Frame):
         wx.lib.colourdb.updateColourDB()
         self.colors = wx.lib.colourdb.getColourList()
 
-        self.LineStyles = FloatCanvas.DrawObject.LineStyleList.keys()
+        self.LineStyles = list(FloatCanvas.DrawObject.LineStyleList.keys())
 
         return None
 
@@ -183,7 +183,7 @@ class DrawFrame(wx.Frame):
         self.Canvas.ZoomToBB()
 
     def MoveTest(self,event=None):
-        print "Running: TestHitTestForeground"
+        print("Running: TestHitTestForeground")
         wx.GetApp().Yield()
 
         self.UnBindAllMouseEvents()

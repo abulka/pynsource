@@ -23,7 +23,7 @@ class MyDialogChooseFromList ( wx.Dialog ):
 		
 		bSizer1 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_staticTextInstruction = wx.StaticText( self, wx.ID_ANY, u"Choose a Sample UML diagram:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticTextInstruction = wx.StaticText( self, wx.ID_ANY, "Choose a Sample UML diagram:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticTextInstruction.Wrap( -1 )
 		bSizer1.Add( self.m_staticTextInstruction, 0, wx.ALL, 5 )
 		

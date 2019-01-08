@@ -53,7 +53,7 @@ class MyFormMediator:
         self.observers = multicast()
         
     def DATA_CHANGED(self, mydata):
-        print "handleNotification (mediator) got", mydata
+        print("handleNotification (mediator) got", mydata)
         self.viewComponent.inputFieldTxt.SetValue(mydata)
 
     def onSubmit(self, evt):
@@ -81,7 +81,7 @@ class DataModelProxy(object):
         return self.realdata.someinfo
     @data.setter
     def data(self, value):
-        print "setData (model) to", value
+        print("setData (model) to", value)
         self.realdata.someinfo = value
         self.observers.DATA_CHANGED(self.data)
 
@@ -95,7 +95,7 @@ class DataSubmittedCommand():
         self.mydata = mydata
 
     def execute(self):
-        print "CMD submit execute (command)"
+        print("CMD submit execute (command)")
         self.model.data = self.mydata.upper()
 
 class Controller():
@@ -134,5 +134,5 @@ if __name__ == '__main__':
     # Start Gui
     wxapp.MainLoop()
     
-    print "DONE"     
+    print("DONE")     
    

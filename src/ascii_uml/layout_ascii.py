@@ -1,6 +1,6 @@
-from asciiworkspace import AsciiWorkspace
+from .asciiworkspace import AsciiWorkspace
 
-"""
+r"""
 HOW IT WORKS
 ============
 
@@ -64,7 +64,6 @@ unit tests in
     test_graph_nodes.py
     test_asciiworkspace_01.py
     test_asciiworkspace_02.py
-    
 """
 
 class NodeWidthCalc:

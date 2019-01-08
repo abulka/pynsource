@@ -1,7 +1,7 @@
 class Incoming1:
     def HandlePowerOperator(self):
         x = 10**2
-        print x
+        print(x)
     
 a = Incoming1()
 a.HandlePowerOperator()

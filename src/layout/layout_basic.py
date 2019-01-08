@@ -88,16 +88,16 @@ if __name__ == '__main__':
     umlworkspace = DisplayModel()
     umlboxshapes = [Shape(), Shape(), Shape()]
     positions, shapeslist, newdiagramsize = layout.Layout(umlworkspace, umlboxshapes)
-    print "positions", positions
+    print("positions", positions)
     #print "shapeslist", shapeslist
-    print "newdiagramsize", newdiagramsize
+    print("newdiagramsize", newdiagramsize)
     assert positions == [(0, 0), (10, 0), (20, 0)]
     assert newdiagramsize == (30, 10)
     
     umlboxshapes = [Shape(), Shape(), Shape(), Shape(), Shape(), Shape()]
     positions, shapeslist, newdiagramsize = layout.Layout(umlworkspace, umlboxshapes)
-    print "positions", positions
+    print("positions", positions)
     #print "shapeslist", shapeslist
-    print "newdiagramsize", newdiagramsize
+    print("newdiagramsize", newdiagramsize)
     assert positions == [(0, 0), (10, 0), (20, 0), (30, 0), (0, 10), (10, 10)]
     assert newdiagramsize == (40, 20)

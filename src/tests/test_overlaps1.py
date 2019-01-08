@@ -480,7 +480,7 @@ class OverlapTests(unittest.TestCase):
     def test6_1LineCrossingNotNeeded(self):
         
         if not LINE_NODE_OVERLAP_REMOVAL_ENABLED:
-            print "Test passed (disabled)",
+            print("Test passed (disabled)", end=' ')
             return
 
         self._LoadScenario6_linecrossing()
@@ -503,7 +503,7 @@ class OverlapTests(unittest.TestCase):
     def test6_2LineCrossingAvoided(self):
 
         if not LINE_NODE_OVERLAP_REMOVAL_ENABLED:
-            print "Test passed (disabled)",
+            print("Test passed (disabled)", end=' ')
             return
 
         self._LoadScenario6_linecrossing()
@@ -529,7 +529,7 @@ class OverlapTests(unittest.TestCase):
     def test6_3LineCrossingAvoidedGoSnug(self):
 
         if not LINE_NODE_OVERLAP_REMOVAL_ENABLED:
-            print "Test passed (disabled)",
+            print("Test passed (disabled)", end=' ')
             return
 
         self._LoadScenario6_linecrossing()

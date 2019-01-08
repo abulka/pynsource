@@ -21,11 +21,11 @@ class TestCase_A(unittest.TestCase):
         #print g.GraphToString().strip()
     
         assert len(g.nodes) == 2
-        assert len(g.nodeSet.keys()) == 2
+        assert len(list(g.nodeSet.keys())) == 2
         assert len(g.edges) == 1
         g.DeleteNodeById('B')
         assert len(g.nodes) == 1
-        assert len(g.nodeSet.keys()) == 1
+        assert len(list(g.nodeSet.keys())) == 1
         assert len(g.edges) == 0
 
         # Old persistence format - very simple, I call this 0.9 format.    
@@ -326,7 +326,7 @@ class TestCase_A(unittest.TestCase):
         m = model_to_ascii_builder()
         s = m.main(g, nodes_annotated_and_sorted=mycustom_ordering)
 
-        expected_s = """
+        expected_s = r"""
 +---+
 | M |
 +---+
@@ -358,17 +358,17 @@ class TestCase_A(unittest.TestCase):
         #print s
         #print "*"*88
         
-        if s.strip() <> expected_s.strip():
+        if s.strip() != expected_s.strip():
             # Write to file
-            with open('logs/test_8_out_actual_.txt','w') as f: f.write(s)
-            with open('logs/test_8_out_expected.txt','w') as f: f.write(expected_s)
+            with open(os.path.abspath('tests/logs/test_8_out_actual_.txt'),'w') as f: f.write(s)
+            with open(os.path.abspath('tests/logs/test_8_out_expected.txt'),'w') as f: f.write(expected_s)
 
             import difflib
             # delta = difflib.ndiff(s.strip(), expected_s.strip()) # this will always emit something, a visual of the original with changes.
             delta = difflib.unified_diff(s.strip(), expected_s.strip(), n=0,
                                 fromfile='actual', tofile='expected')
             diff_s = ''.join(delta)
-            print diff_s
+            print(diff_s)
         
         assert s.strip() == expected_s.strip()
         

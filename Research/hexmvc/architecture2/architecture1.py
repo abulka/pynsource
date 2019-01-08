@@ -6,8 +6,7 @@ import sys; sys.path.append("../lib"); sys.path.append("../hexagon3")
 from architecture_support import *
 import abc
 
-class HexAdapter(object):
-    __metaclass__ = abc.ABCMeta
+class HexAdapter(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def SetApp(self, app): pass
 
@@ -62,8 +61,7 @@ class Thing:
     def AddInfo(self, msg):
         self.info += " " + msg
 
-class IModelDependencies(object):
-    __metaclass__ = abc.ABCMeta
+class IModelDependencies(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def notifyOfModelChange(self, thing, modelsize): pass
     
@@ -71,7 +69,7 @@ class IModelDependencies(object):
 # SERVER
 
 from bottle import route, run, template, request
-import thread
+import _thread
 
 
 class IServer(HexAdapter):
@@ -100,8 +98,7 @@ class Server(IServer):
         #return template('ajax1')
         return 'The model length is %d' % self.app.GetModelSize()
 
-class IServerDependencies(object):
-    __metaclass__ = abc.ABCMeta
+class IServerDependencies(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def GetModelSize(self): pass
 
@@ -110,7 +107,7 @@ class IServerDependencies(object):
 import wx
 import wx.lib.mixins.inspection  # Ctrl-Alt-I 
 from hexmvcgui_gen import HexMvcGuiFrame1
-import thread, time
+import _thread, time
 import random
 
 class IGui(HexAdapter):
@@ -124,13 +121,13 @@ class MyFrame(HexMvcGuiFrame1, IGui, IModelDependencies):
 
     def SetApp(self, app):
         self.app = app
-        print "app has been set"
+        print("app has been set")
         #self._InitHyperlinks()
 
     # IModelDependencies
     
     def notifyOfModelChange(self, thing, modelsize):
-        print "Gui observer got notified"
+        print("Gui observer got notified")
         self.m_listBox1.Append(str(thing), thing)
 
     # Gui Generated Events, override the handler here
@@ -148,8 +145,7 @@ class MyWxApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.myframe = frame
         return True
 
-class IGuiDependencies(object):
-    __metaclass__ = abc.ABCMeta
+class IGuiDependencies(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def AddThing(self, info): pass
 
@@ -162,8 +158,7 @@ assert issubclass(Model, IModel)
 assert issubclass(Server, IServer)
 assert issubclass(MyFrame, IGui)
 
-class IApp(object):
-    __metaclass__ = abc.ABCMeta
+class IApp(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def Boot(self): pass
     
@@ -193,7 +188,7 @@ class App(IApp, IModelDependencies, IServerDependencies, IGuiDependencies):
         return 100
     
     def notifyOfModelChange(self, thing, modelsize):
-        print "App observer got notified, added value %(thing)s - modelsize now %(modelsize)4d" % vars()
+        print("App observer got notified, added value %(thing)s - modelsize now %(modelsize)4d" % vars())
         
 #
 # Wiring up
@@ -216,4 +211,4 @@ wx.CallAfter(app.Boot)
 # Start Gui
 wxapp.MainLoop()
 
-print "DONE"
+print("DONE")

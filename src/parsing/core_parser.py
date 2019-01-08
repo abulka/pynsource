@@ -2,8 +2,8 @@
 
 import tokenize, token
 import pprint
-from keywords import pythonbuiltinfunctions, javakeywords, delphikeywords
-from class_entry import ClassEntry, Attribute
+from .keywords import pythonbuiltinfunctions, javakeywords, delphikeywords
+from .class_entry import ClassEntry, Attribute
 import os
 
 DEBUG_DUMPTOKENS = False
@@ -115,7 +115,7 @@ class HandleClasses(AndyBasicParseEngine):
         self.inbetweenClassAndFirstDef = 0
 
     def On_deindent(self):
-        if self.indentlevel <= self.currclassindentlevel:
+        if self.currclassindentlevel != None and self.indentlevel <= self.currclassindentlevel:
 ##            print 'popping class', self.currclass, 'from', self.currclasslist
             self.PopCurrClass()
 ##        print
@@ -140,6 +140,7 @@ class HandleClasses(AndyBasicParseEngine):
 
     def GetCurrClassIndentLevel(self):
         if not self.currclasslist:
+            # a bit dodgy, but Python 2 used to be able to compare None and int and say it was false
             return None
         currclassandindentlevel = self.currclasslist[-1]
         return currclassandindentlevel[1]
@@ -355,7 +356,7 @@ class HandleComposites(HandleClassAttributes):
         self.dummy2 = [()]
 
     def JustGotASelfAttr(self, selfattrname):
-        assert selfattrname <> 'self'
+        assert selfattrname != 'self'
         self.lastselfattrname = selfattrname
         self.waitingforclassname = 1
         self.waitingforOpenBracket = 0

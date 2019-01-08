@@ -1,7 +1,7 @@
 # blackboard
 
 from view.graph import Graph
-from layout_spring import GraphLayoutSpring
+from .layout_spring import GraphLayoutSpring
 
 ANIMATE_BLACKBOARD_ATTEMPTS = True
 ANIMATE_EVERY_DETAIL = False

@@ -73,12 +73,12 @@ class MyCanvas(wx.ScrolledWindow):
         pass
     
     def OnWheel(self, event):    # ANDY
-        print "wheeeeel %s" % event.ControlDown()  # http://www.cs.cofc.edu/~jimmy/wxPython/wx153.htm#topic592
+        print("wheeeeel %s" % event.ControlDown())  # http://www.cs.cofc.edu/~jimmy/wxPython/wx153.htm#topic592
         
-        print event
+        print(event)
         delta = event.GetWheelDelta() 
         rot = event.GetWheelRotation() 
-        print 'delta', delta, 'rot', rot
+        print('delta', delta, 'rot', rot)
         
         if event.ControlDown():
             INCR = 1.3
@@ -88,7 +88,7 @@ class MyCanvas(wx.ScrolledWindow):
                 self.andyscale /= INCR
             if self.andyscale == 0:
                 self.andyscale = 1.0 
-            print self.andyscale
+            print(self.andyscale)
             self.ClearBackground() 
             self.Refresh()
         else:
@@ -159,8 +159,8 @@ class MyCanvas(wx.ScrolledWindow):
                 # move the map in the view
                 #self.view_offset_x += dx
                 #self.view_offset_y += dy
-                print "PAN %d %d" % (dx, dy)
-                print self.GetViewStart()
+                print("PAN %d %d" % (dx, dy))
+                print(self.GetViewStart())
                 currx, curry = self.GetViewStart()
                 self.Scroll(currx+dx, curry+dy)  # Note The positions are in scroll units, not pixels, so to convert to pixels you will have to multiply by the number of pixels per scroll increment. If either parameter is -1, that position will be ignored (no change in that direction).
                 
@@ -258,7 +258,7 @@ class MyCanvas(wx.ScrolledWindow):
 
         for line in self.lines:
             for coords in line:
-                apply(dc.DrawLine, coords)
+                dc.DrawLine(*coords)
 
 
     def SetXY(self, event):

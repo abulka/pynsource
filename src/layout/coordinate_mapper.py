@@ -15,28 +15,28 @@ def compare_loose_int(val1, val2):
     if abs(abs(val1) - abs(val2)) < 2:
         return True
     else:
-        print "** Lost something in the conversion", val1, val2
+        print("** Lost something in the conversion", val1, val2)
         return False
 
 def compare_loose_float(val1, val2):
     if abs(abs(val1) - abs(val2)) < 0.1:
         return True
     else:
-        print "** Lost something in the conversion", val1, val2
+        print("** Lost something in the conversion", val1, val2)
         return False
     
 def validate_world_to_layout(cc, x,y):  # x, y are int
     res = cc.WorldToLayout((x, y))
-    print "WorldToLayout((%d, %d)) = %s" % (x, y, res)
+    print("WorldToLayout((%d, %d)) = %s" % (x, y, res))
     res2 = cc.LayoutToWorld((res[0], res[1]))
-    print "LayoutToWorld((%f, %f)) = %s" % (res[0], res[1], res2)
+    print("LayoutToWorld((%f, %f)) = %s" % (res[0], res[1], res2))
     return compare_loose_int(x, res2[0]) and compare_loose_int(y, res2[1])
 
 def validate_layout_to_world(cc, x,y):  # x, y are floats
     res = cc.LayoutToWorld((x, y))
-    print "LayoutToWorld((%f, %f)) = %s" % (x, y, res)
+    print("LayoutToWorld((%f, %f)) = %s" % (x, y, res))
     res2 = cc.WorldToLayout((res[0], res[1]))
-    print "WorldToLayout((%d, %d)) = %s" % (res[0], res[1], res2)
+    print("WorldToLayout((%d, %d)) = %s" % (res[0], res[1], res2))
     return compare_loose_float(x, res2[0]) and compare_loose_float(y, res2[1])
 
 #####################
@@ -91,20 +91,20 @@ class CoordinateMapper:
     def DumpCalibrationInfo(self, dump_mode=None, new_world_size=None, scale=None, dump_nodes=True):
         indent = ""
         if dump_mode == "is_function_start":
-            print
-            print indent+"CoordinateMapper.Recalibrate START, calling with new_world_size=%s, scale=%s" %(new_world_size, scale)
+            print()
+            print(indent+"CoordinateMapper.Recalibrate START, calling with new_world_size=%s, scale=%s" %(new_world_size, scale))
         elif dump_mode == "is_function_end":
             indent = "\t"
-            print indent+"CoordinateMapper.Recalibrate END"
+            print(indent+"CoordinateMapper.Recalibrate END")
 
-        print indent+"scale and radius \t\t\t", self.scale, "\t\t", self.radius
-        print indent+"world_size\t\t\t", self.world_size
-        print indent+"layout (MinX/MinY)(MaxX/Maxy)\t(%2.2f,%2.2f) (%2.2f,%2.2f)" % (self.graph.layoutMinX, self.graph.layoutMinY, self.graph.layoutMaxX, self.graph.layoutMaxY)
-        print indent+"layout width height\t\t%2.2f %2.2f" % (self.graph.layoutMaxX - self.graph.layoutMinX, self.graph.layoutMaxY - self.graph.layoutMinY)
-        print indent+"factorX factorY\t\t\t", locale.format("%d", self.factorX, grouping=True), locale.format("%d", self.factorY, grouping=True)
+        print(indent+"scale and radius \t\t\t", self.scale, "\t\t", self.radius)
+        print(indent+"world_size\t\t\t", self.world_size)
+        print(indent+"layout (MinX/MinY)(MaxX/Maxy)\t(%2.2f,%2.2f) (%2.2f,%2.2f)" % (self.graph.layoutMinX, self.graph.layoutMinY, self.graph.layoutMaxX, self.graph.layoutMaxY))
+        print(indent+"layout width height\t\t%2.2f %2.2f" % (self.graph.layoutMaxX - self.graph.layoutMinX, self.graph.layoutMaxY - self.graph.layoutMinY))
+        print(indent+"factorX factorY\t\t\t", locale.format("%d", self.factorX, grouping=True), locale.format("%d", self.factorY, grouping=True))
         if dump_nodes:
             for node in self.graph.nodes:
-                print node
+                print(node)
 
 
     def LayoutToWorld(self, point):
@@ -126,16 +126,16 @@ class CoordinateMapper:
             layoutPosX, layoutPosY = self.WorldToLayout([node.left, node.top])
             
             if abs(layoutPosX) > 50.0:
-                print "??!", "About to set Big layoutPosX?", layoutPosX, "for",  node
+                print("??!", "About to set Big layoutPosX?", layoutPosX, "for",  node)
                 something_wrong = True
             if abs(layoutPosY) > 50.0:
-                print "??!", "About to set Big layoutPosY?", layoutPosY, "for",  node
+                print("??!", "About to set Big layoutPosY?", layoutPosY, "for",  node)
                 something_wrong = True
                 
             node.layoutPosX, node.layoutPosY = layoutPosX, layoutPosY
             
         if something_wrong:
-            print "\nSomething went wrong with AllToLayoutCoords - DumpCalibrationInfo\n"
+            print("\nSomething went wrong with AllToLayoutCoords - DumpCalibrationInfo\n")
             self.DumpCalibrationInfo(False)
     
     def AllToWorldCoords(self):
@@ -157,8 +157,8 @@ class CoordinateMapper:
             #print
             
             if node.left > 20000:
-                print '-'*40, "Something's gone wrong!"
-                print "node.layoutPosX, node.layoutPosY", node.layoutPosX, node.layoutPosY
+                print('-'*40, "Something's gone wrong!")
+                print("node.layoutPosX, node.layoutPosY", node.layoutPosX, node.layoutPosY)
                 self.DumpCalibrationInfo(False)
                 raise CustomException("Insane x values being generated")
 
@@ -186,12 +186,12 @@ if __name__ == '__main__':
     # LayoutToWorld
     
     res = c.LayoutToWorld((-2.7556504645221258, 0.39995144721675263))
-    print res
+    print(res)
     assert res[0] == 149, res
     assert res[1] == 221, res
 
     res = c.LayoutToWorld((-5.4927475878590482, -1.7573960183470871))
-    print res
+    print(res)
     assert res[0] == 61, res
     assert res[1] == 147, res
 
@@ -203,19 +203,19 @@ if __name__ == '__main__':
         return str(f)[:slen]
     
     res = c.WorldToLayout((149, 221))
-    print res
-    print "results should approximate -2.7556504645221258, 0.39995144721675263"
+    print(res)
+    print("results should approximate -2.7556504645221258, 0.39995144721675263")
     assert trunc(res[0], 1) == "-2.7", trunc(res[0], 1)
     assert trunc(res[1], 1) == "0.3", trunc(res[1], 1)
     
     res = c.WorldToLayout(( 61, 147))
-    print res
+    print(res)
     assert trunc(res[0], 0) == "-5", trunc(res[0], 0)
     assert trunc(res[1], 1) == "-1.7", trunc(res[1], 1)
 
     # Symmetry Validation
 
-    print "Symmetry Validation"
+    print("Symmetry Validation")
 
     validate_world_to_layout(c, 100, 200)
     validate_world_to_layout(c, 0, 0)
@@ -250,4 +250,4 @@ bounds (303, 795)
     validate_layout_to_world(c2, -5.0, -5.0)
     validate_layout_to_world(c2, 5.0, 5.0)
     
-    print 'Done'
+    print('Done')

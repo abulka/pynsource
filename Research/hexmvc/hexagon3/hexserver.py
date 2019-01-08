@@ -1,5 +1,5 @@
 from bottle import route, run, template, request
-import thread
+import _thread
 
 class Server1:
     def __init__(self, host, port):
@@ -13,10 +13,10 @@ class Server1:
         return "http://%s:%s" % (self.host, self.port)
         
     def StartServer(self):
-        thread.start_new_thread(self._Serve, ())
+        _thread.start_new_thread(self._Serve, ())
         
     def _Serve(self):
-        print "starting server thread..."
+        print("starting server thread...")
         
         @route('/')
         def index():
@@ -45,8 +45,8 @@ class Server1:
                 else:
                     return 'This is a normal request'
             except Exception as inst:
-                print "Exception!," + type(inst)     # the exception instance
-                print inst           # __str__ allows args to printed directly
+                print("Exception!," + type(inst))     # the exception instance
+                print(inst)           # __str__ allows args to printed directly
                 #print inst.args      # arguments stored in .args
                 #print traceback.print_exc()
 

@@ -17,7 +17,7 @@ elif sys.version_info[:2] == (2,3):
 try:
     from _utilcc import eventStrToList
 except:
-    print "utilcc: Failed to load compiled extension (eventStrToList)"
+    print("utilcc: Failed to load compiled extension (eventStrToList)")
     def eventStrToList(eventstr):
         """
             Input a string e.g. (1,1,0),o2,AT,2,(2,2,2),(3,3,3)
@@ -50,12 +50,12 @@ def show(*args, **kw):
     import traceback
     file, line, func, parms = traceback.extract_stack(limit=2)[0]
     names = parms[5:-1].split(',')
-    print 'File "%s", line %s %s'%(file, line, func)
+    print('File "%s", line %s %s'%(file, line, func))
     result = ""
-    for name, value in zip(names, args) + kw.items():
-        if result: print '|%s'%result
+    for name, value in list(zip(names, args)) + list(kw.items()):
+        if result: print('|%s'%result)
         result = '%s = %s'%(name.strip(), value)
-    if result: print '`%s'%result
+    if result: print('`%s'%result)
 if type(__builtins__) is dict:
     __builtins__['show'] = show
 else:
@@ -132,11 +132,11 @@ def AbsQuadCoordToPixel(absquadcoord):
 def ImportScenarioFile(filename):
     filename = FilenameToFullScenarioPathName(filename)
     globalsdict = {}
-    execfile(filename, globalsdict)
+    exec(compile(open(filename).read(), filename, 'exec'), globalsdict)
     return globalsdict
 
 def repr_SortedDict(thedict):
-    items = thedict.items()
+    items = list(thedict.items())
     items.sort()
 
     def safeconvert(k,v):
@@ -148,7 +148,7 @@ def repr_SortedDict(thedict):
     return '{'+(", ".join([ safeconvert(*i) for i in items ]))+'}'
 
 def repr_SortedDictEx(thedict, *listofkeys):
-    return repr_SortedDict(dict([ (k,v) for k,v in thedict.items() if k in listofkeys]))
+    return repr_SortedDict(dict([ (k,v) for k,v in list(thedict.items()) if k in listofkeys]))
 
 def DeriveScenarioFolderPath():
     """
@@ -164,7 +164,7 @@ def DeriveScenarioFolderPath():
     folderstofind = ('Client', 'Storyline', 'Ai', 'MapEditor')
     def PopFoldersTillFind(currentmoduledir, folders):
         currentmoduledir = currentmoduledir.lower()
-        folders = map(str.lower, folders)
+        folders = list(map(str.lower, folders))
 
         for failsafe in range(10): # maximum number of loops
             currentmoduledir, current = os.path.split(currentmoduledir)
@@ -172,7 +172,7 @@ def DeriveScenarioFolderPath():
                 return currentmoduledir
             if current == '': # top of the tree
                 break
-        raise RuntimeError, ('PopFoldersTillFind cannot find any one of' + `folderstofind`)
+        raise RuntimeError('PopFoldersTillFind cannot find any one of' + repr(folderstofind))
 
 
     currentmoduledir = os.path.dirname(os.path.abspath(sys.argv[0]))  # better to use os.path.abspath(".")
@@ -376,7 +376,7 @@ def CoordCompare(coord1, coord2):
     return CoordXYonly(coord1) == CoordXYonly(coord2)
 
 def CoordXYonly(coord):
-    if not isinstance(coord, types.TupleType):
+    if not isinstance(coord, tuple):
         return coord
     return coord[0:2]
 
@@ -474,19 +474,19 @@ class TestCase00(unittest.TestCase):
     def checkScenarioPath(self):
         apath = DeriveScenarioFolderPath()
 ##        print apath
-        assert apath.lower() in map(str.lower,[
-            'C:\\Documents and Settings\\Administrator\Desktop\\Combat Mission Campaign Devel\\Devel\\Scenarios',
+        assert apath.lower() in list(map(str.lower,[
+            'C:\\Documents and Settings\\Administrator\\Desktop\\Combat Mission Campaign Devel\\Devel\\Scenarios',
             'C:\\CC\\Devel\\Scenarios',
             'D:\\CC\\Devel\\Scenarios',
-            ])
+            ]))
     def checkFullPathForSingleFile(self):
         apath = FilenameToFullScenarioPathName('Alpha3')
 ##        print apath
-        assert apath.lower() in map(str.lower,[
-            'C:\\Documents and Settings\\Administrator\Desktop\\Combat Mission Campaign Devel\\Devel\\Scenarios\\Alpha3.py',
+        assert apath.lower() in list(map(str.lower,[
+            'C:\\Documents and Settings\\Administrator\\Desktop\\Combat Mission Campaign Devel\\Devel\\Scenarios\\Alpha3.py',
             'C:\\CC\\Devel\\Scenarios\\Alpha3.py',
             'D:\\CC\\Devel\\Scenarios\\Alpha3.py',
-            ])
+            ]))
         try:
             FilenameToFullScenarioPathName('Alpha3.py')
             assert 0, 'Should not be able to pass in a single filename with an extension cos the import never allowed it so neither should we'

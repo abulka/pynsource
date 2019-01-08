@@ -43,7 +43,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.SetTopWindow(self.frame)
 
         self.frame.Show(True)
-        print self.umlwin.GetSize()  # should be bigger now.  but it isn't???
+        print(self.umlwin.GetSize())  # should be bigger now.  but it isn't???
         # self.frame.SetSizer(self.sizer)
 
         self.umlwin.InitSizeAndObjs()  # Now that frame is visible and calculated, there should be sensible world coords to use
@@ -86,7 +86,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         # Only call this once enclosing frame has been set up, so that get correct world coord dimensions
 
         width, height = self.GetSize()
-        print width < MIN_SENSIBLE_CANVAS_SIZE or height < MIN_SENSIBLE_CANVAS_SIZE
+        print(width < MIN_SENSIBLE_CANVAS_SIZE or height < MIN_SENSIBLE_CANVAS_SIZE)
 
         # assert not self.canvas_resizer.canvas_too_small(), "InitSizeAndObjs being called too early - please set up enclosing frame size first"
 

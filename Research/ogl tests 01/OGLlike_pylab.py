@@ -77,7 +77,7 @@ class Diagram:
     try:
       pickle.dump(self.shapes,open(file,'w'))
     except:
-      print "problem saving this diagram"
+      print("problem saving this diagram")
 
   def LoadFile(self,file=None):
     if file is None:
@@ -85,7 +85,7 @@ class Diagram:
     try:
       self.shapes = pickle.load(open(file))
     except:
-      print "problem loading this diagram"
+      print("problem loading this diagram")
 
   def AddShape ( self, shape, after = None ) :
     if after:
@@ -221,7 +221,7 @@ class ShapeCanvas ( wx.ScrolledWindow ) :
   def Set_Coordinates ( self, LB = (-100,-100),
                               WH = ( 200, None ),
                               RT = None ) :
-    print LB,WH,RT
+    print(LB,WH,RT)
     if RT :
       if ( len ( RT ) > 1 ) and RT [1] :
         h = RT [1] - LB [1]
@@ -333,27 +333,27 @@ class ShapeCanvas ( wx.ScrolledWindow ) :
   # *********************************************************
   # *********************************************************
   def Print_All ( self ) :
-    print 'Shapes: ****************************************'
+    print('Shapes: ****************************************')
     for item in self.diagram.shapes:
-      print ' ', str ( item.__class__ ).split('.')[1],
+      print(' ', str ( item.__class__ ).split('.')[1], end=' ')
       if   isinstance ( item, Rectangle ) :
-        print ' : ' + item.Caption  + '  ================================='
+        print(' : ' + item.Caption  + '  =================================')
       elif isinstance ( item, Connection_Line ) :
-        print ''
-        print '    input  =', item.input
-        print '    output =', item.output
+        print('')
+        print('    input  =', item.input)
+        print('    output =', item.output)
       else :
-        print ''
-      print '    x, y, color  =', item._x, ',', item._y, ',', \
-                                  item.fill, ',', item.pen
+        print('')
+      print('    x, y, color  =', item._x, ',', item._y, ',', \
+                                  item.fill, ',', item.pen)
 
 
       for node in self.nodes:
         if node.item == item :
-          print '   ', str ( node.__class__ ).split('.')[1] + \
-                '  ---------------------------------'
-          print '      x, y, color  =', node._x, ',', node._y, ',', \
-                                        node.fill, ',', node.pen
+          print('   ', str ( node.__class__ ).split('.')[1] + \
+                '  ---------------------------------')
+          print('      x, y, color  =', node._x, ',', node._y, ',', \
+                                        node.fill, ',', node.pen)
 
   # *********************************************************
   # *********************************************************
@@ -401,7 +401,7 @@ class ShapeCanvas ( wx.ScrolledWindow ) :
     #print 'CANVAS UP'
     for item in self.Get_Current_Shapes ( event ):
       if isinstance ( item, INode ) :
-        print 'Canvas up', self.selectedShapes
+        print('Canvas up', self.selectedShapes)
         #shape.OnLeftUp ( event )
         """
         afhankelijk of de eerste of twede keer:
@@ -434,7 +434,7 @@ class ShapeCanvas ( wx.ScrolledWindow ) :
                  ( 2*x <= x0 + dx ) and \
                  ( 2*y >= y0 - dy ) and \
                  ( 2*y <= y0 + dy ) :
-                print 'GROUPING', item
+                print('GROUPING', item)
         # *********************************************************
 
       shape.leftUp ( self.select() )
@@ -718,8 +718,8 @@ class Shape ( ShapeEvtHandler ):
   # *********************************************************
   # *********************************************************
   def move(self,x,y):
-    self._x = map((lambda v: v+x), self._x)
-    self._y = map((lambda v: v+y), self._y)
+    self._x = list(map((lambda v: v+x), self._x))
+    self._y = list(map((lambda v: v+y), self._y))
 
   # *********************************************************
   # *********************************************************
@@ -737,7 +737,7 @@ class Shape ( ShapeEvtHandler ):
   # *********************************************************
   def SetX ( self, x ) :
     delta = x - self._x[0]
-    self._x = map ( (lambda f: f+delta), self._x)
+    self._x = list(map ( (lambda f: f+delta), self._x))
   def GetX ( self ) :
     return self._x[0]
 
@@ -745,7 +745,7 @@ class Shape ( ShapeEvtHandler ):
   # *********************************************************
   def SetY ( self, y ) :
     delta = y - self._y[0]
-    self._y = map ( (lambda f: f+delta), self._y)
+    self._y = list(map ( (lambda f: f+delta), self._y))
   def GetY ( self ) :
     return self._y[0]
 
@@ -799,8 +799,8 @@ class PointShape ( Shape ) :
     self.graphic._y = [ y-size, y+size ]
 
   def move ( self, x, y ) :
-    self._x = map((lambda v: v+x), self._x)
-    self._y = map((lambda v: v+y), self._y)
+    self._x = list(map((lambda v: v+x), self._x))
+    self._y = list(map((lambda v: v+y), self._y))
     self.graphic.move(x,y)
 
   def HitTest ( self, x, y ) :
@@ -1240,7 +1240,7 @@ class t_BaseShape ( Shape ) :
 # ***********************************************************************
 class t_RubberBand_Shape ( Shape ) :
   def __init__ ( self, Container_Canvas, x1=20, y1=20, x2=90, y2=90 ):
-    print x1,x2,y1,y2
+    print(x1,x2,y1,y2)
     Shape.__init__ ( self, Container_Canvas, [x1,x2] ,  [y1,y2] )
     self.Selectable = True
     self.Resizeable = True
@@ -1425,7 +1425,7 @@ class Rectangle ( t_BaseShape ):
       self.Caption = d.GetValue()
 
   def OnRightDown(self,event):
-    print 'right down'
+    print('right down')
 # ***********************************************************************
 
 

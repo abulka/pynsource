@@ -23,4 +23,4 @@ from copycat import init_system
 wiki = init_system(Wiki(), "./files")
 #wiki.create_page('My First Page', 'My First Page Content')
 page = wiki.pages['My First Page']
-print page
+print(page)

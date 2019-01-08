@@ -2,7 +2,7 @@
 
 import wx
 import wx.lib.ogl as ogl
-from coord_utils import setpos, getpos
+from .coord_utils import setpos, getpos
 from common.architecture_support import *
 from gui.uml_shapes import CommentShape
 
@@ -24,7 +24,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         node = getattr(shape, "node", None)
         if node:
             colour_index = getattr(node, "colour_index", None)
-            if colour_index <> None:
+            if colour_index != None:
                 msg += "colour_index %d" % colour_index
             
         self.frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d) %s" % (x, y, width, height, msg))
@@ -49,7 +49,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             # Adjust the GraphNode to match the shape x,y
             shape.node.left, shape.node.top = newpos
         except:
-            print "no node model attached to this shape!"
+            print("no node model attached to this shape!")
             
         self.UpdateStatusBar(shape)
         
@@ -195,4 +195,4 @@ def node_edit_multi_purpose(shape, app):
     elif isinstance(shape, CommentShape):
         app.run.CmdEditComment(shape)
     else:
-        print "Unknown Shape", shape
+        print("Unknown Shape", shape)

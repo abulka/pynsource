@@ -2,3 +2,5 @@ wxpython
 configobj
 requests
 py2app
+typed_ast
+astpretty

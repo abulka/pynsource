@@ -44,9 +44,9 @@ if __name__ == "__main__":
     conn = SQLiteConnection('hexpersistence_sqlobject.db', debug=False)
     sqlhub.processConnection = conn
 
-    init = raw_input("Create from scratch? (y/n) ")
+    init = input("Create from scratch? (y/n) ")
     if init == 'y':
-        print "Recreating database..."
+        print("Recreating database...")
     
         Model.dropTable(True)
         Model.createTable()
@@ -58,18 +58,18 @@ if __name__ == "__main__":
         thing2 = Thing(info="fred", model=model)
     else:
         model = Model.get(1)
-        thing1 = Thing.get(1); print thing1
-        thing2 = Thing.get(2); print thing2
+        thing1 = Thing.get(1); print(thing1)
+        thing2 = Thing.get(2); print(thing2)
 
     assert len(model.things) == 2
     assert thing1 in model.things
     assert thing2 in model.things
 
     # test deletion    
-    thing3 = Thing(info="tmp", model=model); print thing3
+    thing3 = Thing(info="tmp", model=model); print(thing3)
     assert len(model.things) == 3
     Thing.delete(thing3.id)
     assert len(model.things) == 2
 
-    print "done"
+    print("done")
     

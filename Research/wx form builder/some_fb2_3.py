@@ -7,13 +7,13 @@ from some_fb2_gen import *
 	
 class MyFrame3A ( MyFrame3 ):
 	def OnButton1( self, event ):
-		print "button pushed"
+		print("button pushed")
 	
 	def OnHi( self, event ):
-		print "hi"
+		print("hi")
 
 	def OnSay( self, event ):
-		print "say"
+		print("say")
 
 app = wx.App()
 

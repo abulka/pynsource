@@ -29,7 +29,7 @@ class CmdInvoker1:
 class CmdFred:
     ugg = 1
     def execute(self, context):
-        print "hi from Fred and context is", context
+        print("hi from Fred and context is", context)
 
 invoker = CmdInvoker1(context={'a':1})
 invoker.CmdFred()  # instantiates class CmdFred and calls execute(context, ...) on it
@@ -52,7 +52,7 @@ class CmdInvoker2:
     def __getattr__(self, klass):
         #print klass, type(klass)
         def broadcaster(*args, **kwargs):
-            o = eval(klass+'(self.context)', dict(globals().items() + [('self', self)])) # http://stackoverflow.com/questions/7349785/eval-calling-lambda-dont-see-self
+            o = eval(klass+'(self.context)', dict(list(globals().items()) + [('self', self)])) # http://stackoverflow.com/questions/7349785/eval-calling-lambda-dont-see-self
             
             #print o, type(o)
             func = getattr(o, 'execute', None)
@@ -69,7 +69,7 @@ class CmdMary:
         self.context = context
     ugg = 1
     def execute(self):
-        print "hi from Mary and context is", self.context
+        print("hi from Mary and context is", self.context)
     
 invoker = CmdInvoker2(context={'a':2})
 invoker.CmdMary()  # instantiates class CmdMary and calls execute(...) on it
@@ -123,7 +123,7 @@ class CmdSam:
         self.num = num
         self.num2 = num2
     def execute(self):
-        print "hi from Sam and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__
+        print("hi from Sam and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__)
  
 invoker.CmdSam(100)  # instantiates class CmdSam with constructor value (100) and calls execute() on it
 invoker.CmdSam(100, 97)
@@ -171,7 +171,7 @@ class CmdWoody:
         self.num = num
         self.num2 = num2
     def execute(self):
-        print "hi from Woody and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__
+        print("hi from Woody and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__)
  
 invoker.CmdWoody(100)  # instantiates class CmdWoody with constructor value (100) and calls execute() on it
 invoker.CmdWoody(100, 97)
@@ -192,7 +192,7 @@ class CmdBob(CmdBase):
         self.num2 = num2
     def execute(self):
         assert self.context
-        print "hi from Bob and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__
+        print("hi from Bob and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__)
 
 invoker.CmdBob(100)  # instantiates class CmdBob with constructor value (100) and calls execute() on it
 invoker.CmdBob(100, 97)
@@ -202,4 +202,4 @@ c = CmdBob(100, 88)
 c.setContext({'a':44})   # Need to do this if not using the framework
 c.execute()
 
-print "done"
+print("done")

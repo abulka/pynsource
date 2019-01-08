@@ -5,7 +5,7 @@
 # tested with Python24 and wxPython25   vegaseat   24jul2005
 
 import wx
-import  cStringIO
+import  io
 
 class Panel1(wx.Panel):
   """ class Panel1 creates a panel with an image on it, inherits wx.Panel """
@@ -20,7 +20,7 @@ class Panel1(wx.Panel):
         
         data = open(imageFile, "rb").read()
         # convert to a data stream
-        stream = cStringIO.StringIO(data)
+        stream = io.StringIO(data)
         # convert to a bitmap
         bmp = wx.BitmapFromImage( wx.ImageFromStream( stream ))
         # show the bitmap, (5, 5) are upper left corner coordinates
@@ -33,7 +33,7 @@ class Panel1(wx.Panel):
         # bitmap upper left corner is in the position tuple (x, y) = (5, 5)
         wx.StaticBitmap(self, -1, jpg1, (10 + jpg1.GetWidth(), 5), (jpg1.GetWidth(), jpg1.GetHeight()))
     except IOError:
-        print "Image file %s not found" % imageFile
+        print("Image file %s not found" % imageFile)
         raise SystemExit
 
 

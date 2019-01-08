@@ -1,3 +1,3 @@
-print 6
-raw_input("Press Enter to continue...")
-print 7
+print(6)
+input("Press Enter to continue...")
+print(7)

@@ -45,15 +45,15 @@ class PyYumlGuiFrame ( MyFrame1 ):
         
     def OnImport( self, event ):
         from generate_code.gen_yuml import PySourceAsYuml
-        import urllib
+        import urllib.request, urllib.parse, urllib.error
         
         dlg = wx.FileDialog(parent=self, message="choose", defaultDir='.',
             defaultFile="", wildcard="*.py", style=wx.OPEN|wx.MULTIPLE, pos=wx.DefaultPosition)
         if dlg.ShowModal() == wx.ID_OK:
             filenames = dlg.GetPaths()
-            print 'Importing...'
+            print('Importing...')
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
-            print filenames
+            print(filenames)
             
             files=filenames
             p = PySourceAsYuml()
@@ -63,16 +63,16 @@ class PyYumlGuiFrame ( MyFrame1 ):
                 for f in files:
                     p.Parse(f)
             p.CalcYumls()
-            print p
+            print(p)
 
             #yuml_txt = "[Customer]+1->*[Order],[Order]++1-items >*[LineItem],[Order]-0..1>[PaymentMethod]"
             yuml_txt = ','.join(str(p).split())
             baseUrl = 'http://yuml.me/diagram/dir:lr;scruffy/class/'
-            url = baseUrl + urllib.quote(yuml_txt)
+            url = baseUrl + urllib.parse.quote(yuml_txt)
             self.yuml.ViewImage(url=url)
 
             wx.EndBusyCursor()
-            print 'Import - Done.'
+            print('Import - Done.')
             
             
 APP_SIZE = (600,600)

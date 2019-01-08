@@ -1,9 +1,9 @@
 # GUI.py
 # user interface classes
-from Tkinter import *
+from tkinter import *
 from Globals import *
-import tkFileDialog 
-import tkMessageBox
+import tkinter.filedialog 
+import tkinter.messagebox
 import os
 import string # for EditTransitionDialog
 from State import State
@@ -79,7 +79,7 @@ class Workspace:
         # set the scrollbar and update y0 at the same time so that it doesn't need to
         # be updated each time an event occurs.
     def setXScrollbar(self, *args):
-        apply(self.xScrollbar.set, args)
+        self.xScrollbar.set(*args)
         low, hi = self.xScrollbar.get()
         #Because of the borderwidth, need to adjust the position to reflect the
         # real position of the cursor for both x0 and y0.
@@ -88,7 +88,7 @@ class Workspace:
         
         # set the scrollbar and update y0
     def setYScrollbar(self, *args):
-        apply(self.yScrollbar.set, args)
+        self.yScrollbar.set(*args)
         low, hi = self.yScrollbar.get()
         self.y0 = low * self.height - self.bd - 1
         self.canvasHeight = (hi - low) * self.height
@@ -551,10 +551,10 @@ class EditStateDialog(Dialog):
             
     def validate(self):
         if self.name.get() == "":
-            tkMessageBox.showinfo("State", "A state must be given a name")
+            tkinter.messagebox.showinfo("State", "A state must be given a name")
             return 0
         elif (self.myState.getName() != self.name.get()) and not self.myStatechart.isFreeName(self.myState.parent, self.name.get()):
-            tkMessageBox.showinfo("State", "State name already chosen")
+            tkinter.messagebox.showinfo("State", "State name already chosen")
             return 0
         return 1
         
@@ -644,15 +644,15 @@ class EditTransitionDialog(Dialog):
             try:
                 t = string.atof(self.timeEntry.get())
             except ValueError:
-                tkMessageBox.showinfo("Transition", "Incorrect value for time")
+                tkinter.messagebox.showinfo("Transition", "Incorrect value for time")
                 return 0
             if t <= 0:
-                tkMessageBox.showinfo("Transition", "Time value must be positive")
+                tkinter.messagebox.showinfo("Transition", "Time value must be positive")
                 return 0
             return 1
         else: # chose event
             if self.eventEntry.get() == "":
-                tkMessageBox.showinfo("Transition", "An event must be specified")
+                tkinter.messagebox.showinfo("Transition", "An event must be specified")
                 return 0
             return 1
             
@@ -708,22 +708,22 @@ class GUI:
         self.transitionPopup.tk_popup(x, y)
         
     def showError(self, title, text):
-        tkMessageBox.showerror(title, text)
+        tkinter.messagebox.showerror(title, text)
         
     def askYesNoCancel(self, t,m):
-        return tkMessageBox._show(title=t, message=m, type="yesnocancel", icon="warning")
+        return tkinter.messagebox._show(title=t, message=m, type="yesnocancel", icon="warning")
         
     def getStatechartFilename(self):
-        return tkFileDialog.asksaveasfilename(defaultextension="stt", filetypes=[("Statechart",".stt"), ("All files","*")],title="Save as")
+        return tkinter.filedialog.asksaveasfilename(defaultextension="stt", filetypes=[("Statechart",".stt"), ("All files","*")],title="Save as")
         
     def getSVMFilename(self):
-        return tkFileDialog.asksaveasfilename(defaultextension="des", filetypes=[("SVM Description",".des"), ("All files","*")],title="Export to SVM")
+        return tkinter.filedialog.asksaveasfilename(defaultextension="des", filetypes=[("SVM Description",".des"), ("All files","*")],title="Export to SVM")
         
     def getPostscriptFilename(self):
-        return tkFileDialog.asksaveasfilename(defaultextension="ps", filetypes=[("Postscript",".ps"), ("All files","*")],title="Export to Postscript")
+        return tkinter.filedialog.asksaveasfilename(defaultextension="ps", filetypes=[("Postscript",".ps"), ("All files","*")],title="Export to Postscript")
         
     def getStatechartFile(self):
-        return tkFileDialog.askopenfilename(defaultextension="stt", filetypes=[("Statechart",".stt"), ("All files","*")],title="Open")
+        return tkinter.filedialog.askopenfilename(defaultextension="stt", filetypes=[("Statechart",".stt"), ("All files","*")],title="Open")
         
     def editInitCode(self, statechart):
         title = "Initialization Code"
@@ -820,12 +820,12 @@ class GUI:
     
     def Andy01(self):
         res = self.handler.link.stateAdder._addState(120, 120, parent=None)
-        print res
+        print(res)
         
     def Andy02(self):
         for i in range(1,20):
             self.handler.link.stateAdder._addState(random.randint(100,220), 100+random.randint(100,220), parent=None)
-            print i
+            print(i)
         
     def _createWorkspace(self):
         self.workspace = Workspace(self.root, 1200, 1200, 100, 100, self.handler)

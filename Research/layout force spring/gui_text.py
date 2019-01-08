@@ -21,10 +21,10 @@ class GraphRendererBasic:
             self.drawEdge(edge)
 
     def drawNode(self, node):
-        print node
+        print(node)
        
     def drawEdge(self, edge):
-        print "Edge: from (%d, %d) to (%d, %d)" % (edge['source'].left, edge['source'].top, edge['target'].left, edge['target'].top)
+        print("Edge: from (%d, %d) to (%d, %d)" % (edge['source'].left, edge['source'].top, edge['target'].left, edge['target'].top))
 
 
 if __name__ == '__main__':
@@ -47,13 +47,13 @@ if __name__ == '__main__':
 
     def dump():
         for node in g.nodes:
-            print node, "layout info:", (node.layoutPosX, node.layoutPosY)
+            print(node, "layout info:", (node.layoutPosX, node.layoutPosY))
 
-    print "layout pass 1"
+    print("layout pass 1")
     layouter.layout()
     dump()
 
-    print "layout pass 2"
+    print("layout pass 2")
     layouter.layout()
     dump()
 
@@ -80,11 +80,11 @@ if __name__ == '__main__':
     # move some shapes in the real world
     a = g.FindNodeById('A')
     a.left += 100
-    print "Moved", a
+    print("Moved", a)
     
     # Gonna do another layout (after having just done a world draw) so need to update the layout positions
     r.AllToLayoutCoords()
-    print "layout pass 3"
+    print("layout pass 3")
     layouter.layout()
     dump()
 
@@ -92,5 +92,5 @@ if __name__ == '__main__':
     r.AllToWorldCoords()
     r.draw()
 
-    print 'Done'
+    print('Done')
 

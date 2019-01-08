@@ -28,9 +28,9 @@ def create(parent):
 # xml - using amara
 def ucode(value):
     if isinstance(value, str): 
-        return unicode(value.strip(), 'iso-8859-1')
+        return str(value.strip(), 'iso-8859-1')
     else:
-        return unicode(str(value).strip(), 'iso-8859-1')
+        return str(str(value).strip(), 'iso-8859-1')
 
 def addElement(doc, element, name):
     return element.xml_append(doc.xml_create_element(name))
@@ -60,29 +60,29 @@ class ShapeMixin:
         if isinstance(self, ogl.RectangleShape):
             klass = addElement(xmlDoc, xmlDoc.shapes,
                                 ucode('RectangleShape'))
-            addValueElement(xmlDoc, klass, u'width',
+            addValueElement(xmlDoc, klass, 'width',
                                     ucode(self.GetWidth()))
-            addValueElement(xmlDoc, klass, u'height',
+            addValueElement(xmlDoc, klass, 'height',
                                 ucode(self.GetHeight()))
 
         else:
             klass = addElement(xmlDoc, xmlDoc.shapes,
                                 ucode('PolygonShape'))
             shapePoints = self.GetPoints()
-            points = addElement(xmlDoc, klass, u'points')
+            points = addElement(xmlDoc, klass, 'points')
             for wxp in shapePoints:
                 points.xml_append_fragment('<point><x>%i</x><y>%i</y></point>'%(wxp.x, wxp.y))
                 
-            addValueElement(xmlDoc, klass, u'width',
+            addValueElement(xmlDoc, klass, 'width',
                                 ucode(self.GetOriginalWidth()))
-            addValueElement(xmlDoc, klass, u'height',
+            addValueElement(xmlDoc, klass, 'height',
                                 ucode(self.GetOriginalHeight()))
             
-        addValueElement(xmlDoc, klass, u'x',
+        addValueElement(xmlDoc, klass, 'x',
                                 ucode(self.GetX()))
-        addValueElement(xmlDoc, klass, u'y',
+        addValueElement(xmlDoc, klass, 'y',
                                 ucode(self.GetY()))
-        addValueElement(xmlDoc, klass, u'rackitemid',
+        addValueElement(xmlDoc, klass, 'rackitemid',
                                 ucode(self.GetRackItemId()))
 
 
@@ -101,7 +101,7 @@ class TriangleShape1(ogl.PolygonShape, ShapeMixin):
                    (0.0, 0.0),
                    ]
                    
-        print points
+        print(points)
 
         self.Create(points)
 
@@ -489,7 +489,7 @@ class RackDesigner(wx.Frame):
     
             #self.dbItemRack.shapeinfo = xmlDoc.xml(indent=u'yes')
             # adjust above to your db and remove below
-            print xmlDoc.xml(indent=u'yes')
+            print(xmlDoc.xml(indent='yes'))
         else:
             pass
             # adjust to your db
@@ -623,13 +623,13 @@ class RackDesigner(wx.Frame):
             xmlDoc = binderytools.bind_string(self.dbItemRack.shapeinfo)
             if hasattr(xmlDoc.shapes, 'RectangleShape'):
                 for shape in xmlDoc.shapes.RectangleShape:
-                    x = float(unicode(shape.x))
-                    y = float(unicode(shape.y))
-                    width = float(unicode(shape.width))
-                    height = float(unicode(shape.height))
+                    x = float(str(shape.x))
+                    y = float(str(shape.y))
+                    width = float(str(shape.width))
+                    height = float(str(shape.height))
                     newShape = self.designWindow.MyAddShape(RectangleShape(width, height), 
                         x, y, wx.BLACK_PEN, wx.LIGHT_GREY_BRUSH, "")
-                    newShape.SetRackItemId(int(unicode(shape.rackitemid)))
+                    newShape.SetRackItemId(int(str(shape.rackitemid)))
                     if newShape.GetRackItemId() != 0:
                         bin = wx.GetApp().Getds().selectByPrimaryKey(beans.winerackb,
                                                                      newShape.GetRackItemId())
@@ -642,18 +642,18 @@ class RackDesigner(wx.Frame):
                     newShape.GetCanvas().Refresh()
             if hasattr(xmlDoc.shapes, 'PolygonShape'):
                 for shape in xmlDoc.shapes.PolygonShape:
-                    x = float(unicode(shape.x))
-                    y = float(unicode(shape.y))
-                    width = float(unicode(shape.width))
-                    height = float(unicode(shape.height))
+                    x = float(str(shape.x))
+                    y = float(str(shape.y))
+                    width = float(str(shape.width))
+                    height = float(str(shape.height))
                     shapePoints = []
                     for point in shape.points.point:
-                        shapePoints.append((float(unicode(point.x)), 
-                                            float(unicode(point.y))))
+                        shapePoints.append((float(str(point.x)), 
+                                            float(str(point.y))))
                     newShape = self.designWindow.MyAddShape(PolygonShape(width, height), 
                         x, y, wx.BLACK_PEN, wx.LIGHT_GREY_BRUSH, "")
                     newShape.Create(shapePoints)
-                    newShape.SetRackItemId(int(unicode(shape.rackitemid)))
+                    newShape.SetRackItemId(int(str(shape.rackitemid)))
                     if newShape.GetRackItemId() != 0:
                         bin = wx.GetApp().Getds().selectByPrimaryKey(beans.winerackb,
                                                                      newShape.GetRackItemId())

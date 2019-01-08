@@ -17,7 +17,7 @@ ver = 'installed'
 if ver == 'installed': ## import the installed version
     from wx.lib.floatcanvas import NavCanvas, Resources
     from wx.lib.floatcanvas import FloatCanvas as FC
-    print "using installed version:", wx.lib.floatcanvas.__version__
+    print("using installed version:", wx.lib.floatcanvas.__version__)
 elif ver == 'local':
     ## import a local version
     import sys
@@ -32,9 +32,9 @@ import myimages
 # xml - using amara
 def ucode(value):
     if isinstance(value, str): 
-        return unicode(value.strip(), 'iso-8859-1')
+        return str(value.strip(), 'iso-8859-1')
     else:
-        return unicode(str(value).strip(), 'iso-8859-1')
+        return str(str(value).strip(), 'iso-8859-1')
 
 def addElement(doc, element, name):
     return element.xml_append(doc.xml_create_element(name))
@@ -52,24 +52,24 @@ class ShapeMixin:
         if isinstance(self, FC.Rectangle):
             klass = addElement(xmlDoc, xmlDoc.shapes,
                                 ucode('RectangleShape'))
-            addValueElement(xmlDoc, klass, u'width',
+            addValueElement(xmlDoc, klass, 'width',
                                     ucode(self.WH[0]))
-            addValueElement(xmlDoc, klass, u'height',
+            addValueElement(xmlDoc, klass, 'height',
                                 ucode(self.WH[1]))
-            addValueElement(xmlDoc, klass, u'x',
+            addValueElement(xmlDoc, klass, 'x',
                                     ucode(self.XY[0]))
-            addValueElement(xmlDoc, klass, u'y',
+            addValueElement(xmlDoc, klass, 'y',
                                     ucode(self.XY[1]))
 
         else:
             klass = addElement(xmlDoc, xmlDoc.shapes,
                                 ucode('PolygonShape'))
             shapePoints = self.Points.tolist()
-            points = addElement(xmlDoc, klass, u'points')
+            points = addElement(xmlDoc, klass, 'points')
             for wxp in shapePoints:
                 points.xml_append_fragment('<point><x>%i</x><y>%i</y></point>'%(wxp[0], wxp[1]))
                 
-        addValueElement(xmlDoc, klass, u'rackitemid',
+        addValueElement(xmlDoc, klass, 'rackitemid',
                                 ucode(self.RackItemId))
 
 
@@ -505,7 +505,7 @@ class DrawFrame(wx.Frame):
     
             #self.dbItemRack.shapeinfo = xmlDoc.xml(indent=u'yes')
             # adjust above to your db and remove below
-            print xmlDoc.xml(indent=u'yes')
+            print(xmlDoc.xml(indent='yes'))
         else:
             pass
             # adjust to your db
@@ -599,11 +599,11 @@ class DrawFrame(wx.Frame):
         xmlDoc = binderytools.bind_string(doc_header)
         if hasattr(xmlDoc.shapes, 'RectangleShape'):
             for shape in xmlDoc.shapes.RectangleShape:
-                x = float(unicode(shape.x))
-                y = float(unicode(shape.y))
-                w = float(unicode(shape.width))
-                h = float(unicode(shape.height))
-                rid = (unicode(shape.rackitemid))
+                x = float(str(shape.x))
+                y = float(str(shape.y))
+                w = float(str(shape.width))
+                h = float(str(shape.height))
+                rid = (str(shape.rackitemid))
                 if rid != 0:
                     shapetip = 'some dummy info for rectangle which normally comes from db'
                 else:
@@ -619,12 +619,12 @@ class DrawFrame(wx.Frame):
             for shape in xmlDoc.shapes.PolygonShape:
                 shapePoints = []
                 for point in shape.points.point:
-                    shapePoints.append((float(unicode(point.x)), 
-                                        float(unicode(point.y))))
+                    shapePoints.append((float(str(point.x)), 
+                                        float(str(point.y))))
                 Points = N.array(shapePoints,
                                  N.float_)
                                  
-                rid = (unicode(shape.rackitemid))
+                rid = (str(shape.rackitemid))
                 if rid != 0:
                     shapetip = 'some dummy info for triangle which normally comes from db'
                 else:

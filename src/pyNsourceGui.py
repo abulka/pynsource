@@ -80,7 +80,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             # Page 0
             self.umlcanvas = UmlCanvas(self.notebook, Log(), self.frame)
             self.umlcanvas.SetScrollRate(5, 5)
-            self.notebook.AddPage(self.umlcanvas, u"UML", True)
+            self.notebook.AddPage(self.umlcanvas, "UML", True)
 
             # Page 1
             self.asciiart = wx.ScrolledWindow(self.notebook, wx.ID_ANY, wx.DefaultPosition,
@@ -100,7 +100,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             self.asciiart.SetSizer(asciiart_sizer)
             self.asciiart.Layout()
             asciiart_sizer.Fit(self.asciiart)
-            self.notebook.AddPage(self.asciiart, u"Ascii Art", True)
+            self.notebook.AddPage(self.asciiart, "Ascii Art", True)
 
             sizer.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 0)
             self.frame.SetSizer(sizer)
@@ -417,7 +417,12 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         menuBar.Append(menu1, "&File")
         menuBar.Append(menu2, "&Edit")
         menuBar.Append(menu3, "&Layout")
-        menuBar.Append(menu5, "&View")
+
+        # Super Stoopid Hack (TM) is to just name the menu "View " instead of "View"
+        # https://github.com/itsayellow/marcam/issues/52
+        # https://github.com/wxWidgets/Phoenix/issues/347
+        menuBar.Append(menu5, "&View ")  # the name "View" causes weird mac dock auto items
+
         menuBar.Append(menu4, "&Help")
         self.frame.SetMenuBar(menuBar)
 
@@ -596,8 +601,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         webbrowser.open(WEB_PYNSOURCE_HOME_URL)
 
     def OnCheckForUpdates(self, event):
-        import urllib2
-        s = urllib2.urlopen(WEB_VERSION_CHECK_URL).read()
+        import urllib.request, urllib.error, urllib.parse
+        s = urllib.request.urlopen(WEB_VERSION_CHECK_URL).read()
         s = s.replace("\r", "")
         info = eval(s)
         ver = info["latest_version"]

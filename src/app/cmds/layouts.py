@@ -1,4 +1,4 @@
-from base_cmd import CmdBase
+from .base_cmd import CmdBase
 
 class CmdLayout(CmdBase):
     def execute(self):
@@ -36,7 +36,7 @@ class CmdLayoutExpand(CmdLayoutExpandContractBase):
             self.ChangeScale(-0.2)
             #print "expansion ", self.coordmapper.scale
         else:
-            print "Max expansion prevented.", self.context.coordmapper.scale
+            print("Max expansion prevented.", self.context.coordmapper.scale)
 
 class CmdLayoutContract(CmdLayoutExpandContractBase):
     def execute(self):
@@ -44,10 +44,10 @@ class CmdLayoutContract(CmdLayoutExpandContractBase):
             self.ChangeScale(0.2)
             #print "contraction ", self.coordmapper.scale
         else:
-            print "Min expansion thwarted.", self.context.coordmapper.scale
+            print("Min expansion thwarted.", self.context.coordmapper.scale)
 
 
-from blackboard_frame import MainBlackboardFrame
+from .blackboard_frame import MainBlackboardFrame
 from layout.blackboard import LayoutBlackboard
 
 class CmdDeepLayout(CmdBase):

@@ -238,7 +238,7 @@ class Log:
         if text[-1:] == '\n':
             text = text[:-1]
         # wx.LogMessage(text)
-        print text
+        print(text)
 
     write = WriteText
 

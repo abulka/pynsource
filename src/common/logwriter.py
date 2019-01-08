@@ -23,15 +23,15 @@ class LogWriter:
         
     def out(self, s, force_print=False):
         if self.print_to_console or force_print:
-            print s
+            print(s)
         self.f.write("%s\n"%s)
 
     def out_divider(self):
         if self.print_to_console:
-            print "-"*80
+            print("-"*80)
         self.f.write("<HR>\n")
         
-    def out_wrap_in_html(self, s, style_class='dump1'):
+    def out_wrap_in_html(self, s, style_class='dump1', heading="click", force_print=False):
         self.out("<div class=%s><pre>%s</div></pre>" % (style_class, s))
             
     def out_html_header(self):
@@ -87,7 +87,7 @@ class LogWriterNull:
     def out_divider(self):
         pass
         
-    def out_wrap_in_html(self, s, style_class='dump1'):
+    def out_wrap_in_html(self, s, style_class='dump1', heading="click", force_print=False):
         pass
             
     def out_html_header(self):
