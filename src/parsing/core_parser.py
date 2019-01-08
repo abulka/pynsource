@@ -140,6 +140,7 @@ class HandleClasses(AndyBasicParseEngine):
 
     def GetCurrClassIndentLevel(self):
         if not self.currclasslist:
+            print("AHA - returning None as an indent level!??")
             return None
         currclassandindentlevel = self.currclasslist[-1]
         return currclassandindentlevel[1]
