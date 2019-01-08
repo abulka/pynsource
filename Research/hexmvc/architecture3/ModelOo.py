@@ -1,5 +1,6 @@
 # Simple (in memory) Model
 
+
 class Model(object):
     def __init__(self):
         self.things = []
@@ -23,17 +24,18 @@ class Model(object):
     def size(self):
         return len(self.things)
 
+
 class Thing:
     def __init__(self, info):
         self.model = None  # backpointer
         self.info = info
         self.id = None
-        
+
     def __str__(self):
         return "Thing %d - %s" % (self.id, self.info)
 
     def to_dict(self):
-        return {"id":self.id, "info":self.info}
-        
+        return {"id": self.id, "info": self.info}
+
     def AddInfo(self, msg):
         self.info += " " + msg

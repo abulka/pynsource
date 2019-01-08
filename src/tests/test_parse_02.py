@@ -1,16 +1,17 @@
-# Unit tests for pyNsource that 
-# check that we can parse a class 
-# and stop when the indent 
+# Unit tests for pyNsource that
+# check that we can parse a class
+# and stop when the indent
 # deindents back to the margin.
-# Also check we can scan module 
-# level functions and global vars 
-# and treat them like attrs of a class 
+# Also check we can scan module
+# level functions and global vars
+# and treat them like attrs of a class
 # named after the module.
 
 import unittest
 import os
 from generate_code.gen_asciiart import PySourceAsText
 from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
+
 
 class TestCase01(unittest.TestCase):
     def setUp(self):
@@ -43,7 +44,7 @@ class TestCase01(unittest.TestCase):
 
         CHECK_MODULE_LEVEL_PARSING = 1
 
-        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule03.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule03.py"
         self.p.optionModuleAsClass = CHECK_MODULE_LEVEL_PARSING
         self.p.Parse(FILE)
 
@@ -56,69 +57,65 @@ class TestCase01(unittest.TestCase):
         gotevent7 = 0
         gotevent8 = 0
         for classname, classentry in list(self.p.classlist.items()):
-            if classname == 'ParseMeTest':
+            if classname == "ParseMeTest":
                 gotevent1 = 1
                 assert classentry.classesinheritsfrom == []
 
                 assert len(classentry.attrs) == 2
                 for attrobj in classentry.attrs:
                     attrname = attrobj.attrname
-                    if attrname == 'a':
+                    if attrname == "a":
                         gotevent2 = 1
-                    if attrname == 'b':
+                    if attrname == "b":
                         gotevent3 = 1
 
                 for adef in classentry.defs:
                     pass
                 assert len(classentry.defs) == 1
-                assert '__init__' in classentry.defs
+                assert "__init__" in classentry.defs
 
-            if classname == 'ParseMeTest2':
+            if classname == "ParseMeTest2":
                 gotevent4 = 1
                 assert len(classentry.attrs) == 0
                 assert len(classentry.defs) == 0
 
-            if classname == 'ParseMeTest3':
+            if classname == "ParseMeTest3":
                 gotevent5 = 1
                 assert len(classentry.attrs) == 0
                 assert len(classentry.defs) == 0
 
-            if classname == 'ParseMeTest4':
+            if classname == "ParseMeTest4":
                 gotevent6 = 1
                 assert len(classentry.attrs) == 0
                 assert len(classentry.defs) == 0
 
-
             # module level extra logic
             if CHECK_MODULE_LEVEL_PARSING:
 
-                if classname == 'Module_'+os.path.splitext(os.path.basename(FILE))[0]:
+                if classname == "Module_" + os.path.splitext(os.path.basename(FILE))[0]:
                     gotevent7 = 1
                     assert classentry.classesinheritsfrom == []
 
                     for adef in classentry.defs:
                         pass
                     assert len(classentry.defs) == 1
-                    assert 'y' in classentry.defs
+                    assert "y" in classentry.defs
 
                     assert len(classentry.attrs) == 1
                     for attrobj in classentry.attrs:
                         attrname = attrobj.attrname
-                        if attrname == 'x':
+                        if attrname == "x":
                             gotevent8 = 1
 
-
-
         assert gotevent1
-        assert gotevent2 
-        assert gotevent3 
-        assert gotevent4 
-        assert gotevent5 
+        assert gotevent2
+        assert gotevent3
+        assert gotevent4
+        assert gotevent5
         assert gotevent6
         if CHECK_MODULE_LEVEL_PARSING:
-            assert gotevent7 
-            assert gotevent8 
-        
+            assert gotevent7
+            assert gotevent8
 
     def testModuleVarsAndFunctions02(self):
         """
@@ -138,7 +135,7 @@ class TestCase01(unittest.TestCase):
 
         CHECK_MODULE_LEVEL_PARSING = 1
 
-        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule04.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule04.py"
         self.p.optionModuleAsClass = CHECK_MODULE_LEVEL_PARSING
         self.p.Parse(FILE)
 
@@ -152,42 +149,44 @@ class TestCase01(unittest.TestCase):
         gotevent8 = 0
         gotevent9 = 0
         for classname, classentry in list(self.p.classlist.items()):
-            if classname == 'ParseMeTest':
+            if classname == "ParseMeTest":
                 gotevent1 = 1
                 assert classentry.classesinheritsfrom == []
                 assert classentry.ismodulenotrealclass == 0
 
                 for attrobj in classentry.attrs:
                     attrname = attrobj.attrname
-                    #print attrname
-                    if attrname == 'a':
+                    # print attrname
+                    if attrname == "a":
                         gotevent2 = 1
-                        assert 'static' in attrobj.attrtype
-                    if attrname == 'b':
+                        assert "static" in attrobj.attrtype
+                    if attrname == "b":
                         gotevent3 = 1
-                        assert 'static' in attrobj.attrtype
-                    if attrname == 'c':
+                        assert "static" in attrobj.attrtype
+                    if attrname == "c":
                         gotevent4 = 1
-                        assert 'static' not in attrobj.attrtype
-                    if attrname == 'd':
+                        assert "static" not in attrobj.attrtype
+                    if attrname == "d":
                         gotevent3 = 1
-                        assert 'static' not in attrobj.attrtype
-                    if attrname == 'e':
+                        assert "static" not in attrobj.attrtype
+                    if attrname == "e":
                         gotevent5 = 1
-                        assert 'static' not in attrobj.attrtype
-                    if attrname == 'f':
+                        assert "static" not in attrobj.attrtype
+                    if attrname == "f":
                         gotevent6 = 1
-                        assert 'static' not in attrobj.attrtype
-                assert len(classentry.attrs) == 6, 'Only got ' + repr(len(classentry.attrs)) + ' attributes'
+                        assert "static" not in attrobj.attrtype
+                assert len(classentry.attrs) == 6, (
+                    "Only got " + repr(len(classentry.attrs)) + " attributes"
+                )
 
                 for adef in classentry.defs:
                     pass
                 assert len(classentry.defs) == 1
-                assert '__init__' in classentry.defs
+                assert "__init__" in classentry.defs
 
             # module level extra logic
             if CHECK_MODULE_LEVEL_PARSING:
-                if classname == 'Module_'+os.path.splitext(os.path.basename(FILE))[0]:
+                if classname == "Module_" + os.path.splitext(os.path.basename(FILE))[0]:
                     gotevent7 = 1
                     assert classentry.classesinheritsfrom == []
                     assert classentry.ismodulenotrealclass
@@ -198,26 +197,22 @@ class TestCase01(unittest.TestCase):
 
                     for attrobj in classentry.attrs:
                         attrname = attrobj.attrname
-                        #print 'attr', attrname
-                        if attrname == 'x':
+                        # print 'attr', attrname
+                        if attrname == "x":
                             gotevent8 = 1
-                        if attrname == 'y':
+                        if attrname == "y":
                             gotevent9 = 1
-                    assert len(classentry.attrs) == 2, 'Only got ' + repr(len(classentry.attrs)) + ' attributes'
-
-
+                    assert len(classentry.attrs) == 2, (
+                        "Only got " + repr(len(classentry.attrs)) + " attributes"
+                    )
 
         assert gotevent1
-        assert gotevent2 
-        assert gotevent3 
-        assert gotevent4 
-        assert gotevent5 
+        assert gotevent2
+        assert gotevent3
+        assert gotevent4
+        assert gotevent5
         assert gotevent6
         if CHECK_MODULE_LEVEL_PARSING:
-            assert gotevent7 
-            assert gotevent8 
+            assert gotevent7
+            assert gotevent8
             assert gotevent9
-
-
-
-

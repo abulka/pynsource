@@ -8,6 +8,7 @@ import os
 
 DEBUG_DUMPTOKENS = False
 
+
 class AndyBasicParseEngine(object):
     def __init__(self):
         self.meat = 0
@@ -17,13 +18,13 @@ class AndyBasicParseEngine(object):
         self.indentlevel = 0
 
     def _ReadAllTokensFromFile(self, file):
-        fp = open(file, 'r')
+        fp = open(file, "r")
         try:
-            self.tokens = [ x[0:2] for x in tokenize.generate_tokens(fp.readline) ]
+            self.tokens = [x[0:2] for x in tokenize.generate_tokens(fp.readline)]
         finally:
             fp.close()
         if DEBUG_DUMPTOKENS:
-            pprint.pprint( self.tokens )
+            pprint.pprint(self.tokens)
 
     def Parse(self, file):
         self._ReadAllTokensFromFile(file)
@@ -46,18 +47,21 @@ class AndyBasicParseEngine(object):
             if tokentype == 0:  # End Marker.
                 break
 
-            assert token, ("Not expecting blank token, once have detected in & out dents. tokentype=%d, token=%s" %(tokentype, token))
+            assert token, (
+                "Not expecting blank token, once have detected in & out dents. tokentype=%d, token=%s"
+                % (tokentype, token)
+            )
 
             self.tokentype, self.token = tokentype, token
-            if i+1 < maxtokens:
-                self.nexttokentype, self.nexttoken = self.tokens[i+1]
+            if i + 1 < maxtokens:
+                self.nexttokentype, self.nexttoken = self.tokens[i + 1]
             else:
-                self.nexttokentype, self.nexttoken = (0,None)
+                self.nexttokentype, self.nexttoken = (0, None)
 
             if self._Isblank():
                 continue
             else:
-                #print 'MEAT', self.token
+                # print 'MEAT', self.token
                 self._Gotmeat()
 
     def On_deindent(self):
@@ -82,11 +86,16 @@ class AndyBasicParseEngine(object):
         return 0
 
     def _Isnewline(self):
-        toHex = lambda x:"".join([hex(ord(c))[2:].zfill(2) for c in x])
+        toHex = lambda x: "".join([hex(ord(c))[2:].zfill(2) for c in x])
         # print '_Isnewline?', self.token, toHex(self.token)
-        if (self.token == '\n' or self.token == '\r' or self.token == '\r\n' or self.tokentype == token.N_TOKENS):
+        if (
+            self.token == "\n"
+            or self.token == "\r"
+            or self.token == "\r\n"
+            or self.tokentype == token.N_TOKENS
+        ):
             if self.tokentype == token.N_TOKENS:
-                assert '#' in self.token
+                assert "#" in self.token
             self.meat = 0
             self.isfreshline = 1
             # print 'NEWLINE2'
@@ -116,26 +125,29 @@ class HandleClasses(AndyBasicParseEngine):
 
     def On_deindent(self):
         if self.currclassindentlevel != None and self.indentlevel <= self.currclassindentlevel:
-##            print 'popping class', self.currclass, 'from', self.currclasslist
+            ##            print 'popping class', self.currclass, 'from', self.currclasslist
             self.PopCurrClass()
-##        print
-##        print 'deindent!!', self.indentlevel, 'class indentlevel =', self.currclassindentlevel
+
+    ##        print
+    ##        print 'deindent!!', self.indentlevel, 'class indentlevel =', self.currclassindentlevel
 
     def _DeriveNestedClassName(self, currclass):
         if not self.currclasslist:
             return currclass
         else:
             classname, indentlevel = self.currclasslist[-1]
-            return classname + '_' + currclass   # Cannot use :: since java doesn't like this name, nor does the file system.
+            return (
+                classname + "_" + currclass
+            )  # Cannot use :: since java doesn't like this name, nor does the file system.
 
     def PushCurrClass(self, currclass):
-        #print 'pushing currclass', currclass, 'self.currclasslist', self.currclasslist
+        # print 'pushing currclass', currclass, 'self.currclasslist', self.currclasslist
         currclass = self._DeriveNestedClassName(currclass)
-        self.currclasslist.append( (currclass, self.indentlevel) )
-        #print 'result of pushing = ', self.currclasslist
+        self.currclasslist.append((currclass, self.indentlevel))
+        # print 'result of pushing = ', self.currclasslist
 
     def PopCurrClass(self):
-        #__import__("traceback").print_stack(limit=6)
+        # __import__("traceback").print_stack(limit=6)
         self.currclasslist.pop()
 
     def GetCurrClassIndentLevel(self):
@@ -150,6 +162,7 @@ class HandleClasses(AndyBasicParseEngine):
             return None
         currclassandindentlevel = self.currclasslist[-1]
         return currclassandindentlevel[0]
+
     currclass = property(GetCurrClass)
 
     currclassindentlevel = property(GetCurrClassIndentLevel)
@@ -159,19 +172,20 @@ class HandleClasses(AndyBasicParseEngine):
         self.nexttokenisclass = 0
         if self.currclass not in self.classlist:
             self.classlist[self.currclass] = ClassEntry()
-        #print 'class', self.currclass
+        # print 'class', self.currclass
         self.inbetweenClassAndFirstDef = 1
 
     def On_newline(self):
         pass
 
     def On_meat(self):
-        if self.token == 'class':
-##            print 'meat found class', self.token
+        if self.token == "class":
+            ##            print 'meat found class', self.token
             self.nexttokenisclass = 1
         elif self.nexttokenisclass:
-##            print 'meat found class name ', self.token
+            ##            print 'meat found class name ', self.token
             self._JustThenGotclass()
+
 
 class HandleInheritedClasses(HandleClasses):
     def __init__(self):
@@ -180,7 +194,7 @@ class HandleInheritedClasses(HandleClasses):
 
     def _JustThenGotclass(self):
         HandleClasses._JustThenGotclass(self)
-        self.currsuperclass = ''
+        self.currsuperclass = ""
         self.nexttokenisBracketOpenOrColon = 1
 
     def _ClearwaitingInheriteClasses(self):
@@ -193,30 +207,33 @@ class HandleInheritedClasses(HandleClasses):
 
     def On_meat(self):
         HandleClasses.On_meat(self)
-        if self.nexttokenisBracketOpenOrColon and self.token == '(':
-            assert self.tokentype == token.OP  # unecessary, just practicing refering to tokens via names not numbers
+        if self.nexttokenisBracketOpenOrColon and self.token == "(":
+            assert (
+                self.tokentype == token.OP
+            )  # unecessary, just practicing refering to tokens via names not numbers
             self.nexttokenisBracketOpen = 0
             self.nexttokenisSuperclass = 1
 
-        elif self.nexttokenisBracketOpenOrColon and self.token == ':':
+        elif self.nexttokenisBracketOpenOrColon and self.token == ":":
             self._ClearwaitingInheriteClasses()
 
-        elif self.nexttokenisSuperclass and self.token == ')':
+        elif self.nexttokenisSuperclass and self.token == ")":
             self._ClearwaitingInheriteClasses()
 
         elif self.nexttokenisSuperclass:
             self.currsuperclass += self.token
-            if self.token == '.' or self.nexttoken == '.':
-                #print 'processing multi part superclass detected!', self.token, self.nexttoken
+            if self.token == "." or self.nexttoken == ".":
+                # print 'processing multi part superclass detected!', self.token, self.nexttoken
                 self.nexttokenisSuperclass = 1
             else:
                 self.nexttokenisSuperclass = 0
                 self.nexttokenisComma = 1
                 self.classlist[self.currclass].classesinheritsfrom.append(self.currsuperclass)
 
-        elif self.nexttokenisComma and self.token == ',':
+        elif self.nexttokenisComma and self.token == ",":
             self.nexttokenisSuperclass = 1
             self.nexttokenisComma = 0
+
 
 class HandleDefs(HandleInheritedClasses):
     def __init__(self):
@@ -227,8 +244,8 @@ class HandleDefs(HandleInheritedClasses):
     def _Gotdef(self):
         self.currdef = self.token
         self.nexttokenisdef = 0
-        #print 'ADDING    def', self.currdef, 'to', self.currclass
-##        if self.currclass and self.indentlevel == 1:
+        # print 'ADDING    def', self.currdef, 'to', self.currclass
+        ##        if self.currclass and self.indentlevel == 1:
         if self.currclass:
             self.classlist[self.currclass].defs.append(self.currdef)
         elif self.optionModuleAsClass and self.indentlevel == 0:
@@ -242,13 +259,16 @@ class HandleDefs(HandleInheritedClasses):
     def On_meat(self):
         HandleInheritedClasses.On_meat(self)
 
-##        if self.token == 'def' and self.indentlevel == 1:
-        if self.token == 'def':
-##            print 'DEF FOUND AT LEVEL', self.indentlevel
+        ##        if self.token == 'def' and self.indentlevel == 1:
+        if self.token == "def":
+            ##            print 'DEF FOUND AT LEVEL', self.indentlevel
             self.nexttokenisdef = 1
         elif self.nexttokenisdef:
             self._Gotdef()
+
+
 ##        self.meat = 1
+
 
 class HandleClassAttributes(HandleDefs):
     def __init__(self):
@@ -277,10 +297,10 @@ class HandleClassAttributes(HandleDefs):
     def On_meat(self):
         HandleDefs.On_meat(self)
         # print 'token %-10s' % self.token.strip()[0:9], 'nexttoken %-10s' % self.nexttoken.strip()[0:9], 'wfdot', self.waitingfordot, 'wfvarname', self.waitingforvarname, 'wfequalsymbol', self.waitingforequalsymbol, 'wfsubsequentdot', self.waitingforsubsequentdot, 'isfreshline', self.isfreshline, 'self.nstatic', self.nextvarnameisstatic, 'self.obracket', self.waitforappendopenbracket, 'self.nmany', self.nextvarnameismany
-        if self.isfreshline and self.token == 'self' and self.nexttoken == '.':
+        if self.isfreshline and self.token == "self" and self.nexttoken == ".":
             self.waitingfordot = 1
 
-        elif self.waitingfordot and self.token == '.':
+        elif self.waitingfordot and self.token == ".":
             self.waitingfordot = 0
             self.waitingforvarname = 1
 
@@ -301,19 +321,19 @@ class HandleClassAttributes(HandleDefs):
 
             G. We could find   self.numberOfFlags = read16(fp)    - skip cos read16 is a module function.
             """
-            if self.nexttoken == '=':
+            if self.nexttoken == "=":
                 self.waitingforequalsymbol = 1  # Case A
-            elif self.nexttoken == '.':
-                self.waitingforsubsequentdot = 1 # Cases B,C, D,E,F  pending
+            elif self.nexttoken == ".":
+                self.waitingforsubsequentdot = 1  # Cases B,C, D,E,F  pending
 
-        elif self.waitingforsubsequentdot and self.token == '.':
+        elif self.waitingforsubsequentdot and self.token == ".":
             self.waitingfordot = 0
             self.waitingforsubsequentdot = 0
             self.waitingforequalsymbol = 0
-            if self.nexttoken.lower() in ('append','add','insert'):  # Case B
+            if self.nexttoken.lower() in ("append", "add", "insert"):  # Case B
                 # keep the class attribute name we have, wait till bracket
                 self.waitforappendopenbracket = 1
-            elif self.currvarname in ('__class__',):  # Case C
+            elif self.currvarname in ("__class__",):  # Case C
                 self.currvarname = None
                 self.waitingforvarname = 1
                 self.nextvarnameisstatic = 1
@@ -321,13 +341,13 @@ class HandleClassAttributes(HandleDefs):
                 # Skip cases D, E, F
                 self._Clearwaiting()
 
-        elif self.waitforappendopenbracket and self.token == '(':
+        elif self.waitforappendopenbracket and self.token == "(":
             self.waitforappendopenbracket = 0
             self.nextvarnameismany = 1
             self._AddAttribute()
             self._Clearwaiting()
 
-        elif self.waitingforequalsymbol and self.token == '=':
+        elif self.waitingforequalsymbol and self.token == "=":
             self.waitingforequalsymbol = 0
             self._AddAttribute()
             self._Clearwaiting()
@@ -337,16 +357,17 @@ class HandleClassAttributes(HandleDefs):
         # print '_AddAttribute'
         classentry = self.classlist[self.currclass]
         if self.nextvarnameisstatic:
-            attrtype = ['static']
+            attrtype = ["static"]
         else:
-            attrtype = ['normal']
+            attrtype = ["normal"]
 
         if self.nextvarnameismany:
-            attrtype.append('many')
+            attrtype.append("many")
 
         classentry.AddAttribute(self.currvarname, attrtype)
         # print '       ATTR  ', self.currvarname
         self.JustGotASelfAttr(self.currvarname)
+
 
 class HandleComposites(HandleClassAttributes):
     def __init__(self):
@@ -356,7 +377,7 @@ class HandleComposites(HandleClassAttributes):
         self.dummy2 = [()]
 
     def JustGotASelfAttr(self, selfattrname):
-        assert selfattrname != 'self'
+        assert selfattrname != "self"
         self.lastselfattrname = selfattrname
         self.waitingforclassname = 1
         self.waitingforOpenBracket = 0
@@ -383,23 +404,26 @@ class HandleComposites(HandleClassAttributes):
         if self.dontdoanythingnow:
             pass
 
-        elif self.waitingforclassname and self.token not in ( '(', '[' ) and \
-          self.token not in pythonbuiltinfunctions and\
-          self.tokentype not in (token.NUMBER, token.STRING) and\
-          self.token not in self.modulemethods:
+        elif (
+            self.waitingforclassname
+            and self.token not in ("(", "[")
+            and self.token not in pythonbuiltinfunctions
+            and self.tokentype not in (token.NUMBER, token.STRING)
+            and self.token not in self.modulemethods
+        ):
             self.possibleclassname = self.token
             self.waitingforclassname = 0
             self.waitingforOpenBracket = 1
 
-        elif self.waitingforOpenBracket and self.token == '(':
+        elif self.waitingforOpenBracket and self.token == "(":
             self.waitingforclassname = 0
             self.waitingforOpenBracket = 0
 
             dependency = (self.lastselfattrname, self.possibleclassname)
             self.classlist[self.currclass].classdependencytuples.append(dependency)
-            #print '*** dependency - created instance of', self.possibleclassname, 'assigned to', self.lastselfattrname
+            # print '*** dependency - created instance of', self.possibleclassname, 'assigned to', self.lastselfattrname
 
-        elif self.waitingforOpenBracket and self.token == ')':
+        elif self.waitingforOpenBracket and self.token == ")":
             """
             New - we haven't got a class being created but instead have a variable.
             Note that the above code detects
@@ -411,8 +435,8 @@ class HandleComposites(HandleClassAttributes):
             variablename = self.possibleclassname
 
             # try to find a class with the same name.
-            correspondingClassName = variablename[0].upper() + variablename[1:] # HACK
-            #print 'correspondingClassName', correspondingClassName
+            correspondingClassName = variablename[0].upper() + variablename[1:]  # HACK
+            # print 'correspondingClassName', correspondingClassName
 
             dependency = (self.lastselfattrname, correspondingClassName)
             self.classlist[self.currclass].classdependencytuples.append(dependency)
@@ -428,18 +452,25 @@ class HandleClassStaticAttrs(HandleComposites):
 
     def __Clearwaiting(self):
         self.__waitingforequalsymbol = 0
-        self.__staticattrname = ''
+        self.__staticattrname = ""
 
     def On_meat(self):
         HandleComposites.On_meat(self)
 
-        if self.isfreshline and self.currclass and self.inbetweenClassAndFirstDef and self.tokentype == 1 and self.indentlevel != 0 and self.nexttoken == '=':
+        if (
+            self.isfreshline
+            and self.currclass
+            and self.inbetweenClassAndFirstDef
+            and self.tokentype == 1
+            and self.indentlevel != 0
+            and self.nexttoken == "="
+        ):
             self.__waitingforequalsymbol = 1
             self.__staticattrname = self.token
 
-        elif self.__waitingforequalsymbol and self.token == '=':
+        elif self.__waitingforequalsymbol and self.token == "=":
             self.__waitingforequalsymbol = 0
-            #print 'have static level attr', self.__staticattrname
+            # print 'have static level attr', self.__staticattrname
             self.__AddAttrModuleLevel()
             self.__Clearwaiting()
 
@@ -449,25 +480,24 @@ class HandleClassStaticAttrs(HandleComposites):
         # also should be able to resuse most of _AddAttr()
         #
         classentry = self.classlist[self.currclass]
-        attrtype = ['static']
+        attrtype = ["static"]
 
         classentry.AddAttribute(self.__staticattrname, attrtype)
-        #print '       STATIC ATTR  ', self.__staticattrname
-
+        # print '       STATIC ATTR  ', self.__staticattrname
 
 
 class HandleModuleLevelDefsAndAttrs(HandleClassStaticAttrs):
     def __init__(self):
         HandleClassStaticAttrs.__init__(self)
-        self.moduleasclass = ''
+        self.moduleasclass = ""
         self.__Clearwaiting()
 
     def __Clearwaiting(self):
         self.waitingforequalsymbolformoduleattr = 0
-        self.modulelevelattrname = ''
+        self.modulelevelattrname = ""
 
     def Parse(self, file):
-        self.moduleasclass = 'Module_'+os.path.splitext(os.path.basename(file))[0]
+        self.moduleasclass = "Module_" + os.path.splitext(os.path.basename(file))[0]
         if self.optionModuleAsClass:
             self.classlist[self.moduleasclass] = ClassEntry()
             self.classlist[self.moduleasclass].ismodulenotrealclass = 1
@@ -477,13 +507,18 @@ class HandleModuleLevelDefsAndAttrs(HandleClassStaticAttrs):
     def On_meat(self):
         HandleClassStaticAttrs.On_meat(self)
 
-        if self.isfreshline and self.tokentype == 1 and self.indentlevel == 0 and self.nexttoken == '=':
+        if (
+            self.isfreshline
+            and self.tokentype == 1
+            and self.indentlevel == 0
+            and self.nexttoken == "="
+        ):
             self.waitingforequalsymbolformoduleattr = 1
             self.modulelevelattrname = self.token
 
-        elif self.waitingforequalsymbolformoduleattr and self.token == '=':
+        elif self.waitingforequalsymbolformoduleattr and self.token == "=":
             self.waitingforequalsymbolformoduleattr = 0
-            #print 'have module level attr', self.modulelevelattrname
+            # print 'have module level attr', self.modulelevelattrname
             self._AddAttrModuleLevel()
             self.__Clearwaiting()
 
@@ -500,19 +535,20 @@ class HandleModuleLevelDefsAndAttrs(HandleClassStaticAttrs):
         # also should be able to resuse most of _AddAttr()
         #
         classentry = self.classlist[self.moduleasclass]
-        attrtype = ['normal']
+        attrtype = ["normal"]
 
-##        if self.nextvarnameisstatic:
-##            attrtype = ['static']
-##        else:
-##            attrtype = ['normal']
-##
-##        if self.nextvarnameismany:
-##            attrtype.append('many')
+        ##        if self.nextvarnameisstatic:
+        ##            attrtype = ['static']
+        ##        else:
+        ##            attrtype = ['normal']
+        ##
+        ##        if self.nextvarnameismany:
+        ##            attrtype.append('many')
 
         classentry.AddAttribute(self.modulelevelattrname, attrtype)
-        #print '       ATTR  ', self.currvarname
-        #self.JustGotASelfAttr(self.currvarname)
+        # print '       ATTR  ', self.currvarname
+        # self.JustGotASelfAttr(self.currvarname)
+
 
 class PynsourcePythonParser(HandleModuleLevelDefsAndAttrs):
     def __init__(self):
@@ -531,10 +567,12 @@ class PynsourcePythonParser(HandleModuleLevelDefsAndAttrs):
 
         Returns: pmodel
         """
+
         class OldParseModel(object):
             def __init__(self):
                 self.classlist = {}
                 self.modulemethods = []
+
         pmodel = OldParseModel()
         pmodel.classlist = self.classlist
         pmodel.modulemethods = self.modulemethods

@@ -15,8 +15,8 @@ import wx
 import _thread
 from time import sleep
 
-class MainFrame(wx.Frame):
 
+class MainFrame(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(self, parent)
 
@@ -55,9 +55,9 @@ class MainFrame(wx.Frame):
         sleep(10)
         wx.CallAfter(self.onLongRunDone)
 
+
 if __name__ == "__main__":
     app = wx.PySimpleApp()
     app.TopWindow = MainFrame(None)
     app.TopWindow.Show()
     app.MainLoop()
-    

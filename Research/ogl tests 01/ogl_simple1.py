@@ -1,29 +1,27 @@
 import wx
 import wx.lib.ogl as ogl
 
+
 class AppFrame(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__( self,
-                          None, -1, "Demo",
-                          size=(300,200),
-                          style=wx.DEFAULT_FRAME_STYLE )
-        sizer = wx.BoxSizer( wx.VERTICAL )
+        wx.Frame.__init__(self, None, -1, "Demo", size=(300, 200), style=wx.DEFAULT_FRAME_STYLE)
+        sizer = wx.BoxSizer(wx.VERTICAL)
         # put stuff into sizer
 
-        canvas = ogl.ShapeCanvas( self )
-        sizer.Add( canvas, 1, wx.GROW )
+        canvas = ogl.ShapeCanvas(self)
+        sizer.Add(canvas, 1, wx.GROW)
 
-        canvas.SetBackgroundColour( "LIGHT BLUE" ) #
+        canvas.SetBackgroundColour("LIGHT BLUE")  #
 
         diagram = ogl.Diagram()
-        canvas.SetDiagram( diagram )
-        diagram.SetCanvas( canvas )
+        canvas.SetDiagram(diagram)
+        diagram.SetCanvas(canvas)
 
-        shape = ogl.CircleShape( 20.0 )            #
-        shape.SetX( 25.0 )                         #
-        shape.SetY( 25.0 )                         #
-        canvas.AddShape( shape )                   #
-        diagram.ShowAll( 1 )                       #
+        shape = ogl.CircleShape(20.0)  #
+        shape.SetX(25.0)  #
+        shape.SetY(25.0)  #
+        canvas.AddShape(shape)  #
+        diagram.ShowAll(1)  #
 
         # apply sizer
         self.SetSizer(sizer)
@@ -32,13 +30,14 @@ class AppFrame(wx.Frame):
 
         # test TextEntryDialog
         dlg = wx.TextEntryDialog(
-                self, 'What is your favorite programming language?',
-                'Eh??', 'Python')
+            self, "What is your favorite programming language?", "Eh??", "Python"
+        )
         dlg.SetValue("Python is the best!")
         if dlg.ShowModal() == wx.ID_OK:
-            print(('You entered: %s\n' % dlg.GetValue()))
+            print(("You entered: %s\n" % dlg.GetValue()))
 
         dlg.Destroy()
+
 
 app = wx.PySimpleApp()
 ogl.OGLInitialize()

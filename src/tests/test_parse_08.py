@@ -5,19 +5,20 @@ import unittest
 from parsing.api import old_parser, new_parser
 from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
 
+
 class TestCase08(unittest.TestCase):
     def setUp(self):
         pass
-                
+
     def test01(self):
         """
         """
-        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule08_multiple_inheritance.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule08_multiple_inheritance.py"
 
-        #self.p, debuginfo = old_parser(FILE)
+        # self.p, debuginfo = old_parser(FILE)
         self.p, debuginfo = new_parser(FILE)
 
-        #print self.p
+        # print self.p
 
         # -------------------------------------------------------
 
@@ -30,13 +31,15 @@ class TestCase08(unittest.TestCase):
         gotevent7 = 0
 
         for classname, classentry in list(self.p.classlist.items()):
-            if classname == 'Fred':
+            if classname == "Fred":
                 gotevent1 = 1
-                assert classentry.classesinheritsfrom == ['Mary', 'Sam'], classentry.classesinheritsfrom
+                assert classentry.classesinheritsfrom == [
+                    "Mary",
+                    "Sam",
+                ], classentry.classesinheritsfrom
 
-            if classname == 'MarySam':
+            if classname == "MarySam":
                 gotevent3 = False  # should not get this
-
 
         assert gotevent1
         assert not gotevent3
@@ -44,12 +47,12 @@ class TestCase08(unittest.TestCase):
     def test_parse_power_operator(self):
         """
         """
-        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule11_incoming_bugs.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule11_incoming_bugs.py"
 
-        #self.p, debuginfo = old_parser(FILE)
+        # self.p, debuginfo = old_parser(FILE)
         self.p, debuginfo = new_parser(FILE)
 
-        #print self.p
+        # print self.p
 
         # -------------------------------------------------------
 
@@ -57,11 +60,7 @@ class TestCase08(unittest.TestCase):
         gotevent2 = 0
 
         for classname, classentry in list(self.p.classlist.items()):
-            if classname == 'Incoming1':
+            if classname == "Incoming1":
                 gotevent1 = 1
 
-
         assert gotevent1
-
-
-

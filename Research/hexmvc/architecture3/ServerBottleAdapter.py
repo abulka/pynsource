@@ -1,30 +1,43 @@
-import sys; sys.path.append("../lib")
+import sys
+
+sys.path.append("../lib")
 from architecture_support import *
 
-from bottle import route, run, template, request, response, get, post, put, delete  # easy_install -U bottle
+from bottle import (
+    route,
+    run,
+    template,
+    request,
+    response,
+    get,
+    post,
+    put,
+    delete,
+)  # easy_install -U bottle
 import _thread
-import wx # for mutex under linux so can update gui via app
+import wx  # for mutex under linux so can update gui via app
+
 
 class Server(object):
     def __init__(self, host, port):
         self.app = None  # inject
-        self.model = None # inject
+        self.model = None  # inject
         self.host = host
         self.port = port
         self.thread_id = None
         self.observers = multicast()
         self.json_from_dict = None  # inject
-        
+
     @property
     def url_server(self):
         return "http://%s:%s" % (self.host, self.port)
-        
+
     def StartServer(self):
         self.thread_id = _thread.start_new_thread(self._Serve, ())
 
     def StopServer(self):
-        print("stopping server thread...") # actually cannot kill python threads!?
-        
+        print("stopping server thread...")  # actually cannot kill python threads!?
+
     def _Serve(self):
         print("starting server thread...")
 
@@ -33,36 +46,37 @@ class Server(object):
             print(msg)
             return msg
 
-        @route('/')
+        @route("/")
         def index():
             return "G'day"
-        
-        @route('/modelsize')
-        def modelsize():
-            return 'The model length is %d' % self.model.size
 
-        @route('/dumpthings')
+        @route("/modelsize")
+        def modelsize():
+            return "The model length is %d" % self.model.size
+
+        @route("/dumpthings")
         def dumpthings():
             s = ""
             for thing in self.model.things:
-                s += str(thing) + '<BR>'
+                s += str(thing) + "<BR>"
             return s
 
-        @route('/addthing')
+        @route("/addthing")
         def addthing():
             self.observers.CMD_ADD_THING("fred")
-            return 'The model length is now %d' % self.model.size
+            return "The model length is now %d" % self.model.size
 
         # JSON
 
-        @route('/jsontest')
+        @route("/jsontest")
         def jsontest():
             import time
-            return {'status':'online', 'servertime':time.time()}
+
+            return {"status": "online", "servertime": time.time()}
 
         # REST API
-        
-        @get('/things')
+
+        @get("/things")
         def things():
             """
             GET /things
@@ -73,11 +87,13 @@ class Server(object):
             Example: GET http://localhost:8081/things
             """
             try:
-                return self.app.controller.CmdGetThingsAsDict()  # no need to call self.json_from_dict as bottle handles it
+                return (
+                    self.app.controller.CmdGetThingsAsDict()
+                )  # no need to call self.json_from_dict as bottle handles it
             except Exception as inst:
                 return report_error(inst)
 
-        @get('/things/:id')
+        @get("/things/:id")
         def things_id(id):
             """
             GET /things/id
@@ -86,11 +102,13 @@ class Server(object):
             Example: GET http://localhost:8081/things/1
             """
             try:
-                return self.app.controller.CmdGetThingAsDict(id)  # no need to call self.json_from_dict as bottle handles it
+                return self.app.controller.CmdGetThingAsDict(
+                    id
+                )  # no need to call self.json_from_dict as bottle handles it
             except Exception as inst:
                 return report_error(inst)
 
-        @post('/things')
+        @post("/things")
         def things_post():
             """
             POST /things, thing
@@ -100,21 +118,23 @@ class Server(object):
             Note: Is there a way to send json to the server? e.g. {"info":"thing info content here"}
             """
             try:
-                print(request.headers.get('X-Requested-With')) # typically 'XMLHttpRequest'
-                print(request.headers.get('Content-Type'))
-                content_type = request.headers.get('Content-Type');
+                print(request.headers.get("X-Requested-With"))  # typically 'XMLHttpRequest'
+                print(request.headers.get("Content-Type"))
+                content_type = request.headers.get("Content-Type")
 
-                if content_type == 'application/json':
+                if content_type == "application/json":
                     info = request.json["info"]
-                elif content_type == 'application/x-www-form-urlencoded':
+                elif content_type == "application/x-www-form-urlencoded":
                     info = request.forms["info"]
 
-                dict = self.app.controller.CmdAddThing(info)  # no need to call self.json_from_dict as bottle handles it
+                dict = self.app.controller.CmdAddThing(
+                    info
+                )  # no need to call self.json_from_dict as bottle handles it
                 return dict
             except Exception as inst:
                 return report_error(inst)
 
-        @put('/things')
+        @put("/things")
         def thing_put():
             """
             PUT /things, thing
@@ -123,22 +143,24 @@ class Server(object):
                Note: Is there a way to send json to the server? e.g. {"id":1, "info":"MODIFIED info content here"}
             """
             try:
-                content_type = request.headers.get('Content-Type');
-                if content_type == 'application/json':
-                    print('JSON REQUEST')
+                content_type = request.headers.get("Content-Type")
+                if content_type == "application/json":
+                    print("JSON REQUEST")
                     id = request.json.get("id")
                     info = request.json.get("info")
                 else:
-                    print('FORM REQUEST')
+                    print("FORM REQUEST")
                     id = request.forms.get("id")
                     info = request.forms.get("info")
 
-                dict = self.app.controller.CmdModifyThing(id, info)  # no need to call self.json_from_dict as bottle handles it
+                dict = self.app.controller.CmdModifyThing(
+                    id, info
+                )  # no need to call self.json_from_dict as bottle handles it
                 return dict
             except Exception as inst:
                 return report_error(inst)
 
-        @delete('/things/:id')
+        @delete("/things/:id")
         def thing_delete(id):
             """
             DELETE /things/id
@@ -149,17 +171,16 @@ class Server(object):
                 return self.app.controller.CmdDeleteThing(id)
             except Exception as inst:
                 return report_error(inst)
-            
-            
+
         # REST API - Support
-            
-        @route('/api')
+
+        @route("/api")
         def modify_form():
             """
             POST is done via normal form submit post.
             PUT and DELETE are not supported in normal forms, so we have to do it via ajax
             """
-            return '''
+            return """
 <!DOCTYPE html>
 
 <html>
@@ -256,8 +277,7 @@ class Server(object):
 
 </body>
 </html>
-'''
-    
+"""
 
         run(host=self.host, port=self.port)
         # nothing runs after this point

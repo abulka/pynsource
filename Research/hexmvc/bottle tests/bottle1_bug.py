@@ -1,9 +1,13 @@
 from bottle import debug, route, run, request
-@route('/:name')
-def index(name='World'):
-    return '<b>Hello %s!</b>' % name
+
+
+@route("/:name")
+def index(name="World"):
+    return "<b>Hello %s!</b>" % name
+
+
 debug(True)
-run(reloader=True, host='localhost', port=8080)
+run(reloader=True, host="localhost", port=8080)
 
 
 """

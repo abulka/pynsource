@@ -11,6 +11,7 @@ Inserting and editing regular UML Class nodes/shapes
 
 """
 
+
 class UtilCmdUmlClass(CmdBase):  # Not Used directly, please subclass
     def display_dialog(self, id, attrs, methods):
         """
@@ -26,14 +27,20 @@ class UtilCmdUmlClass(CmdBase):  # Not Used directly, please subclass
             attrs, methods as lists of strings
 
         """
+
         class EditDialog(DialogUmlNodeEdit):
-            def OnClassNameEnter( self, event ):
-                self.EndModal(wx.ID_OK) 
+            def OnClassNameEnter(self, event):
+                self.EndModal(wx.ID_OK)
+
         dialog = EditDialog(None)
 
-        dialog.txtClassName.Value, dialog.txtAttrs.Value, dialog.txtMethods.Value = id, "\n".join(attrs), "\n".join(methods)
+        dialog.txtClassName.Value, dialog.txtAttrs.Value, dialog.txtMethods.Value = (
+            id,
+            "\n".join(attrs),
+            "\n".join(methods),
+        )
         if dialog.ShowModal() == wx.ID_OK:
-            #wx.MessageBox("got wx.ID_OK")
+            # wx.MessageBox("got wx.ID_OK")
             result = True
             id = dialog.txtClassName.Value
 
@@ -42,7 +49,7 @@ class UtilCmdUmlClass(CmdBase):  # Not Used directly, please subclass
                 if s == "":
                     return []
                 else:
-                    return s.split('\n')
+                    return s.split("\n")
 
             attrs = string_to_list_smart(dialog.txtAttrs.Value)
             methods = string_to_list_smart(dialog.txtMethods.Value)
@@ -55,29 +62,34 @@ class UtilCmdUmlClass(CmdBase):  # Not Used directly, please subclass
 
 class CmdInsertUmlClass(UtilCmdUmlClass):
     """ Insert new node """
+
     def execute(self):
         """ insert the new node and refresh the ascii tab too """
         umlcanvas = self.context.umlcanvas
         wxapp = self.context.wxapp
         displaymodel = self.context.displaymodel
-        
-        #self.umlcanvas.CmdInsertNewNode()
-        
-        result, id, attrs, methods = self.display_dialog(id='D' + str(random.randint(1,99)),
-                                            attrs=['attribute 1', 'attribute 2', 'attribute 3'],
-                                            methods=['method A', 'method B', 'method C', 'method D'])
+
+        # self.umlcanvas.CmdInsertNewNode()
+
+        result, id, attrs, methods = self.display_dialog(
+            id="D" + str(random.randint(1, 99)),
+            attrs=["attribute 1", "attribute 2", "attribute 3"],
+            methods=["method A", "method B", "method C", "method D"],
+        )
 
         if result:
             # Ensure unique name
             while displaymodel.graph.FindNodeById(id):
-                id += '2'
+                id += "2"
 
             node = displaymodel.AddUmlNode(id, attrs, methods)
             shape = umlcanvas.CreateUmlShape(node)
-            displaymodel.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
-            
+            displaymodel.classnametoshape[
+                node.id
+            ] = shape  # Record the name to shape map so that we can wire up the links later.
+
             node.shape.Show(True)
-            
+
             umlcanvas.remove_overlaps()
             umlcanvas.mega_refresh()
 
@@ -107,11 +119,11 @@ class CmdEditUmlClass(UtilCmdUmlClass):
 
         # node is a regular node, its the node.shape that is different for a comment
         if isinstance(node.shape, DividedShape):
-            result, id, attrs, methods = self.display_dialog(node.id, node.attrs,
-                                                                       node.meths)
+            result, id, attrs, methods = self.display_dialog(node.id, node.attrs, node.meths)
             if result:
-                displaymodel.graph.RenameNode(node,
-                                       id)  # need special rename cos of underlying graph plumbing - perhaps put setter on id?
+                displaymodel.graph.RenameNode(
+                    node, id
+                )  # need special rename cos of underlying graph plumbing - perhaps put setter on id?
                 node.attrs = attrs
                 node.meths = methods
 
@@ -120,7 +132,8 @@ class CmdEditUmlClass(UtilCmdUmlClass):
 
                 shape = umlcanvas.CreateUmlShape(node)
                 displaymodel.classnametoshape[
-                    node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+                    node.id
+                ] = shape  # Record the name to shape map so that we can wire up the links later.
 
                 # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
                 for edge in displaymodel.graph.edges:
@@ -145,6 +158,7 @@ class CmdEditUmlClass(UtilCmdUmlClass):
 Insert and edit Comment nodes/shapes
 """
 
+
 class UtilCmdComment(CmdBase):  # Not Used directly, please subclass
     def display_dialog(self, comment):
         """
@@ -155,10 +169,12 @@ class UtilCmdComment(CmdBase):  # Not Used directly, please subclass
 
         Returns: (result, comment)
         """
+
         class EditDialog(DialogComment):
             # Custom dialog built via wxformbuilder - subclass it first, to hook up event handlers
             def OnClassNameEnter(self, event):
                 self.EndModal(wx.ID_OK)
+
         dialog = EditDialog(None)
         dialog.txt_comment.Value = comment
         dialog.txt_comment.SetFocus()
@@ -184,16 +200,17 @@ class CmdInsertComment(UtilCmdComment):
         associates them, then adds them to the `self.context.displaymodel.classnametoshape` mapping.
         """
 
-        id = 'C' + str(random.randint(1, 9999))
+        id = "C" + str(random.randint(1, 9999))
         result, comment = self.display_dialog(comment="initial comment")
         if result:
             # Ensure unique name
             while self.context.displaymodel.graph.FindNodeById(id):
-                id += '2'
+                id += "2"
             node = self.context.displaymodel.AddCommentNode(id, comment)
             shape = self.context.umlcanvas.createCommentShape(node)
             self.context.displaymodel.classnametoshape[
-                node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+                node.id
+            ] = shape  # Record the name to shape map so that we can wire up the links later.
             node.shape.Show(True)
             self.context.umlcanvas.mega_refresh()
 
@@ -229,7 +246,8 @@ class CmdEditComment(UtilCmdComment):
 
             shape = umlcanvas.createCommentShape(node)
             displaymodel.classnametoshape[
-                node.id] = shape  # Record the name to shape map so that we can wire up the links later.
+                node.id
+            ] = shape  # Record the name to shape map so that we can wire up the links later.
 
             # # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
             # for edge in model.graph.edges:
@@ -237,7 +255,6 @@ class CmdEditComment(UtilCmdComment):
 
             node.shape.Show(True)
             umlcanvas.mega_refresh()
-
 
     def undo(self):  # override
         """ undo insert new node """
@@ -258,33 +275,41 @@ class CmdInsertImage(CmdBase):
         config = self.context.config
 
         filename = None
-        
-        thisdir = config.get('LastDirInsertImage', '.') # remember dir path
-        dlg = wx.FileDialog(parent=frame, message="choose", defaultDir=thisdir,
-            defaultFile="", wildcard="*.jpg", style=wx.FC_OPEN, pos=wx.DefaultPosition)
+
+        thisdir = config.get("LastDirInsertImage", ".")  # remember dir path
+        dlg = wx.FileDialog(
+            parent=frame,
+            message="choose",
+            defaultDir=thisdir,
+            defaultFile="",
+            wildcard="*.jpg",
+            style=wx.FC_OPEN,
+            pos=wx.DefaultPosition,
+        )
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
 
-            config['LastDirInsertImage'] = dlg.GetDirectory()  # remember dir path
+            config["LastDirInsertImage"] = dlg.GetDirectory()  # remember dir path
             config.write()
         dlg.Destroy()
-        
+
         self.create_new_image_node(filename)
 
     def create_new_image_node(self, filename=None):
         import os
+
         if not filename:
-            curr_dir = os.path.dirname( os.path.abspath( __file__ ) )
-            filename = os.path.join(curr_dir, '..\\..\..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP')
+            curr_dir = os.path.dirname(os.path.abspath(__file__))
+            filename = os.path.join(
+                curr_dir, "..\\..\..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP"
+            )
             print(filename)
-            
+
         self.context.umlcanvas.CreateImageShape(filename)
         self.context.umlcanvas.remove_overlaps()
         self.context.umlcanvas.mega_refresh()
-        #self.SelectNodeNow(node.shape)
-        
+        # self.SelectNodeNow(node.shape)
+
     def undo(self):  # override
         """ Docstring """
         # not implemented
-        
-

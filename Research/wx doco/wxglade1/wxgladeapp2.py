@@ -8,7 +8,6 @@ import wx
 # end wxGlade
 
 
-
 class MyFrame(wx.Frame):
     def __init__(self, *args, **kwds):
         # begin wxGlade: MyFrame.__init__
@@ -16,7 +15,14 @@ class MyFrame(wx.Frame):
         wx.Frame.__init__(self, *args, **kwds)
         self.notebook_1 = wx.Notebook(self, -1, style=0)
         self.notebook_1_pane_1 = wx.Panel(self.notebook_1, -1)
-        self.bitmap_1 = wx.StaticBitmap(self.notebook_1_pane_1, -1, wx.Bitmap("F:\\Documents\\AndyTabletXp2\\Documents and Settings\\Andy\\My Documents\\Software Development\\aa python\\pyNsource\\Research\\wx doco\\Images\\outyuml.png", wx.BITMAP_TYPE_ANY))
+        self.bitmap_1 = wx.StaticBitmap(
+            self.notebook_1_pane_1,
+            -1,
+            wx.Bitmap(
+                "F:\\Documents\\AndyTabletXp2\\Documents and Settings\\Andy\\My Documents\\Software Development\\aa python\\pyNsource\\Research\\wx doco\\Images\\outyuml.png",
+                wx.BITMAP_TYPE_ANY,
+            ),
+        )
 
         self.__set_properties()
         self.__do_layout()
@@ -39,6 +45,7 @@ class MyFrame(wx.Frame):
         sizer_1.Fit(self)
         self.Layout()
         # end wxGlade
+
 
 # end of class MyFrame
 

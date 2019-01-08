@@ -4,10 +4,11 @@ http://nedbatchelder.com/text/python-parsers.html
 http://wiki.python.org/moin/LanguageParsing
 """
 
-# OLD FASHIOINED PARSER 
+# OLD FASHIOINED PARSER
 
 import parser
 import pprint
+
 source = """
 class A:
     def hello(self):
@@ -20,9 +21,7 @@ o = parser.suite(source)
 pprint.pprint(parser.st2tuple(o))
 
 
-
-print("-"*88)
-
+print("-" * 88)
 
 
 # AST
@@ -36,16 +35,17 @@ http://www.breti.org/tech/files/a7b5fcecb0596b9bf127212e847584f9-66.html  ** to 
 
 import ast
 
+
 class Py2Neko(ast.NodeVisitor):
     def generic_visit(self, node):
         print(type(node).__name__)
         ast.NodeVisitor.generic_visit(self, node)
 
     def visit_Name(self, node):
-        print('Name :', node.id)
+        print("Name :", node.id)
 
     def visit_Num(self, node):
-        print('Num :', node.__dict__['n'])
+        print("Num :", node.__dict__["n"])
 
     def visit_Str(self, node):
         print("Str :", node.s)
@@ -64,30 +64,32 @@ class Py2Neko(ast.NodeVisitor):
 
     def visit_Str(self, node):
         print('Found string "%s"' % node.s)
-        
+
     def visit_ClassDef(self, node):
         have_args = []
+
         def paren_or_comma():
             if have_args:
-                print(', ', end=' ')
+                print(", ", end=" ")
             else:
                 have_args.append(True)
-                print('(', end=' ')
+                print("(", end=" ")
 
-        #self.newline(extra=2)
-        #self.decorators(node)
-        #self.newline(node)
-        print('class %s' % node.name, end=' ')
+        # self.newline(extra=2)
+        # self.decorators(node)
+        # self.newline(node)
+        print("class %s" % node.name, end=" ")
         for base in node.bases:
             paren_or_comma()
             self.visit(base)
-            
-if __name__ == '__main__':
-    #node = ast.parse("a = 1 + 2")
-    #print ast.dump(node)
-    #v = Py2Neko()
-    #v.visit(node)
-    
+
+
+if __name__ == "__main__":
+    # node = ast.parse("a = 1 + 2")
+    # print ast.dump(node)
+    # v = Py2Neko()
+    # v.visit(node)
+
     # Andy
     node = ast.parse(source)
     print(ast.dump(node))
@@ -95,12 +97,12 @@ if __name__ == '__main__':
     v.visit(node)
 
     print()
-    print("from ast to source code")    
-    import codegen   # http://stackoverflow.com/questions/768634/python-parse-a-py-file-read-the-ast-modify-it-then-write-back-the-modified
+    print("from ast to source code")
+    import codegen  # http://stackoverflow.com/questions/768634/python-parse-a-py-file-read-the-ast-modify-it-then-write-back-the-modified
+
     print(codegen.to_source(node))
-    
-    
-    
+
+
 """
 lib2to3.
 

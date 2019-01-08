@@ -113,34 +113,38 @@ N1 .. ClassDependency
 
 def dump_old_structure(pmodel):
     res = ""
-    
+
     # TODO build this into ClassEntry
     def calc_classname(classentry):
         if classentry.name_long:
             return classentry.name_long
         else:
             return classentry.name
-        
+
     # repair old parse models #TODO build this into the old parser so that we don't have to do this
-    for classname, classentry in  list(pmodel.classlist.items()):
+    for classname, classentry in list(pmodel.classlist.items()):
         classentry.name = classname
-    
-    for classname, classentry in  sorted(list(pmodel.classlist.items()), key=lambda kv: calc_classname(kv[1])):
-        res += "%s (is module=%s) inherits from %s class dependencies %s\n" % \
-                                    (calc_classname(classentry),
-                                     classentry.ismodulenotrealclass,
-                                     classentry.classesinheritsfrom,
-                                     classentry.classdependencytuples)
+
+    for classname, classentry in sorted(
+        list(pmodel.classlist.items()), key=lambda kv: calc_classname(kv[1])
+    ):
+        res += "%s (is module=%s) inherits from %s class dependencies %s\n" % (
+            calc_classname(classentry),
+            classentry.ismodulenotrealclass,
+            classentry.classesinheritsfrom,
+            classentry.classdependencytuples,
+        )
 
         if classentry.classdependencytuples:
             for tup in classentry.classdependencytuples:
                 res += "%s\n" % (tup,)
 
         for attrobj in classentry.attrs:
-            res += "    %-20s (attrtype %s)\n" % (attrobj.attrname,
-                                            attrobj.attrtype) # currently skip calc of self._GetCompositeCreatedClassesFor(attrobj.attrname), arguably it should be precalculated and part of the data structure
+            res += "    %-20s (attrtype %s)\n" % (
+                attrobj.attrname,
+                attrobj.attrtype,
+            )  # currently skip calc of self._GetCompositeCreatedClassesFor(attrobj.attrname), arguably it should be precalculated and part of the data structure
         for adef in classentry.defs:
             res += "    %s()\n" % adef
     res += "    modulemethods %s\n" % (pmodel.modulemethods)
     return res
-    

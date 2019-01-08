@@ -22,29 +22,29 @@ class CmdFileNew(CmdBase):
 # ----- Importing python source code
 
 
-class CmdFileImportBase(CmdBase):   # BASE
+class CmdFileImportBase(CmdBase):  # BASE
     def execute(self):
         assert self.files
-        
+
         # these are tuples between class names.
-        self.context.displaymodel.ClearAssociations()       # WHY DO WE WANT TO DESTROY THIS VALUABLE INFO?
+        self.context.displaymodel.ClearAssociations()  # WHY DO WE WANT TO DESTROY THIS VALUABLE INFO?
 
         if self.files:
             for f in self.files:
-                #pmodel, debuginfo = old_parser(f)
+                # pmodel, debuginfo = old_parser(f)
                 # pmodel, debuginfo = new_parser(f)
-                pmodel, debuginfo = new_parser(f, options={'mode': 3})
+                pmodel, debuginfo = new_parser(f, options={"mode": 3})
 
-                #from parsing.dump_pmodel import dump_old_structure
-                #print dump_old_structure(pmodel)
-                
+                # from parsing.dump_pmodel import dump_old_structure
+                # print dump_old_structure(pmodel)
+
                 self.context.displaymodel.ConvertParseModelToUmlModel(pmodel)
 
-                #p = PySourceAsJava()
-                #p.optionModuleAsClass = 0
-                #p.verbose = 0
-                #p.Parse(f)
-                #self.context.displaymodel.ConvertParseModelToUmlModel(p)
+                # p = PySourceAsJava()
+                # p.optionModuleAsClass = 0
+                # p.verbose = 0
+                # p.Parse(f)
+                # self.context.displaymodel.ConvertParseModelToUmlModel(p)
 
         self.context.umlcanvas.build_view()
 
@@ -54,59 +54,80 @@ class CmdFileImportBase(CmdBase):   # BASE
         self.context.frame.Layout()  # needed when running phoenix
 
 
-class CmdFileImportFromFilePath(CmdFileImportBase):   # was class CmdFileImportSource(CmdBase):
+class CmdFileImportFromFilePath(CmdFileImportBase):  # was class CmdFileImportSource(CmdBase):
     def __init__(self, files=None):
         self.files = files
 
 
-class CmdFileImportViaDialog(CmdFileImportBase):    # was class CmdFileImport(CmdBase):
+class CmdFileImportViaDialog(CmdFileImportBase):  # was class CmdFileImport(CmdBase):
     def execute(self):
         self.context.wxapp.switch_to_ogl_uml_view()
-        
-        thisdir = self.context.config.get('LastDirFileImport', os.getcwd()) # remember dir path
-        
-        dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir=thisdir,
-            defaultFile="", wildcard="*.py", style=OPEN|MULTIPLE, pos=wx.DefaultPosition)
+
+        thisdir = self.context.config.get("LastDirFileImport", os.getcwd())  # remember dir path
+
+        dlg = wx.FileDialog(
+            parent=self.context.frame,
+            message="choose",
+            defaultDir=thisdir,
+            defaultFile="",
+            wildcard="*.py",
+            style=OPEN | MULTIPLE,
+            pos=wx.DefaultPosition,
+        )
         if dlg.ShowModal() == wx.ID_OK:
-            
-            self.context.config['LastDirFileImport'] = dlg.GetDirectory()  # remember dir path
+
+            self.context.config["LastDirFileImport"] = dlg.GetDirectory()  # remember dir path
             self.context.config.write()
-            
+
             self.files = dlg.GetPaths()
-            print('Importing...', self.files)
+            print("Importing...", self.files)
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
-            
+
             super(CmdFileImportViaDialog, self).execute()
 
             wx.EndBusyCursor()
-            #print 'Import - Done.'
-            
+            # print 'Import - Done.'
+
         dlg.Destroy()
-        
+
 
 class CmdBootStrap(CmdBase):
     def execute(self):
         self.frame = self.context.frame
         self.app = self.context.wxapp.app
         self.umlcanvas = self.context.umlcanvas
-        
+
         def bootstrap01():
-            self.frame.SetSize((1024,768))
-            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath( __file__ )])
+            self.frame.SetSize((1024, 768))
+            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath(__file__)])
+
         def bootstrap02():
-            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath( "../Research/state chart editor/Editor.py" )])
+            self.app.run.CmdFileImportFromFilePath(
+                files=[os.path.abspath("../Research/state chart editor/Editor.py")]
+            )
+
         def bootstrap03():
-            self.app.run.CmdFileLoadWorkspaceFromFilepath(filepath=os.path.abspath("../tests/saved uml workspaces/uml05.pyns"))
+            self.app.run.CmdFileLoadWorkspaceFromFilepath(
+                filepath=os.path.abspath("../tests/saved uml workspaces/uml05.pyns")
+            )
+
         def bootstrap04():
-            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath( "pyNsourceGui.py" )])
+            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("pyNsourceGui.py")])
+
         def bootstrap05():
-            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("common/printframework.py"), os.path.abspath("common/png.py")])
+            self.app.run.CmdFileImportFromFilePath(
+                files=[
+                    os.path.abspath("common/printframework.py"),
+                    os.path.abspath("common/png.py"),
+                ]
+            )
+
         def bootstrap06():
             self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("gui/uml_shapes.py")])
-            
-        #bootstrap03()
-        #self.umlcanvas.set_uml_canvas_size((9000,9000))
-        
+
+        # bootstrap03()
+        # self.umlcanvas.set_uml_canvas_size((9000,9000))
+
 
 # ------- Refresh
 
@@ -123,17 +144,24 @@ class CmdRefreshUmlWindow(CmdBase):
 
 class CmdFileSaveWorkspace(CmdBase):
     def execute(self):
-        dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir='..\\tests\\saved uml workspaces',
-            defaultFile="", wildcard="*.pyns", style=wx.FD_SAVE, pos=wx.DefaultPosition)
+        dlg = wx.FileDialog(
+            parent=self.context.frame,
+            message="choose",
+            defaultDir="..\\tests\\saved uml workspaces",
+            defaultFile="",
+            wildcard="*.pyns",
+            style=wx.FD_SAVE,
+            pos=wx.DefaultPosition,
+        )
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
-            
+
             fp = open(filename, "w")
             fp.write(self.context.displaymodel.graph.GraphToString())
             fp.close()
-            
+
             self.context.wxapp.set_app_title(filename)
-            
+
         dlg.Destroy()
 
 
@@ -145,29 +173,31 @@ class CmdFileSaveWorkspaceToConsole(CmdBase):
 # ------- Loading from persistence
 
 
-class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
+class CmdFileLoadWorkspaceBase(CmdBase):  # BASE
     def __init__(self):
         self.filepath = None
-    
+
     def load_model_from_text_and_build_shapes(self, filedata=""):
         umlcanvas = self.context.umlcanvas
-        
+
         force = False
         canread, msg = self.context.displaymodel.graph.persistence.can_I_read(filedata)
         if not canread:
-            #self.context.wxapp.MessageBox(msg)
-            retCode = wx.MessageBox(msg + "\n\nTry anyway?", "File Open Error", wx.YES_NO | wx.ICON_QUESTION)  # MessageBox simpler than MessageDialog
-            if (retCode == wx.YES):
+            # self.context.wxapp.MessageBox(msg)
+            retCode = wx.MessageBox(
+                msg + "\n\nTry anyway?", "File Open Error", wx.YES_NO | wx.ICON_QUESTION
+            )  # MessageBox simpler than MessageDialog
+            if retCode == wx.YES:
                 force = True
             else:
                 return
 
         umlcanvas.Clear()
-        
+
         if not self.context.displaymodel.graph.LoadGraphFromStrings(filedata, force):
             self.context.wxapp.MessageBox("Open failed.")
             return
-                
+
         # build view from display model
         umlcanvas.build_view(translatecoords=False)
 
@@ -178,14 +208,14 @@ class CmdFileLoadWorkspaceBase(CmdBase):   # BASE
         self.context.frame.Layout()  # needed when running phoenix
 
         # refresh view
-        umlcanvas.GetDiagram().ShowAll(1) # need this, yes
+        umlcanvas.GetDiagram().ShowAll(1)  # need this, yes
         umlcanvas.mega_refresh()
 
         self.context.wxapp.RefreshAsciiUmlTab()
         self.context.wxapp.set_app_title(self.filepath)
 
         self.filepath = None
-        
+
     def execute(self):
         fp = open(self.filepath, "r")
         s = fp.read()
@@ -197,14 +227,20 @@ class CmdFileLoadWorkspaceFromFilepath(CmdFileLoadWorkspaceBase):
     def __init__(self, filepath):
         self.filepath = filepath
 
-            
+
 class CmdFileLoadWorkspaceFromQuickPrompt(CmdFileLoadWorkspaceBase):
     def __init__(self):
-        self.filepath = ('Console')
+        self.filepath = "Console"
 
     def execute(self):
         eg = "{'type':'node', 'id':'A', 'x':142, 'y':129, 'width':250, 'height':250}"
-        dialog = wx.TextEntryDialog (parent=self.context.frame, message='Enter node/edge persistence strings:', caption='Load Graph From Text', value=eg, style=wx.OK|wx.CANCEL|wx.TE_MULTILINE )
+        dialog = wx.TextEntryDialog(
+            parent=self.context.frame,
+            message="Enter node/edge persistence strings:",
+            caption="Load Graph From Text",
+            value=eg,
+            style=wx.OK | wx.CANCEL | wx.TE_MULTILINE,
+        )
         dialog.SetClientSize(wx.Size(400, 200))  # make bigger
         if dialog.ShowModal() == wx.ID_OK:
             txt = dialog.GetValue()
@@ -212,35 +248,52 @@ class CmdFileLoadWorkspaceFromQuickPrompt(CmdFileLoadWorkspaceBase):
             self.load_model_from_text_and_build_shapes(txt)
         dialog.Destroy()
 
-        
+
 class CmdFileLoadWorkspaceViaDialog(CmdFileLoadWorkspaceBase):
     def execute(self):
-        thisdir = self.context.config.get('LastDirFileOpen', '..\\tests\\saved uml workspaces') # remember dir path
+        thisdir = self.context.config.get(
+            "LastDirFileOpen", "..\\tests\\saved uml workspaces"
+        )  # remember dir path
 
-        dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir=thisdir,
-            defaultFile="", wildcard="*.pyns", style=OPEN, pos=wx.DefaultPosition)
+        dlg = wx.FileDialog(
+            parent=self.context.frame,
+            message="choose",
+            defaultDir=thisdir,
+            defaultFile="",
+            wildcard="*.pyns",
+            style=OPEN,
+            pos=wx.DefaultPosition,
+        )
         if dlg.ShowModal() == wx.ID_OK:
             self.filepath = dlg.GetPath()
 
-            self.context.config['LastDirFileOpen'] = dlg.GetDirectory()  # remember dir path
+            self.context.config["LastDirFileOpen"] = dlg.GetDirectory()  # remember dir path
             self.context.config.write()
 
             super(CmdFileLoadWorkspaceViaDialog, self).execute()
 
         dlg.Destroy()
 
+
 class CmdFileLoadWorkspaceSampleViaDialog(CmdFileLoadWorkspaceBase):
     """
     Load from the samples directory
     """
-        
+
     def execute_from_dir(self):
-        
+
         thisdir = os.path.dirname(os.path.realpath(__file__))
         thisdir = os.path.join(thisdir, "../../samples")
-        
-        dlg = wx.FileDialog(parent=self.context.frame, message="choose", defaultDir=thisdir,
-            defaultFile="", wildcard="*.pyns", style=OPEN, pos=wx.DefaultPosition)
+
+        dlg = wx.FileDialog(
+            parent=self.context.frame,
+            message="choose",
+            defaultDir=thisdir,
+            defaultFile="",
+            wildcard="*.pyns",
+            style=OPEN,
+            pos=wx.DefaultPosition,
+        )
         if dlg.ShowModal() == wx.ID_OK:
             self.filepath = dlg.GetPath()
             super(CmdFileLoadWorkspaceSampleViaDialog, self).execute()
@@ -248,21 +301,23 @@ class CmdFileLoadWorkspaceSampleViaDialog(CmdFileLoadWorkspaceBase):
 
 
 from dialogs.DialogChooseFromList import MyDialogChooseFromList
-class DialogChooser(MyDialogChooseFromList):
 
+
+class DialogChooser(MyDialogChooseFromList):
     def SetMyData(self, data):
         self.data = data
         self.m_listBox1.InsertItems(data, 0)
-        
+
     # TODO how to get doubleclick to exit the ShowModal() call?
-    #def OnListDoubleClick( self, event ):
+    # def OnListDoubleClick( self, event ):
     #    print self.GetChosenItem()
     #    self.Close()
 
     def GetChosenItem(self):
         index = self.m_listBox1.GetSelection()
         return self.data[index]
-        
+
+
 class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
     """
     Load from the samples base64 dictionary.
@@ -272,39 +327,39 @@ class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
     
     Run buildsamples.py to update it.
     """
-    
+
     def execute(self):
         from base64 import b64decode
         from samples.files_as_resource import sample_files_dict
-        #print "samples_dir_files", sample_files_dict.keys()
+
+        # print "samples_dir_files", sample_files_dict.keys()
 
         dlg = wx.SingleChoiceDialog(
-                self.context.frame, 'Choice:', 'Choose a Sample Uml Diagram',
-                list(sample_files_dict.keys()), 
-                wx.CHOICEDLG_STYLE
-                )
+            self.context.frame,
+            "Choice:",
+            "Choose a Sample Uml Diagram",
+            list(sample_files_dict.keys()),
+            wx.CHOICEDLG_STYLE,
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
-            #self.log.WriteText('You selected: %s\n' % dlg.GetStringSelection())
+            # self.log.WriteText('You selected: %s\n' % dlg.GetStringSelection())
             k = dlg.GetStringSelection()
             self.filepath = "(Sample %s)" % k
-        
-            s = b64decode(sample_files_dict[k]).decode('utf-8')
+
+            s = b64decode(sample_files_dict[k]).decode("utf-8")
             self.load_model_from_text_and_build_shapes(s)
         dlg.Destroy()
-        
-        #dialog = DialogChooser(None)
-        #dialog.m_staticTextInstruction.Value = "Please Choose:"
-        #dialog.SetMyData(sample_files_dict.keys())
-        #if dialog.ShowModal() == wx.ID_OK:
+
+        # dialog = DialogChooser(None)
+        # dialog.m_staticTextInstruction.Value = "Please Choose:"
+        # dialog.SetMyData(sample_files_dict.keys())
+        # if dialog.ShowModal() == wx.ID_OK:
         #    #print dialog.GetChosenItem()
         #    k = dialog.GetChosenItem() # sample_files_dict.keys()[0]
         #    self.filepath = "(Sample %s)" % k
         #
         #    s = b64decode(sample_files_dict[k])
         #    self.load_model_from_text_and_build_shapes(s)
-        #    
-        #dialog.Destroy()
-
-
-
+        #
+        # dialog.Destroy()

@@ -5,6 +5,7 @@ import unittest
 from generate_code.gen_asciiart import PySourceAsText
 from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
 
+
 class TestCase01(unittest.TestCase):
     def setUp(self):
         self.p = PySourceAsText()
@@ -12,10 +13,10 @@ class TestCase01(unittest.TestCase):
     def test01(self):
         """
         """
-        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule66.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule66.py"
         self.p.Parse(FILE)
 
-        #print self.p
+        # print self.p
 
         # -------------------------------------------------------
 
@@ -28,53 +29,54 @@ class TestCase01(unittest.TestCase):
         gotevent7 = 0
 
         for classname, classentry in list(self.p.classlist.items()):
-            if classname == 'Flag':
+            if classname == "Flag":
                 gotevent1 = 1
                 assert classentry.classesinheritsfrom == []
 
                 assert len(classentry.attrs) == 3, len(classentry.attrs)
                 for attrobj in classentry.attrs:
                     attrname = attrobj.attrname
-                    if attrname == 'flagx':
+                    if attrname == "flagx":
                         gotevent5 = 1
-                    if attrname == 'flagy':
+                    if attrname == "flagy":
                         gotevent6 = 1
-                    if attrname == 'owner':
+                    if attrname == "owner":
                         gotevent7 = 1
 
                 for adef in classentry.defs:
                     pass
                 assert len(classentry.defs) == 3
-                assert '__init__' in classentry.defs
-                assert 'readflag' in classentry.defs
-                assert '__repr__' in classentry.defs
+                assert "__init__" in classentry.defs
+                assert "readflag" in classentry.defs
+                assert "__repr__" in classentry.defs
 
-
-            if classname == 'Flags':
+            if classname == "Flags":
                 gotevent2 = 2
                 assert classentry.classesinheritsfrom == []
 
                 assert len(classentry.attrs) == 2
                 for attrobj in classentry.attrs:
                     attrname = attrobj.attrname
-                    if attrname == 'flags':
+                    if attrname == "flags":
                         gotevent3 = 1
-                        compositescreatedforattr = self.p.GetCompositeClassesForAttr(attrobj.attrname, classentry)
+                        compositescreatedforattr = self.p.GetCompositeClassesForAttr(
+                            attrobj.attrname, classentry
+                        )
                         # 'flags is pointing at composite of flag'
                         assert len(compositescreatedforattr) == 1
-                        assert compositescreatedforattr[0] == 'Flag'
+                        assert compositescreatedforattr[0] == "Flag"
 
-                    if attrname == 'numberOfFlags':
+                    if attrname == "numberOfFlags":
                         gotevent4 = 1
-                        assert not 'static' in attrobj.attrtype
+                        assert not "static" in attrobj.attrtype
 
                 for adef in classentry.defs:
                     pass
                 assert len(classentry.defs) == 4
-                assert '__init__' in classentry.defs
-                assert 'readFlags' in classentry.defs
-                assert 'AddFlag' in classentry.defs
-                assert '__repr__' in classentry.defs
+                assert "__init__" in classentry.defs
+                assert "readFlags" in classentry.defs
+                assert "AddFlag" in classentry.defs
+                assert "__repr__" in classentry.defs
 
         assert gotevent1
         assert gotevent2
@@ -83,5 +85,3 @@ class TestCase01(unittest.TestCase):
         assert gotevent5
         assert gotevent6
         assert gotevent7
-
-

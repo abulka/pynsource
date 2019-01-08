@@ -8,23 +8,26 @@ import wx.lib.ogl as ogl
 from common.architecture_support import whoscalling2
 
 MIN_SENSIBLE_CANVAS_SIZE = 200
-    
+
+
 class CanvasResizer(object):
     """
     Looks after the reszing of the canvas virtual size plus a few other related functions.
     We change virtual size by calling SetScrollbars()
     """
-    
+
     def __init__(self, canvas):
         self.canvas = canvas
         self.allshapes_bounds_cached = None
         self.allshapes_bounds_last = None
-        self.working = False  # setting SetScrollbars() can trigger a frame resize thus this flag prevents 2 calls
+        self.working = (
+            False
+        )  # setting SetScrollbars() can trigger a frame resize thus this flag prevents 2 calls
 
     def canvas_too_small(self):
         width, height = self.canvas.GetSize()
         return width < MIN_SENSIBLE_CANVAS_SIZE or height < MIN_SENSIBLE_CANVAS_SIZE
-        
+
     # UTILITY - called by OnResizeFrame, layout_and_position_shapes
     def frame_calibration(self, auto_resize_virtualcanvas=True):
         """
@@ -36,8 +39,10 @@ class CanvasResizer(object):
         """
         if self.canvas_too_small():
             return
-        self.canvas.coordmapper.Recalibrate(self.canvas.frame.GetClientSize())  # passing self.GetVirtualSize() seems to spread the layout out too much
-        
+        self.canvas.coordmapper.Recalibrate(
+            self.canvas.frame.GetClientSize()
+        )  # passing self.GetVirtualSize() seems to spread the layout out too much
+
         if auto_resize_virtualcanvas:
             self.resize_virtual_canvas_tofit_bounds(shrinkage_leeway=0, bounds_dirty=False)
 
@@ -50,9 +55,9 @@ class CanvasResizer(object):
         """
         if bounds_dirty:
             self.allshapes_bounds_cached = None
-            
+
         if self.allshapes_bounds_last == self.calc_allshapes_bounds():
-            #print "nochange",
+            # print "nochange",
             return
 
         if self.working:
@@ -62,31 +67,32 @@ class CanvasResizer(object):
         bounds_width, bounds_height = self.calc_allshapes_bounds()
         virt_width, virt_height = self.canvas.GetVirtualSize()
         frame_width, frame_height = self.canvas.GetClientSize()
-        
+
         need_more_virtual_room = bounds_width > virt_width or bounds_height > virt_height
-        need_to_compact = will_compact = (bounds_width < virt_width or bounds_height < virt_height)
-        
+        need_to_compact = will_compact = bounds_width < virt_width or bounds_height < virt_height
+
         if need_to_compact and shrinkage_leeway > 0:  # Relax the compacting rule
-            will_compact = \
-                (percent_change(bounds_width, virt_width) > shrinkage_leeway or \
-                 percent_change(bounds_height, virt_height) > shrinkage_leeway)
-            
+            will_compact = (
+                percent_change(bounds_width, virt_width) > shrinkage_leeway
+                or percent_change(bounds_height, virt_height) > shrinkage_leeway
+            )
+
         if need_more_virtual_room or will_compact:
             self._do_resize_virtual_canvas_tofit_bounds((bounds_width, bounds_height))
 
-        #Debug version of above last two lines.
+        # Debug version of above last two lines.
         #
-        #print need_more_virtual_room, need_to_compact,
-        #if need_to_compact and not will_compact:
+        # print need_more_virtual_room, need_to_compact,
+        # if need_to_compact and not will_compact:
         #    print "(compact pending)",
-        #            
-        #if need_more_virtual_room or will_compact:
+        #
+        # if need_more_virtual_room or will_compact:
         #    print "(action)"
         #    print "\n",whoscalling2()
         #    self._do_resize_virtual_canvas_tofit_bounds((bounds_width, bounds_height))
-        #else:
+        # else:
         #    print "(no action)"
-    
+
         self.working = False
 
     def _do_resize_virtual_canvas_tofit_bounds(self, bounds):
@@ -97,8 +103,10 @@ class CanvasResizer(object):
 
         print("Setting virtual size to %d,%d" % (bounds_width, bounds_height))
 
-        self.canvas.SetScrollbars(1, 1, bounds_width, bounds_height, oldscrollx, oldscrolly, noRefresh = True)
-        
+        self.canvas.SetScrollbars(
+            1, 1, bounds_width, bounds_height, oldscrollx, oldscrolly, noRefresh=True
+        )
+
         # Cache is different to last bounds value - cannot combine these concepts
         self.allshapes_bounds_last = bounds
         self.allshapes_bounds_cached = None
@@ -108,21 +116,24 @@ class CanvasResizer(object):
         Calculates the maxx and maxy for all the shapes on the canvas.
         """
         if self.allshapes_bounds_cached:
-            #print ".",
+            # print ".",
             return self.allshapes_bounds_cached
-        
+
         ALLSHAPES_BOUNDS_MARGIN = 20
         maxx = maxy = 0
         for shape in self.canvas.umlboxshapes:
             width, height = shape.GetBoundingBoxMax()
-            right = shape.GetX() + width/2
-            bottom = shape.GetY() + height/2
+            right = shape.GetX() + width / 2
+            bottom = shape.GetY() + height / 2
             maxx = max(right, maxx)
             maxy = max(bottom, maxy)
-        #print "!",
-        self.allshapes_bounds_cached= (maxx + ALLSHAPES_BOUNDS_MARGIN,
-                                        maxy + ALLSHAPES_BOUNDS_MARGIN)
+        # print "!",
+        self.allshapes_bounds_cached = (
+            maxx + ALLSHAPES_BOUNDS_MARGIN,
+            maxy + ALLSHAPES_BOUNDS_MARGIN,
+        )
         return self.allshapes_bounds_cached
+
 
 """
 Notes:
@@ -177,13 +188,13 @@ of 20-40% or so.
 
 """
 
-#print "bounds", self.calc_allshapes_bounds()
-#print "canvas.GetVirtualSize()", self.GetVirtualSize()
+# print "bounds", self.calc_allshapes_bounds()
+# print "canvas.GetVirtualSize()", self.GetVirtualSize()
 
-#print "canvas.GetSize()", self.GetSize()
-#print "frame.GetVirtualSize()", self.frame.GetVirtualSize()
-#print "frame.GetSize()", self.frame.GetSize()
-#print "frame.GetClientSize()", self.frame.GetClientSize()
+# print "canvas.GetSize()", self.GetSize()
+# print "frame.GetVirtualSize()", self.frame.GetVirtualSize()
+# print "frame.GetSize()", self.frame.GetSize()
+# print "frame.GetClientSize()", self.frame.GetClientSize()
 
-#print "bounds now", self.calc_allshapes_bounds(), self.allshapes_bounds_cached
-#print "canvas.GetVirtualSize()", self.GetVirtualSize()
+# print "bounds now", self.calc_allshapes_bounds(), self.allshapes_bounds_cached
+# print "canvas.GetVirtualSize()", self.GetVirtualSize()

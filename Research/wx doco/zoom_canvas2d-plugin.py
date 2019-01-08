@@ -56,191 +56,207 @@ from Plugins.mainGui import app
 
 import math
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 class GraphWindow(ogl.ShapeCanvas):
     def __init__(self, frame):
         ogl.OGLInitialize()
         ogl.ShapeCanvas.__init__(self, frame)
 
-        maxWidth  = 10000
+        maxWidth = 10000
         maxHeight = 10000
-        self.SetScrollbars(20, 20, maxWidth/20, maxHeight/20)
+        self.SetScrollbars(20, 20, maxWidth / 20, maxHeight / 20)
 
         self.nodeShapes = {}
-        self.connShapes = [] #Connection line shapes
+        self.connShapes = []  # Connection line shapes
         self.linesFrom = {}
         self.linesTo = {}
-        
-        self.viewMode = 'static'
 
-        self.SetBackgroundColour( wx.Color(*Config.backgroundColorStatic) )
+        self.viewMode = "static"
+
+        self.SetBackgroundColour(wx.Color(*Config.backgroundColorStatic))
         self.diagram = ogl.Diagram()
         self.SetDiagram(self.diagram)
         self.diagram.SetCanvas(self)
         self.SetSize((640, 480))
-        
+
         self.zoom = 1
         self.mainFrame = mf = app.mainFrame
 
-        self.menu = \
-        mf.AddMenu( _('&Canvas'),   ( mf.MenuEntry( _('&Zoom +') + '\tCtrl++', _('Zooms in'), self.OnZoomPlus, 'Art/viewmag.png' ),
-                                      mf.MenuEntry( _('&Zoom -') + '\tCtrl+-', _('Zooms out'), self.OnZoomMinus, 'Art/viewmag.png' ),
-                                      mf.MenuEntry( _('Zoom &100%') + '\tCtrl+*', _('Reset zoom to 100%'), self.OnZoomReset, 'Art/viewmag.png' ),
-                                     )
-                   )        
+        self.menu = mf.AddMenu(
+            _("&Canvas"),
+            (
+                mf.MenuEntry(
+                    _("&Zoom +") + "\tCtrl++", _("Zooms in"), self.OnZoomPlus, "Art/viewmag.png"
+                ),
+                mf.MenuEntry(
+                    _("&Zoom -") + "\tCtrl+-", _("Zooms out"), self.OnZoomMinus, "Art/viewmag.png"
+                ),
+                mf.MenuEntry(
+                    _("Zoom &100%") + "\tCtrl+*",
+                    _("Reset zoom to 100%"),
+                    self.OnZoomReset,
+                    "Art/viewmag.png",
+                ),
+            ),
+        )
 
         sb = mf.statusBar
-        self.zoomStatusBarWidget = wx.StaticText(sb, -1, '100%' )
+        self.zoomStatusBarWidget = wx.StaticText(sb, -1, "100%")
         noItems = sb.GetFieldsCount()
-        sb.SetFieldsCount( noItems + 1  )
-        sb.AddWidget( self.zoomStatusBarWidget, pos = noItems )
+        sb.SetFieldsCount(noItems + 1)
+        sb.AddWidget(self.zoomStatusBarWidget, pos=noItems)
         newWidths = sb.GetStatusWidths()[0:-1] + [60]
-        sb.SetStatusWidths( newWidths )
+        sb.SetStatusWidths(newWidths)
 
-        self.SetDropTarget( CanvasDropTarget(self) )
-        
-        louie.connect( self.OnNewNode, Events.instantiateClassFinished )
-        louie.connect( self.OnDeleteNode, Events.deleteNodeFinished )
-        louie.connect( self.OnChangePresenterInfo, Events.changePresenterInfoFinished )
-        louie.connect( self.OnChangePresenterClassInfo, Events.setPresenterClassInfoFinished )
-        louie.connect( self.OnNewConnection, Events.createConnectionFinished )
-        louie.connect( self.OnDeleteConnection, Events.deleteConnectionFinished )
-        louie.connect( self.OnSetViewMode, Events.setViewMode )
-        louie.connect( self.OnChangePropertyValue, Events.changePropertyValue )
-        louie.connect( self.OnDisconnected, Events.disconnected )
-        louie.connect( self.OnClearCanvas, Events.resetServerWorkspaceFinished )
-        
-        #self.Bind(wx.EVT_MOUSEWHEEL, self.OnMouseWheel)
-        
+        self.SetDropTarget(CanvasDropTarget(self))
+
+        louie.connect(self.OnNewNode, Events.instantiateClassFinished)
+        louie.connect(self.OnDeleteNode, Events.deleteNodeFinished)
+        louie.connect(self.OnChangePresenterInfo, Events.changePresenterInfoFinished)
+        louie.connect(self.OnChangePresenterClassInfo, Events.setPresenterClassInfoFinished)
+        louie.connect(self.OnNewConnection, Events.createConnectionFinished)
+        louie.connect(self.OnDeleteConnection, Events.deleteConnectionFinished)
+        louie.connect(self.OnSetViewMode, Events.setViewMode)
+        louie.connect(self.OnChangePropertyValue, Events.changePropertyValue)
+        louie.connect(self.OnDisconnected, Events.disconnected)
+        louie.connect(self.OnClearCanvas, Events.resetServerWorkspaceFinished)
+
+        # self.Bind(wx.EVT_MOUSEWHEEL, self.OnMouseWheel)
+
     def OnDisconnected(self):
-        #self.Clear()
+        # self.Clear()
         pass
-        
+
     def OnClearCanvas(self, result):
         self.Clear()
-        
-    def OnChangePresenterInfo(self, objAndInfo, refresh = True):
+
+    def OnChangePresenterInfo(self, objAndInfo, refresh=True):
         obj, info = objAndInfo
         id = obj.id
         shape = self.nodeShapes[id]
 
-        pinfo = PresenterInfo.fromDict( info )
-        
+        pinfo = PresenterInfo.fromDict(info)
+
         if shape.info.presenterClass != pinfo.presenterClass:
             newNode = self.AddNode(obj, info)
 
-            oldLinesFrom, oldLinesTo = self.getAllLinesOfNode( id )                
+            oldLinesFrom, oldLinesTo = self.getAllLinesOfNode(id)
             for name, line in list(oldLinesFrom.items()):
-                self.removeLineFromTo( id, name, line[0][0], line[0][1] )
-                self.addLineFromTo( id, name, line[0][0], line[0][1], newNode, self.nodeShapes[line[0][0]] )
+                self.removeLineFromTo(id, name, line[0][0], line[0][1])
+                self.addLineFromTo(
+                    id, name, line[0][0], line[0][1], newNode, self.nodeShapes[line[0][0]]
+                )
             for name, line in list(oldLinesTo.items()):
-                self.removeLineFromTo( line[0][0], line[0][1], id, name )
-                self.addLineFromTo( line[0][0], line[0][1], id, name, self.nodeShapes[line[0][0]], newNode )
+                self.removeLineFromTo(line[0][0], line[0][1], id, name)
+                self.addLineFromTo(
+                    line[0][0], line[0][1], id, name, self.nodeShapes[line[0][0]], newNode
+                )
 
-            #self.DeleteNode(id)
+            # self.DeleteNode(id)
         else:
             shape.UpdateInfo(pinfo)
-            
-        if refresh: self.Refresh()        
-        
+
+        if refresh:
+            self.Refresh()
+
     def OnChangePresenterClassInfo(self, classAndPresenterAndNodesWithInfo):
         klass, info, nodesWithInfo = classAndPresenterAndNodesWithInfo
-        
+
         for node, info in nodesWithInfo:
-            self.OnChangePresenterInfo( (node, info), False )
-            
+            self.OnChangePresenterInfo((node, info), False)
+
         self.Refresh()
 
     def AddNode(self, obj, info):
-        presenterinfo = PresenterInfo.fromDict( info )
+        presenterinfo = PresenterInfo.fromDict(info)
         pclass = presenterinfo.presenterClass
-        
+
         if not pclass:
-            pclass = 'EditorPresenter'
-        
-        presentermodule = __import__( 'Client.Sources.GUI.Presenters.%s' % pclass, globals(), locals(), [pclass] )
+            pclass = "EditorPresenter"
+
+        presentermodule = __import__(
+            "Client.Sources.GUI.Presenters.%s" % pclass, globals(), locals(), [pclass]
+        )
         presenter = getattr(presentermodule, pclass)
         if obj.id in self.nodeShapes:
             self.DeleteNode(obj.id, False)
-        self.nodeShapes[obj.id] = newShape = presenter( self, obj, presenterinfo )
+        self.nodeShapes[obj.id] = newShape = presenter(self, obj, presenterinfo)
         newShape.SetViewMode(self.viewMode)
 
-        #self.classToShapes.setDefault(obj.kclsid, []).append( newShape )
-        
+        # self.classToShapes.setDefault(obj.kclsid, []).append( newShape )
+
         return newShape
-    
-    def DeleteNode(self, id, deleteConnections = True):        
+
+    def DeleteNode(self, id, deleteConnections=True):
         if deleteConnections:
-            oldLinesFrom, oldLinesTo = self.getAllLinesOfNode( id )                
+            oldLinesFrom, oldLinesTo = self.getAllLinesOfNode(id)
             for name, line in list(oldLinesFrom.items()):
-                self.removeLineFromTo( id, name, line[0][0], line[0][1] )
+                self.removeLineFromTo(id, name, line[0][0], line[0][1])
             for name, line in list(oldLinesTo.items()):
-                self.removeLineFromTo( line[0][0], line[0][1], id, name )
-    
+                self.removeLineFromTo(line[0][0], line[0][1], id, name)
+
         shape = self.nodeShapes[id]
         del self.nodeShapes[id]
         shape.Delete()
-        #del self.classToShapes[id]
-        
-        
+        # del self.classToShapes[id]
+
     def OnNewNode(self, objandpresenterinfo):
         obj, presenterinfo = objandpresenterinfo
-        
+
         self.AddNode(obj, presenterinfo)
-        
+
         self.Refresh()
-        
-    def addLineFromTo(self, id1, name1, id2, name2, presenter1, presenter2, kind = 'ref'):
-        line = ConnectionShape( self, kind, presenter1, name1, presenter2, name2 )
+
+    def addLineFromTo(self, id1, name1, id2, name2, presenter1, presenter2, kind="ref"):
+        line = ConnectionShape(self, kind, presenter1, name1, presenter2, name2)
 
         if id1 not in self.linesFrom:
             self.linesFrom[id1] = {}
 
-        self.linesFrom[id1][name1] = ( (id2, name2), line )
-    
+        self.linesFrom[id1][name1] = ((id2, name2), line)
+
         if id2 not in self.linesTo:
             self.linesTo[id2] = {}
 
-        self.linesTo[id2][name2] = ( (id1, name1), line )
+        self.linesTo[id2][name2] = ((id1, name1), line)
 
     def removeLineFromTo(self, id1, name1, id2, name2):
         lineShape = self.linesFrom[id1][name1][1]
-        
-        lineShape.Delete()  
+
+        lineShape.Delete()
 
         del self.linesFrom[id1][name1]
-        
+
         if self.linesFrom[id1] == {}:
             del self.linesFrom[id1]
 
         del self.linesTo[id2][name2]
-        
+
         if self.linesTo[id2] == {}:
             del self.linesTo[id2]
-            
+
     def getAllLinesOfNode(self, id):
-        #try:
+        # try:
         #    linesFrom = [ l for l in self.linesFrom[id].items() ]
-        #except KeyError:
+        # except KeyError:
         #    linesFrom = []
         #
-        #try:
+        # try:
         #    linesTo = [ l for l in self.linesTo[id].items() ]
-        #except KeyError:
+        # except KeyError:
         #    linesTo = []
 
-        #return linesFrom, linesTo
-        
+        # return linesFrom, linesTo
+
         return self.linesFrom.get(id, {}), self.linesTo.get(id, {})
-        
 
     def OnNewConnection(self, obj1name1obj2name2):
         obj1, name1, obj2, name2 = obj1name1obj2name2
-        
+
         presenter1 = self.nodeShapes[obj1.id]
         presenter2 = self.nodeShapes[obj2.id]
-        
-        self.addLineFromTo( obj1.id, name1, obj2.id, name2, presenter1, presenter2 )
+
+        self.addLineFromTo(obj1.id, name1, obj2.id, name2, presenter1, presenter2)
 
         self.Refresh()
 
@@ -250,139 +266,145 @@ class GraphWindow(ogl.ShapeCanvas):
 
     def OnDeleteConnection(self, obj1name1obj2name2):
         obj1, name1, obj2, name2 = obj1name1obj2name2
-        
-        self.removeLineFromTo( obj1.id, name1, obj2.id, name2 )
-                
+
+        self.removeLineFromTo(obj1.id, name1, obj2.id, name2)
+
         self.Refresh()
-        
+
     def OnSetViewMode(self, mode):
         self.viewMode = mode
-        if mode == 'static':
-            self.SetBackgroundColour( wx.Color(*Config.backgroundColorStatic) )
-        elif mode == 'dynamic':
-            self.SetBackgroundColour( wx.Color(*Config.backgroundColorDynamic) )
-        
-        for id, shape in list(self.nodeShapes.items()):
-            shape.SetViewMode( mode )
+        if mode == "static":
+            self.SetBackgroundColour(wx.Color(*Config.backgroundColorStatic))
+        elif mode == "dynamic":
+            self.SetBackgroundColour(wx.Color(*Config.backgroundColorDynamic))
 
+        for id, shape in list(self.nodeShapes.items()):
+            shape.SetViewMode(mode)
 
         self.Refresh()
-        
-    def OnChangePropertyValue(self, id, name, value, kind = 'static'):
-        if kind == 'dynamic':
+
+    def OnChangePropertyValue(self, id, name, value, kind="static"):
+        if kind == "dynamic":
+
             def x():
                 for id, shape in list(self.nodeShapes.items()):
                     shape.update()
-                
-            wx.CallAfter( x )
-    
-    def Redraw(self, dc = None):
+
+            wx.CallAfter(x)
+
+    def Redraw(self, dc=None):
         if dc is None:
             dc = self.GetDC()
-            
+
         ogl.ShapeCanvas.Redraw(self, dc)
-        
+
     def GetDC(self):
         dc = wx.ClientDC(self)
         self.PrepareDC(dc)
         return dc
-        
-    def UpdateLines(self, shape, refresh = True):
-        fromTo = self.getAllLinesOfNode( shape.node.id )
+
+    def UpdateLines(self, shape, refresh=True):
+        fromTo = self.getAllLinesOfNode(shape.node.id)
         lines = list(fromTo[0].values()) + list(fromTo[1].values())
-        
-        allLinesFrom = [ line[1] for line in lines ]
+
+        allLinesFrom = [line[1] for line in lines]
 
         dc = self.GetDC()
-        
+
         for l in allLinesFrom:
             l.OnMoveLink(dc)
-            
+
         if refresh:
             self.Refresh()
-    
-    def UpdateAllLines(self, refresh = True):    
+
+    def UpdateAllLines(self, refresh=True):
         for shape in list(self.nodeShapes.values()):
             self.UpdateLines(shape, False)
-        if refresh: self.Refresh()
+        if refresh:
+            self.Refresh()
 
     def Clear(self):
         for id in list(self.nodeShapes.keys()):
             self.DeleteNode(id)
 
     def SetZoom(self, zoom):
-        zoom = max( min(zoom, Config.maxZoom), Config.minZoom)
+        zoom = max(min(zoom, Config.maxZoom), Config.minZoom)
         self.zoom = zoom
-        self.zoomStatusBarWidget.SetLabel( '%.1f%%' % (zoom * 100) )
+        self.zoomStatusBarWidget.SetLabel("%.1f%%" % (zoom * 100))
         self.Redraw()
         self.UpdateAllLines(False)
         self.Refresh()
-    
+
     def OnZoomPlus(self, evt):
         evt.Skip()
-        self.SetZoom( self.zoom * Config.zoomStep )
-        
+        self.SetZoom(self.zoom * Config.zoomStep)
+
     def OnZoomMinus(self, evt):
         evt.Skip()
-        self.SetZoom( self.zoom * 1.0 / Config.zoomStep )
-        
+        self.SetZoom(self.zoom * 1.0 / Config.zoomStep)
+
     def OnZoomReset(self, evt):
         evt.Skip()
-        self.SetZoom( 1.0 )
+        self.SetZoom(1.0)
 
     def PrepareDC(self, dc):
         ogl.ShapeCanvas.PrepareDC(self, dc)
-        dc.SetUserScale( self.zoom, self.zoom )
-        
+        dc.SetUserScale(self.zoom, self.zoom)
+
 
 class ConnectionShape(ogl.LineShape):
     def __init__(self, canvas, connectionType, upNodeShp, upProp, downNodeShp, downProp):
         ogl.LineShape.__init__(self)
-                
+
         if Config.showConnectionLabels:
             dc = canvas.GetDC()
-            
-            lineLabels = { 'Start' : upProp, 'Middle' : '%s - %s' % (upProp, downProp), 'End' : downProp }
-            
+
+            lineLabels = {
+                "Start": upProp,
+                "Middle": "%s - %s" % (upProp, downProp),
+                "End": downProp,
+            }
+
             for label, value in lineLabels.items():
                 rgnId = self.GetRegionId(label)
                 self.FormatText(dc, value, rgnId)
-                
+
             for rgn in self.GetRegions():
                 if rgn.GetName() in list(lineLabels.keys()):
-                    rgn.SetSize(70,10)
+                    rgn.SetSize(70, 10)
                     rgn.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL))
-        
+
         self.upShape = upNodeShp
         self.upProp = upProp
         self.downShape = downNodeShp
         self.downProp = downProp
-        
+
         self.canvas = canvas
         self.SetCanvas(canvas)
-        
-        colors = { 'ref'  : (wx.BLACK_PEN, wx.BLACK_BRUSH),
-                   'copy' : (wx.GREEN_PEN, wx.GREEN_BRUSH),
-                   'deep' : (wx.RED_PEN, wx.RED_BRUSH)
-                 }
-                   
+
+        colors = {
+            "ref": (wx.BLACK_PEN, wx.BLACK_BRUSH),
+            "copy": (wx.GREEN_PEN, wx.GREEN_BRUSH),
+            "deep": (wx.RED_PEN, wx.RED_BRUSH),
+        }
+
         colors = colors[connectionType]
-        
-        self.SetPen( colors[0] )
-        self.SetBrush( colors[1] )
+
+        self.SetPen(colors[0])
+        self.SetBrush(colors[1])
         self.AddArrow(ogl.ARROW_ARROW)
-        #self.MakeLineControlPoints(4)
+        # self.MakeLineControlPoints(4)
         self.MakeLineControlPoints(2)
-        #self.SetSpline(False)
+        # self.SetSpline(False)
         upNodeShp.AddLine(self, downNodeShp)
         canvas.diagram.AddShape(self)
         self.Show(True)
         self.SetAttachments(1, 3)
         self.SetDrawHandles(True)
-        #self.SetDraggable(True)
+        # self.SetDraggable(True)
 
-    #This method just changes view.
-    def changeView(self, select = True, refreshCanvas = True):
+    # This method just changes view.
+    def changeView(self, select=True, refreshCanvas=True):
         if select:
             pen = wx.Pen(wx.RED, 1)
             brush = wx.RED_BRUSH
@@ -395,7 +417,7 @@ class ConnectionShape(ogl.LineShape):
         if refreshCanvas:
             self.GetCanvas().Refresh()
 
-    def OnLeftClick(self, x, y, keys = 0, attachment = 0):
+    def OnLeftClick(self, x, y, keys=0, attachment=0):
         canvas = self.canvas
         dc = canvas.GetDC()
 
@@ -421,31 +443,30 @@ class ConnectionShape(ogl.LineShape):
                     s.Select(False, dc)
 
                 canvas.Redraw(dc)
-                
+
     def FindLineEndPoints(self):
-        upPoints = self.upShape.GetConnectionPoints( self.upProp )
-        downPoints = self.downShape.GetConnectionPoints( self.downProp )
+        upPoints = self.upShape.GetConnectionPoints(self.upProp)
+        downPoints = self.downShape.GetConnectionPoints(self.downProp)
 
         def sqDist(p1, p2):
-            return math.sqrt( (p1[0] - p2[0])**2 + (p1[1] - p2[1])**2 )
-        
+            return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
+
         minDist = 999999
         closestPoints = None
         for pup in upPoints:
             for pdown in downPoints:
-                dist = sqDist( pup, pdown )
+                dist = sqDist(pup, pdown)
                 if dist < minDist:
                     minDist = dist
                     closestPoints = (pup, pdown)
-                    
-        #print upPoints, downPoints
+
+        # print upPoints, downPoints
         return closestPoints[0][0], closestPoints[0][1], closestPoints[1][0], closestPoints[1][1]
-    
-    def Delete(self):        
-        self.upShape.RemoveLine( self )
+
+    def Delete(self):
+        self.upShape.RemoveLine(self)
         ogl.LineShape.Delete(self)
-        
-        
+
     def GetLabelPosition(self, position):
         """Get the reference point for a label.
 
@@ -460,8 +481,8 @@ class ConnectionShape(ogl.LineShape):
             return result[0] + 40, result[1]
         elif position == 2:
             return result[0] - 40, result[1]
-        
-    #def OnMoveLink(self, dc, moveControlPoints = True):
+
+    # def OnMoveLink(self, dc, moveControlPoints = True):
     #    getfrom = self.GetFrom()
     #    getto = self.GetTo()
     #    x, y = (getto.GetX() - getfrom.GetX(), getto.GetY() - getfrom.GetY())
@@ -477,14 +498,13 @@ class ConnectionShape(ogl.LineShape):
     #
     #    ogl.LineShape.OnMoveLink(self, dc, moveControlPoints)
 
-        #fAtPtX, fAtPtY = self.GetFrom().GetAttachmentPosition(1)
-        #tAtPtX, tAtPtY = self.GetTo().GetAttachmentPosition(3)
-        #self.GetNextControlPoint(self.GetFrom()).x = fAtPtX + 20
-        #self.GetNextControlPoint(self.GetFrom()).y = fAtPtY
-        #self.GetNextControlPoint(self.GetTo()).x = tAtPtX - 30
-        #self.GetNextControlPoint(self.GetTo()).y = tAtPtY        
-        
-        
+    # fAtPtX, fAtPtY = self.GetFrom().GetAttachmentPosition(1)
+    # tAtPtX, tAtPtY = self.GetTo().GetAttachmentPosition(3)
+    # self.GetNextControlPoint(self.GetFrom()).x = fAtPtX + 20
+    # self.GetNextControlPoint(self.GetFrom()).y = fAtPtY
+    # self.GetNextControlPoint(self.GetTo()).x = tAtPtX - 30
+    # self.GetNextControlPoint(self.GetTo()).y = tAtPtY
+
 
 class PresenterInfo(object):
     def __init__(self, presenterClass, pos, size, editors, inheritPresenter, inheritEditors):
@@ -494,13 +514,12 @@ class PresenterInfo(object):
         self.editors = editors
         self.inheritPresenter = inheritPresenter
         self.inheritEditors = inheritEditors
-    
-    
+
     # the next 2 funcs are a bit ugly, but I don't want to write a twisted wrapper just for them :-)
     # update: now that we use pickle with twisted, this could go away, but i am too lazy right now to change it
     def getInfo(self):
         return vars(self)
-    
+
     @classmethod
     def fromDict(cls, dict):
         presenterinfo = cls(**dict)
@@ -509,6 +528,7 @@ class PresenterInfo(object):
 
 
 import pickle as pickle
+
 
 class DropData(wx.CustomDataObject):
     def __init__(self):
@@ -520,8 +540,8 @@ class DropData(wx.CustomDataObject):
 
     def getObject(self):
         return pickle.loads(self.GetData())
-    
-    
+
+
 class CanvasDropTarget(wx.PyDropTarget):
     def __init__(self, canvas):
         wx.PyDropTarget.__init__(self)
@@ -537,7 +557,6 @@ class CanvasDropTarget(wx.PyDropTarget):
         self.comp = comp
         self.SetDataObject(comp)
 
-
     def OnEnter(self, x, y, d):
         return d
 
@@ -545,9 +564,9 @@ class CanvasDropTarget(wx.PyDropTarget):
         pass
 
     def OnDrop(self, x, y):
-        #print "got an drop event at", x, y
+        # print "got an drop event at", x, y
         return True
-        
+
     def OnDragOver(self, x, y, d):
         # provide visual feedback by selecting the item the mouse is over
         pass
@@ -566,24 +585,22 @@ class CanvasDropTarget(wx.PyDropTarget):
         if self.GetData():
             filenames = self.fileObject.GetFilenames()
             nodeid, nodeType = self.data.getObject()
-            
-            if nodeType == 'ClassNode':
-                #x, y = self.canvas.CalcUnscrolledPosition(x, y)
+
+            if nodeType == "ClassNode":
+                # x, y = self.canvas.CalcUnscrolledPosition(x, y)
                 dc = self.canvas.GetDC()
                 x, y = dc.DeviceToLogicalX(x), dc.DeviceToLogicalY(y)
-                info = PresenterInfo( '', (x,y), (220, 200), {}, True, True )
-                louie.send( Events.instantiateClass, classid = nodeid, presenterinfo = info.getInfo() )
+                info = PresenterInfo("", (x, y), (220, 200), {}, True, True)
+                louie.send(Events.instantiateClass, classid=nodeid, presenterinfo=info.getInfo())
 
-            self._makeObjects()   # reset data objects..
-    
+            self._makeObjects()  # reset data objects..
+
         return d  # what is returned signals the source what to do
-                  # with the original data (move, copy, etc.)  In this
-                  # case we just return the suggested value given to us.
-
+        # with the original data (move, copy, etc.)  In this
+        # case we just return the suggested value given to us.
 
 
 def GetInfo(me):
-    me.uniqueName = 'Canvas'
+    me.uniqueName = "Canvas"
     me.version = 1.0
-    me.info = 'Helper plugin'
-
+    me.info = "Helper plugin"

@@ -13,18 +13,18 @@ PyNSource is a UML modelling tool for Python source code.
 Reverse engineer python source code into either a UML diagram
 or into Ascii Art UML which you can paste into your source code!
 """
-#ABOUT_FEATURES = """
-#Resilient: doesn't import the python files, thus will never get "stuck" when syntax is wrong.
-#Fast
-#Free
-#Recognises inheritance and composition  relationships
-#Recognises ocurrences of self.somevar as UML fields (no other UML tool does this for python)
-#Detects the cardinality of associations e.g. one to one or 1..*  etc
-#Optionally treat modules as classes - creating a pseudo class for each module - module variables and functions are  treated as attributes and methods of a class
-#Has been developed using unit tests (supplied) so that you can trust it just that little bit more ;-)
-#Can generate UML Ascii-art :-)
-#Can generate Java and Delphi code skeletons (out of your python code) so that you can import those into a proper UML tool.
-#"""
+# ABOUT_FEATURES = """
+# Resilient: doesn't import the python files, thus will never get "stuck" when syntax is wrong.
+# Fast
+# Free
+# Recognises inheritance and composition  relationships
+# Recognises ocurrences of self.somevar as UML fields (no other UML tool does this for python)
+# Detects the cardinality of associations e.g. one to one or 1..*  etc
+# Optionally treat modules as classes - creating a pseudo class for each module - module variables and functions are  treated as attributes and methods of a class
+# Has been developed using unit tests (supplied) so that you can trust it just that little bit more ;-)
+# Can generate UML Ascii-art :-)
+# Can generate Java and Delphi code skeletons (out of your python code) so that you can import those into a proper UML tool.
+# """
 
 WEB_UPDATE_MSG = """
 There is a newer version of PyNSource GUI available:  %s
@@ -103,12 +103,13 @@ implementation
 
 end.
 """
-ASCII_UML_HELP_MSG = \
-"Use the file menu to import python source code " \
-"and generate UML ascii art here.\n\n" \
-"Optionally join up your asci art UML using a tool like " \
-"e.g Java Ascii Versatile Editor http://www.jave.de/\n\n" \
-"Idea: Paste your UML Ascii art into your source code as comments!\n\n"
+ASCII_UML_HELP_MSG = (
+    "Use the file menu to import python source code "
+    "and generate UML ascii art here.\n\n"
+    "Optionally join up your asci art UML using a tool like "
+    "e.g Java Ascii Versatile Editor http://www.jave.de/\n\n"
+    "Idea: Paste your UML Ascii art into your source code as comments!\n\n"
+)
 
 PY_YUML_ABOUT_APPNAME = "PyYuml Gui"
 PY_YUML_APP_VERSION = 1.0
@@ -137,4 +138,3 @@ You cannot edit these diagrams, each import overwrites the previous.  You can ho
 You can zoom with CTRL-mousewheel.
 You can annotate with SHIFT right mouse button drawing.
 """
-

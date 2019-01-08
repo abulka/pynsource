@@ -1,4 +1,6 @@
 import copy
+
+
 def listdiff__(list1, list2):
     list1 = copy.copy(list1)
     list2 = copy.copy(list2)
@@ -17,16 +19,21 @@ def listdiff__(list1, list2):
     notfound.extend(list1)
     return notfound
 
+
 import collections
+
+
 def listdiff(list1, list2):
     """
     Difference between two lists, taking into account duplicates too
     """
     dups = []
+
     def finddups(lzt):
-        y=collections.Counter(lzt)
-        dups.extend([i for i in y if y[i]>1])
-    def realdiffs(a,b):
+        y = collections.Counter(lzt)
+        dups.extend([i for i in y if y[i] > 1])
+
+    def realdiffs(a, b):
         """
         Now lets say you wanted to know which elements in the two lists did not
         overlap at all between them. This is sometimes referred to as the
@@ -37,16 +44,19 @@ def listdiff(list1, list2):
         c = set(a).union(set(b))
         d = set(a).intersection(set(b))
         return list(c - d)
+
     finddups(list1)
     finddups(list2)
     realdiffs = realdiffs(list1, list2)
     realdiffs.extend(dups)
     return realdiffs
 
+
 def listdiff2(list1, list2):
     # UNfinished
     appearinboth = set(list1) & set(list2)
-    
+
+
 """
 a = ['One', 'Two', 'Three', 'Four']
 b = ['One', 'Two']
@@ -72,32 +82,53 @@ d = set(a).intersection(set(b))
 print list(c - d)
 """
 
-a = [1,2,3]
-b = [2,3,4]
+a = [1, 2, 3]
+b = [2, 3, 4]
 
-res = listdiff(a,b)
-print(res)
-assert res == [1,4]
-
-res = listdiff(b,a)
+res = listdiff(a, b)
 print(res)
 assert res == [1, 4]
 
-c = [3,4,5,6,7]
-res = listdiff(a,c)
+res = listdiff(b, a)
 print(res)
-assert res == [1,2,4,5,6,7]
+assert res == [1, 4]
 
-a = [1,2,3]
-b = [2,3,3,4]
-res = listdiff(a,b)
+c = [3, 4, 5, 6, 7]
+res = listdiff(a, c)
 print(res)
-assert res == [1,4,3], res
+assert res == [1, 2, 4, 5, 6, 7]
 
-a = ['MainApp', 'MainApp_Context', 'wx.App', 'wx.Appwx.lib.mixins.inspection.InspectionMixin', 'object', 'Log', 'UmlCanvas', 'App', 'ConfigObj']
-b = ['wx.App', 'MainApp', 'wx.Appwx.lib.mixins.inspection.InspectionMixin', 'MainApp', 'object', 'MainApp_Context', 'Log', 'UmlCanvas', 'App', 'ConfigObj']
-res = listdiff(a,b)
+a = [1, 2, 3]
+b = [2, 3, 3, 4]
+res = listdiff(a, b)
 print(res)
-assert res == ['MainApp']
+assert res == [1, 4, 3], res
 
-print('done')
+a = [
+    "MainApp",
+    "MainApp_Context",
+    "wx.App",
+    "wx.Appwx.lib.mixins.inspection.InspectionMixin",
+    "object",
+    "Log",
+    "UmlCanvas",
+    "App",
+    "ConfigObj",
+]
+b = [
+    "wx.App",
+    "MainApp",
+    "wx.Appwx.lib.mixins.inspection.InspectionMixin",
+    "MainApp",
+    "object",
+    "MainApp_Context",
+    "Log",
+    "UmlCanvas",
+    "App",
+    "ConfigObj",
+]
+res = listdiff(a, b)
+print(res)
+assert res == ["MainApp"]
+
+print("done")

@@ -1,19 +1,21 @@
 # Test submitted by Antonio
 
+
 class Vert:
     def __init__(self, co):
         self.prev = self
         self.next = self
 
+
 class Polygon:
-    def __init__(self, vlist = None):
+    def __init__(self, vlist=None):
         self.verts = []
         if vlist:
             for v in vlist:
                 self.appendVert(Vert(v))
 
     def appendVert(self, v):
-#        self.verts.append(v)
+        #        self.verts.append(v)
         self.verts.append(Vert())
 
 

@@ -1,8 +1,10 @@
 # Uml canvas
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
-    if ".." not in sys.path: sys.path.append("..")
+
+    if ".." not in sys.path:
+        sys.path.append("..")
 
 import random
 
@@ -32,6 +34,7 @@ from common.architecture_support import *
 ogl.Shape.Move2 = Move2
 
 from gui.repair_ogl import repairOGL
+
 repairOGL()
 
 # class DiagramAndy(ogl.Diagram):
@@ -184,8 +187,9 @@ repairOGL()
 
 # repairOGL()
 
+
 class UmlCanvas(ogl.ShapeCanvas):
-# class UmlCanvas(ShapeCanvasAndy):
+    # class UmlCanvas(ShapeCanvasAndy):
 
     def __init__(self, parent, log, frame):
         ogl.ShapeCanvas.__init__(self, parent)
@@ -195,7 +199,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         self.observers = multicast()
         self.app = None  # assigned later by app boot
-        
+
         self.log = log
         self.frame = frame
         self.SetBackgroundColour("LIGHT BLUE")
@@ -213,21 +217,24 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
 
         self.working = False
-        self._kill_layout = False   # flag to communicate with layout engine.  aborting keypress in gui should set this to true
+        self._kill_layout = (
+            False
+        )  # flag to communicate with layout engine.  aborting keypress in gui should set this to true
 
         @property
         def kill_layout(self):
-          return self._kill_layout
+            return self._kill_layout
+
         @kill_layout.setter
         def kill_layout(self, value):
-          self._kill_layout = value
+            self._kill_layout = value
 
     def InitSizeAndObjs(self):
         # Only call this once enclosing frame has been set up, so that get correct world coord dimensions
-        
+
         self.canvas_resizer = CanvasResizer(canvas=self)
-        
-        # Don't assert canvas size sanity anymore as wxpython3 (phoenix) doesn't set canvas size 
+
+        # Don't assert canvas size sanity anymore as wxpython3 (phoenix) doesn't set canvas size
         # as quickly as wxpython2.8 does, even though frame has been sized and shown
         # with frame.SetSize(WINDOW_SIZE) and frame.Show(True)
         # In wxpython3 (phoenix) canvas stays at (20,20) despite the frame increasing in size to (1024,768)
@@ -236,12 +243,18 @@ class UmlCanvas(ogl.ShapeCanvas):
         # assert not self.canvas_resizer.canvas_too_small(), "InitSizeAndObjs being called too early - please set up enclosing frame size first"
 
         self.displaymodel = DisplayModel()
-        self.layout = LayoutBasic(leftmargin=5, topmargin=5, verticalwhitespace=50, horizontalwhitespace=50, maxclassesperline=7)
+        self.layout = LayoutBasic(
+            leftmargin=5,
+            topmargin=5,
+            verticalwhitespace=50,
+            horizontalwhitespace=50,
+            maxclassesperline=7,
+        )
         self.snapshot_mgr = GraphSnapshotMgr(graph=self.displaymodel.graph, umlcanvas=self)
         self.coordmapper = CoordinateMapper(self.displaymodel.graph, self.GetSize())
         self.layouter = GraphLayoutSpring(self.displaymodel.graph, gui=self)
         self.overlap_remover = OverlapRemoval(self.displaymodel.graph, margin=50, gui=self)
-        
+
     def AllToLayoutCoords(self):
         self.coordmapper.AllToLayoutCoords()
 
@@ -271,7 +284,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         if keycode == wx.WXK_RIGHT:
             self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
-                
+
         elif keycode == wx.WXK_LEFT:
             self.app.run.CmdLayoutContract(remove_overlaps=not event.ShiftDown())
 
@@ -290,49 +303,54 @@ class UmlCanvas(ogl.ShapeCanvas):
             event.Skip()
             return
         self.working = True
-        
+
         keycode = chr(event.GetKeyCode())
 
-        if keycode in ['q', 'Q']:
+        if keycode in ["q", "Q"]:
             self.NewEdgeMarkFrom()
 
-        elif keycode in ['w', 'W']:
-            self.NewEdgeMarkTo(edge_type='composition')
+        elif keycode in ["w", "W"]:
+            self.NewEdgeMarkTo(edge_type="composition")
 
-        elif keycode in ['e', 'E']:
-            self.NewEdgeMarkTo(edge_type='generalisation')
-            
-        elif keycode in ['1','2','3','4','5','6','7','8']:
-            todisplay = ord(keycode) - ord('1')
+        elif keycode in ["e", "E"]:
+            self.NewEdgeMarkTo(edge_type="generalisation")
+
+        elif keycode in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+            todisplay = ord(keycode) - ord("1")
             self.snapshot_mgr.Restore(todisplay)
 
-        elif keycode == 'P':
+        elif keycode == "P":
             self.Refresh()
 
-        elif keycode in ['d', 'D']:
+        elif keycode in ["d", "D"]:
             self.app.run.CmdDumpUmlWorkspace()
 
-        elif keycode == 's':
+        elif keycode == "s":
             self.CmdTrimScrollbars()
 
-        elif keycode == 'G': # and event.ShiftDown() and event.ControlDown():
+        elif keycode == "G":  # and event.ShiftDown() and event.ControlDown():
             self.app.run.CmdBuildColourChartWorkspace()
 
-        elif keycode in ['h', 'H']:
-            self.app.run.CmdColourSequential(color_range_offset=(keycode == 'H'))
+        elif keycode in ["h", "H"]:
+            self.app.run.CmdColourSequential(color_range_offset=(keycode == "H"))
 
         self.working = False
         event.Skip()
 
     def CmdTrimScrollbars(self):
-        self.canvas_resizer.resize_virtual_canvas_tofit_bounds(shrinkage_leeway=0, bounds_dirty=True)
-        
+        self.canvas_resizer.resize_virtual_canvas_tofit_bounds(
+            shrinkage_leeway=0, bounds_dirty=True
+        )
+
     def CmdRememberLayout1(self):
         self.snapshot_mgr.QuickSave(slot=1)
+
     def CmdRememberLayout2(self):
         self.snapshot_mgr.QuickSave(slot=2)
+
     def CmdRestoreLayout1(self):
         self.snapshot_mgr.QuickRestore(slot=1)
+
     def CmdRestoreLayout2(self):
         self.snapshot_mgr.QuickRestore(slot=2)
 
@@ -343,17 +361,19 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
-        shape.Select(True, dc)  # could pass None as dc if you don't want to trigger the OnDrawControlPoints(dc) handler immediately - e.g. if you want to do a complete redraw of everything later anyway
-        
+        shape.Select(
+            True, dc
+        )  # could pass None as dc if you don't want to trigger the OnDrawControlPoints(dc) handler immediately - e.g. if you want to do a complete redraw of everything later anyway
+
         # change colour when select
-        #shape.SetBrush(wx.WHITE_BRUSH) #wx.Brush("WHEAT", wx.SOLID))
-        #canvas.Refresh(False) # works
-        #canvas.Redraw(dc) # works too
-        #shape.Draw(dc) # works too, most efficient
-        
-        #canvas.Refresh(False)   # t/f or don't use - doesn't seem to make a difference
-        
-        #self.UpdateStatusBar(shape)  # only available in the shape evt handler (this method used to live there...)
+        # shape.SetBrush(wx.WHITE_BRUSH) #wx.Brush("WHEAT", wx.SOLID))
+        # canvas.Refresh(False) # works
+        # canvas.Redraw(dc) # works too
+        # shape.Draw(dc) # works too, most efficient
+
+        # canvas.Refresh(False)   # t/f or don't use - doesn't seem to make a difference
+
+        # self.UpdateStatusBar(shape)  # only available in the shape evt handler (this method used to live there...)
 
     def delete_shape_view(self, shape):
         # View
@@ -367,154 +387,174 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.GetDiagram().DeleteAllShapes()
 
         dc = wx.ClientDC(self)
-        self.GetDiagram().Clear(dc)   # Clears screen - don't prepare the dc or it will only clear the top scrolled bit (see my mailing list discussion)
+        self.GetDiagram().Clear(
+            dc
+        )  # Clears screen - don't prepare the dc or it will only clear the top scrolled bit (see my mailing list discussion)
 
         self.displaymodel.Clear()
 
-        if "wxMac" in wx.PlatformInfo:      # Hack on Mac so that onKeyChar bindings take hold properly. 
+        if "wxMac" in wx.PlatformInfo:  # Hack on Mac so that onKeyChar bindings take hold properly.
             wx.CallAfter(self.SetFocus)
-        elif 'wxGTK' in wx.PlatformInfo:    # Hack on Linux so that onKeyChar bindings take hold properly. 
+        elif (
+            "wxGTK" in wx.PlatformInfo
+        ):  # Hack on Linux so that onKeyChar bindings take hold properly.
             wx.CallLater(1500, self.app.context.wxapp.multiText.SetFocus)
             wx.CallLater(1500, self.SetFocus)
-            
+
     def NewEdgeMarkFrom(self):
         selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
         if not selected:
             print("Please select a node")
             return
-        
+
         self.new_edge_from = selected[0].node
         print("From", self.new_edge_from.id)
 
-    def NewEdgeMarkTo(self, edge_type='composition'):
+    def NewEdgeMarkTo(self, edge_type="composition"):
         selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
         if not selected:
             print("Please select a node")
             return
-        
+
         tonode = selected[0].node
         print("To", tonode.id)
-        
+
         if self.new_edge_from == None:
             print("Please set from node first")
             return
-        
+
         if self.new_edge_from.id == tonode.id:
             print("Can't link to self")
             return
-        
+
         if not self.displaymodel.graph.FindNodeById(self.new_edge_from.id):
             print("From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id)
             return
-        
-        edge = self.displaymodel.graph.AddEdge(tonode, self.new_edge_from, weight=None) # swap direction as is a directional composition.
+
+        edge = self.displaymodel.graph.AddEdge(
+            tonode, self.new_edge_from, weight=None
+        )  # swap direction as is a directional composition.
         # TODO should also arguably add to umlworkspace's associations_composition or associations_generalisation list (or create a new one for unlabelled associations like the one we are creating here)
-        #edge['uml_edge_type'] = ''
-        edge['uml_edge_type'] = edge_type
+        # edge['uml_edge_type'] = ''
+        edge["uml_edge_type"] = edge_type
         self.CreateUmlEdge(edge)
         self.mega_refresh()
-              
+
     def CreateImageShape(self, F):
-        #shape = ogl.BitmapShape()
+        # shape = ogl.BitmapShape()
         shape = BitmapShapeResizable()
         img = wx.Image(F, wx.BITMAP_TYPE_ANY)
-        
-        #adjusted_img = img.AdjustChannels(factor_red = 1., factor_green = 1., factor_blue = 1., factor_alpha = 0.5)
-        #adjusted_img = img.Rescale(10,10)
+
+        # adjusted_img = img.AdjustChannels(factor_red = 1., factor_green = 1., factor_blue = 1., factor_alpha = 0.5)
+        # adjusted_img = img.Rescale(10,10)
         adjusted_img = img
-        
+
         bmp = wx.BitmapFromImage(adjusted_img)
         shape.SetBitmap(bmp)
 
         self.GetDiagram().AddShape(shape)
         shape.Show(True)
 
-        evthandler = UmlShapeHandler(self.log, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
+        evthandler = UmlShapeHandler(
+            self.log, self.frame, self
+        )  # just init the handler with whatever will be convenient for it to know.
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
         self.new_evthandler_housekeeping(evthandler)
 
         setpos(shape, 0, 0)
-        #setpos(shape, node.left, node.top)
-        #node.width, node.height = shape.GetBoundingBoxMax()
-        #node.shape = shape
-        #shape.node = node
+        # setpos(shape, node.left, node.top)
+        # node.width, node.height = shape.GetBoundingBoxMax()
+        # node.shape = shape
+        # shape.node = node
         return shape
-        
-    def CreateUmlShape(self, node):
 
-        def newRegion(font, name, textLst, maxWidth, totHeight = 10):
+    def CreateUmlShape(self, node):
+        def newRegion(font, name, textLst, maxWidth, totHeight=10):
             # Taken from Boa, but put into the canvas class instead of the scrolled window class.
             region = ogl.ShapeRegion()
-            
+
             if len(textLst) == 0:
                 return region, maxWidth, 0
-                
+
             dc = wx.ClientDC(self)  # self is the canvas
             dc.SetFont(font)
-    
+
             for text in textLst:
                 w, h = dc.GetTextExtent(text)
-                if w > maxWidth: maxWidth = w
-                totHeight = totHeight + h + 0 # interline padding
-    
+                if w > maxWidth:
+                    maxWidth = w
+                totHeight = totHeight + h + 0  # interline padding
+
             region.SetFont(font)
-            region.SetText('\n'.join(textLst))
+            region.SetText("\n".join(textLst))
             region.SetName(name)
-    
+
             return region, maxWidth, totHeight
 
         shape = DividedShape(width=99, height=98, canvas=self)
-        maxWidth = 10 # min node width, grows as we update it with text widths
-        
+        maxWidth = 10  # min node width, grows as we update it with text widths
+
         """
         Future: Perhaps be able to show regions or not. Might need to totally
         reconstruct the shape.
         """
-        #if not self.showAttributes: classAttrs = [' ']
-        #if not self.showMethods: classMeths = [' ']
+        # if not self.showAttributes: classAttrs = [' ']
+        # if not self.showMethods: classMeths = [' ']
 
         # Create each region.  If height returned is 0 this means don't create this region.
-        regionName, maxWidth, nameHeight = newRegion(self.font1, 'class_name', [node.classname], maxWidth)
-        regionAttribs, maxWidth, attribsHeight = newRegion(self.font2, 'attributes', node.attrs, maxWidth)
-        regionMeths, maxWidth, methsHeight = newRegion(self.font2, 'methods', node.meths, maxWidth)
+        regionName, maxWidth, nameHeight = newRegion(
+            self.font1, "class_name", [node.classname], maxWidth
+        )
+        regionAttribs, maxWidth, attribsHeight = newRegion(
+            self.font2, "attributes", node.attrs, maxWidth
+        )
+        regionMeths, maxWidth, methsHeight = newRegion(self.font2, "methods", node.meths, maxWidth)
 
         # Work out total height of shape
         totHeight = nameHeight + attribsHeight + methsHeight
 
         # Set regions to be a proportion of the total height of shape
-        regionName.SetProportions(0.0, 1.0*(nameHeight/float(totHeight)))
-        regionAttribs.SetProportions(0.0, 1.0*(attribsHeight/float(totHeight)))
-        regionMeths.SetProportions(0.0, 1.0*(methsHeight/float(totHeight)))
+        regionName.SetProportions(0.0, 1.0 * (nameHeight / float(totHeight)))
+        regionAttribs.SetProportions(0.0, 1.0 * (attribsHeight / float(totHeight)))
+        regionMeths.SetProportions(0.0, 1.0 * (methsHeight / float(totHeight)))
 
         # Add regions to the shape
         shape.AddRegion(regionName)
-        if attribsHeight:   # Dont' make a region unless we have to
+        if attribsHeight:  # Dont' make a region unless we have to
             shape.AddRegion(regionAttribs)
-        if methsHeight:     # Dont' make a region unless we have to
+        if methsHeight:  # Dont' make a region unless we have to
             shape.AddRegion(regionMeths)
 
         shape.SetSize(maxWidth + 10, totHeight + 10)
-        shape.SetCentreResize(False)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
+        shape.SetCentreResize(
+            False
+        )  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
 
         regionName.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
-        shape.region1 = regionName  # Andy added, for later external reference to classname from just having the shape instance.
-        
+        shape.region1 = (
+            regionName
+        )  # Andy added, for later external reference to classname from just having the shape instance.
+
         shape.SetDraggable(True, True)
         shape.SetCanvas(self)
-        shape.SetPen(wx.BLACK_PEN)   # Controls the color of the border of the shape
+        shape.SetPen(wx.BLACK_PEN)  # Controls the color of the border of the shape
         shape.SetBrush(wx.Brush("WHEAT", wx.SOLID))
         setpos(shape, node.left, node.top)
-        self.GetDiagram().AddShape(shape) # self.AddShape is ok too, ShapeCanvas's AddShape is delegated back to Diagram's AddShape.  ShapeCanvas-->Diagram
+        self.GetDiagram().AddShape(
+            shape
+        )  # self.AddShape is ok too, ShapeCanvas's AddShape is delegated back to Diagram's AddShape.  ShapeCanvas-->Diagram
         shape.Show(True)
 
-        evthandler = UmlShapeHandler(self.log, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
+        evthandler = UmlShapeHandler(
+            self.log, self.frame, self
+        )  # just init the handler with whatever will be convenient for it to know.
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
         self.new_evthandler_housekeeping(evthandler)
-        
+
         shape.FlushText()
 
         # Don't set the node left,top here as the shape needs to conform to the node.
@@ -522,22 +562,26 @@ class UmlCanvas(ogl.ShapeCanvas):
         # ACTUALLY I now do set the pos of the shape, see above,
         # just before the AddShape() call.
         #
-        node.width, node.height = shape.GetBoundingBoxMax()  # TODO: Shouldn't this be in node coords not world coords?
+        node.width, node.height = (
+            shape.GetBoundingBoxMax()
+        )  # TODO: Shouldn't this be in node coords not world coords?
         node.shape = shape
         shape.node = node
         return shape
 
-    def createNodeShape(self, node):     # FROM SPRING LAYOUT
-        shape = ogl.RectangleShape( node.width, node.height )
+    def createNodeShape(self, node):  # FROM SPRING LAYOUT
+        shape = ogl.RectangleShape(node.width, node.height)
         shape.AddText(node.id)
         setpos(shape, node.left, node.top)
-        #shape.SetDraggable(True, True)
-        self.AddShape( shape )
+        # shape.SetDraggable(True, True)
+        self.AddShape(shape)
         node.shape = shape
         shape.node = node
-        
+
         # wire in the event handler for the new shape
-        evthandler = UmlShapeHandler(None, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
+        evthandler = UmlShapeHandler(
+            None, self.frame, self
+        )  # just init the handler with whatever will be convenient for it to know.
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
@@ -545,8 +589,10 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def createCommentShape(self, node):
         # shape = ogl.TextShape( node.width, node.height )
-        shape = CommentShape( node.width, node.height )
-        shape.SetCentreResize(False)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
+        shape = CommentShape(node.width, node.height)
+        shape.SetCentreResize(
+            False
+        )  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
         shape.GetRegions()[0].SetFormatMode(ogl.FORMAT_NONE)  # left justify
         shape.SetCanvas(self)
         shape.SetPen(wx.BLACK_PEN)
@@ -554,18 +600,20 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.SetBrush(wx.YELLOW_BRUSH)
         font2 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         shape.SetFont(font2)
-        for line in node.comment.split('\n'):
+        for line in node.comment.split("\n"):
             shape.AddText(line)
-        
+
         setpos(shape, node.left, node.top)
-        shape.SetSize(200,90)
-        #shape.SetDraggable(True, True)
-        self.AddShape( shape )
+        shape.SetSize(200, 90)
+        # shape.SetDraggable(True, True)
+        self.AddShape(shape)
         node.shape = shape
         shape.node = node
-        
+
         # wire in the event handler for the new shape
-        evthandler = UmlShapeHandler(None, self.frame, self)  # just init the handler with whatever will be convenient for it to know.
+        evthandler = UmlShapeHandler(
+            None, self.frame, self
+        )  # just init the handler with whatever will be convenient for it to know.
         evthandler.SetShape(shape)
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
@@ -578,8 +626,8 @@ class UmlCanvas(ogl.ShapeCanvas):
         # Or could have just done:
         #   evthandler.app = self.app
         # here.  But we may need observer for other things later.
-        self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler) 
-        
+        self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler)
+
     def CreateUmlEdge(self, edge):
         """
         @startuml
@@ -621,13 +669,13 @@ class UmlCanvas(ogl.ShapeCanvas):
         """
         from gui.uml_lines import LineShapeCustom, ARROW_UML_GENERALISATION, ARROW_UML_COMPOSITION
 
-        fromShape = edge['source'].shape
-        toShape = edge['target'].shape
-        
-        edge_label = edge.get('uml_edge_type', '')
-        if edge_label == 'generalisation':
+        fromShape = edge["source"].shape
+        toShape = edge["target"].shape
+
+        edge_label = edge.get("uml_edge_type", "")
+        if edge_label == "generalisation":
             arrowtype = ARROW_UML_GENERALISATION  # used to be ogl.ARROW_ARROW
-        elif edge_label == 'composition':
+        elif edge_label == "composition":
             arrowtype = ARROW_UML_COMPOSITION  # used to be ogl.ARROW_FILLED_CIRCLE
         else:
             arrowtype = None
@@ -646,8 +694,9 @@ class UmlCanvas(ogl.ShapeCanvas):
         line.Show(True)
 
     def OnWheelZoom(self, event):
-        #print "OnWheelZoom"
-        if self.working: return
+        # print "OnWheelZoom"
+        if self.working:
+            return
         self.working = True
 
         SCROLL_AMOUNT = 40
@@ -655,9 +704,9 @@ class UmlCanvas(ogl.ShapeCanvas):
             oldscrollx = self.GetScrollPos(wx.HORIZONTAL)
             oldscrolly = self.GetScrollPos(wx.VERTICAL)
             if event.GetWheelRotation() < 0:
-                self.Scroll(oldscrollx, oldscrolly+SCROLL_AMOUNT)
+                self.Scroll(oldscrollx, oldscrolly + SCROLL_AMOUNT)
             else:
-                self.Scroll(oldscrollx, max(0, oldscrolly-SCROLL_AMOUNT))
+                self.Scroll(oldscrollx, max(0, oldscrolly - SCROLL_AMOUNT))
         else:
             if event.GetWheelRotation() < 0:
                 self.app.run.CmdLayoutContract(remove_overlaps=not event.ShiftDown())
@@ -666,7 +715,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         self.working = False
 
-    # UTILITY - called by CmdFileImportSource, CmdFileLoadWorkspaceBase.LoadGraph   
+    # UTILITY - called by CmdFileImportSource, CmdFileLoadWorkspaceBase.LoadGraph
     def build_view(self, translatecoords=True):
         if translatecoords:
             self.AllToWorldCoords()
@@ -681,20 +730,21 @@ class UmlCanvas(ogl.ShapeCanvas):
         for node in self.displaymodel.graph.nodes:
             assert not node.shape
             shape = self.CreateUmlShape(node)
-            self.displaymodel.classnametoshape[node.id] = shape  # Record the name to shape map so that we can wire up the links later.
-            
+            self.displaymodel.classnametoshape[
+                node.id
+            ] = shape  # Record the name to shape map so that we can wire up the links later.
+
         for edge in self.displaymodel.graph.edges:
             self.CreateUmlEdge(edge)
 
-
     # UTILITY - called by
     #
-    #CmdInsertUmlClass, CmdInsertImage, CmdLayoutExpandContractBase,
-    #umlcanvas.OnWheelZoom_OverlapRemoval_Defunct,
-    #umlcanvas.layout_and_position_shapes,
-    #UmlShapeHandler.OnEndDragLeft
-    #UmlShapeHandler.OnSizingEndDragLeft
-    #LayoutBlackboard.LayoutLoopTillNoChange
+    # CmdInsertUmlClass, CmdInsertImage, CmdLayoutExpandContractBase,
+    # umlcanvas.OnWheelZoom_OverlapRemoval_Defunct,
+    # umlcanvas.layout_and_position_shapes,
+    # UmlShapeHandler.OnEndDragLeft
+    # UmlShapeHandler.OnSizingEndDragLeft
+    # LayoutBlackboard.LayoutLoopTillNoChange
     #
     def remove_overlaps(self, watch_removals=True):
         """
@@ -702,29 +752,29 @@ class UmlCanvas(ogl.ShapeCanvas):
         redraw the screen
         """
         self.overlap_remover.RemoveOverlaps(watch_removals=watch_removals)
-        return self.overlap_remover.GetStats()['total_overlaps_found'] > 0
-   
+        return self.overlap_remover.GetStats()["total_overlaps_found"] > 0
+
     # UTILITY - called by everyone!!??
     #
-    #CmdFileLoadWorkspaceBase, CmdInsertComment, CmdEditUmlClass
-    #CmdLayoutExpandContractBase, 
-    #CmdInsertUmlClass
-    #umlcanvas.NewEdgeMarkTo
-    #umlcanvas.OnWheelZoom_OverlapRemoval_Defunct
-    #LayoutBlackboard.LayoutThenPickBestScale
-    #LayoutBlackboard.Experiment1
-    #LayoutBlackboard.LayoutLoopTillNoChange
-    #LayoutBlackboard.ScaleUpMadly
-    #LayoutBlackboard.GetVitalStats  (only if animate is true)
-    #OverlapRemoval.RemoveOverlaps   ( refresh gui if self.gui and watch_removals)
-    #GraphSnapshotMgr.RestoreGraph
+    # CmdFileLoadWorkspaceBase, CmdInsertComment, CmdEditUmlClass
+    # CmdLayoutExpandContractBase,
+    # CmdInsertUmlClass
+    # umlcanvas.NewEdgeMarkTo
+    # umlcanvas.OnWheelZoom_OverlapRemoval_Defunct
+    # LayoutBlackboard.LayoutThenPickBestScale
+    # LayoutBlackboard.Experiment1
+    # LayoutBlackboard.LayoutLoopTillNoChange
+    # LayoutBlackboard.ScaleUpMadly
+    # LayoutBlackboard.GetVitalStats  (only if animate is true)
+    # OverlapRemoval.RemoveOverlaps   ( refresh gui if self.gui and watch_removals)
+    # GraphSnapshotMgr.RestoreGraph
     #
     # these do an overlap removal first before calling here
     #
-    #CmdInsertImage
-    #umlcanvas.layout_and_position_shapes,
-    #UmlShapeHandler.OnEndDragLeft
-    #UmlShapeHandler.OnSizingEndDragLeft
+    # CmdInsertImage
+    # umlcanvas.layout_and_position_shapes,
+    # UmlShapeHandler.OnEndDragLeft
+    # UmlShapeHandler.OnSizingEndDragLeft
     #
     # recalibrate = True - called by core spring layout self.gui.mega_refresh()
     #
@@ -732,7 +782,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         if recalibrate:  # was stateofthespring
             self.coordmapper.Recalibrate()
             self.AllToWorldCoords()
-            
+
         dc = wx.ClientDC(self)
         self.PrepareDC(dc)
 
@@ -740,8 +790,8 @@ class UmlCanvas(ogl.ShapeCanvas):
             node.shape.Move2(dc, node.left, node.top, display=False)
         self.Refresh()
 
-        self.Update() # or wx.SafeYield()  # Without this the nodes don't paint during a "L" layout (edges do!?)
-                      # You need to be yielding or updating on a regular basis, so that when your OS/window manager sends repaint messages to your app, it can handle them. See http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh
+        self.Update()  # or wx.SafeYield()  # Without this the nodes don't paint during a "L" layout (edges do!?)
+        # You need to be yielding or updating on a regular basis, so that when your OS/window manager sends repaint messages to your app, it can handle them. See http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh
         if auto_resize_canvas:
             self.canvas_resizer.resize_virtual_canvas_tofit_bounds(bounds_dirty=True)
 
@@ -750,13 +800,15 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     # UTILITY - used by CmdLayout and CmdFileImportBase
     def layout_and_position_shapes(self):
-        self.canvas_resizer.frame_calibration(auto_resize_virtualcanvas=False)  # going to do a mega_refresh later so no point changing virt canvas now
+        self.canvas_resizer.frame_calibration(
+            auto_resize_virtualcanvas=False
+        )  # going to do a mega_refresh later so no point changing virt canvas now
         self.AllToLayoutCoords()
         self.layouter.layout(keep_current_positions=False, optimise=True)
         self.AllToWorldCoords()
         if self.remove_overlaps():
             self.mega_refresh()
-       
+
     def get_umlboxshapes(self):
         """
         Return list of all uml classes and comment shapes
@@ -765,12 +817,16 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         Returns: list of all shapes
         """
-        #return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
+        # return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
         # return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]
-        return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape) or isinstance(s, CommentShape) ]
+        return [
+            s
+            for s in self.GetDiagram().GetShapeList()
+            if isinstance(s, DividedShape) or isinstance(s, CommentShape)
+        ]
 
     umlboxshapes = property(get_umlboxshapes)
-    
+
     def OnDestroy(self, evt):
         for shape in self.GetDiagram().GetShapeList():
             if shape.GetParent() == None:

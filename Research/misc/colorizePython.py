@@ -12,17 +12,17 @@ import keyword, token, tokenize
 #############################################################################
 
 _KEYWORD = token.NT_OFFSET + 1
-_TEXT    = token.NT_OFFSET + 2
+_TEXT = token.NT_OFFSET + 2
 
 _colors = {
-    token.NUMBER:       '#0080C0',
-    token.OP:           '#0000C0',
-    token.STRING:       '#004080',
-    tokenize.COMMENT:   '#008000',
-    token.NAME:         '#000000',
-    token.ERRORTOKEN:   '#FF8080',
-    _KEYWORD:           '#C00000',
-    _TEXT:              '#000000',
+    token.NUMBER: "#0080C0",
+    token.OP: "#0000C0",
+    token.STRING: "#004080",
+    tokenize.COMMENT: "#008000",
+    token.NAME: "#000000",
+    token.ERRORTOKEN: "#FF8080",
+    _KEYWORD: "#C00000",
+    _TEXT: "#000000",
 }
 
 
@@ -30,7 +30,7 @@ class Parser:
     """ Send colored python source.
     """
 
-    def __init__(self, raw, out = sys.stdout):
+    def __init__(self, raw, out=sys.stdout):
         """ Store the source text.
         """
         self.raw = string.strip(string.expandtabs(raw))
@@ -43,8 +43,9 @@ class Parser:
         self.lines = [0, 0]
         pos = 0
         while 1:
-            pos = string.find(self.raw, '\n', pos) + 1
-            if not pos: break
+            pos = string.find(self.raw, "\n", pos) + 1
+            if not pos:
+                break
             self.lines.append(pos)
         self.lines.append(len(self.raw))
 
@@ -57,18 +58,17 @@ class Parser:
         except tokenize.TokenError as ex:
             msg = ex[0]
             line = ex[1][0]
-            self.out.write("<h3>ERROR: %s</h3>%s\n" % (
-                msg, self.raw[self.lines[line]:]))
-        self.out.write('</font></pre>')
+            self.out.write("<h3>ERROR: %s</h3>%s\n" % (msg, self.raw[self.lines[line] :]))
+        self.out.write("</font></pre>")
 
     def __call__(self, toktype, toktext, xxx_todo_changeme, xxx_todo_changeme1, line):
         """ Token handler.
         """
-        (srow,scol) = xxx_todo_changeme
-        (erow,ecol) = xxx_todo_changeme1
+        (srow, scol) = xxx_todo_changeme
+        (erow, ecol) = xxx_todo_changeme1
         if 0:
-            print("type", toktype, token.tok_name[toktype], "text", toktext, end=' ')
-            print("start", srow,scol, "end", erow,ecol, "<br>")
+            print("type", toktype, token.tok_name[toktype], "text", toktext, end=" ")
+            print("start", srow, scol, "end", erow, ecol, "<br>")
 
         # calculate new positions
         oldpos = self.pos
@@ -77,7 +77,7 @@ class Parser:
 
         # handle newlines
         if toktype in [token.NEWLINE, tokenize.NL]:
-            self.out.write('\n')
+            self.out.write("\n")
             return
 
         # send the original whitespace, if needed
@@ -96,32 +96,33 @@ class Parser:
             toktype = _KEYWORD
         color = _colors.get(toktype, _colors[_TEXT])
 
-        style = ''
+        style = ""
         if toktype == token.ERRORTOKEN:
             style = ' style="border: solid 1.5pt #FF0000;"'
 
         # send text
         self.out.write('<font color="%s"%s>' % (color, style))
         self.out.write(cgi.escape(toktext))
-        self.out.write('</font>')
+        self.out.write("</font>")
 
 
 if __name__ == "__main__":
     import os, sys
-    FILENAME = 'colorizePython'
-    FILENAME_PY = FILENAME+'.py'
-    FILENAME_HTML = FILENAME+'.html'
-    
+
+    FILENAME = "colorizePython"
+    FILENAME_PY = FILENAME + ".py"
+    FILENAME_HTML = FILENAME + ".html"
+
     print("Formatting...")
 
     # open own source
     source = open(FILENAME_PY).read()
 
     # write colorized version to "python.html"
-    Parser(source, open(FILENAME_HTML, 'wt')).format(None, None)
+    Parser(source, open(FILENAME_HTML, "wt")).format(None, None)
 
     # load HTML page into browser
     if os.name == "nt":
         os.system("explorer " + FILENAME_HTML)
     else:
-        os.system("netscape " +  + FILENAME_HTML + " &")
+        os.system("netscape " + +FILENAME_HTML + " &")

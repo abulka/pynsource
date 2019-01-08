@@ -17,12 +17,13 @@ import wx
 from wx.lib.floatcanvas import NavCanvas, FloatCanvas
 
 ## import a local version
-#import sys
-#sys.path.append("..")
-#from floatcanvas import NavCanvas, FloatCanvas
+# import sys
+# sys.path.append("..")
+# from floatcanvas import NavCanvas, FloatCanvas
 
 
 import numpy as N
+
 
 def YScaleFun(center):
     """
@@ -31,6 +32,7 @@ def YScaleFun(center):
     """
     # center gets ignored in this case
     return N.array((5e7, 1), N.float)
+
 
 class DrawFrame(wx.Frame):
 
@@ -45,33 +47,30 @@ class DrawFrame(wx.Frame):
         self.CreateStatusBar()
 
         # Add the Canvas
-        Canvas = NavCanvas.NavCanvas(self,-1,
-                                     size = (500,500),
-                                     ProjectionFun = YScaleFun,
-                                     Debug = 0,
-                                     BackgroundColor = "DARK SLATE BLUE",
-                                     ).Canvas
-      
+        Canvas = NavCanvas.NavCanvas(
+            self,
+            -1,
+            size=(500, 500),
+            ProjectionFun=YScaleFun,
+            Debug=0,
+            BackgroundColor="DARK SLATE BLUE",
+        ).Canvas
+
         self.Canvas = Canvas
-        
+
         Point = N.array((50e-6, 0))
-        Size = N.array(( (2000e-6 - 5e-6), 50000))
-        Box = Canvas.AddRectangle(Point,
-                                  Size,
-                                  FillColor = "blue"
-                                  )
+        Size = N.array(((2000e-6 - 5e-6), 50000))
+        Box = Canvas.AddRectangle(Point, Size, FillColor="blue")
 
-        Canvas.AddText("%s"%(Point,), Point, Position="cr")
-        Canvas.AddPoint(Point, Diameter=3, Color = "red")
+        Canvas.AddText("%s" % (Point,), Point, Position="cr")
+        Canvas.AddPoint(Point, Diameter=3, Color="red")
 
-        
         Point = Point + Size
-        Canvas.AddText("%s"%(Point,), Point, Position="cl")
-        Canvas.AddPoint(Point, Diameter=3, Color = "red")
-        
-        FloatCanvas.EVT_MOTION(self.Canvas, self.OnMove ) 
+        Canvas.AddText("%s" % (Point,), Point, Position="cl")
+        Canvas.AddPoint(Point, Diameter=3, Color="red")
 
-        
+        FloatCanvas.EVT_MOTION(self.Canvas, self.OnMove)
+
         self.Show()
         Canvas.ZoomToBB()
 
@@ -79,22 +78,9 @@ class DrawFrame(wx.Frame):
         """
         Updates the status bar with the world coordinates
         """
-        self.SetStatusText("%.2g, %.2g"%tuple(event.Coords))
+        self.SetStatusText("%.2g, %.2g" % tuple(event.Coords))
 
 
 app = wx.App(False)
-F = DrawFrame(None, title="FloatCanvas Demo App", size=(700,700) )
+F = DrawFrame(None, title="FloatCanvas Demo App", size=(700, 700))
 app.MainLoop()
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-

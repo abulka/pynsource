@@ -3,14 +3,15 @@
 import wx
 
 ## import local version:
-#import sys
-#sys.path.append("../")
-#from floatcanvas import NavCanvas, FloatCanvas
+# import sys
+# sys.path.append("../")
+# from floatcanvas import NavCanvas, FloatCanvas
 
 ## import installed version
 from wx.lib.floatcanvas import NavCanvas, FloatCanvas
 
 import wx.lib.colourdb
+
 
 class DrawFrame(wx.Frame):
 
@@ -27,31 +28,32 @@ class DrawFrame(wx.Frame):
         MenuBar = wx.MenuBar()
 
         file_menu = wx.Menu()
-        item = file_menu.Append(wx.ID_ANY, "&Close","Close this frame")
+        item = file_menu.Append(wx.ID_ANY, "&Close", "Close this frame")
         self.Bind(wx.EVT_MENU, self.OnQuit, item)
         MenuBar.Append(file_menu, "&File")
 
         draw_menu = wx.Menu()
 
-        item = draw_menu.Append(wx.ID_ANY, "&Draw Test","Run a test of drawing random components")
-        self.Bind(wx.EVT_MENU,self.DrawTest, item)
+        item = draw_menu.Append(wx.ID_ANY, "&Draw Test", "Run a test of drawing random components")
+        self.Bind(wx.EVT_MENU, self.DrawTest, item)
 
-        item = draw_menu.Append(wx.ID_ANY, "&Move Test","Run a test of moving stuff in the background")
+        item = draw_menu.Append(
+            wx.ID_ANY, "&Move Test", "Run a test of moving stuff in the background"
+        )
         self.Bind(wx.EVT_MENU, self.MoveTest, item)
 
-        item = draw_menu.Append(wx.ID_ANY, "&Clear","Clear the Canvas")
-        self.Bind(wx.EVT_MENU,self.Clear, item)
+        item = draw_menu.Append(wx.ID_ANY, "&Clear", "Clear the Canvas")
+        self.Bind(wx.EVT_MENU, self.Clear, item)
 
         MenuBar.Append(draw_menu, "&Draw")
 
         view_menu = wx.Menu()
-        item = view_menu.Append(wx.ID_ANY, "Zoom to &Fit","Zoom to fit the window")
-        self.Bind(wx.EVT_MENU,self.ZoomToFit, item)
+        item = view_menu.Append(wx.ID_ANY, "Zoom to &Fit", "Zoom to fit the window")
+        self.Bind(wx.EVT_MENU, self.ZoomToFit, item)
         MenuBar.Append(view_menu, "&View")
 
         help_menu = wx.Menu()
-        item = help_menu.Append(wx.ID_ANY, "&About",
-                                "More information About this program")
+        item = help_menu.Append(wx.ID_ANY, "&About", "More information About this program")
         self.Bind(wx.EVT_MENU, self.OnAbout, item)
         MenuBar.Append(help_menu, "&Help")
 
@@ -63,15 +65,11 @@ class DrawFrame(wx.Frame):
         wx.EVT_CLOSE(self, self.OnCloseWindow)
 
         # Add the Canvas
-        self.Canvas = NavCanvas.NavCanvas(self,
-                                          ProjectionFun = None,
-                                          Debug = 0,
-                                          BackgroundColor = "DARK SLATE BLUE",
-                                          ).Canvas
+        self.Canvas = NavCanvas.NavCanvas(
+            self, ProjectionFun=None, Debug=0, BackgroundColor="DARK SLATE BLUE"
+        ).Canvas
 
-        
         self.Show(True)
-
 
         # get a list of colors for random colors
         wx.lib.colourdb.updateColourDB()
@@ -82,30 +80,34 @@ class DrawFrame(wx.Frame):
         return None
 
     def OnAbout(self, event):
-        dlg = wx.MessageDialog(self, "This is a small program to demonstrate\n"
-                                                  "the use of the FloatCanvas\n",
-                                                  "About Me", wx.OK | wx.ICON_INFORMATION)
+        dlg = wx.MessageDialog(
+            self,
+            "This is a small program to demonstrate\n" "the use of the FloatCanvas\n",
+            "About Me",
+            wx.OK | wx.ICON_INFORMATION,
+        )
         dlg.ShowModal()
         dlg.Destroy()
 
-    def ZoomToFit(self,event):
+    def ZoomToFit(self, event):
         self.Canvas.ZoomToBB()
 
-    def Clear(self,event = None):
+    def Clear(self, event=None):
         self.Canvas.ClearAll()
         self.Canvas.Draw()
 
-    def OnQuit(self,event):
+    def OnQuit(self, event):
         self.Close(True)
 
     def OnCloseWindow(self, event):
         self.Destroy()
 
-    def DrawTest(self,event):
+    def DrawTest(self, event):
         wx.GetApp().Yield()
         import random
         import numpy.random as RandomArray
-        Range = (-10,10)
+
+        Range = (-10, 10)
 
         Canvas = self.Canvas
         Canvas.ClearAll()
@@ -118,71 +120,65 @@ class DrawFrame(wx.Frame):
 
         # Rectangles
         for i in range(5):
-            xy = (random.uniform(Range[0],Range[1]),random.uniform(Range[0],Range[1]))
-            lw = random.randint(1,5)
-            cf = random.randint(0,len(self.colors)-1)
-            h = random.randint(1,5)
-            w = random.randint(1,5)
-            Canvas.AddRectangle(xy, (h,w),
-                                LineWidth = lw,
-                                FillColor = self.colors[cf])
+            xy = (random.uniform(Range[0], Range[1]), random.uniform(Range[0], Range[1]))
+            lw = random.randint(1, 5)
+            cf = random.randint(0, len(self.colors) - 1)
+            h = random.randint(1, 5)
+            w = random.randint(1, 5)
+            Canvas.AddRectangle(xy, (h, w), LineWidth=lw, FillColor=self.colors[cf])
 
             # Ellipses
         for i in range(5):
-            xy = (random.uniform(Range[0],Range[1]),random.uniform(Range[0],Range[1]))
-            lw = random.randint(1,5)
-            cf = random.randint(0,len(self.colors)-1)
-            h = random.randint(1,5)
-            w = random.randint(1,5)
-            Canvas.AddEllipse(xy, (h,w),
-                              LineWidth = lw,
-                              FillColor = self.colors[cf])
+            xy = (random.uniform(Range[0], Range[1]), random.uniform(Range[0], Range[1]))
+            lw = random.randint(1, 5)
+            cf = random.randint(0, len(self.colors) - 1)
+            h = random.randint(1, 5)
+            w = random.randint(1, 5)
+            Canvas.AddEllipse(xy, (h, w), LineWidth=lw, FillColor=self.colors[cf])
 
         # Circles
         for i in range(5):
-            point = (random.uniform(Range[0],Range[1]),random.uniform(Range[0],Range[1]))
-            D = random.randint(1,5)
-            lw = random.randint(1,5)
-            cf = random.randint(0,len(self.colors)-1)
-            cl = random.randint(0,len(self.colors)-1)
-            Canvas.AddCircle(point, D,
-                             LineWidth = lw,
-                             LineColor = self.colors[cl],
-                             FillColor = self.colors[cf])
-            Canvas.AddText("Circle # %i"%(i),
-                           point,
-                           Size = 12,
-                           Position = "cc")
+            point = (random.uniform(Range[0], Range[1]), random.uniform(Range[0], Range[1]))
+            D = random.randint(1, 5)
+            lw = random.randint(1, 5)
+            cf = random.randint(0, len(self.colors) - 1)
+            cl = random.randint(0, len(self.colors) - 1)
+            Canvas.AddCircle(
+                point, D, LineWidth=lw, LineColor=self.colors[cl], FillColor=self.colors[cf]
+            )
+            Canvas.AddText("Circle # %i" % (i), point, Size=12, Position="cc")
 
             # Lines
         for i in range(5):
             points = []
-            for j in range(random.randint(2,10)):
-                point = (random.randint(Range[0],Range[1]),random.randint(Range[0],Range[1]))
+            for j in range(random.randint(2, 10)):
+                point = (random.randint(Range[0], Range[1]), random.randint(Range[0], Range[1]))
                 points.append(point)
-            lw = random.randint(1,10)
-            cf = random.randint(0,len(self.colors)-1)
-            cl = random.randint(0,len(self.colors)-1)
-            Canvas.AddLine(points, LineWidth = lw, LineColor = self.colors[cl])
+            lw = random.randint(1, 10)
+            cf = random.randint(0, len(self.colors) - 1)
+            cl = random.randint(0, len(self.colors) - 1)
+            Canvas.AddLine(points, LineWidth=lw, LineColor=self.colors[cl])
 
             # Polygons
         for i in range(3):
             points = []
-            for j in range(random.randint(2,6)):
-                point = (random.uniform(Range[0],Range[1]),random.uniform(Range[0],Range[1]))
+            for j in range(random.randint(2, 6)):
+                point = (random.uniform(Range[0], Range[1]), random.uniform(Range[0], Range[1]))
                 points.append(point)
-            lw = random.randint(1,6)
-            cf = random.randint(0,len(self.colors)-1)
-            cl = random.randint(0,len(self.colors)-1)
-            Canvas.AddPolygon(points,
-                              LineWidth = lw,
-                              LineColor = self.colors[cl],
-                              FillColor = self.colors[cf],
-                              FillStyle = 'Solid')
+            lw = random.randint(1, 6)
+            cf = random.randint(0, len(self.colors) - 1)
+            cl = random.randint(0, len(self.colors) - 1)
+            Canvas.AddPolygon(
+                points,
+                LineWidth=lw,
+                LineColor=self.colors[cl],
+                FillColor=self.colors[cf],
+                FillStyle="Solid",
+            )
 
         self.Canvas.ZoomToBB()
 
-    def MoveTest(self,event=None):
+    def MoveTest(self, event=None):
         print("Running: TestHitTestForeground")
         wx.GetApp().Yield()
 
@@ -196,21 +192,18 @@ class DrawFrame(wx.Frame):
 
         Canvas.SetProjectionFun(None)
 
-        #Add a Hitable rectangle
-        w,h = 60, 20
+        # Add a Hitable rectangle
+        w, h = 60, 20
 
         dx = 80
         dy = 40
-        x,y = 20, 20
+        x, y = 20, 20
 
         color = "Red"
-        R = Canvas.AddRectangle((x,y), (w,h),
-                                LineWidth = 2,
-                                FillColor = color
-                                )
+        R = Canvas.AddRectangle((x, y), (w, h), LineWidth=2, FillColor=color)
 
         R.Name = color + "Rectangle"
-        Canvas.AddText(R.Name, (x, y+h), Position = "tl")
+        Canvas.AddText(R.Name, (x, y + h), Position="tl")
 
         ## A set of Rectangles that move together
 
@@ -220,90 +213,82 @@ class DrawFrame(wx.Frame):
         self.MovingRects = []
         x += dx
         color = "LightBlue"
-        R = Canvas.AddRectangle((x,y), (w/2, h/2),
-                                LineWidth = 2,
-                                FillColor = color)
+        R = Canvas.AddRectangle((x, y), (w / 2, h / 2), LineWidth=2, FillColor=color)
 
         R.HitFill = True
         R.Bind(FloatCanvas.EVT_FC_LEFT_DOWN, self.RectMoveLeft)
-        L = Canvas.AddText("Left", (x + w/4, y + h/4),
-                           Position = "cc")
-        self.MovingRects.extend( (R,L) )
+        L = Canvas.AddText("Left", (x + w / 4, y + h / 4), Position="cc")
+        self.MovingRects.extend((R, L))
 
-        x += w/2
-        R = Canvas.AddRectangle((x, y), (w/2, h/2),
-                                LineWidth = 2,
-                                FillColor = color)
+        x += w / 2
+        R = Canvas.AddRectangle((x, y), (w / 2, h / 2), LineWidth=2, FillColor=color)
 
         R.HitFill = True
         R.Bind(FloatCanvas.EVT_FC_LEFT_DOWN, self.RectMoveRight)
-        L = Canvas.AddText("Right", (x + w/4, y + h/4),
-                           Position = "cc")
-        self.MovingRects.extend( (R,L) )
+        L = Canvas.AddText("Right", (x + w / 4, y + h / 4), Position="cc")
+        self.MovingRects.extend((R, L))
 
-        x -= w/2
-        y += h/2
-        R = Canvas.AddRectangle((x, y), (w/2, h/2),
-                                LineWidth = 2,
-                                FillColor = color)
+        x -= w / 2
+        y += h / 2
+        R = Canvas.AddRectangle((x, y), (w / 2, h / 2), LineWidth=2, FillColor=color)
         R.HitFill = True
         R.Bind(FloatCanvas.EVT_FC_LEFT_DOWN, self.RectMoveUp)
-        L = Canvas.AddText("Up", (x + w/4, y + h/4),
-                           Position = "cc")
-        self.MovingRects.extend( (R,L) )
+        L = Canvas.AddText("Up", (x + w / 4, y + h / 4), Position="cc")
+        self.MovingRects.extend((R, L))
 
-
-        x += w/2
-        R = Canvas.AddRectangle((x, y), (w/2, h/2),
-                                LineWidth = 2,
-                                FillColor = color)
+        x += w / 2
+        R = Canvas.AddRectangle((x, y), (w / 2, h / 2), LineWidth=2, FillColor=color)
         R.HitFill = True
         R.Bind(FloatCanvas.EVT_FC_LEFT_DOWN, self.RectMoveDown)
-        L = Canvas.AddText("Down", (x + w/4, y + h/4),
-                           Position = "cc")
-        self.MovingRects.extend( (R,L) )
+        L = Canvas.AddText("Down", (x + w / 4, y + h / 4), Position="cc")
+        self.MovingRects.extend((R, L))
 
         self.Canvas.ZoomToBB()
 
-    def RectMoveLeft(self,Object):
+    def RectMoveLeft(self, Object):
         self.MoveRects("left")
 
-    def RectMoveRight(self,Object):
+    def RectMoveRight(self, Object):
         self.MoveRects("right")
 
-    def RectMoveUp(self,Object):
+    def RectMoveUp(self, Object):
         self.MoveRects("up")
 
-    def RectMoveDown(self,Object):
+    def RectMoveDown(self, Object):
         self.MoveRects("down")
 
     def MoveRects(self, Dir):
         for Object in self.MovingRects:
-            X,Y = Object.XY
-            if Dir == "left": X -= 10
-            elif Dir == "right": X += 10
-            elif Dir == "up": Y += 10
-            elif Dir == "down": Y -= 10
-            Object.SetPoint((X,Y))
+            X, Y = Object.XY
+            if Dir == "left":
+                X -= 10
+            elif Dir == "right":
+                X += 10
+            elif Dir == "up":
+                Y += 10
+            elif Dir == "down":
+                Y -= 10
+            Object.SetPoint((X, Y))
         self.Canvas.Draw(True)
-                
+
     def UnBindAllMouseEvents(self):
         ## Here is how you catch FloatCanvas mouse events
-        FloatCanvas.EVT_LEFT_DOWN(self.Canvas, None ) 
-        FloatCanvas.EVT_LEFT_UP(self.Canvas, None )
-        FloatCanvas.EVT_LEFT_DCLICK(self.Canvas, None) 
+        FloatCanvas.EVT_LEFT_DOWN(self.Canvas, None)
+        FloatCanvas.EVT_LEFT_UP(self.Canvas, None)
+        FloatCanvas.EVT_LEFT_DCLICK(self.Canvas, None)
 
-        FloatCanvas.EVT_MIDDLE_DOWN(self.Canvas, None )
-        FloatCanvas.EVT_MIDDLE_UP(self.Canvas, None )
-        FloatCanvas.EVT_MIDDLE_DCLICK(self.Canvas, None )
+        FloatCanvas.EVT_MIDDLE_DOWN(self.Canvas, None)
+        FloatCanvas.EVT_MIDDLE_UP(self.Canvas, None)
+        FloatCanvas.EVT_MIDDLE_DCLICK(self.Canvas, None)
 
-        FloatCanvas.EVT_RIGHT_DOWN(self.Canvas, None )
-        FloatCanvas.EVT_RIGHT_UP(self.Canvas, None )
-        FloatCanvas.EVT_RIGHT_DCLICK(self.Canvas, None )
+        FloatCanvas.EVT_RIGHT_DOWN(self.Canvas, None)
+        FloatCanvas.EVT_RIGHT_UP(self.Canvas, None)
+        FloatCanvas.EVT_RIGHT_DCLICK(self.Canvas, None)
 
-        FloatCanvas.EVT_MOUSEWHEEL(self.Canvas, None )
+        FloatCanvas.EVT_MOUSEWHEEL(self.Canvas, None)
 
         self.EventsAreBound = False
+
 
 class DemoApp(wx.App):
     """
@@ -356,26 +341,12 @@ class DemoApp(wx.App):
     """
 
     def OnInit(self):
-        frame = DrawFrame(None, wx.ID_ANY,
-                          title = "FloatCanvas Demo App",
-                          size = (700,700) )
+        frame = DrawFrame(None, wx.ID_ANY, title="FloatCanvas Demo App", size=(700, 700))
 
         self.SetTopWindow(frame)
 
         return True
 
-app =  DemoApp(False)
+
+app = DemoApp(False)
 app.MainLoop()
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-

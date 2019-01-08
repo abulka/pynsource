@@ -4,7 +4,7 @@
 # varies greatly from one project to the next, so the code shown below will not
 # be incorporated into the 'unittest' module. Instead, modify it for your own
 # purposes.
-# 
+#
 # $Id:  $
 """
   ANDY NOTES:  Example of assembling all available unit tests into one suite.   
@@ -37,35 +37,41 @@
 
 import unittest
 
+
 def suite():
     modules_to_test = (
-            'test_parse_01',
-            'test_parse_02',
-            'test_parse_03',
-            'test_parse_04',
-            'test_parse_05',
-            'test_parse_06',
-            'test_parse_07',
-            'test_parse_08',
-            'test_overlaps1',
-            'test_overlaps2stress',
-            'test_asciiworkspace_01',
-            'test_asciiworkspace_02',
-            'test_parse_yuml_01',
-            'test_rhs_analyser',
-            'test_parse_old_vs_new',
-            'test_graph_nodes',
-            'test_persistence_01'
-            )   # ANDY - and so on
+        "test_parse_01",
+        "test_parse_02",
+        "test_parse_03",
+        "test_parse_04",
+        "test_parse_05",
+        "test_parse_06",
+        "test_parse_07",
+        "test_parse_08",
+        "test_overlaps1",
+        "test_overlaps2stress",
+        "test_asciiworkspace_01",
+        "test_asciiworkspace_02",
+        "test_parse_yuml_01",
+        "test_rhs_analyser",
+        "test_parse_old_vs_new",
+        "test_graph_nodes",
+        "test_persistence_01",
+    )  # ANDY - and so on
     alltests = unittest.TestSuite()
     for module in map(__import__, modules_to_test):
-        #alltests.addTest(unittest.findTestCases(module))  # ANDY - this doesn't seem to work
-        alltests.addTest( module.suite() )  # ANDY CHANGED since all my modules have .suite() module function.
+        # alltests.addTest(unittest.findTestCases(module))  # ANDY - this doesn't seem to work
+        alltests.addTest(
+            module.suite()
+        )  # ANDY CHANGED since all my modules have .suite() module function.
     return alltests
 
-if __name__ == '__main__':
-    #unittest.main(defaultTest='suite')
-    unittest.main(defaultTest='suite',argv=('andyDummySomeapp', '-v') )  # ANDY - made this verbose.  had to put dummy text into tuple that simulates this being run from shell comman line.
+
+if __name__ == "__main__":
+    # unittest.main(defaultTest='suite')
+    unittest.main(
+        defaultTest="suite", argv=("andyDummySomeapp", "-v")
+    )  # ANDY - made this verbose.  had to put dummy text into tuple that simulates this being run from shell comman line.
 
 
 """Regression testing framework

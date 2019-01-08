@@ -2,51 +2,57 @@
 # http://www.ibm.com/developerworks/opensource/library/os-pythonsqlo/
 
 from sqlobject import *
-from sqlobject.sqlite import builder; SQLiteConnection = builder()
-conn = SQLiteConnection('andyormtest1.db', debug=False)
+from sqlobject.sqlite import builder
+
+SQLiteConnection = builder()
+conn = SQLiteConnection("andyormtest1.db", debug=False)
+
 
 class Cubicle(SQLObject):
     _connection = conn
     location = StringCol(length=20, default="unknown")
-    occupant = ForeignKey('Person', default=None)
+    occupant = ForeignKey("Person", default=None)
 
     def SetOccupant(self, person):
         # Evict any previous occupant
         if self.occupant:
             self.occupant.cubicle = None
         self.occupant = person  # New occupant wired in
-        person.cubicle = self   # back pointer
+        person.cubicle = self  # back pointer
+
 
 class Person(SQLObject):
     _connection = conn
     firstname = StringCol(length=20)
     lastname = StringCol(length=20)
-    cubicle = ForeignKey('Cubicle', default=None)
-    orders = MultipleJoin('GiftOrder')
-    addresses = RelatedJoin('Address')
+    cubicle = ForeignKey("Cubicle", default=None)
+    orders = MultipleJoin("GiftOrder")
+    addresses = RelatedJoin("Address")
 
     def AddOrder(self, giftOrder):
-        #self.orders.append(giftOrder)  # one to many # SQL OBJECT doesn't need this
-        giftOrder.person = self        # back pointer ** becomes the primary info sqlobject goes on
+        # self.orders.append(giftOrder)  # one to many # SQL OBJECT doesn't need this
+        giftOrder.person = self  # back pointer ** becomes the primary info sqlobject goes on
 
     def SetAddress(self, address):
-        #self.addresses.append(address) # many to many # SQL OBJECT doesn't need this
-        #address.residents.append(self) # back pointer (note the 'append' cos many to many) # SQL OBJECT doesn't need this
+        # self.addresses.append(address) # many to many # SQL OBJECT doesn't need this
+        # address.residents.append(self) # back pointer (note the 'append' cos many to many) # SQL OBJECT doesn't need this
         address.addPerson(self)  # SQLobject created this "addWHATEVER" method for us
+
 
 class GiftOrder(SQLObject):
     _connection = conn
     orderNumber = IntCol()
     description = StringCol()
-    person = ForeignKey('Person', default=None)
+    person = ForeignKey("Person", default=None)
+
 
 class Address(SQLObject):
     _connection = conn
     street = StringCol(length=20)
     suburb = StringCol(length=20)
     postcode = StringCol(length=20)
-    residents = RelatedJoin('Person')
-    #def _init(self):
+    residents = RelatedJoin("Person")
+    # def _init(self):
     #    SQLObject._init(self, *args, **kw)
     #    self.postcodesDict = {'2323':'Brighton','22222':'Werribee'}
 
@@ -81,7 +87,9 @@ assert o2 in tom.orders
 # Test Many to many
 
 angelina = Person(firstname="Angelina", lastname="Jolie")
-a1 = Address(street="Fox Studios", suburb="California", postcode="3186") # tom and angelina both work here
+a1 = Address(
+    street="Fox Studios", suburb="California", postcode="3186"
+)  # tom and angelina both work here
 a2 = Address(street="Brads Place", suburb="Manhattan", postcode="40004")
 
 angelina.SetAddress(a1)
@@ -103,7 +111,6 @@ assert cubicle1.occupant == angelina
 assert tom.cubicle == None
 
 
-
 cubicle2 = Cubicle(location="West Wing D5")
 cubicle2.SetOccupant(tom)
 assert tom.cubicle == cubicle2
@@ -112,18 +119,17 @@ assert tom.cubicle == cubicle2
 p = Person.get(1)
 print(p)
 
-#ps = Person.select(Person.q.firstName=="John")
-#print list(ps)
+# ps = Person.select(Person.q.firstName=="John")
+# print list(ps)
 
-#ps = Person.select("""address.id = person.id AND
+# ps = Person.select("""address.id = person.id AND
 #                         address.postcode LIKE '40004%'""",
 #                      clauseTables=['address'])
-ps = Person.select("""address.postcode LIKE '3186'""",
-                      clauseTables=['address'])
+ps = Person.select("""address.postcode LIKE '3186'""", clauseTables=["address"])
 print(list(ps))
 
-print('all people')
+print("all people")
 ps = Person.select()
 print(list(ps))
 
-print('Done!')
+print("Done!")

@@ -8,7 +8,6 @@ import wx
 # end wxGlade
 
 
-
 class MyNotebook(wx.Notebook):
     def __init__(self, *args, **kwds):
         # begin wxGlade: MyNotebook.__init__
@@ -44,6 +43,7 @@ class MyNotebook(wx.Notebook):
         self.notebook_1_pane_1.SetSizer(sizer_222)
         # end wxGlade
 
+
 # end of class MyNotebook
 
 
@@ -53,7 +53,7 @@ class MyFrame(wx.Frame):
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
         self.notebook_1 = MyNotebook(self, -1)
-        
+
         # Menu Bar
         self.frame_1_menubar = wx.MenuBar()
         wxglade_tmp_menu = wx.Menu()
@@ -87,6 +87,7 @@ class MyFrame(wx.Frame):
         sizer_1.Fit(self)
         self.Layout()
         # end wxGlade
+
 
 # end of class MyFrame
 

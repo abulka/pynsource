@@ -3,6 +3,7 @@ class SomePythonBug:
         assert param == [], param
         param.append(1)  # appending to or extending an optional parameter affects it for next time!
 
+
 b = SomePythonBug()
 
 # Triggers the bug

@@ -3,10 +3,10 @@ from parsing.api import new_parser, old_parser
 
 # python -m unittest tests.test_java_delphi_gen
 
-class TestJavaDelphiGen(unittest.TestCase):
 
+class TestJavaDelphiGen(unittest.TestCase):
     def test_1(self):
-        in_filename = 'tests/testing-generate-java/python-in/utilcc.py'
+        in_filename = "tests/testing-generate-java/python-in/utilcc.py"
 
         p, debuginfo = old_parser(in_filename)
         pmodel_old = p.pmodel
@@ -21,7 +21,7 @@ class TestJavaDelphiGen(unittest.TestCase):
 
         any_changes = old ^ new
 
-        differences_expected = set(['safeconvert', 'PopFoldersTillFind'])
+        differences_expected = set(["safeconvert", "PopFoldersTillFind"])
 
         # no_changes = set()
         # self.assertSetEqual(any_changes, no_changes, any_changes)

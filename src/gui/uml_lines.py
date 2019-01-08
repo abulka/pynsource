@@ -21,11 +21,13 @@ ARROW_UML_GENERALISATION = 200
 ARROW_UML_COMPOSITION = 201
 ARROW_UML_AGGREGATION = 202
 
+
 class LineShapeCustom(LineShape):
     """
     Custom lines for UML purposes
     Entire DrawArrow() method replicated here, and enhanced
     """
+
     def __init__(self):
         LineShape.__init__(self)
 
@@ -47,12 +49,20 @@ class LineShapeCustom(LineShape):
             realOffset = XOffset
             if proportionalOffset:
                 totalLength = math.sqrt(
-                    (second_line_point[0] - first_line_point[0]) * (second_line_point[0] - first_line_point[0]) + (
-                    second_line_point[1] - first_line_point[1]) * (second_line_point[1] - first_line_point[1]))
+                    (second_line_point[0] - first_line_point[0])
+                    * (second_line_point[0] - first_line_point[0])
+                    + (second_line_point[1] - first_line_point[1])
+                    * (second_line_point[1] - first_line_point[1])
+                )
                 realOffset = XOffset * totalLength
 
-            positionOnLineX, positionOnLineY = GetPointOnLine(second_line_point[0], second_line_point[1],
-                                                              first_line_point[0], first_line_point[1], realOffset)
+            positionOnLineX, positionOnLineY = GetPointOnLine(
+                second_line_point[0],
+                second_line_point[1],
+                first_line_point[0],
+                first_line_point[1],
+                realOffset,
+            )
 
             startPositionX = second_line_point[0]
             startPositionY = second_line_point[1]
@@ -61,13 +71,21 @@ class LineShapeCustom(LineShape):
             # will be on the line.
             realOffset = XOffset
             if proportionalOffset:
-                totalLength = math.sqrt((second_last_line_point[0] - last_line_point[0]) * (
-                second_last_line_point[0] - last_line_point[0]) + (second_last_line_point[1] - last_line_point[1]) * (
-                                        second_last_line_point[1] - last_line_point[1]));
+                totalLength = math.sqrt(
+                    (second_last_line_point[0] - last_line_point[0])
+                    * (second_last_line_point[0] - last_line_point[0])
+                    + (second_last_line_point[1] - last_line_point[1])
+                    * (second_last_line_point[1] - last_line_point[1])
+                )
                 realOffset = XOffset * totalLength
 
-            positionOnLineX, positionOnLineY = GetPointOnLine(second_last_line_point[0], second_last_line_point[1],
-                                                              last_line_point[0], last_line_point[1], realOffset)
+            positionOnLineX, positionOnLineY = GetPointOnLine(
+                second_last_line_point[0],
+                second_last_line_point[1],
+                last_line_point[0],
+                last_line_point[1],
+                realOffset,
+            )
 
             startPositionX = second_last_line_point[0]
             startPositionY = second_last_line_point[1]
@@ -80,12 +98,15 @@ class LineShapeCustom(LineShape):
             # will be on the line.
             realOffset = XOffset
             if proportionalOffset:
-                totalLength = math.sqrt((second_last_line_point[0] - x) * (second_last_line_point[0] - x) + (
-                second_last_line_point[1] - y) * (second_last_line_point[1] - y));
+                totalLength = math.sqrt(
+                    (second_last_line_point[0] - x) * (second_last_line_point[0] - x)
+                    + (second_last_line_point[1] - y) * (second_last_line_point[1] - y)
+                )
                 realOffset = XOffset * totalLength
 
-            positionOnLineX, positionOnLineY = GetPointOnLine(second_last_line_point[0], second_last_line_point[1], x,
-                                                              y, realOffset)
+            positionOnLineX, positionOnLineY = GetPointOnLine(
+                second_last_line_point[0], second_last_line_point[1], x, y, realOffset
+            )
             startPositionX = second_last_line_point[0]
             startPositionY = second_last_line_point[1]
 
@@ -125,35 +146,37 @@ class LineShapeCustom(LineShape):
             arrowLength = arrow.GetSize()
             arrowWidth = arrowLength / 3.0
 
-            tip_x, tip_y, side1_x, side1_y, side2_x, side2_y = GetArrowPoints(startPositionX + deltaX, startPositionY + deltaY, positionOnLineX + deltaX, positionOnLineY + deltaY, arrowLength, arrowWidth)
+            tip_x, tip_y, side1_x, side1_y, side2_x, side2_y = GetArrowPoints(
+                startPositionX + deltaX,
+                startPositionY + deltaY,
+                positionOnLineX + deltaX,
+                positionOnLineY + deltaY,
+                arrowLength,
+                arrowWidth,
+            )
 
-            points = [[tip_x, tip_y],
-                    [side1_x, side1_y],
-                    [side2_x, side2_y],
-                    [tip_x, tip_y]]
+            points = [[tip_x, tip_y], [side1_x, side1_y], [side2_x, side2_y], [tip_x, tip_y]]
 
             dc.SetPen(self._pen)
             dc.SetBrush(self._brush)
             dc.DrawPolygon(points)
 
-
-
         # CUSTOM
 
         elif at == ARROW_UML_GENERALISATION:
             arrowLength = arrow.GetSize()
-            arrowWidth = arrowLength # don't divide by three, making arrow bigger  # / 3.0
+            arrowWidth = arrowLength  # don't divide by three, making arrow bigger  # / 3.0
 
-            tip_x, tip_y, side1_x, side1_y, side2_x, side2_y = GetArrowPoints(startPositionX + deltaX,
-                                                                              startPositionY + deltaY,
-                                                                              positionOnLineX + deltaX,
-                                                                              positionOnLineY + deltaY, arrowLength,
-                                                                              arrowWidth)
+            tip_x, tip_y, side1_x, side1_y, side2_x, side2_y = GetArrowPoints(
+                startPositionX + deltaX,
+                startPositionY + deltaY,
+                positionOnLineX + deltaX,
+                positionOnLineY + deltaY,
+                arrowLength,
+                arrowWidth,
+            )
 
-            points = [[tip_x, tip_y],
-                      [side1_x, side1_y],
-                      [side2_x, side2_y],
-                      [tip_x, tip_y]]
+            points = [[tip_x, tip_y], [side1_x, side1_y], [side2_x, side2_y], [tip_x, tip_y]]
 
             dc.SetPen(self._pen)
 
@@ -183,46 +206,54 @@ class LineShapeCustom(LineShape):
                 y3 = -length * j_bar + y2
 
                 # Extra point to make a diamond
-                x4 = -length*2 * i_bar + x2
-                y4 = -length*2 * j_bar + y2
+                x4 = -length * 2 * i_bar + x2
+                y4 = -length * 2 * j_bar + y2
 
-                return x2, y2, \
-                       width * -j_bar + x3, width * i_bar + y3, \
-                       x4, y4, \
-                       -width * -j_bar + x3, -width * i_bar + y3, \
+                return (
+                    x2,
+                    y2,
+                    width * -j_bar + x3,
+                    width * i_bar + y3,
+                    x4,
+                    y4,
+                    -width * -j_bar + x3,
+                    -width * i_bar + y3,
+                )
 
-            tip_x, tip_y, \
-            side1_x, side1_y, \
-            side3_x, side3_y, \
-            side2_x, side2_y = GetArrowPointsCustom(startPositionX + deltaX,
-                                                      startPositionY + deltaY,
-                                                      positionOnLineX + deltaX,
-                                                      positionOnLineY + deltaY,
-                                                      arrowLength,
-                                                      arrowWidth)
-            points = [[tip_x, tip_y],
-                      [side1_x, side1_y],
-                      [side3_x, side3_y],    # extra point introduced
-                      [side2_x, side2_y],
-                      [tip_x, tip_y],
-                      ]
+            tip_x, tip_y, side1_x, side1_y, side3_x, side3_y, side2_x, side2_y = GetArrowPointsCustom(
+                startPositionX + deltaX,
+                startPositionY + deltaY,
+                positionOnLineX + deltaX,
+                positionOnLineY + deltaY,
+                arrowLength,
+                arrowWidth,
+            )
+            points = [
+                [tip_x, tip_y],
+                [side1_x, side1_y],
+                [side3_x, side3_y],  # extra point introduced
+                [side2_x, side2_y],
+                [tip_x, tip_y],
+            ]
 
             dc.SetPen(self._pen)
             # dc.SetBrush(self.GetBackgroundBrush())
             dc.SetBrush(wx.Brush("BLACK"))
             dc.DrawPolygon(points)
 
-
         # END CUSTOM
-
 
         elif at in [ARROW_HOLLOW_CIRCLE, ARROW_FILLED_CIRCLE]:
             # Find point on line of centre of circle, which is a radius away
             # from the end position
             diameter = arrow.GetSize()
-            x, y = GetPointOnLine(startPositionX + deltaX, startPositionY + deltaY,
-                                  positionOnLineX + deltaX, positionOnLineY + deltaY,
-                                  diameter / 2.0)
+            x, y = GetPointOnLine(
+                startPositionX + deltaX,
+                startPositionY + deltaY,
+                positionOnLineX + deltaX,
+                positionOnLineY + deltaY,
+                diameter / 2.0,
+            )
             x1 = x - diameter / 2.0
             y1 = y - diameter / 2.0
             dc.SetPen(self._pen)
@@ -245,9 +276,13 @@ class LineShapeCustom(LineShape):
                 #  --------------|  x  | <-- e.g. rectangular arrowhead
                 #                 -----
                 #
-                x, y = GetPointOnLine(startPositionX, startPositionY,
-                                      positionOnLineX, positionOnLineY,
-                                      arrow.GetMetaFile()._width / 2.0)
+                x, y = GetPointOnLine(
+                    startPositionX,
+                    startPositionY,
+                    positionOnLineX,
+                    positionOnLineY,
+                    arrow.GetMetaFile()._width / 2.0,
+                )
                 # Calculate theta for rotating the metafile.
                 #
                 # |
@@ -289,8 +324,12 @@ class LineShapeCustom(LineShape):
                     minX, minY, maxX, maxY = arrow.GetMetaFile().GetBounds()
                     # Make erasing rectangle slightly bigger or you get droppings
                     extraPixels = 4
-                    dc.DrawRectangle(deltaX + x + minX - extraPixels / 2.0, deltaY + y + minY - extraPixels / 2.0,
-                                     maxX - minX + extraPixels, maxY - minY + extraPixels)
+                    dc.DrawRectangle(
+                        deltaX + x + minX - extraPixels / 2.0,
+                        deltaY + y + minY - extraPixels / 2.0,
+                        maxX - minX + extraPixels,
+                        maxY - minY + extraPixels,
+                    )
                 else:
                     arrow.GetMetaFile().Draw(dc, x + deltaX, y + deltaY)
 

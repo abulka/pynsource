@@ -28,6 +28,7 @@
 
 """
 
+
 class Playhead:
     def __init__(self, maxitems=0):
         """
@@ -38,18 +39,21 @@ class Playhead:
         self.Clear()
         assert maxitems >= 0
 
-        # Add useful behaviour to initial position.        
+        # Add useful behaviour to initial position.
         if maxitems > 0:
             self.Position = 0
-            
+
         self._SetMaxItems(maxitems)
+
     def Clear(self):
         self.Position = -1
         self.MaxPosition = -1
         self._SetMaxItems(0)
+
     def _ClipPositionToMax(self):
         if self.Position > self.MaxPosition:
             self.Position = self.MaxPosition
+
     def _SetMaxItems(self, maxitems):
         """
         Sets the maximum poisition that the playhead will move over.
@@ -60,11 +64,12 @@ class Playhead:
         If there are no items in the list, then max is -1 and pos is -1
         """
         assert maxitems >= 0
-        self.MaxPosition = maxitems-1
+        self.MaxPosition = maxitems - 1
         self._ClipPositionToMax()
-        
+
     def IsEmpty(self):
         return self.MaxPosition <= -1
+
     def IsMoreToPlay(self):
         if self.IsEmpty():
             return 0
@@ -72,9 +77,10 @@ class Playhead:
             return 1
         else:
             return 0
-          
+
     def NotifyPositionNowValid(self, position):
         self.NotifyOfInsert(position, noinsertJustValidate=1)
+
     def NotifyOfInsert(self, position, noinsertJustValidate=0):
         """
         Says that position 'position' is now valid and has been inserted, pushing all above it (if any) up.
@@ -93,34 +99,38 @@ class Playhead:
         (except for when position is -1 cos nothing in the playhead, then insert something)
         """
         if position == -1:
-          return
-        
-        assert position >= 0, "Playhead's NotifyOfInsert error, attempt to position to negative value " + str(position)
-        
+            return
+
+        assert (
+            position >= 0
+        ), "Playhead's NotifyOfInsert error, attempt to position to negative value " + str(position)
+
         wasemptyPlayheadSituation = self.Position == -1 and self.IsEmpty()
-        
+
         if position > self.MaxPosition:
             self.MaxPosition = position
         else:
             if noinsertJustValidate:
                 pass
             else:
-               if position <= self.Position:
-                   self.Position += 1
-               self.MaxPosition += 1
-            
+                if position <= self.Position:
+                    self.Position += 1
+                self.MaxPosition += 1
+
         # New extra helpful logic.  Automatically move the playhead to start if now non empty
         if wasemptyPlayheadSituation and not self.IsEmpty():
             self.GoStart()
-        
+
     def GoStart(self):
         if self.MaxPosition == -1:
             self.Position = -1
         else:
             self.Position = 0
         self._ClipPositionToMax()
+
     def GoEnd(self):
         self.Position = self.MaxPosition
+
     def Go(self, position):
         """
         Jumps playhead to position in the range 0 to maxitems-1
@@ -131,45 +141,58 @@ class Playhead:
         if position > self.MaxPosition:
             position = self.MaxPosition
         self.Position = position
+
     def GoNext(self):
         if self.Position < self.MaxPosition:
             self.Position += 1
+
     def GoPrevious(self):
         if self.Position > 0:
             self.Position -= 1
 
+
 import unittest, random
+
 
 class TestCase00(unittest.TestCase):
     def checkInit(self):
-        p = Playhead(10) # Means handling a list positions 0 to 9
+        p = Playhead(10)  # Means handling a list positions 0 to 9
         assert p.Position == 0
+
     def checkInitZero(self):
-        p = Playhead(0) # Means nothing in list (though we don't actually allocate or track any list)
+        p = Playhead(
+            0
+        )  # Means nothing in list (though we don't actually allocate or track any list)
         assert p.Position == -1
+
     def checkGoEnd(self):
         p = Playhead(10)
         p.GoEnd()
         assert p.Position == 9
+
     def checkAdvance(self):
         p = Playhead(10)
         p.GoNext()
         assert p.Position == 1
+
     def checkAdvanceMore(self):
         p = Playhead(10)
         p.GoNext()
         p.GoNext()
         assert p.Position == 2
+
     def checkGo(self):
         p = Playhead(10)
         p.Go(5)
         assert p.Position == 5
+
     def checkGoTooFar(self):
         p = Playhead(10)
         p.Go(10)
         assert p.Position == 9
         p.Go(0)
         assert p.Position == 0
+
     def checkRewindMore(self):
         p = Playhead(10)
         p.Go(9)
@@ -180,6 +203,7 @@ class TestCase00(unittest.TestCase):
         p.GoStart()
         p.GoPrevious()
         assert p.Position == 0
+
     def checkNotifyInsert(self):
         p = Playhead(10)
         assert p.MaxPosition == 9
@@ -194,6 +218,7 @@ class TestCase00(unittest.TestCase):
         p.NotifyOfInsert(9)
         assert p.Position == 8
         assert p.MaxPosition == 12
+
     def checkNotifyInsertZero(self):
         p = Playhead(0)
         assert p.Position == -1
@@ -201,18 +226,24 @@ class TestCase00(unittest.TestCase):
         assert p.Position == 0  # position automoved for us to a useful position
         assert p.MaxPosition == 0
         p.NotifyOfInsert(0)  # this will insert at pos 0 and push old 0 and rest up
-        assert p.Position == 1  # what position was pointing to shouldn't be affected by insert (except for when position is -1 cos nothing in the playhead, then insert something)
+        assert (
+            p.Position == 1
+        )  # what position was pointing to shouldn't be affected by insert (except for when position is -1 cos nothing in the playhead, then insert something)
         assert p.MaxPosition == 1
+
     def checkIsMoretoplay(self):
         p = Playhead(0)
         assert p.IsEmpty()
         assert not p.IsMoreToPlay()
         p.NotifyOfInsert(0)
         assert not p.IsEmpty()
-        assert not p.IsMoreToPlay() # already at last pos cos position automoved for us to a useful position 0
+        assert (
+            not p.IsMoreToPlay()
+        )  # already at last pos cos position automoved for us to a useful position 0
         p.GoNext()
         assert not p.IsEmpty()
         assert not p.IsMoreToPlay()
+
     def checkClear(self):
         p = Playhead(0)
         a = p.MaxPosition
@@ -231,19 +262,19 @@ class TestCase00(unittest.TestCase):
     def checkInsertPastMaximum(self):
         p = Playhead(0)
         assert p.Position == -1
-        
+
         p.NotifyOfInsert(0)
         assert p.MaxPosition == 0
-        assert p.Position == 0 # position automoved for us to a useful position
-        
+        assert p.Position == 0  # position automoved for us to a useful position
+
         p.Go(0)
         assert p.MaxPosition == 0
         assert p.Position == 0
-        
+
         p.NotifyOfInsert(10)
         assert p.Position == 0
         assert p.MaxPosition == 10
-        
+
         p.Go(10)
         assert p.Position == 10
         assert p.MaxPosition == 10
@@ -253,11 +284,13 @@ class TestCase00(unittest.TestCase):
         assert p.Position == -1
         p.GoStart()
         assert p.Position == -1
+
     def checkGoEndWithNoItems(self):
         p = Playhead(0)
         assert p.Position == -1
         p.GoEnd()
         assert p.Position == -1
+
     def checkGoEndWithSomeItems(self):
         p = Playhead(10)  # this will be 0..9
         assert p.Position == 0
@@ -266,7 +299,7 @@ class TestCase00(unittest.TestCase):
         p.NotifyOfInsert(10)  # tells us that pos 10 is now valid pos
         assert p.Position == 0
         assert p.MaxPosition == 10
-        
+
         p.GoEnd()
         assert p.Position == 10
 
@@ -274,7 +307,7 @@ class TestCase00(unittest.TestCase):
         p = Playhead(10)  # this will be 0..9
         p.Go(5)
         assert p.Position == 5
-        
+
         p.NotifyOfInsert(5)
         assert p.Position == 6
         assert p.MaxPosition == 10
@@ -282,7 +315,7 @@ class TestCase00(unittest.TestCase):
         p.NotifyPositionNowValid(8)
         assert p.Position == 6
         assert p.MaxPosition == 10
-        
+
         p.NotifyPositionNowValid(12)
         assert p.Position == 6
         assert p.MaxPosition == 12
@@ -295,11 +328,13 @@ class TestCase00(unittest.TestCase):
         assert p.Position == 7
         assert p.MaxPosition == 16
 
+
 def suite():
-    suite1 = unittest.makeSuite(TestCase00,'check')
-    alltests = unittest.TestSuite( (suite1,) )
+    suite1 = unittest.makeSuite(TestCase00, "check")
+    alltests = unittest.TestSuite((suite1,))
     return alltests
-    
+
+
 def main():
     """ Run all the suites.  To run via a gui, then
             python unittestgui.py NestedDictionaryTest.suite
@@ -309,12 +344,14 @@ def main():
           runner = unittest.TextTestRunner(descriptions=0, verbosity=2)
         The default arguments are descriptions=1, verbosity=1
     """
-    runner = unittest.TextTestRunner(descriptions=0, verbosity=2) # default is descriptions=1, verbosity=1
-    #runner = unittest.TextTestRunner(descriptions=0, verbosity=1) # default is descriptions=1, verbosity=1
-    runner.run( suite() )
+    runner = unittest.TextTestRunner(
+        descriptions=0, verbosity=2
+    )  # default is descriptions=1, verbosity=1
+    # runner = unittest.TextTestRunner(descriptions=0, verbosity=1) # default is descriptions=1, verbosity=1
+    runner.run(suite())
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
-        
-#print __name__
 
+# print __name__

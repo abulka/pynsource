@@ -2,17 +2,19 @@ import unittest
 import os
 
 import sys
+
 sys.path.append("../src")
 from ascii_uml.asciiworkspace import AsciiWorkspace
 
 OUT_FILE = "ascii_out.txt"
 
-class TestCaseAscii_01(unittest.TestCase):
 
+class TestCaseAscii_01(unittest.TestCase):
     def setUp(self):
         w = AsciiWorkspace()
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +------------+
 |   Editor   |
 |------------|
@@ -23,27 +25,35 @@ class TestCaseAscii_01(unittest.TestCase):
 | __init__   |
 | start      |
 +------------+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +------------+
 | TopHandler |
 +------------+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +-----+
 | GUI |
 +-----+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +------------+
 | Statechart |
 +------------+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
            [ ogl ]           
               .              
              /_\             
@@ -99,17 +109,21 @@ class TestCaseAscii_01(unittest.TestCase):
 | OnLeftClick                 |
 | DeselectAllShapes           |
 +-----------------------------+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +-----------+
 |    Log    |
 |-----------|
 | WriteText |
 +-----------+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
             [ wx ]            
               .               
              /_\              
@@ -161,9 +175,11 @@ class TestCaseAscii_01(unittest.TestCase):
 | OnButton                     |
 | OnCloseFrame                 |
 +------------------------------+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
        [ ogl ]        
           .           
          /_\          
@@ -188,61 +204,80 @@ class TestCaseAscii_01(unittest.TestCase):
 | OnRightClick         |
 | RightClickDeleteNode |
 +----------------------+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +-----+
 | ogl |
 +-----+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +----+
 | wx |
 +----+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +--------------+
 | UmlWorkspace |
 +--------------+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +-------------+
 | LayoutBasic |
 +-------------+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +------------------+
 | CoordinateMapper |
 +------------------+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +-------------------+
 | GraphLayoutSpring |
 +-------------------+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +----------------+
 | OverlapRemoval |
 +----------------+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +-------+
 | Frame |
 +-------+
-""")
+"""
+        )
 
-        w.AddColumn("""
+        w.AddColumn(
+            """
 +-------------+
 | ImageViewer |
 +-------------+
-""")
+"""
+        )
 
         w.Flush()
         fp = open(OUT_FILE, "w")
@@ -251,25 +286,38 @@ class TestCaseAscii_01(unittest.TestCase):
 
     def tearDown(self):
         os.remove(OUT_FILE)
-    
+
     def test_ascii_layout_01(self):
         fp = open(OUT_FILE, "r")
         lines = fp.readlines()
         fp.close()
-        
-        self.assertEqual("                                                                                                                                                                                                                                                                                                                                                                                                                    \n", lines[0])
-        self.assertEqual("+------------+                          +------------+   +-----+   +------------+              [ ogl ]                                              +-----------+               [ wx ]                                                   [ ogl ]             +-----+   +----+   +--------------+   +-------------+   +------------------+   +-------------------+   +----------------+   +-------+   +-------------+\n", lines[1])
-        self.assertEqual("| statechart |  ---->  [ GUI ]                                                      +-----------------------------+                                                 +------------------------------+                              +----------------------+                                                                                                                                                          \n", lines[6])
+
+        self.assertEqual(
+            "                                                                                                                                                                                                                                                                                                                                                                                                                    \n",
+            lines[0],
+        )
+        self.assertEqual(
+            "+------------+                          +------------+   +-----+   +------------+              [ ogl ]                                              +-----------+               [ wx ]                                                   [ ogl ]             +-----+   +----+   +--------------+   +-------------+   +------------------+   +-------------------+   +----------------+   +-------+   +-------------+\n",
+            lines[1],
+        )
+        self.assertEqual(
+            "| statechart |  ---->  [ GUI ]                                                      +-----------------------------+                                                 +------------------------------+                              +----------------------+                                                                                                                                                          \n",
+            lines[6],
+        )
 
 
 def suite():
-    suite1 = unittest.makeSuite(TestCaseAscii_01, 'test')
-    alltests = unittest.TestSuite((suite1, ))
+    suite1 = unittest.makeSuite(TestCaseAscii_01, "test")
+    alltests = unittest.TestSuite((suite1,))
     return alltests
 
+
 def main():
-    runner = unittest.TextTestRunner(descriptions = 0, verbosity = 2) # default is descriptions=1, verbosity=1
+    runner = unittest.TextTestRunner(
+        descriptions=0, verbosity=2
+    )  # default is descriptions=1, verbosity=1
     runner.run(suite())
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

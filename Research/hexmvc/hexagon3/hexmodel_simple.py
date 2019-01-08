@@ -1,4 +1,4 @@
-class Model: 
+class Model:
     def __init__(self, persistence):
         self.persistence = persistence
         self.things = []
@@ -9,13 +9,13 @@ class Model:
 
     def __len__(self):
         return len(self.things)
-        
+
     def SetApp(self, app):
         self.app = app
 
     def Clear(self):
         self.things = []
-        
+
     def LoadAll(self):
         self.things = self.persistence.LoadAll()
 
@@ -28,10 +28,11 @@ class Model:
     def DeleteThing(self, thing):
         self.things.remove(thing)
 
+
 class Thing:
     def __init__(self, info):
         self.info = info
-        
+
     def __str__(self):
         return "A-" + self.info
 

@@ -10,7 +10,8 @@ import random
 # wx.Memory DC , etc.
 
 USE_BUFFERED_DC = False
-#USE_BUFFERED_DC = True
+# USE_BUFFERED_DC = True
+
 
 class BufferedWindow(wx.Window):
 
@@ -29,9 +30,12 @@ class BufferedWindow(wx.Window):
     SaveToFile(self, file_name, file_type) method.
 
     """
+
     def __init__(self, *args, **kwargs):
         # make sure the NO_FULL_REPAINT_ON_RESIZE style flag is set.
-        kwargs['style'] = kwargs.setdefault('style', wx.NO_FULL_REPAINT_ON_RESIZE) | wx.NO_FULL_REPAINT_ON_RESIZE
+        kwargs["style"] = (
+            kwargs.setdefault("style", wx.NO_FULL_REPAINT_ON_RESIZE) | wx.NO_FULL_REPAINT_ON_RESIZE
+        )
         wx.Window.__init__(self, *args, **kwargs)
 
         wx.EVT_PAINT(self, self.OnPaint)
@@ -56,11 +60,11 @@ class BufferedWindow(wx.Window):
             dc = wx.PaintDC(self)
             dc.DrawBitmap(self._Buffer, 0, 0)
 
-    def OnSize(self,event):
+    def OnSize(self, event):
         # The Buffer init is done here, to make sure the buffer is always
         # the same size as the Window
-        #Size  = self.GetClientSizeTuple()
-        Size  = self.ClientSize
+        # Size  = self.GetClientSizeTuple()
+        Size = self.ClientSize
 
         # Make new offscreen bitmap: this bitmap will always have the
         # current drawing in it, so it can be used to save the image to
@@ -70,7 +74,7 @@ class BufferedWindow(wx.Window):
 
     def SaveToFile(self, FileName, FileType=wx.BITMAP_TYPE_PNG):
         ## This will save the contents of the buffer
-        ## to the specified file. See the wxWindows docs for 
+        ## to the specified file. See the wxWindows docs for
         ## wx.Bitmap::SaveFile for the details
         self._Buffer.SaveFile(FileName, FileType)
 
@@ -87,9 +91,10 @@ class BufferedWindow(wx.Window):
         dc = wx.MemoryDC()
         dc.SelectObject(self._Buffer)
         self.Draw(dc)
-        del dc # need to get rid of the MemoryDC before Update() is called.
+        del dc  # need to get rid of the MemoryDC before Update() is called.
         self.Refresh()
         self.Update()
+
 
 class DrawWindow(BufferedWindow):
     def __init__(self, *args, **kwargs):
@@ -100,34 +105,37 @@ class DrawWindow(BufferedWindow):
         BufferedWindow.__init__(self, *args, **kwargs)
 
     def Draw(self, dc):
-        dc.SetBackground( wx.Brush("White") )
-        dc.Clear() # make sure you clear the bitmap!
+        dc.SetBackground(wx.Brush("White"))
+        dc.Clear()  # make sure you clear the bitmap!
 
         # Here's the actual drawing code.
         for key, data in list(self.DrawData.items()):
             if key == "Rectangles":
                 dc.SetBrush(wx.BLUE_BRUSH)
-                dc.SetPen(wx.Pen('VIOLET', 4))
+                dc.SetPen(wx.Pen("VIOLET", 4))
                 for r in data:
                     dc.DrawRectangle(*r)
             elif key == "Ellipses":
                 dc.SetBrush(wx.Brush("GREEN YELLOW"))
-                dc.SetPen(wx.Pen('CADET BLUE', 2))
+                dc.SetPen(wx.Pen("CADET BLUE", 2))
                 for r in data:
                     dc.DrawEllipse(*r)
             elif key == "Polygons":
                 dc.SetBrush(wx.Brush("SALMON"))
-                dc.SetPen(wx.Pen('VIOLET RED', 4))
+                dc.SetPen(wx.Pen("VIOLET RED", 4))
                 for r in data:
                     dc.DrawPolygon(r)
 
 
 class TestFrame(wx.Frame):
     def __init__(self, parent=None):
-        wx.Frame.__init__(self, parent,
-                          size = (500,500),
-                          title="Double Buffered Test",
-                          style=wx.DEFAULT_FRAME_STYLE)
+        wx.Frame.__init__(
+            self,
+            parent,
+            size=(500, 500),
+            title="Double Buffered Test",
+            style=wx.DEFAULT_FRAME_STYLE,
+        )
 
         ## Set up the MenuBar
         MenuBar = wx.MenuBar()
@@ -139,9 +147,9 @@ class TestFrame(wx.Frame):
         MenuBar.Append(file_menu, "&File")
 
         draw_menu = wx.Menu()
-        item = draw_menu.Append(wx.ID_ANY, "&New Drawing","Update the Drawing Data")
+        item = draw_menu.Append(wx.ID_ANY, "&New Drawing", "Update the Drawing Data")
         self.Bind(wx.EVT_MENU, self.NewDrawing, item)
-        item = draw_menu.Append(wx.ID_ANY,'&Save Drawing\tAlt-I','')
+        item = draw_menu.Append(wx.ID_ANY, "&Save Drawing\tAlt-I", "")
         self.Bind(wx.EVT_MENU, self.SaveToFile, item)
         MenuBar.Append(draw_menu, "&Draw")
 
@@ -152,19 +160,22 @@ class TestFrame(wx.Frame):
         #   so that the Windows has teh right size.
         self.NewDrawing()
 
-    def OnQuit(self,event):
+    def OnQuit(self, event):
         self.Close(True)
 
     def NewDrawing(self, event=None):
         self.Window.DrawData = self.MakeNewData()
         self.Window.UpdateDrawing()
 
-    def SaveToFile(self,event):
-        dlg = wx.FileDialog(self, "Choose a file name to save the image as a PNG to",
-                           defaultDir = "",
-                           defaultFile = "",
-                           wildcard = "*.png",
-                           style = wx.SAVE)
+    def SaveToFile(self, event):
+        dlg = wx.FileDialog(
+            self,
+            "Choose a file name to save the image as a PNG to",
+            defaultDir="",
+            defaultFile="",
+            wildcard="*.png",
+            style=wx.SAVE,
+        )
         if dlg.ShowModal() == wx.ID_OK:
             self.Window.SaveToFile(dlg.GetPath(), wx.BITMAP_TYPE_PNG)
         dlg.Destroy()
@@ -177,34 +188,35 @@ class TestFrame(wx.Frame):
         # make some random rectangles
         l = []
         for i in range(5):
-            w = random.randint(1,MaxX/2)
-            h = random.randint(1,MaxY/2)
-            x = random.randint(1,MaxX-w)
-            y = random.randint(1,MaxY-h)
-            l.append( (x,y,w,h) )
+            w = random.randint(1, MaxX / 2)
+            h = random.randint(1, MaxY / 2)
+            x = random.randint(1, MaxX - w)
+            y = random.randint(1, MaxY - h)
+            l.append((x, y, w, h))
         DrawData["Rectangles"] = l
 
         # make some random ellipses
         l = []
         for i in range(5):
-            w = random.randint(1,MaxX/2)
-            h = random.randint(1,MaxY/2)
-            x = random.randint(1,MaxX-w)
-            y = random.randint(1,MaxY-h)
-            l.append( (x,y,w,h) )
+            w = random.randint(1, MaxX / 2)
+            h = random.randint(1, MaxY / 2)
+            x = random.randint(1, MaxX - w)
+            y = random.randint(1, MaxY - h)
+            l.append((x, y, w, h))
         DrawData["Ellipses"] = l
 
         # Polygons
         l = []
         for i in range(3):
             points = []
-            for j in range(random.randint(3,8)):
-                point = (random.randint(1,MaxX),random.randint(1,MaxY))
+            for j in range(random.randint(3, 8)):
+                point = (random.randint(1, MaxX), random.randint(1, MaxY))
                 points.append(point)
             l.append(points)
         DrawData["Polygons"] = l
 
         return DrawData
+
 
 class DemoApp(wx.App):
     def OnInit(self):
@@ -212,6 +224,7 @@ class DemoApp(wx.App):
         self.SetTopWindow(frame)
 
         return True
+
 
 if __name__ == "__main__":
     app = DemoApp(0)

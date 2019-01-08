@@ -10,15 +10,15 @@ Plus hard to disentangle from the pylab project https://code.google.com/archive/
 
 
 def menuMaker(frame, menus):
-  menubar = wx.MenuBar()
-  for m, n in list(menus.items()):
-    menu = wx.Menu()
-    menubar.Append(menu, m)
-    for x in n:
-      id = wx.NewId()
-      menu.Append(id, x[0], x[1])
-      wx.EVT_MENU(frame, id, x[2])
-  frame.SetMenuBar(menubar)
+    menubar = wx.MenuBar()
+    for m, n in list(menus.items()):
+        menu = wx.Menu()
+        menubar.Append(menu, m)
+        for x in n:
+            id = wx.NewId()
+            menu.Append(id, x[0], x[1])
+            wx.EVT_MENU(frame, id, x[2])
+    frame.SetMenuBar(menubar)
 
 
 class RectangleShape(Shape):
@@ -26,7 +26,9 @@ class RectangleShape(Shape):
 
         # ANDY
         if ANDYMAIN:
-            topx, topy = ANDYMAIN.canvas.GetViewStart()  # The positions are in logical scroll units, not pixels, so to convert to pixels you will have to multiply by the number of pixels per scroll increment.
+            topx, topy = (
+                ANDYMAIN.canvas.GetViewStart()
+            )  # The positions are in logical scroll units, not pixels, so to convert to pixels you will have to multiply by the number of pixels per scroll increment.
             print(topx, topy)
             px, py = ANDYMAIN.canvas.GetScrollPixelsPerUnit()
             print(topx, topy, px, py, topx * px, topy * py)
@@ -42,14 +44,19 @@ class RectangleShape(Shape):
 
     def draw(self, dc):
         Shape.draw(self, dc)
-        dc.DrawRectangle(int(self.x[0]), int(self.y[0]), int(self.x[1] - self.x[0]),
-                         int(self.y[1] - self.y[0]))
+        dc.DrawRectangle(
+            int(self.x[0]), int(self.y[0]), int(self.x[1] - self.x[0]), int(self.y[1] - self.y[0])
+        )
 
     def HitTest(self, x, y):
-        if x < self.x[0]: return False
-        if x > self.x[1]: return False
-        if y < self.y[0]: return False
-        if y > self.y[1]: return False
+        if x < self.x[0]:
+            return False
+        if x > self.x[1]:
+            return False
+        if y < self.y[0]:
+            return False
+        if y > self.y[1]:
+            return False
         return True
 
 
@@ -155,15 +162,9 @@ class RectangleShape(Shape):
 #         return False
 #
 
+
 class ShapeCanvas(wx.ScrolledWindow):
-    def __init__(self,
-                 parent,
-                 id=-1,
-                 pos=(-1, -1),
-                 size=(-1, -1),
-                 style=0,
-                 name="",
-                 ):
+    def __init__(self, parent, id=-1, pos=(-1, -1), size=(-1, -1), style=0, name=""):
         wx.ScrolledWindow.__init__(self, parent, id, pos, size, style, name)
         self.diagram = None
         self.nodes = []
@@ -292,7 +293,8 @@ class ShapeCanvas(wx.ScrolledWindow):
         item.OnLeftDown(event)  # send leftdown event to current shape
 
         if isinstance(item, Selectable):
-            if not event.ShiftDown():  self.deselect()
+            if not event.ShiftDown():
+                self.deselect()
 
         self.select(item)
         self.Refresh()
@@ -332,8 +334,10 @@ class ShapeCanvas(wx.ScrolledWindow):
     def getEventCoordinates(self, event):
         originX, originY = self.GetViewStart()
         unitX, unitY = self.GetScrollPixelsPerUnit()
-        return [(event.GetX() + (originX * unitX)) / self.scalex,
-                (event.GetY() + (originY * unitY)) / self.scaley]
+        return [
+            (event.GetX() + (originX * unitX)) / self.scalex,
+            (event.GetY() + (originY * unitY)) / self.scaley,
+        ]
 
     def getSelectedShapes(self):
         return self.selectedShapes
@@ -385,58 +389,59 @@ class ShapeCanvas(wx.ScrolledWindow):
 
 
 class Block(RectangleShape, Connectable, Resizeable, Selectable, Attributable):
+    def __init__(self):
+        RectangleShape.__init__(self)
+        Resizeable.__init__(self)
+        Connectable.__init__(self)
+        Attributable.__init__(self)
+        self.AddAttributes(["label", "pen", "fill", "input", "output"])
+        self.label = "Block"
 
-  def __init__(self):
-    RectangleShape.__init__(self)
-    Resizeable.__init__(self)
-    Connectable.__init__(self)
-    Attributable.__init__(self)
-    self.AddAttributes(['label', 'pen', 'fill', 'input', 'output'])
-    self.label = 'Block'
+    def draw(self, dc):
+        RectangleShape.draw(self, dc)
+        w, h = dc.GetTextExtent(self.label)
+        mx = int((self.x[0] + self.x[1]) / 2.0) - int(w / 2.0)
+        my = int((self.y[0] + self.y[1]) / 2.0) - int(h / 2.0)
+        dc.DrawText(self.label, mx, my)
 
-  def draw(self, dc):
-    RectangleShape.draw(self, dc)
-    w, h = dc.GetTextExtent(self.label)
-    mx = int((self.x[0] + self.x[1]) / 2.0) - int(w / 2.0)
-    my = int((self.y[0] + self.y[1]) / 2.0) - int(h / 2.0)
-    dc.DrawText(self.label, mx, my)
+    def OnLeftDown(self, event):
+        if isinstance(self, Block) and event.ControlDown():
+            d = TextEntryDialog(None, "Block Label", defaultValue=self.label, style=OK)
+            d.ShowModal()
+            self.label = d.GetValue()
 
-  def OnLeftDown(self, event):
-    if isinstance(self, Block) and event.ControlDown():
-      d = TextEntryDialog(None, 'Block Label', defaultValue=self.label, style=OK)
-      d.ShowModal()
-      self.label = d.GetValue()
+    # ANDY
+    # def OnRightDown(self,event):
+    #    f = AttributeEditor(NULL, -1, "props",self)
+    #    f.Show(True)
 
-  # ANDY
-  # def OnRightDown(self,event):
-  #    f = AttributeEditor(NULL, -1, "props",self)
-  #    f.Show(True)
+    # ANDY
+    def OnRightDown(self, event):
+        self.popupmenu = Menu()
+        item = self.popupmenu.Append(2011, "Properties...")
+        ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
+        item = self.popupmenu.Append(2012, "Delete Node")
+        ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
+        item = self.popupmenu.Append(2013, "Cancel")
+        ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
+        #
+        pos = event.GetPosition()
+        pos = ANDYMAIN.canvas.ScreenToClient(pos)
+        ANDYMAIN.canvas.PopupMenu(self.popupmenu, pos)
 
-  # ANDY
-  def OnRightDown(self, event):
-    self.popupmenu = Menu()
-    item = self.popupmenu.Append(2011, "Properties...")
-    ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
-    item = self.popupmenu.Append(2012, "Delete Node")
-    ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
-    item = self.popupmenu.Append(2013, "Cancel")
-    ANDYMAIN.canvas.Bind(EVT_MENU, self.OnPopupItemSelected, item)
-    #
-    pos = event.GetPosition()
-    pos = ANDYMAIN.canvas.ScreenToClient(pos)
-    ANDYMAIN.canvas.PopupMenu(self.popupmenu, pos)
+    ##########
 
-  ##########
+    # ANDY
+    def OnPopupItemSelected(self, event):
+        item = self.popupmenu.FindItemById(event.GetId())
+        text = item.GetText()
+        # wx.MessageBox("You selected item '%s'" % text)
+        if text == "Properties...":
+            f = AttributeEditor(None, -1, "props", self)
+            f.Show(True)
 
-  # ANDY
-  def OnPopupItemSelected(self, event):
-    item = self.popupmenu.FindItemById(event.GetId())
-    text = item.GetText()
-    # wx.MessageBox("You selected item '%s'" % text)
-    if text == "Properties...":
-      f = AttributeEditor(None, -1, "props", self)
-      f.Show(True)
-  ################
+    ################
+
 
 #
 # class CodeBlock(Block):
@@ -452,19 +457,19 @@ class Block(RectangleShape, Connectable, Resizeable, Selectable, Attributable):
 #
 #
 class ContainerBlock(Block, Diagram):
+    def __init__(self):
+        Block.__init__(self)
+        Diagram.__init__(self)
 
-  def __init__(self):
-    Block.__init__(self)
-    Diagram.__init__(self)
+        self.label = "Container"
+        self.pen = ["BLACK", 2]
+        self.fill = ["GREEN"]
 
-    self.label = 'Container'
-    self.pen = ['BLACK', 2]
-    self.fill = ['GREEN']
+    def OnLeftDClick(self, event):
+        f = CodeFrame(self)
+        f.SetTitle(self.label)
+        f.Show(True)
 
-  def OnLeftDClick(self, event):
-    f = CodeFrame(self)
-    f.SetTitle(self.label)
-    f.Show(True)
 
 # class AttributeEditor(Frame):
 #     def __init__(self, parent, ID, title, item):
@@ -519,108 +524,126 @@ class ContainerBlock(Block, Diagram):
 
 
 class CodeFrame(wx.Frame):
-  def __init__(self, diagram):
-    wx.Frame.__init__(self, None, -1, 'Untitled', size=(500, 300))
+    def __init__(self, diagram):
+        wx.Frame.__init__(self, None, -1, "Untitled", size=(500, 300))
 
-    self.file = None
-    menus = {}
+        self.file = None
+        menus = {}
 
-    menus['&Add'] = [
-      ('Code', "Block that holds code", self.newCodeBlock),
-      ('Container', 'Block that holds blocks', self.newContBlock),
-      ('Point', 'Playing with points', self.newPointShape),
-      ('Lines', 'Plotting', self.newLinesShape),
-    ]
+        menus["&Add"] = [
+            ("Code", "Block that holds code", self.newCodeBlock),
+            ("Container", "Block that holds blocks", self.newContBlock),
+            ("Point", "Playing with points", self.newPointShape),
+            ("Lines", "Plotting", self.newLinesShape),
+        ]
 
-    menus['&Zoom'] = [
-      ('Zoom In\tCtrl+o', "zoom in", self.zoomin),
-      ('Zoom Out\tCtrl+p', "zoom out", self.zoomout),
-    ]
+        menus["&Zoom"] = [
+            ("Zoom In\tCtrl+o", "zoom in", self.zoomin),
+            ("Zoom Out\tCtrl+p", "zoom out", self.zoomout),
+        ]
 
-    menuMaker(self, menus)
+        menuMaker(self, menus)
 
-    # Canvas Stuff
-    self.canvas = ShapeCanvas(self, -1)
-    self.canvas.SetDiagram(diagram)
-    self.canvas.SetBackgroundColour(WHITE)
+        # Canvas Stuff
+        self.canvas = ShapeCanvas(self, -1)
+        self.canvas.SetDiagram(diagram)
+        self.canvas.SetBackgroundColour(WHITE)
+
+        # ANDY
+        global ANDYMAIN
+        ANDYMAIN = self
+        #
+        self.canvas.SetScrollbars(1, 1, 600, 400)
+        self.canvas.SetVirtualSize((600, 400))
+        ################
+
+        self.Show(True)
 
     # ANDY
-    global ANDYMAIN
-    ANDYMAIN = self
+    # def OnPopupItemSelected(self, event):
+    #    OnPopupItemSelected(self, event):
     #
-    self.canvas.SetScrollbars(1, 1, 600, 400)
-    self.canvas.SetVirtualSize((600, 400))
+    #    item = self.popupmenu.FindItemById(event.GetId())
+    #    text = item.GetText()
+    #    wx.MessageBox("You selected item '%s'" % text)
+    #    if text == "Properties...":
+    #        f = AttributeEditor(NULL, -1, "props",self)
+    #        f.Show(True)
     ################
 
-    self.Show(True)
+    def zoomin(self, event):
+        self.canvas.scalex = max(self.canvas.scalex + 0.05, 0.3)
+        self.canvas.scaley = max(self.canvas.scaley + 0.05, 0.3)
 
-  # ANDY
-  # def OnPopupItemSelected(self, event):
-  #    OnPopupItemSelected(self, event):
-  #
-  #    item = self.popupmenu.FindItemById(event.GetId())
-  #    text = item.GetText()
-  #    wx.MessageBox("You selected item '%s'" % text)
-  #    if text == "Properties...":
-  #        f = AttributeEditor(NULL, -1, "props",self)
-  #        f.Show(True)
-  ################
+        # ANDY
+        self.canvas.SetVirtualSize((1900, 1600))
 
-  def zoomin(self, event):
-    self.canvas.scalex = max(self.canvas.scalex + .05, .3)
-    self.canvas.scaley = max(self.canvas.scaley + .05, .3)
+        self.canvas.Refresh()
 
-    # ANDY
-    self.canvas.SetVirtualSize((1900, 1600))
+    def zoomout(self, event):
+        self.canvas.scalex = self.canvas.scalex - 0.05
+        self.canvas.scaley = self.canvas.scaley - 0.05
+        self.canvas.Refresh()
 
-    self.canvas.Refresh()
+    def newCodeBlock(self, event):
+        i = CodeBlock()
+        self.canvas.AddShape(i)
+        self.canvas.deselect()
+        self.canvas.Refresh()
 
-  def zoomout(self, event):
-    self.canvas.scalex = self.canvas.scalex - .05
-    self.canvas.scaley = self.canvas.scaley - .05
-    self.canvas.Refresh()
+    def newContBlock(self, event):
+        i = ContainerBlock()
+        self.canvas.AddShape(i)
+        self.canvas.deselect()
+        self.canvas.Refresh()
 
-  def newCodeBlock(self, event):
-    i = CodeBlock()
-    self.canvas.AddShape(i)
-    self.canvas.deselect()
-    self.canvas.Refresh()
+    def newPointShape(self, event):
+        i = PointShape(50, 50)
+        self.canvas.AddShape(i)
+        self.canvas.deselect()
+        self.canvas.Refresh()
 
-  def newContBlock(self, event):
-    i = ContainerBlock()
-    self.canvas.AddShape(i)
-    self.canvas.deselect()
-    self.canvas.Refresh()
-
-  def newPointShape(self, event):
-    i = PointShape(50, 50)
-    self.canvas.AddShape(i)
-    self.canvas.deselect()
-    self.canvas.Refresh()
-
-  def newLinesShape(self, event):
-    points = [
-      (5, 30), (10, 20), (20, 25), (30, 50), (40, 70),
-      (50, 30), (60, 20), (70, 25), (80, 50), (90, 70),
-      (100, 30), (110, 20), (115, 25), (120, 50), (125, 70),
-      (130, 30), (135, 20), (140, 25), (150, 50), (160, 70),
-      (165, 30), (170, 20), (175, 25), (180, 50), (200, 70),
-    ]
-    i = LinesShape(points)
-    self.canvas.AddShape(i)
-    self.canvas.deselect()
-    self.canvas.Refresh()
+    def newLinesShape(self, event):
+        points = [
+            (5, 30),
+            (10, 20),
+            (20, 25),
+            (30, 50),
+            (40, 70),
+            (50, 30),
+            (60, 20),
+            (70, 25),
+            (80, 50),
+            (90, 70),
+            (100, 30),
+            (110, 20),
+            (115, 25),
+            (120, 50),
+            (125, 70),
+            (130, 30),
+            (135, 20),
+            (140, 25),
+            (150, 50),
+            (160, 70),
+            (165, 30),
+            (170, 20),
+            (175, 25),
+            (180, 50),
+            (200, 70),
+        ]
+        i = LinesShape(points)
+        self.canvas.AddShape(i)
+        self.canvas.deselect()
+        self.canvas.Refresh()
 
 
 class MyApp(wx.App):
-  def OnInit(self):
-    frame = CodeFrame(ContainerBlock())
-    return True
+    def OnInit(self):
+        frame = CodeFrame(ContainerBlock())
+        return True
 
 
 ##########################################
 
 app = MyApp(0)
 app.MainLoop()
-
-

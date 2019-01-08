@@ -1,9 +1,9 @@
 class Torture1:
     def PrepTests(self):
         self.a = UmlCanvas(panel, Log(), self.frame)
-        self.b.append( UmlCanvas(panel, Log(), self.frame) )
+        self.b.append(UmlCanvas(panel, Log(), self.frame))
 
-    #def Tricky(self):
+    # def Tricky(self):
     #    self.log = Log()
     #    from self.frame = wx.Frame    ? should pick up more?
     #    self.notebook = wx.Notebook
@@ -20,5 +20,6 @@ class Torture1:
     #    self.printData = wx.PrintData()
     #    self.box = wx.BoxSizer(wx.VERTICAL)
     #    self.canvas = self.umlcanvas.GetDiagram().GetCanvas()
-    
+
+
 a = Torture1()

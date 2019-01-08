@@ -36,8 +36,7 @@ class CommandManager(object):
 
     def _can_redo(self):
         """ Docstring """
-        return len(self._list) > 0 and \
-            self._current_undo < (len(self._list) - 1)
+        return len(self._list) > 0 and self._current_undo < (len(self._list) - 1)
 
     def _can_undo(self):
         """ Docstring """
@@ -117,7 +116,7 @@ class CommandManager(object):
 
     def undo(self, num):
         """ Docstring """
-        #print 'undo module num is', num
+        # print 'undo module num is', num
         if self._can_undo():
             for _ in range(1, num + 1):
                 self.currentItem.undo()
@@ -136,20 +135,20 @@ import unittest
 class TestCase01(unittest.TestCase):
     """ Docstring """
 
-    fakeScreen = ''
+    fakeScreen = ""
 
     class CmdDoA(Command):
         """ Docstring """
 
         def __init__(self):
             """ Docstring """
-            self._oldstate = ''
+            self._oldstate = ""
 
         def execute(self):
             """ Docstring """
             # print 'doing A'
             self._oldstate = TestCase01.fakeScreen
-            TestCase01.fakeScreen = 'aaaaa'
+            TestCase01.fakeScreen = "aaaaa"
 
         def redo(self):  # override
             """ Docstring """
@@ -166,13 +165,13 @@ class TestCase01(unittest.TestCase):
 
         def __init__(self):
             """ Docstring """
-            self._oldstate = ''
+            self._oldstate = ""
 
         def execute(self):
             """ Docstring """
             # print 'doing B'
             self._oldstate = TestCase01.fakeScreen
-            TestCase01.fakeScreen = 'bbbbbbbbbbbbbbbbbbb'
+            TestCase01.fakeScreen = "bbbbbbbbbbbbbbbbbbb"
 
         def redo(self):  # override
             """ Docstring """
@@ -186,7 +185,7 @@ class TestCase01(unittest.TestCase):
 
     def setUp(self):
         """ Docstring """
-        TestCase01.fakeScreen = ''
+        TestCase01.fakeScreen = ""
 
     def check_can_create_instances(self):
         """ Docstring """
@@ -198,13 +197,13 @@ class TestCase01(unittest.TestCase):
         undoStack = CommandManager(100)
         cmd = TestCase01.CmdDoA()
 
-        assert TestCase01.fakeScreen == ''
+        assert TestCase01.fakeScreen == ""
 
-        undoStack.run(cmd)   # cmd.execute
-        assert TestCase01.fakeScreen == 'aaaaa'
+        undoStack.run(cmd)  # cmd.execute
+        assert TestCase01.fakeScreen == "aaaaa"
 
         undoStack.undo(1)
-        assert TestCase01.fakeScreen == ''
+        assert TestCase01.fakeScreen == ""
 
     def check_fail_if_too_many_undos(self):
         """
@@ -213,55 +212,55 @@ class TestCase01(unittest.TestCase):
         undoStack = CommandManager(100)
         cmd = TestCase01.CmdDoA()
 
-        assert TestCase01.fakeScreen == ''
+        assert TestCase01.fakeScreen == ""
 
-        undoStack.run(cmd)   # cmd.execute
-        assert TestCase01.fakeScreen == 'aaaaa'
-
-        undoStack.undo(1)
-        assert TestCase01.fakeScreen == ''
+        undoStack.run(cmd)  # cmd.execute
+        assert TestCase01.fakeScreen == "aaaaa"
 
         undoStack.undo(1)
+        assert TestCase01.fakeScreen == ""
+
+        undoStack.undo(1)
         undoStack.undo(1)
 
-        #self.assertRaises(EHiddenProc, undoStack.undo, 1)
+        # self.assertRaises(EHiddenProc, undoStack.undo, 1)
 
     def check_Redo_01(self):
         """ Docstring """
         undoStack = CommandManager(100)
         cmd = TestCase01.CmdDoA()
 
-        assert TestCase01.fakeScreen == ''
+        assert TestCase01.fakeScreen == ""
 
-        undoStack.run(cmd)   # cmd.execute
-        assert TestCase01.fakeScreen == 'aaaaa'
+        undoStack.run(cmd)  # cmd.execute
+        assert TestCase01.fakeScreen == "aaaaa"
 
         undoStack.undo(1)
-        assert TestCase01.fakeScreen == ''
+        assert TestCase01.fakeScreen == ""
 
         undoStack.redo(1)
-        assert TestCase01.fakeScreen == 'aaaaa'
+        assert TestCase01.fakeScreen == "aaaaa"
 
     def check_Redo_02(self):
         """ Docstring """
         undoStack = CommandManager(100)
         cmd = TestCase01.CmdDoA()
 
-        assert TestCase01.fakeScreen == ''
+        assert TestCase01.fakeScreen == ""
 
-        undoStack.run(cmd)   # cmd.execute
-        assert TestCase01.fakeScreen == 'aaaaa'
+        undoStack.run(cmd)  # cmd.execute
+        assert TestCase01.fakeScreen == "aaaaa"
 
         undoStack.undo(1)
-        assert TestCase01.fakeScreen == ''
+        assert TestCase01.fakeScreen == ""
 
-        undoStack.redo(2)   # should only be one item on stack, though
-        assert TestCase01.fakeScreen == 'aaaaa'
+        undoStack.redo(2)  # should only be one item on stack, though
+        assert TestCase01.fakeScreen == "aaaaa"
 
         # these shouldn't do anything...
         undoStack.redo(2)
         undoStack.redo(2)
-        assert TestCase01.fakeScreen == 'aaaaa'
+        assert TestCase01.fakeScreen == "aaaaa"
 
     def check_UndoTwoDifferentCommands(self):
         """ Docstring """
@@ -269,25 +268,25 @@ class TestCase01(unittest.TestCase):
         cmdA = TestCase01.CmdDoA()
         cmdB = TestCase01.CmdDoB()
 
-        assert TestCase01.fakeScreen == ''
+        assert TestCase01.fakeScreen == ""
 
-        undoStack.run(cmdA)   # cmd.execute
-        assert TestCase01.fakeScreen == 'aaaaa'
+        undoStack.run(cmdA)  # cmd.execute
+        assert TestCase01.fakeScreen == "aaaaa"
 
-        undoStack.run(cmdB)   # cmd.execute
-        assert TestCase01.fakeScreen == 'bbbbbbbbbbbbbbbbbbb'
-
-        undoStack.undo(1)
-        assert TestCase01.fakeScreen == 'aaaaa'
+        undoStack.run(cmdB)  # cmd.execute
+        assert TestCase01.fakeScreen == "bbbbbbbbbbbbbbbbbbb"
 
         undoStack.undo(1)
-        assert TestCase01.fakeScreen == ''
+        assert TestCase01.fakeScreen == "aaaaa"
 
-        undoStack.redo(2)   # should two items on stack
-        assert TestCase01.fakeScreen == 'bbbbbbbbbbbbbbbbbbb'
+        undoStack.undo(1)
+        assert TestCase01.fakeScreen == ""
+
+        undoStack.redo(2)  # should two items on stack
+        assert TestCase01.fakeScreen == "bbbbbbbbbbbbbbbbbbb"
 
         undoStack.undo(2)
-        assert TestCase01.fakeScreen == ''
+        assert TestCase01.fakeScreen == ""
 
     def check_UndoThreeDifferentCommands(self):
         """ Docstring """
@@ -296,25 +295,25 @@ class TestCase01(unittest.TestCase):
         cmdA2 = TestCase01.CmdDoA()
         cmdB = TestCase01.CmdDoB()
 
-        assert TestCase01.fakeScreen == ''
+        assert TestCase01.fakeScreen == ""
 
-        undoStack.run(cmdA)   # cmd.execute
-        assert TestCase01.fakeScreen == 'aaaaa'
+        undoStack.run(cmdA)  # cmd.execute
+        assert TestCase01.fakeScreen == "aaaaa"
 
-        undoStack.run(cmdB)   # cmd.execute
-        assert TestCase01.fakeScreen == 'bbbbbbbbbbbbbbbbbbb'
+        undoStack.run(cmdB)  # cmd.execute
+        assert TestCase01.fakeScreen == "bbbbbbbbbbbbbbbbbbb"
 
-        undoStack.run(cmdA2)   # cmd.execute
-        assert TestCase01.fakeScreen == 'aaaaa'
-
-        undoStack.undo(1)
-        assert TestCase01.fakeScreen == 'bbbbbbbbbbbbbbbbbbb'
+        undoStack.run(cmdA2)  # cmd.execute
+        assert TestCase01.fakeScreen == "aaaaa"
 
         undoStack.undo(1)
-        assert TestCase01.fakeScreen == 'aaaaa'
+        assert TestCase01.fakeScreen == "bbbbbbbbbbbbbbbbbbb"
 
         undoStack.undo(1)
-        assert TestCase01.fakeScreen == ''
+        assert TestCase01.fakeScreen == "aaaaa"
+
+        undoStack.undo(1)
+        assert TestCase01.fakeScreen == ""
 
 
 def suite():
@@ -327,15 +326,15 @@ def suite():
         return cmp(x[-2:], y[-2:])
 
     for i in allchecks:
-        if i.startswith('_check'):
+        if i.startswith("_check"):
             print("WARNING - only running tests prepended with underscore")
-            testprefix = '_check'
+            testprefix = "_check"
             break
     else:
-        testprefix = 'check'
+        testprefix = "check"
 
     suite1 = unittest.makeSuite(TestCase01, testprefix, sortUsing=numbersuffix)
-    #suite2 = unittest.makeSuite(TestCase02, testprefix, \
+    # suite2 = unittest.makeSuite(TestCase02, testprefix, \
     #            sortUsing=numbersuffix)
 
     # alltests = unittest.TestSuite((suite1, suite2))
@@ -356,9 +355,9 @@ def main():
     """
 
     runner = unittest.TextTestRunner(descriptions=0, verbosity=2)
-    #runner = unittest.TextTestRunner(descriptions=0, verbosity=1)
+    # runner = unittest.TextTestRunner(descriptions=0, verbosity=1)
     runner.run(suite())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -24,6 +24,7 @@ SUMMARY: csharp2 implementation seems cleaner.  Don't need to define 'event' con
 import operator
 from functools import reduce
 
+
 class multicast(dict):
     "Class multiplexes messages to registered objects"
 
@@ -34,8 +35,9 @@ class multicast(dict):
 
     def __call__(self, *args, **kwargs):
         "Invoke method attributes and return results through another multicast"
-        return self.__class__( [ (alias, obj(*args, **kwargs) ) \
-                for alias, obj in list(self.items()) if callable(obj) ] )
+        return self.__class__(
+            [(alias, obj(*args, **kwargs)) for alias, obj in list(self.items()) if callable(obj)]
+        )
 
     def __bool__(self):
         "A multicast is logically true if all delegate attributes are logically true"
@@ -44,8 +46,9 @@ class multicast(dict):
 
     def __getattr__(self, name):
         "Wrap requested attributes for further processing"
-        return self.__class__( [ (alias, getattr(obj, name) ) \
-                for alias, obj in list(self.items()) if hasattr(obj, name) ] )
+        return self.__class__(
+            [(alias, getattr(obj, name)) for alias, obj in list(self.items()) if hasattr(obj, name)]
+        )
 
     def __setattr__(self, name, value):
         """Wrap setting of requested attributes for further
@@ -55,22 +58,23 @@ class multicast(dict):
             o.setdefault(name, value)
 
     # Andy Modifications
-        
+
     def addObserver(self, o):
         self[id(o)] = o
-        
+
     def removeObserver(self, o):
         if id(o) in self:
             del self[id(o)]
 
-    #def __add__(self, other):
+    # def __add__(self, other):
     #    print "__add__ called"
     #    #self.addObserver(other)
 
-    #def __setitem__(self, key, value):
+    # def __setitem__(self, key, value):
     #    # optional processing here
     #    super(multicast, self).__setitem__(key, value)
-    #    
+    #
+
 
 if __name__ == "__main__":
     import io
@@ -95,46 +99,51 @@ if __name__ == "__main__":
     # Andy's tests
 
     print("Andy's tests:")
-    
+
     class Model:
         def __init__(self):
             self.value = 0
             self.observers = multicast()
+
         def addObserver(self, o):
             self.observers.addObserver(o)
+
         def addValue(self, v):
             self.value += v
             self.observers.notifyOfModelValueChange(v, self.value)
-            
+
     class Observer1:
         def notifyOfModelValueChange(self, value, new_total_value):
-            print("Observer1 got notified, added value %(value)4d - total now %(new_total_value)4d" % vars())
-                
+            print(
+                "Observer1 got notified, added value %(value)4d - total now %(new_total_value)4d"
+                % vars()
+            )
+
     model = Model()
     o1 = Observer1()
-    model.addObserver(o1)                          # Use model's addobserver method which wraps the use of the multicast
+    model.addObserver(o1)  # Use model's addobserver method which wraps the use of the multicast
     model.addValue(10)
     model.addValue(605)
-    
+
     class Observer2:
         def __init__(self):
             self.num_calls = 0
+
         def notifyOfModelValueChange(self, value, new_total_value):
             self.num_calls += 1
             print("Observer2 got notified %2d times" % self.num_calls)
 
     o2 = Observer2()
-    model.observers.addObserver(o2)                         # Or access the multicast directly. 
+    model.observers.addObserver(o2)  # Or access the multicast directly.
     model.addValue(100)
     model.addValue(2000)
-    
-    model.observers.removeObserver(o1)                      # Or access the multicast directly.
+
+    model.observers.removeObserver(o1)  # Or access the multicast directly.
     model.addValue(33)
     model.addValue(44)
-    
+
     ## Test extra __add__ syntax
     #
-    #model.observers += o1
-    #model.addValue(1)
-    #model.addValue(1)
-    
+    # model.observers += o1
+    # model.addValue(1)
+    # model.addValue(1)

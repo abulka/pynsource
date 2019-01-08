@@ -8,11 +8,12 @@ from .graph_persistence import GraphPersistence
 
 global_colour_index = 1
 
+
 class Graph:
     def __init__(self):
         self.Clear()
         self.persistence = GraphPersistence(self)
-        
+
     def Clear(self):
         self.nodeSet = {}
         self.nodes = []
@@ -51,14 +52,16 @@ class Graph:
         #        and add extra attributes to the edge, thus potentially making it
         #        the same or different to another existing edge.  We simply cannot
         #        tell at this point.
-        
+
         # If node hasn't been added, then add it now
-        if not self.FindNodeById(source_node.id): self.AddNode(source_node)
-        if not self.FindNodeById(target_node.id): self.AddNode(target_node)
-            
-        edge = {'source': source_node, 'target': target_node}
+        if not self.FindNodeById(source_node.id):
+            self.AddNode(source_node)
+        if not self.FindNodeById(target_node.id):
+            self.AddNode(target_node)
+
+        edge = {"source": source_node, "target": target_node}
         if weight:
-            edge['weight'] = weight
+            edge["weight"] = weight
         self.edges.append(edge)
         return edge
 
@@ -68,11 +71,11 @@ class Graph:
             if node.id in list(self.nodeSet.keys()):
                 del self.nodeSet[node.id]
         for edge in self.edges[:]:
-            if edge['source'].id == node.id or edge['target'].id == node.id:
+            if edge["source"].id == node.id or edge["target"].id == node.id:
                 self.edges.remove(edge)
 
     # Special getter which sorts nodes
-    
+
     @property
     def nodes_sorted_by_generalisation(self):
         """
@@ -88,32 +91,32 @@ class Graph:
             count = 1
             child_level_counts = []
             for n in node.children:
-                child_level_counts.append( num_descendant_levels(n) )
+                child_level_counts.append(num_descendant_levels(n))
             count += max(child_level_counts)
             return count
 
         def count_attrs_meths(node):
             result = 0
-            if hasattr(node, 'attrs'):
+            if hasattr(node, "attrs"):
                 result += len(node.attrs)
-            if hasattr(node, 'meths'):
+            if hasattr(node, "meths"):
                 result += len(node.meths)
             return result
-                
+
         def sort_siblings(children):
             if not children:
                 return []
-                
+
             # prioritise by num descendants so the leftmost node is part of the longest generalisation chain
             kids = sorted(children, key=lambda node: -num_descendant_levels(node))
             result = [kids[0]]
-            
+
             # then prioritise by node height, from biggest to smallest
             if len(kids) > 1:
-                result.extend( sorted(kids[1:], key=lambda node: -count_attrs_meths(node)) )
+                result.extend(sorted(kids[1:], key=lambda node: -count_attrs_meths(node)))
 
             return result
-        
+
         def process_descendants(node, prevent_fc=False):
             """
             Note: this algorithm takes a while to understand. There is recursion
@@ -135,43 +138,53 @@ class Graph:
                         annotation = "fc"
                 else:
                     annotation = "tab"
-                    
+
                 result.append((child, annotation))
-                
+
             for child in kids:
                 isfirst = child == kids[0]
                 result.extend(process_descendants(child, prevent_fc=not isfirst))
             return result
 
-        def order_the_nodes():                
+        def order_the_nodes():
             result = []
             parentless_nodes = [node for node in self.nodes if not node.parents]
-            parentless_nodes = sorted(parentless_nodes[:], key=lambda node: -num_descendant_levels(node)) # put childless roots last
+            parentless_nodes = sorted(
+                parentless_nodes[:], key=lambda node: -num_descendant_levels(node)
+            )  # put childless roots last
             for node in parentless_nodes:
-                result.append((node,"root"))
+                result.append((node, "root"))
                 result.extend(process_descendants(node))
             return result
 
-        assert len(set(self.nodes)) == len(self.nodes), [node.id for node in self.nodes]                                # ensure no duplicates exist
-        
+        assert len(set(self.nodes)) == len(self.nodes), [
+            node.id for node in self.nodes
+        ]  # ensure no duplicates exist
+
         self.setup_temporary_parent_child_relationships()
         result = order_the_nodes()
-        
+
         # You CAN get repeated children entries due to having multiple parents (with multiple inheritance)
-        result = self.remove_duplicates_preserver_order(result) # so filter such duplicates out
-        
-        assert len(result) == len(self.nodes), "Count increased! from %d to %d, diff=%s" %(len(self.nodes), len(result), listdiff([node.id for node in self.nodes], [node[0].id for node in result]))         # ensure not introducing duplicates
-        assert len(set(result)) == len(result), [node.id for node in result]                                            # ensure no duplicates exist
-        
-        self.del_temporary_parent_child_relationships()                    
+        result = self.remove_duplicates_preserver_order(result)  # so filter such duplicates out
+
+        assert len(result) == len(self.nodes), "Count increased! from %d to %d, diff=%s" % (
+            len(self.nodes),
+            len(result),
+            listdiff([node.id for node in self.nodes], [node[0].id for node in result]),
+        )  # ensure not introducing duplicates
+        assert len(set(result)) == len(result), [
+            node.id for node in result
+        ]  # ensure no duplicates exist
+
+        self.del_temporary_parent_child_relationships()
         return result
-    
+
     def remove_duplicates_preserver_order(self, lzt):
         result = []
         for item in lzt:
             if item not in result:
                 result.append(item)
-            #else:
+            # else:
             #    print "duplicate skipped", item
         return result
 
@@ -181,9 +194,9 @@ class Graph:
             node.parents = []
             node.children = []
         for edge in self.edges:
-            if 'uml_edge_type' in edge and edge['uml_edge_type'] == 'generalisation':
-                parent = edge['target']
-                child = edge['source']
+            if "uml_edge_type" in edge and edge["uml_edge_type"] == "generalisation":
+                parent = edge["target"]
+                child = edge["source"]
                 if parent not in child.parents:
                     child.parents.append(parent)
                 if child not in parent.children:
@@ -199,8 +212,8 @@ class Graph:
         global_colour_index = 0
 
         for node in self.nodes:
-            node.colour_index = -1      # mark so that only assign a colour once
-            
+            node.colour_index = -1  # mark so that only assign a colour once
+
         def process_descendants(node):
             global global_colour_index
             kids = node.children
@@ -218,17 +231,16 @@ class Graph:
             node.colour_index = 0
             process_descendants(node)
 
-        self.del_temporary_parent_child_relationships()                    
-
+        self.del_temporary_parent_child_relationships()
 
     def del_temporary_parent_child_relationships(self):
         # remove parent / child knowledge attributes
         for node in self.nodes:
             del node.parents
             del node.children
-                
+
     # These next methods take id as parameters, not nodes.
-    
+
     def FindNodeById(self, id):
         node = self.nodeSet.get(id, None)
         return node
@@ -237,30 +249,32 @@ class Graph:
         node = self.FindNodeById(id)
         if node:
             self.DeleteNode(node)
-        
-    # Persistence methods 
-    
+
+    # Persistence methods
+
     def LoadGraphFromStrings(self, filedata_str, force=False):
         return self.persistence.Load(filedata_str, force)
 
     def GraphToString(self):
         return self.persistence.Save()
- 
+
     def NotifyCreateNewNode(self, id, l, t, w, h):
-        return GraphNode(id, l, t, w, h) # subclasses to override, opportunity to create different instance type
-    
+        return GraphNode(
+            id, l, t, w, h
+        )  # subclasses to override, opportunity to create different instance type
+
     def NotifyOfNodeBeingPersisted(self, node):
         return ""  # subclasses to override, opportunity to inject additional persistence dict info
 
     def NotifyOfEdgeBeingPersisted(self, edge):
         return ""  # subclasses to override, opportunity to inject additional persistence dict info
-    
+
     def NotifyOfNodeCreateFromPersistence(self, node, data):
-        pass    # subclasses to override, opportunity to add attributes to node, by ref
+        pass  # subclasses to override, opportunity to add attributes to node, by ref
 
     def NotifyOfEdgeCreateFromPersistence(self, edge, data):
-        pass    # subclasses to override, opportunity to add attributes to edge, by ref
-    
+        pass  # subclasses to override, opportunity to add attributes to edge, by ref
+
     def GetMementoOfLayoutPoints(self):
         memento = {}
         for node in self.nodes:
@@ -277,12 +291,12 @@ class Graph:
     def MementosEqual(self, memento1, memento2, tolerance=5):
         for id, point in list(memento1.items()):
             point2 = memento2.get(id, None)
-            #if tolerance == 0.01:
+            # if tolerance == 0.01:
             #    print "point %s diff %f greater than %f = %s" % (point, abs(point[0] - point2[0]), tolerance, abs(point[0] - point2[0]) > tolerance)
             if abs(point[0] - point2[0]) > tolerance or abs(point[1] - point2[1]) > tolerance:
                 return False
         return True
-    
+
     def RestoreWorldPositions(self, memento):
         for id, point in list(memento.items()):
             node = self.FindNodeById(id)
@@ -294,16 +308,16 @@ class Graph:
         for node in self.nodes:
             total_crossing = []
             for edge in self.edges:
-                line_start_point = edge['source'].centre_point
-                line_end_point = edge['target'].centre_point
-                if edge['source'] == node or edge['target'] == node:
+                line_start_point = edge["source"].centre_point
+                line_end_point = edge["target"].centre_point
+                if edge["source"] == node or edge["target"] == node:
                     continue
                 crossings = node.CalcLineIntersectionPoints(line_start_point, line_end_point)
                 if crossings:
                     total_crossing.extend(crossings)
             result[node.id] = len(total_crossing)
             allcount += len(total_crossing)
-        result['ALL'] = allcount
+        result["ALL"] = allcount
         return result
 
     def CountLineOverLineIntersections(self, ignore_nodes=False):
@@ -321,41 +335,51 @@ class Graph:
         removing LL overlaps - though... LL raw can reduce to 0 after sufficient
         scaling expansion.
         """
-        
+
         def PointInsideANode(point):
             for node in self.nodes:
                 if node.ContainsPoint(point):
                     return node
             return None
-        
+
         def PointInCentreOfNode(point, edge1, edge2):
-            return point in [edge1['source'].centre_point,  edge1['target'].centre_point,
-                             edge2['source'].centre_point, edge2['target'].centre_point]
-        
+            return point in [
+                edge1["source"].centre_point,
+                edge1["target"].centre_point,
+                edge2["source"].centre_point,
+                edge2["target"].centre_point,
+            ]
+
         result = []
         for edge1, edge2 in getpermutations(self.edges):
-            line_start_point = edge1['source'].centre_point
-            line_end_point = edge2['target'].centre_point
-            point = FindLineIntersection(edge1['source'].centre_point, edge1['target'].centre_point,
-                                         edge2['source'].centre_point, edge2['target'].centre_point)
+            line_start_point = edge1["source"].centre_point
+            line_end_point = edge2["target"].centre_point
+            point = FindLineIntersection(
+                edge1["source"].centre_point,
+                edge1["target"].centre_point,
+                edge2["source"].centre_point,
+                edge2["target"].centre_point,
+            )
             if point:
                 point = (int(point[0]), int(point[1]))
-                
+
                 # We have a crossing
                 if not ignore_nodes and PointInsideANode(point):
                     continue
                 if PointInCentreOfNode(point, edge1, edge2):
                     continue
-                result.append( point )
-    
+                result.append(point)
+
         # trim out duplicates
         def remove_duplicates(lzt):
             d = {}
-            for x in lzt: d[tuple(x)]=x
+            for x in lzt:
+                d[tuple(x)] = x
             return list(d.values())
+
         result = remove_duplicates(result)
         return result
-            
+
     def GetBounds(self):
         maxx = 0
         maxy = 0
@@ -364,7 +388,7 @@ class Graph:
             maxy = max(node.top, maxy)
 
         return (maxx, maxy)
-        
+
     def SaveOldPositionsForAnimationPurposes(self):
         for node in self.nodes:
             node.previous_left, node.previous_top = node.left, node.top  # for animation
@@ -375,19 +399,26 @@ class Graph:
         """
         found_crossing_points = []
         found_edges = []
-        edges = [edge for edge in self.edges if not (edge['source'] == movingnode or edge['target'] == movingnode)]
+        edges = [
+            edge
+            for edge in self.edges
+            if not (edge["source"] == movingnode or edge["target"] == movingnode)
+        ]
         for edge in edges:
-            crossings = proposednode.CalcLineIntersectionPoints(edge['source'].centre_point, edge['target'].centre_point)
+            crossings = proposednode.CalcLineIntersectionPoints(
+                edge["source"].centre_point, edge["target"].centre_point
+            )
             if crossings:
-                #print "%s would cross edge %s_%s crossings: %s" % (movingnode.id, edge['source'].id, edge['target'].id, crossings)
+                # print "%s would cross edge %s_%s crossings: %s" % (movingnode.id, edge['source'].id, edge['target'].id, crossings)
                 found_crossing_points.extend(crossings)
                 found_edges.append(edge)
         return found_crossing_points, found_edges
-        
+
+
 class GraphNode:
     def __init__(self, id, left, top, width=60, height=60):
         self.id = id
-        
+
         self.left = left
         self.top = top
         self.width = width
@@ -414,38 +445,56 @@ class GraphNode:
         return self.left, self.top, self.right, self.bottom
 
     def get_lines(self):
-        return [((self.left, self.top), (self.right, self.top)),
-                ((self.right, self.top), (self.right, self.bottom)),
-                ((self.right, self.bottom), (self.left, self.bottom)),
-                ((self.left, self.bottom), (self.left, self.top))]
+        return [
+            ((self.left, self.top), (self.right, self.top)),
+            ((self.right, self.top), (self.right, self.bottom)),
+            ((self.right, self.bottom), (self.left, self.bottom)),
+            ((self.left, self.bottom), (self.left, self.top)),
+        ]
 
     lines = property(get_lines)
-        
+
     def CalcLineIntersectionPoints(self, line_start_point, line_end_point):
         result = []
         for nodeline in self.lines:
             point = FindLineIntersection(line_start_point, line_end_point, nodeline[0], nodeline[1])
             if point:
-                result.append( (int(point[0]), int(point[1])) )
-    
+                result.append((int(point[0]), int(point[1])))
+
         # trim out duplicated and Nones
         def remove_duplicates(lzt):
             d = {}
-            for x in lzt: d[tuple(x)]=x
+            for x in lzt:
+                d[tuple(x)] = x
             return list(d.values())
+
         result = [r for r in result if r != None]
         result = remove_duplicates(result)
         return result
 
     def get_centre_point(self):
-        return ((self.left+self.width/2), (self.top+self.height/2))
-        
-    centre_point = property(get_centre_point)
-    
-    def ContainsPoint(self, point):
-        return point[0] >= self.left and point[0] <= self.right and point[1] >= self.top and point[1] <= self.bottom
-        
-    def __str__(self):
-        return "Node %15s: x/left,y/top (% 4d, % 4d) w,h (% 4d, % 4d) layoutPosX,layoutPosY (% 2.2f, % 2.2f)" % (self.id, self.left, self.top, self.width, self.height, self.layoutPosX, self.layoutPosY)
-   
+        return ((self.left + self.width / 2), (self.top + self.height / 2))
 
+    centre_point = property(get_centre_point)
+
+    def ContainsPoint(self, point):
+        return (
+            point[0] >= self.left
+            and point[0] <= self.right
+            and point[1] >= self.top
+            and point[1] <= self.bottom
+        )
+
+    def __str__(self):
+        return (
+            "Node %15s: x/left,y/top (% 4d, % 4d) w,h (% 4d, % 4d) layoutPosX,layoutPosY (% 2.2f, % 2.2f)"
+            % (
+                self.id,
+                self.left,
+                self.top,
+                self.width,
+                self.height,
+                self.layoutPosX,
+                self.layoutPosY,
+            )
+        )

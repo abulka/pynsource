@@ -7,6 +7,7 @@
 import operator
 from functools import reduce
 
+
 class multicast(dict):
     "Class multiplexes messages to registered objects"
 
@@ -17,8 +18,9 @@ class multicast(dict):
 
     def __call__(self, *args, **kwargs):
         "Invoke method attributes and return results through another multicast"
-        return self.__class__( [ (alias, obj(*args, **kwargs) ) \
-                for alias, obj in list(self.items()) if callable(obj) ] )
+        return self.__class__(
+            [(alias, obj(*args, **kwargs)) for alias, obj in list(self.items()) if callable(obj)]
+        )
 
     def __bool__(self):
         "A multicast is logically true if all delegate attributes are logically true"
@@ -27,8 +29,9 @@ class multicast(dict):
 
     def __getattr__(self, name):
         "Wrap requested attributes for further processing"
-        return self.__class__( [ (alias, getattr(obj, name) ) \
-                for alias, obj in list(self.items()) if hasattr(obj, name) ] )
+        return self.__class__(
+            [(alias, getattr(obj, name)) for alias, obj in list(self.items()) if hasattr(obj, name)]
+        )
 
     def __setattr__(self, name, value):
         """Wrap setting of requested attributes for further
@@ -46,7 +49,9 @@ class multicast(dict):
         if id(o) in self:
             del self[id(o)]
 
+
 # Decorators
+
 
 class countcalls(object):
     "Decorator that keeps track of the number of times a function is called."
@@ -65,27 +70,35 @@ class countcalls(object):
     def count(self):
         "Return the number of times the function f was called."
         return countcalls.__instances[self.__f].__numcalls
-        #return self.__numcalls # ANDY - THIS WORKS TOO!? SO WHY IS THE ABOVE COMPLICATED THING USED?
+        # return self.__numcalls # ANDY - THIS WORKS TOO!? SO WHY IS THE ABOVE COMPLICATED THING USED?
 
     @staticmethod
     def counts():
         "Return a dict of {function: # of calls} for all registered functions."
-        return dict([(f.__name__, countcalls.__instances[f].__numcalls) for f in countcalls.__instances])
+        return dict(
+            [(f.__name__, countcalls.__instances[f].__numcalls) for f in countcalls.__instances]
+        )
 
 
 dodumpargs = True
 
+
 def dump_args(func):
     "This decorator dumps out the arguments passed to a function before calling it"
-    argnames = func.__code__.co_varnames[:func.__code__.co_argcount]
+    argnames = func.__code__.co_varnames[: func.__code__.co_argcount]
     fname = func.__name__
 
     if not dodumpargs:
         return func
 
-    def echo_func(*args,**kwargs):
-        print(fname, ":", ', '.join(
-            '%s=%r' % entry
-            for entry in list(zip(argnames,args)) + list(kwargs.items())))
+    def echo_func(*args, **kwargs):
+        print(
+            fname,
+            ":",
+            ", ".join(
+                "%s=%r" % entry for entry in list(zip(argnames, args)) + list(kwargs.items())
+            ),
+        )
         return func(*args, **kwargs)
+
     return echo_func

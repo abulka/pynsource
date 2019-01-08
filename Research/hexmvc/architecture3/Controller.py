@@ -1,10 +1,10 @@
-class Controller():
+class Controller:
     def __init__(self, model):
         self.app = None
         self.model = model
 
     # Events from Gui
-    
+
     def CMD_FILE_NEW(self):
         self.model.Clear()
 
@@ -18,16 +18,19 @@ class Controller():
         thing = self.model.AddThing(info)
 
     def CMD_ADD_INFO_TO_THING(self, thing, moreinfo):
-        #thing.AddInfo(moreinfo)
+        # thing.AddInfo(moreinfo)
         self.model.AddInfoToThing(thing, moreinfo)
 
     def CMD_DELETE_THING(self, thing):
         self.model.DeleteThing(thing)
-        
+
     # Other events
-    
+
     def MODEL_THING_ADDED(self, thing, modelsize):
-        print("App observer got notified, added value %(thing)s - modelsize now %(modelsize)d" % vars())
+        print(
+            "App observer got notified, added value %(thing)s - modelsize now %(modelsize)d"
+            % vars()
+        )
 
     # Methods that adapters need, which require immediate response vs.
     # using the multicasting / eventing approach.  Typically these are
@@ -40,7 +43,7 @@ class Controller():
             thing_json["link"] = "%s/things/%d" % (self.app.url_server, thing.id)
             things.append(thing_json)
         return {"things": things}
-    
+
     def CmdGetThingAsDict(self, id):
         thing = self.model.FindThing(int(id))
         if thing:
@@ -50,7 +53,7 @@ class Controller():
     def CmdAddThing(self, info):
         try:
             self.app.MainThreadMutexGuiEnter()
-            thing = self.model.AddThing(info) # will typically indirectly update a gui
+            thing = self.model.AddThing(info)  # will typically indirectly update a gui
             if thing:
                 return thing.to_dict()
             return "Couldn't create thing with info %(info)s" % vars()
@@ -79,15 +82,12 @@ class Controller():
         finally:
             self.app.MainThreadMutexGuiLeave()
 
-
     """
     Used to redirect via app - lets not do this as too indirect.
     let server see app.controller  !!
     """
-    #def CmdGetThingsAsDict(self):
+    # def CmdGetThingsAsDict(self):
     #    return self.controller.CmdGetThingsAsJson()
     #
-    #def CmdGetThingAsDict(self, id):
+    # def CmdGetThingAsDict(self, id):
     #    return self.controller.CmdGetThingAsJson(id)
-
-        

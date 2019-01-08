@@ -4,13 +4,15 @@ import wx
 import wx.lib.ogl as ogl
 import random
 
+
 def get_new_xy(shape):
-    x = random.randint(1,600)
+    x = random.randint(1, 600)
     y = shape.GetY()
     width, height = shape.GetBoundingBoxMax()
-    x += width/2
-    #y += height/2
-    return x,y
+    x += width / 2
+    # y += height/2
+    return x, y
+
 
 """
 structure of classes is typically:
@@ -18,30 +20,31 @@ structure of classes is typically:
 
 """
 
-technique = '6'
+technique = "6"
+
 
 def process_key(keycode, frame, canvas, shapes):
-        
-        if keycode == 'm':
-         
-            shape = shapes[random.randint(0,len(shapes)-1)]
-            
-            """
+
+    if keycode == "m":
+
+        shape = shapes[random.randint(0, len(shapes) - 1)]
+
+        """
             prepareDc is related to scrolling and will adjust coords to take into account
             scrolled window scroll
             """
-            dc = wx.ClientDC(canvas)
-            canvas.PrepareDC(dc)
+        dc = wx.ClientDC(canvas)
+        canvas.PrepareDC(dc)
 
-            x,y = get_new_xy(shape)
+        x, y = get_new_xy(shape)
 
-            #shape.ClearText()
-            #shape.AddText("%d,%d"%(x,y))            
-            
-            global technique
-                
-            if technique == '2':
-                """
+        # shape.ClearText()
+        # shape.AddText("%d,%d"%(x,y))
+
+        global technique
+
+        if technique == "2":
+            """
                 Effectiveness: Poor.  duplicates / smudges *everywhere* cos no clear
 
                 Using shape.Move() to do the drawing. Note that shape.Move()
@@ -51,33 +54,33 @@ def process_key(keycode, frame, canvas, shapes):
                 to self.Draw() which means we actually ARE triggering a shape
                 draw Reason this smudges is that there is no .Clear going on.
                 """
-                # 
-                shape.SetX(x)
-                shape.SetY(y)
-                shape.Move(dc, shape.GetX(), shape.GetY())
-        
-            elif technique == '3':
-                """
+            #
+            shape.SetX(x)
+            shape.SetY(y)
+            shape.Move(dc, shape.GetX(), shape.GetY())
+
+        elif technique == "3":
+            """
                 Effectiveness: Poor.  duplicates / smudges cos no clear
                 
                 Using shape.Move() and moving the shape to the new coords.
                 The default is display=True which means a draw occurs.
                 """
-                shape.Move(dc, x, y)
+            shape.Move(dc, x, y)
 
-            elif technique == '4':
-                """
+        elif technique == "4":
+            """
                 Effectiveness: Good. WOW this technique WORKS on scrolled area,
                 bug fixed - BUT with provisos.
 
                 Proviso: we remove the old shape with shape.Erase(dc) but
                 this erase will clobber any overlapping shapes.
                 """
-                shape.Erase(dc)
-                shape.Move(dc, x, y, display=True)
+            shape.Erase(dc)
+            shape.Move(dc, x, y, display=True)
 
-            elif technique == '1':
-                """
+        elif technique == "1":
+            """
                 Effectiveness: Poor.  Scrolled area doesn't get cleared thus get
                 duplicates / smudges there.
                 
@@ -91,14 +94,14 @@ def process_key(keycode, frame, canvas, shapes):
                 area, then that would be perfect. But it doesn't even though we
                 have called canvas.PrepareDC(dc) which is supposed to do this.
                 """
-                shape.SetX(x)
-                shape.SetY(y)
-                shape.MoveLinks(dc)  # normally shape.Move() would have done this
-                canvas.GetDiagram().Clear(dc)
-                canvas.GetDiagram().Redraw(dc)
-            
-            elif technique == '5':
-                """
+            shape.SetX(x)
+            shape.SetY(y)
+            shape.MoveLinks(dc)  # normally shape.Move() would have done this
+            canvas.GetDiagram().Clear(dc)
+            canvas.GetDiagram().Redraw(dc)
+
+        elif technique == "5":
+            """
                 Effectiveness: Poor. smudges cos no clear not effective on
                 scrolled areas. This is the long standing bug I was having.
 
@@ -115,12 +118,12 @@ def process_key(keycode, frame, canvas, shapes):
                 there. e.g. if the shape that was moved was in the scrolled off
                 area, you will see double - the old position and the new.
                 """
-                shape.Move(dc, x, y, display=False)
-                canvas.GetDiagram().Clear(dc)
-                canvas.GetDiagram().Redraw(dc)
+            shape.Move(dc, x, y, display=False)
+            canvas.GetDiagram().Clear(dc)
+            canvas.GetDiagram().Redraw(dc)
 
-            elif technique == '6':
-                """
+        elif technique == "6":
+            """
                 Effectiveness: Excellent. BEST technique. this technique WORKS
                 on scrolled area, bug fixed
                 
@@ -134,12 +137,11 @@ def process_key(keycode, frame, canvas, shapes):
                 think yes. Tip: a Refresh() by default will erase the background
                 before sending the paint event -- which then leads to a Draw.
                 """
-                shape.Move(dc, x, y, display=False)  # handles shape.MoveLinks(dc) internally too
-                canvas.Refresh()     # or canvas.frame.Refresh()
-            
+            shape.Move(dc, x, y, display=False)  # handles shape.MoveLinks(dc) internally too
+            canvas.Refresh()  # or canvas.frame.Refresh()
 
-            elif technique == '7':
-                """
+        elif technique == "7":
+            """
                 Effectiveness: Very Bad - experimental only to demonstate a point.
 
                 This technique shouldn't be used and only demonstrates the
@@ -154,14 +156,14 @@ def process_key(keycode, frame, canvas, shapes):
                 "breathe" and allows the .Refresh() to occur immediately. Then
                 you will see the effect of the clear.
                 """
-                shape.Move(dc, x, y, display=False)
-                canvas.Refresh()
-                canvas.Update()   # Allow .Refresh() to occur immediately
-                
-                canvas.GetDiagram().Clear(dc)
+            shape.Move(dc, x, y, display=False)
+            canvas.Refresh()
+            canvas.Update()  # Allow .Refresh() to occur immediately
 
-            elif technique == '8':
-                """
+            canvas.GetDiagram().Clear(dc)
+
+        elif technique == "8":
+            """
                 Effectiveness: Good - Traditional technique resurrected and repaired!
 
                 Traditional non .Refresh() technique, but now taking into
@@ -182,69 +184,69 @@ def process_key(keycode, frame, canvas, shapes):
                 window area that is cleared." - R. Dunn. July 2012.
 
                 """
-                dc = wx.ClientDC(canvas)
-                canvas.GetDiagram().Clear(dc)
-
-                canvas.PrepareDC(dc)
-                shape.Move(dc, x, y, display=False)
-                # you can even postpone the .PrepareDC(dc) till this point since no drawing has occurred yet
-                canvas.GetDiagram().Redraw(dc)
-                
-            elif technique == '9':
-                # SCRAPS FOR TESTING
-                pass
-                
-                # WORKS
-                #dc = wx.ClientDC(canvas)
-                #canvas.GetDiagram().Clear(dc)
-                #
-                #shape.Move(dc, x, y, display=False)
-                #canvas.PrepareDC(dc)
-                #canvas.GetDiagram().Redraw(dc)
-
-                # WRONG - need the .PrepareDC(dc) before the Move(dc, x, y) since by default it does a .Draw()
-                #dc = wx.ClientDC(canvas)
-                #canvas.GetDiagram().Clear(dc)
-                #
-                #shape.Move(dc, x, y)
-                #canvas.PrepareDC(dc)
-                #canvas.GetDiagram().Redraw(dc)
-
-                # WRONG - without the Redraw, you only see the last moved shape, not all the shapes.
-                #dc = wx.ClientDC(canvas)
-                #canvas.GetDiagram().Clear(dc)
-                #
-                #canvas.PrepareDC(dc)
-                #shape.Move(dc, x, y)
-                
-        elif keycode == 'f':
-            canvas.frame.SetDimensions(200, 200, 350, 350) # get size with frame.GetSize()
-            
-        elif keycode == 'r':
-            canvas.frame.Refresh()
-            
-        elif keycode == 's':
-            # Temporary frame resize hack to cause scrollbar to appear properly
-            # probably causes .Refresh() but only if your ogl canvas is in a tab
-            # of a notebook and there are at least two notebook pages. Whew!
-            oldSize = frame.GetSize()
-            frame.SetSize((oldSize[0]+1,oldSize[1]+1))
-            frame.SetSize(oldSize)
-
-        elif keycode == 'c':
-            # Aha - this does NOT clear the scrolled area!
-            # even though I have prepareDC !!!!
             dc = wx.ClientDC(canvas)
-            canvas.PrepareDC(dc)
             canvas.GetDiagram().Clear(dc)
-            
-        elif keycode == 'd':
-            print("GetVirtualSize()", canvas.GetVirtualSize())
-            print("frame.GetClientSize()", canvas.frame.GetClientSize())
-            print("frame.GetSize()", canvas.frame.GetSize())
-        
-        elif keycode in ['1','2','3','4','5','6','7','8','9']:
-            technique = keycode
 
-        elif keycode in ['b', 'B']:
+            canvas.PrepareDC(dc)
+            shape.Move(dc, x, y, display=False)
+            # you can even postpone the .PrepareDC(dc) till this point since no drawing has occurred yet
+            canvas.GetDiagram().Redraw(dc)
+
+        elif technique == "9":
+            # SCRAPS FOR TESTING
             pass
+
+            # WORKS
+            # dc = wx.ClientDC(canvas)
+            # canvas.GetDiagram().Clear(dc)
+            #
+            # shape.Move(dc, x, y, display=False)
+            # canvas.PrepareDC(dc)
+            # canvas.GetDiagram().Redraw(dc)
+
+            # WRONG - need the .PrepareDC(dc) before the Move(dc, x, y) since by default it does a .Draw()
+            # dc = wx.ClientDC(canvas)
+            # canvas.GetDiagram().Clear(dc)
+            #
+            # shape.Move(dc, x, y)
+            # canvas.PrepareDC(dc)
+            # canvas.GetDiagram().Redraw(dc)
+
+            # WRONG - without the Redraw, you only see the last moved shape, not all the shapes.
+            # dc = wx.ClientDC(canvas)
+            # canvas.GetDiagram().Clear(dc)
+            #
+            # canvas.PrepareDC(dc)
+            # shape.Move(dc, x, y)
+
+    elif keycode == "f":
+        canvas.frame.SetDimensions(200, 200, 350, 350)  # get size with frame.GetSize()
+
+    elif keycode == "r":
+        canvas.frame.Refresh()
+
+    elif keycode == "s":
+        # Temporary frame resize hack to cause scrollbar to appear properly
+        # probably causes .Refresh() but only if your ogl canvas is in a tab
+        # of a notebook and there are at least two notebook pages. Whew!
+        oldSize = frame.GetSize()
+        frame.SetSize((oldSize[0] + 1, oldSize[1] + 1))
+        frame.SetSize(oldSize)
+
+    elif keycode == "c":
+        # Aha - this does NOT clear the scrolled area!
+        # even though I have prepareDC !!!!
+        dc = wx.ClientDC(canvas)
+        canvas.PrepareDC(dc)
+        canvas.GetDiagram().Clear(dc)
+
+    elif keycode == "d":
+        print("GetVirtualSize()", canvas.GetVirtualSize())
+        print("frame.GetClientSize()", canvas.frame.GetClientSize())
+        print("frame.GetSize()", canvas.frame.GetSize())
+
+    elif keycode in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
+        technique = keycode
+
+    elif keycode in ["b", "B"]:
+        pass

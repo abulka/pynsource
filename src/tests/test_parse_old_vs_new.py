@@ -17,6 +17,7 @@ LOG_TO_CONSOLE = 0
 
 last_diff_s = ""
 
+
 def parse_old_and_new(in_filename, print_diffs=True, options={}):
     """
     Runs old and new parsers and compares the result.
@@ -33,98 +34,112 @@ def parse_old_and_new(in_filename, print_diffs=True, options={}):
         log = LogWriter(in_filename, print_to_console=LOG_TO_CONSOLE)
     else:
         log = LogWriterNull()
-    
+
     def oldparse():
         model, debuginfo = old_parser(in_filename)
         d1 = dump_old_structure(model)
-        log.out_wrap_in_html(d1, style_class='dump1')
+        log.out_wrap_in_html(d1, style_class="dump1")
         return d1
-        
+
     def newparse(options):
         model, debuginfo = new_parser(in_filename, log, options)
         d2 = dump_old_structure(model)
-        log.out_wrap_in_html(d2, style_class='dump1')
+        log.out_wrap_in_html(d2, style_class="dump1")
         return d2, debuginfo
 
     def dodiff(d1, d2):
-        diff = difflib.ndiff(d1.splitlines(1),d2.splitlines(1))
-        diff_s = ''.join(diff)
+        diff = difflib.ndiff(d1.splitlines(1), d2.splitlines(1))
+        diff_s = "".join(diff)
         return diff_s
-            
+
     try:
         log.out_html_header()
         log.out("PARSING: %s *****\n" % in_filename)
-        
+
         d1 = oldparse()
         log.out_divider()
         d2, debuginfo = newparse(options)
-        
-        comparedok = (d1 == d2)
+
+        comparedok = d1 == d2
         log.out("** old vs new method comparison = %s" % comparedok)
 
         diff_s = dodiff(d1, d2)
-        log.out_wrap_in_html(diff_s, style_class='dumpdiff')
+        log.out_wrap_in_html(diff_s, style_class="dumpdiff")
         if not comparedok and print_diffs:
             print(diff_s)
 
-        #dd = difflib.HtmlDiff()
-        #diff_table = dd.make_table(d1.splitlines(1),d2.splitlines(1))
-        #log.out(diff_table)
+        # dd = difflib.HtmlDiff()
+        # diff_table = dd.make_table(d1.splitlines(1),d2.splitlines(1))
+        # log.out(diff_table)
 
         if not comparedok:
             global last_diff_s
-            
+
             log.out("<hr>")
-            delta = difflib.unified_diff(d1.splitlines(1),d2.splitlines(1), n=0,
-                                fromfile='before.py', tofile='after.py')
+            delta = difflib.unified_diff(
+                d1.splitlines(1), d2.splitlines(1), n=0, fromfile="before.py", tofile="after.py"
+            )
             last_diff_s = "".join(delta)
-            log.out_wrap_in_html(last_diff_s, style_class='dumpdiff')
+            log.out_wrap_in_html(last_diff_s, style_class="dumpdiff")
 
         if DEBUGINFO:
             log.out(debuginfo)
-    
+
         log.out_html_footer()
     finally:
         log.finish()
-        
+
     return comparedok
 
 
-############        
+############
 
 results = []
+
+
 def reset_tests():
     global results
     results = []
+
+
 def test(filename, options={}):
     results.append(parse_old_and_new(filename, options=options))
+
+
 def test_not(filename, expected_diffs=None, options={}):
     # expect parse to slightly fail, with a diff matching expected_diff
     result = parse_old_and_new(filename, print_diffs=False, options=options)
     if not result:
         # good, we expected this
         successful_test = True
-        if expected_diffs and last_diff_s.strip() != expected_diffs[os.path.basename(filename)].strip():
+        if (
+            expected_diffs
+            and last_diff_s.strip() != expected_diffs[os.path.basename(filename)].strip()
+        ):
             successful_test = False
     else:
         # we didn't expect this to parse and match - unbelievable.  Good but not what we expected.
         successful_test = False
     results.append(successful_test)
+
+
 def report(msg):
     if all(results):
-        #print "%s OK" % msg
+        # print "%s OK" % msg
         return True
     else:
         print("oooops %s broken" % msg, results)
         return False
-        
+
 
 ###########
 
 expected_diffs = {}
 
 # ast is better, base classes with . handled
-expected_diffs['testmodule08_multiple_inheritance.py'] = """
+expected_diffs[
+    "testmodule08_multiple_inheritance.py"
+] = """
 --- before.py
 +++ after.py
 @@ -1 +1 @@
@@ -135,7 +150,9 @@ expected_diffs['testmodule08_multiple_inheritance.py'] = """
 # ast is better, (1) nested module functions ignored. (2) class actually checked
 # for when relaxed attr ref to instance. (3) extra properties picked up (though
 # they should be normal not static)
-expected_diffs['testmodule_command_pattern.py'] = """
+expected_diffs[
+    "testmodule_command_pattern.py"
+] = """
 --- before.py
 +++ after.py
 @@ -5,2 +5 @@
@@ -152,7 +169,9 @@ expected_diffs['testmodule_command_pattern.py'] = """
 """
 
 # ast is better, less module methods found - more correct
-expected_diffs['testmodule_pynsource.py'] = """
+expected_diffs[
+    "testmodule_pynsource.py"
+] = """
 --- before.py
 +++ after.py
 @@ -1 +1 @@
@@ -194,7 +213,9 @@ latest is ok
 
 """
 
-expected_diffs['testmodule09_intense.py'] = """
+expected_diffs[
+    "testmodule09_intense.py"
+] = """
 --- before.py
 +++ after.py
 @@ -1 +1 @@
@@ -219,26 +240,27 @@ expected_diffs['testmodule09_intense.py'] = """
 
 import unittest
 
+
 class TestCase_A(unittest.TestCase):
     def test_1_official_parsing(self):
-        reset_tests()    
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule01.py')
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule02.py')
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule03.py')
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule04.py')
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule05.py') # (inner classes)
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule06.py')
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule07.py')
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule66.py')
+        reset_tests()
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule01.py")
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule02.py")
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule03.py")
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule04.py")
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule05.py")  # (inner classes)
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule06.py")
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule07.py")
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule66.py")
         self.assertTrue(report("official parsing tests"))
 
     def test_2_subsidiary_parsing(self):
         # Run test with
         # python -m unittest -v tests.test_parse_old_vs_new.TestCase_A.test_2_subsidiary_parsing
         reset_tests()
-        options = {'TREAT_PROPERTY_DECORATOR_AS_PROP': False}
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_printframework.py', options=options)
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_asciiworkspace.py', options=options)
+        options = {"TREAT_PROPERTY_DECORATOR_AS_PROP": False}
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_printframework.py", options=options)
+        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_asciiworkspace.py", options=options)
         self.assertTrue(report("subsidiary parsing tests"))
 
     def test_2a_treat_prop_as_prop(self):
@@ -268,38 +290,46 @@ class TestCase_A(unittest.TestCase):
 
         """
         reset_tests()
-        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_asciiworkspace.py')  # we expect the new parser to not match the old parser
+        test_not(
+            PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_asciiworkspace.py"
+        )  # we expect the new parser to not match the old parser
         self.assertTrue(report("treat_prop_as_prop"))
 
     def test_3_ast_parsing_is_genuinely_better(self):
         # Expect these to fail cos ast parsing is genuinely better
-        reset_tests()    
-        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule08_multiple_inheritance.py', expected_diffs)
-        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_command_pattern.py', expected_diffs)
-        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule_pynsource.py', expected_diffs)
-        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule09_intense.py', expected_diffs)
+        reset_tests()
+        test_not(
+            PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule08_multiple_inheritance.py", expected_diffs
+        )
+        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_command_pattern.py", expected_diffs)
+        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_pynsource.py", expected_diffs)
+        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule09_intense.py", expected_diffs)
         self.assertTrue(report("ast parsing is genuinely better"))
-    
+
+
 def suite():
-    suite1 = unittest.makeSuite(TestCase_A, 'test')
-    #suite2 = unittest.makeSuite(test_2_subsidiary_parsing, 'test')
-    #suite3 = unittest.makeSuite(test_3_ast_parsing_is_genuinely_better, 'test')
-    #suite4 = unittest.makeSuite(TestCase_D_MultipleAttrBeforeClassic, 'test')
-    #suite5 = unittest.makeSuite(TestCase_E_DoubleCall, 'test')
-    #suite6 = unittest.makeSuite(TestCase_F_CallThenTrailingInstance, 'test')
-    #suite7 = unittest.makeSuite(TestCase_G_AttrBeforeRhsInstance, 'test')
-    #suite8 = unittest.makeSuite(TestCase_AddHoc, 'test')
-    #alltests = unittest.TestSuite((suite1, suite2, suite3, suite4, suite5, suite6, suite7))
-    alltests = unittest.TestSuite((suite1, ))
-    #alltests = unittest.TestSuite((suite1, suite2, suite3))
+    suite1 = unittest.makeSuite(TestCase_A, "test")
+    # suite2 = unittest.makeSuite(test_2_subsidiary_parsing, 'test')
+    # suite3 = unittest.makeSuite(test_3_ast_parsing_is_genuinely_better, 'test')
+    # suite4 = unittest.makeSuite(TestCase_D_MultipleAttrBeforeClassic, 'test')
+    # suite5 = unittest.makeSuite(TestCase_E_DoubleCall, 'test')
+    # suite6 = unittest.makeSuite(TestCase_F_CallThenTrailingInstance, 'test')
+    # suite7 = unittest.makeSuite(TestCase_G_AttrBeforeRhsInstance, 'test')
+    # suite8 = unittest.makeSuite(TestCase_AddHoc, 'test')
+    # alltests = unittest.TestSuite((suite1, suite2, suite3, suite4, suite5, suite6, suite7))
+    alltests = unittest.TestSuite((suite1,))
+    # alltests = unittest.TestSuite((suite1, suite2, suite3))
     return alltests
 
+
 def main():
-    runner = unittest.TextTestRunner(descriptions = 0, verbosity = 2) # default is descriptions=1, verbosity=1
+    runner = unittest.TextTestRunner(
+        descriptions=0, verbosity=2
+    )  # default is descriptions=1, verbosity=1
     runner.run(suite())
 
-if __name__ == '__main__':
-    main()
-    #print parse_old_and_new('../../src/pyNsourceGui.py') # different - ok
-    #print parse_old_and_new('python-in/testmodule08_multiple_inheritance.py')
 
+if __name__ == "__main__":
+    main()
+    # print parse_old_and_new('../../src/pyNsourceGui.py') # different - ok
+    # print parse_old_and_new('python-in/testmodule08_multiple_inheritance.py')

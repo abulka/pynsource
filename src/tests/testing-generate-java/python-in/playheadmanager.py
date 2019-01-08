@@ -23,6 +23,7 @@ from render import Renderer
 from playhead import Playhead
 from utilcc import eventStrToList
 
+
 class PlayAPI:
     def __init__(self, mediator, turnmanager, playhead):
         self.mediator = mediator
@@ -31,12 +32,14 @@ class PlayAPI:
 
     def IsEmpty(self):
         return self.playhead.IsEmpty()
+
     def IsMoreToPlay(self):
         return self.playhead.IsMoreToPlay()
 
     def Start(self):
         self.playhead.GoStart()
         self.SynchroniseOtherPlayheads()
+
     def Endd(self):
         self.playhead.GoEnd()
         self.SynchroniseOtherPlayheads()
@@ -44,32 +47,37 @@ class PlayAPI:
     def Next(self):
         self.playhead.GoNext()
         self.SynchroniseOtherPlayheads()
+
     def Previous(self):
         self.playhead.GoPrevious()
         self.SynchroniseOtherPlayheads()
 
     def _GetCurrentPosition(self):
         return self.playhead.Position
+
     def GetCurrentValue(self):
-        raise RuntimeError('Not Implemented')
+        raise RuntimeError("Not Implemented")
 
     def _GetMaxPosition(self):
         return self.playhead.MaxPosition
+
     def GetMaxValue(self):
-        raise RuntimeError('Not Implemented')
+        raise RuntimeError("Not Implemented")
 
     def _JumpToPosition(self, position):
         self.playhead.Go(position)
         self.SynchroniseOtherPlayheads()
+
     def JumpToValue(self, value):
-        raise RuntimeError('Not Implemented')
+        raise RuntimeError("Not Implemented")
 
     def NotifyOfInsert(self, pos):
         self.playhead.NotifyOfInsert(pos)
-        self.SynchroniseOtherPlayheads(toposition = pos)
+        self.SynchroniseOtherPlayheads(toposition=pos)
+
     def NotifyPositionNowValid(self, pos):
         self.playhead.NotifyPositionNowValid(pos)
-        self.SynchroniseOtherPlayheads(toposition = pos)
+        self.SynchroniseOtherPlayheads(toposition=pos)
 
     def SynchroniseOtherPlayheads(self, toposition):
         """
@@ -123,7 +131,7 @@ class PlayAPI:
         There are similar arbitary decisions when synching to time, I think.  There is another function
                    _FindLatestEventWithTime() which makes this decision.
         """
-        raise RuntimeError('Not Implemented')
+        raise RuntimeError("Not Implemented")
 
     def _FindLastEventWithTimeElseMostRecentEventLessthanTime(self, timeToFind):
         timepostofind = self.turnMgr.TimeToTimePosition(timeToFind)
@@ -132,16 +140,16 @@ class PlayAPI:
         if not hi:
             return 0
         while lo < hi:
-            mid = (lo+hi)//2
+            mid = (lo + hi) // 2
             event = self.mediator.story[mid]
-            eventtime = eval( eventStrToList(event)[0] )
+            eventtime = eval(eventStrToList(event)[0])
             timeposmid = self.turnMgr.TimeToTimePosition(eventtime)
             if timepostofind < timeposmid:
                 hi = mid
             else:
                 lo = mid + 1
-        return max(0, lo-1)
-    
+        return max(0, lo - 1)
+
     def _FindLastEventWithTimeElseMostRecentEventLessthanTime_ORI(self, timeToFind):
         """
           if 'timeToFind' matches event then return pos of last event with time of 'timeToFind'
@@ -159,17 +167,19 @@ class PlayAPI:
             eventtime = eventStrToList(event)[0]
             eventtime = eval(eventtime)
 
-            if self.turnMgr.TimeToTimePosition(eventtime) <= self.turnMgr.TimeToTimePosition(timeToFind):
-                #if eventtime <= timeToFind:
+            if self.turnMgr.TimeToTimePosition(eventtime) <= self.turnMgr.TimeToTimePosition(
+                timeToFind
+            ):
+                # if eventtime <= timeToFind:
                 lastoccurenceoftime = pos
-                pos+=1
+                pos += 1
             else:
                 break
                 # pos should now be positioned at the insertion point
 
-        if lastoccurenceoftime!=-1:
+        if lastoccurenceoftime != -1:
             return lastoccurenceoftime
-        maxpos = len(self.mediator.story)-1
+        maxpos = len(self.mediator.story) - 1
         return min(maxpos, pos)
 
     def _EnsureMaxTimeCorrespondsToMaxTurn(self):
@@ -178,11 +188,11 @@ class PlayAPI:
         maxturn is.
         """
         maxturnsofar = self.mediator.byTurn.GetMaxValue()
-        if maxturnsofar!=-1:
+        if maxturnsofar != -1:
             # find out what the maximum time for that turn is
             timetuple, day = self.turnMgr.TurnToTime(maxturnsofar)
             maxtime = timetuple[1]
-            maxtimepos = self.turnMgr.TimeToTimePosition((day, )+maxtime)
+            maxtimepos = self.turnMgr.TimeToTimePosition((day,) + maxtime)
 
             self.mediator.timePlayhead.NotifyPositionNowValid(maxtimepos)
 
@@ -197,7 +207,7 @@ class PlayAPI:
         If don't supply a parameter 'toposition', (the usual case) then it means we want to
         move the current position and synch the current position of the other playheads to it.
         """
-        wanttomovecurrentpos = (toposition == None)
+        wanttomovecurrentpos = toposition == None
         if wanttomovecurrentpos:
             pos = self.playhead.Position
         else:
@@ -207,9 +217,13 @@ class PlayAPI:
 
 class EventPlayAPI(PlayAPI):
     def GetCurrentValue(self):
-        return self._GetCurrentPosition()  # Could have returned event object at this position, but no.
+        return (
+            self._GetCurrentPosition()
+        )  # Could have returned event object at this position, but no.
+
     def GetMaxValue(self):
         return self._GetMaxPosition()  # Could have returned event object at this position, but no.
+
     def JumpToValue(self, value):
         self._JumpToPosition(value)
 
@@ -217,21 +231,21 @@ class EventPlayAPI(PlayAPI):
         # Derive timepos & turnpos
         def _TimeOfEventAt(eventpos, story, self):
             if eventpos == -1:
-                return-1
+                return -1
             event = story[eventpos]
             timestr = eventStrToList(event)[0]
-            #print event
-            assert '('in timestr
-            assert ')'in timestr
-            return eval(timestr) # convert string tuple to tuple
+            # print event
+            assert "(" in timestr
+            assert ")" in timestr
+            return eval(timestr)  # convert string tuple to tuple
 
-
-        time = _TimeOfEventAt(eventpos, self.mediator.story, self)   # find out what turn the current event is in
+        time = _TimeOfEventAt(
+            eventpos, self.mediator.story, self
+        )  # find out what turn the current event is in
         turn = self.turnMgr.TimeToTurn(time)
-        timepos = self.turnMgr.TimeToTimePosition(time)   # time is already a 3 piece tuple
+        timepos = self.turnMgr.TimeToTimePosition(time)  # time is already a 3 piece tuple
         turnpos = self.turnMgr.TurnToTurnPosition(turn)
         return timepos, turnpos
-
 
     def _SetOtherPlayheadsTo(self, wanttomovecurrentpos, timepos, turnpos):
         self.mediator.timePlayhead.NotifyPositionNowValid(timepos)
@@ -240,7 +254,7 @@ class EventPlayAPI(PlayAPI):
             self.mediator.timePlayhead.Go(timepos)
             self.mediator.turnPlayhead.Go(turnpos)
 
-    def SynchroniseOtherPlayheads(self, toposition = None):
+    def SynchroniseOtherPlayheads(self, toposition=None):
         if self.playhead.IsEmpty():
             # if no events, maybe are turns, maybe is time (can have time and turns without events)
             return
@@ -253,22 +267,26 @@ class EventPlayAPI(PlayAPI):
         assert not self.mediator.timePlayhead.IsEmpty()
         assert not self.mediator.turnPlayhead.IsEmpty()
 
+
 class TimePlayAPI(PlayAPI):
     """
     Time playhead ok, set event & turn playheads
     """
+
     def GetCurrentValue(self):
         result = self.turnMgr.TimePositionToTime(self._GetCurrentPosition())
         return result
+
     def GetMaxValue(self):
         result = self.turnMgr.TimePositionToTime(self._GetMaxPosition())
         return result
+
     def JumpToValue(self, value):
         self._JumpToPosition(self.turnMgr.TimeToTimePosition(value))
 
     def _DeriveOtherPlayheadPositionsFrom(self, timepos):
         # Derive eventpos & turnpos
-        time = self.turnMgr.TimePositionToTime(timepos)       # (day,hour,min)
+        time = self.turnMgr.TimePositionToTime(timepos)  # (day,hour,min)
         turn = self.turnMgr.TimeToTurn(time)
         eventpos = self._FindLastEventWithTimeElseMostRecentEventLessthanTime(time)
         turnpos = self.turnMgr.TurnToTurnPosition(turn)
@@ -281,7 +299,7 @@ class TimePlayAPI(PlayAPI):
             self.mediator.turnPlayhead.Go(turnpos)
             self.mediator.eventPlayhead.Go(eventpos)
 
-    def SynchroniseOtherPlayheads(self, toposition = None):
+    def SynchroniseOtherPlayheads(self, toposition=None):
         if self.playhead.IsEmpty():
             # if no time, should be no turns, and should be no events
             assert self.mediator.turnPlayhead.IsEmpty()
@@ -296,14 +314,18 @@ class TimePlayAPI(PlayAPI):
         # if there is a time, there will be a turn but not necessarily an event
         assert not self.mediator.turnPlayhead.IsEmpty()
 
+
 class TurnPlayAPI(PlayAPI):
     """
     Turn playhead ok, set time & event playheads
     """
+
     def GetCurrentValue(self):
         return self.turnMgr.TurnPositionToTurn(self._GetCurrentPosition())
+
     def GetMaxValue(self):
         return self.turnMgr.TurnPositionToTurn(self._GetMaxPosition())
+
     def JumpToValue(self, value):
         self._JumpToPosition(self.turnMgr.TurnToTurnPosition(value))
 
@@ -312,9 +334,9 @@ class TurnPlayAPI(PlayAPI):
         turn = self.turnMgr.TurnPositionToTurn(turnpos)
         pairOftimetuples, day = self.turnMgr.TurnToTime(turn)
         timefrom, totime = pairOftimetuples
-        timefrom = (day, )+timefrom      # e.g. (1,6,0)
+        timefrom = (day,) + timefrom  # e.g. (1,6,0)
 
-        #ORIG eventpos = self._FindNearestEvent(timefrom)
+        # ORIG eventpos = self._FindNearestEvent(timefrom)
         eventpos = self._FindLastEventWithTimeElseMostRecentEventLessthanTime(timefrom)
 
         timepos = self.turnMgr.TimeToTimePosition(timefrom)
@@ -327,7 +349,7 @@ class TurnPlayAPI(PlayAPI):
             self.mediator.timePlayhead.Go(timepos)
             self.mediator.eventPlayhead.Go(eventpos)
 
-    def SynchroniseOtherPlayheads(self, toposition = None):
+    def SynchroniseOtherPlayheads(self, toposition=None):
         if self.playhead.IsEmpty():
             # if no turns, should be no time, and should be no events
             assert self.mediator.timePlayhead.IsEmpty()
@@ -341,7 +363,6 @@ class TurnPlayAPI(PlayAPI):
 
         # if there is a turn, there will be time, but not necessarily an event
         assert not self.mediator.timePlayhead.IsEmpty()
-
 
 
 class PlayheadMediator:
@@ -362,9 +383,12 @@ class PlayheadMediator:
       del self.story[0:]   rather than
       self.story = [] 
     """
-    def __init__(self, turnmanager, storyListRef = []):
-        self.turnMgr = turnmanager    # aggregated, not owned
-        self.story = storyListRef     # reference to list owned by storyline.  Changes there are reflected here.
+
+    def __init__(self, turnmanager, storyListRef=[]):
+        self.turnMgr = turnmanager  # aggregated, not owned
+        self.story = (
+            storyListRef
+        )  # reference to list owned by storyline.  Changes there are reflected here.
 
         self.eventPlayhead = Playhead()
         self.timePlayhead = Playhead()
@@ -373,19 +397,25 @@ class PlayheadMediator:
         self.byEvent = EventPlayAPI(self, turnmanager, self.eventPlayhead)
         self.byTime = TimePlayAPI(self, turnmanager, self.timePlayhead)
         self.byTurn = TurnPlayAPI(self, turnmanager, self.turnPlayhead)
+
     def Clear(self):
         del self.story[0:]
         self.eventPlayhead.Clear()
         self.timePlayhead.Clear()
         self.turnPlayhead.Clear()
-    def IsEmpty(self):
-        return len(self.story) == 0and \
-          self.byEvent.IsEmpty()and self.byTime.IsEmpty()and self.byTurn.IsEmpty()
 
+    def IsEmpty(self):
+        return (
+            len(self.story) == 0
+            and self.byEvent.IsEmpty()
+            and self.byTime.IsEmpty()
+            and self.byTurn.IsEmpty()
+        )
 
 
 import unittest
 from turn import TurnMgr
+
 
 class TestCase01(unittest.TestCase):
     def setUp(self):
@@ -394,7 +424,7 @@ class TestCase01(unittest.TestCase):
 
     def checkInit(self):
         assert self.goto.byEvent.mediator == self.goto
-        
+
     def checkStartNoItemsNormal(self):
         self.goto.byEvent.Start()
         assert self.goto.byEvent._GetCurrentPosition() == -1
@@ -438,10 +468,10 @@ class TestCase01(unittest.TestCase):
         # But playhead is helpful & automatically move the head if were empty and item is inserted.
         assert self.goto.byEvent._GetCurrentPosition() == 0
 
-        self.goto.byEvent._JumpToPosition(0) # this will ripple to the other playheads.
+        self.goto.byEvent._JumpToPosition(0)  # this will ripple to the other playheads.
         timepos = self.goto.byTime._GetCurrentPosition()
         assert timepos == 30
-        assert self.goto.byTime.GetCurrentValue() == (1,6,30)
+        assert self.goto.byTime.GetCurrentValue() == (1, 6, 30)
 
         turnpos = self.goto.byTurn._GetCurrentPosition()
         assert turnpos == 0
@@ -449,7 +479,7 @@ class TestCase01(unittest.TestCase):
 
         self.goto.byEvent.Start()
         assert self.goto.byEvent.GetCurrentValue() == 0
-        assert self.goto.byTime.GetCurrentValue() == (1,6,30)
+        assert self.goto.byTime.GetCurrentValue() == (1, 6, 30)
         assert self.goto.byTurn.GetCurrentValue() == 1
 
     def checkBasicMovementSynch01Normal(self):
@@ -459,17 +489,19 @@ class TestCase01(unittest.TestCase):
 
         self.goto.byEvent._JumpToPosition(1)
         assert self.goto.byEvent._GetCurrentPosition() == 1
-        assert self.goto.byTime.GetCurrentValue() == (1,7,0)
+        assert self.goto.byTime.GetCurrentValue() == (1, 7, 0)
         assert self.goto.byTurn.GetCurrentValue() == 2
 
-        self.goto.byEvent._JumpToPosition(2) # invalid position, goto max, which means time stays where it is
+        self.goto.byEvent._JumpToPosition(
+            2
+        )  # invalid position, goto max, which means time stays where it is
         assert self.goto.byEvent._GetCurrentPosition() == 1
-        assert self.goto.byTime.GetCurrentValue() == (1,7,0)
+        assert self.goto.byTime.GetCurrentValue() == (1, 7, 0)
         assert self.goto.byTurn.GetCurrentValue() == 2
         self.goto.byEvent.Start()
         self.goto.byEvent.Endd()
         assert self.goto.byEvent.GetCurrentValue() == 1
-        assert self.goto.byTime.GetCurrentValue() == (1,7,0)
+        assert self.goto.byTime.GetCurrentValue() == (1, 7, 0)
         assert self.goto.byTurn.GetCurrentValue() == 2
 
     def checkBasicMovementSynch02Normal(self):
@@ -485,7 +517,7 @@ class TestCase01(unittest.TestCase):
         self.goto.byEvent._JumpToPosition(2)
         assert self.goto.byEvent._GetCurrentPosition() == 2
         assert self.goto.byEvent.GetCurrentValue() == 2
-        assert self.goto.byTime.GetCurrentValue() == (2,6,45)
+        assert self.goto.byTime.GetCurrentValue() == (2, 6, 45)
         assert self.goto.byTurn.GetCurrentValue() == 17
 
         # For events, jumping by position and by value are the same.
@@ -496,24 +528,26 @@ class TestCase01(unittest.TestCase):
         # Check by time positioning
 
         self.goto.byEvent.Start()
-        self.goto.byTime.JumpToValue((1,7,0))
+        self.goto.byTime.JumpToValue((1, 7, 0))
         assert self.goto.byEvent.GetCurrentValue() == 1
-        assert self.goto.byTime.GetCurrentValue() == (1,7,0)
+        assert self.goto.byTime.GetCurrentValue() == (1, 7, 0)
         assert self.goto.byTurn.GetCurrentValue() == 2
 
         self.goto.byTime.Next()
-        assert self.goto.byEvent.GetCurrentValue() == 1  # reverting to older findNearest event algorithm undershoots - pretty arbitrary
-        assert self.goto.byTime.GetCurrentValue() == (1,7,1)
+        assert (
+            self.goto.byEvent.GetCurrentValue() == 1
+        )  # reverting to older findNearest event algorithm undershoots - pretty arbitrary
+        assert self.goto.byTime.GetCurrentValue() == (1, 7, 1)
         assert self.goto.byTurn.GetCurrentValue() == 2
 
         self.goto.byTime.Start()
         assert self.goto.byEvent.GetCurrentValue() == 0
-        assert self.goto.byTime.GetCurrentValue() == (1,6,0)
+        assert self.goto.byTime.GetCurrentValue() == (1, 6, 0)
         assert self.goto.byTurn.GetCurrentValue() == 1
 
         self.goto.byTime.Endd()
         assert self.goto.byEvent.GetCurrentValue() == 2
-        assert self.goto.byTime.GetCurrentValue() == (2,6,59)
+        assert self.goto.byTime.GetCurrentValue() == (2, 6, 59)
         assert self.goto.byTurn.GetCurrentValue() == 17
 
         # Test byTurn positioning
@@ -521,7 +555,7 @@ class TestCase01(unittest.TestCase):
         self.goto.byTurn.JumpToValue(1)
         assert self.goto.byEvent.GetCurrentValue() == 0
         assert self.goto.byTurn.GetCurrentValue() == 1
-        assert self.goto.byTime.GetCurrentValue() == (1,6,0)
+        assert self.goto.byTime.GetCurrentValue() == (1, 6, 0)
 
         self.goto.byTurn.JumpToValue(2)
         assert self.goto.byEvent.GetCurrentValue() == 1 or self.goto.byEvent.GetCurrentValue() == 2
@@ -531,30 +565,38 @@ class TestCase01(unittest.TestCase):
          of the event at the event playhead position is set to.
          Resolve by favouring the time.  i.e.
         """
-        assert self.goto.byTime.GetCurrentValue() == (1, 7, 0)    # if we favor the theoretical time corresponding to the turn start time.
+        assert self.goto.byTime.GetCurrentValue() == (
+            1,
+            7,
+            0,
+        )  # if we favor the theoretical time corresponding to the turn start time.
 
     def checkMaxValue(self):
         self.goto.story = ["(1,6,30),o2,AT,2", "(1,7,0),x2,AT,4", "(2,6,45),o2,AT,2"]
         self.goto.byEvent.NotifyPositionNowValid(2)  # this will ripple to the other playheads.
 
         assert self.goto.byEvent.GetMaxValue() == 2
-        assert self.goto.byTime.GetMaxValue() == (2, 6, 59)   # this is an important test. Ensure time is expanding to max for max turn
+        assert self.goto.byTime.GetMaxValue() == (
+            2,
+            6,
+            59,
+        )  # this is an important test. Ensure time is expanding to max for max turn
         assert self.goto.byTurn.GetMaxValue() == 17
 
     def checkJumpToAndValidateCurrentValueNormal(self):
         self.goto.story = ["(1,6,30),o2,AT,2", "(1,7,0),x2,AT,4", "(2,6,45),o2,AT,2"]
         self.goto.byEvent.NotifyPositionNowValid(2)  # this will ripple to the other playheads.
 
-        for i in range(1, 5+1):  # should go up to time (1,6,5)
-            self.goto.byTime.JumpToValue((1,6,i))
-            assert self.goto.byTime.GetCurrentValue() == (1,6,i)
-        assert self.goto.byTime.GetCurrentValue() == (1,6,5)
+        for i in range(1, 5 + 1):  # should go up to time (1,6,5)
+            self.goto.byTime.JumpToValue((1, 6, i))
+            assert self.goto.byTime.GetCurrentValue() == (1, 6, i)
+        assert self.goto.byTime.GetCurrentValue() == (1, 6, 5)
 
-        for i in range(1, 2+1):  # should go up to turn 2
+        for i in range(1, 2 + 1):  # should go up to turn 2
             self.goto.byTurn.JumpToValue(i)
             assert self.goto.byTurn.GetCurrentValue() == i
 
-        for i in range(0, 2+1):  # events should go 0,1,2
+        for i in range(0, 2 + 1):  # events should go 0,1,2
             self.goto.byEvent.JumpToValue(i)
             assert self.goto.byEvent.GetCurrentValue() == i
 
@@ -577,7 +619,7 @@ class TestCase01(unittest.TestCase):
         # Insert a events - this is usually done by storyline class
         self.goto.story = ["(1,6,30),o2,AT,2", "(1,7,0),x2,AT,4", "(2,6,45),o2,AT,2"]
 
-        #self.goto.eventPlayhead.NotifyPositionNowValid(2)  # naughty - do not address dumb playhead class directly
+        # self.goto.eventPlayhead.NotifyPositionNowValid(2)  # naughty - do not address dumb playhead class directly
         self.goto.byEvent.NotifyPositionNowValid(2)
 
         # Check by time positioning
@@ -601,8 +643,12 @@ class TestCase01(unittest.TestCase):
 
         self.goto.byTime.Endd()
         assert self.goto.byEvent.GetCurrentValue() == 2
-        #print self.goto.byTime.GetCurrentValue()
-        assert self.goto.byTime.GetCurrentValue() == (2, 6, 59)   # not 2,6,45  cos time always padded to end of turn time
+        # print self.goto.byTime.GetCurrentValue()
+        assert self.goto.byTime.GetCurrentValue() == (
+            2,
+            6,
+            59,
+        )  # not 2,6,45  cos time always padded to end of turn time
 
     def checkByTurnPositioningNormal(self):
         self.goto.story = ["(1,12,1),o1,AT,6"]
@@ -634,66 +680,70 @@ class TestCase02(unittest.TestCase):
         First turn should be 4 hours long
         """
         turnmanager = turnmodule.TurnMgr()
-        specs = [((7, 0), (10, 59)),
-                ((11, 0), (16, 59)),
-                ((17, 0), (17, 59)),
-                ((18, 0), (18, 59)),
-                ((19, 0), (19, 59)),
-                ((20, 0), (20, 59)),
-                ((21, 0), (21, 59)),
-                ((22, 0), (22, 59)),
-                ((23, 0), (23, 59)),
-                ((0, 0), (0, 59)),
-                ((1, 0), (1, 59)),
-                ((2, 0), (2, 59)),
-                ((3, 0), (3, 59)),
-                ((4, 0), (4, 59)),
-                ((5, 0), (6, 59))]
+        specs = [
+            ((7, 0), (10, 59)),
+            ((11, 0), (16, 59)),
+            ((17, 0), (17, 59)),
+            ((18, 0), (18, 59)),
+            ((19, 0), (19, 59)),
+            ((20, 0), (20, 59)),
+            ((21, 0), (21, 59)),
+            ((22, 0), (22, 59)),
+            ((23, 0), (23, 59)),
+            ((0, 0), (0, 59)),
+            ((1, 0), (1, 59)),
+            ((2, 0), (2, 59)),
+            ((3, 0), (3, 59)),
+            ((4, 0), (4, 59)),
+            ((5, 0), (6, 59)),
+        ]
         turnmanager.SetTurnSpecs(specs)
         self.goto = PlayheadMediator(turnmanager, [])  # init with empty story list
 
-    def CalcAmountOfTimeInStoryline(self, playheads):  # DUPLICATED in playheadmanager.py and unittestgogo01.py
+    def CalcAmountOfTimeInStoryline(
+        self, playheads
+    ):  # DUPLICATED in playheadmanager.py and unittestgogo01.py
         numminutes = 0
         while playheads.byTime.IsMoreToPlay():
             playheads.byTime.Next()
             numminutes += 1
-        numhours = (numminutes+1)/60
+        numhours = (numminutes + 1) / 60
         return numminutes, numhours
 
     def EnsureSanity(self):
-    
+
         # Check earliest time
-        assert self.goto.turnMgr.EarlistTimeMinusOne() == (0,6,59)
+        assert self.goto.turnMgr.EarlistTimeMinusOne() == (0, 6, 59)
 
         # Check max values for playheads
-        #print 'byTime.GetMaxValue', self.goto.byTime.GetMaxValue()
-        assert self.goto.byTime.GetMaxValue() == (1,10,59)
-        #print 'byEvent.GetMaxValue', self.goto.byEvent.GetMaxValue()
-        assert self.goto.byEvent.GetMaxValue() == 1                     # 0 based
-        #print 'byTurn.GetMaxValue', self.goto.byTurn.GetMaxValue()
-        assert self.goto.byTurn.GetMaxValue() == 1                      # 1 based
+        # print 'byTime.GetMaxValue', self.goto.byTime.GetMaxValue()
+        assert self.goto.byTime.GetMaxValue() == (1, 10, 59)
+        # print 'byEvent.GetMaxValue', self.goto.byEvent.GetMaxValue()
+        assert self.goto.byEvent.GetMaxValue() == 1  # 0 based
+        # print 'byTurn.GetMaxValue', self.goto.byTurn.GetMaxValue()
+        assert self.goto.byTurn.GetMaxValue() == 1  # 1 based
 
         # Check amount of time in storyline
-        
+
         numminutes, numhours = self.CalcAmountOfTimeInStoryline(self.goto)
-        #print 'PASS 1 numminutes =%d #hours= %d' % (numminutes, numhours)
+        # print 'PASS 1 numminutes =%d #hours= %d' % (numminutes, numhours)
         assert numhours == 4
 
         self.goto.byTime.Start()
         numminutes, numhours = self.CalcAmountOfTimeInStoryline(self.goto)
-        #print 'PASS 2 numminutes =%d #hours= %d' % (numminutes, numhours)
+        # print 'PASS 2 numminutes =%d #hours= %d' % (numminutes, numhours)
         assert numhours == 4
 
         self.goto.byEvent.Start()
         numminutes, numhours = self.CalcAmountOfTimeInStoryline(self.goto)
-        #print 'PASS 3 numminutes =%d #hours= %d' % (numminutes, numhours)
+        # print 'PASS 3 numminutes =%d #hours= %d' % (numminutes, numhours)
         assert numhours == 4
 
         self.goto.byTurn.Start()
         numminutes, numhours = self.CalcAmountOfTimeInStoryline(self.goto)
-        #print 'PASS 4 numminutes =%d #hours= %d' % (numminutes, numhours)
+        # print 'PASS 4 numminutes =%d #hours= %d' % (numminutes, numhours)
         assert numhours == 4
-    
+
     def check01(self):
         # Insert a events - this is usually done by storyline class
         self.goto.story = ["(1,7,0),p1,AT,0", "(1,7,59),p1,AT,4"]
@@ -709,7 +759,7 @@ class TestCase02(unittest.TestCase):
 ##
 ##        self.EnsureSanity()
 ##        return
-##        
+##
 ##        #print 'EarlistTimeMinusOne', self.goto.turnMgr.EarlistTimeMinusOne()
 ##        assert self.goto.turnMgr.EarlistTimeMinusOne() == (0,6,59)
 ##
@@ -727,11 +777,12 @@ class TestCase02(unittest.TestCase):
 
 
 def suite():
-    suite1 = unittest.makeSuite(TestCase01, 'check')
-    suite2 = unittest.makeSuite(TestCase02, 'check')
-    alltests = unittest.TestSuite((suite1,suite2))
-##    alltests = unittest.TestSuite((suite2,))
+    suite1 = unittest.makeSuite(TestCase01, "check")
+    suite2 = unittest.makeSuite(TestCase02, "check")
+    alltests = unittest.TestSuite((suite1, suite2))
+    ##    alltests = unittest.TestSuite((suite2,))
     return alltests
+
 
 def main():
     """ Run all the suites.  To run via a gui, then
@@ -742,11 +793,12 @@ def main():
           runner = unittest.TextTestRunner(descriptions=0, verbosity=2)
         The default arguments are descriptions=1, verbosity=1
     """
-    runner = unittest.TextTestRunner(descriptions = 0, verbosity = 2) # default is descriptions=1, verbosity=1
-    #runner = unittest.TextTestRunner(descriptions=0, verbosity=1) # default is descriptions=1, verbosity=1
+    runner = unittest.TextTestRunner(
+        descriptions=0, verbosity=2
+    )  # default is descriptions=1, verbosity=1
+    # runner = unittest.TextTestRunner(descriptions=0, verbosity=1) # default is descriptions=1, verbosity=1
     runner.run(suite())
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
-
-

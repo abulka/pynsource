@@ -1,11 +1,12 @@
 from ModelOo import Model
 from ModelOoAdapter import ModelOoAdapter
 
-#from PersistenceOoPickle import Persistence
+# from PersistenceOoPickle import Persistence
 from PersistenceOoHomegrown import Persistence
 
 from ServerBottleAdapter import Server
-#from ServerMockAdapter import Server
+
+# from ServerMockAdapter import Server
 
 from ViewWxAdapter import MyWxApp
 import wx
@@ -19,11 +20,13 @@ persistence = Persistence()
 model = ModelOoAdapter(model_oo, persistence)
 
 # Create Server
-server = Server(host='localhost', port=8081)
+server = Server(host="localhost", port=8081)
 
 # Create Gui
 wxapp = MyWxApp(redirect=False)
-gui = wxapp.myframe  # gui mediator inherits from gui rather than wrapping it, in this implementation
+gui = (
+    wxapp.myframe
+)  # gui mediator inherits from gui rather than wrapping it, in this implementation
 
 # Hook up Utility adapters
 gui.random = RandomIntFunction
@@ -40,4 +43,5 @@ print("DONE")
 
 # Stops any background server threads.
 import sys
+
 sys.exit()

@@ -3,9 +3,11 @@
 # Uses a CmdInvoker to create command instances, assigns the
 # context object and then runs the command via the command manager.
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
-    if ".." not in sys.path: sys.path.append("..")
+
+    if ".." not in sys.path:
+        sys.path.append("..")
 
 from common.command_pattern import CommandManager
 
@@ -16,13 +18,15 @@ from .cmds.selection import *
 from .cmds.filemgmt import *
 from .cmds.layouts import *
 from .cmds.colouring import *
+
 # TODO: Perhaps can add these modules to the globals within the
 # invoker class, to avoid having to import each module explicitly?
 
 # IMPORTANT: Command Invoker has to be defined here in order to access the scope
 # of the above cmds modules
 
-class CmdInvoker:   # version 4 - see pyNsource\trunk\Research\python advanced\command_invokers1.py
+
+class CmdInvoker:  # version 4 - see pyNsource\trunk\Research\python advanced\command_invokers1.py
     """
     When you call any method on an instance of this invoker class, the method is
     interpreted as the name of a command class to be instantiated. Parameters in
@@ -31,26 +35,28 @@ class CmdInvoker:   # version 4 - see pyNsource\trunk\Research\python advanced\c
     to a command manager to be run. No extra parameters are injected into the
     constructor or to the execute() call.
     """
+
     def __init__(self, context, cmd_mgr):
         self.context = context
         self.cmd_mgr = cmd_mgr
-        
+
     # needs to return a callable function which will then be called by python,
     # with the arguments to the original call to '.method/klass' call.
     def __getattr__(self, klass):
         def cmd_invoker_f(*args, **kwargs):
-            cmd = eval(klass+'(*args, **kwargs)', globals(), locals())
+            cmd = eval(klass + "(*args, **kwargs)", globals(), locals())
             cmd.context = self.context
             self.cmd_mgr.run(cmd)
+
         return cmd_invoker_f
-    
-class Controller():
+
+
+class Controller:
     def __init__(self, app):
         self.app = app
-        
+
         self.cmd_mgr = CommandManager(100)
         self.invoker = CmdInvoker(self.app.context, self.cmd_mgr)
-
 
     """
     # Events from Gui
@@ -126,59 +132,72 @@ class Controller():
     Used to redirect via app - lets not do this as too indirect.
     let server see app.controller  !!
     """
-    #def CmdGetThingsAsDict(self):
+    # def CmdGetThingsAsDict(self):
     #    return self.controller.CmdGetThingsAsJson()
     #
-    #def CmdGetThingAsDict(self, id):
+    # def CmdGetThingAsDict(self, id):
     #    return self.controller.CmdGetThingAsJson(id)
 
 
+if __name__ == "__main__":
 
-
-if __name__ == '__main__':
-        
     class CmdMgr:
         def run(self, cmd):
             cmd.execute()
 
-    invoker = CmdInvoker(context={'a':4}, cmd_mgr=CmdMgr())
-    
+    invoker = CmdInvoker(context={"a": 4}, cmd_mgr=CmdMgr())
+
     class CmdWoody:
         ugg = 1
+
         def __init__(self, num, num2=98):
-            #self.context = context
+            # self.context = context
             self.num = num
             self.num2 = num2
+
         def execute(self):
-            print("hi from Woody and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__)
-     
-    invoker.CmdWoody(100)  # instantiates class CmdWoody with constructor value (100) and calls execute() on it
+            print(
+                "hi from Woody and context is %(context)s and num is %(num)d and num2 is %(num2)d"
+                % self.__dict__
+            )
+
+    invoker.CmdWoody(
+        100
+    )  # instantiates class CmdWoody with constructor value (100) and calls execute() on it
     invoker.CmdWoody(100, 97)
-    
+
     # Test again with base class idea
-    
+
     class CmdBase:
         def setContext(self, context):
             self.context = context
+
         def execute(self):
             raise RuntimeError("virtual")
+
         def redo(self):
             self.execute()
-            
+
     class CmdBob(CmdBase):
         def __init__(self, num, num2=98):
             self.num = num
             self.num2 = num2
+
         def execute(self):
             assert self.context
-            print("hi from Bob and context is %(context)s and num is %(num)d and num2 is %(num2)d" % self.__dict__)
-    
-    invoker.CmdBob(100)  # instantiates class CmdBob with constructor value (100) and calls execute() on it
+            print(
+                "hi from Bob and context is %(context)s and num is %(num)d and num2 is %(num2)d"
+                % self.__dict__
+            )
+
+    invoker.CmdBob(
+        100
+    )  # instantiates class CmdBob with constructor value (100) and calls execute() on it
     invoker.CmdBob(100, 97)
-    
+
     # Using command outside of the invoker framework
     c = CmdBob(100, 88)
-    c.setContext({'a':44})   # Need to do this if not using the framework
+    c.setContext({"a": 44})  # Need to do this if not using the framework
     c.execute()
-    
-    print("done")        
+
+    print("done")

@@ -1,7 +1,7 @@
 # http://wiki.wxpython.org/wxHTML
 
 import wx
-import  wx.lib.wxpTag
+import wx.lib.wxpTag
 
 # The html page as a python string literal
 page = r"""
@@ -31,6 +31,7 @@ class Bitmap1(wx.StaticBitmap):
     """
     A custom StaticBitmap class that holds your image. 
     """
+
     def __init__(self, *args, **kwargs):
         """
         The __init__ is called by the HtmlWindow, it takes all the usual
@@ -38,39 +39,43 @@ class Bitmap1(wx.StaticBitmap):
         word arguments.
         """
         bmp = smalltest.GetBitmap()
-        kwargs['bitmap'] = bmp
+        kwargs["bitmap"] = bmp
         wx.StaticBitmap.__init__(self, *args, **kwargs)
+
 
 class DemoFrame(wx.Frame):
     """ This window displays a HtmlWindow """
+
     def __init__(self, *args, **kwargs):
         wx.Frame.__init__(self, *args, **kwargs)
 
         htmlwin = wx.html.HtmlWindow(self)
         htmlwin.SetPage(page)
 
-       
+
 class MyApp(wx.App):
     """
     A little test wx.App
     """
+
     def OnInit(self):
         # add the image to the MemoryFileSystem:
         mfs = wx.MemoryFSHandler()
         # wx.FileSystem_AddHandler(mfs)  # Doesn't seem to work anymore?
         mfs.AddFile("smalltest.png", smalltest.GetImage(), wx.BITMAP_TYPE_PNG)
 
-
         # Initializing the Frame
-        frame = DemoFrame(None, title="HTML Tester Window", size = (500,500))
+        frame = DemoFrame(None, title="HTML Tester Window", size=(500, 500))
         self.SetTopWindow(frame)
-        
+
         frame.Show(True)
         return True
+
 
 ## This is the image data itself, created with the img2py utility that
 ## ships with wxPython
 from wx.lib.embeddedimage import PyEmbeddedImage
+
 smalltest = PyEmbeddedImage(
     "iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABHNCSVQICAgIfAhkiAAAAAlw"
     "SFlzAAAMIgAADCIByQlnqQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoA"
@@ -178,9 +183,10 @@ smalltest = PyEmbeddedImage(
     "ORCSjtlLFmqxVAY8r6qTmsu2toDlAoAD/f79gdOA0fv/H8AsHuoShA9zUeZp2krX5ccKMSGA"
     "wxGRjpgJ3Im6m4M7gRNUtbhFDYtDYnU+QE/M4qAu+4qBUe2JHx1iUgCq+j+gH2bbvubewR7g"
     "Co3C8G47JjFZBPzI/nb0ZcAfMcV6pbbi3ThikZgWwI/sryQ61KIx83imVQigneYjJusA7bQc"
-    "7QJo47QLoI3TLoA2TrsA2jjtAmjjtAugjdMugDbO/wOgoxtWADHq7wAAAABJRU5ErkJggg==")
+    "7QJo47QLoI3TLoA2TrsA2jjtAmjjtAugjdMugDbO/wOgoxtWADHq7wAAAABJRU5ErkJggg=="
+)
 
 
-if __name__ == "__main__" :
+if __name__ == "__main__":
     app = MyApp(0)
     app.MainLoop()

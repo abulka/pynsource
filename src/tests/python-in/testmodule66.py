@@ -1,23 +1,27 @@
 import struct, time
 
+
 def readString(fp):
     fmt = int8
     block = fp.read(struct.calcsize(fmt))
-    numchars = struct.unpack(fmt, block)[0]   # get pos 0 cos a tuple always returned e.g. (12,)
+    numchars = struct.unpack(fmt, block)[0]  # get pos 0 cos a tuple always returned e.g. (12,)
 
     fmt = "s"
     str = fp.read(numchars)
     return str
 
+
 def read32(fp):
-    fmt = '>'+int32
+    fmt = ">" + int32
     block = fp.read(struct.calcsize(fmt))
     return struct.unpack(fmt, block)[0]
 
+
 def read16(fp):
-    fmt = '>'+int16
+    fmt = ">" + int16
     block = fp.read(struct.calcsize(fmt))
     return struct.unpack(fmt, block)[0]
+
 
 def read8(fp):
     # result (int8)
@@ -25,11 +29,13 @@ def read8(fp):
     block = fp.read(struct.calcsize(fmt))
     return struct.unpack(fmt, block)[0]
 
+
 def YesOrNo(bool):
     if bool:
-        return 'Yes'
+        return "Yes"
     else:
-        return 'No'
+        return "No"
+
 
 class Flags:
     def __init__(self, fp):
@@ -65,6 +71,7 @@ class Flags:
                 msg += "\t%s\n" % flag
         return msg
 
+
 class Flag:
     def __init__(self, fp):
         self.readflag(fp)
@@ -73,8 +80,8 @@ class Flag:
         self.flagx = read16(fp)
         self.flagy = read16(fp)
         self.owner = read8(fp)
-    
+
     def __repr__(self):
         msg = ""
-        msg += "flag at %d, %d owned by %s" % ( self.flagx, self.flagy, lookup_flagowner[self.owner] )
+        msg += "flag at %d, %d owned by %s" % (self.flagx, self.flagy, lookup_flagowner[self.owner])
         return msg

@@ -7,25 +7,25 @@ from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
 
 # python -m unittest tests.test_parse_plantuml
 
+
 class TestCasePlantUml01(unittest.TestCase):
     def setUp(self):
         self.p = PySourceAsPlantUml()
 
     def _dump(self, p, expected):
         print()
-        print("_"*80 + " PlantUml CALCULATED:")
+        print("_" * 80 + " PlantUml CALCULATED:")
         print(str(p).strip())
-        print("-"*80 + " PlantUml EXPECTED:")
+        print("-" * 80 + " PlantUml EXPECTED:")
         print(expected)
-        print("_"*80 + " PlantUml END DUMP")
-
+        print("_" * 80 + " PlantUml END DUMP")
 
     def test01(self):
         """
         class Fred(Mary, Sam):
             pass
         """
-        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule08_multiple_inheritance.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule08_multiple_inheritance.py"
         self.p.Parse(FILE)
         self.p.calc_plant_uml(optimise=False)
         expected = """
@@ -62,7 +62,7 @@ Sam <|- Fred
             def DoB(self):
                 self._secretinfo = 2
         """
-        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule01.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule01.py"
         self.p.Parse(FILE)
         self.p.calc_plant_uml(optimise=False)
         expected = """

@@ -11,13 +11,13 @@ import pickle
 
 DEFAULT_FILENAME = "hexmodel_sqlobject.pickle"
 
+
 class Persistence:
-        
     def LoadAll(self, model, filename):
         if not filename:
             filename = DEFAULT_FILENAME
         # ignore existing model paramter since pickle creates a new one.
-        output = open(filename, 'r')
+        output = open(filename, "r")
         model = pickle.load(output)
         output.close()
         return model
@@ -25,8 +25,6 @@ class Persistence:
     def SaveAll(self, model, filename):
         if not filename:
             filename = DEFAULT_FILENAME
-        output = open(filename, 'w')
+        output = open(filename, "w")
         pickle.dump(model, output, protocol=0)
         output.close()
-
-        

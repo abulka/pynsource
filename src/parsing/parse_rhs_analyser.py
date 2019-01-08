@@ -1,6 +1,7 @@
 from common.architecture_support import whosdaddy, whosgranddaddy
 from parsing.keywords import pythonbuiltinfunctions
 
+
 class RhsAnalyser:
     """
     Usage:
@@ -82,13 +83,13 @@ class RhsAnalyser:
 
     def __init__(self, visitor):
         self.v = visitor
-        
+
         assert len(self.v.rhs) > 0
-        assert not (self.v.made_assignment and self.v.made_append_call) # these both can't be true
-        
+        assert not (self.v.made_assignment and self.v.made_append_call)  # these both can't be true
+
         self.rhs_ref_to_class = None
         self.calc_rhs_ref_to_class()
-    
+
     def calc_rhs_ref_to_class(self):
         """
         IF made_rhs_call then one or more calls () involved on rhs (which would
@@ -99,13 +100,15 @@ class RhsAnalyser:
         whole rhs - in either case just take the names's last attr.
         """
         if self.v.made_rhs_call:
-            self.rhs_ref_to_class = self.v.rhs[self.pos]      
+            self.rhs_ref_to_class = self.v.rhs[self.pos]
         else:
-            self.rhs_ref_to_class = self.v.rhs[-1]     # want instance names's last attr - no call here 
-        
+            self.rhs_ref_to_class = self.v.rhs[-1]  # want instance names's last attr - no call here
+
     def in_module_methods_etc(self):
-        return self.rhs_ref_to_class in pythonbuiltinfunctions or \
-               self.rhs_ref_to_class in self.v.quick_parse.quick_found_module_defs
+        return (
+            self.rhs_ref_to_class in pythonbuiltinfunctions
+            or self.rhs_ref_to_class in self.v.quick_parse.quick_found_module_defs
+        )
 
     def class_exists(self, instance_check=False):
         if instance_check:
@@ -113,16 +116,17 @@ class RhsAnalyser:
         else:
             c = self.rhs_ref_to_class
         return c in self.v.quick_parse.quick_found_classes
-    
+
     def upper_just_first_char(self):
         return self.rhs_ref_to_class[0].upper() + self.rhs_ref_to_class[1:]
 
     @property
     def pos(self):
         return self.v.pos_rhs_call_pre_first_bracket
+
     @property
     def prefix(self):
-        return ".".join(self.v.rhs[0:self.pos])
+        return ".".join(self.v.rhs[0 : self.pos])
 
     def is_prefixed_class_call(self):
         return self.v.made_rhs_call and self.pos > 0
@@ -139,49 +143,59 @@ class RhsAnalyser:
         This is the main API method to call.
         Returns T/F
         """
-        
-        if self.is_prefixed_instance(): #G
+
+        if self.is_prefixed_instance():  # G
             self.rhs_ref_to_class = None
             return False
 
-        if self.v.made_rhs_call and self.is_there_syntax_after_class_call():  #E, #F, #G
+        if self.v.made_rhs_call and self.is_there_syntax_after_class_call():  # E, #F, #G
             self.rhs_ref_to_class = None
             return False
-            
-        if self.is_prefixed_class_call(): #C, #D
-            if self.prefix in self.v.imports_encountered: # C1, # D4
+
+        if self.is_prefixed_class_call():  # C, #D
+            if self.prefix in self.v.imports_encountered:  # C1, # D4
                 self.rhs_ref_to_class = "%s.%s" % (self.prefix, self.v.rhs[self.pos])
                 return True
             else:
                 self.rhs_ref_to_class = None
                 return False
-        
+
         assert not self.is_prefixed_class_call()
-        
-        if self.class_exists() and not self.in_module_methods_etc() and self.v.made_rhs_call: # A1
+
+        if self.class_exists() and not self.in_module_methods_etc() and self.v.made_rhs_call:  # A1
             return True
-        
-        if self.class_exists(instance_check=True) and not self.in_module_methods_etc() and not self.v.made_rhs_call: # B1
+
+        if (
+            self.class_exists(instance_check=True)
+            and not self.in_module_methods_etc()
+            and not self.v.made_rhs_call
+        ):  # B1
             self.rhs_ref_to_class = self.upper_just_first_char()
             return True
-        
-        if not self.class_exists() and self.in_module_methods_etc() and self.v.made_rhs_call: # A2
-            self.rhs_ref_to_class = None
-            return False
-        
-        if self.class_exists(instance_check=True) and self.in_module_methods_etc() and not self.v.made_rhs_call: # B2
+
+        if not self.class_exists() and self.in_module_methods_etc() and self.v.made_rhs_call:  # A2
             self.rhs_ref_to_class = None
             return False
 
-        if self.class_exists() and self.in_module_methods_etc() and self.v.made_rhs_call: # A3
+        if (
+            self.class_exists(instance_check=True)
+            and self.in_module_methods_etc()
+            and not self.v.made_rhs_call
+        ):  # B2
+            self.rhs_ref_to_class = None
+            return False
+
+        if self.class_exists() and self.in_module_methods_etc() and self.v.made_rhs_call:  # A3
             return True
-        
-        if not self.class_exists() and not self.in_module_methods_etc() and self.v.made_rhs_call: # A4
+
+        if (
+            not self.class_exists() and not self.in_module_methods_etc() and self.v.made_rhs_call
+        ):  # A4
             if self.rhs_ref_to_class[0].isupper():  # GUESS yes, if starts with uppercase letter
                 return True
             else:
                 self.rhs_ref_to_class = None
                 return False
-                
+
         self.rhs_ref_to_class = None
         return False

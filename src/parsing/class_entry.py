@@ -1,9 +1,11 @@
 class ClassEntry:
-    def __init__(self, name=''):
+    def __init__(self, name=""):
         self.name = name  # new and optional.
-        self.name_long = ''  # new and optional.
-        self.stack_functions = [False]  # new, only used by ast parser.  can we make this empty? for init?
-        
+        self.name_long = ""  # new and optional.
+        self.stack_functions = [
+            False
+        ]  # new, only used by ast parser.  can we make this empty? for init?
+
         self.defs = []
         self.attrs = []
         self.classdependencytuples = []
@@ -33,19 +35,20 @@ class ClassEntry:
         else:
             # See if there is more info to add re this attr.
             if len(attrobj.attrtype) < len(attrtype):
-                attrobj.attrtype = attrtype   # Update it.
+                attrobj.attrtype = attrtype  # Update it.
 
         # OLD CODE
-        #if not self.FindAttribute(attrname):
+        # if not self.FindAttribute(attrname):
         #    self.attrs.append(Attribute(attrname, attrtype))
-        
+
     def __str__(self):
         if self.name:
             return self.name
         else:
             return repr(self)
-    
+
+
 class Attribute:
-    def __init__(self, attrname, attrtype='normal'):
+    def __init__(self, attrname, attrtype="normal"):
         self.attrname = attrname
         self.attrtype = attrtype

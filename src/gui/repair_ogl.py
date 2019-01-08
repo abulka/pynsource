@@ -93,6 +93,7 @@ PyNSource UML tool for Python at http://www.andypatterns.com/index.php/products/
 import wx
 import wx.lib.ogl as ogl
 
+
 def repairOGL():
 
     # general refresh hack
@@ -105,20 +106,22 @@ def repairOGL():
 
     # moving
 
-    def new_OnBeginDragLeft(self, x, y, keys = 0, attachment = 0):
+    def new_OnBeginDragLeft(self, x, y, keys=0, attachment=0):
         self.begin_drag_mouse_point = (x, y)
         self.begin_drag_shape_centre_point = (self.GetX(), self.GetY())
 
-    def new_OnDragLeft(self, draw, x, y, keys = 0, attachment = 0):
+    def new_OnDragLeft(self, draw, x, y, keys=0, attachment=0):
         dx = self.begin_drag_mouse_point[0] - x
         dy = self.begin_drag_mouse_point[1] - y
         dc = wx.ClientDC(self.GetCanvas())
         self.GetCanvas().PrepareDC(dc)
-        self.Move(dc,
-                  self.begin_drag_shape_centre_point[0] - dx,
-                  self.begin_drag_shape_centre_point[1] - dy)
+        self.Move(
+            dc,
+            self.begin_drag_shape_centre_point[0] - dx,
+            self.begin_drag_shape_centre_point[1] - dy,
+        )
 
-    def new_OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
+    def new_OnEndDragLeft(self, x, y, keys=0, attachment=0):
         pass
 
     # sizing
@@ -127,12 +130,12 @@ def repairOGL():
     old_OnSizingDragLeft = wx.lib.ogl.basic.Shape.OnSizingDragLeft
     old_OnSizingEndDragLeft = wx.lib.ogl.basic.Shape.OnSizingEndDragLeft
 
-    def new_OnSizingBeginDragLeft(self, pt, x, y, keys = 0, attachment = 0):
-        old_OnSizingBeginDragLeft(self, pt, x, y, keys = 0, attachment = 0)
-        old_OnSizingDragLeft(self, pt, None, x, y, keys = 0, attachment = 0)  # 'draw' param is None
+    def new_OnSizingBeginDragLeft(self, pt, x, y, keys=0, attachment=0):
+        old_OnSizingBeginDragLeft(self, pt, x, y, keys=0, attachment=0)
+        old_OnSizingDragLeft(self, pt, None, x, y, keys=0, attachment=0)  # 'draw' param is None
 
-    def new_OnSizingDragLeft(self, pt, draw, x, y, keys = 0, attachment = 0):
-        old_OnSizingDragLeft(self, pt, draw, x, y, keys = 0, attachment = 0)
+    def new_OnSizingDragLeft(self, pt, draw, x, y, keys=0, attachment=0):
+        old_OnSizingDragLeft(self, pt, draw, x, y, keys=0, attachment=0)
         old_OnSizingEndDragLeft(self, pt, x, y, keys=0, attachment=0)
 
     # monkey patch new methods to replace existing ogl class methods
@@ -141,5 +144,5 @@ def repairOGL():
     wx.lib.ogl.basic.Shape.OnBeginDragLeft = new_OnBeginDragLeft
     wx.lib.ogl.basic.Shape.OnDragLeft = new_OnDragLeft
     wx.lib.ogl.basic.Shape.OnEndDragLeft = new_OnEndDragLeft
-    wx.lib.ogl.basic.Shape.OnSizingBeginDragLeft= new_OnSizingBeginDragLeft
+    wx.lib.ogl.basic.Shape.OnSizingBeginDragLeft = new_OnSizingBeginDragLeft
     wx.lib.ogl.basic.Shape.OnSizingDragLeft = new_OnSizingDragLeft

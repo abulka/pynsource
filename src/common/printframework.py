@@ -1,6 +1,7 @@
 # Version 1.5 (clone of 1.4c with wx changes - Andy)
 
-import  wx
+import wx
+
 
 class MyPrintout(wx.Printout):
     def __init__(self, canvas, log):
@@ -9,42 +10,42 @@ class MyPrintout(wx.Printout):
         self.log = log
 
     def OnBeginDocument(self, start, end):
-        #self.log.WriteText("wxPrintout.OnBeginDocument\n")
+        # self.log.WriteText("wxPrintout.OnBeginDocument\n")
         return super(MyPrintout, self).OnBeginDocument(start, end)
 
     def OnEndDocument(self):
-        #self.log.WriteText("wxPrintout.OnEndDocument\n")
+        # self.log.WriteText("wxPrintout.OnEndDocument\n")
         super(MyPrintout, self).OnEndDocument()
 
     def OnBeginPrinting(self):
-        #self.log.WriteText("wxPrintout.OnBeginPrinting\n")
+        # self.log.WriteText("wxPrintout.OnBeginPrinting\n")
         super(MyPrintout, self).OnBeginPrinting()
 
     def OnEndPrinting(self):
-        #self.log.WriteText("wxPrintout.OnEndPrinting\n")
+        # self.log.WriteText("wxPrintout.OnEndPrinting\n")
         super(MyPrintout, self).OnEndPrinting()
 
     def OnPreparePrinting(self):
-        #self.log.WriteText("wxPrintout.OnPreparePrinting\n")
+        # self.log.WriteText("wxPrintout.OnPreparePrinting\n")
         super(MyPrintout, self).OnPreparePrinting()
 
     def HasPage(self, page):
-        #self.log.WriteText("wxPrintout.HasPage: %d\n" % page)
+        # self.log.WriteText("wxPrintout.HasPage: %d\n" % page)
 
-        # If GetPageInfo is setup correctly, this can 
+        # If GetPageInfo is setup correctly, this can
         # always return True.
-        return True        
+        return True
 
     def GetPageInfo(self):
-        #self.log.WriteText("wxPrintout.GetPageInfo\n")
+        # self.log.WriteText("wxPrintout.GetPageInfo\n")
         # This will print just 1 page
         return (1, 1, 1, 1)
-    
+
     def OnPrintPage(self, page):
-        #self.log.WriteText("wxPrintout.OnPrintPage: %d\n" % page)
+        # self.log.WriteText("wxPrintout.OnPrintPage: %d\n" % page)
         dc = self.GetDC()
 
-        #-------------------------------------------
+        # -------------------------------------------
         # One possible method of setting scaling factors...
 
         canvasMaxX = self.canvas.GetSize()[0]
@@ -63,7 +64,12 @@ class MyPrintout(wx.Printout):
         try:
             (w, h) = dc.GetSizeTuple()  # classic wxpython
         except AttributeError:
-            (w, h) = dc.GetSize()  # pheonix - see https://wxpython.org/Phoenix/docs/html/classic_vs_phoenix.html
+            (
+                w,
+                h,
+            ) = (
+                dc.GetSize()
+            )  # pheonix - see https://wxpython.org/Phoenix/docs/html/classic_vs_phoenix.html
 
         # Calculate a suitable scaling factor
         scaleX = float(w) / maxX
@@ -80,10 +86,10 @@ class MyPrintout(wx.Printout):
         dc.SetUserScale(actualScale, actualScale)
         dc.SetDeviceOrigin(int(posX), int(posY))
 
-        #-------------------------------------------
+        # -------------------------------------------
 
         self.canvas.Redraw(dc)
-        #dc.DrawText("Page: %d" % page, marginX/2, maxY-marginY)
+        # dc.DrawText("Page: %d" % page, marginX/2, maxY-marginY)
 
         return True
 
@@ -101,7 +107,6 @@ class MyPrintout(wx.Printout):
             x = shape.GetX() - width / 2.0
             y = shape.GetY() - height / 2.0
             # remember the shapes' biggest x and y points
-            xs.append(x+width)
-            ys.append(y+height)
+            xs.append(x + width)
+            ys.append(y + height)
         return max(xs), max(ys)
-

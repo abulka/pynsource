@@ -30,11 +30,12 @@ C:\Documents and Settings\Administrator\Desktop>
 
 import sys, tokenize, glob, token
 
-symdir={}
+symdir = {}
+
 
 def tokeneater(type, tokstr, start, end, line, symdir=symdir):
-    if (type==token.NAME):
-        TOKSTR = tokstr.upper()  #should show up for this file
+    if type == token.NAME:
+        TOKSTR = tokstr.upper()  # should show up for this file
         if TOKSTR in symdir:
             d = symdir[TOKSTR]
             if tokstr in d:
@@ -42,38 +43,43 @@ def tokeneater(type, tokstr, start, end, line, symdir=symdir):
             else:
                 d[tokstr] = 1
         else:
-            symdir[TOKSTR]={ tokstr:1 }
+            symdir[TOKSTR] = {tokstr: 1}
+
 
 for fileglob in sys.argv[1:]:
     for filename in glob.glob(fileglob):
         symdir.clear()
         tokenize.tokenize(open(filename).readline, tokeneater)
 
-        header = '\n====< '+filename+' >===='
+        header = "\n====< " + filename + " >===="
         singlecase = []
-        multicase = [key for key in list(symdir.keys())
-                        if len(symdir[key])>1 or singlecase.append(key)]
+        multicase = [
+            key for key in list(symdir.keys()) if len(symdir[key]) > 1 or singlecase.append(key)
+        ]
         for key in multicase:
             if header:
                 print(header)
-                print('  (Multicase symbols)')
+                print("  (Multicase symbols)")
                 header = None
             for name, freq in list(symdir[key].items()):
-                print('%15s:%-3s'% (name, freq), end=' ')
+                print("%15s:%-3s" % (name, freq), end=" ")
             print()
-        if header: print(header); header = None
-        print('  (Singlecase symbols)')
+        if header:
+            print(header)
+            header = None
+        print("  (Singlecase symbols)")
         byfreq = [list(symdir[k].items())[0] for k in singlecase]
-        byfreq = [(n,k) for k,n in byfreq]
+        byfreq = [(n, k) for k, n in byfreq]
         byfreq.sort()
         npr = 0
         for freq, key in byfreq:
-                if header:
-                    print(header)
-                    header = None
-                print('%15s:%-3s'% (key, freq), end=' ')
-                if npr%4==3: print()
-                npr +=1
+            if header:
+                print(header)
+                header = None
+            print("%15s:%-3s" % (key, freq), end=" ")
+            if npr % 4 == 3:
+                print()
+            npr += 1
         print()
 
 """
@@ -109,4 +115,3 @@ Operating on itself and another little file (you can specify file glob expressio
 Regards,
 Bengt Richter
 """
-

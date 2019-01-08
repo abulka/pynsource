@@ -5,6 +5,7 @@ import unittest
 from generate_code.gen_asciiart import PySourceAsText
 from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
 
+
 class TestCase01(unittest.TestCase):
     def setUp(self):
         self.p = PySourceAsText()
@@ -24,10 +25,10 @@ class TestCase01(unittest.TestCase):
 
 
         """
-        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + 'testmodule07.py'
+        FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule07.py"
         self.p.Parse(FILE)
 
-        #print self.p
+        # print self.p
 
         # -------------------------------------------------------
 
@@ -36,31 +37,25 @@ class TestCase01(unittest.TestCase):
         gotevent3 = 0
 
         for classname, classentry in list(self.p.classlist.items()):
-            if classname == 'ParseMeTest':
+            if classname == "ParseMeTest":
                 gotevent1 = 1
-                assert classentry.classesinheritsfrom == ['undo.UndoItem']
+                assert classentry.classesinheritsfrom == ["undo.UndoItem"]
 
                 assert len(classentry.attrs) == 2
                 for attrobj in classentry.attrs:
                     attrname = attrobj.attrname
-                    if attrname == 'map':
+                    if attrname == "map":
                         gotevent2 = 1
-                    if attrname == 'DEFAULT_ELEVATION':
+                    if attrname == "DEFAULT_ELEVATION":
                         gotevent3 = 1
-                        assert 'static' in attrobj.attrtype
+                        assert "static" in attrobj.attrtype
 
                 for adef in classentry.defs:
                     pass
                 assert len(classentry.defs) == 2
-                assert '__init__' in classentry.defs
-                assert 'PlaceTile' in classentry.defs
-
-
+                assert "__init__" in classentry.defs
+                assert "PlaceTile" in classentry.defs
 
         assert gotevent1
         assert gotevent2
         assert gotevent3
-
-
-
-

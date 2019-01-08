@@ -3,6 +3,7 @@ from Statechart import Statechart
 from TopHandler import TopHandler
 from GUI import GUI
 
+
 class Editor:
     def __init__(self):
         self.topHandler = TopHandler()

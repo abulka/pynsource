@@ -1,16 +1,16 @@
-
 from wxPython.wx import *
 from wxPython.ogl import *
 import wx
 
 import images
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # This creates some pens and brushes that the OGL library uses.
 
 wxOGLInitialize()
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+
 
 class DiamondShape(wxPolygonShape):
     def __init__(self, w=0.0, h=0.0):
@@ -22,21 +22,18 @@ class DiamondShape(wxPolygonShape):
 
         ## Either wxRealPoints or 2-tuples of floats  works.
 
-        #points = [ wxRealPoint(0.0,    -h/2.0),
+        # points = [ wxRealPoint(0.0,    -h/2.0),
         #          wxRealPoint(w/2.0,  0.0),
         #          wxRealPoint(0.0,    h/2.0),
         #          wxRealPoint(-w/2.0, 0.0),
         #          ]
-        points = [ (0.0,    -h/2.0),
-                   (w/2.0,  0.0),
-                   (0.0,    h/2.0),
-                   (-w/2.0, 0.0),
-                   ]
+        points = [(0.0, -h / 2.0), (w / 2.0, 0.0), (0.0, h / 2.0), (-w / 2.0, 0.0)]
 
         self.Create(points)
 
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+
 
 class RoundedRectangleShape(wxRectangleShape):
     def __init__(self, w=0.0, h=0.0):
@@ -44,22 +41,23 @@ class RoundedRectangleShape(wxRectangleShape):
         self.SetCornerRadius(-0.3)
 
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+
 
 class DividedShape(wxDividedShape):
     def __init__(self, width, height, canvas):
         wxDividedShape.__init__(self, width, height)
 
         region1 = wxShapeRegion()
-        region1.SetText('wxDividedShape')
+        region1.SetText("wxDividedShape")
         region1.SetProportions(0.0, 0.2)
         region1.SetFormatMode(FORMAT_CENTRE_HORIZ)
         self.AddRegion(region1)
 
         region2 = wxShapeRegion()
-        region2.SetText('This is Region number two.')
+        region2.SetText("This is Region number two.")
         region2.SetProportions(0.0, 0.3)
-        region2.SetFormatMode(FORMAT_CENTRE_HORIZ|FORMAT_CENTRE_VERT)
+        region2.SetFormatMode(FORMAT_CENTRE_HORIZ | FORMAT_CENTRE_VERT)
         self.AddRegion(region2)
 
         region3 = wxShapeRegion()
@@ -69,12 +67,10 @@ class DividedShape(wxDividedShape):
         region3.SetFormatMode(FORMAT_NONE)
         self.AddRegion(region3)
 
-
-        self.region3 = region3   # for external access...
+        self.region3 = region3  # for external access...
 
         self.SetRegionSizes()
         self.ReformatRegions(canvas)
-
 
     def ReformatRegions(self, canvas=None):
         rnum = 0
@@ -86,7 +82,6 @@ class DividedShape(wxDividedShape):
             self.FormatText(dc, text, rnum)
             rnum += 1
 
-
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
         self.base_OnSizingEndDragLeft(pt, x, y, keys, attch)
         self.SetRegionSizes()
@@ -94,7 +89,8 @@ class DividedShape(wxDividedShape):
         self.GetCanvas().Refresh()
 
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+
 
 class MyEvtHandler(wxShapeEvtHandler):
     def __init__(self, log, frame):
@@ -103,13 +99,11 @@ class MyEvtHandler(wxShapeEvtHandler):
         self.statbarFrame = frame
 
     def UpdateStatusBar(self, shape):
-        x,y = shape.GetX(), shape.GetY()
+        x, y = shape.GetX(), shape.GetY()
         width, height = shape.GetBoundingBoxMax()
-        self.statbarFrame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)" %
-                                        (x, y, width, height))
+        self.statbarFrame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d)" % (x, y, width, height))
 
-
-    def OnLeftClick(self, x, y, keys = 0, attachment = 0):
+    def OnLeftClick(self, x, y, keys=0, attachment=0):
         shape = self.GetShape()
         print(shape.__class__, shape.GetClassName())
         canvas = shape.GetCanvas()
@@ -139,30 +133,27 @@ class MyEvtHandler(wxShapeEvtHandler):
 
         self.UpdateStatusBar(shape)
 
-
-    def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
+    def OnEndDragLeft(self, x, y, keys=0, attachment=0):
         shape = self.GetShape()
         self.base_OnEndDragLeft(x, y, keys, attachment)
         if not shape.Selected():
             self.OnLeftClick(x, y, keys, attachment)
         self.UpdateStatusBar(shape)
 
-
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
         self.base_OnSizingEndDragLeft(pt, x, y, keys, attch)
         self.UpdateStatusBar(self.GetShape())
-
 
     def OnMovePost(self, dc, x, y, oldX, oldY, display):
         self.base_OnMovePost(dc, x, y, oldX, oldY, display)
         self.UpdateStatusBar(self.GetShape())
 
-
     def OnRightClick(self, *dontcare):
         self.log.WriteText("%s\n" % self.GetShape())
 
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+
 
 class TestWindow(wxShapeCanvas):
     scrollStepX = 10
@@ -171,13 +162,13 @@ class TestWindow(wxShapeCanvas):
     def __init__(self, parent, log, frame):
         wxShapeCanvas.__init__(self, parent)
 
-        maxWidth  = 1000
+        maxWidth = 1000
         maxHeight = 1000
-        self.SetScrollbars(20, 20, maxWidth/20, maxHeight/20)
+        self.SetScrollbars(20, 20, maxWidth / 20, maxHeight / 20)
 
         self.log = log
         self.frame = frame
-        self.SetBackgroundColour("LIGHT BLUE") #wxWHITE)
+        self.SetBackgroundColour("LIGHT BLUE")  # wxWHITE)
         self.diagram = wxDiagram()
         self.SetDiagram(self.diagram)
         self.diagram.SetCanvas(self)
@@ -187,21 +178,21 @@ class TestWindow(wxShapeCanvas):
         rRectBrush = wxBrush("MEDIUM TURQUOISE", wxSOLID)
         dsBrush = wxBrush("WHEAT", wxSOLID)
 
-        ds0 = self.MyAddShape(DividedShape(100, 150, self), 50, 145, wxBLACK_PEN, dsBrush, '')
-        ds1 = self.MyAddShape(DividedShape(140, 150, self), 195, 445, wxBLACK_PEN, dsBrush, '')
-        ds2 = self.MyAddShape(DividedShape(440, 150, self), 495, 145, wxBLACK_PEN, dsBrush, '')
+        ds0 = self.MyAddShape(DividedShape(100, 150, self), 50, 145, wxBLACK_PEN, dsBrush, "")
+        ds1 = self.MyAddShape(DividedShape(140, 150, self), 195, 445, wxBLACK_PEN, dsBrush, "")
+        ds2 = self.MyAddShape(DividedShape(440, 150, self), 495, 145, wxBLACK_PEN, dsBrush, "")
 
-        for i in range(1,20):
-            self.MyAddShape(DividedShape(440, 150, self), 50, 445, wxBLACK_PEN, dsBrush, '')
+        for i in range(1, 20):
+            self.MyAddShape(DividedShape(440, 150, self), 50, 445, wxBLACK_PEN, dsBrush, "")
 
         dc = wxClientDC(self)
         self.PrepareDC(dc)
         for x in range(len(self.shapes)):
             fromShape = self.shapes[x]
-            if x+1 == len(self.shapes):
+            if x + 1 == len(self.shapes):
                 toShape = self.shapes[0]
             else:
-                toShape = self.shapes[x+1]
+                toShape = self.shapes[x + 1]
             line = wxLineShape()
             line.SetCanvas(self)
 
@@ -221,7 +212,6 @@ class TestWindow(wxShapeCanvas):
             # for some reason, the shapes have to be moved for the line to show up...
             fromShape.Move(dc, fromShape.GetX(), fromShape.GetY())
 
-
         # ANDY EXTRA STUFF
 
         def_area = """
@@ -236,25 +226,20 @@ DoSomething233()
 DoSomething2343()
         """
         ds1.region3.SetText(def_area)
-        ds1.SetCentreResize(0)  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
+        ds1.SetCentreResize(
+            0
+        )  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
         # for some reason, the shapes have to be resized to re-format theior container text
-        #ds1.SetSize(200, 500)
+        # ds1.SetSize(200, 500)
         print(ds1.GetBoundingBoxMax())
-        ds1.SetSize(ds1.GetBoundingBoxMax()[0]+1, ds1.GetBoundingBoxMax()[1])
+        ds1.SetSize(ds1.GetBoundingBoxMax()[0] + 1, ds1.GetBoundingBoxMax()[1])
         ds1.ReformatRegions()
-        #self.redraw()
-
+        # self.redraw()
 
         # Layout
         self.ArrangeShapes()
 
-
-
         EVT_WINDOW_DESTROY(self, self.OnDestroy)
-
-
-
-
 
     def redraw(self):
         diagram = self.GetDiagram()
@@ -266,8 +251,6 @@ DoSomething2343()
             shape.SetRegionSizes()
         diagram.Clear(dc)
         diagram.Redraw(dc)
-
-
 
     def ArrangeShapes(self):
 
@@ -291,10 +274,10 @@ DoSomething2343()
                 x = LEFTMARGIN
                 y = y + verticalWhiteSpace
 
-            whiteSpace = 50 # (width - currentWidth)/(len(self.shapes)-1.0 or 2.0)
+            whiteSpace = 50  # (width - currentWidth)/(len(self.shapes)-1.0 or 2.0)
             shapeX, shapeY = self.getShapeSize(classShape)
             # snap to diagram grid coords
-            csX, csY = self.diagram.Snap((shapeX/2.0)+x, (shapeY/2.0)+y)
+            csX, csY = self.diagram.Snap((shapeX / 2.0) + x, (shapeY / 2.0) + y)
             # don't display until finished
             positions.append((csX, csY))
             x = x + shapeX + whiteSpace
@@ -305,7 +288,9 @@ DoSomething2343()
 
         height = y + 500
         width = maxx
-        self.setSize(wxSize(int(width+50), int(height+50))) # fudge factors to keep some extra space
+        self.setSize(
+            wxSize(int(width + 50), int(height + 50))
+        )  # fudge factors to keep some extra space
 
         for (pos, classShape) in zip(positions, self.shapes):
             x, y = pos
@@ -322,7 +307,7 @@ DoSomething2343()
         for shape in self.shapes:
             currentWidth = 0
             currentHeight = 0
-            x,y = shape.GetX(), shape.GetY()
+            x, y = shape.GetX(), shape.GetY()
             if y > currentHeight:
                 currentHeight = y
             currentWidth = currentWidth + x
@@ -331,15 +316,15 @@ DoSomething2343()
                 width = currentWidth
             height = height + currentHeight
             # store generation info
-            widths.append( currentWidth )
-            heights.append( currentHeight )
+            widths.append(currentWidth)
+            heights.append(currentHeight)
         # add in some whitespace so we can see lines...
         width = width * whiteSpaceFactor
         rawHeight = height
         height = height * whiteSpaceFactor
-        verticalWhiteSpace = (height-rawHeight)/(len(self.shapes)-1.0 or 2.0)
+        verticalWhiteSpace = (height - rawHeight) / (len(self.shapes) - 1.0 or 2.0)
         # self.setSize(wxSize(int(width+50), int(height+50))) # fudge factors to keep some extra space
-        print('massive size is', int(width+50), int(height+50))
+        print("massive size is", int(width + 50), int(height + 50))
         # DONT ACTUALLY DO ANYTHING WITH THIS INFO - yet.
 
         # distribute each generation across the width
@@ -353,22 +338,20 @@ DoSomething2343()
         RefactoringTool: Line 348: cannot convert map(None, ...) with multiple arguments because map() now truncates to the shortest sequence
         RefactoringTool: Line 348: cannot convert map(None, ...) with multiple arguments because map() now truncates to the shortest sequence
         """
-        for currentWidth, currentHeight, shape in map( None, widths, heights, self.shapes ):
+        for currentWidth, currentHeight, shape in map(None, widths, heights, self.shapes):
             x = 0
             # whiteSpace is the space between any two elements...
-            whiteSpace = (width - currentWidth)/(len(self.shapes)-1.0 or 2.0)
+            whiteSpace = (width - currentWidth) / (len(self.shapes) - 1.0 or 2.0)
             for classShape in self.shapes:
                 shapeX, shapeY = self.getShapeSize(classShape)
                 # snap to diagram grid coords
-                csX, csY = self.diagram.Snap((shapeX/2.0)+x, (shapeY/2.0)+y)
+                csX, csY = self.diagram.Snap((shapeX / 2.0) + x, (shapeY / 2.0) + y)
                 # don't display until finished
                 classShape.Move(dc, csX, csY, false)
                 x = x + shapeX + whiteSpace
             y = y + currentHeight + verticalWhiteSpace
 
-
-
-    def getShapeSize( self, shape ):
+    def getShapeSize(self, shape):
         """Return the size of a shape's representation, an abstraction point"""
         return shape.GetBoundingBoxMax()
 
@@ -384,10 +367,13 @@ DoSomething2343()
         shape.SetCanvas(self)
         shape.SetX(x)
         shape.SetY(y)
-        if pen:    shape.SetPen(pen)
-        if brush:  shape.SetBrush(brush)
-        if text:   shape.AddText(text)
-        #shape.SetShadowMode(SHADOW_RIGHT)
+        if pen:
+            shape.SetPen(pen)
+        if brush:
+            shape.SetBrush(brush)
+        if text:
+            shape.AddText(text)
+        # shape.SetShadowMode(SHADOW_RIGHT)
         self.diagram.AddShape(shape)
         shape.Show(True)
 
@@ -399,7 +385,6 @@ DoSomething2343()
         self.shapes.append(shape)
         return shape
 
-
     def OnDestroy(self, evt):
         # Do some cleanup
         for shape in self.diagram.GetShapeList():
@@ -408,7 +393,6 @@ DoSomething2343()
                 shape.Destroy()
         self.diagram.Destroy()
 
-
     def OnBeginDragLeft(self, x, y, keys):
         self.log.write("OnBeginDragLeft: %s, %s, %s\n" % (x, y, keys))
 
@@ -416,27 +400,26 @@ DoSomething2343()
         self.log.write("OnEndDragLeft: %s, %s, %s\n" % (x, y, keys))
 
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+
 
 def runTest(frame, nb, log):
     win = TestWindow(nb, log, frame)
     return win
 
-#----------------------------------------------------------------------
+
+# ----------------------------------------------------------------------
+
 
 class __Cleanup:
     cleanup = wxOGLCleanUp
+
     def __del__(self):
         self.cleanup()
 
+
 # when this module gets cleaned up then wxOGLCleanUp() will get called
 __cu = __Cleanup()
-
-
-
-
-
-
 
 
 overview = """\
@@ -446,37 +429,39 @@ manipulation of simple and complex graphic images on a canvas.
 """
 
 
-
-#if __name__ == '__main__':
+# if __name__ == '__main__':
 #    import sys,os
 #    import run
 #    run.main(['', os.path.basename(sys.argv[0])])
 
 
-
 class Log:
     def WriteText(self, text):
-        if text[-1:] == '\n':
+        if text[-1:] == "\n":
             text = text[:-1]
         wx.LogMessage(text)
-    write = WriteText
 
+    write = WriteText
 
 
 class BoaApp(wxApp):
     def OnInit(self):
         wxInitAllImageHandlers()
 
-        #self.main = wxFrame1.create(None)
+        # self.main = wxFrame1.create(None)
 
-        #self.main = TestWindow(parent=self, log=None, frame=None)
+        # self.main = TestWindow(parent=self, log=None, frame=None)
 
-        self.name = 'Andy app'
+        self.name = "Andy app"
 
-
-
-        frame = wx.Frame(None, -1, "RunDemo: " + self.name, pos=(50,50), size=(0,0),
-                        style=wx.NO_FULL_REPAINT_ON_RESIZE|wx.DEFAULT_FRAME_STYLE)
+        frame = wx.Frame(
+            None,
+            -1,
+            "RunDemo: " + self.name,
+            pos=(50, 50),
+            size=(0, 0),
+            style=wx.NO_FULL_REPAINT_ON_RESIZE | wx.DEFAULT_FRAME_STYLE,
+        )
         frame.CreateStatusBar()
         menuBar = wx.MenuBar()
         menu = wx.Menu()
@@ -487,7 +472,7 @@ class BoaApp(wxApp):
         frame.Show(True)
         wx.EVT_CLOSE(frame, self.OnCloseFrame)
 
-        #win = self.demoModule.runTest(frame, frame, Log())
+        # win = self.demoModule.runTest(frame, frame, Log())
         win = runTest(frame, frame, Log())
 
         # a window will be returned if the demo does not create
@@ -501,7 +486,7 @@ class BoaApp(wxApp):
         else:
             # otherwise the demo made its own frame, so just put a
             # button in this one
-            if hasattr(frame, 'otherWin'):
+            if hasattr(frame, "otherWin"):
                 b = wx.Button(frame, -1, " Exit ")
                 frame.SetSize((200, 100))
                 wx.EVT_BUTTON(frame, b.GetId(), self.OnButton)
@@ -513,27 +498,24 @@ class BoaApp(wxApp):
 
         self.SetTopWindow(frame)
 
-
-
-
-        #self.main.Show()
-        #self.SetTopWindow(self.main)
+        # self.main.Show()
+        # self.SetTopWindow(self.main)
 
         return True
 
-
     def OnButton(self, evt):
         self.frame.Close(True)
-
 
     def OnCloseFrame(self, evt):
         if hasattr(self, "window") and hasattr(self.window, "ShutdownDemo"):
             self.window.ShutdownDemo()
         evt.Skip()
 
+
 def main():
     application = BoaApp(0)
     application.MainLoop()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

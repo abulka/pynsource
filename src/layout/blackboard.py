@@ -7,6 +7,7 @@ ANIMATE_BLACKBOARD_ATTEMPTS = True
 ANIMATE_EVERY_DETAIL = False
 ANIMATE_LAYOUTS = False
 
+
 class LayoutBlackboard(object):
     def __init__(self, graph, umlcanvas):
         self.graph = graph
@@ -32,10 +33,11 @@ class LayoutBlackboard(object):
             return True
         else:
             return False
+
     @kill_layout.setter
     def kill_layout(self, value):
-      pass
-          
+        pass
+
     def LayoutMultipleChooseBest(self, numlayouts=3):
         """
         Blackboard
@@ -47,7 +49,7 @@ class LayoutBlackboard(object):
         Coordinate scaling runs 3.2 to max within ScaleUpMadly()
         Finish at the best scale as chosen by this algorithm
         """
-        self.umlcanvas.AllToLayoutCoords()    # doesn't matter what scale the layout starts with
+        self.umlcanvas.AllToLayoutCoords()  # doesn't matter what scale the layout starts with
         layouter = GraphLayoutSpring(self.graph, gui=self)
         self.umlcanvas.snapshot_mgr.Clear()
         oriscale = self.umlcanvas.coordmapper.scale
@@ -58,68 +60,85 @@ class LayoutBlackboard(object):
             # Calculate a layout score, lower the better?  Not used yet.
             score = 0
             bounds = self.graph.GetBounds()
-            
-            self.umlcanvas.snapshot_mgr.AddSnapshot(\
+
+            self.umlcanvas.snapshot_mgr.AddSnapshot(
                 layout_score=score,
                 LL=num_line_line_crossings,
                 NN=num_node_node_overlaps,
                 LN=num_line_node_crossings,
                 scale=self.umlcanvas.coordmapper.scale,
                 bounds=bounds,
-                bounds_area_simple=bounds[0]*bounds[1]/10000,
-                graph_memento=self.graph.GetMementoOfPositions())
+                bounds_area_simple=bounds[0] * bounds[1] / 10000,
+                graph_memento=self.graph.GetMementoOfPositions(),
+            )
 
         # Generate several totally fresh layout variations
         for i in range(numlayouts):
-            
-            progress_val = i+1 # range is 1..n inclusive whereas for loop is 0..n-1 excluding n, so adjust by adding 1 for visual progress
-            if not self.outer_thread.CheckContinue(statusmsg="Layout #%d of %d" % (progress_val, numlayouts), progress=progress_val):
+
+            progress_val = (
+                i + 1
+            )  # range is 1..n inclusive whereas for loop is 0..n-1 excluding n, so adjust by adding 1 for visual progress
+            if not self.outer_thread.CheckContinue(
+                statusmsg="Layout #%d of %d" % (progress_val, numlayouts), progress=progress_val
+            ):
                 break
-            
+
             # Do a layout
             self.outer_thread.Log("spring layout started")
             layouter.layout(keep_current_positions=False)
             self.outer_thread.Log("layout done")
 
-            if not self.outer_thread.CheckContinue(logmsg="GetVitalStats"): break
+            if not self.outer_thread.CheckContinue(logmsg="GetVitalStats"):
+                break
 
             # Expand directly to the original scale, and calc vitals stats
             res = self.GetVitalStats(scale=oriscale, animate=False)
             ThinkAndAddSnapshot(res)
-            
-            if res[0] == 0 and res[2] <= 0:     # LL crossings solved and LN reasonable, so optimise and break - save time
-                self.outer_thread.Log("LL crossings solved and LN reasonable, so optimise and break - save time")
+
+            if (
+                res[0] == 0 and res[2] <= 0
+            ):  # LL crossings solved and LN reasonable, so optimise and break - save time
+                self.outer_thread.Log(
+                    "LL crossings solved and LN reasonable, so optimise and break - save time"
+                )
                 break
 
-            if not self.outer_thread.CheckContinue(logmsg="ScaleUpMadly"): break
+            if not self.outer_thread.CheckContinue(logmsg="ScaleUpMadly"):
+                break
 
             # Expand progressively from small to large scale, and calc vitals stats
             # This can be SLOW
-            res = self.ScaleUpMadly(strategy=":reduce post overlap removal LN crossings", animate=ANIMATE_BLACKBOARD_ATTEMPTS)
+            res = self.ScaleUpMadly(
+                strategy=":reduce post overlap removal LN crossings",
+                animate=ANIMATE_BLACKBOARD_ATTEMPTS,
+            )
             ThinkAndAddSnapshot(res)
-                
-            if res[0] == 0 and res[2] <= 0:     # LL crossings solved and LN reasonable, so optimise and break - save time
+
+            if (
+                res[0] == 0 and res[2] <= 0
+            ):  # LL crossings solved and LN reasonable, so optimise and break - save time
                 break
-        
-        #self.umlcanvas.snapshot_mgr.DumpSnapshots(label='Unsorted')
-            
+
+        # self.umlcanvas.snapshot_mgr.DumpSnapshots(label='Unsorted')
+
         """
         blackboard now sorting smarter because I have converted snapshots to
         dictionary format and thus can control which elements to sort by and
         whether to maximise or minimise any particular key in that snapshot
         dictionary.
         """
+
         def sortfunc(d):
             # this does the thinking!
-          return (d['LL'], d['LN'], d['bounds_area_simple'], -d['scale'], d['NN_pre_OR'])        
+            return (d["LL"], d["LN"], d["bounds_area_simple"], -d["scale"], d["NN_pre_OR"])
 
-        #self.umlcanvas.snapshot_mgr.Sort()
+        # self.umlcanvas.snapshot_mgr.Sort()
         self.umlcanvas.snapshot_mgr.Sort(sortfunc)  # this does the thinking!
-        #self.umlcanvas.snapshot_mgr.Sort(lambda d: (d['scale'], -d['LL'], -d['LN']))   # pick biggest with most line crossings! - Ha ha
+        # self.umlcanvas.snapshot_mgr.Sort(lambda d: (d['scale'], -d['LL'], -d['LN']))   # pick biggest with most line crossings! - Ha ha
 
-        """Diagnostic"""        
-        #self.umlcanvas.snapshot_mgr.DumpSnapshots('Sorted')
-        
+        """Diagnostic"""
+        # self.umlcanvas.snapshot_mgr.DumpSnapshots('Sorted')
+
         """
         can't do the snapshot restore
             self.umlcanvas.snapshot_mgr.Restore(0)
@@ -177,39 +196,41 @@ class LayoutBlackboard(object):
         MAX_SCALE = 1.4
         SCALE_STEP = 0.2
         SCALE_START = 3.2
-        
+
         self.umlcanvas.coordmapper.Recalibrate(scale=SCALE_START)
         for i in range(15):
-            
-            res = self.GetVitalStats(scale=self.umlcanvas.coordmapper.scale - SCALE_STEP, animate=ANIMATE_EVERY_DETAIL)
-            
+
+            res = self.GetVitalStats(
+                scale=self.umlcanvas.coordmapper.scale - SCALE_STEP, animate=ANIMATE_EVERY_DETAIL
+            )
+
             num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings = res
 
-            if not self.outer_thread.CheckContinue(logmsg="Scale test %d"%i):
+            if not self.outer_thread.CheckContinue(logmsg="Scale test %d" % i):
                 break
-            
+
             if strategy == ":reduce pre overlap removal NN overlaps":
                 if num_node_node_overlaps <= ACCEPTABLE_NODE_NODE_PRE_REMOVAL:
-                    #print "Mad: Aborting expansion since num NN overlaps <= %d" % ACCEPTABLE_NODE_NODE_PRE_REMOVAL
+                    # print "Mad: Aborting expansion since num NN overlaps <= %d" % ACCEPTABLE_NODE_NODE_PRE_REMOVAL
                     break
             elif strategy == ":reduce post overlap removal LN crossings":
                 if num_line_node_crossings == 0:
-                    #print "Mad: Finished expansion since LN crossings == 0 :-)"
+                    # print "Mad: Finished expansion since LN crossings == 0 :-)"
                     break
             elif strategy == ":reduce post overlap removal LN and LL crossings":
                 if num_line_node_crossings == 0 and num_line_node_crossings == 0:
-                    #print "Mad: Finished expansion since LN and LL crossings == 0 :-)"
+                    # print "Mad: Finished expansion since LN and LL crossings == 0 :-)"
                     break
             else:
                 assert False, "Mad: unknown strategy"
-    
+
             if self.umlcanvas.coordmapper.scale < MAX_SCALE:
-                #print "Mad: Aborting expansion - gone too far.", self.umlcanvas.coordmapper.scale
+                # print "Mad: Aborting expansion - gone too far.", self.umlcanvas.coordmapper.scale
                 break
 
         if animate:
             self.mega_refresh_inside_blackboard()
-        
+
         return num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings
 
     def GetVitalStats(self, scale, animate=False):
@@ -219,15 +240,15 @@ class LayoutBlackboard(object):
         Same as ScaleUpMadly except only one scale made
         NN Overlap Removal performed.
         """
-        
+
         self.umlcanvas.coordmapper.Recalibrate(scale=scale)
         self.umlcanvas.AllToWorldCoords()
 
         if animate:
             self.mega_refresh_inside_blackboard()
-        
+
         """Pre Overlap Removal"""
-        
+
         # The only thing of interest here pre node overlap removal are the
         # initial NN as this gives us some indication of how crowded we are and
         # how hard the node overlap removal algorithm has to work. If too much
@@ -243,13 +264,11 @@ class LayoutBlackboard(object):
         """Post Overlap Removal"""
 
         # How many LN reduced (or perhaps increased) after expansion & post removing NN overlaps
-        num_line_node_crossings = self.graph.CountLineOverNodeCrossings()['ALL']/2
-        
+        num_line_node_crossings = self.graph.CountLineOverNodeCrossings()["ALL"] / 2
+
         # How many LL reduced (or perhaps increased) after expansion & post removing NN overlaps
         num_line_line_crossings = len(self.graph.CountLineOverLineIntersections())
 
-        #print "GetVitalStats: At scale %.1f NN_pre %d LN %d LL %d" % (self.umlcanvas.coordmapper.scale, num_node_node_overlaps, num_line_node_crossings, num_line_line_crossings)
-    
-        return num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings
+        # print "GetVitalStats: At scale %.1f NN_pre %d LN %d LL %d" % (self.umlcanvas.coordmapper.scale, num_node_node_overlaps, num_line_node_crossings, num_line_line_crossings)
 
-        
+        return num_line_line_crossings, num_node_node_overlaps, num_line_node_crossings

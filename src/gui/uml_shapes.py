@@ -3,6 +3,7 @@
 import wx
 import wx.lib.ogl as ogl
 
+
 class DiamondShape(ogl.PolygonShape):
     def __init__(self, w=0.0, h=0.0):
         ogl.PolygonShape.__init__(self)
@@ -11,13 +12,10 @@ class DiamondShape(ogl.PolygonShape):
         if h == 0.0:
             h = 60.0
 
-        points = [ (0.0,    -h/2.0),
-                   (w/2.0,  0.0),
-                   (0.0,    h/2.0),
-                   (-w/2.0, 0.0),
-                   ]
+        points = [(0.0, -h / 2.0), (w / 2.0, 0.0), (0.0, h / 2.0), (-w / 2.0, 0.0)]
 
         self.Create(points)
+
 
 class RoundedRectangleShape(ogl.RectangleShape):
     def __init__(self, w=0.0, h=0.0):
@@ -50,7 +48,8 @@ class CompositeDivisionShape(ogl.CompositeShape):
 
         for division in self.GetDivisions():
             division.SetSensitivityFilter(0)
-        
+
+
 class CompositeShape(ogl.CompositeShape):
     def __init__(self, canvas):
         ogl.CompositeShape.__init__(self)
@@ -63,12 +62,16 @@ class CompositeShape(ogl.CompositeShape):
 
         constraining_shape.SetBrush(wx.BLUE_BRUSH)
         constrained_shape2.SetBrush(wx.RED_BRUSH)
-        
+
         self.AddChild(constraining_shape)
         self.AddChild(constrained_shape1)
         self.AddChild(constrained_shape2)
 
-        constraint = ogl.Constraint(ogl.CONSTRAINT_MIDALIGNED_BOTTOM, constraining_shape, [constrained_shape1, constrained_shape2])
+        constraint = ogl.Constraint(
+            ogl.CONSTRAINT_MIDALIGNED_BOTTOM,
+            constraining_shape,
+            [constrained_shape1, constrained_shape2],
+        )
         self.AddConstraint(constraint)
         self.Recompute()
 
@@ -81,23 +84,23 @@ class CompositeShape(ogl.CompositeShape):
         # If we don't do this the shape will take all left-clicks for itself
         constraining_shape.SetSensitivityFilter(0)
 
-        
+
 class DividedShape(ogl.DividedShape):
     def __init__(self, width, height, canvas):
         ogl.DividedShape.__init__(self, width, height)
 
     def BuildRegions(self, canvas):
         region1 = ogl.ShapeRegion()
-        region1.SetText('DividedShape')
+        region1.SetText("DividedShape")
         region1.SetProportions(0.0, 0.2)
         region1.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
         self.AddRegion(region1)
 
         region2 = ogl.ShapeRegion()
-        region2.SetText('This is Region number two.')
+        region2.SetText("This is Region number two.")
         region2.SetProportions(0.0, 0.3)
         region2.SetFormatMode(ogl.FORMAT_NONE)
-        #region2.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ|ogl.FORMAT_CENTRE_VERT)
+        # region2.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ|ogl.FORMAT_CENTRE_VERT)
         self.AddRegion(region2)
 
         region3 = ogl.ShapeRegion()
@@ -108,13 +111,12 @@ class DividedShape(ogl.DividedShape):
         self.AddRegion(region3)
 
         # Andy Added
-        self.region1 = region1   # for external access...
-        self.region2 = region2   # for external access...
-        self.region3 = region3   # for external access...
+        self.region1 = region1  # for external access...
+        self.region2 = region2  # for external access...
+        self.region3 = region3  # for external access...
 
         self.SetRegionSizes()
         self.ReformatRegions(canvas)
-
 
     def FlushText(self):
         # Taken from Boa
@@ -153,12 +155,12 @@ class DividedShapeSmall(DividedShape):
 
     def BuildRegions(self, canvas):
         region1 = ogl.ShapeRegion()
-        region1.SetText('wxDividedShapeSmall')
+        region1.SetText("wxDividedShapeSmall")
         region1.SetProportions(0.0, 0.9)
         region1.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
         self.AddRegion(region1)
 
-        self.region1 = region1   # for external access...
+        self.region1 = region1  # for external access...
 
         self.SetRegionSizes()
         self.ReformatRegions(canvas)
@@ -179,29 +181,33 @@ class DividedShapeSmall(DividedShape):
         self.ReformatRegions()
         self.GetCanvas().Refresh()
 
+
 class BitmapShapeResizable(ogl.BitmapShape):
     """Draws a bitmap (andy's attempt at a resizable one)."""
+
     def __init__(self):
         ogl.BitmapShape.__init__(self)
-        self._ori_bmp = None    # ANDY ADDED
-        
-    def ResetSize(self):        # ANDY ADDED
+        self._ori_bmp = None  # ANDY ADDED
+
+    def ResetSize(self):  # ANDY ADDED
         if self._bitmap.IsOk():  # Returns True if bitmap data is present.
             w = self._ori_bmp.GetWidth()
             h = self._ori_bmp.GetHeight()
-            self.SetSize(w,h)
-        
-    def SetSize(self, w, h, recursive = True):
+            self.SetSize(w, h)
+
+    def SetSize(self, w, h, recursive=True):
         if self._bitmap.IsOk():
 
             # ANDY ADDED
             if self._bitmap.GetWidth() != w or self._bitmap.GetHeight() != h:
                 img = wx.ImageFromBitmap(self._ori_bmp)
-                adjusted_img = img.Rescale(w,h, wx.IMAGE_QUALITY_HIGH)
+                adjusted_img = img.Rescale(w, h, wx.IMAGE_QUALITY_HIGH)
                 bitmap = wx.BitmapFromImage(adjusted_img)
-                self._bitmap = bitmap  #shape.SetBitmap(bitmap)  # don't call SetBitmap() cos it will infinite loop.  Plus don't want to destroy ori bmp info
+                self._bitmap = (
+                    bitmap
+                )  # shape.SetBitmap(bitmap)  # don't call SetBitmap() cos it will infinite loop.  Plus don't want to destroy ori bmp info
             ##########
-            
+
             w = self._bitmap.GetWidth()
             h = self._bitmap.GetHeight()
 
@@ -212,7 +218,7 @@ class BitmapShapeResizable(ogl.BitmapShape):
 
         self.SetDefaultRegionSize()
 
-    def SetBitmap(self, bitmap):    # Override
+    def SetBitmap(self, bitmap):  # Override
         ogl.BitmapShape.SetBitmap(self, bitmap)
         self._ori_bmp = bitmap  # ANDY ADDED
 
@@ -235,6 +241,7 @@ class BitmapShapeResizable(ogl.BitmapShape):
 #
 #         self.Create(points)
 
+
 class CommentShape(ogl.RectangleShape):
     def __init__(self, w=0.0, h=0.0):
         ogl.RectangleShape.__init__(self, w, h)
@@ -252,7 +259,7 @@ class CommentShape(ogl.RectangleShape):
         y2 = y1 + self._height
 
         # simple box corner, but need to erase top right triangle portion of it - see below
-        dc.DrawRectangle(x2-10, y1, 10, 10)
+        dc.DrawRectangle(x2 - 10, y1, 10, 10)
 
         """
         Bit of a hacky way of doing it - draw a triangle to make it appear that the
@@ -260,16 +267,11 @@ class CommentShape(ogl.RectangleShape):
         The proper solution is not to draw a rectangle for the comment shape in the first place
         and leave the top right corner undrawn.  This will do for now, though.
         """
-        my_points = [
-            (x2, y1),
-            (x2-10, y1),
-            (x2, y1+10),
-            (x2, y1)
-        ]
+        my_points = [(x2, y1), (x2 - 10, y1), (x2, y1 + 10), (x2, y1)]
         uml_canvas_blue = wx.TheColourDatabase.Find("LIGHT BLUE")
         dc.SetBrush(wx.Brush(uml_canvas_blue))  # fill
         dc.SetPen(wx.Pen(uml_canvas_blue, 1, wx.PENSTYLE_SOLID))  # line
         dc.DrawPolygon(my_points)
 
         dc.SetPen(wx.Pen(wx.BLACK, 1, wx.PENSTYLE_SOLID))  # line
-        dc.DrawLine(x2-10, y1, x2, y1+10)
+        dc.DrawLine(x2 - 10, y1, x2, y1 + 10)

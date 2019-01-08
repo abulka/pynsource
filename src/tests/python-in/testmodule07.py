@@ -8,4 +8,3 @@ class ParseMeTest(undo.UndoItem):
     def PlaceTile(self, coord, terrainbmp):
         self.EnsureGraphicsSubDictAllocated(coord)
         newterraintype = self.bmpUtils.BmpToTerrainType(terrainbmp)
-

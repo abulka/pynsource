@@ -1,10 +1,9 @@
-
 # BOOT WIRING
 
 from hexappmodel import App, Thing
 from hexpersistence import PersistenceMock, PersistenceMock2
 
-#app = App(PersistenceMock()) 
+# app = App(PersistenceMock())
 app = App(PersistenceMock2())
 
 # UNIT TEST
@@ -27,4 +26,3 @@ print(app.model)
 
 app.Load()
 print(app.model)
-

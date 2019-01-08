@@ -23,22 +23,24 @@
 import wx
 import wx.stc as stc
 
+
 class Log(stc.StyledTextCtrl):
     """
     Subclass the StyledTextCtrl to provide  additions
     and initializations to make it useful as a log window.
 
     """
+
     def __init__(self, parent, style=wx.SIMPLE_BORDER):
         """
         Constructor
         
         """
         stc.StyledTextCtrl.__init__(self, parent, style=style)
-        self._styles = [None]*32
+        self._styles = [None] * 32
         self._free = 1
 
-    def getStyle(self, c='black'):
+    def getStyle(self, c="black"):
         """
         Returns a style for a given colour if one exists.  If no style
         exists for the colour, make a new style.
@@ -51,7 +53,7 @@ class Log(stc.StyledTextCtrl):
         if c and isinstance(c, str):
             c = c.lower()
         else:
-            c = 'black'
+            c = "black"
 
         try:
             style = self._styles.index(c)
@@ -63,7 +65,7 @@ class Log(stc.StyledTextCtrl):
             self.StyleSetForeground(style, wx.NamedColour(c))
 
             free += 1
-            if free >31:
+            if free > 31:
                 free = 0
             self._free = free
             return style
@@ -76,13 +78,12 @@ class Log(stc.StyledTextCtrl):
         'text' should be a unicode string or contain only ascii data.
         """
         style = self.getStyle(c)
-        lenText = len(text.encode('utf8'))
+        lenText = len(text.encode("utf8"))
         end = self.GetLength()
         self.AddText(text)
         self.StartStyling(end, 31)
         self.SetStyling(lenText, style)
         self.EnsureCaretVisible()
-
 
     __call__ = write
 
@@ -90,44 +91,43 @@ class Log(stc.StyledTextCtrl):
 class TestPanel(wx.Panel):
     def __init__(self, parent, log):
         self.log = log
-        self.colour = 'black'
-        log('Welcom to wxPython %s' % wx.VERSION_STRING, 'blue')
-        log('Hi there')
-        log('Ctrl-+ and Ctrl-- or Ctrl-ScrollWheel', 'blue')
-        log(' to zoom text in this window.\n')
+        self.colour = "black"
+        log("Welcom to wxPython %s" % wx.VERSION_STRING, "blue")
+        log("Hi there")
+        log("Ctrl-+ and Ctrl-- or Ctrl-ScrollWheel", "blue")
+        log(" to zoom text in this window.\n")
         wx.Panel.__init__(self, parent, -1)
 
-        self.SetBackgroundColour('cyan')
+        self.SetBackgroundColour("cyan")
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.Bind(wx.EVT_LEFT_DOWN, lambda e:self.OnMouse(e, 'Left'))
-        self.Bind(wx.EVT_RIGHT_DOWN, lambda e:self.OnMouse(e, 'Right'))
-        self.Bind(wx.EVT_MIDDLE_DOWN, lambda e:self.OnMouse(e, 'Middle'))
+        self.Bind(wx.EVT_LEFT_DOWN, lambda e: self.OnMouse(e, "Left"))
+        self.Bind(wx.EVT_RIGHT_DOWN, lambda e: self.OnMouse(e, "Right"))
+        self.Bind(wx.EVT_MIDDLE_DOWN, lambda e: self.OnMouse(e, "Middle"))
 
-        for i in ('red', 'green', 'blue', 'cyan', 'magenta'):
+        for i in ("red", "green", "blue", "cyan", "magenta"):
             btn = wx.Button(self, -1, i)
-            sizer.Add(btn, 1, wx.TOP|wx.BOTTOM, 15)
+            sizer.Add(btn, 1, wx.TOP | wx.BOTTOM, 15)
             btn.Bind(wx.EVT_BUTTON, self.OnButton)
 
         self.SetSizer(sizer)
 
     def OnMouse(self, event, type):
-        self.log('\n\n%s Mouse Button Clicked'%type, self.colour)
+        self.log("\n\n%s Mouse Button Clicked" % type, self.colour)
         event.Skip()
 
     def OnButton(self, event):
         btn = event.GetEventObject()
         label = btn.GetLabel()
         self.colour = label
-        self.log('\n\n%s button clicked'%label, label)
+        self.log("\n\n%s button clicked" % label, label)
         event.Skip()
 
 
 class TestFrame(wx.Frame):
-
     def __init__(self):
-        wx.Frame.__init__(self, None, -1, 'StyledTextCtrl Log Panel Demo')
+        wx.Frame.__init__(self, None, -1, "StyledTextCtrl Log Panel Demo")
 
         log = Log(self)
         tp = TestPanel(self, log)
@@ -138,9 +138,8 @@ class TestFrame(wx.Frame):
         self.SetSize((400, 300))
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     app = wx.PySimpleApp()
     win = TestFrame()
     win.Show(True)
     app.MainLoop()
-    

@@ -1,4 +1,6 @@
-import sys; sys.path.append("../lib")
+import sys
+
+sys.path.append("../lib")
 from architecture_support import *
 
 """
@@ -7,6 +9,7 @@ adapter (modelProxy). The methods include model manipulation and access methods,
 as well as persistence methods. The Adapter has a reference to both the
 underlying model and persistence object (if any).
 """
+
 
 class ModelAdapterBase(object):
     def __init__(self, model):
@@ -29,7 +32,7 @@ class ModelAdapterBase(object):
         return self.model.things
 
     # Things you can do to the Model
-    
+
     def Clear(self):
         self.model.Clear()
         self.observers.MODEL_CLEARED()
@@ -44,18 +47,17 @@ class ModelAdapterBase(object):
         self.observers.MODEL_THING_UPDATE(thing)
 
     def DeleteThing(self, thing):
-        raise Exception("DeleteThing not implemented in adapter");
+        raise Exception("DeleteThing not implemented in adapter")
 
     # Need to subclass depending on implementation
-    
+
     def FindThing(self, id):
-        raise Exception("FindThing() not implemented in this particular adapter");
+        raise Exception("FindThing() not implemented in this particular adapter")
 
     # Delegate to Persistence
-    
+
     def LoadAll(self, filename=None):
-        raise Exception("LoadAll not implemented in adapter");
+        raise Exception("LoadAll not implemented in adapter")
 
     def SaveAll(self, filename=None):
-        raise Exception("SaveAll not implemented in adapter");
-
+        raise Exception("SaveAll not implemented in adapter")

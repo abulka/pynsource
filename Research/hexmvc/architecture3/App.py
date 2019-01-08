@@ -1,5 +1,6 @@
 from Controller import Controller
 
+
 class App(object):
     def __init__(self, model, server, gui):
         self.model = model
@@ -11,14 +12,14 @@ class App(object):
         # Inject multicast dependencies / observers
         gui.observers.addObserver(self.controller)
         model.observers.addObserver(gui)
-        model.observers.addObserver(self.controller) # diagnostic, optional
+        model.observers.addObserver(self.controller)  # diagnostic, optional
         server.observers.addObserver(self.controller)
-        
+
         # Inject normal dependencies
         self.server.model = model
-        
+
     # Startup and Shutdown
-    
+
     def Boot(self):
         self.gui.Boot()
         self.model.Boot()
@@ -35,7 +36,7 @@ class App(object):
 
     def MainThreadMutexGuiEnter(self):
         self.gui.MainThreadMutexGuiEnter()
-    
+
     def MainThreadMutexGuiLeave(self):
         self.gui.MainThreadMutexGuiLeave()
 
@@ -45,5 +46,3 @@ class App(object):
     @property
     def url_server(self):
         return self.server.url_server
-
-    

@@ -2,6 +2,7 @@ from System import AsyncCallback
 from System.Net import HttpListener, HttpListenerException
 from System.Text import Encoding
 
+
 class SimpleServer(object):
     def __init__(self, host, port):
         self.host = host
@@ -10,10 +11,10 @@ class SimpleServer(object):
     def serveforever(self):
         self.failed = False
         listener = HttpListener()
-        
-        prefix = 'http://%s:%s/' % (self.host, str(self.port))
+
+        prefix = "http://%s:%s/" % (self.host, str(self.port))
         listener.Prefixes.Add(prefix)
-        
+
         try:
             listener.Start()
         except HttpListenerException:
@@ -25,8 +26,8 @@ class SimpleServer(object):
             result.AsyncWaitHandle.WaitOne()
 
     def pathComponents(self, context):
-        url = context.Request.RawUrl.strip('/')      # We make use of request.RawUrl
-        return url.split('/')
+        url = context.Request.RawUrl.strip("/")  # We make use of request.RawUrl
+        return url.split("/")
 
     def handleRequest(self, result):
         listener = result.AsyncState
@@ -47,7 +48,7 @@ class SimpleServer(object):
         """
 
         text = self.handle(path, method, request, response)
-        
+
         buffer = Encoding.UTF8.GetBytes(text)
         response.ContentLength64 = buffer.Length
         output = response.OutputStream
@@ -56,8 +57,8 @@ class SimpleServer(object):
 
     # Subclasses to override this.
     def handle(self, path, method, request, response):
-        url = '<P><STRONG>URL Requested: %s</STRONG></P>' % request.RawUrl
-        pagesServed = '<P><STRONG>Number of Pages Served: %s</STRONG></P>' % 999
+        url = "<P><STRONG>URL Requested: %s</STRONG></P>" % request.RawUrl
+        pagesServed = "<P><STRONG>Number of Pages Served: %s</STRONG></P>" % 999
         text = """
         <HTML>
         <HEAD><TITLE>Welcome to the Simple Server</TITLE></HEAD>
@@ -66,6 +67,7 @@ class SimpleServer(object):
         """
         return text % (url + pagesServed)
 
-if __name__ == '__main__':
-    s = SimpleServer('localhost', 8081)
+
+if __name__ == "__main__":
+    s = SimpleServer("localhost", 8081)
     s.serveforever()

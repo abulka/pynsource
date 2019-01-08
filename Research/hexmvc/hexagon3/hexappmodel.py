@@ -1,24 +1,25 @@
 #!/usr/bin/env python
 
+
 class App:
     def __init__(self, persistence, server, gui):
         self.model = Model(persistence)
         self.server = server
         self.gui = gui
-        
+
         server.SetApp(self)
         persistence.SetApp(self)
         gui.SetApp(self)
-        
+
     def Boot(self):
         self.server.StartServer()
-        
+
     def GetUrlOrigin(self):
         return self.server.GetUrlOrigin()
-        
+
     def GetModelSize(self):
         return len(self.model)
-        
+
     def New(self):
         cmd = CmdNew(self)
         cmd.Execute()
@@ -57,47 +58,52 @@ class App:
         cmd.Execute()
 
 
-
 class Cmd:
     def __init__(self, app):
         self.app = app
+
 
 class CmdNew(Cmd):
     def Execute(self):
         self.app.model.Clear()
         self.app.gui.NotifyOfModelChange("clear", None)
 
+
 class CmdLoadModel(Cmd):
     def Execute(self):
         self.app.model.LoadAll()
         self.app.gui.NotifyOfModelChange("loadall", None)
 
+
 class CmdSaveModel(Cmd):
     def Execute(self):
         self.app.model.SaveAll()
+
 
 class CmdCreateThing(Cmd):
     def Execute(self):
         self.result = Thing(self.info)
         self.app.model.things.append(self.result)
 
+
 class CmdDeleteThing(Cmd):
     def Execute(self):
         self.app.gui.NotifyOfModelChange("delete", self.thing)
         self.app.model.things.remove(self.thing)
+
 
 class CmdAddInfoToThing(Cmd):
     def Execute(self):
         self.thing.AddInfo(self.info)
         self.app.gui.NotifyOfModelChange("update", self.thing)
 
+
 class CmdStartServer(Cmd):
     def Execute(self):
         self.server.StartServer()
 
 
-
-class Model:        
+class Model:
     def __init__(self, persistence):
         self.persistence = persistence
         self.things = []
@@ -108,20 +114,21 @@ class Model:
 
     def __len__(self):
         return len(self.things)
-        
+
     def Clear(self):
         self.things = []
-        
+
     def LoadAll(self):
         self.things = self.persistence.LoadAll()
 
     def SaveAll(self):
         self.persistence.SaveAll(self.things)
 
+
 class Thing:
     def __init__(self, info):
         self.info = info
-        
+
     def __str__(self):
         return "A-" + self.info
 

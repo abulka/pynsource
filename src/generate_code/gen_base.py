@@ -10,11 +10,12 @@ class ReportGenerator(object):
     it uses a new or old parser instead.
 
     """
+
     def __init__(self, ast=True):
         self.ast_parsing = ast
         self.listcompositesatend = 0
         self.embedcompositeswithattributelist = 1
-        self.result = ''
+        self.result = ""
         self.aclass = None
         self.classentry = None
         self.staticmessage = ""
@@ -27,7 +28,7 @@ class ReportGenerator(object):
         if self.ast_parsing:
             pmodel, debuginfo = new_parser(file)
         else:
-            options = {'optionModuleAsClass': self.optionModuleAsClass}
+            options = {"optionModuleAsClass": self.optionModuleAsClass}
             pmodel, debuginfo = old_parser(file, options)
 
         self.pmodel = pmodel  # remember the parse model
@@ -50,21 +51,23 @@ class ReportGenerator(object):
         for attrobj in self.classentry.attrs:
             self.staticmessage = ""
             self.manymessage = ""
-            if 'static' in attrobj.attrtype:
+            if "static" in attrobj.attrtype:
                 self.staticmessage = " static"
-            if 'many' in attrobj.attrtype:
+            if "many" in attrobj.attrtype:
                 self.manymessage = " 1..*"
             self._DumpAttribute(attrobj)
 
     def _DumpClassHeader(self):
-        self.result += '\n'
+        self.result += "\n"
 
     def _DumpModuleMethods(self):
         if self.modulemethods:
-            self.result += '  ModuleMethods = %s\n' % repr(self.modulemethods)
+            self.result += "  ModuleMethods = %s\n" % repr(self.modulemethods)
 
-    def GenReportDump(self):   # DESIGN PATTERN: Template method, subclasses override the _methods to vary
-        self.result = ''
+    def GenReportDump(
+        self
+    ):  # DESIGN PATTERN: Template method, subclasses override the _methods to vary
+        self.result = ""
         self._DumpClassHeader()
         self._DumpModuleMethods()
 
@@ -73,8 +76,9 @@ class ReportGenerator(object):
         if optionAlphabetic:
             classnames.sort()
         else:
-            def cmpfunc(a,b):
-                if a.find('Module_') != -1:
+
+            def cmpfunc(a, b):
+                if a.find("Module_") != -1:
                     return -1
                 else:
                     if a < b:
@@ -83,9 +87,12 @@ class ReportGenerator(object):
                         return 0
                     else:
                         return 1
+
             classnames.sort(cmpfunc)
-            
-        for self.aclass in classnames:   # for self.aclass, self.classentry in self.classlist.items():
+
+        for (
+            self.aclass
+        ) in classnames:  # for self.aclass, self.classentry in self.classlist.items():
             self.classentry = self.classlist[self.aclass]
 
             self._DumpClassNameAndGeneralisations()
@@ -107,36 +114,38 @@ class CmdLineGenerator:
         self.optionModuleAsClass = treatmoduleasclass
         self.verbose = verbose
 
-    def ExportTo(self, outpath):     # Template method
+    def ExportTo(self, outpath):  # Template method
         self.outpath = outpath
 
         self._GenerateAuxilliaryClasses()  # overridden by subclasses
 
         for directory in self.directories:
-            if '*' in directory or '.' in directory:
+            if "*" in directory or "." in directory:
                 filepath = directory
             else:
                 filepath = os.path.join(directory, "*.py")
             if self.verbose:
-                print('Processing directory', filepath)
+                print("Processing directory", filepath)
             globbed = glob.glob(filepath)
             for f in globbed:
                 self._Process(f)
 
-    def _Process(self, filepath):    # Template method
+    def _Process(self, filepath):  # Template method
         if self.verbose:
-            padding = ' '
+            padding = " "
         else:
-            padding = ''
+            padding = ""
         thefile = os.path.basename(filepath)
-        if thefile[0] == '_':
-            print('  ', 'Skipped', thefile, 'cos begins with underscore.')
+        if thefile[0] == "_":
+            print("  ", "Skipped", thefile, "cos begins with underscore.")
             return
-        print('%sProcessing %s...'%(padding, thefile))
+        print("%sProcessing %s..." % (padding, thefile))
 
-        self.p = self._CreateLanguageGenerator() # overridden by subclasses
+        self.p = self._CreateLanguageGenerator()  # overridden by subclasses
         self.p.optionModuleAsClass = self.optionModuleAsClass
         self.p.verbose = self.verbose
-        
+
         self.p.Parse(filepath)
-        str(self.p)  # triggers the complex output on the generator.  Usually involves calling a complex template method being invoked, which calls overridden methods in particular generator classes.
+        str(
+            self.p
+        )  # triggers the complex output on the generator.  Usually involves calling a complex template method being invoked, which calls overridden methods in particular generator classes.

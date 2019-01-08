@@ -8,20 +8,21 @@ from ViewDotnetWinForm import MainForm
 # GUI Mediator inherits rather than wraps the viewComponent, in this case, due
 # to the way wxBuilder sends us events - expecting us to override handlers
 
+
 class WinFormAdapter(MainForm):
     def __init__(self):
         MainForm.__init__(self)
         self.app = None
         self.observers = multicast()
         self.callAfter = None
-        self.random = None        # inject
+        self.random = None  # inject
 
     def onLoad(self, sender, e):
-        # Call whatever method has been wired (by the master app) into self.callAfter so that 
+        # Call whatever method has been wired (by the master app) into self.callAfter so that
         # we know the form is all set up and ready for app to start.  Its typically the app.Boot method.
         if self.callAfter:
             self.callAfter()
-            
+
     def onClosed(self, sender, e):
         self.app.Shutdown()
 
@@ -36,53 +37,54 @@ class WinFormAdapter(MainForm):
         # click event pointing to OnLinkClicked.
         # This code following is just for the tooltips.
         def seturl(obj):
-            #obj.SetURL(self.app.url_server + obj.Text)
+            # obj.SetURL(self.app.url_server + obj.Text)
             self._toolTip1.SetToolTip(obj, obj.Text)
+
         seturl(self._linkLabel1)
         seturl(self._linkLabel2)
         seturl(self._linkLabel3)
         seturl(self._linkLabel4)
 
     # Threading
-    
+
     def MainThreadMutexGuiEnter(self):
         pass
-    
+
     def MainThreadMutexGuiLeave(self):
         pass
-        
+
     # Gui Generated Events, override the handler here
-        
+
     def BtnDebug1Click(self, sender, e):
-        print('self.app.server.StartServer_real')
+        print("self.app.server.StartServer_real")
         self.app.server.StopServer()
 
-#        print "got debug event"
-#        from System.Collections import ArrayList
-#        self.array = ArrayList()
-#        for i in xrange(10):
-#          self.array.Add(i)
-#        self._listBox1.DataSource = self.array
-#        self.array.Add(100)
-#        self.array.Add(200)
-#        self.array.Add(300)
+    #        print "got debug event"
+    #        from System.Collections import ArrayList
+    #        self.array = ArrayList()
+    #        for i in xrange(10):
+    #          self.array.Add(i)
+    #        self._listBox1.DataSource = self.array
+    #        self.array.Add(100)
+    #        self.array.Add(200)
+    #        self.array.Add(300)
 
-    
     def OnLinkClicked(self, sender, e):
         print("link clicked", sender.Text)
         System.Diagnostics.Process.Start(self.app.url_server + sender.Text)
-    
+
     def OnAddThing(self, sender, e):
         assert self.random
-        info = str(self.random(0,99999)) + " " + self._inputFieldTxt.Text
+        info = str(self.random(0, 99999)) + " " + self._inputFieldTxt.Text
         self.observers.CMD_ADD_THING(info)
         print(info)
 
     # Non Gui Incoming Events
 
     def MODEL_THING_ADDED(self, thing, modelsize):
-        #self.self._listBox1.Add(str(thing), thing)
+        # self.self._listBox1.Add(str(thing), thing)
         self._listBox1.Items.Add(str(thing))
+
 
 """
 

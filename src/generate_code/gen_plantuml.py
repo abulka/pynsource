@@ -2,13 +2,14 @@ import os
 import requests
 from .gen_base import ReportGenerator, CmdLineGenerator
 
+
 class PySourceAsPlantUml(ReportGenerator):
     def __init__(self, ast=True):
         ReportGenerator.__init__(self, ast=ast)
-        self.result = ''
+        self.result = ""
 
     def calc_plant_uml(self, optimise=False):
-        self.result = ''
+        self.result = ""
 
         classnames = list(self.pmodel.classlist.keys())
         for self.aclass in classnames:
@@ -35,7 +36,7 @@ class PySourceAsPlantUml(ReportGenerator):
             for attrobj in self.classentry.attrs:
                 compositescreated = self._GetCompositeCreatedClassesFor(attrobj.attrname)
                 for c in compositescreated:
-                    if 'many' in attrobj.attrtype:
+                    if "many" in attrobj.attrtype:
                         line = "*-->"
                         cardinality = "*"
                     else:
@@ -47,8 +48,7 @@ class PySourceAsPlantUml(ReportGenerator):
                         connector = line
                     self.result += "%s %s %s : %s\n" % (self.aclass, connector, c, attrobj.attrname)
 
-
-    def GenReportDump(self):            # Override template method entirely and do it ourselves
+    def GenReportDump(self):  # Override template method entirely and do it ourselves
         """
         This method gets called by the __str__ of the parent ReportGenerator
         We override here to do our own generation rather than the template method design pattern
@@ -59,15 +59,17 @@ class PySourceAsPlantUml(ReportGenerator):
             self.calc_plant_uml()
         return self.result
 
+
 class CmdLinePythonToPlantUml(CmdLineGenerator):
     """
     The only thing we inherit from CmdLineGenerator is the constructor with gives us self.directories etc.
     Everything else gets triggered by the ExportTo()
     """
+
     def _GenerateAuxilliaryClasses(self):
         pass
 
-    def ExportTo(self, outpath=None):     # Override and redefine Template method entirely
+    def ExportTo(self, outpath=None):  # Override and redefine Template method entirely
         """
         """
         globbed = self.directories
@@ -85,11 +87,11 @@ class CmdLinePythonToPlantUml(CmdLineGenerator):
 
         # Optionally generate image via plant uml server
         outpng = outpath
-        if outpng != "nopng" :
-            if not '.png' in outpng.lower():
+        if outpng != "nopng":
+            if not ".png" in outpng.lower():
                 print("output filename %s must have .png in the name" % outpng)
                 exit(1)
-            print('Generating plantuml diagram %s...' % outpng)
+            print("Generating plantuml diagram %s..." % outpng)
             plant_uml_create_png(plant_uml_text, outpng)
 
             # Windows specific solution
@@ -98,16 +100,16 @@ class CmdLinePythonToPlantUml(CmdLineGenerator):
             # Cross platform solution - conda install pillow
             # This will open the image in your default image viewer.
             from PIL import Image
+
             img = Image.open(outpng)
             img.show()
 
-            print('Done!')
+            print("Done!")
 
 
 def plant_uml_create_png_and_return_image_url(plant_uml_txt):
     plant_uml_server = "http://www.plantuml.com/plantuml/form"
-    response = requests.post(plant_uml_server,
-                             data={'text': plant_uml_txt})
+    response = requests.post(plant_uml_server, data={"text": plant_uml_txt})
     if response.status_code == 200:
 
         """
@@ -118,6 +120,7 @@ def plant_uml_create_png_and_return_image_url(plant_uml_txt):
         in the response.
         """
         import re
+
         regex = r'.*<p id="diagram".*\s*<.*img src=\"(.*?)\"'
         image_url = re.findall(regex, response.text, re.MULTILINE)
         if image_url:
@@ -127,6 +130,7 @@ def plant_uml_create_png_and_return_image_url(plant_uml_txt):
         return image_url, response
     else:
         return None, response
+
 
 def plant_uml_create_png(plant_uml_txt, output_filename):
     image_url, response = plant_uml_create_png_and_return_image_url(plant_uml_txt)
@@ -138,9 +142,9 @@ def plant_uml_create_png(plant_uml_txt, output_filename):
         """
         response = requests.get(image_url)
         if response.status_code == 200:
-            with open(output_filename, 'wb') as fp:
+            with open(output_filename, "wb") as fp:
                 fp.write(response.content)
         else:
-            print('ok getting generating uml but error pulling down image')
+            print("ok getting generating uml but error pulling down image")
     else:
-        print('error calling plantuml server', response.status_code)
+        print("error calling plantuml server", response.status_code)

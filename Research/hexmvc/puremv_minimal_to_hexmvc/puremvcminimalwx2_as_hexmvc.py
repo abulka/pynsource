@@ -21,20 +21,27 @@ and the app will still work.
 
 import wx
 import abc
-import sys; sys.path.append("../lib")
+import sys
+
+sys.path.append("../lib")
 from architecture_support import *
 
 # GUI
 
+
 class MyForm(wx.Panel):
     def __init__(self, parent):
-        wx.Panel.__init__(self,parent,id=3)
-        self.inputFieldTxt = wx.TextCtrl(self, -1, size=(170,-1), pos=(5, 10), style=wx.TE_PROCESS_ENTER)
+        wx.Panel.__init__(self, parent, id=3)
+        self.inputFieldTxt = wx.TextCtrl(
+            self, -1, size=(170, -1), pos=(5, 10), style=wx.TE_PROCESS_ENTER
+        )
+
 
 class AppFrame(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self,parent=None, id=-1, title="HexMVC Minimalist Demo",size=(200,100))
+        wx.Frame.__init__(self, parent=None, id=-1, title="HexMVC Minimalist Demo", size=(200, 100))
         self.myForm = MyForm(parent=self)
+
 
 class WxApp(wx.App):
     appFrame = None
@@ -44,14 +51,16 @@ class WxApp(wx.App):
         self.appFrame.Show()
         return True
 
+
 # GUI Mediator
+
 
 class MyFormMediator:
     def __init__(self, viewComponent):
         self.viewComponent = viewComponent
         self.viewComponent.Bind(wx.EVT_TEXT_ENTER, self.onSubmit, self.viewComponent.inputFieldTxt)
         self.observers = multicast()
-        
+
     def DATA_CHANGED(self, mydata):
         print("handleNotification (mediator) got", mydata)
         self.viewComponent.inputFieldTxt.SetValue(mydata)
@@ -60,36 +69,45 @@ class MyFormMediator:
         mydata = self.viewComponent.inputFieldTxt.GetValue()
         self.observers.DATA_SUBMITTED(mydata)
 
+
 # Model
+
 
 class Data:
     def __init__(self):
         self.someinfo = "Hello - hit enter"
 
+
 # Model Proxy
+
 
 class DataModelProxy(object):
     def __init__(self):
         self.realdata = Data()
         self.observers = multicast()
 
-    def Boot(self):  # New - needed for HexMvc version since wiring of observers is much delayed so can't do it in init
+    def Boot(
+        self
+    ):  # New - needed for HexMvc version since wiring of observers is much delayed so can't do it in init
         self.observers.DATA_CHANGED(self.data)
 
     @property
     def data(self):
         return self.realdata.someinfo
+
     @data.setter
     def data(self, value):
         print("setData (model) to", value)
         self.realdata.someinfo = value
         self.observers.DATA_CHANGED(self.data)
 
+
 # App
 
 # Controller
 
-class DataSubmittedCommand():
+
+class DataSubmittedCommand:
     def __init__(self, model, mydata):
         self.model = model
         self.mydata = mydata
@@ -98,12 +116,14 @@ class DataSubmittedCommand():
         print("CMD submit execute (command)")
         self.model.data = self.mydata.upper()
 
-class Controller():
+
+class Controller:
     def __init__(self, model):
         self.model = model
 
     def DATA_SUBMITTED(self, mydata):
         DataSubmittedCommand(self.model, mydata).execute()
+
 
 class App:
     def __init__(self, model, gui):
@@ -115,24 +135,24 @@ class App:
         # Wire observers
         gui.observers.addObserver(self.controller)
         model.observers.addObserver(gui)
-    
+
     def Boot(self):
         self.model.Boot()
-    
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     # Create Gui
     wxapp = WxApp(redirect=False)
     gui = MyFormMediator(wxapp.appFrame.myForm)
-    
+
     # Create Model
     model = DataModelProxy()
-    
+
     # Create Core Hexagon App and inject adapters
     app = App(model, gui)
     wx.CallAfter(app.Boot)
-    
+
     # Start Gui
     wxapp.MainLoop()
-    
-    print("DONE")     
-   
+
+    print("DONE")

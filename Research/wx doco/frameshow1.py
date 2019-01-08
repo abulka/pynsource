@@ -5,8 +5,10 @@ import os, stat
 
 # from app.app import App
 import wx.lib.mixins.inspection  # Ctrl-Alt-I
-WINDOW_SIZE = (1024,768)
+
+WINDOW_SIZE = (1024, 768)
 MIN_SENSIBLE_CANVAS_SIZE = 200
+
 
 class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnInit(self):
@@ -14,10 +16,16 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         # self.log = Log()
         self.working = False
         wx.InitAllImageHandlers()
-        self.andyapptitle = 'PyNsource GUI - Python Code into UML'
+        self.andyapptitle = "PyNsource GUI - Python Code into UML"
 
-        self.frame = wx.Frame(None, -1, self.andyapptitle, pos=(50,50), size=(0,0),
-                        style=wx.NO_FULL_REPAINT_ON_RESIZE|wx.DEFAULT_FRAME_STYLE)
+        self.frame = wx.Frame(
+            None,
+            -1,
+            self.andyapptitle,
+            pos=(50, 50),
+            size=(0, 0),
+            style=wx.NO_FULL_REPAINT_ON_RESIZE | wx.DEFAULT_FRAME_STYLE,
+        )
         self.frame.CreateStatusBar()
 
         self.notebook = wx.Notebook(self.frame, -1)
@@ -25,11 +33,15 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.asciiart = wx.Panel(self.notebook, -1)
         self.notebook.AddPage(self.umlwin, "UML")
         self.notebook.AddPage(self.asciiart, "Ascii Art")
-        self.multiText = wx.TextCtrl(self.asciiart, -1, 'ASCII_UML_HELP_MSG', style=wx.TE_MULTILINE|wx.HSCROLL)
+        self.multiText = wx.TextCtrl(
+            self.asciiart, -1, "ASCII_UML_HELP_MSG", style=wx.TE_MULTILINE | wx.HSCROLL
+        )
         bsizer = wx.BoxSizer()
         bsizer.Add(self.multiText, 1, wx.EXPAND)
         self.asciiart.SetSizerAndFit(bsizer)
-        self.multiText.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False))   # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
+        self.multiText.SetFont(
+            wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+        )  # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
         # self.multiText.Bind( wx.EVT_CHAR, self.onKeyChar_Ascii_Text_window)
         # self.multiText.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom_ascii)
 
@@ -49,8 +61,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.umlwin.InitSizeAndObjs()  # Now that frame is visible and calculated, there should be sensible world coords to use
         return True
 
-class UmlCanvas(ogl.ShapeCanvas):
 
+class UmlCanvas(ogl.ShapeCanvas):
     def __init__(self, parent, log, frame):
         ogl.ShapeCanvas.__init__(self, parent)
 
@@ -90,20 +102,22 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         # assert not self.canvas_resizer.canvas_too_small(), "InitSizeAndObjs being called too early - please set up enclosing frame size first"
 
+
 def main():
     application = MainApp(0)
     # application = MainApp(redirect=True, filename='/tmp/pynsource.log')  # to view what's going on
 
     application.MainLoop()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 
     # Sanity check for paths, ensure there is not any .. and other relative crud in
     # our path.  You only need that stuff when running a module as a standalone.
     # in which case prefix such appends with if __name__ == '__main__':
     # Otherwise everything should be assumed to run from trunk/src/ as the root
     #
-    #import sys, pprint
-    #pprint.pprint(sys.path)
+    # import sys, pprint
+    # pprint.pprint(sys.path)
 
     main()

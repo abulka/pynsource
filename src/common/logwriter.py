@@ -1,8 +1,9 @@
 import os
 
+
 class LogWriter:
     def __init__(self, in_filename=None, out_filename=None, print_to_console=False):
-        
+
         self.print_to_console = print_to_console
 
         # TODO should allow both 'in_filename' and 'out_filename' to be separately specified
@@ -14,28 +15,28 @@ class LogWriter:
         else:
             self.out_filename = out_filename
         assert self.out_filename, "Must specify either in or out filename"
-        
-        self.f = open(self.out_filename, 'w')
-        
-    
+
+        self.f = open(self.out_filename, "w")
+
     def finish(self):
         self.f.close()
-        
+
     def out(self, s, force_print=False):
         if self.print_to_console or force_print:
             print(s)
-        self.f.write("%s\n"%s)
+        self.f.write("%s\n" % s)
 
     def out_divider(self):
         if self.print_to_console:
-            print("-"*80)
+            print("-" * 80)
         self.f.write("<HR>\n")
-        
-    def out_wrap_in_html(self, s, style_class='dump1', heading="click", force_print=False):
+
+    def out_wrap_in_html(self, s, style_class="dump1", heading="click", force_print=False):
         self.out("<div class=%s><pre>%s</div></pre>" % (style_class, s))
-            
+
     def out_html_header(self):
-        self.out("""
+        self.out(
+            """
             <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
             <html>
             <head>
@@ -66,32 +67,36 @@ class LogWriter:
             </head>
             
             <body>
-            """)
-        
+            """
+        )
+
     def out_html_footer(self):
-        self.out("""
+        self.out(
+            """
             </body>
             </html>
-        """)
-        
+        """
+        )
+
+
 class LogWriterNull:
     def __init__(self, in_filename=None, out_filename=None, print_to_console=False):
         pass
-    
+
     def finish(self):
         pass
-        
+
     def out(self, s, force_print=False):
         pass
 
     def out_divider(self):
         pass
-        
-    def out_wrap_in_html(self, s, style_class='dump1', heading="click", force_print=False):
+
+    def out_wrap_in_html(self, s, style_class="dump1", heading="click", force_print=False):
         pass
-            
+
     def out_html_header(self):
         pass
-        
+
     def out_html_footer(self):
         pass

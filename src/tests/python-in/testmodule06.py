@@ -7,6 +7,7 @@ from editorturns import TurnEditor
 import copy
 import pprint, undo
 
+
 class ParseMeTest(undo.UndoItem):
     def __init__(self, scenario):
         self.scenario = scenario

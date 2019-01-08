@@ -9,9 +9,9 @@ import wx
 # Create Gui
 wxapp = MyWxApp(redirect=False)
 gui = wxapp.myframe  # arguably too wx based to be a true adapter, but as long
-                     # as we call nothing wx specific, it acts as an adapter ok.
+# as we call nothing wx specific, it acts as an adapter ok.
 # Create Server
-server = Server1(host='localhost', port=8081)
+server = Server1(host="localhost", port=8081)
 
 # Create Persistence
 persistence = PersistenceMock2()

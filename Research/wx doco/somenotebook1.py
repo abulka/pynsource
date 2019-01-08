@@ -5,20 +5,23 @@ import wx
 # want to use something more meaningful for your application, these
 # are just for illustration.
 
+
 class PageOne(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        t = wx.StaticText(self, -1, "This is a PageOne object", (20,20))
+        t = wx.StaticText(self, -1, "This is a PageOne object", (20, 20))
+
 
 class PageTwo(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        t = wx.StaticText(self, -1, "This is a PageTwo object", (40,40))
+        t = wx.StaticText(self, -1, "This is a PageTwo object", (40, 40))
+
 
 class PageThree(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        t = wx.StaticText(self, -1, "This is a PageThree object", (60,60))
+        t = wx.StaticText(self, -1, "This is a PageThree object", (60, 60))
 
 
 class MainFrame(wx.Frame):

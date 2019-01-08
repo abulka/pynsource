@@ -1,5 +1,6 @@
 from common.command_pattern import Command
 
+
 class CmdBase(Command):
     """ Base command """
 
@@ -12,4 +13,3 @@ class CmdBase(Command):
     def redo(self):
         """ redoes the command. Usually as simple as re executing it. """
         self.execute()
-

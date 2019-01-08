@@ -9,7 +9,7 @@ import wx.lib.wxpTag
 
 # from Main import opj
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 # This shows how to catch the OnLinkClicked non-event.  (It's a virtual
 # method in the C++ code...)
@@ -21,24 +21,23 @@ class MyHtmlWindow(html.HtmlWindow):
             self.SetStandardFonts()
 
     def OnLinkClicked(self, linkinfo):
-        self.log.WriteText('OnLinkClicked: %s\n' % linkinfo.GetHref())
+        self.log.WriteText("OnLinkClicked: %s\n" % linkinfo.GetHref())
         super(MyHtmlWindow, self).OnLinkClicked(linkinfo)
 
     def OnSetTitle(self, title):
-        self.log.WriteText('OnSetTitle: %s\n' % title)
+        self.log.WriteText("OnSetTitle: %s\n" % title)
         super(MyHtmlWindow, self).OnSetTitle(title)
 
     def OnCellMouseHover(self, cell, x, y):
-        self.log.WriteText('OnCellMouseHover: %s, (%d %d)\n' % (cell, x, y))
+        self.log.WriteText("OnCellMouseHover: %s, (%d %d)\n" % (cell, x, y))
         super(MyHtmlWindow, self).OnCellMouseHover(cell, x, y)
 
     def OnCellClicked(self, cell, x, y, evt):
-        self.log.WriteText('OnCellClicked: %s, (%d %d)\n' % (cell, x, y))
+        self.log.WriteText("OnCellClicked: %s, (%d %d)\n" % (cell, x, y))
         if isinstance(cell, html.HtmlWordCell):
             sel = html.HtmlSelection()
-            self.log.WriteText('     %s\n' % cell.ConvertToText(sel))
+            self.log.WriteText("     %s\n" % cell.ConvertToText(sel))
         return super(MyHtmlWindow, self).OnCellClicked(cell, x, y, evt)
-
 
 
 # This filter doesn't really do anything but show how to use filters
@@ -121,32 +120,27 @@ class TestHtmlPanel(wx.Panel):
 
         self.OnShowDefault(None)
 
-
     def ShutdownDemo(self):
         # put the frame title back
         if self.frame:
             self.frame.SetTitle(self.titleBase)
 
-
     def OnShowDefault(self, event):
         # name = os.path.join(self.cwd, opj('data/test.htm'))
         # name = os.path.abspath(os.path.join(self.cwd, "../../src/dialogs", 'HelpWindow.html'))
-        name = os.path.join(self.cwd, "../../src/dialogs", 'HelpWindow.html')
+        name = os.path.join(self.cwd, "../../src/dialogs", "HelpWindow.html")
         self.html.LoadPage(name)
 
-
     def OnLoadFile(self, event):
-        dlg = wx.FileDialog(self, style=wx.FD_OPEN,
-                            wildcard='HTML Files|*.htm;*.html', )
+        dlg = wx.FileDialog(self, style=wx.FD_OPEN, wildcard="HTML Files|*.htm;*.html")
 
-        print('before shomaodal')
+        print("before shomaodal")
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             print(path)
             self.html.LoadPage(path)
 
         dlg.Destroy()
-
 
     def OnLoadURL(self, event):
         dlg = wx.TextEntryDialog(self, "Enter a URL")
@@ -157,12 +151,10 @@ class TestHtmlPanel(wx.Panel):
 
         dlg.Destroy()
 
-
     def OnWithWidgets(self, event):  # ANDY - not sure when this is called...
         # name = os.path.join(self.cwd, opj('data/widgetTest.htm'))
-        name = os.path.join(self.cwd, "../../dialogs", 'HelpWindow.html')
+        name = os.path.join(self.cwd, "../../dialogs", "HelpWindow.html")
         self.html.LoadPage(name)
-
 
     def OnOk(self, event):
         self.log.WriteText("It works!\n")
@@ -171,34 +163,33 @@ class TestHtmlPanel(wx.Panel):
         if not self.html.HistoryBack():
             wx.MessageBox("No more items in history!")
 
-
     def OnForward(self, event):
         if not self.html.HistoryForward():
             wx.MessageBox("No more items in history!")
 
-
     def OnViewSource(self, event):
-        import  wx.lib.dialogs
+        import wx.lib.dialogs
 
         source = self.html.GetParser().GetSource()
 
-        dlg = wx.lib.dialogs.ScrolledMessageDialog(self, source, 'HTML Source')
+        dlg = wx.lib.dialogs.ScrolledMessageDialog(self, source, "HTML Source")
         dlg.ShowModal()
         dlg.Destroy()
-
 
     def OnPrint(self, event):
         self.printer.GetPrintData().SetPaperId(wx.PAPER_LETTER)
         self.printer.PrintFile(self.html.GetOpenedPage())
 
-#----------------------------------------------------------------------
+
+# ----------------------------------------------------------------------
+
 
 def runTest(frame, nb, log):
     win = TestHtmlPanel(nb, frame, log)
     return win
 
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 
 overview = """<html><body>
@@ -223,19 +214,16 @@ wraps the core MSIE HTML viewer.
 #
 
 
-
-
-
-
 # -------- ANDY REPLACEMENT BOOTSTRAP FOR WX PYTHON DEMOS
 #
 # Just paste this after the demo code.
 # Ensure you call the runTest() method which is supplied by each demo.
 #
 
+
 class Log:
     def WriteText(self, text):
-        if text[-1:] == '\n':
+        if text[-1:] == "\n":
             text = text[:-1]
         # wx.LogMessage(text)
         print(text)
@@ -247,9 +235,14 @@ class MainApp(wx.App):
     def OnInit(self):
         self.log = Log()
 
-        self.frame = wx.Frame(None, -1, "hit m repeadedly to move shapes", pos=(350, 350),
-                              size=(640, 340),
-                              style=wx.NO_FULL_REPAINT_ON_RESIZE | wx.DEFAULT_FRAME_STYLE)
+        self.frame = wx.Frame(
+            None,
+            -1,
+            "hit m repeadedly to move shapes",
+            pos=(350, 350),
+            size=(640, 340),
+            style=wx.NO_FULL_REPAINT_ON_RESIZE | wx.DEFAULT_FRAME_STYLE,
+        )
         self.frame.CreateStatusBar()
 
         self.demowin = runTest(self.frame, self.frame, self.log)
@@ -292,12 +285,5 @@ def main():
     application.MainLoop()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-
-
-
-
-
-
-

@@ -17,8 +17,8 @@ import wx
 import _thread
 from time import sleep
 
-class MainFrame(wx.Frame):
 
+class MainFrame(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(self, parent)
 
@@ -34,7 +34,7 @@ class MainFrame(wx.Frame):
         self.SetSizerAndFit(sizer)
 
         self.Bind(wx.EVT_BUTTON, self.onButton)
-        
+
         self.btn.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)  # self.Bind doesn't work
         self.working = False
         self.kill_layout = False
@@ -53,7 +53,7 @@ class MainFrame(wx.Frame):
 
         self.working = False
         event.Skip()
-        
+
     def onButton(self, evt):
         self.btn.Enable(False)
         self.gauge.SetValue(0)
@@ -71,22 +71,25 @@ class MainFrame(wx.Frame):
         sleep(3)
         wx.Yield()
         wx.CallAfter(self.gauge.SetValue, 20)
-        if self.kill_layout: return
+        if self.kill_layout:
+            return
         sleep(5)
         wx.Yield()
         wx.CallAfter(self.gauge.SetValue, 50)
-        if self.kill_layout: return
+        if self.kill_layout:
+            return
         sleep(1)
         wx.Yield()
         wx.CallAfter(self.gauge.SetValue, 70)
-        if self.kill_layout: return
+        if self.kill_layout:
+            return
         sleep(10)
         wx.Yield()
         wx.CallAfter(self.onLongRunDone)
+
 
 if __name__ == "__main__":
     app = wx.PySimpleApp()
     app.TopWindow = MainFrame(None)
     app.TopWindow.Show()
     app.MainLoop()
-    
