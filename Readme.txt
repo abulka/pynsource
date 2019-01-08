@@ -3,7 +3,7 @@ PyNSource and PyNSource GUI
 Reverse engineer python source code into UML - optionally display UML as Ascii
 art for pasting into your source code.
 
-Version 1.62
+Version 1.63
 (c) Andy Bulka 2004-2018
 andy@andypatterns.com
 http://www.andypatterns.com/index.php/products/pynsource/
@@ -11,7 +11,7 @@ License: GPL 3
 
 ========================================
 
-** 2018 News: For an exciting new, online version of pynsource, please email abulka@gmail.com and
+** 2019 News: For an exciting new, online version of pynsource, please email abulka@gmail.com and
    get onto the beta program.
 
 ========================================
@@ -159,13 +159,17 @@ then install the binary release which uses wxpython 2.8 internally.
 Change Log
 
 Version 1.63 (Jan 2019)
+- python3 conversion, ability to parse python3 source code
+- 
+
+Version 1.62 (Dec 2018)
 - compatibility with latest wxpython 4.0.3
 - new Mac OSX build script to generate 64bit mac .app - Mojave compatible
 - fixed lack of drag outline on Mac OS
 - multi-page notebook on Mac OS to match other platforms, showing UML and Ascii UML
 - HTML help window
 
-Version 1.62 (March 2016)
+Version 1.62_pre (March 2016)
 - fixed main window appearing almost offscreen on mac
 - methods with property decorator now treated as fields/properties
 
