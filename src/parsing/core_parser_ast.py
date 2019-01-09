@@ -141,7 +141,7 @@ def parse(filename, log=None, options={}):
 
     pmodel, debuginfo = _convert_ast_to_old_parser(node, filename, log, options)
     mode(0)  # reset
-    return pmodel, debuginfo
+    return pmodel, debuginfo  # string of html
 
 
 def _ast_parse(filename):

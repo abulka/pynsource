@@ -27,7 +27,7 @@ import wx.lib.ogl as ogl
 import os, stat
 from common.messages import *
 
-APP_VERSION = 1.63
+APP_VERSION = 1.70
 WINDOW_SIZE = (1024, 768)
 MULTI_TAB_GUI = True
 USE_SIZER = False
@@ -668,7 +668,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnCheckForUpdates(self, event):
         import urllib.request, urllib.error, urllib.parse
 
-        s = urllib.request.urlopen(WEB_VERSION_CHECK_URL).read()
+        s = urllib.request.urlopen(WEB_VERSION_CHECK_URL).read().decode('utf-8')
         s = s.replace("\r", "")
         info = eval(s)
         ver = info["latest_version"]
@@ -682,6 +682,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
                 import webbrowser
 
                 webbrowser.open(info["download_url"])
+        elif ver < APP_VERSION:
+            self.MessageBox(f"You seem to have a pre-release version {APP_VERSION} - congratulations!  Stable version is {ver}")
         else:
             self.MessageBox("You already have the latest version:  %s" % APP_VERSION)
 
