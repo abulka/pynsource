@@ -377,6 +377,8 @@ class TestCase_A(unittest.TestCase):
         # print "*"*88
 
         if s.strip() != expected_s.strip():
+            print(s.strip())
+            print(expected_s.strip())
             # Write to file
             with open(os.path.abspath("tests/logs/test_8_out_actual_.txt"), "w") as f:
                 f.write(s)

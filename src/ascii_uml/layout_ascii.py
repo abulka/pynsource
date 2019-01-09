@@ -1,4 +1,5 @@
 from .asciiworkspace import AsciiWorkspace
+from typing import List, Set, Dict, Tuple, Optional
 
 r"""
 HOW IT WORKS
@@ -116,9 +117,24 @@ class model_to_ascii_builder:
             result += "\n"
         return result
 
-    def removeDuplicates(self, lzt):
-        # workaround a bug in pynsource where duplicate edges are recorded - to be fixed.  For now remove duplicates.
-        return list(set(lzt))
+    def removeDuplicates(self, lzt: List[str]) -> List[str]:
+        """
+        Remove duplicates in lzt.
+
+        workaround a bug in pynsource where duplicate edges are recorded - to be fixed.
+        For now remove duplicates.
+
+        note: sets are arbitrarily ordered so take this into account when testing results
+        update: now I sort the result so that at least its consistent for testing.
+
+        Args:
+            lzt: list of string elements
+
+        Returns: list
+        """
+        result = list(set(lzt))
+        result.sort(reverse=True)  # remember sort() returns None
+        return result
 
     def CalcRelations(self, node, graph):
         rels_composition = self.removeDuplicates(
