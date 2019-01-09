@@ -100,9 +100,11 @@ def repairOGL():
 
     old_OnMouseEvent = wx.lib.ogl.canvas.ShapeCanvas.OnMouseEvent
 
-    def new_OnMouseEvent(self, *k, **kw):
-        old_OnMouseEvent(self, *k, **kw)
-        self.Refresh()
+    def new_OnMouseEvent(self, event):
+        old_OnMouseEvent(self, event)
+        if event.Dragging():
+            print("draggging..............")
+            self.Refresh()
 
     # moving
 
