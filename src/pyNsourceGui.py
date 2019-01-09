@@ -408,9 +408,9 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu1, "&Import Python Code...", "Ctrl-I", self.OnFileImport)
 
         # New way of wiring things up - see https://wxpython.org/blog/avoiding-window-ids/index.html
-        self.item_python_mode = menu1.AppendCheckItem(wx.ID_ANY, "Python 3 mode", help="Assume Python syntax 2/3")
-        self.Bind(wx.EVT_MENU, self.OnPythonMode, self.item_python_mode)
-        self.item_python_mode.Check()
+        self.item_python3_mode = menu1.AppendCheckItem(wx.ID_ANY, "Python 3 mode", help="Assume Python syntax 2/3")
+        self.Bind(wx.EVT_MENU, self.OnPythonMode, self.item_python3_mode)
+        self.item_python3_mode.Check()
 
         menu1.AppendSeparator()
         Add(menu1, "&Print / Preview...", "Ctrl-P", self.FilePrint)
@@ -482,7 +482,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.frame.SetMenuBar(menuBar)
 
     def OnPythonMode(self, event):
-        print("python 3 syntax mode state now:", self.item_python_mode.IsChecked())
+        print("python 3 syntax mode state now:", self.item_python3_mode.IsChecked())
 
     def OnRightButtonMenu(self, event):  # Menu
         x, y = event.GetPosition()
@@ -565,7 +565,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.app.run.CmdColourSiblings(color_range_offset=True)
 
     def OnFileImport(self, event):
-        self.app.run.CmdFileImportViaDialog()
+        mode = 3 if self.item_python3_mode.IsChecked() else 2
+        self.app.run.CmdFileImportViaDialog(mode=mode)
 
     def OnViewToggleAscii(self, event):
         if MULTI_TAB_GUI:

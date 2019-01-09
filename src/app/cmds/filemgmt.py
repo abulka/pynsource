@@ -33,7 +33,9 @@ class CmdFileImportBase(CmdBase):  # BASE
             for f in self.files:
                 # pmodel, debuginfo = old_parser(f)
                 # pmodel, debuginfo = new_parser(f)
-                pmodel, debuginfo = new_parser(f, options={"mode": 3})
+                mode = getattr(self, "mode", 2)
+                print(f"Importing Python in syntax mode {mode}")
+                pmodel, debuginfo = new_parser(f, options={"mode": mode})
 
                 # from parsing.dump_pmodel import dump_old_structure
                 # print dump_old_structure(pmodel)
@@ -60,6 +62,9 @@ class CmdFileImportFromFilePath(CmdFileImportBase):  # was class CmdFileImportSo
 
 
 class CmdFileImportViaDialog(CmdFileImportBase):  # was class CmdFileImport(CmdBase):
+    def __init__(self, mode=2):
+        self.mode = mode
+
     def execute(self):
         self.context.wxapp.switch_to_ogl_uml_view()
 
