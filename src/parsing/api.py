@@ -1,4 +1,4 @@
-from parsing.core_parser import PynsourcePythonParser
+from parsing.core_parser_old import PynsourcePythonParser
 from parsing.core_parser_ast import parse
 from common.logwriter import LogWriterNull
 

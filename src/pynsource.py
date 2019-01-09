@@ -10,7 +10,7 @@ from generate_code.gen_java import CmdLinePythonToJava
 from generate_code.gen_plantuml import CmdLinePythonToPlantUml
 import common.messages
 from parsing.dump_pmodel import dump_old_structure
-from parsing.core_parser import PynsourcePythonParser
+from parsing.core_parser_old import PynsourcePythonParser
 from parsing.api import old_parser, new_parser
 
 

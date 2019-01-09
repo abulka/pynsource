@@ -1,7 +1,7 @@
 """
 @startuml
 
-package "parsing.core_parser.py" {
+package "parsing.core_parser_old.py" {
 
     class AndyBasicParseEngine {
         meat
