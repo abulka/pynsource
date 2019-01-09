@@ -5,16 +5,24 @@
 import random
 import sys
 from .graph import Graph, GraphNode
-
+from base64 import b64encode
 
 class UmlGraph(Graph):
     def NotifyCreateNewNode(self, id, l, t, w, h):
         # subclasses overriding, opportunity to create different instance type
         return UmlNode(id, l, t, w, h)
 
+    def NotifyCreateNewCommentNode(self, id, l, t, w, h):
+        # subclasses overriding, opportunity to create different instance type
+        return CommentNode(id, l, t, w, h)
+
     def NotifyOfNodeBeingPersisted(self, node):
         # subclass overriding, opportunity to inject additional persistence dict info
-        return ", 'attrs':'%s', 'meths':'%s'" % ("|".join(node.attrs), "|".join(node.meths))
+        if type(node) == CommentNode:
+            # encode comment as bas64 but decode it into str so that it doesn't get saved as b'..'r
+            return ", 'comment':'%s'" % str(b64encode(node.comment.encode("utf-8")).decode('utf-8'))
+        else:
+            return ", 'attrs':'%s', 'meths':'%s'" % ("|".join(node.attrs), "|".join(node.meths))
 
     def NotifyOfEdgeBeingPersisted(self, edge):
         # subclass overriding, opportunity to inject additional persistence dict info
@@ -26,6 +34,11 @@ class UmlGraph(Graph):
             node.attrs = data["attrs"].split("|")
         if data.get("meths", ""):
             node.meths = data["meths"].split("|")
+        if data.get("comment", ""):
+            from base64 import b64decode
+            comment = data["comment"]  # TODO need to base64 decode this
+            # b = comment.decode('utf-8')
+            node.comment = b64decode(comment).decode('utf-8')
 
     def NotifyOfEdgeCreateFromPersistence(self, edge, data):
         # subclass overriding, opportunity to add attributes to edge

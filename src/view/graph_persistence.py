@@ -8,7 +8,7 @@ handle the n-1 to n conversion (just the one step from the previous version to
 this new version n)
 """
 
-PERSISTENCE_UPGRADE_SEQUENCE = [0.9, 1.0, 1.1]
+PERSISTENCE_UPGRADE_SEQUENCE = [0.9, 1.0, 1.1, 1.2]
 PERSISTENCE_CURRENT_VERSION = PERSISTENCE_UPGRADE_SEQUENCE[-1]
 
 
@@ -147,9 +147,15 @@ class GraphPersistence:
             if data["type"] == "meta":
                 pass
             if data["type"] == "umlshape":
-                node = self.graph.NotifyCreateNewNode(
-                    data["id"], data["x"], data["y"], data["width"], data["height"]
-                )
+                if "comment" in data:
+                    print("comment detected!!!!!!!")
+                    node = self.graph.NotifyCreateNewCommentNode(
+                        data["id"], data["x"], data["y"], data["width"], data["height"]
+                    )
+                else:
+                    node = self.graph.NotifyCreateNewNode(
+                        data["id"], data["x"], data["y"], data["width"], data["height"]
+                    )
                 self.graph.AddNode(node)
                 self.graph.NotifyOfNodeCreateFromPersistence(node, data)
             elif data["type"] == "edge":
@@ -188,7 +194,7 @@ class GraphPersistence:
 
         if len(self.graph.nodes):
             nodes += "# PynSource Version %1.1f\n" % PERSISTENCE_CURRENT_VERSION
-            nodes += "{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin.'}\n"
+            nodes += "{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin. Comments are saved.'}\n"
 
         for node in self.graph.nodes:
             subclass_persistence_str = self.graph.NotifyOfNodeBeingPersisted(node)

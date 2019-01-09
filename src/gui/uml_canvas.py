@@ -729,7 +729,10 @@ class UmlCanvas(ogl.ShapeCanvas):
         # Create fresh visualisation
         for node in self.displaymodel.graph.nodes:
             assert not node.shape
-            shape = self.CreateUmlShape(node)
+            if hasattr(node, "comment"):
+                shape = self.createCommentShape(node)
+            else:
+                shape = self.CreateUmlShape(node)
             self.displaymodel.classnametoshape[
                 node.id
             ] = shape  # Record the name to shape map so that we can wire up the links later.

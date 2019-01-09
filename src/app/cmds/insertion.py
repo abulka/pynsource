@@ -208,9 +208,10 @@ class CmdInsertComment(UtilCmdComment):
                 id += "2"
             node = self.context.displaymodel.AddCommentNode(id, comment)
             shape = self.context.umlcanvas.createCommentShape(node)
-            self.context.displaymodel.classnametoshape[
-                node.id
-            ] = shape  # Record the name to shape map so that we can wire up the links later.
+
+            # Record the name to shape map so that we can wire up the links later.
+            self.context.displaymodel.classnametoshape[node.id] = shape
+
             node.shape.Show(True)
             self.context.umlcanvas.mega_refresh()
 

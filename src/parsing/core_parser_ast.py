@@ -136,7 +136,7 @@ def parse(filename, log=None, options={}):
     else:
         generic_help = "If you are parsing Python 2 code, uncheck the menu item 'File/Python 3."
     generic_help += "\n\nOr of course you may be dealing with a real syntax error :-)"
-    
+
     try:
         node = _ast_parse(filename)
     except SyntaxError as e:
