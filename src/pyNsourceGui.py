@@ -166,7 +166,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.frame.Show(
             True
         )  # in wxpython2.8 this causes umlcanvas canvas to grow too, but not in wxpython3 - till much later
-        wx.EVT_CLOSE(self.frame, self.OnCloseFrame)
+        self.frame.Bind(wx.EVT_CLOSE, self.OnCloseFrame)
 
         self.popupmenu = None
         self.umlcanvas.Bind(
@@ -377,27 +377,28 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         menu5 = wx.Menu()
         menu5sub = wx.Menu()
 
-        self.next_menu_id = wx.NewId()
+        self.next_menu_id = wx.NewIdRef()  # was wx.NewId()
 
-        def Add(menu, s1, key=None, func=None, func_update=None):
-            s2 = s1
-            if key:
-                s1 = "%s\t%s" % (s1, key)
+        def Add(menu, name, shortcut=None, func=None, func_update=None):
+            name_ori = name
+            if shortcut:
+                name = "%s\t%s" % (name, shortcut)
             id = self.next_menu_id
-            if (
-                "wxMac" in wx.PlatformInfo and s1 == "&About..."
-            ):  # http://wiki.wxpython.org/Optimizing%20for%20Mac%20OS%20X
+
+            # Mac tweak, see http://wiki.wxpython.org/Optimizing%20for%20Mac%20OS%20X
+            if "wxMac" in wx.PlatformInfo and name == "&About...":
                 id = wx.ID_ABOUT
-            menu_item = menu.Append(id, s1, s2)
-            wx.EVT_MENU(self, id, func)
+
+            menu_item = menu.Append(id, name, name_ori)
+            self.Bind(wx.EVT_MENU, func, id=id)
             if func_update:
-                wx.EVT_UPDATE_UI(self, id, func_update)
-            self.next_menu_id = wx.NewId()
+                self.Bind(wx.EVT_UPDATE_UI, func_update, id=id)
+
+            self.next_menu_id = wx.NewIdRef()  # was wx.NewId()
             return menu_item
 
         def AddSubMenu(menu, submenu, s):
-            menu.AppendMenu(self.next_menu_id, s, submenu)
-            self.next_menu_id = wx.NewId()
+            menu.AppendSubMenu(submenu, s)
 
         Add(menu1, "&New", "Ctrl-N", self.FileNew)
         Add(menu1, "&Open...", "Ctrl-O", self.OnLoadGraph)
@@ -491,33 +492,33 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             self.popupmenu.Destroy()  # wx.Menu objects need to be explicitly destroyed (e.g. menu.Destroy()) in this situation. Otherwise, they will rack up the USER Objects count on Windows; eventually crashing a program when USER Objects is maxed out. -- U. Artie Eoff  http://wiki.wxpython.org/index.cgi/PopupMenuOnRightClick
         self.popupmenu = wx.Menu()  # Create a menu
 
-        item = self.popupmenu.Append(wx.NewId(), "Add Class...")
+        item = self.popupmenu.Append(wx.ID_ANY, "Add Class...")
         self.frame.Bind(wx.EVT_MENU, self.OnInsertClass, item)
         if ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS:
-            item = self.popupmenu.Append(wx.NewId(), "Add Image...")
+            item = self.popupmenu.Append(wx.ID_ANY, "Add Image...")
             self.frame.Bind(wx.EVT_MENU, self.OnInsertImage, item)
-            item = self.popupmenu.Append(wx.NewId(), "Add Comment...")
+            item = self.popupmenu.Append(wx.ID_ANY, "Add Comment...")
             self.frame.Bind(wx.EVT_MENU, self.OnInsertComment, item)
 
         self.popupmenu.AppendSeparator()
 
-        item = self.popupmenu.Append(wx.NewId(), "Load Graph from text...")
+        item = self.popupmenu.Append(wx.ID_ANY, "Load Graph from text...")
         self.frame.Bind(wx.EVT_MENU, self.OnLoadGraphFromText, item)
 
-        item = self.popupmenu.Append(wx.NewId(), "Dump Graph to console")
+        item = self.popupmenu.Append(wx.ID_ANY, "Dump Graph to console")
         self.frame.Bind(wx.EVT_MENU, self.OnSaveGraphToConsole, item)
 
         self.popupmenu.AppendSeparator()
 
-        item = self.popupmenu.Append(wx.NewId(), "Load Graph...")
+        item = self.popupmenu.Append(wx.ID_ANY, "Load Graph...")
         self.frame.Bind(wx.EVT_MENU, self.OnLoadGraph, item)
 
-        item = self.popupmenu.Append(wx.NewId(), "Save Graph...")
+        item = self.popupmenu.Append(wx.ID_ANY, "Save Graph...")
         self.frame.Bind(wx.EVT_MENU, self.OnSaveGraph, item)
 
         self.popupmenu.AppendSeparator()
 
-        item = self.popupmenu.Append(wx.NewId(), "DumpUmlWorkspace")
+        item = self.popupmenu.Append(wx.ID_ANY, "DumpUmlWorkspace")
         self.frame.Bind(wx.EVT_MENU, self.OnDumpUmlWorkspace, item)
 
         self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))
@@ -695,7 +696,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
                 HelpWindow.__init__(self, parent)
 
                 # CMD-W to close Frame by attaching the key bind event to accellerator table
-                randomId = wx.NewId()
+                randomId = wx.NewIdRef()  # was wx.NewId()
                 self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=randomId)
                 accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord("W"), randomId)])
                 self.SetAcceleratorTable(accel_tbl)

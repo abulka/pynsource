@@ -208,7 +208,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         # self.SetDiagram(DiagramAndy())  # ANDY HACK OGL
         self.GetDiagram().SetCanvas(self)
 
-        wx.EVT_WINDOW_DESTROY(self, self.OnDestroy)
+        self.Bind(wx.EVT_WINDOW_DESTROY, self.OnDestroy)
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
         self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
         self.Bind(wx.EVT_CHAR, self.onKeyChar)

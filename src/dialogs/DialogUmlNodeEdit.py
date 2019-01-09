@@ -26,7 +26,7 @@ class DialogUmlNodeEdit(wx.Dialog):
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
         )
 
-        self.SetSizeHintsSz(wx.DefaultSize, wx.DefaultSize)
+        self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
 
         bSizer9 = wx.BoxSizer(wx.VERTICAL)
 
