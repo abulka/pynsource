@@ -34,8 +34,11 @@ class CmdFileImportBase(CmdBase):  # BASE
                 # pmodel, debuginfo = old_parser(f)
                 # pmodel, debuginfo = new_parser(f)
                 mode = getattr(self, "mode", 2)
-                print(f"Importing Python in syntax mode {mode}")
+                # print(f"Importing Python in syntax mode {mode}")
                 pmodel, debuginfo = new_parser(f, options={"mode": mode})
+                if pmodel.errors:
+                    # print(pmodel.errors)
+                    self.context.wxapp.MessageBox(pmodel.errors)
 
                 # from parsing.dump_pmodel import dump_old_structure
                 # print dump_old_structure(pmodel)

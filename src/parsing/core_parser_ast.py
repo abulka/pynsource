@@ -105,6 +105,7 @@ class OldParseModel(object):
     def __init__(self):
         self.classlist = {}
         self.modulemethods = []
+        self.errors = ""
 
 
 def parse(filename, log=None, options={}):
@@ -128,20 +129,28 @@ def parse(filename, log=None, options={}):
     # NEW
     _mode = options.get("mode", 2)
     mode(_mode)
+    pmodel = OldParseModel()
+
+    if _mode == 2:
+        generic_help = "If you are parsing Python 3 code, check the menu item 'File/Python 3."
+    else:
+        generic_help = "If you are parsing Python 2 code, uncheck the menu item 'File/Python 3."
+    generic_help += "\n\nOr of course you may be dealing with a real syntax error :-)"
+    
     try:
         node = _ast_parse(filename)
     except SyntaxError as e:
-        print("Syntax error in parsing assuming Python %s syntax" % _mode)
         mode(0)  # reset
-        return OldParseModel(), ""
+        pmodel.errors = f"Syntax error in parsing\n'{filename}'\nassuming Python {_mode} syntax.\n\n{generic_help}"
+        return pmodel, ""
     except Exception as e:
-        print("General exception in parsing assuming Python %s syntax %s" % (_mode, e))
         mode(0)  # reset
-        return OldParseModel(), ""
+        pmodel.errors = f"General exception in parsing\n'{filename}'\nassuming Python {_mode} syntax - exception is: {e}.\n\n{generic_help}"
+        return pmodel, ""
 
-    pmodel, debuginfo = _convert_ast_to_old_parser(node, filename, log, options)
     mode(0)  # reset
-    return pmodel, debuginfo  # string of html
+    pmodel, debuginfo = _convert_ast_to_old_parser(node, filename, log, options)
+    return pmodel, debuginfo  # 'debuginfo' is string of html
 
 
 def _ast_parse(filename):
