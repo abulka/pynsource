@@ -101,10 +101,17 @@ def repairOGL():
     old_OnMouseEvent = wx.lib.ogl.canvas.ShapeCanvas.OnMouseEvent
 
     def new_OnMouseEvent(self, event):
+
+        # Original event handler causes a self.Draw() on the canvas
+        # which clears the background canvas and does a self.GetDiagram().Redraw(dc)
         old_OnMouseEvent(self, event)
+
         if event.Dragging():
-            print("draggging..............")
+            # looks like a wx.ScrolledWindow C++ low level call - this is the magic that is needed
             self.Refresh()
+        else:
+            # wasted refresh avoided because not dragging...
+            pass
 
     # moving
 
