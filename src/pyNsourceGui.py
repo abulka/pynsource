@@ -406,6 +406,12 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu1, "&Save As...", "Ctrl-S", self.OnSaveGraph)
         menu1.AppendSeparator()
         Add(menu1, "&Import Python Code...", "Ctrl-I", self.OnFileImport)
+
+        # New way of wiring things up - see https://wxpython.org/blog/avoiding-window-ids/index.html
+        self.item_python_mode = menu1.AppendCheckItem(wx.ID_ANY, "Python 3 mode", help="Assume Python syntax 2/3")
+        self.Bind(wx.EVT_MENU, self.OnPythonMode, self.item_python_mode)
+        self.item_python_mode.Check()
+
         menu1.AppendSeparator()
         Add(menu1, "&Print / Preview...", "Ctrl-P", self.FilePrint)
         menu1.AppendSeparator()
@@ -474,6 +480,9 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         menuBar.Append(menu4, "&Help")
         self.frame.SetMenuBar(menuBar)
+
+    def OnPythonMode(self, event):
+        print("python 3 syntax mode state now:", self.item_python_mode.IsChecked())
 
     def OnRightButtonMenu(self, event):  # Menu
         x, y = event.GetPosition()
