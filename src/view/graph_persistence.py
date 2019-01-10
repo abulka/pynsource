@@ -152,15 +152,17 @@ class GraphPersistence:
             if data["type"] == "meta":
                 pass
             if data["type"] == "umlshape":
-                if "comment" in data:
-                    print("comment detected!!!!!!!")
-                    node = self.graph.create_new_comment(
-                        data["id"], data["x"], data["y"], data["width"], data["height"]
-                    )
-                else:
-                    node = self.graph.create_new_node(
-                        data["id"], data["x"], data["y"], data["width"], data["height"]
-                    )
+                assert "comment" not in data
+                node = self.graph.create_new_node(
+                    data["id"], data["x"], data["y"], data["width"], data["height"]
+                )
+                self.graph.AddNode(node)
+                self.graph.node_from_persistence_str(node, data)
+            elif data["type"] == "comment":
+                assert "comment" in data
+                node = self.graph.create_new_comment(
+                    data["id"], data["x"], data["y"], data["width"], data["height"]
+                )
                 self.graph.AddNode(node)
                 self.graph.node_from_persistence_str(node, data)
             elif data["type"] == "edge":

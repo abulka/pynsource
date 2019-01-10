@@ -38,7 +38,7 @@ class UmlGraph(Graph):
         first string is a type, second string is the node representation as flat single str
         """
         if type(node) == CommentNode:
-            _type = "umlshape"  # TODO change to "comment"
+            _type = "comment"
             # encode comment as bas64 but decode it into str so that it doesn't get saved as b'..'r
             data = {"comment": f"{str(b64encode(node.comment.encode('utf-8')).decode('utf-8'))}"}
         else:
@@ -93,7 +93,7 @@ class UmlNode(GraphNode):
 
 class CommentNode(GraphNode):
     def __init__(self, id, left, top, width=60, height=60, comment=""):
-        GraphNode.__init__(self, id, left, top, width=60, height=60)
+        GraphNode.__init__(self, id, left, top, width, height)
         self.comment = comment
         self.shape = None
 

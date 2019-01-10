@@ -604,7 +604,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             shape.AddText(line)
 
         setpos(shape, node.left, node.top)
-        shape.SetSize(200, 90)
+        # shape.SetSize(node.width, node.height)  # this is already done!?
         # shape.SetDraggable(True, True)
         self.AddShape(shape)
         node.shape = shape
