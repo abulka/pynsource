@@ -5,6 +5,7 @@ from layout.line_intersection import FindLineIntersection
 from layout.permutations import getpermutations
 from common.architecture_support import listdiff
 from .graph_persistence import GraphPersistence
+from typing import List, Set, Dict, Tuple, Optional
 
 global_colour_index = 1
 
@@ -263,11 +264,17 @@ class Graph:
             id, l, t, w, h
         )  # subclasses to override, opportunity to create different instance type
 
-    def node_to_persistence_str(self, node):
-        return ""  # subclasses to override, opportunity to inject additional persistence dict info
+    def node_to_persistence_str(self, node) -> Tuple[str, str]:
+        """subclasses to override, opportunity to inject additional persistence dict info
+        first string is a type, second string is the node representation as flat single str
+        """
+        return "",""
 
-    def edge_to_persistence_str(self, edge):
-        return ""  # subclasses to override, opportunity to inject additional persistence dict info
+    def edge_to_persistence_str(self, edge) -> Tuple[str, str]:
+        """subclasses to override, opportunity to inject additional persistence dict info
+        first string is a type, second string is the node representation as flat single str
+        """
+        return "",""
 
     def node_from_persistence_str(self, node, data):
         pass  # subclasses to override, opportunity to add attributes to node, by ref

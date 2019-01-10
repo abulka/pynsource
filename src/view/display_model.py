@@ -6,6 +6,8 @@ import random
 import sys
 from .graph import Graph, GraphNode
 from base64 import b64encode
+from typing import List, Set, Dict, Tuple, Optional
+
 
 class UmlGraph(Graph):
     def create_new_node(self, id, l, t, w, h):
@@ -16,17 +18,44 @@ class UmlGraph(Graph):
         # subclasses overriding, opportunity to create different instance type
         return CommentNode(id, l, t, w, h)
 
-    def node_to_persistence_str(self, node):
-        # subclass overriding, opportunity to inject additional persistence dict info
-        if type(node) == CommentNode:
-            # encode comment as bas64 but decode it into str so that it doesn't get saved as b'..'r
-            return ", 'comment':'%s'" % str(b64encode(node.comment.encode("utf-8")).decode('utf-8'))
-        else:
-            return ", 'attrs':'%s', 'meths':'%s'" % ("|".join(node.attrs), "|".join(node.meths))
+    def _repr_flat(self, data: Dict) -> str:
+        """
+        Convert dictionary into a flat single string of k:v, k:v
+        with each key and value single quoted.
 
-    def edge_to_persistence_str(self, edge):
-        # subclass overriding, opportunity to inject additional persistence dict info
-        return ", 'uml_edge_type':'%s'" % (edge["uml_edge_type"])
+        Args:
+            data: dict
+
+        Returns: string
+        """
+        result = ""
+        for k,v in data.items():
+            result += f", '{k}': '{v}'"
+        return result
+
+    def node_to_persistence_str(self, node) -> Tuple[str, str]:
+        """subclasses to override, opportunity to inject additional persistence dict info
+        first string is a type, second string is the node representation as flat single str
+        """
+        if type(node) == CommentNode:
+            _type = "umlshape"  # TODO change to "comment"
+            # encode comment as bas64 but decode it into str so that it doesn't get saved as b'..'r
+            data = {"comment": f"{str(b64encode(node.comment.encode('utf-8')).decode('utf-8'))}"}
+        else:
+            _type = "umlshape"
+            data = {"attrs": "|".join(node.attrs),
+                    "meths": "|".join(node.meths)}
+        return _type, self._repr_flat(data)
+
+    def edge_to_persistence_str(self, edge) -> Tuple[str, str]:
+        """subclasses to override, opportunity to inject additional persistence dict info
+        first string is a type, second string is the node representation as flat single str
+
+        No need to specify 'source' and 'target' as this is done by the graph persistence save
+        along with the id, left, top etc.
+        """
+        data = {"uml_edge_type": edge['uml_edge_type']}
+        return "edge", self._repr_flat(data)
 
     def node_from_persistence_str(self, node, data):
         # subclass overriding, opportunity to add attributes to node
