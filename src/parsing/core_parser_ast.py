@@ -148,8 +148,8 @@ def parse(filename, log=None, options={}):
         pmodel.errors = f"General exception in parsing\n'{filename}'\nassuming Python {_mode} syntax - exception is: {e}.\n\n{generic_help}"
         return pmodel, ""
 
-    mode(0)  # reset
     pmodel, debuginfo = _convert_ast_to_old_parser(node, filename, log, options)
+    mode(0)  # reset
     return pmodel, debuginfo  # 'debuginfo' is string of html
 
 

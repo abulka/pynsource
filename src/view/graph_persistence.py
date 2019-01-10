@@ -120,6 +120,11 @@ class GraphPersistence:
 
             for i in range(2, len(self.filedata_list)):
                 self.filedata_list[i] = re.sub("'node'", "'umlshape'", self.filedata_list[i])
+        elif to_vers == 1.2:
+            """
+            No changes, just new comment shapes added, but these are currently still
+            'umlshape' objects with different attributes - a bit dodgy TODO revise this approach
+            """
         else:
             print("Don't know how to upgrade persistence format to %f" % to_vers)
 
