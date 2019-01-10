@@ -8,15 +8,15 @@ from .graph import Graph, GraphNode
 from base64 import b64encode
 
 class UmlGraph(Graph):
-    def NotifyCreateNewNode(self, id, l, t, w, h):
+    def create_new_node(self, id, l, t, w, h):
         # subclasses overriding, opportunity to create different instance type
         return UmlNode(id, l, t, w, h)
 
-    def NotifyCreateNewCommentNode(self, id, l, t, w, h):
+    def create_new_comment(self, id, l, t, w, h):
         # subclasses overriding, opportunity to create different instance type
         return CommentNode(id, l, t, w, h)
 
-    def NotifyOfNodeBeingPersisted(self, node):
+    def node_to_persistence_str(self, node):
         # subclass overriding, opportunity to inject additional persistence dict info
         if type(node) == CommentNode:
             # encode comment as bas64 but decode it into str so that it doesn't get saved as b'..'r
@@ -24,11 +24,11 @@ class UmlGraph(Graph):
         else:
             return ", 'attrs':'%s', 'meths':'%s'" % ("|".join(node.attrs), "|".join(node.meths))
 
-    def NotifyOfEdgeBeingPersisted(self, edge):
+    def edge_to_persistence_str(self, edge):
         # subclass overriding, opportunity to inject additional persistence dict info
         return ", 'uml_edge_type':'%s'" % (edge["uml_edge_type"])
 
-    def NotifyOfNodeCreateFromPersistence(self, node, data):
+    def node_from_persistence_str(self, node, data):
         # subclass overriding, opportunity to add attributes to node
         if data.get("attrs", ""):
             node.attrs = data["attrs"].split("|")
@@ -40,7 +40,7 @@ class UmlGraph(Graph):
             # b = comment.decode('utf-8')
             node.comment = b64decode(comment).decode('utf-8')
 
-    def NotifyOfEdgeCreateFromPersistence(self, edge, data):
+    def edge_from_persistence_str(self, edge, data):
         # subclass overriding, opportunity to add attributes to edge
         if data.get("uml_edge_type", ""):
             edge["uml_edge_type"] = data["uml_edge_type"]

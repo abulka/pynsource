@@ -123,7 +123,7 @@ class CmdBuildColourChartWorkspace(CmdBase):
         x = y = 10
         for clr in clrs:
             # print clr
-            node = graph.NotifyCreateNewNode("%d %s" % (index, clr), x, y, 100, NODE_HEIGHT)
+            node = graph.create_new_node("%d %s" % (index, clr), x, y, 100, NODE_HEIGHT)
             graph.AddNode(node)
             index += 1
             y += NODE_HEIGHT + 5

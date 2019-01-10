@@ -47,8 +47,8 @@ class Graph:
         # Uniqueness of this edge relationship must be ensured by caller!
         #
         # Cannot add duplicate protection here, since there are call chains like:
-        # LoadGraphFromStrings -> AddEdge -> NotifyOfEdgeCreateFromPersistence
-        #     -> subclasses of this graph intercept NotifyOfEdgeCreateFromPersistence
+        # LoadGraphFromStrings -> AddEdge -> edge_from_persistence_str
+        #     -> subclasses of this graph intercept edge_from_persistence_str
         #        and add extra attributes to the edge, thus potentially making it
         #        the same or different to another existing edge.  We simply cannot
         #        tell at this point.
@@ -258,21 +258,21 @@ class Graph:
     def GraphToString(self):
         return self.persistence.Save()
 
-    def NotifyCreateNewNode(self, id, l, t, w, h):
+    def create_new_node(self, id, l, t, w, h):
         return GraphNode(
             id, l, t, w, h
         )  # subclasses to override, opportunity to create different instance type
 
-    def NotifyOfNodeBeingPersisted(self, node):
+    def node_to_persistence_str(self, node):
         return ""  # subclasses to override, opportunity to inject additional persistence dict info
 
-    def NotifyOfEdgeBeingPersisted(self, edge):
+    def edge_to_persistence_str(self, edge):
         return ""  # subclasses to override, opportunity to inject additional persistence dict info
 
-    def NotifyOfNodeCreateFromPersistence(self, node, data):
+    def node_from_persistence_str(self, node, data):
         pass  # subclasses to override, opportunity to add attributes to node, by ref
 
-    def NotifyOfEdgeCreateFromPersistence(self, edge, data):
+    def edge_from_persistence_str(self, edge, data):
         pass  # subclasses to override, opportunity to add attributes to edge, by ref
 
     def GetMementoOfLayoutPoints(self):

@@ -14,7 +14,7 @@
 {'type':'node', 'id':'Frame', 'x':105, 'y':576, 'width':100, 'height':30, 'attrs':'', 'meths':''}
 {'type':'node', 'id':'ImageViewer', 'x':106, 'y':641, 'width':100, 'height':30, 'attrs':'', 'meths':''}
 {'type':'node', 'id':'UmlNode', 'x':1497, 'y':467, 'width':87, 'height':157, 'attrs':'attrs|meths|id', 'meths':'__init__|get_id|set_id'}
-{'type':'node', 'id':'UmlGraph', 'x':1258, 'y':690, 'width':274, 'height':141, 'attrs':'', 'meths':'NotifyCreateNewNode|NotifyOfNodeBeingPersisted|NotifyOfEdgeBeingPersisted|NotifyOfNodeCreateFromPersistence|NotifyOfEdgeCreateFromPersistence'}
+{'type':'node', 'id':'UmlGraph', 'x':1258, 'y':690, 'width':274, 'height':141, 'attrs':'', 'meths':'create_new_node|node_to_persistence_str|edge_to_persistence_str|node_from_persistence_str|edge_from_persistence_str'}
 {'type':'node', 'id':'GraphNode', 'x':1435, 'y':400, 'width':100, 'height':30, 'attrs':'', 'meths':''}
 {'type':'node', 'id':'Graph', 'x':1280, 'y':630, 'width':100, 'height':30, 'attrs':'', 'meths':''}
 {'type':'edge', 'id':'UmlShapeCanvas_to_ogl', 'source':'UmlShapeCanvas', 'target':'ogl', 'uml_edge_type':'generalisation'}

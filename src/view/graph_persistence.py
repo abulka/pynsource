@@ -154,15 +154,15 @@ class GraphPersistence:
             if data["type"] == "umlshape":
                 if "comment" in data:
                     print("comment detected!!!!!!!")
-                    node = self.graph.NotifyCreateNewCommentNode(
+                    node = self.graph.create_new_comment(
                         data["id"], data["x"], data["y"], data["width"], data["height"]
                     )
                 else:
-                    node = self.graph.NotifyCreateNewNode(
+                    node = self.graph.create_new_node(
                         data["id"], data["x"], data["y"], data["width"], data["height"]
                     )
                 self.graph.AddNode(node)
-                self.graph.NotifyOfNodeCreateFromPersistence(node, data)
+                self.graph.node_from_persistence_str(node, data)
             elif data["type"] == "edge":
                 source_id = data["source"]
                 target_id = data["target"]
@@ -178,7 +178,7 @@ class GraphPersistence:
                 edge = self.graph.AddEdge(
                     sourcenode, targetnode, weight
                 )  # AddEdge takes node objects as parameters
-                self.graph.NotifyOfEdgeCreateFromPersistence(
+                self.graph.edge_from_persistence_str(
                     edge, data
                 )  # e.g. UmlGraph class would add edge['uml_edge_type'] if it exists in data
 
@@ -202,7 +202,7 @@ class GraphPersistence:
             nodes += "{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin. Comments are saved.'}\n"
 
         for node in self.graph.nodes:
-            subclass_persistence_str = self.graph.NotifyOfNodeBeingPersisted(node)
+            subclass_persistence_str = self.graph.node_to_persistence_str(node)
             str = "{'type':'umlshape', 'id':'%s', 'x':%d, 'y':%d, 'width':%d, 'height':%d%s}\n" % (
                 node.id,
                 node.left,
@@ -215,7 +215,7 @@ class GraphPersistence:
         for edge in self.graph.edges:
             source = edge["source"].id
             target = edge["target"].id
-            subclass_persistence_str = self.graph.NotifyOfEdgeBeingPersisted(edge)
+            subclass_persistence_str = self.graph.edge_to_persistence_str(edge)
             str = "{'type':'edge', 'id':'%s_to_%s', 'source':'%s', 'target':'%s'%s}\n" % (
                 source,
                 target,
