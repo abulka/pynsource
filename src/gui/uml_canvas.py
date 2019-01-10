@@ -11,31 +11,24 @@ import random
 from generate_code.gen_java import PySourceAsJava
 
 from view.display_model import DisplayModel
-
+from view.display_model import CommentNode
 from .uml_shapes import *
 from .coord_utils import setpos, getpos, Move2
-
 from layout.layout_basic import LayoutBasic
-
 from layout.snapshots import GraphSnapshotMgr
 from layout.layout_spring import GraphLayoutSpring
 from layout.overlap_removal import OverlapRemoval
 from layout.coordinate_mapper import CoordinateMapper
-
 from .canvas_resizer import CanvasResizer
-
 import wx
 import wx.lib.ogl as ogl
-
 from .uml_shape_handler import UmlShapeHandler
-
 from common.architecture_support import *
 
-ogl.Shape.Move2 = Move2
-
 from gui.repair_ogl import repairOGL
-
 repairOGL()
+
+ogl.Shape.Move2 = Move2
 
 # class DiagramAndy(ogl.Diagram):
 #
@@ -720,7 +713,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         if translatecoords:
             self.AllToWorldCoords()
 
-        # Clear existing visualisation
+        # Clear existing visualisation, including lines
         for node in self.displaymodel.graph.nodes:
             if node.shape:
                 self.delete_shape_view(node.shape)
@@ -729,7 +722,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         # Create fresh visualisation
         for node in self.displaymodel.graph.nodes:
             assert not node.shape
-            if hasattr(node, "comment"):
+            if isinstance(node, CommentNode) or hasattr(node, "comment"):
                 shape = self.createCommentShape(node)
             else:
                 shape = self.CreateUmlShape(node)
