@@ -226,6 +226,12 @@ class DisplayModel:
 
         Note: A graph node is not a ogl shape!
 
+        Position is random.  Size is set to resonable defaults.  This method
+        only gets called by the UI creation of comments.  When loading from
+        persistence, GraphPersistence.Load and UmlGraph.create_new_comment
+        do the same work and respect the size of the node coming from disk
+        thus no randomisation or default size setting then.
+
         Args:
             id: random string id, randomised by the called e.g. D1788.
                 For example CmdInsertComment allocates the id, pops up
@@ -241,8 +247,8 @@ class DisplayModel:
         t, l, w, h = (
             random.randint(0, 100),
             random.randint(0, 100),
-            random.randint(60, 160),
-            random.randint(60, 160),
+            200, # random.randint(60, 160),
+            100, # random.randint(60, 160),
         )
         node = CommentNode(id, t, l, w, h, comment=comment)
         node = self.graph.AddNode(node)
