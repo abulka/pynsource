@@ -4,12 +4,14 @@ from parsing.api import old_parser, new_parser
 from parsing.dump_pmodel import dump_old_structure
 from view.display_model import DisplayModel
 
+
 def parse_source(source_code, options):
     with tempfile.NamedTemporaryFile(mode="wt") as temp:  # TODO use streams not temporary files
         temp.write(source_code)
         temp.flush()
         pmodel, debuginfo = new_parser(temp.name, options)
     return pmodel, debuginfo
+
 
 class TestCaseDisplayModel(unittest.TestCase):
     def test_no_duplicate_edges(self):
@@ -42,7 +44,6 @@ class Fred(Mary, Sam):
         # dmodel.Dump()
         self.assertEqual(len(dmodel.graph.nodes), 3)
         self.assertEqual(len(dmodel.graph.edges), 2)  # <---- THIS IS FAILING
-
 
     def test_merge_attrs(self):
         """
@@ -89,19 +90,22 @@ class Fred(Mary):
 
         # check the parsemodel
         # self.assertEqual(list(pmodel1.classlist.keys()), ["Fred", "Mary"])   # seems that parent doesn't get officially created
-        self.assertEqual(pmodel2.classlist["Fred"].attrs[0].attrname, 'attr1')   # the point of this test
-        self.assertEqual(pmodel2.classlist["Fred"].defs, ['__init__', 'method1'])  # the point of this test
+
+        # the main point of this test
+        self.assertEqual(pmodel2.classlist["Fred"].attrs[0].attrname, "attr1")
+        self.assertEqual(pmodel2.classlist["Fred"].defs, ["__init__", "method1"])
+
         # check the displaymodel
         self.assertEqual(len(dmodel.graph.nodes), 2)
         self.assertEqual(len(dmodel.graph.edges), 1)  # relies on edge duplicate protection fix
         node = dmodel.graph.FindNodeById("Fred")
         # test the merging has occurred
-        self.assertEqual(node.attrs, ['attr1'])
-        self.assertCountEqual(node.meths, ['__init__', 'method1']) # relies on edge duplicate fix
+        self.assertEqual(node.attrs, ["attr1"])
+        self.assertCountEqual(node.meths, ["__init__", "method1"])  # relies on edge duplicate fix
 
 
 """
-Differences to alsm
+Differences between old parser model used in pynsource and GitUML alsm
 
 OLD PARSE MODEL             GITUML 
 USED BY PYNSOURCE           ALSM                        TYPE
@@ -118,91 +122,6 @@ ClassEntry
     
     .ismodulenotrealclass   no equivalent cos an alsm 
                             represents a module
-    
-"""
 
-#     def test_incoming_bugs(self):
-#         source_code = """
-# class Incoming1:
-#     def HandlePowerOperator(self):
-#         x = 10**2
-#         print(x)
-#
-# a = Incoming1()
-# a.HandlePowerOperator()
-#         """
-#         alsm = self.parse_to_alsm(source_code)
-#         # TODO(alsm): Fix module attributes - 'a'
-#         self.assertIsNone(alsm.error)
-#         self.assertEqual(alsm.functions, [])
-#         self.assertEqual(list(alsm.classes.keys()), ["Incoming1"])
-#         self.assertEqual(alsm.classes["Incoming1"].methods, ["HandlePowerOperator"])
-#         class_attributes = [
-#             (x.attr_name, x.attr_type) for x in alsm.classes["Incoming1"].attributes
-#         ]
-#         self.assertEqual(class_attributes, [])
-#         self.assertEqual(alsm.classes["Incoming1"].classes_inherits_from, [])
-#
-#
-# import unittest
-# from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
-#
-#
-# class TestCase08(unittest.TestCase):
-#     def setUp(self):
-#         pass
-#
-#     def test01(self):
-#         """
-#         """
-#         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule08_multiple_inheritance.py"
-#
-#         # self.p, debuginfo = old_parser(FILE)
-#         self.p, debuginfo = new_parser(FILE)
-#
-#         # print self.p
-#
-#         # -------------------------------------------------------
-#
-#         gotevent1 = 0
-#         gotevent2 = 0
-#         gotevent3 = 0
-#         gotevent4 = 0
-#         gotevent5 = 0
-#         gotevent6 = 0
-#         gotevent7 = 0
-#
-#         for classname, classentry in list(self.p.classlist.items()):
-#             if classname == "Fred":
-#                 gotevent1 = 1
-#                 assert classentry.classesinheritsfrom == [
-#                     "Mary",
-#                     "Sam",
-#                 ], classentry.classesinheritsfrom
-#
-#             if classname == "MarySam":
-#                 gotevent3 = False  # should not get this
-#
-#         assert gotevent1
-#         assert not gotevent3
-#
-#     def test_parse_power_operator(self):
-#         """
-#         """
-#         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule11_incoming_bugs.py"
-#
-#         # self.p, debuginfo = old_parser(FILE)
-#         self.p, debuginfo = new_parser(FILE)
-#
-#         # print self.p
-#
-#         # -------------------------------------------------------
-#
-#         gotevent1 = 0
-#         gotevent2 = 0
-#
-#         for classname, classentry in list(self.p.classlist.items()):
-#             if classname == "Incoming1":
-#                 gotevent1 = 1
-#
-#         assert gotevent1
++ other differences not documented yet.    
+"""

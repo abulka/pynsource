@@ -19,6 +19,7 @@ class CmdFileNew(CmdBase):
         self.context.wxapp.set_app_title("(Untitled)")
         self.context.umlcanvas.mega_refresh()
 
+
 # ----- Importing python source code
 
 

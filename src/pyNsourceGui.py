@@ -408,7 +408,9 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu1, "&Import Python Code...", "Ctrl-I", self.OnFileImport)
 
         # New way of wiring things up - see https://wxpython.org/blog/avoiding-window-ids/index.html
-        self.item_python3_mode = menu1.AppendCheckItem(wx.ID_ANY, "Python 3 mode", help="Assume Python syntax 2/3")
+        self.item_python3_mode = menu1.AppendCheckItem(
+            wx.ID_ANY, "Python 3 mode", help="Assume Python syntax 2/3"
+        )
         self.Bind(wx.EVT_MENU, self.OnPythonMode, self.item_python3_mode)
         self.item_python3_mode.Check()
 
@@ -668,7 +670,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnCheckForUpdates(self, event):
         import urllib.request, urllib.error, urllib.parse
 
-        s = urllib.request.urlopen(WEB_VERSION_CHECK_URL).read().decode('utf-8')
+        s = urllib.request.urlopen(WEB_VERSION_CHECK_URL).read().decode("utf-8")
         s = s.replace("\r", "")
         info = eval(s)
         ver = info["latest_version"]
@@ -683,7 +685,9 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
                 webbrowser.open(info["download_url"])
         elif ver < APP_VERSION:
-            self.MessageBox(f"You seem to have a pre-release version {APP_VERSION} - congratulations!  Stable version is {ver}")
+            self.MessageBox(
+                f"You seem to have a pre-release version {APP_VERSION} - congratulations!  Stable version is {ver}"
+            )
         else:
             self.MessageBox("You already have the latest version:  %s" % APP_VERSION)
 

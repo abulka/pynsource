@@ -7,6 +7,8 @@ import sys
 from .graph import Graph, GraphNode
 from base64 import b64encode
 from typing import List, Set, Dict, Tuple, Optional
+from pprint import pprint
+from base64 import b64decode
 
 
 class UmlGraph(Graph):
@@ -29,7 +31,7 @@ class UmlGraph(Graph):
         Returns: string
         """
         result = ""
-        for k,v in data.items():
+        for k, v in data.items():
             result += f", '{k}': '{v}'"
         return result
 
@@ -43,8 +45,7 @@ class UmlGraph(Graph):
             data = {"comment": f"{str(b64encode(node.comment.encode('utf-8')).decode('utf-8'))}"}
         else:
             _type = "umlshape"
-            data = {"attrs": "|".join(node.attrs),
-                    "meths": "|".join(node.meths)}
+            data = {"attrs": "|".join(node.attrs), "meths": "|".join(node.meths)}
         return _type, self._repr_flat(data)
 
     def edge_to_persistence_str(self, edge) -> Tuple[str, str]:
@@ -54,7 +55,7 @@ class UmlGraph(Graph):
         No need to specify 'source' and 'target' as this is done by the graph persistence save
         along with the id, left, top etc.
         """
-        data = {"uml_edge_type": edge['uml_edge_type']}
+        data = {"uml_edge_type": edge["uml_edge_type"]}
         return "edge", self._repr_flat(data)
 
     def node_from_persistence_str(self, node, data):
@@ -64,10 +65,8 @@ class UmlGraph(Graph):
         if data.get("meths", ""):
             node.meths = data["meths"].split("|")
         if data.get("comment", ""):
-            from base64 import b64decode
-            comment = data["comment"]  # TODO need to base64 decode this
-            # b = comment.decode('utf-8')
-            node.comment = b64decode(comment).decode('utf-8')
+            comment = data["comment"]
+            node.comment = b64decode(comment).decode("utf-8")
 
     def edge_from_persistence_str(self, edge, data):
         # subclass overriding, opportunity to add attributes to edge
@@ -164,8 +163,6 @@ class DisplayModel:
         def line(ch="-"):
             return ch * 70
 
-        from pprint import pprint
-
         print()
         print("     DisplayModel    ")
         print()
@@ -195,10 +192,9 @@ class DisplayModel:
         """
         adds new attrs and meths into existing node, avoiding duplicates
         """
-        # return # TODO uncomment when have failing test, which this will then fix
         node.attrs = list(set(attrs + node.attrs))
         node.meths = list(set(meths + node.meths))
-        
+
     def AddUmlNode(self, id, attrs=[], meths=[]):
         node = self.graph.FindNodeById(id)
         if node:
@@ -227,15 +223,14 @@ class DisplayModel:
         add to the dict here. Hmm. Another reason is that Graph.AddEdge() auto creates nodes
         if they don't exist.  Attempts at duplicate protection inside Graph.AddEdge()
         were abandoned (see explanation there) but we are retrying here!  Good luck!.
+        Update: duplicate edge protection seems to be working ok.
 
         Returns: - 
         """
-        DUPLICATE_PROTECTION = True
         edge = self.graph.FindEdge(from_node, to_node, edge_type)
         if edge:
-            # print('Duplcate edge detected', edge, 'already exists...', "DUPLICATE_PROTECTION is", DUPLICATE_PROTECTION)
-            if DUPLICATE_PROTECTION:
-                return
+            # print('Duplicate edge detected', edge, 'already exists...', "DUPLICATE_PROTECTION is", DUPLICATE_PROTECTION)
+            return
         edge = self.graph.AddEdge(from_node, to_node)
         edge["uml_edge_type"] = edge_type
 
@@ -258,7 +253,7 @@ class DisplayModel:
 
         Note: A graph node is not a ogl shape!
 
-        Position is random.  Size is set to resonable defaults.  This method
+        Position is random.  Size is set to reasonable defaults.  This method
         only gets called by the UI creation of comments.  When loading from
         persistence, GraphPersistence.Load and UmlGraph.create_new_comment
         do the same work and respect the size of the node coming from disk
@@ -279,8 +274,8 @@ class DisplayModel:
         t, l, w, h = (
             random.randint(0, 100),
             random.randint(0, 100),
-            200, # random.randint(60, 160),
-            100, # random.randint(60, 160),
+            200,  # random.randint(60, 160),
+            100,  # random.randint(60, 160),
         )
         node = CommentNode(id, t, l, w, h, comment=comment)
         node = self.graph.AddNode(node)
@@ -316,7 +311,9 @@ class DisplayModel:
             for fromClassname, toClassname in association_tuples:
                 from_node = self.AddUmlNode(fromClassname)
                 to_node = self.AddUmlNode(toClassname)
-                edge = self.AddUmlEdge(from_node, to_node, edge_type)  # incl. duplicate protection in here
+                edge = self.AddUmlEdge(
+                    from_node, to_node, edge_type
+                )  # incl. duplicate protection in here
 
         def AddGeneralisation(classname, parentclass):
             if (classname, parentclass) in self.associations_generalisation:
@@ -331,7 +328,6 @@ class DisplayModel:
             self.associations_composition.append(
                 (otherclass, classname)
             )  # reverse direction so round black arrows look ok
-
 
         # MAIN ALGORITHM BEGINS HERE
 
@@ -364,5 +360,3 @@ class DisplayModel:
 
         build_edges(self.associations_generalisation, "generalisation")
         build_edges(self.associations_composition, "composition")
-
-

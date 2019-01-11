@@ -52,11 +52,13 @@ class Graph:
         AddEdge complains that it cannot do duplicate protection, but
         we need it and I don't see why this Find function won't work.
         """
-        edge : Dict[str, GraphNode]  # e.g. {"source": source_node, "target": target_node}
+        edge: Dict[str, GraphNode]  # e.g. {"source": source_node, "target": target_node}
         for edge in self.edges:
-            if edge["source"] == from_node and \
-               edge["target"] == to_node and \
-               edge.get("uml_edge_type", "") == edge_type:
+            if (
+                edge["source"] == from_node
+                and edge["target"] == to_node
+                and edge.get("uml_edge_type", "") == edge_type
+            ):
                 return edge
         return None
 
@@ -284,13 +286,13 @@ class Graph:
         """subclasses to override, opportunity to inject additional persistence dict info
         first string is a type, second string is the node representation as flat single str
         """
-        return "",""
+        return "", ""
 
     def edge_to_persistence_str(self, edge) -> Tuple[str, str]:
         """subclasses to override, opportunity to inject additional persistence dict info
         first string is a type, second string is the node representation as flat single str
         """
-        return "",""
+        return "", ""
 
     def node_from_persistence_str(self, node, data):
         pass  # subclasses to override, opportunity to add attributes to node, by ref

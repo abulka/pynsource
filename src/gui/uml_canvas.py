@@ -26,6 +26,7 @@ from .uml_shape_handler import UmlShapeHandler
 from common.architecture_support import *
 
 from gui.repair_ogl import repairOGL
+
 repairOGL()
 
 ogl.Shape.Move2 = Move2
