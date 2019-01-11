@@ -37,6 +37,7 @@ class CmdColourSiblings(CmdBase):
             node.shape.SetBrush(colour)
             # print "colour_index", node.id, node.colour_index, clr
         umlcanvas.Redraw(dc)
+        self.context.frame.Layout()  # needed when running phoenix
 
 
 class CmdCycleColours(CmdBase):
@@ -70,6 +71,7 @@ class CmdCycleColours(CmdBase):
         for node in self.context.displaymodel.graph.nodes:
             node.shape.SetBrush(self.colour)
         umlcanvas.Redraw(dc)
+        self.context.frame.Layout()  # needed when running phoenix
 
 
 class CmdColourSequential(CmdBase):
