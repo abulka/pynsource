@@ -32,14 +32,14 @@ class Fred(Mary, Sam):
 
         dmodel = DisplayModel()
         dmodel.ConvertParseModelToUmlModel(pmodel)
-        dmodel.Dump()
+        # dmodel.Dump()
         self.assertEqual(len(dmodel.graph.nodes), 3)
         self.assertEqual(len(dmodel.graph.edges), 2)
         print("display model", dmodel)
 
         # again - should not cause extra edges to be created
         dmodel.ConvertParseModelToUmlModel(pmodel)
-        dmodel.Dump()
+        # dmodel.Dump()
         self.assertEqual(len(dmodel.graph.nodes), 3)
         self.assertEqual(len(dmodel.graph.edges), 2)  # <---- THIS IS FAILING
 
@@ -70,7 +70,8 @@ class Fred(Mary):
 
         # first parse of class Fred - no attributes or methods, but inherits from Mary
         dmodel.ConvertParseModelToUmlModel(pmodel1)
-        dmodel.Dump()
+        # dmodel.Dump()
+
         # check the parsemodel
         # self.assertEqual(list(pmodel1.classlist.keys()), ["Fred", "Mary"])   # seems that parent doesn't get officially created
         self.assertEqual(pmodel1.classlist["Fred"].attrs, [])
@@ -84,18 +85,19 @@ class Fred(Mary):
 
         # second parse of class Fred - one attributes one method, and still inherits from Mary
         dmodel.ConvertParseModelToUmlModel(pmodel2)
-        dmodel.Dump()
+        # dmodel.Dump()
+
         # check the parsemodel
         # self.assertEqual(list(pmodel1.classlist.keys()), ["Fred", "Mary"])   # seems that parent doesn't get officially created
-        self.assertEqual(pmodel1.classlist["Fred"].attrs, ['attr1'])   # the point of this test
-        self.assertEqual(pmodel1.classlist["Fred"].defs, ['method1'])  # the point of this test
+        self.assertEqual(pmodel2.classlist["Fred"].attrs[0].attrname, 'attr1')   # the point of this test
+        self.assertEqual(pmodel2.classlist["Fred"].defs, ['__init__', 'method1'])  # the point of this test
         # check the displaymodel
         self.assertEqual(len(dmodel.graph.nodes), 2)
-        self.assertEqual(len(dmodel.graph.edges), 1)
+        self.assertEqual(len(dmodel.graph.edges), 1)  # relies on edge duplicate protection fix
         node = dmodel.graph.FindNodeById("Fred")
         # test the merging has occurred
         self.assertEqual(node.attrs, ['attr1'])
-        self.assertEqual(node.meths, ['method1'])
+        self.assertEqual(set(node.meths), set(['__init__', 'method1']))  # relies on edge duplicate fix
 
 
 

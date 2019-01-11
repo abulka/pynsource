@@ -195,9 +195,9 @@ class DisplayModel:
         """
         adds new attrs and meths into existing node, avoiding duplicates
         """
-        return # TODO uncomment when have failing test, which this will then fix
+        # return # TODO uncomment when have failing test, which this will then fix
         node.attrs = list(set(attrs + node.attrs))
-        node.meths += list(set(meths + node.meths))
+        node.meths = list(set(meths + node.meths))
         
     def AddUmlNode(self, id, attrs=[], meths=[]):
         node = self.graph.FindNodeById(id)
@@ -230,10 +230,10 @@ class DisplayModel:
 
         Returns: - 
         """
-        DUPLICATE_PROTECTION = False
+        DUPLICATE_PROTECTION = True
         edge = self.graph.FindEdge(from_node, to_node, edge_label)
         if edge:
-            print('Duplcate edge detected', edge, 'already exists...', "DUPLICATE_PROTECTION is", DUPLICATE_PROTECTION)
+            # print('Duplcate edge detected', edge, 'already exists...', "DUPLICATE_PROTECTION is", DUPLICATE_PROTECTION)
             if DUPLICATE_PROTECTION:
                 return
         edge = self.graph.AddEdge(from_node, to_node)
@@ -350,7 +350,7 @@ class DisplayModel:
                     #    parentclass = parentclass.split('.')[0] # take the lhs
                     AddGeneralisation(classname, parentclass)
 
-            classAttrs = [attrobj.attrname for attrobj in classentry.attrs]  # TODO what type is each attr?
+            classAttrs = [attrobj.attrname for attrobj in classentry.attrs]  # type Attribute class
             classMeths = classentry.defs
             node = self.AddUmlNode(classname, classAttrs, classMeths)
 
