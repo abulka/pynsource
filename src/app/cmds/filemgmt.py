@@ -43,7 +43,7 @@ class CmdFileImportBase(CmdBase):  # BASE
                 # from parsing.dump_pmodel import dump_old_structure
                 # print dump_old_structure(pmodel)
 
-                self.context.displaymodel.ConvertParseModelToUmlModel(pmodel)
+                self.context.displaymodel.build_displaymodel(pmodel)
 
                 # p = PySourceAsJava()
                 # p.optionModuleAsClass = 0

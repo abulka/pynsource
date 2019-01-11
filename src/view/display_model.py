@@ -286,7 +286,7 @@ class DisplayModel:
         node = self.graph.AddNode(node)
         return node
 
-    def ConvertParseModelToUmlModel(self, p):  # TODO rename convert_parsemodel_to_displaymodel
+    def build_displaymodel(self, p):
         """
         Builds a displaymodel from pmodel 'p'
 
@@ -300,7 +300,7 @@ class DisplayModel:
             self.associations_generalisation
         2. Then we 
             self.AddUmlNode with its attrs and methods
-        3. Lastly we create the edges by calling BuildEdgeModel(), which goes through 
+        3. Lastly we create the edges by calling build_edges(), which goes through
             each association that we created in step 1 and attempts to create the uml node
             on either end. It uses AddUmlNode().  Most probably the node already exists
             and will not be created twice. AddUmlNode is smart - it even now merges attrs/meths.
@@ -312,7 +312,7 @@ class DisplayModel:
         owns all those other classes.
         """
 
-        def BuildEdgeModel(association_tuples, edge_type):  # TODO rename build_edges()
+        def build_edges(association_tuples, edge_type):
             for fromClassname, toClassname in association_tuples:
                 from_node = self.AddUmlNode(fromClassname)
                 to_node = self.AddUmlNode(toClassname)
@@ -362,29 +362,7 @@ class DisplayModel:
             self.associations_generalisation
         ), self.associations_generalisation  # ensure no duplicates exist
 
-        BuildEdgeModel(self.associations_generalisation, "generalisation")
-        BuildEdgeModel(self.associations_composition, "composition")
+        build_edges(self.associations_generalisation, "generalisation")
+        build_edges(self.associations_composition, "composition")
 
-"""
-Plan.
 
-Two bugs we are trying to fix.
-1. duplicate edges when add to displaymodel from parsemodel twice
-2. when add multiple parseemodels to the displaymodel classes can miss out on their
-     full set of attrs/methods depending on the order of pmodels. (cos not merging)
-     
-write test for 1 DONE
-write test for 2 DONE
-
-DONE make test 1 pass by DUPLICATE_PROTECTION = True above
-DONE make test 2 pass by uncommenting code in merge_attrs_and_meths
-
-DONE run all tests to ensure duplicate protection isn't breaking things
-
-DONE rename edge_label to edge_type
-
-rename def ConvertParseModelToUmlModel(self, p):  to  convert_parsemodel_to_displaymodel
-  or perhaps just rename it
-  build_displaymodel()
-
-"""

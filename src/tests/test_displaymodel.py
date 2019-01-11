@@ -31,14 +31,14 @@ class Fred(Mary, Sam):
         # Now convert to a display model
 
         dmodel = DisplayModel()
-        dmodel.ConvertParseModelToUmlModel(pmodel)
+        dmodel.build_displaymodel(pmodel)
         # dmodel.Dump()
         self.assertEqual(len(dmodel.graph.nodes), 3)
         self.assertEqual(len(dmodel.graph.edges), 2)
-        print("display model", dmodel)
+        # print("display model", dmodel)
 
         # again - should not cause extra edges to be created
-        dmodel.ConvertParseModelToUmlModel(pmodel)
+        dmodel.build_displaymodel(pmodel)
         # dmodel.Dump()
         self.assertEqual(len(dmodel.graph.nodes), 3)
         self.assertEqual(len(dmodel.graph.edges), 2)  # <---- THIS IS FAILING
@@ -69,7 +69,7 @@ class Fred(Mary):
         dmodel = DisplayModel()
 
         # first parse of class Fred - no attributes or methods, but inherits from Mary
-        dmodel.ConvertParseModelToUmlModel(pmodel1)
+        dmodel.build_displaymodel(pmodel1)
         # dmodel.Dump()
 
         # check the parsemodel
@@ -84,7 +84,7 @@ class Fred(Mary):
         self.assertEqual(node.meths, [])
 
         # second parse of class Fred - one attributes one method, and still inherits from Mary
-        dmodel.ConvertParseModelToUmlModel(pmodel2)
+        dmodel.build_displaymodel(pmodel2)
         # dmodel.Dump()
 
         # check the parsemodel
