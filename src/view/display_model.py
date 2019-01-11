@@ -233,7 +233,7 @@ class DisplayModel:
         DUPLICATE_PROTECTION = False
         edge = self.graph.FindEdge(from_node, to_node, edge_label)
         if edge:
-            print('Duplcate edge detected', edge, 'already exists...')
+            print('Duplcate edge detected', edge, 'already exists...', "DUPLICATE_PROTECTION is", DUPLICATE_PROTECTION)
             if DUPLICATE_PROTECTION:
                 return
         edge = self.graph.AddEdge(from_node, to_node)
@@ -332,6 +332,9 @@ class DisplayModel:
                 (otherclass, classname)
             )  # reverse direction so round black arrows look ok
 
+
+        # MAIN ALGORITHM BEGINS HERE
+
         for classname, classentry in list(p.classlist.items()):
             # print 'CLASS', classname, classentry
 
@@ -367,7 +370,7 @@ Plan.
 
 Two bugs we are trying to fix.
 1. duplicate edges when add to displaymodel from parsemodel twice
-2. when add multiple paresemodels to the displaymodel classes can miss out on their
+2. when add multiple parseemodels to the displaymodel classes can miss out on their
      full set of attrs/methods depending on the order of pmodels. (cos not merging)
      
 write test for 1 DONE

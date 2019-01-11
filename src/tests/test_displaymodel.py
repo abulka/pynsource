@@ -12,7 +12,10 @@ def parse_source(source_code, options):
     return pmodel, debuginfo
 
 class TestCaseDisplayModel(unittest.TestCase):
-    def test_simple(self):
+    def test_no_duplicate_edges(self):
+        """
+        1. Ensure no duplicate edges when add to displaymodel from same parsemodel twice
+        """
         source_code = """
 class Fred(Mary, Sam):
     pass
@@ -38,7 +41,63 @@ class Fred(Mary, Sam):
         dmodel.ConvertParseModelToUmlModel(pmodel)
         dmodel.Dump()
         self.assertEqual(len(dmodel.graph.nodes), 3)
-        # self.assertEqual(len(dmodel.graph.edges), 2)  <---- THIS IS FAILING
+        self.assertEqual(len(dmodel.graph.edges), 2)  # <---- THIS IS FAILING
+
+
+    def test_merge_attrs(self):
+        """
+        2. when add multiple paresemodels to the displaymodel classes in both pmodels
+        can miss out on their full set of attrs/methods depending on the order of pmodels.
+        (cos attrs/methods might not be merging)
+        """
+        source_code1 = """
+class Fred(Mary):
+    pass
+        """
+        pmodel1, debuginfo = parse_source(source_code1, options={})
+
+        source_code2 = """
+class Fred(Mary):
+    def __init__(self):
+        self.attr1 = None
+    def method1(self):
+        pass
+        """
+        pmodel2, debuginfo = parse_source(source_code2, options={})
+
+        # now add both pmodels to the same display model - hopefully
+        dmodel = DisplayModel()
+
+        # first parse of class Fred - no attributes or methods, but inherits from Mary
+        dmodel.ConvertParseModelToUmlModel(pmodel1)
+        dmodel.Dump()
+        # check the parsemodel
+        # self.assertEqual(list(pmodel1.classlist.keys()), ["Fred", "Mary"])   # seems that parent doesn't get officially created
+        self.assertEqual(pmodel1.classlist["Fred"].attrs, [])
+        self.assertEqual(pmodel1.classlist["Fred"].defs, [])
+        # check the displaymodel
+        self.assertEqual(len(dmodel.graph.nodes), 2)
+        self.assertEqual(len(dmodel.graph.edges), 1)
+        node = dmodel.graph.FindNodeById("Fred")
+        self.assertEqual(node.attrs, [])
+        self.assertEqual(node.meths, [])
+
+        # second parse of class Fred - one attributes one method, and still inherits from Mary
+        dmodel.ConvertParseModelToUmlModel(pmodel2)
+        dmodel.Dump()
+        # check the parsemodel
+        # self.assertEqual(list(pmodel1.classlist.keys()), ["Fred", "Mary"])   # seems that parent doesn't get officially created
+        self.assertEqual(pmodel1.classlist["Fred"].attrs, ['attr1'])   # the point of this test
+        self.assertEqual(pmodel1.classlist["Fred"].defs, ['method1'])  # the point of this test
+        # check the displaymodel
+        self.assertEqual(len(dmodel.graph.nodes), 2)
+        self.assertEqual(len(dmodel.graph.edges), 1)
+        node = dmodel.graph.FindNodeById("Fred")
+        # test the merging has occurred
+        self.assertEqual(node.attrs, ['attr1'])
+        self.assertEqual(node.meths, ['method1'])
+
+
 
 """
 Differences to alsm
