@@ -216,9 +216,9 @@ class DisplayModel:
         node = self.graph.AddNode(node)
         return node
 
-    def AddUmlEdge(self, from_node, to_node, edge_label):  # NEW - to stop duplicates
+    def AddUmlEdge(self, from_node, to_node, edge_type):  # NEW - to stop duplicates
         """
-        Add edge but prevent creating another edge of type 'edge_label' TODO rename to edge_type
+        Add edge but prevent creating another edge of type 'edge_type'
         of the set 
             'generalisation', 'composition' 
         that already exists between the two nodes.
@@ -231,13 +231,13 @@ class DisplayModel:
         Returns: - 
         """
         DUPLICATE_PROTECTION = True
-        edge = self.graph.FindEdge(from_node, to_node, edge_label)
+        edge = self.graph.FindEdge(from_node, to_node, edge_type)
         if edge:
             # print('Duplcate edge detected', edge, 'already exists...', "DUPLICATE_PROTECTION is", DUPLICATE_PROTECTION)
             if DUPLICATE_PROTECTION:
                 return
         edge = self.graph.AddEdge(from_node, to_node)
-        edge["uml_edge_type"] = edge_label
+        edge["uml_edge_type"] = edge_type
 
     def AddSimpleNode(self, id):
         if self.graph.FindNodeById(id):
@@ -312,11 +312,11 @@ class DisplayModel:
         owns all those other classes.
         """
 
-        def BuildEdgeModel(association_tuples, edge_label):  # TODO rename build_edges()
+        def BuildEdgeModel(association_tuples, edge_type):  # TODO rename build_edges()
             for fromClassname, toClassname in association_tuples:
                 from_node = self.AddUmlNode(fromClassname)
                 to_node = self.AddUmlNode(toClassname)
-                edge = self.AddUmlEdge(from_node, to_node, edge_label)  # incl. duplicate protection in here
+                edge = self.AddUmlEdge(from_node, to_node, edge_type)  # incl. duplicate protection in here
 
         def AddGeneralisation(classname, parentclass):
             if (classname, parentclass) in self.associations_generalisation:
@@ -374,14 +374,14 @@ Two bugs we are trying to fix.
      full set of attrs/methods depending on the order of pmodels. (cos not merging)
      
 write test for 1 DONE
-write test for 2
+write test for 2 DONE
 
-make test 1 pass by DUPLICATE_PROTECTION = True above
-make test 2 pass by uncommenting code in merge_attrs_and_meths
+DONE make test 1 pass by DUPLICATE_PROTECTION = True above
+DONE make test 2 pass by uncommenting code in merge_attrs_and_meths
 
-run all tests to ensure duplicate protection isn't breaking things
+DONE run all tests to ensure duplicate protection isn't breaking things
 
-rename edge_label to edge_type
+DONE rename edge_label to edge_type
 
 rename def ConvertParseModelToUmlModel(self, p):  to  convert_parsemodel_to_displaymodel
   or perhaps just rename it
