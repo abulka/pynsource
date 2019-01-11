@@ -30,7 +30,15 @@ class Fred(Mary, Sam):
         dmodel = DisplayModel()
         dmodel.ConvertParseModelToUmlModel(pmodel)
         dmodel.Dump()
+        self.assertEqual(len(dmodel.graph.nodes), 3)
+        self.assertEqual(len(dmodel.graph.edges), 2)
         print("display model", dmodel)
+
+        # again - should not cause extra edges to be created
+        dmodel.ConvertParseModelToUmlModel(pmodel)
+        dmodel.Dump()
+        self.assertEqual(len(dmodel.graph.nodes), 3)
+        # self.assertEqual(len(dmodel.graph.edges), 2)  <---- THIS IS FAILING
 
 """
 Differences to alsm
