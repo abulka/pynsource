@@ -2,7 +2,7 @@ import unittest
 import tempfile
 from parsing.api import old_parser, new_parser
 from parsing.dump_pmodel import dump_old_structure
-
+from view.display_model import DisplayModel
 
 def parse_source(source_code, options):
     with tempfile.NamedTemporaryFile(mode="wt") as temp:  # TODO use streams not temporary files
@@ -24,6 +24,13 @@ class Fred(Mary, Sam):
         self.assertEqual(list(pmodel.classlist.keys()), ["Fred"])
         self.assertEqual(pmodel.classlist["Fred"].defs, [])
         self.assertEqual(pmodel.classlist["Fred"].classesinheritsfrom, ["Mary", "Sam"])
+
+        # Now convert to a display model
+
+        dmodel = DisplayModel()
+        dmodel.ConvertParseModelToUmlModel(pmodel)
+        dmodel.Dump()
+        print("display model", dmodel)
 
 """
 Differences to alsm
