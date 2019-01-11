@@ -191,11 +191,20 @@ class DisplayModel:
             edgetype = edge["uml_edge_type"]
             print("from %40s --> %-40s  (%s)" % (source, target, edgetype))
 
+    def merge_attrs_and_meths(self, node, attrs, meths):
+        """
+        adds new attrs and meths into existing node, avoiding duplicates
+        """
+        return # TODO uncomment when have failing test, which this will then fix
+        node.attrs = list(set(attrs + node.attrs))
+        node.meths += list(set(meths + node.meths))
+        
     def AddUmlNode(self, id, attrs=[], meths=[]):
         node = self.graph.FindNodeById(id)
         if node:
             # could merge the nodes and their attributes etc. ?
             # print 'Skipping', node.classname, 'already built shape...'
+            self.merge_attrs_and_meths(node, attrs, meths)
             return node
         t, l, w, h = (
             random.randint(0, 100),
@@ -206,6 +215,29 @@ class DisplayModel:
         node = UmlNode(id, t, l, w, h, attrs=attrs, meths=meths)
         node = self.graph.AddNode(node)
         return node
+
+    def AddUmlEdge(self, from_node, to_node, edge_label):  # NEW - to stop duplicates
+        """
+        Add edge but prevent creating another edge of type 'edge_label' TODO rename to edge_type
+        of the set 
+            'generalisation', 'composition' 
+        that already exists between the two nodes.
+        Interesting, we don't create the edge object here, but call into Graph()
+        to do it.  Presumably because edges are dicts and a bit private, though we do 
+        add to the dict here. Hmm. Another reason is that Graph.AddEdge() auto creates nodes
+        if they don't exist.  Attempts at duplicate protection inside Graph.AddEdge()
+        were abandoned (see explanation there) but we are retrying here!  Good luck!.
+
+        Returns: - 
+        """
+        DUPLICATE_PROTECTION = False
+        edge = self.graph.FindEdge(from_node, to_node, edge_label)
+        if edge:
+            print('Duplcate edge detected', edge, 'already exists...')
+            if DUPLICATE_PROTECTION:
+                return
+        edge = self.graph.AddEdge(from_node, to_node)
+        edge["uml_edge_type"] = edge_label
 
     def AddSimpleNode(self, id):
         if self.graph.FindNodeById(id):
@@ -254,13 +286,37 @@ class DisplayModel:
         node = self.graph.AddNode(node)
         return node
 
-    def ConvertParseModelToUmlModel(self, p):
-        def BuildEdgeModel(association_tuples, edge_label):
+    def ConvertParseModelToUmlModel(self, p):  # TODO rename convert_parsemodel_to_displaymodel
+        """
+        Builds a displaymodel from pmodel 'p'
+
+        Algorithm
+        ---------
+        Loops through each class in the pmodel.  
+        Note: Comments do not exist in the pmodel.
+
+        1. First we create tuple entries in 
+            self.associations_composition
+            self.associations_generalisation
+        2. Then we 
+            self.AddUmlNode with its attrs and methods
+        3. Lastly we create the edges by calling BuildEdgeModel(), which goes through 
+            each association that we created in step 1 and attempts to create the uml node
+            on either end. It uses AddUmlNode().  Most probably the node already exists
+            and will not be created twice. AddUmlNode is smart - it even now merges attrs/meths.
+            Then of course we create the edge using AddUmlEdge() which attempts new 
+            duplicate protection.
+
+        WHAT IS THIS COMMENT ABOUT?
+        These are a list of (attr, otherclass) however they imply that THIS class
+        owns all those other classes.
+        """
+
+        def BuildEdgeModel(association_tuples, edge_label):  # TODO rename build_edges()
             for fromClassname, toClassname in association_tuples:
                 from_node = self.AddUmlNode(fromClassname)
                 to_node = self.AddUmlNode(toClassname)
-                edge = self.graph.AddEdge(from_node, to_node)
-                edge["uml_edge_type"] = edge_label
+                edge = self.AddUmlEdge(from_node, to_node, edge_label)  # incl. duplicate protection in here
 
         def AddGeneralisation(classname, parentclass):
             if (classname, parentclass) in self.associations_generalisation:
@@ -277,10 +333,6 @@ class DisplayModel:
             )  # reverse direction so round black arrows look ok
 
         for classname, classentry in list(p.classlist.items()):
-            """
-            These are a list of (attr, otherclass) however they imply that THIS class
-            owns all those other classes.
-            """
             # print 'CLASS', classname, classentry
 
             # Composition / Dependencies
@@ -295,7 +347,7 @@ class DisplayModel:
                     #    parentclass = parentclass.split('.')[0] # take the lhs
                     AddGeneralisation(classname, parentclass)
 
-            classAttrs = [attrobj.attrname for attrobj in classentry.attrs]
+            classAttrs = [attrobj.attrname for attrobj in classentry.attrs]  # TODO what type is each attr?
             classMeths = classentry.defs
             node = self.AddUmlNode(classname, classAttrs, classMeths)
 
@@ -309,3 +361,27 @@ class DisplayModel:
 
         BuildEdgeModel(self.associations_generalisation, "generalisation")
         BuildEdgeModel(self.associations_composition, "composition")
+
+"""
+Plan.
+
+Two bugs we are trying to fix.
+1. duplicate edges when add to displaymodel from parsemodel twice
+2. when add multiple paresemodels to the displaymodel classes can miss out on their
+     full set of attrs/methods depending on the order of pmodels. (cos not merging)
+     
+write test for 1 DONE
+write test for 2
+
+make test 1 pass by DUPLICATE_PROTECTION = True above
+make test 2 pass by uncommenting code in merge_attrs_and_meths
+
+run all tests to ensure duplicate protection isn't breaking things
+
+rename edge_label to edge_type
+
+rename def ConvertParseModelToUmlModel(self, p):  to  convert_parsemodel_to_displaymodel
+  or perhaps just rename it
+  build_displaymodel()
+
+"""

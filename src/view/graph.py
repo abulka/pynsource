@@ -44,6 +44,22 @@ class Graph:
             self.nodes.append(node)
         return node
 
+    def FindEdge(self, from_node, to_node, edge_type):
+        """
+        Attempt at duplication avoidance, used by display_model.py
+        returns edge if it is found, and matches all params
+
+        AddEdge complains that it cannot do duplicate protection, but
+        we need it and I don't see why this Find function won't work.
+        """
+        edge : Dict[str, GraphNode]  # e.g. {"source": source_node, "target": target_node}
+        for edge in self.edges:
+            if edge["source"] == from_node and \
+               edge["target"] == to_node and \
+               edge.get("uml_edge_type", "") == edge_type:
+                return edge
+        return None
+
     def AddEdge(self, source_node, target_node, weight=None):
         # Uniqueness of this edge relationship must be ensured by caller!
         #
