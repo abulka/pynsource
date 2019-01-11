@@ -21,8 +21,8 @@ class Fred(Mary, Sam):
     pass
         """
         pmodel, debuginfo = parse_source(source_code, options={})
-        print(pmodel.classlist)
-        print((dump_old_structure(pmodel)))
+        # print(pmodel.classlist)
+        # print((dump_old_structure(pmodel)))
 
         self.assertEqual(list(pmodel.classlist.keys()), ["Fred"])
         self.assertEqual(pmodel.classlist["Fred"].defs, [])
@@ -97,8 +97,7 @@ class Fred(Mary):
         node = dmodel.graph.FindNodeById("Fred")
         # test the merging has occurred
         self.assertEqual(node.attrs, ['attr1'])
-        self.assertEqual(set(node.meths), set(['__init__', 'method1']))  # relies on edge duplicate fix
-
+        self.assertCountEqual(node.meths, ['__init__', 'method1']) # relies on edge duplicate fix
 
 
 """
