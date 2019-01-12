@@ -299,6 +299,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.working = True
 
         keycode = chr(event.GetKeyCode())
+        print("keycode", keycode)
 
         if keycode in ["q", "Q"]:
             self.NewEdgeMarkFrom()
@@ -308,6 +309,9 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         elif keycode in ["e", "E"]:
             self.NewEdgeMarkTo(edge_type="generalisation")
+
+        elif keycode in ["a", "A"]:
+            self.NewEdgeMarkTo(edge_type="association")
 
         elif keycode in ["1", "2", "3", "4", "5", "6", "7", "8"]:
             todisplay = ord(keycode) - ord("1")
@@ -329,7 +333,8 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.app.run.CmdColourSequential(color_range_offset=(keycode == "H"))
 
         self.working = False
-        event.Skip()
+
+        # event.Skip()  # makes an annoying beep if enabled
 
     def CmdTrimScrollbars(self):
         self.canvas_resizer.resize_virtual_canvas_tofit_bounds(

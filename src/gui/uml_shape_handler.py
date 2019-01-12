@@ -5,7 +5,7 @@ import wx.lib.ogl as ogl
 from .coord_utils import setpos, getpos
 from common.architecture_support import *
 from gui.uml_shapes import CommentShape
-
+from view.display_model import CommentNode
 
 class UmlShapeHandler(ogl.ShapeEvtHandler):
     def __init__(self, log, frame, shapecanvas):
@@ -139,13 +139,18 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
                 "Begin - Remember selected class as FROM node (for drawing lines)\tq",
                 self.OnDrawBegin,
             )  # Note: unlike proper toolbar menus, these shortcut keys don't work - you need to add onKeyChar() interceptions in umlcanvas.py
+
+            if not isinstance(self.GetShape().node, CommentNode):
+                MakeMenuItem(
+                    menu_sub, "End - Draw Line TO selected class (composition)\tw", self.OnDrawEnd1
+                )
+                MakeMenuItem(
+                    menu_sub, "End - Draw Line TO selected class (generalisation)\te", self.OnDrawEnd2
+                )
             MakeMenuItem(
-                menu_sub, "End - Draw Line TO selected class (composition)\tw", self.OnDrawEnd1
+                menu_sub, "End - Draw Line TO selected comment/class (association - dashed)\te", self.OnDrawEnd3
             )
-            MakeMenuItem(
-                menu_sub, "End - Draw Line TO selected class (generalisation)\te", self.OnDrawEnd2
-            )
-            self.popupmenu.AppendMenu(wx.NewId(), "Draw Line", menu_sub)
+            self.popupmenu.Append(wx.NewId(), "Draw Line", menu_sub)
 
         if self.GetShape().__class__.__name__ == "BitmapShapeResizable":
             self.popupmenu.AppendSeparator()
@@ -175,6 +180,9 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
 
     def OnDrawEnd2(self, event):
         self.GetShape().GetCanvas().NewEdgeMarkTo(edge_type="generalisation")
+
+    def OnDrawEnd3(self, event):
+        self.GetShape().GetCanvas().NewEdgeMarkTo(edge_type="association")
 
     def OnResetImageSize(self, event):
         shape = self.GetShape()
