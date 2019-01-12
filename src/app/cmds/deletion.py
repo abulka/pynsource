@@ -8,7 +8,10 @@ class CmdNodeDeleteBase(CmdBase):
         displaymodel = self.context.displaymodel
         gui = self.context.umlcanvas
 
-        displaymodel.delete_node_for_shape(shape)
+        # Currently images are not nodes, just shapes, so skip deleting the node
+        if shape.GetShape().__class__.__name__ != "BitmapShapeResizable":
+            displaymodel.delete_node_for_shape(shape)
+
         gui.delete_shape_view(shape)
 
         self.context.frame.Layout()  # needed when running phoenix

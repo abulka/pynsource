@@ -123,7 +123,7 @@ class GraphPersistence:
         elif to_vers == 1.2:
             """
             No changes, just new comment shapes added, but these are currently still
-            'umlshape' objects with different attributes - a bit dodgy TODO revise this approach
+            'umlshape' objects with different attributes
             """
         else:
             print("Don't know how to upgrade persistence format to %f" % to_vers)
@@ -194,7 +194,7 @@ class GraphPersistence:
 
     def Save(self):
         """
-        This code is now for saving version 1.1 persistence format.
+        This code is now for saving version 1.2 persistence format.
         """
         nodes = ""
         edges = ""

@@ -129,22 +129,23 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             item = parent_menu.Append(wx.NewId(), msg)
             self.frame.Bind(wx.EVT_MENU, method, item)
 
-        MakeMenuItem(self.popupmenu, "Properties...", self.NodeProperties)
-        self.popupmenu.AppendSeparator()
+        if self.GetShape().__class__.__name__ != "BitmapShapeResizable":
+            MakeMenuItem(self.popupmenu, "Properties...", self.NodeProperties)
+            self.popupmenu.AppendSeparator()
 
-        menu_sub = wx.Menu()
-        MakeMenuItem(
-            menu_sub,
-            "Begin - Remember selected class as FROM node (for drawing lines)\tq",
-            self.OnDrawBegin,
-        )  # Note: unlike proper toolbar menus, these shortcut keys don't work - you need to add onKeyChar() interceptions in umlcanvas.py
-        MakeMenuItem(
-            menu_sub, "End - Draw Line TO selected class (composition)\tw", self.OnDrawEnd1
-        )
-        MakeMenuItem(
-            menu_sub, "End - Draw Line TO selected class (generalisation)\te", self.OnDrawEnd2
-        )
-        self.popupmenu.AppendMenu(wx.NewId(), "Draw Line", menu_sub)
+            menu_sub = wx.Menu()
+            MakeMenuItem(
+                menu_sub,
+                "Begin - Remember selected class as FROM node (for drawing lines)\tq",
+                self.OnDrawBegin,
+            )  # Note: unlike proper toolbar menus, these shortcut keys don't work - you need to add onKeyChar() interceptions in umlcanvas.py
+            MakeMenuItem(
+                menu_sub, "End - Draw Line TO selected class (composition)\tw", self.OnDrawEnd1
+            )
+            MakeMenuItem(
+                menu_sub, "End - Draw Line TO selected class (generalisation)\te", self.OnDrawEnd2
+            )
+            self.popupmenu.AppendMenu(wx.NewId(), "Draw Line", menu_sub)
 
         if self.GetShape().__class__.__name__ == "BitmapShapeResizable":
             self.popupmenu.AppendSeparator()

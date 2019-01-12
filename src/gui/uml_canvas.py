@@ -443,7 +443,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         # adjusted_img = img.Rescale(10,10)
         adjusted_img = img
 
-        bmp = wx.BitmapFromImage(adjusted_img)
+        bmp = wx.Bitmap(adjusted_img)
         shape.SetBitmap(bmp)
 
         self.GetDiagram().AddShape(shape)
