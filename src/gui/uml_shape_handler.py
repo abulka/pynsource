@@ -5,14 +5,14 @@ import wx.lib.ogl as ogl
 from .coord_utils import setpos, getpos
 from common.architecture_support import *
 from gui.uml_shapes import CommentShape
-from view.display_model import CommentNode
+from view.display_model import GraphNode, UmlNode, CommentNode
 
 class UmlShapeHandler(ogl.ShapeEvtHandler):
     def __init__(self, log, frame, shapecanvas):
         ogl.ShapeEvtHandler.__init__(self)
         self.log = log
         self.frame = frame  # these are arbitrary initialisations
-        self.shapecanvas = shapecanvas  # these are arbitrary initialisations
+        self.umlcanvas = shapecanvas  # these are arbitrary initialisations
         self.app = (
             None
         )  # assigned later by event sent to controller from uml canvas when creating new shapes
@@ -128,53 +128,91 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self._SelectNodeNow(x, y, keys, attachment)
         # self.log.WriteText("%s\n" % self.GetShape())
 
-        self.popupmenu = wx.Menu()
+        self.popupmenu = wx.Menu()  # This is the popup menu to which we attach menu items
+        self.submenu = wx.Menu()  # This is the sub menu within the popupmenu
 
-        def MakeMenuItem(parent_menu, msg, method):
-            """
-            Not sure why but passing item is needed to Bind. Not to find the
-            menu item later, but to avoid crashes? try two right click deletes
-            followed by main menu edit/delete. Official Bind 3rd parameter DOCO:
-            menu source - Sometimes the event originates from a different window
-            than self, but you still want to catch it in self. (For example, a
-            button event delivered to a frame.) By passing the source of the
-            event, the event handling system is able to differentiate between
-            the same event type from different controls. 
-            """
-            item = parent_menu.Append(wx.NewId(), msg)
+        def add_menuitem(item_text, method, submenu=False):
+            if submenu:
+                to_menu = self.submenu
+            else:
+                to_menu = self.popupmenu
+            item = to_menu.Append(wx.ID_ANY, item_text)
             self.frame.Bind(wx.EVT_MENU, method, item)
 
-        if self.GetShape().__class__.__name__ != "BitmapShapeResizable":
-            MakeMenuItem(self.popupmenu, "Properties...", self.NodeProperties)
-            self.popupmenu.AppendSeparator()
+        def add_submenu_to_popup():
+            self.popupmenu.Append(wx.ID_ANY, "Draw Line", self.submenu)
 
-            menu_sub = wx.Menu()
-            MakeMenuItem(
-                menu_sub,
+        def add_separator():
+            self.popupmenu.AppendSeparator()
+        def add_properties():
+            add_menuitem("Properties...", self.NodeProperties)
+        def add_from():
+            add_menuitem(
                 "Begin - Remember selected class as FROM node (for drawing lines)\tq",
                 self.OnDrawBegin,
+                submenu=True
             )
-
-            if not isinstance(self.GetShape().node, CommentNode):
-                MakeMenuItem(
-                    menu_sub, "End - Draw Line TO selected class (composition)\tw", self.OnDrawEnd1
-                )
-                MakeMenuItem(
-                    menu_sub, "End - Draw Line TO selected class (generalisation)\te", self.OnDrawEnd2
-                )
-            MakeMenuItem(
-                menu_sub, "End - Draw Line TO selected comment/class (association - dashed)\ta", self.OnDrawEnd3
+        def add_association_edge():
+            add_menuitem(
+                "End - Draw Line TO selected comment/class (association - dashed)\ta",
+                self.OnDrawEnd3,
+                submenu = True
             )
-            self.popupmenu.Append(wx.NewId(), "Draw Line", menu_sub)
+        def add_generalise_composition_edges():
+            add_menuitem(
+                "End - Draw Line TO selected class (composition)\tw",
+                self.OnDrawEnd1,
+                submenu=True
+            )
+            add_menuitem(
+                "End - Draw Line TO selected class (generalisation)\te",
+                self.OnDrawEnd2,
+                submenu = True
+            )
+        def add_reset_image_size():
+            add_menuitem("Reset Image Size", self.OnResetImageSize)
+        def add_delete():
+            add_menuitem("Delete\tDel", self.RightClickDeleteNode)
+        def add_cancel():
+            add_menuitem("Cancel", self.OnPopupMenuCancel)
 
-        if self.GetShape().__class__.__name__ == "BitmapShapeResizable":
-            self.popupmenu.AppendSeparator()
-            MakeMenuItem(self.popupmenu, "Reset Image Size", self.OnResetImageSize)
+        shape = self.GetShape()
+        from_node : GraphNode = self.umlcanvas.new_edge_from
+        is_bitmap = shape.__class__.__name__ == "BitmapShapeResizable"
+        is_comment = isinstance(shape.node, CommentNode)
+        is_umlclass = isinstance(shape.node, UmlNode)
+        assert not is_umlclass == (is_comment or is_bitmap)
+        started_connecting = from_node != None
+        from_is_comment = isinstance(from_node, CommentNode)
 
-        self.popupmenu.AppendSeparator()
-        MakeMenuItem(self.popupmenu, "Delete\tDel", self.RightClickDeleteNode)
-        self.popupmenu.AppendSeparator()
-        MakeMenuItem(self.popupmenu, "Cancel", self.OnPopupMenuCancel)
+        if is_umlclass or is_comment:
+            add_properties()
+            add_separator()
+            add_from()
+
+        if is_umlclass:
+            if started_connecting:
+                add_association_edge()
+                if not from_is_comment:
+                    add_generalise_composition_edges()
+            else:
+                pass  # don't offer 'to' menu choices cos haven't started connecting yet
+        elif is_comment:
+            if started_connecting:
+                add_association_edge()
+            else:
+                pass  # don't offer 'to' menu choices cos haven't started connecting yet
+        elif is_bitmap:
+            add_reset_image_size()
+        else:
+            raise RuntimeError("Right click on unknown shape")
+
+        add_submenu_to_popup()
+
+        add_separator()
+        add_delete()
+        add_separator()
+        add_cancel()
 
         self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))
 

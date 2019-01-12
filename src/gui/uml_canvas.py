@@ -439,6 +439,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         # edge['uml_edge_type'] = ''
         edge["uml_edge_type"] = edge_type
         self.CreateUmlEdge(edge)
+        self.new_edge_from = None  # reset from after each connection, for UI clarity
         self.mega_refresh()
 
     def CreateImageShape(self, F):
@@ -681,7 +682,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         else:
             arrowtype = None
 
-        if True or edge_label == "comment":
+        if edge_label == "association":
             line = ogl.LineShape()  # attempt to make a dotted line
         else:
             line = LineShapeCustom()  # used to be ogl.LineShape()
