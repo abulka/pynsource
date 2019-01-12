@@ -110,6 +110,21 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             shape.GetCanvas().Refresh(False)
 
     def OnRightClick(self, x, y, keys, attachment):
+        """
+        Popup menu when r.click on shape.
+
+        Note: unlike proper toolbar menus, these shortcut keys don't work - you need to add
+        onKeyChar() interceptions in umlcanvas.py
+
+        Args:
+            x:
+            y:
+            keys:
+            attachment:
+
+        Returns:
+
+        """
         self._SelectNodeNow(x, y, keys, attachment)
         # self.log.WriteText("%s\n" % self.GetShape())
 
@@ -138,7 +153,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
                 menu_sub,
                 "Begin - Remember selected class as FROM node (for drawing lines)\tq",
                 self.OnDrawBegin,
-            )  # Note: unlike proper toolbar menus, these shortcut keys don't work - you need to add onKeyChar() interceptions in umlcanvas.py
+            )
 
             if not isinstance(self.GetShape().node, CommentNode):
                 MakeMenuItem(
@@ -148,7 +163,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
                     menu_sub, "End - Draw Line TO selected class (generalisation)\te", self.OnDrawEnd2
                 )
             MakeMenuItem(
-                menu_sub, "End - Draw Line TO selected comment/class (association - dashed)\te", self.OnDrawEnd3
+                menu_sub, "End - Draw Line TO selected comment/class (association - dashed)\ta", self.OnDrawEnd3
             )
             self.popupmenu.Append(wx.NewId(), "Draw Line", menu_sub)
 

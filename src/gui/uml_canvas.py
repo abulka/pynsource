@@ -215,6 +215,8 @@ class UmlCanvas(ogl.ShapeCanvas):
             False
         )  # flag to communicate with layout engine.  aborting keypress in gui should set this to true
 
+        self.new_edge_from = None  # the 'from' node when creating new edges manually via UI
+
         @property
         def kill_layout(self):
             return self._kill_layout
@@ -264,7 +266,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.working = True
 
         if keycode == wx.WXK_ESCAPE:
-            print("ESC key detected: Abort Layout")
+            self.frame.SetStatusText("ESC key detected: Abort Layout")
             self.kill_layout = True
 
             # # HACK PLAY
@@ -382,7 +384,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.Delete()
 
     def Clear(self):
-        print("Draw: Clear")
+        self.frame.SetStatusText("Draw: Clear")
         self.GetDiagram().DeleteAllShapes()
 
         dc = wx.ClientDC(self)
@@ -403,31 +405,31 @@ class UmlCanvas(ogl.ShapeCanvas):
     def NewEdgeMarkFrom(self):
         selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
         if not selected:
-            print("Please select a node")
+            self.frame.SetStatusText("Please select a node")
             return
 
         self.new_edge_from = selected[0].node
-        print("From", self.new_edge_from.id)
+        self.frame.SetStatusText("From %s" % self.new_edge_from.id)
 
     def NewEdgeMarkTo(self, edge_type="composition"):
         selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
         if not selected:
-            print("Please select a node")
+            self.frame.SetStatusText("Please select a node")
             return
 
         tonode = selected[0].node
-        print("To", tonode.id)
+        self.frame.SetStatusText("To %s" % tonode.id)
 
         if self.new_edge_from == None:
-            print("Please set from node first")
+            self.frame.SetStatusText("Please set from node first")
             return
 
         if self.new_edge_from.id == tonode.id:
-            print("Can't link to self")
+            self.frame.SetStatusText("Can't link to self")
             return
 
         if not self.displaymodel.graph.FindNodeById(self.new_edge_from.id):
-            print("From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id)
+            self.frame.SetStatusText("From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id)
             return
 
         edge = self.displaymodel.graph.AddEdge(
