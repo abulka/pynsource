@@ -674,10 +674,18 @@ class UmlCanvas(ogl.ShapeCanvas):
         else:
             arrowtype = None
 
-        line = LineShapeCustom()  # used to be ogl.LineShape()
+        if True or edge_label == "comment":
+            line = ogl.LineShape()  # attempt to make a dotted line
+        else:
+            line = LineShapeCustom()  # used to be ogl.LineShape()
 
         line.SetCanvas(self)
-        line.SetPen(wx.BLACK_PEN)
+
+        if edge_label == "association":
+            line.SetPen(wx.Pen(colour=wx.BLACK, width=1, style=wx.SHORT_DASH)) # or try PENSTYLE_DOT
+        else:
+            line.SetPen(wx.BLACK_PEN)
+
         line.SetBrush(wx.BLACK_BRUSH)
         if arrowtype:
             line.AddArrow(arrowtype)
@@ -709,73 +717,61 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         self.working = False
 
-    # UTILITY - called by CmdFileImportSource, CmdFileLoadWorkspaceBase.LoadGraph
-    def build_view(self, translatecoords=True):
-        if translatecoords:
-            self.AllToWorldCoords()
-
-        # Clear existing visualisation, including lines
-        for node in self.displaymodel.graph.nodes:
-            if node.shape:
-                self.delete_shape_view(node.shape)
-                node.shape = None
-
-        # Create fresh visualisation
-        for node in self.displaymodel.graph.nodes:
-            assert not node.shape
-            if isinstance(node, CommentNode) or hasattr(node, "comment"):
-                shape = self.createCommentShape(node)
-            else:
-                shape = self.CreateUmlShape(node)
-            self.displaymodel.classnametoshape[
-                node.id
-            ] = shape  # Record the name to shape map so that we can wire up the links later.
-
-        for edge in self.displaymodel.graph.edges:
-            self.CreateUmlEdge(edge)
-
-    # UTILITY - called by
-    #
-    # CmdInsertUmlClass, CmdInsertImage, CmdLayoutExpandContractBase,
-    # umlcanvas.OnWheelZoom_OverlapRemoval_Defunct,
-    # umlcanvas.layout_and_position_shapes,
-    # UmlShapeHandler.OnEndDragLeft
-    # UmlShapeHandler.OnSizingEndDragLeft
-    # LayoutBlackboard.LayoutLoopTillNoChange
-    #
     def remove_overlaps(self, watch_removals=True):
         """
         Returns T/F if any overlaps found, so caller can decide whether to
         redraw the screen
+
+        Called by
+
+            CmdInsertUmlClass, CmdInsertImage, CmdLayoutExpandContractBase,
+            umlcanvas.OnWheelZoom_OverlapRemoval_Defunct,
+            umlcanvas.layout_and_position_shapes,
+            UmlShapeHandler.OnEndDragLeft
+            UmlShapeHandler.OnSizingEndDragLeft
+            LayoutBlackboard.LayoutLoopTillNoChange
         """
         self.overlap_remover.RemoveOverlaps(watch_removals=watch_removals)
         return self.overlap_remover.GetStats()["total_overlaps_found"] > 0
 
-    # UTILITY - called by everyone!!??
-    #
-    # CmdFileLoadWorkspaceBase, CmdInsertComment, CmdEditUmlClass
-    # CmdLayoutExpandContractBase,
-    # CmdInsertUmlClass
-    # umlcanvas.NewEdgeMarkTo
-    # umlcanvas.OnWheelZoom_OverlapRemoval_Defunct
-    # LayoutBlackboard.LayoutThenPickBestScale
-    # LayoutBlackboard.Experiment1
-    # LayoutBlackboard.LayoutLoopTillNoChange
-    # LayoutBlackboard.ScaleUpMadly
-    # LayoutBlackboard.GetVitalStats  (only if animate is true)
-    # OverlapRemoval.RemoveOverlaps   ( refresh gui if self.gui and watch_removals)
-    # GraphSnapshotMgr.RestoreGraph
-    #
-    # these do an overlap removal first before calling here
-    #
-    # CmdInsertImage
-    # umlcanvas.layout_and_position_shapes,
-    # UmlShapeHandler.OnEndDragLeft
-    # UmlShapeHandler.OnSizingEndDragLeft
-    #
-    # recalibrate = True - called by core spring layout self.gui.mega_refresh()
-    #
-    def mega_refresh(self, recalibrate=False, auto_resize_canvas=True):  # was stateofthenation
+    def mega_refresh(self, recalibrate=False, auto_resize_canvas=True):
+        """
+        Refresh canvas.  There are a lot of ways to trigger a refresh
+        and this is one of them.  Often you don't need this call and just
+        a subset of this functionality.  TODO understand this better.
+
+        Was once called `stateofthenation`.
+
+        Called by everyone!!??
+
+            CmdFileLoadWorkspaceBase, CmdInsertComment, CmdEditUmlClass
+            CmdLayoutExpandContractBase,
+            CmdInsertUmlClass
+            umlcanvas.NewEdgeMarkTo
+            umlcanvas.OnWheelZoom_OverlapRemoval_Defunct
+            LayoutBlackboard.LayoutThenPickBestScale
+            LayoutBlackboard.Experiment1
+            LayoutBlackboard.LayoutLoopTillNoChange
+            LayoutBlackboard.ScaleUpMadly
+            LayoutBlackboard.GetVitalStats  (only if animate is true)
+            OverlapRemoval.RemoveOverlaps   ( refresh gui if self.gui and watch_removals)
+            GraphSnapshotMgr.RestoreGraph
+
+            these do an overlap removal first before calling here
+
+            CmdInsertImage
+            umlcanvas.layout_and_position_shapes,
+            UmlShapeHandler.OnEndDragLeft
+            UmlShapeHandler.OnSizingEndDragLeft
+
+            recalibrate = True - called by core spring layout self.gui.mega_refresh()
+
+        Args:
+            recalibrate:
+            auto_resize_canvas:
+
+        Returns:
+        """
         if recalibrate:  # was stateofthespring
             self.coordmapper.Recalibrate()
             self.AllToWorldCoords()
@@ -795,8 +791,16 @@ class UmlCanvas(ogl.ShapeCanvas):
         # This cures so many phoenix refresh issues that I'm throwing it in here for fun too.
         self.frame.Layout()  # needed when running phoenix
 
-    # UTILITY - used by CmdLayout and CmdFileImportBase
     def layout_and_position_shapes(self):
+        """
+        Layouit and position shapes.
+
+        Called by
+            CmdLayout
+            CmdFileImportBase
+
+        Returns: -
+        """
         self.canvas_resizer.frame_calibration(
             auto_resize_virtualcanvas=False
         )  # going to do a mega_refresh later so no point changing virt canvas now
@@ -832,3 +836,48 @@ class UmlCanvas(ogl.ShapeCanvas):
     def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
         # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
         self.app.run.CmdDeselectAllShapes()
+
+    def build_view(self, translatecoords=True):
+        """
+        Builds the shapes from the display model, attaching shapes to nodes
+        and in the case of edge shapes, attaching them to ??
+
+        This is an important method.
+
+        Called by
+            CmdFileLoadWorkspaceBase.load_model_from_text_and_build_shapes()
+
+            CmdFileImportBase - and its subclasses
+                class CmdFileImportFromFilePath(CmdFileImportBase):  # was class CmdFileImportSource(CmdBase):
+                class CmdFileImportViaDialog(CmdFileImportBase):  # was class CmdFileImport(CmdBase):
+
+            CmdBuildColourChartWorkspace
+
+        Args:
+            translatecoords: ?
+
+        Returns:
+        """
+        if translatecoords:
+            self.AllToWorldCoords()
+
+        # Clear existing visualisation, including any attached edges/lines
+        for node in self.displaymodel.graph.nodes:
+            if node.shape:
+                self.delete_shape_view(node.shape)
+                node.shape = None
+
+        # Create fresh visualisation
+        for node in self.displaymodel.graph.nodes:
+            assert not node.shape
+            if isinstance(node, CommentNode) or hasattr(node, "comment"):
+                shape = self.createCommentShape(node)
+            else:
+                shape = self.CreateUmlShape(node)
+            self.displaymodel.classnametoshape[
+                node.id
+            ] = shape  # Record the name to shape map so that we can wire up the links later.
+
+        for edge in self.displaymodel.graph.edges:
+            self.CreateUmlEdge(edge)
+

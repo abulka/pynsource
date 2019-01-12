@@ -277,6 +277,8 @@ class Graph:
     def GraphToString(self):
         return self.persistence.Save()
 
+    # Persistence continued
+
     def create_new_node(self, id, l, t, w, h):
         return GraphNode(
             id, l, t, w, h
