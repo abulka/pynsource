@@ -152,6 +152,12 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
                 self.OnDrawBegin,
                 submenu=True
             )
+        def add_from_cancel():
+            add_menuitem(
+                "Cancel Line Begin\tx",
+                self.OnCancelDrawBegin,
+                submenu=True
+            )
         def add_association_edge():
             add_menuitem(
                 "End - Draw Line TO selected comment/class (association - dashed)\ta",
@@ -188,7 +194,8 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         if is_umlclass or is_comment:
             add_properties()
             add_separator()
-            add_from()
+            if not from_node:
+                add_from()
 
         if is_umlclass:
             if started_connecting:
@@ -206,6 +213,10 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             add_reset_image_size()
         else:
             raise RuntimeError("Right click on unknown shape")
+
+        if is_umlclass or is_comment:
+            if from_node:
+                add_from_cancel()
 
         add_submenu_to_popup()
 
@@ -227,6 +238,9 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
 
     def OnDrawBegin(self, event):
         self.GetShape().GetCanvas().NewEdgeMarkFrom()
+
+    def OnCancelDrawBegin(self, event):
+        self.GetShape().GetCanvas().new_edge_from = None
 
     def OnDrawEnd1(self, event):
         self.GetShape().GetCanvas().NewEdgeMarkTo(edge_type="composition")
