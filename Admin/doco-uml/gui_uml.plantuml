@@ -1,0 +1,360 @@
+"""
+@startuml
+
+class UmlCanvas <<ogl.ShapeCanvas>> {
+    umlboxshapes
+    <color:Green>new_edge_from
+    working
+    kill_layout
+    -- references to instances --
+    app
+    frame
+    canvas_resizer
+    displaymodel
+    layout
+    snapshot_mgr
+    coordmapper
+    layouter
+    overlap_remover
+    observers  <color:royalBlue><-- my home grown multicast/observer pattern
+    log
+    ---
+    <b>__init__()
+    <color:Green>NewEdgeMarkFrom()
+    <color:Green>NewEdgeMarkTo()
+    InitSizeAndObjs()
+    AllToLayoutCoords()
+    AllToWorldCoords()
+    <b>onKeyPress()</b>     <color:royalBlue><-- handles ESC, and RIGHT/LEFT to expand layout
+    <b>onKeyChar()</b>     <color:royalBlue><-- handles popup menu shortcuts Q, W, E etc
+    CmdTrimScrollbars()
+    CmdRememberLayout1()
+    CmdRememberLayout2()
+    CmdRestoreLayout1()
+    CmdRestoreLayout2()
+    SelectNodeNow()
+    delete_shape_view()
+    Clear()
+    CreateImageShape()
+    CreateUmlShape()
+    newRegion()
+    createNodeShape()
+    <b>createCommentShape()
+    new_evthandler_housekeeping()
+    CreateUmlEdge()
+    OnWheelZoom()
+    remove_overlaps()
+    mega_refresh()
+    layout_and_position_shapes()
+    get_umlboxshapes()
+    OnDestroy()
+    OnLeftClick()
+    build_view()
+
+    .. def __init__(self, parent, log, frame): ..
+
+    self.Bind(wx.EVT_WINDOW_DESTROY, self.OnDestroy)
+    self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
+    self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
+    self.Bind(wx.EVT_CHAR, self.onKeyChar)
+
+    .. def createCommentShape(self, node): ..
+
+    shape = CommentShape(node.width, node.height)
+
+    <i>Wire in the event handler for the new shape
+    evthandler = <b>UmlShapeHandler</b>( None, self.frame, self ) <color:royalBlue><-- Each shape gets its own instance
+    evthandler.SetShape(shape)
+    evthandler.SetPreviousHandler(shape.GetEventHandler())
+    shape.SetEventHandler(evthandler)
+    self.new_evthandler_housekeeping(evthandler)
+
+    .. def onKeyPress(self, event): ..
+
+    keycode = event.GetKeyCode()
+    self.working = True   <color:royalBlue><-- protection against re-entrancy
+
+    if keycode == wx.WXK_ESCAPE:
+    \t self.kill_layout = True
+    if keycode == wx.WXK_RIGHT:
+    \t    self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
+
+    self.working = False
+
+    .. def onKeyChar(self, event): ..
+    <i>Handles popup menu shortcuts Q, W, E etc
+    <i>But is pre accelerator technology, we are seeking to replace this
+    <i>(also uses self.working protection against re-entrancy)
+
+    keycode = chr(event.GetKeyCode())
+
+    if keycode in ["q", "Q"]:
+    \t    self.NewEdgeMarkFrom()
+    elif keycode in ["w", "W"]:
+    \t    self.NewEdgeMarkTo(edge_type="composition")
+    elif keycode in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+    <i> also handles P D s G h
+
+    .. def CmdRememberLayout1(self): ..
+    <i>This is called from MainApp's main menu handler: self.umlcanvas.CmdRememberLayout1()
+    self.snapshot_mgr.QuickSave(slot=1)
+
+}
+
+UmlCanvas ..> App: app
+UmlCanvas ..> Frame : frame
+UmlCanvas ..> DisplayModel : displaymodel
+UmlCanvas ..> ogl.Diagram : diagram
+UmlCanvas <.. ogl.Diagram : canvas
+
+class MainApp {
+    log
+    working
+    andyapptitle
+    frame
+    notebook
+    umlcanvas
+    asciiart
+    multiText
+    app
+    menuBar
+    --
+    <b>OnInit()
+    InitConfig()
+    OnResizeFrame()
+    OnWheelZoom_ascii()
+    <b>onKeyChar_Ascii_Text_window()
+    OnDumpUmlWorkspace()
+    OnSaveGraphToConsole()
+    OnSaveGraph()
+    OnLoadGraphFromText()
+    OnLoadGraph()
+    OnLoadGraphSample()
+    set_app_title()
+    OnTabPageChanged()
+    RefreshAsciiUmlTab()
+    PostAsciiViewSwitch()
+    PostOglViewSwitch()
+    <b>InitMenus()      <color:royalBlue><-- Builds main menu
+    Add()
+    AddSubMenu()
+    OnPythonMode()
+    <b>OnRightButtonMenu()    <color:royalBlue><-- Builds canvas background click popup menu
+    OnReportBug()
+    OnRememberLayout1()
+    OnRememberLayout2()
+    OnRestoreLayout1()
+    OnRestoreLayout2()
+    OnCycleColours()
+    OnCycleColoursDefault()
+    OnColourSiblings()
+    OnColourSiblingsRandom()
+    OnFileImport()
+    OnViewToggleAscii()
+    <b>OnHelp()</b>    <color:royalBlue><-- Displays new popup Frame, uses help frame accelerator table
+    <b>Enable_if_node_selected()
+    OnDeleteNode()
+    <b>OnDeleteNode_update()
+    OnInsertComment()
+    OnInsertImage()
+    OnInsertClass()
+    OnEditProperties()
+    <b>OnEditProperties_update()
+    OnLayout()
+    OnDeepLayout()
+    OnRefreshUmlWindow()
+    MessageBox()
+    OnButton()
+    OnCloseFrame()
+
+    .. def OnInit(self): ..
+
+    self.frame.Bind( wx.EVT_CLOSE, self.OnCloseFrame )
+    self.umlcanvas.Bind( wx.EVT_RIGHT_DOWN, self.OnRightButtonMenu )
+
+    <i>this is not the wx.App but is our local app
+    self.app = App(context)
+
+    self.InitMenus()
+
+    .. def InitMenus(self): ..
+
+    self.menuBar = wx.MenuBar()
+
+    <i>Build the entire main menu
+    <i>Shortcuts done via item naming technique, not accelerators
+    Add(menu2, "&Redraw Screen", "Ctrl-R", self.OnRefreshUmlWindow)
+
+    <i>Disabling/Enabling technology
+    menu_item_delete_class = Add( menu2, "&Delete", "Del", self.OnDeleteNode, self.OnDeleteNode_update )
+    menu_item_delete_class.Enable( True )
+
+    Add( menu2, "&Edit Class Properties...", "F2", self.OnEditProperties, self.OnEditProperties_update, )
+
+    .. def OnEditProperties_update(self, event): ..
+
+    self.Enable_if_node_selected(event)
+
+    .. def Enable_if_node_selected(self, event): ..
+
+    event.Enable(len(selected) > 0 and self.viewing_uml_tab)
+
+    .. def OnDeleteNode_update(self, event): ..
+
+        self.Enable_if_node_selected(event)
+
+    .. def onKeyChar_Ascii_Text_window(self, event): ..
+
+        keycode = event.GetKeyCode()
+        if controlDown and keycode == 1:  # CTRL-A
+        \t    self.multiText.SelectAll()
+
+    .. def OnRightButtonMenu(self, event): ..
+
+    <i>builds the main canvas popup menu
+    self.popupmenu.Destroy()
+    self.popupmenu = wx.Menu()  # Create a menu
+
+    item = self.popupmenu.Append(wx.ID_ANY, "Add Class...")
+    self.frame.Bind(wx.EVT_MENU, self.OnInsertClass, item)
+
+    .. def OnHelp(self, event): ..
+
+    <i>Creates a popup frame and wires in an accelerator table to that frame only
+    <i>to close help on CMD-W.  This does not affect the main frame's accelerator table
+    randomId = wx.NewIdRef()  # was wx.NewId()
+    self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=randomId)
+    accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord("W"), randomId)])
+    self.SetAcceleratorTable(accel_tbl)
+
+    <i>different technique used for closing help frame on ESC
+    self.Bind(wx.EVT_CHAR_HOOK, self.OnKeyUP)  # Close on ESC
+}
+
+wx.App <|- MainApp
+MainApp ..> wx.Frame : frame
+MainApp ..> App : app
+MainApp ..> UmlCanvas : umlcanvas
+class pyNsourceGui <<module>> << (M,orchid) >> #DarkSeaGreen {
+    ---
+}
+
+pyNsourceGui .. MainApp : contains >
+class Context {
+    wxapp
+    config
+    umlcanvas
+    displaymodel
+    snapshot_mgr
+    coordmapper
+    layouter
+    overlap_remover
+    multiText
+    asciiart
+}
+MainApp --> Context
+
+
+class UmlShapeHandler <<ogl.ShapeEvtHandler>> {
+    log
+    frame
+    umlcanvas
+    app
+    <b>popupmenu</b>    <color:royalBlue><-- for the shape
+    <b>submenu</b>
+    accel_entries
+    GetShape
+    __init__()
+    UpdateStatusBar()
+    OnLeftClick()
+    _SelectNodeNow()
+    OnEndDragLeft()
+    OnSizingEndDragLeft()
+    OnEndSize()
+    OnMovePost()
+    ---
+    <b>OnRightClick()
+    add_menuitem()
+    add_submenu_to_popup()
+    add_separator()
+    add_properties()
+    add_from()
+    add_from_cancel()
+    add_association_edge()
+    add_generalise_composition_edges()
+    add_reset_image_size()
+    add_delete()
+    add_cancel()
+    ---
+    RightClickDeleteNode()
+    OnLeftDoubleClick()
+    NodeProperties()
+    OnDrawBegin()
+    OnCancelDrawBegin()
+    OnDrawEnd1()
+    OnDrawEnd2()
+    OnDrawEnd3()
+    OnResetImageSize()
+    OnPopupMenuCancel()
+
+    .. def OnRightClick(self, x, y, keys, attachment): ..
+
+    <i>Builds popup menu and sets up the main frame accelerator table
+    <i>Trouble is, need to popup the menus once to create the accelerator
+    <i>table, and also, when shape selection changes need to update the table
+    <i>Hmmmmm.
+
+    self.popupmenu = wx.Menu()  # This is the popup menu to which we attach menu items
+    self.submenu = wx.Menu()  # This is the sub menu within the popupmenu
+
+    <i>Logic for determining what items to add to popup menu ...
+
+    self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))     <color:royalBlue><-- Actually displays new popup menu
+
+    accel_tbl = wx.AcceleratorTable(self.accel_entries)    <color:royalBlue><-- Sets up the accelerator table
+    self.frame.SetAcceleratorTable(accel_tbl)
+}
+
+class uml_shape_handler <<module>> << (M,orchid) >> #DarkSeaGreen {
+    ---
+    node_edit_multi_purpose()
+}
+
+uml_shape_handler .. UmlShapeHandler : contains >
+
+
+class App {
+    context
+    controller
+    run
+    __init__()
+    NOTIFY_EVT_HANDLER_CREATED()
+    Boot()
+    Shutdown()
+}
+
+App ..> Controller : controller
+App ..> Context: context
+
+@enduml
+
+SCRAPS
+
+hiding things after the fact or before the fact
+successfully hides the classes but they still "exist"
+in terms of layout.  Need to totally zap any mention of
+them in order to clean up the layout
+
+MainApp ..> UmlCanvas : umlcanvas
+MainApp ..> wx.ScrolledWindow : asciiart
+MainApp ..> wx.TextCtrl : multiText
+MainApp ..> wx.Panel : panel_one
+MainApp ..> wx.Panel : panel_two
+MainApp ..> wx.BoxSizer : sizer
+MainApp ..> wx.Menu : popupmenu
+MainApp ..> App : app
+MainApp ..> ConfigObj : config
+MainApp ..> wx.NewIdRef : next_menu_id
+MainApp ..> wx.PrintData : printData
+
+"""

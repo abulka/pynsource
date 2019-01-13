@@ -194,6 +194,11 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.observers = multicast()
         self.app = None  # assigned later by app boot
 
+        # set below
+        self.canvas_resizer = None
+        self.displaymodel = None
+        self.layout = None
+
         self.log = log
         self.frame = frame
         self.SetBackgroundColour("LIGHT BLUE")
@@ -211,11 +216,11 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
 
         self.working = False
-        self._kill_layout = (
-            False
-        )  # flag to communicate with layout engine.  aborting keypress in gui should set this to true
+        # flag to communicate with layout engine.  aborting keypress in gui should set this to true
 
         self.new_edge_from = None  # the 'from' node when creating new edges manually via UI
+
+        self._kill_layout = False
 
         @property
         def kill_layout(self):
