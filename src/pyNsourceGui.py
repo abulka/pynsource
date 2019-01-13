@@ -165,7 +165,7 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         self.frame.Show(
             True
-        )  # in wxpython2.8 this causes umlcanvas canvas to grow too, but not in wxpython3 - till much later
+        )  # in wxpython2.8 this causes umlcanvas to grow too, but not in wxpython3 - till much later
         self.frame.Bind(wx.EVT_CLOSE, self.OnCloseFrame)
 
         self.popupmenu = None
@@ -622,13 +622,11 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.printData.SetPaperId(wx.PAPER_LETTER)
 
         self.box = wx.BoxSizer(wx.VERTICAL)
-        self.canvas = self.umlcanvas.GetDiagram().GetCanvas()
-
         # self.log.WriteText("OnPrintPreview\n")
-        printout = MyPrintout(self.canvas, self.log)
-        printout2 = MyPrintout(self.canvas, self.log)
+        printout = MyPrintout(self.umlcanvas, self.log)
+        printout2 = MyPrintout(self.umlcanvas, self.log)
         self.preview = wx.PrintPreview(printout, printout2, self.printData)
-        if not self.preview.Ok():
+        if not self.preview.IsOk():
             self.log.WriteText("Houston, we have a problem...\n")
             return
 
