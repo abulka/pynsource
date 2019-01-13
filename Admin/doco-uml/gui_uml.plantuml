@@ -25,29 +25,35 @@ class UmlCanvas <<ogl.ShapeCanvas>> {
     InitSizeAndObjs()
     AllToLayoutCoords()
     AllToWorldCoords()
+    -- bound handlers --
     <b>onKeyPress()</b>     <color:royalBlue><-- handles ESC, and RIGHT/LEFT to expand layout
     <b>onKeyChar()</b>     <color:royalBlue><-- handles popup menu shortcuts Q, W, E etc
+    OnWheelZoom()
+    OnDestroy()
+    -- called by this class itself --
     CmdTrimScrollbars()
-    CmdRememberLayout1()
+    -- called by handlers in MainApp or other external --
+    <b>CmdRememberLayout1()
     CmdRememberLayout2()
     CmdRestoreLayout1()
     CmdRestoreLayout2()
     SelectNodeNow()
+    --
     delete_shape_view()
     Clear()
+    -- shape creation --
     CreateImageShape()
     CreateUmlShape()
     newRegion()
     createNodeShape()
     <b>createCommentShape()
+    ---
     new_evthandler_housekeeping()
     CreateUmlEdge()
-    OnWheelZoom()
     remove_overlaps()
     mega_refresh()
     layout_and_position_shapes()
     get_umlboxshapes()
-    OnDestroy()
     OnLeftClick()
     build_view()
 
@@ -106,6 +112,7 @@ UmlCanvas ..> Frame : frame
 UmlCanvas ..> DisplayModel : displaymodel
 UmlCanvas ..> ogl.Diagram : diagram
 UmlCanvas <.. ogl.Diagram : canvas
+UmlShapeHandler --|> ShapeEvtHandler
 
 class MainApp {
     log
@@ -264,16 +271,17 @@ class UmlShapeHandler <<ogl.ShapeEvtHandler>> {
     <b>submenu</b>
     accel_entries
     GetShape
+    ---
     __init__()
     UpdateStatusBar()
-    OnLeftClick()
-    _SelectNodeNow()
+    <b>_SelectNodeNow()
+    OnMovePost()
+    <b>OnLeftClick()
+    <b>OnRightClick()
+    OnLeftDoubleClick()
     OnEndDragLeft()
     OnSizingEndDragLeft()
     OnEndSize()
-    OnMovePost()
-    ---
-    <b>OnRightClick()
     add_menuitem()
     add_submenu_to_popup()
     add_separator()
@@ -285,9 +293,8 @@ class UmlShapeHandler <<ogl.ShapeEvtHandler>> {
     add_reset_image_size()
     add_delete()
     add_cancel()
-    ---
+    -- shape popup menu handlers --
     RightClickDeleteNode()
-    OnLeftDoubleClick()
     NodeProperties()
     OnDrawBegin()
     OnCancelDrawBegin()
@@ -313,6 +320,16 @@ class UmlShapeHandler <<ogl.ShapeEvtHandler>> {
 
     accel_tbl = wx.AcceleratorTable(self.accel_entries)    <color:royalBlue><-- Sets up the accelerator table
     self.frame.SetAcceleratorTable(accel_tbl)
+
+    .. def OnLeftClick(self, x, y, keys=0, attachment=0): ..
+
+        self._SelectNodeNow(x, y, keys, attachment)
+
+    .. def _SelectNodeNow(self, x, y, keys=0, attachment=0): ..
+
+        shape = self.GetShape()
+        shape.GetCanvas().SelectNodeNow(shape)
+        self.UpdateStatusBar(shape)
 }
 
 class uml_shape_handler <<module>> << (M,orchid) >> #DarkSeaGreen {
@@ -335,6 +352,29 @@ class App {
 
 App ..> Controller : controller
 App ..> Context: context
+
+class ogl.Diagram {
+    _shapeList
+    canvas
+    GetShapeList()
+    AddShape()
+    RemoveShape()
+    FindShape()
+}
+
+class Shape {
+    _eventHandler
+    _canvas
+}
+
+Shape -|> ShapeEvtHandler
+Shape -> UmlCanvas : shape's canvas
+Shape .> UmlShapeHandler : eventHandler
+
+class ShapeEvtHandler <<ogl>> {
+}
+
+ogl.Diagram *-- "*" Shape : shapes
 
 @enduml
 
