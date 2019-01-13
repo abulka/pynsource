@@ -377,6 +377,18 @@ class ShapeEvtHandler <<ogl>> {
 
 ogl.Diagram "shapes" *-- "*" Shape
 
+Note as N1
+Handlers are done in
+
+In Main menu
+In UmlCanvas
+In ShapeEvtHandler
+
+end note
+
+
+
+
 @enduml
 
 SCRAPS
