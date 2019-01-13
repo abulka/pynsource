@@ -262,6 +262,10 @@ class UmlCanvas(ogl.ShapeCanvas):
     def AllToWorldCoords(self):
         self.coordmapper.AllToWorldCoords()
 
+    def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
+        # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
+        self.app.run.CmdDeselectAllShapes()
+
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
 
@@ -367,9 +371,10 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         dc = wx.ClientDC(canvas)
         canvas.PrepareDC(dc)
-        shape.Select(
-            True, dc
-        )  # could pass None as dc if you don't want to trigger the OnDrawControlPoints(dc) handler immediately - e.g. if you want to do a complete redraw of everything later anyway
+
+        # Could pass None as dc if you don't want to trigger the OnDrawControlPoints(dc) handler
+        # immediately - e.g. if you want to do a complete redraw of everything later anyway
+        shape.Select(True, dc)
 
         # change colour when select
         # shape.SetBrush(wx.WHITE_BRUSH) #wx.Brush("WHEAT", wx.SOLID))
@@ -845,10 +850,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         for shape in self.GetDiagram().GetShapeList():
             if shape.GetParent() == None:
                 shape.SetCanvas(None)
-
-    def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
-        # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
-        self.app.run.CmdDeselectAllShapes()
 
     def build_view(self, translatecoords=True):
         """

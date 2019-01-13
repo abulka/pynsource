@@ -9,14 +9,14 @@ class UmlCanvas <<ogl.ShapeCanvas>> {
     -- references to instances --
     app
     frame
-    canvas_resizer
+    canvas_resizer    <color:Red><u>ref23</u>
     displaymodel
     layout
     snapshot_mgr
     coordmapper
     layouter
     overlap_remover
-    observers  <color:royalBlue><-- my home grown multicast/observer pattern
+    observers  <color:royalBlue><-- my home grown multicast/observer pattern  <color:Red><u>ref61</u>
     log
     ---
     <b>__init__()
@@ -30,6 +30,7 @@ class UmlCanvas <<ogl.ShapeCanvas>> {
     <b>onKeyChar()</b>     <color:royalBlue><-- handles popup menu shortcuts Q, W, E etc
     OnWheelZoom()
     OnDestroy()
+    OnLeftClick()   <color:royalBlue> <-- Override of ShapeCanvas method</color>, calls self.app.run.CmdDeselectAllShapes()
     -- called by this class itself --
     CmdTrimScrollbars()
     -- called by handlers in MainApp or other external --
@@ -39,23 +40,21 @@ class UmlCanvas <<ogl.ShapeCanvas>> {
     CmdRestoreLayout2()
     SelectNodeNow()
     --
-    delete_shape_view()
-    Clear()
+    delete_shape_view() <color:Salmon><- called by build_view(), CmdNodeDeleteBase, CmdEditUmlClass (edit props), CmdEditComment
+    Clear()  <color:royalBlue> <-- self.GetDiagram().DeleteAllShapes(), called from outside this class
     -- shape creation --
     CreateImageShape()
     CreateUmlShape()
     newRegion()
     createNodeShape()
     <b>createCommentShape()
-    ---
-    new_evthandler_housekeeping()
+    new_evthandler_housekeeping()   <color:royalBlue> <-- self.<b>observers</b>.NOTIFY_EVT_HANDLER_CREATED(evthandler)</color>  <color:Red><u>ref61</u>
     CreateUmlEdge()
-    remove_overlaps()
-    mega_refresh()
+    ---
+    build_view()  <color:Salmon><- IMPORTANT
+    mega_refresh()  <color:Salmon><- called by a lot of places
     layout_and_position_shapes()
-    get_umlboxshapes()
-    OnLeftClick()
-    build_view()
+    remove_overlaps()  <color:royalBlue><- called by UmlShapeHandler's <b>OnEndDragLeft</b></color> <color:Red><u>ref22</u>
 
     .. def __init__(self, parent, log, frame): ..
 
@@ -279,8 +278,8 @@ class UmlShapeHandler <<ogl.ShapeEvtHandler>> {
     <b>OnLeftClick()
     <b>OnRightClick()
     OnLeftDoubleClick()
-    OnEndDragLeft()
-    OnSizingEndDragLeft()
+    <b>OnEndDragLeft()</b>  <color:royalBlue><-- shape.GetCanvas().remove_overlaps()</color> <color:Red><u>ref22</u>
+    OnSizingEndDragLeft()</b>  <color:royalBlue><-- removes overlaps, also shape.GetCanvas().<b>canvas_resizer.</b>resize_virtual_canvas_tofit_bounds()</color>  <color:Red><u>ref23</u>
     OnEndSize()
     add_menuitem()
     add_submenu_to_popup()
@@ -294,14 +293,14 @@ class UmlShapeHandler <<ogl.ShapeEvtHandler>> {
     add_delete()
     add_cancel()
     -- shape popup menu handlers --
-    RightClickDeleteNode()
-    NodeProperties()
+    OnNodeProperties()   <color:Red><u>ref55</u>
     OnDrawBegin()
     OnCancelDrawBegin()
     OnDrawEnd1()
     OnDrawEnd2()
     OnDrawEnd3()
     OnResetImageSize()
+    OnRightClickDeleteNode()
     OnPopupMenuCancel()
 
     .. def OnRightClick(self, x, y, keys, attachment): ..
@@ -314,7 +313,9 @@ class UmlShapeHandler <<ogl.ShapeEvtHandler>> {
     self.popupmenu = wx.Menu()  # This is the popup menu to which we attach menu items
     self.submenu = wx.Menu()  # This is the sub menu within the popupmenu
 
-    <i>Logic for determining what items to add to popup menu ...
+    <i>Logic for determining what items to add to popup menu ... and binding them
+    ... self.OnDrawBegin, OnNodeProperties, OnDrawEnd{1,2,3}, OnResetImageSize, OnRightClickDeleteNode   <color:Red><u>ref55</u>
+
 
     self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))     <color:royalBlue><-- Actually displays new popup menu
 
@@ -374,7 +375,7 @@ Shape .> UmlShapeHandler : eventHandler
 class ShapeEvtHandler <<ogl>> {
 }
 
-ogl.Diagram *-- "*" Shape : shapes
+ogl.Diagram "shapes" *-- "*" Shape
 
 @enduml
 

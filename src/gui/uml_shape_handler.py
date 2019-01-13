@@ -156,7 +156,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             self.popupmenu.AppendSeparator()
 
         def add_properties():
-            add_menuitem("Properties...", self.NodeProperties)
+            add_menuitem("Properties...", self.OnNodeProperties)
 
         def add_from():
             add_menuitem(
@@ -196,7 +196,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             add_menuitem("Reset Image Size", self.OnResetImageSize)
 
         def add_delete():
-            add_menuitem("Delete\tDel", self.RightClickDeleteNode)
+            add_menuitem("Delete\tDel", self.OnRightClickDeleteNode)
 
         def add_cancel():
             add_menuitem("Cancel", self.OnPopupMenuCancel)
@@ -249,13 +249,13 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         accel_tbl = wx.AcceleratorTable(self.accel_entries)
         self.frame.SetAcceleratorTable(accel_tbl)
 
-    def RightClickDeleteNode(self, event):
+    def OnRightClickDeleteNode(self, event):
         self.app.run.CmdNodeDelete(self.GetShape())
 
     def OnLeftDoubleClick(self, x, y, keys, attachment):
         node_edit_multi_purpose(self.GetShape(), self.app)
 
-    def NodeProperties(self, event):
+    def OnNodeProperties(self, event):
         node_edit_multi_purpose(self.GetShape(), self.app)
 
     def OnDrawBegin(self, event):
