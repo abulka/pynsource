@@ -6,6 +6,8 @@ from .coord_utils import setpos, getpos
 from common.architecture_support import *
 from gui.uml_shapes import CommentShape
 from view.display_model import GraphNode, UmlNode, CommentNode
+from typing import List, Set, Dict, Tuple, Optional
+
 
 class UmlShapeHandler(ogl.ShapeEvtHandler):
     def __init__(self, log, frame, shapecanvas):
@@ -131,39 +133,53 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self.popupmenu = wx.Menu()  # This is the popup menu to which we attach menu items
         self.submenu = wx.Menu()  # This is the sub menu within the popupmenu
 
-        def add_menuitem(item_text, method, submenu=False):
+        self.accel_entries : List[wx.AcceleratorEntry] = []
+
+        def add_menuitem(item_text, method, submenu=False, key_code=None):
             if submenu:
                 to_menu = self.submenu
             else:
                 to_menu = self.popupmenu
-            item = to_menu.Append(wx.ID_ANY, item_text)
+            item : wx.MenuItem = to_menu.Append(wx.ID_ANY, item_text)
             self.frame.Bind(wx.EVT_MENU, method, item)
+
+            if key_code:
+                # https://wxpython.org/Phoenix/docs/html/wx.AcceleratorEntryFlags.enumeration.html#wx-acceleratorentryflags
+                entry = wx.AcceleratorEntry()
+                entry.Set(wx.ACCEL_NORMAL, key_code, item.GetId())
+                self.accel_entries.append(entry)
 
         def add_submenu_to_popup():
             self.popupmenu.Append(wx.ID_ANY, "Draw Line", self.submenu)
 
         def add_separator():
             self.popupmenu.AppendSeparator()
+
         def add_properties():
             add_menuitem("Properties...", self.NodeProperties)
+
         def add_from():
             add_menuitem(
                 "Begin - Remember selected class as FROM node (for drawing lines)\tq",
                 self.OnDrawBegin,
-                submenu=True
+                submenu=True,
+                key_code=ord('Z')
             )
+
         def add_from_cancel():
             add_menuitem(
                 "Cancel Line Begin\tx",
                 self.OnCancelDrawBegin,
                 submenu=True
             )
+
         def add_association_edge():
             add_menuitem(
                 "End - Draw Line TO selected comment/class (association - dashed)\ta",
                 self.OnDrawEnd3,
                 submenu = True
             )
+
         def add_generalise_composition_edges():
             add_menuitem(
                 "End - Draw Line TO selected class (composition)\tw",
@@ -175,10 +191,13 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
                 self.OnDrawEnd2,
                 submenu = True
             )
+
         def add_reset_image_size():
             add_menuitem("Reset Image Size", self.OnResetImageSize)
+
         def add_delete():
             add_menuitem("Delete\tDel", self.RightClickDeleteNode)
+
         def add_cancel():
             add_menuitem("Cancel", self.OnPopupMenuCancel)
 
@@ -226,6 +245,9 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         add_cancel()
 
         self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))
+
+        accel_tbl = wx.AcceleratorTable(self.accel_entries)
+        self.frame.SetAcceleratorTable(accel_tbl)
 
     def RightClickDeleteNode(self, event):
         self.app.run.CmdNodeDelete(self.GetShape())
