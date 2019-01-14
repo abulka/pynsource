@@ -210,7 +210,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.Bind(wx.EVT_WINDOW_DESTROY, self.OnDestroy)
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
         self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
-        self.Bind(wx.EVT_CHAR, self.onKeyChar)
+        # self.Bind(wx.EVT_CHAR, self.onKeyChar)
 
         self.font1 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
@@ -296,56 +296,56 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.working = False
         event.Skip()
 
-    def onKeyChar(self, event):
-        """
-        These are secret keycodes not exposed on the menu
-        Normally shortcuts added on the menu work fine.
-        """
-        if event.GetKeyCode() >= 256:
-            event.Skip()
-            return
-        if self.working:
-            event.Skip()
-            return
-        self.working = True
-
-        keycode = chr(event.GetKeyCode())
-        print("keycode", keycode)
-
-        if keycode in ["q", "Q"]:
-            self.NewEdgeMarkFrom()
-
-        elif keycode in ["w", "W"]:
-            self.NewEdgeMarkTo(edge_type="composition")
-
-        elif keycode in ["e", "E"]:
-            self.NewEdgeMarkTo(edge_type="generalisation")
-
-        elif keycode in ["a", "A"]:
-            self.NewEdgeMarkTo(edge_type="association")
-
-        elif keycode in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-            todisplay = ord(keycode) - ord("1")
-            self.snapshot_mgr.Restore(todisplay)
-
-        elif keycode == "P":
-            self.Refresh()
-
-        elif keycode in ["d", "D"]:
-            self.app.run.CmdDumpUmlWorkspace()
-
-        elif keycode == "s":
-            self.CmdTrimScrollbars()
-
-        elif keycode == "G":  # and event.ShiftDown() and event.ControlDown():
-            self.app.run.CmdBuildColourChartWorkspace()
-
-        elif keycode in ["h", "H"]:
-            self.app.run.CmdColourSequential(color_range_offset=(keycode == "H"))
-
-        self.working = False
-
-        # event.Skip()  # makes an annoying beep if enabled
+    # def onKeyChar(self, event):
+    #     """
+    #     These are secret keycodes not exposed on the menu
+    #     Normally shortcuts added on the menu work fine.
+    #     """
+    #     if event.GetKeyCode() >= 256:
+    #         event.Skip()
+    #         return
+    #     if self.working:
+    #         event.Skip()
+    #         return
+    #     self.working = True
+    #
+    #     keycode = chr(event.GetKeyCode())
+    #     print("keycode", keycode)
+    #
+    #     if keycode in ["q", "Q"]:
+    #         self.NewEdgeMarkFrom()
+    #
+    #     elif keycode in ["w", "W"]:
+    #         self.NewEdgeMarkTo(edge_type="composition")
+    #
+    #     elif keycode in ["e", "E"]:
+    #         self.NewEdgeMarkTo(edge_type="generalisation")
+    #
+    #     elif keycode in ["a", "A"]:
+    #         self.NewEdgeMarkTo(edge_type="association")
+    #
+    #     elif keycode in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+    #         todisplay = ord(keycode) - ord("1")
+    #         self.snapshot_mgr.Restore(todisplay)
+    #
+    #     elif keycode == "P":
+    #         self.Refresh()
+    #
+    #     elif keycode in ["d", "D"]:
+    #         self.app.run.CmdDumpUmlWorkspace()
+    #
+    #     elif keycode == "s":
+    #         self.CmdTrimScrollbars()
+    #
+    #     elif keycode == "G":  # and event.ShiftDown() and event.ControlDown():
+    #         self.app.run.CmdBuildColourChartWorkspace()
+    #
+    #     elif keycode in ["h", "H"]:
+    #         self.app.run.CmdColourSequential(color_range_offset=(keycode == "H"))
+    #
+    #     self.working = False
+    #
+    #     event.Skip()  # makes an annoying beep if enabled
 
     def CmdTrimScrollbars(self):
         self.canvas_resizer.resize_virtual_canvas_tofit_bounds(

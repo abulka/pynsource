@@ -224,6 +224,9 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         wx.CallAfter(
             self.app.run.CmdBootStrap
         )  # doesn't make a difference calling this via CallAfter
+
+        # wx.lib.inspection.InspectionTool().Show()
+
         return True
 
     # def minimized_on_mac_problem(self):

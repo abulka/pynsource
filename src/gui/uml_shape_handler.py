@@ -19,6 +19,8 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             None
         )  # assigned later by event sent to controller from uml canvas when creating new shapes
 
+        self.popupmenu = None   # ANDY HACK
+
     def UpdateStatusBar(self, shape):
         x, y = shape.GetX(), shape.GetY()
         x, y = getpos(shape)
@@ -130,6 +132,39 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self._SelectNodeNow(x, y, keys, attachment)
         # self.log.WriteText("%s\n" % self.GetShape())
 
+
+
+
+
+        # EXPERIMENT
+
+        self.accel_entries : List[wx.AcceleratorEntry] = []
+
+        if self.popupmenu:  # already exists - don't build it again
+            print("already exists")
+        else:
+            print("creating popup")
+            self.popupmenu = wx.Menu()  # This is the popup menu to which we attach menu items
+            item : wx.MenuItem = self.popupmenu.Append(wx.ID_ANY, "Do Z")
+            self.frame.Bind(wx.EVT_MENU, self.doZ, item)
+
+            item.Enable(False)  # hmm, accelerator still fires :-(
+
+            entry = wx.AcceleratorEntry()
+            # entry.Set(wx.ACCEL_NORMAL, ord('Z'), item.GetId())
+            entry.Set(wx.ACCEL_CTRL, ord('Z'), item.GetId())
+            self.accel_entries.append(entry)
+
+            accel_tbl = wx.AcceleratorTable(self.accel_entries)
+            self.frame.SetAcceleratorTable(accel_tbl)
+            print("self.accel_entries", self.accel_entries)
+
+        self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))
+
+
+        return
+
+
         self.popupmenu = wx.Menu()  # This is the popup menu to which we attach menu items
         self.submenu = wx.Menu()  # This is the sub menu within the popupmenu
 
@@ -142,12 +177,15 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
                 to_menu = self.popupmenu
             item : wx.MenuItem = to_menu.Append(wx.ID_ANY, item_text)
             self.frame.Bind(wx.EVT_MENU, method, item)
+            self.frame.Bind(wx.EVT_UPDATE_UI, self.TestUpdateUI, item)
 
             if key_code:
                 # https://wxpython.org/Phoenix/docs/html/wx.AcceleratorEntryFlags.enumeration.html#wx-acceleratorentryflags
                 entry = wx.AcceleratorEntry()
                 entry.Set(wx.ACCEL_NORMAL, key_code, item.GetId())
                 self.accel_entries.append(entry)
+
+            return item
 
         def add_submenu_to_popup():
             self.popupmenu.Append(wx.ID_ANY, "Draw Line", self.submenu)
@@ -159,12 +197,13 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             add_menuitem("Properties...", self.OnNodeProperties)
 
         def add_from():
-            add_menuitem(
+            item : wx.MenuItem = add_menuitem(
                 "Begin - Remember selected class as FROM node (for drawing lines)\tq",
                 self.OnDrawBegin,
                 submenu=True,
                 key_code=ord('Z')
             )
+            # item.Enable(False)  # hmm, accelerator still fires :-(
 
         def add_from_cancel():
             add_menuitem(
@@ -248,6 +287,34 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
 
         accel_tbl = wx.AcceleratorTable(self.accel_entries)
         self.frame.SetAcceleratorTable(accel_tbl)
+
+        # wx.GetApp().Bind(wx.EVT_UPDATE_UI, self.TestUpdateUI, id=506)
+        # self.frame.Bind(wx.EVT_UPDATE_UI, updateUI, item)
+        #
+        # def doBind(item, handler, updateUI=None):
+        #     self.Bind(wx.EVT_TOOL, handler, item)
+        #     if updateUI is not None:
+        #         self.Bind(wx.EVT_UPDATE_UI, updateUI, item)
+        #
+        # doBind(tbar.AddTool(-1, images._rt_bold.GetBitmap(), isToggle=True, shortHelpString="Bold"),
+        #        self.OnBold,
+        #        self.OnUpdateBold)
+
+    def TestUpdateUI(self, evt):
+        import time
+        text = time.ctime()
+        # How to get to the target of the event e.g. the specific menu item - AH you need to
+        # bind a different handler to each menuitem,
+        # Or you can check evt.GetId()
+
+        # evt.SetText(text)  # gosh this sets the text of the menuitem!
+
+        evt.Enable(False)  # Accelerator still fires !!??????
+
+        # print("TestUpdateUI", text, evt.EventObject)
+
+    def doZ(self, event):
+        print("doZ")
 
     def OnRightClickDeleteNode(self, event):
         self.app.run.CmdNodeDelete(self.GetShape())
