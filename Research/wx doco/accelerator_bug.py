@@ -20,31 +20,40 @@ class MyForm(wx.Frame):
         wx.Frame.__init__(self, None, wx.ID_ANY, "Accelerators fire even when menu item is disabled", size=(500,500))
         panel = wx.Panel(self, wx.ID_ANY)
         wx.StaticText(panel, wx.ID_ANY, help, wx.DefaultPosition, wx.DefaultSize, 0)
+        self.cb = wx.CheckBox(panel, wx.ID_ANY, u"Enable Menuitem", wx.DefaultPosition, wx.DefaultSize, 0)
         self.popupmenu = wx.Menu()
 
         self.item: wx.Menuself.item = self.popupmenu.Append(wx.ID_ANY, "Do Something (CMD S)")
         self.Bind(wx.EVT_MENU, self.DoSomething, self.item)
+        self.Bind(wx.EVT_CHECKBOX, self.OnCbChanged)
 
         accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL,  ord('S'), self.item.GetId() )])
         self.SetAcceleratorTable(accel_tbl)
 
         # hmm, accelerator still fires :-(
-        self.item.Enable(False)
-        self.popupmenu.Enable(self.item.GetId(), False)
-        wx.CallAfter(self.item.Enable, False)
+        self.item.Enable(self.cb.IsChecked())
+        # self.popupmenu.Enable(self.item.GetId(), False)
+        # wx.CallAfter(self.item.Enable, False)
 
         # frame doesn't get event EVT_RIGHT_UP (panel does), only gets EVT_CONTEXT_MENU
         self.Bind(wx.EVT_CONTEXT_MENU, self.OnRight)
+
+    def OnCbChanged(self, event):
+        self.item.Enable(self.cb.IsChecked())
 
     def OnRight(self, event):
         self.PopupMenu(self.popupmenu)
 
     def DoSomething(self, event):
-        msg = f"Something is being triggered, even though menuitem enabled is {self.item.Enabled}"
+        if not self.item.Enabled:
+            print("Hack - workaround - accelerator triggers but action blocked!")
+            return
+
+        msg = f"Something is being triggered, menuitem enabled state is: {self.item.Enabled}"
         print(msg)
-        dlg = wx.MessageDialog(self, msg, "Message", wx.OK | wx.ICON_INFORMATION)
-        dlg.ShowModal()
-        dlg.Destroy()
+        # dlg = wx.MessageDialog(self, msg, "Message", wx.OK | wx.ICON_INFORMATION)
+        # dlg.ShowModal()
+        # dlg.Destroy()
 
 
 class MyApp(wx.App):
