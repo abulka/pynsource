@@ -117,9 +117,108 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
 
     def BuildPopupMenuItems(self):
         """
-        Builds the MenuItems used in the r.click popup and stores them in a dict
-        self.popup_menuitems using known keys, which allows them to be acc
-        Returns:
+        Builds the MenuItems used in the r.click popup and also builds the accelerator table.
+        Returns: -
+
+        FUN FACT: Keyboard shortcuts in wxPython are actually menu events
+        (i.e. wx.EVT_MENU), probably because the shortcuts are usually also a menu item.
+        Id's seems to be 'broadcast' and anything bound to that id gets called
+
+        Also wx.EVT_MENU is an object, not an id.  All menu events and presumably
+        key events emit this event, and the 'id' is needed to distinguish between the events.
+
+        On Binding
+        ----------
+        https://wxpython.org/Phoenix/docs/html/wx.EvtHandler.html#wx.EvtHandler.Bind
+
+        third parameter is 'source'   <--- this is not an id, but an object e.g. a frame, a menuitem
+        Sometimes the event originates from a different window than self, but you still want
+        to catch it in self
+
+        fourth parameter is 'id' – Used to specify the event source by ID instead of instance.
+
+        ** Initially this didn't make sense.  if the event source is a 'window', which means a
+        canvas or control etc. a frame, a menuitem etc. then how can you alternatively
+        refer to that 'window' by id?
+        do windows have id's?  I thought id's were the pseudo 'events' that get broadcast
+        and bound to.
+        ** ANSWER: Source is not an id - its an object e.g. a frame, a menuitem
+
+        and the window/control.Bind() construct suggests that the id is expected to come
+        from that window (AHA which makes sense re the definition above of 'source')
+
+        OBJ.Bind(event_type, handler, source)
+        but why bother with source - you always specify where events come from by the OBJ
+        and you can bind to any destination with the handler method.  what does it mean to
+        specify both source and OBJ, as the destination is always 'handler' !
+        Why not just always have OBJ as your source?
+        Perhaps menuitem.Bind() wouldn't work? as the events are coming from frame?  e.g.
+        accelerator key id's come from the frame.  main menu event come from the frame.
+        Menuitem event would surely come from the menuitem?
+
+        OBJ.Bind(event_type, handler, source)
+        OBJ.Bind(event_type, handler, id=integer_id)
+        I thus think OBJ and source are both places where events 'come from'.  Specifying
+        both means you can get them from either e.g. a frame or from a menuitem, if you had
+        specified a menuitem as source.
+        Presumably one doesn't override the other?  In other words you can get events from
+        both places, not just 'source'.?
+        Perhaps menuitems don't have a Bind() method, so you have to do it this way, and source
+        does indeed override.  CONFIRMED
+            AttributeError: 'MenuItem' object has no attribute 'Bind'
+        I wonder what 'propagation', if any, happens
+
+        OBJ.Bind(event_type, handler, integer_id)
+        only seems to work with pre-allocated ids or wx.NewIdRef() but not wx.ID_ANY which is
+        -1 which is strange since the passing of wx.ID_ANY into .Append() works?
+        Perhaps the adding to the menu and the binding need different thinking.
+        YES
+        The creation of a menuitem via .Append(wx.ID_ANY, text) will give that menu item
+        an id of -1 which means how do we get to it?  Well the Bind() with the menu item as the
+        third parameter which is the 'source' allows the Bind to work and "receive" from the
+        menuitem even though the id is generically wx.ID_ANY -1
+        But if we don't specify the 'source' then we must rely on a general broadcast of the id
+        and thus we need a specific id to distinguish on.  Its kind of making sense now.
+
+        If you want both a menu item and an accelerator then you need to use a unique id
+        binding technique, not 'source' based, because you can't have accelerator tables
+        broadcasting wx.ID_ANY -1 everywhere, nobody would be able to tell them apart.
+        How I learned this:
+        At one stage I thought I would be tricky
+            if not id:
+                id = wx.NewIdRef() if keycode_only else wx.ID_ANY
+        then the following:
+            if keycode_only:
+                # Need a unique id in Bind() because id broadcast from frame
+                self.frame.Bind(wx.EVT_MENU, method, id=id)
+            else:
+                # Can use a generic wx.ID_ANY -1 id because binding directly to menuitem thus don't need id
+                to_menu = self.submenu if submenu else self.popupmenu
+                item = to_menu.Append(id, text)
+                self.frame.Bind(wx.EVT_MENU, method, source=item)
+            if key_code:
+                entry = wx.AcceleratorEntry()
+                entry.Set(wx.ACCEL_NORMAL, key_code, id)
+                self.accel_entries.append(entry)
+        BUT the wx.ID_ANY -1 in the accelerator table didn't trigger anything!
+
+        Summary
+        -------
+        Thus when creating a menu item to_menu.Append(id, text) you can specify wx.ID_ANY -1
+        as the id, but this means you MUST do a Bind() with the third parameter
+        which is the 'source' set to the menuitem that was just created.
+        A kind of 'hard wiring / direct broadcast' which doesn't rely on unique ids.
+            item = to_menu.Append(wx.ID_ANY, text)
+            self.frame.Bind(wx.EVT_MENU, method, source=item)
+
+        When creating a menu item with unique ids
+        (pre-allocated ids or wx.NewIdRef() but not wx.ID_ANY) you have the option in the Bind
+        to not specify the 'source' and just to specify the id.
+        Warning, the third parameter is 'source', if you want to specify id, that's the
+        fourth parameter, so you are typically going to need to use a keyword arg id= approach.
+            id = wx.NewIdRef()               <-- this could be a pre-allocated constant
+            item = to_menu.Append(id, text)              <--- id specified
+            self.frame.Bind(wx.EVT_MENU, method, id=id)  <--- same id specified
 
         """
 
@@ -132,19 +231,18 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
 
             item: wx.MenuItem = None
 
-            # FUN FACT: Keyboard shortcuts in wxPython are actually menu events
-            # (i.e. wx.EVT_MENU), probably because the shortcuts are usually also a menu item.
-            # Id's seems to be 'broadcast' and anything bound to that id gets called
-            if not id:
-                id = wx.ID_ANY
+            # Accelerator tables need unique ids, whereas direct menuitem binding with Bind(....source=menuitem)
+            # don't care about ids and can thus use wx.ID_ANY (which is always -1)
+            if not id or id == wx.ID_ANY:
+                id = wx.NewIdRef() if key_code or keycode_only else wx.ID_ANY
 
             if keycode_only:
-                # Bind() accepts a menu item as third param or just plain id
-                self.frame.Bind(wx.EVT_MENU, method, id)
+                self.frame.Bind(wx.EVT_MENU, method, id=id)
             else:
                 to_menu = self.submenu if submenu else self.popupmenu
                 item = to_menu.Append(id, text)
-                self.frame.Bind(wx.EVT_MENU, method, item)  # item or item.GetId() or id - are ok
+                self.frame.Bind(wx.EVT_MENU, method, source=item)
+                # self.frame.Bind(wx.EVT_MENU, method, id=id)
                 # self.frame.Bind(wx.EVT_UPDATE_UI, self.TestUpdateUI, item)
 
             if key_code:  # accelerator tables work using keycodes and menu/key 'event' int ids
@@ -152,6 +250,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
                 entry = wx.AcceleratorEntry()
                 entry.Set(wx.ACCEL_NORMAL, key_code, id)
                 self.accel_entries.append(entry)
+                # print("accel built", entry, key_code, id)
 
             return item
 
@@ -172,7 +271,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             item : wx.MenuItem = add_menuitem(
                 "Begin - Remember selected class as FROM node (for drawing lines)\tq",
                 self.OnDrawBegin,
-                id=MENU_ID_BEGIN_LINE,
+                # id=MENU_ID_BEGIN_LINE,
                 submenu=True,
                 key_code=ord('Q'),
                 keycode_only=keycode_only
