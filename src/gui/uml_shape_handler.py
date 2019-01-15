@@ -120,12 +120,18 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         Builds the MenuItems used in the r.click popup and also builds the accelerator table.
         Returns: -
 
-        FUN FACT: Keyboard shortcuts in wxPython are actually menu events
+        Fun Facts
+        ---------
+        Keyboard shortcuts in wxPython are actually menu events
         (i.e. wx.EVT_MENU), probably because the shortcuts are usually also a menu item.
-        Id's seems to be 'broadcast' and anything bound to that id gets called
-
-        Also wx.EVT_MENU is an object, not an id.  All menu events and presumably
+        Id's seems to be 'broadcast' and any handler bound to that id gets called
+        wx.EVT_MENU is an object, not an id.  All menu events and presumably
         key events emit this event, and the 'id' is needed to distinguish between the events.
+
+        Accelerator tables work using keycodes and menu/key 'event' int ids - they do not involve
+        menuitem objects or any other object, only ids.  There is only one global accelerator table
+        per frame.
+        https://wxpython.org/Phoenix/docs/html/wx.AcceleratorEntryFlags.enumeration.html#wx-acceleratorentryflags
 
         On Binding
         ----------
@@ -202,6 +208,49 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
                 self.accel_entries.append(entry)
         BUT the wx.ID_ANY -1 in the accelerator table didn't trigger anything!
 
+        Perhaps 'source=menuitem' binding to menu items is the only correct way cos
+            to_menu = self.submenu if submenu else self.popupmenu
+            item = to_menu.Append(id, text)
+         1. self.frame.Bind(wx.EVT_MENU, method, source=item)   <- WORKS
+         2. self.frame.Bind(wx.EVT_MENU, method, id=id)    <- DOESN'T TRIGGER THE HANDLER
+        AH BUT it WORKS when the ids are unique it does, but they must be freshly allocated
+        each time the menu it built, for some reason?  Otherwise the handlers don't get called?
+        Possibly the 'shape' isn't in the broadcast zone of the frame - but it is, when using
+        freshly allocated ids.
+        Even when using a unique, pre-allocated id, the (2.) technique doesn't work?
+        Even when the menuitem in question is getting a freshly allocated id, if the surrounding
+        menuitems are reusing ids, no accelerator shortcuts work and I even see that CMD Q
+        of the main menu stops working - something seriously screwy here.
+
+        Here is an example illustrating the above comment.
+            if not id or id == wx.ID_ANY:
+                # Accelerator tables need unique ids, whereas direct menuitem binding
+                # with Bind(....source=menuitem)
+                # don't care about ids and can thus use wx.ID_ANY (which is always -1)
+                id = wx.NewIdRef() if key_code or keycode_only else wx.ID_ANY
+
+            # id = wx.NewIdRef()  <--- need to uncomment this to make the (2) binding technique work
+            if key_code:
+                assert id != wx.ID_ANY
+            if keycode_only:
+                assert id != wx.ID_ANY
+            print(f"id={id} used for {text}")
+
+            if keycode_only:
+                self.frame.Bind(wx.EVT_MENU, method, id=id)
+            else:
+                to_menu = self.submenu if submenu else self.popupmenu
+                item = to_menu.Append(id, text)
+                # self.frame.Bind(wx.EVT_MENU, method, source=item) # (1)
+                self.frame.Bind(wx.EVT_MENU, method, id=id)  # (2) doesn't work unless all ids fresh
+
+                # self.frame.Bind(wx.EVT_UPDATE_UI, self.TestUpdateUI, item)  # future update ?
+
+            if key_code:
+                entry = wx.AcceleratorEntry()
+                entry.Set(wx.ACCEL_NORMAL, key_code, id)
+                self.accel_entries.append(entry)
+
         Summary
         -------
         Thus when creating a menu item to_menu.Append(id, text) you can specify wx.ID_ANY -1
@@ -229,12 +278,17 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
 
         def add_menuitem(text, method, id=None, submenu=False, key_code=None, keycode_only=False):
 
-            item: wx.MenuItem = None
+            def check_id(id):
+                """
+                Accelerator tables need unique ids, whereas direct menuitem binding with Bind(...source=menuitem)
+                doesn't care about ids and can thus use wx.ID_ANY (which is always -1)
+                """
+                if not id or id == wx.ID_ANY:
+                    id = wx.NewIdRef() if key_code or keycode_only else wx.ID_ANY
+                return id
 
-            # Accelerator tables need unique ids, whereas direct menuitem binding with Bind(....source=menuitem)
-            # don't care about ids and can thus use wx.ID_ANY (which is always -1)
-            if not id or id == wx.ID_ANY:
-                id = wx.NewIdRef() if key_code or keycode_only else wx.ID_ANY
+            item: wx.MenuItem = None
+            id = check_id(id)
 
             if keycode_only:
                 self.frame.Bind(wx.EVT_MENU, method, id=id)
@@ -242,11 +296,9 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
                 to_menu = self.submenu if submenu else self.popupmenu
                 item = to_menu.Append(id, text)
                 self.frame.Bind(wx.EVT_MENU, method, source=item)
-                # self.frame.Bind(wx.EVT_MENU, method, id=id)
-                # self.frame.Bind(wx.EVT_UPDATE_UI, self.TestUpdateUI, item)
+                # self.frame.Bind(wx.EVT_UPDATE_UI, self.TestUpdateUI, item)  # future update ?
 
-            if key_code:  # accelerator tables work using keycodes and menu/key 'event' int ids
-                # https://wxpython.org/Phoenix/docs/html/wx.AcceleratorEntryFlags.enumeration.html#wx-acceleratorentryflags
+            if key_code:
                 entry = wx.AcceleratorEntry()
                 entry.Set(wx.ACCEL_NORMAL, key_code, id)
                 self.accel_entries.append(entry)
@@ -271,7 +323,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             item : wx.MenuItem = add_menuitem(
                 "Begin - Remember selected class as FROM node (for drawing lines)\tq",
                 self.OnDrawBegin,
-                # id=MENU_ID_BEGIN_LINE,
+                id=MENU_ID_BEGIN_LINE,
                 submenu=True,
                 key_code=ord('Q'),
                 keycode_only=keycode_only
