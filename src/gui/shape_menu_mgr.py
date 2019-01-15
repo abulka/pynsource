@@ -279,15 +279,21 @@ class ShapeMenuMgr:
         def add_cancel():
             add_menuitem("Cancel", self.OnPopupMenuCancel)
 
+        # Look around...
 
         shape = self.shapehandler.GetShape()
         from_node : GraphNode = self.shapehandler.umlcanvas.new_edge_from
         is_bitmap = shape.__class__.__name__ == "BitmapShapeResizable"
-        is_comment = isinstance(shape.node, CommentNode)
-        is_umlclass = isinstance(shape.node, UmlNode)
+        if is_bitmap:
+            is_comment = is_umlclass = False
+        else:
+            is_comment = isinstance(shape.node, CommentNode)
+            is_umlclass = isinstance(shape.node, UmlNode)
         assert not is_umlclass == (is_comment or is_bitmap)
         started_connecting = from_node != None
         from_is_comment = isinstance(from_node, CommentNode)
+
+        # The algorithm that builds the menu
 
         if is_umlclass or is_comment:
             add_properties()
@@ -320,7 +326,8 @@ class ShapeMenuMgr:
             else:
                 add_from_cancel(keycode_only=True)  # always allow begin line cancel as shortcut
 
-        add_submenu_to_popup()
+        if not is_bitmap:
+            add_submenu_to_popup()
 
         add_separator()
         add_delete()
@@ -345,9 +352,6 @@ class ShapeMenuMgr:
 
     def OnDrawBegin(self, event):
         print("OnDrawBegin")
-        # if not is_item_enabled(event.GetId()):
-        #     print("OnDrawBegin THWARTED")
-        #     return
         self.GetShape().GetCanvas().NewEdgeMarkFrom()
         self.focus_shape()  # rebuild the accelerator table and menus cos situation changed
 
@@ -357,22 +361,25 @@ class ShapeMenuMgr:
 
     def OnDrawEnd1(self, event):
         self.GetShape().GetCanvas().NewEdgeMarkTo(edge_type="composition")
+        self.focus_shape()
 
     def OnDrawEnd2(self, event):
         self.GetShape().GetCanvas().NewEdgeMarkTo(edge_type="generalisation")
+        self.focus_shape()
 
     def OnDrawEnd3(self, event):
         self.GetShape().GetCanvas().NewEdgeMarkTo(edge_type="association")
+        self.focus_shape()
 
     def OnResetImageSize(self, event):
         shape = self.GetShape()
         shape.ResetSize()
         # shape.GetCanvas().Refresh(False)   # don't seem to need since SelectNodeNow() might be doing it for us
         shape.GetCanvas().SelectNodeNow(shape)
-        self.UpdateStatusBar(shape)
+        self.shapehandler.UpdateStatusBar(shape)
 
     def OnRightClickDeleteNode(self, event):
-        self.app.run.CmdNodeDelete(self.GetShape())
+        self.shapehandler.app.run.CmdNodeDelete(self.GetShape())
 
     def OnPopupMenuCancel(self, event):
         pass

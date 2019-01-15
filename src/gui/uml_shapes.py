@@ -200,9 +200,9 @@ class BitmapShapeResizable(ogl.BitmapShape):
 
             # ANDY ADDED
             if self._bitmap.GetWidth() != w or self._bitmap.GetHeight() != h:
-                img = wx.ImageFromBitmap(self._ori_bmp)
+                img = self._ori_bmp.ConvertToImage()
                 adjusted_img = img.Rescale(w, h, wx.IMAGE_QUALITY_HIGH)
-                bitmap = wx.BitmapFromImage(adjusted_img)
+                bitmap = wx.Bitmap(adjusted_img)
                 self._bitmap = (
                     bitmap
                 )  # shape.SetBitmap(bitmap)  # don't call SetBitmap() cos it will infinite loop.  Plus don't want to destroy ori bmp info
