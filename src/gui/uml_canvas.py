@@ -26,7 +26,7 @@ from .uml_shape_handler import UmlShapeHandler
 from common.architecture_support import *
 
 from gui.repair_ogl import repairOGL
-from gui.shape_menuitems import MENU_ID_CANCEL_LINE
+from gui.shape_menu import MENU_ID_CANCEL_LINE
 
 repairOGL()
 
