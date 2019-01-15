@@ -3,6 +3,7 @@ from typing import List, Set, Dict, Tuple, Optional
 from view.display_model import GraphNode, UmlNode, CommentNode
 from gui.node_edit_multi_purpose import node_edit_multi_purpose
 
+# not all are defined, as the rest of the ids are auto allocated, just nice not to waste id's :-)
 MENU_ID_SHAPE_PROPERTIES = wx.NewIdRef()
 MENU_ID_BEGIN_LINE = wx.NewIdRef()
 MENU_ID_CANCEL_LINE = wx.NewIdRef()
@@ -217,6 +218,8 @@ class ShapeMenuMgr:
 
             return item
 
+        # Utility functions to add specific things to the menu - nicer way for algorithm to refer to
+
         def add_submenu_to_popup():
             self.popupmenu.Append(wx.ID_ANY, "Draw Line", self.submenu)
 
@@ -255,6 +258,7 @@ class ShapeMenuMgr:
             add_menuitem(
                 "End - Draw Line TO selected comment/class (association - dashed)\ta",
                 self.OnDrawEnd3,
+                key_code = ord('A'),
                 submenu = True
             )
 
@@ -262,12 +266,14 @@ class ShapeMenuMgr:
             add_menuitem(
                 "End - Draw Line TO selected class (composition)\tw",
                 self.OnDrawEnd1,
-                submenu=True
+                submenu=True,
+                key_code = ord('W'),
             )
             add_menuitem(
                 "End - Draw Line TO selected class (generalisation)\te",
                 self.OnDrawEnd2,
-                submenu = True
+                submenu = True,
+                key_code=ord('E'),
             )
 
         def add_reset_image_size():
@@ -351,7 +357,6 @@ class ShapeMenuMgr:
         node_edit_multi_purpose(self.GetShape(), self.shapehandler.app)
 
     def OnDrawBegin(self, event):
-        print("OnDrawBegin")
         self.GetShape().GetCanvas().NewEdgeMarkFrom()
         self.focus_shape()  # rebuild the accelerator table and menus cos situation changed
 

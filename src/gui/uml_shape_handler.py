@@ -46,7 +46,8 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             # Adjust the GraphNode to match the shape x,y
             shape.node.left, shape.node.top = newpos
         except:
-            print("no node model attached to this shape!")
+            # print("no node model attached to this shape!")
+            pass
 
         self.UpdateStatusBar(shape)
 
