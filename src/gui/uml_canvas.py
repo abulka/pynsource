@@ -26,7 +26,7 @@ from .uml_shape_handler import UmlShapeHandler
 from common.architecture_support import *
 
 from gui.repair_ogl import repairOGL
-from gui.shape_menu import MENU_ID_CANCEL_LINE
+from gui.shape_menu_mgr import MENU_ID_CANCEL_LINE
 
 repairOGL()
 
@@ -268,7 +268,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         ])
         self.frame.SetAcceleratorTable(accel_tbl)
         self.frame.Bind(wx.EVT_MENU, self.OnCancelLine, id=MENU_ID_CANCEL_LINE)
-        print("focus_canvas")
 
     def OnCancelLine(self, event):
         if True or self.new_edge_from:
