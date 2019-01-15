@@ -47,6 +47,7 @@ class MyForm(wx.Frame):
     def DoSomething(self, event):
         if not self.item.Enabled:
             print("Hack - workaround - accelerator triggers but action blocked!")
+            print(f"menu item id is {self.item.GetId()} and event id is {event.GetId()}")
             return
 
         msg = f"Something is being triggered, menuitem enabled state is: {self.item.Enabled}"

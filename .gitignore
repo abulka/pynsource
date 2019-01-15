@@ -6,3 +6,5 @@ dist/
 build/
 src/setup.py
 .eggs
+.vscode/
+Research/wxglade/*/*~

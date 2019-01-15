@@ -502,6 +502,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             event.Skip()
             return
 
+        self.umlcanvas.focus_canvas()  # bit of accelerator fun, though below menu is not accel.
+
         if self.popupmenu:
             self.popupmenu.Destroy()  # wx.Menu objects need to be explicitly destroyed (e.g. menu.Destroy()) in this situation. Otherwise, they will rack up the USER Objects count on Windows; eventually crashing a program when USER Objects is maxed out. -- U. Artie Eoff  http://wiki.wxpython.org/index.cgi/PopupMenuOnRightClick
         self.popupmenu = wx.Menu()  # Create a menu

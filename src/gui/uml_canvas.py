@@ -26,6 +26,7 @@ from .uml_shape_handler import UmlShapeHandler
 from common.architecture_support import *
 
 from gui.repair_ogl import repairOGL
+from gui.popup_menuitems import MENU_ID_CANCEL_LINE
 
 repairOGL()
 
@@ -181,7 +182,6 @@ ogl.Shape.Move2 = Move2
 
 # repairOGL()
 
-
 class UmlCanvas(ogl.ShapeCanvas):
     # class UmlCanvas(ShapeCanvasAndy):
 
@@ -256,6 +256,26 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.layouter = GraphLayoutSpring(self.displaymodel.graph, gui=self)
         self.overlap_remover = OverlapRemoval(self.displaymodel.graph, margin=50, gui=self)
 
+        self.focus_canvas()
+
+    def focus_canvas(self):
+        """ accelerator stuff
+        this is what is called when shape is deselected
+        the only acceleration should be to cancel the pending line drawing
+        """
+        accel_tbl = wx.AcceleratorTable([
+            (wx.ACCEL_NORMAL, ord('X'), MENU_ID_CANCEL_LINE),
+        ])
+        self.frame.SetAcceleratorTable(accel_tbl)
+        self.frame.Bind(wx.EVT_MENU, self.OnCancelLine, id=MENU_ID_CANCEL_LINE)
+        print("focus_canvas")
+
+    def OnCancelLine(self, event):
+        if True or self.new_edge_from:
+            print("Line drawing cancelled")
+        self.new_edge_from = None
+        self.frame.SetStatusText("")
+
     def AllToLayoutCoords(self):
         self.coordmapper.AllToLayoutCoords()
 
@@ -265,6 +285,7 @@ class UmlCanvas(ogl.ShapeCanvas):
     def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
         # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
         self.app.run.CmdDeselectAllShapes()
+        self.focus_canvas()
 
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
@@ -418,8 +439,10 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.frame.SetStatusText("Please select a node")
             return
 
+        if self.new_edge_from:
+            print("warning, new_edge_from already set")
         self.new_edge_from = selected[0].node
-        self.frame.SetStatusText("From %s" % self.new_edge_from.id)
+        self.frame.SetStatusText(f"Line begun from \"{self.new_edge_from.id}\" - now select destination node and r.click to join")
 
     def NewEdgeMarkTo(self, edge_type="composition"):
         selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
@@ -563,6 +586,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.log, self.frame, self
         )  # just init the handler with whatever will be convenient for it to know.
         evthandler.SetShape(shape)
+        # prev handler happens to be <gui.uml_shapes.DividedShape> - this handler wiring is tricky
         evthandler.SetPreviousHandler(shape.GetEventHandler())
         shape.SetEventHandler(evthandler)
         self.new_evthandler_housekeeping(evthandler)

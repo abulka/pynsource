@@ -7,6 +7,7 @@ from common.architecture_support import *
 from gui.uml_shapes import CommentShape
 from view.display_model import GraphNode, UmlNode, CommentNode
 from typing import List, Set, Dict, Tuple, Optional
+from gui.popup_menuitems import *
 
 
 class UmlShapeHandler(ogl.ShapeEvtHandler):
@@ -19,7 +20,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             None
         )  # assigned later by event sent to controller from uml canvas when creating new shapes
 
-        self.popupmenu = None   # ANDY HACK
+        self.popupmenu = None
 
     def UpdateStatusBar(self, shape):
         x, y = shape.GetX(), shape.GetY()
@@ -42,6 +43,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         shape = self.GetShape()
         shape.GetCanvas().SelectNodeNow(shape)
         self.UpdateStatusBar(shape)
+        self.focus_shape(shape)
 
     def OnEndDragLeft(self, x, y, keys=0, attachment=0):
         shape = self.GetShape()
@@ -113,57 +115,13 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         ):  # Definitely seem to need this on Mac to avoid ghost lines being left after a move
             shape.GetCanvas().Refresh(False)
 
-    def OnRightClick(self, x, y, keys, attachment):
+    def BuildPopupMenuItems(self):
         """
-        Popup menu when r.click on shape.
-
-        Note: unlike proper toolbar menus, these shortcut keys don't work - you need to add
-        onKeyChar() interceptions in umlcanvas.py
-
-        Args:
-            x:
-            y:
-            keys:
-            attachment:
-
+        Builds the MenuItems used in the r.click popup and stores them in a dict
+        self.popup_menuitems using known keys, which allows them to be acc
         Returns:
 
         """
-        self._SelectNodeNow(x, y, keys, attachment)
-        # self.log.WriteText("%s\n" % self.GetShape())
-
-
-
-
-
-        # EXPERIMENT
-
-        self.accel_entries : List[wx.AcceleratorEntry] = []
-
-        if self.popupmenu:  # already exists - don't build it again
-            print("already exists")
-        else:
-            print("creating popup")
-            self.popupmenu = wx.Menu()  # This is the popup menu to which we attach menu items
-            item : wx.MenuItem = self.popupmenu.Append(wx.ID_ANY, "Do Z")
-            self.frame.Bind(wx.EVT_MENU, self.doZ, item)
-
-            item.Enable(False)  # hmm, accelerator still fires :-(
-
-            entry = wx.AcceleratorEntry()
-            # entry.Set(wx.ACCEL_NORMAL, ord('Z'), item.GetId())
-            entry.Set(wx.ACCEL_CTRL, ord('Z'), item.GetId())
-            self.accel_entries.append(entry)
-
-            accel_tbl = wx.AcceleratorTable(self.accel_entries)
-            self.frame.SetAcceleratorTable(accel_tbl)
-            print("self.accel_entries", self.accel_entries)
-
-        self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))
-
-
-        return
-
 
         self.popupmenu = wx.Menu()  # This is the popup menu to which we attach menu items
         self.submenu = wx.Menu()  # This is the sub menu within the popupmenu
@@ -175,9 +133,22 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
                 to_menu = self.submenu
             else:
                 to_menu = self.popupmenu
-            item : wx.MenuItem = to_menu.Append(wx.ID_ANY, item_text)
+
+            item: wx.MenuItem = None
+            # print("wiring", item_text)
+            if item_text == "Properties...\ts":
+                item = to_menu.Append(MENU_ID_SHAPE_PROPERTIES, item_text)
+                print('yep1')
+            elif item_text == "Begin - Remember selected class as FROM node (for drawing lines)\tq":
+                item = to_menu.Append(MENU_ID_BEGIN_LINE, item_text)
+                print('yep2')
+            elif item_text == "Cancel Line Begin\tx":
+                item = to_menu.Append(MENU_ID_CANCEL_LINE, item_text)
+                print('yep3')
+            else:
+                item = to_menu.Append(wx.ID_ANY, item_text)
             self.frame.Bind(wx.EVT_MENU, method, item)
-            self.frame.Bind(wx.EVT_UPDATE_UI, self.TestUpdateUI, item)
+            # self.frame.Bind(wx.EVT_UPDATE_UI, self.TestUpdateUI, item)
 
             if key_code:
                 # https://wxpython.org/Phoenix/docs/html/wx.AcceleratorEntryFlags.enumeration.html#wx-acceleratorentryflags
@@ -194,14 +165,17 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             self.popupmenu.AppendSeparator()
 
         def add_properties():
-            add_menuitem("Properties...", self.OnNodeProperties)
+            add_menuitem("Properties...\ts",
+                         self.OnNodeProperties,
+                         key_code=ord('S'),
+                         )
 
         def add_from():
             item : wx.MenuItem = add_menuitem(
                 "Begin - Remember selected class as FROM node (for drawing lines)\tq",
                 self.OnDrawBegin,
                 submenu=True,
-                key_code=ord('Z')
+                key_code=ord('Q')
             )
             # item.Enable(False)  # hmm, accelerator still fires :-(
 
@@ -209,7 +183,8 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             add_menuitem(
                 "Cancel Line Begin\tx",
                 self.OnCancelDrawBegin,
-                submenu=True
+                submenu=True,
+                key_code = ord('X')
             )
 
         def add_association_edge():
@@ -283,8 +258,6 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         add_separator()
         add_cancel()
 
-        self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))
-
         accel_tbl = wx.AcceleratorTable(self.accel_entries)
         self.frame.SetAcceleratorTable(accel_tbl)
 
@@ -300,21 +273,113 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         #        self.OnBold,
         #        self.OnUpdateBold)
 
-    def TestUpdateUI(self, evt):
-        import time
-        text = time.ctime()
-        # How to get to the target of the event e.g. the specific menu item - AH you need to
-        # bind a different handler to each menuitem,
-        # Or you can check evt.GetId()
+    def focus_shape(self, shape):
+        """
+        Called by both left and right click on a shape
 
-        # evt.SetText(text)  # gosh this sets the text of the menuitem!
+        This is where we need to refresh the values in the central table
 
-        evt.Enable(False)  # Accelerator still fires !!??????
+        This is where we need to bind accelerators to shape events just in case it was a
+        left click and accelerator key pressed, thus no popup menu ever occurs.
+        FUN FACT: Keyboard shortcuts in wxPython are actually menu events (i.e. wx.EVT_MENU), probably because the shortcuts are usually also a menu item.
 
-        # print("TestUpdateUI", text, evt.EventObject)
+        If it is a right click then we bind from the menu items again?  But how does that
+        interact with the (non menu popup) first bindings?  Does the fact that menu items
+        share ids nicely affect things?  Need to experiment a bit.
 
-    def doZ(self, event):
-        print("doZ")
+        what about unbinding when no shape is selected?  or when shape is deleted?
+        well, we just cross our fingers the wxpython event handling does the right thing.
+
+        """
+        # Need to build accelerator table with only the entries that are relevant
+        # and bind to the shape's handlers
+        print("focus_shape")
+        self.BuildPopupMenuItems()  # easy way, we simply don't popup the menu
+        # accelerator table gets put in place - bonus
+        # and the menu is ready to be displayed if we right click - bonus
+
+    def OnRightClick(self, x, y, keys, attachment):
+        """
+        Popup menu when r.click on shape.
+
+        Note: unlike proper toolbar menus, these shortcut keys don't work - you need to add
+        onKeyChar() interceptions in umlcanvas.py
+        Or we use a global accelerator table on the frame.  <-- 2019 current approach.
+
+        Args:
+            x:
+            y:
+            keys:
+            attachment:
+
+        Returns:
+
+        """
+        self._SelectNodeNow(x, y, keys, attachment)
+        # self.log.WriteText("%s\n" % self.GetShape())
+
+        # self.BuildPopupMenuItems()  should already be built cos of the focus_shape() call
+        self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))
+
+
+        # # MGR attempt
+        # pm = self.umlcanvas.shape_popup_menu_mgr
+        # pmm.clear()
+        # pmm.add_properties()
+        # self.frame.PopupMenu(pmm.popupmenu, wx.Point(x, y))
+        #
+        # return
+
+
+        # # EXPERIMENT
+        #
+        # self.accel_entries : List[wx.AcceleratorEntry] = []
+        #
+        # if self.popupmenu:  # already exists - don't build it again
+        #     print("already exists")
+        # else:
+        #     print("creating popup")
+        #     self.popupmenu = wx.Menu()  # This is the popup menu to which we attach menu items
+        #     item : wx.MenuItem = self.popupmenu.Append(wx.ID_ANY, "Do Z")
+        #     self.frame.Bind(wx.EVT_MENU, self.doZ, item)
+        #
+        #     item.Enable(False)  # hmm, accelerator still fires :-(
+        #
+        #     entry = wx.AcceleratorEntry()
+        #     # entry.Set(wx.ACCEL_NORMAL, ord('Z'), item.GetId())
+        #     entry.Set(wx.ACCEL_CTRL, ord('Z'), item.GetId())
+        #     self.accel_entries.append(entry)
+        #
+        #     accel_tbl = wx.AcceleratorTable(self.accel_entries)
+        #     self.frame.SetAcceleratorTable(accel_tbl)
+        #     print("self.accel_entries", self.accel_entries)
+        #
+        # self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))
+        #
+        #
+        # return
+
+
+
+
+    # def TestUpdateUI(self, evt):
+    #     import time
+    #     text = time.ctime()
+    #     # How to get to the target of the event e.g. the specific menu item - AH you need to
+    #     # bind a different handler to each menuitem,
+    #     # Or you can check evt.GetId()
+    #
+    #     # evt.SetText(text)  # gosh this sets the text of the menuitem!
+    #
+    #     evt.Enable(False)  # Accelerator still fires !!??????
+    #
+    #     # print("TestUpdateUI", text, evt.EventObject)
+    #
+    # def doZ(self, event):
+    #     print("doZ")
+
+    # def _update_line_state(self):
+    #     set_item_state(MENU_ID_BEGIN_LINE, self.GetShape().GetCanvas().new_edge_from == None)
 
     def OnRightClickDeleteNode(self, event):
         self.app.run.CmdNodeDelete(self.GetShape())
@@ -326,19 +391,29 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         node_edit_multi_purpose(self.GetShape(), self.app)
 
     def OnDrawBegin(self, event):
+        print("OnDrawBegin")
+        # if not is_item_enabled(event.GetId()):
+        #     print("OnDrawBegin THWARTED")
+        #     return
         self.GetShape().GetCanvas().NewEdgeMarkFrom()
+        # self._update_line_state()
+        self.focus_shape(self)  # rebuild the accelerator table and menus cos situation changed
 
     def OnCancelDrawBegin(self, event):
-        self.GetShape().GetCanvas().new_edge_from = None
+        self.GetShape().GetCanvas().OnCancelLine(event)  # delegate to canvas handler - event dodgy
+        self.focus_shape(self)  # rebuild the accelerator table and menus cos situation changed
 
     def OnDrawEnd1(self, event):
         self.GetShape().GetCanvas().NewEdgeMarkTo(edge_type="composition")
+        # self._update_line_state()
 
     def OnDrawEnd2(self, event):
         self.GetShape().GetCanvas().NewEdgeMarkTo(edge_type="generalisation")
+        # self._update_line_state()
 
     def OnDrawEnd3(self, event):
         self.GetShape().GetCanvas().NewEdgeMarkTo(edge_type="association")
+        # self._update_line_state()
 
     def OnResetImageSize(self, event):
         shape = self.GetShape()
