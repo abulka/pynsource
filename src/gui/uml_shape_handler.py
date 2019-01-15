@@ -25,8 +25,8 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
     def OnRightClick(self, x, y, keys, attachment):
         """
         Popup menu when r.click on shape.
-        The popupmenu is already built and waiting, do to the call to BuildPopupMenuItems()
-          via focus_shape() call, which happens when left or right click on a shape.
+        The popupmenu is already built and waiting, due to the call to BuildPopupMenuItems()
+        via focus_shape() call, which happens when left or right click on a shape.
         """
         self._SelectNodeNow(x, y, keys, attachment)
         self.frame.PopupMenu(self.shapemenu_mgr.popupmenu, wx.Point(x, y))

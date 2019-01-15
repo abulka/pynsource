@@ -1,6 +1,12 @@
 """
 @startuml
 
+header
+<font color=red>Note:</font>
+15th Jan 2019
+After the refactoring of UmlShapeHandler and creation of ShapeMenuMgr
+endheader
+
 class UmlCanvas <<ogl.ShapeCanvas>> {
     umlboxshapes
     <color:Green>new_edge_from
@@ -39,6 +45,7 @@ class UmlCanvas <<ogl.ShapeCanvas>> {
     CmdRestoreLayout1()
     CmdRestoreLayout2()
     SelectNodeNow()
+    focus_canvas()  <color:royalBlue><-- NEW, sets up accelerator table for the X key when shapes lose focus
     --
     delete_shape_view() <color:Salmon><- called by build_view(), CmdNodeDeleteBase, CmdEditUmlClass (edit props), CmdEditComment
     Clear()  <color:royalBlue> <-- self.GetDiagram().DeleteAllShapes(), called from outside this class
@@ -238,9 +245,9 @@ class MainApp {
 }
 
 wx.App <|- MainApp
-MainApp ..> wx.Frame : frame
-MainApp ..> App : app
-MainApp ..> UmlCanvas : umlcanvas
+MainApp .> wx.Frame : frame
+MainApp .> App : app
+MainApp .> UmlCanvas : umlcanvas
 class pyNsourceGui <<module>> << (M,orchid) >> #DarkSeaGreen {
     ---
 }
@@ -265,62 +272,30 @@ class UmlShapeHandler <<ogl.ShapeEvtHandler>> {
     log
     frame
     umlcanvas
+    shapemenu_mgr <color:royalBlue><-- NEW!
     app
-    <b>popupmenu</b>    <color:royalBlue><-- for the shape
-    <b>submenu</b>
-    accel_entries
-    GetShape
     ---
     __init__()
-    UpdateStatusBar()
-    <b>_SelectNodeNow()
-    OnMovePost()
     <b>OnLeftClick()
     <b>OnRightClick()
     OnLeftDoubleClick()
     <b>OnEndDragLeft()</b>  <color:royalBlue><-- shape.GetCanvas().remove_overlaps()</color> <color:Red><u>ref22</u>
-    OnSizingEndDragLeft()</b>  <color:royalBlue><-- removes overlaps, also shape.GetCanvas().<b>canvas_resizer.</b>resize_virtual_canvas_tofit_bounds()</color>  <color:Red><u>ref23</u>
+    OnMovePost()
+    OnSizingEndDragLeft()</b>  <color:royalBlue><-- removes overlaps and also
+                               \t\t\t\t <color:royalBlue> shape.GetCanvas().<b>canvas_resizer.</b>resize_virtual_canvas_tofit_bounds()</color>  <color:Red><u>ref23</u>
     OnEndSize()
-    add_menuitem()
-    add_submenu_to_popup()
-    add_separator()
-    add_properties()
-    add_from()
-    add_from_cancel()
-    add_association_edge()
-    add_generalise_composition_edges()
-    add_reset_image_size()
-    add_delete()
-    add_cancel()
-    -- shape popup menu handlers --
-    OnNodeProperties()   <color:Red><u>ref55</u>
-    OnDrawBegin()
-    OnCancelDrawBegin()
-    OnDrawEnd1()
-    OnDrawEnd2()
-    OnDrawEnd3()
-    OnResetImageSize()
-    OnRightClickDeleteNode()
-    OnPopupMenuCancel()
+    <b>focus_shape()</b> <color:royalBlue><-- NEW!
+    <b>_SelectNodeNow()
+    UpdateStatusBar()
 
     .. def OnRightClick(self, x, y, keys, attachment): ..
 
-    <i>Builds popup menu and sets up the main frame accelerator table
-    <i>Trouble is, need to popup the menus once to create the accelerator
-    <i>table, and also, when shape selection changes need to update the table
-    <i>Hmmmmm.
+        <i>Popup menu when r.click on shape.
+        <i>The popupmenu is already built and waiting, due to the call to BuildPopupMenuItems()
+        <i>via the focus_shape() <color:Red><u>ref11</u></color> call, which happens when left or right click on a shape.
 
-    self.popupmenu = wx.Menu()  # This is the popup menu to which we attach menu items
-    self.submenu = wx.Menu()  # This is the sub menu within the popupmenu
-
-    <i>Logic for determining what items to add to popup menu ... and binding them
-    ... self.OnDrawBegin, OnNodeProperties, OnDrawEnd{1,2,3}, OnResetImageSize, OnRightClickDeleteNode   <color:Red><u>ref55</u>
-
-
-    self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))     <color:royalBlue><-- Actually displays new popup menu
-
-    accel_tbl = wx.AcceleratorTable(self.accel_entries)    <color:royalBlue><-- Sets up the accelerator table
-    self.frame.SetAcceleratorTable(accel_tbl)
+        self._SelectNodeNow(x, y, keys, attachment)
+        self.frame.PopupMenu(self.shapemenu_mgr.popupmenu, wx.Point(x, y)) <color:royalBlue><-- Displays the popup!
 
     .. def OnLeftClick(self, x, y, keys=0, attachment=0): ..
 
@@ -331,6 +306,14 @@ class UmlShapeHandler <<ogl.ShapeEvtHandler>> {
         shape = self.GetShape()
         shape.GetCanvas().SelectNodeNow(shape)
         self.UpdateStatusBar(shape)
+        self.focus_shape() <color:Red><u>ref11</u></color>
+
+    .. def focus_shape(self): <color:Red><u>ref11</u></color> ..
+        <i>Called by both left and right click on a shape
+        <i>We build both a ready to go but dormant popupmenu and update the main frame's accelerator
+        <i>table with only the entries that are relevant to this shape.
+
+        self.shapemenu_mgr.BuildPopupMenuItems()
 }
 
 class uml_shape_handler <<module>> << (M,orchid) >> #DarkSeaGreen {
@@ -339,7 +322,68 @@ class uml_shape_handler <<module>> << (M,orchid) >> #DarkSeaGreen {
 }
 
 uml_shape_handler .. UmlShapeHandler : contains >
+UmlShapeHandler ..> ShapeMenuMgr : shapemenu_mgr
 
+class ShapeMenuMgr {
+    frame
+    shapehandler
+    popupmenu
+    submenu
+    accel_entries
+    --
+    __init__()
+    <b>BuildPopupMenuItems() <color:royalBlue><-- The main action happens here
+    add_menuitem()
+    check_id()
+    -- little sub builders --
+    add_submenu_to_popup()
+    add_separator()
+    add_properties()
+    add_from()
+    add_from_cancel()
+    add_association_edge()
+    add_generalise_composition_edges()
+    add_reset_image_size()
+    add_delete()
+    add_cancel()
+    -- util --
+    GetShape()
+    focus_shape()
+    -- handlers --
+    OnNodeProperties()   <color:Red><u>ref55</u>
+    OnDrawBegin()
+    OnCancelDrawBegin()
+    OnDrawEnd1()
+    OnDrawEnd2()
+    OnDrawEnd3()
+    OnResetImageSize()
+    OnRightClickDeleteNode()
+    OnPopupMenuCancel()
+
+    .. def BuildPopupMenuItems(self): ..
+
+        self.popupmenu = wx.Menu()  # This is the popup menu to which we attach menu items
+        self.submenu = wx.Menu()  # This is the sub menu within the popupmenu
+        self.accel_entries : List[wx.AcceleratorEntry] = []
+
+        <i>algorithm which dynamically builds the popupmenu and builds accelerator table
+        <i>bindings to handlers self.OnDrawBegin, OnNodeProperties,</i>  <color:Red><u>ref55</u>
+        <i>OnDrawEnd{1,2,3}, OnResetImageSize, OnRightClickDeleteNode etc.
+
+        accel_tbl = wx.AcceleratorTable(self.accel_entries)    <color:royalBlue><-- Sets up the accelerator table
+        self.frame.SetAcceleratorTable(accel_tbl)
+
+}
+
+class shape_menu_mgr <<module>> << (M,orchid) >> #DarkSeaGreen {
+    MENU_ID_SHAPE_PROPERTIES
+    MENU_ID_BEGIN_LINE
+    MENU_ID_CANCEL_LINE
+    ---
+}
+
+shape_menu_mgr .. ShapeMenuMgr : contains >
+ShapeMenuMgr -> UmlShapeHandler : shapehandler
 
 class App {
     context
@@ -382,8 +426,7 @@ Handlers are done in
 
 In Main menu
 In UmlCanvas
-In ShapeEvtHandler
-
+In ShapeEvtHandler which delegates to ShapeMenuMgr
 end note
 
 
