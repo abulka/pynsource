@@ -7,7 +7,7 @@ from common.architecture_support import *
 from gui.uml_shapes import CommentShape
 from view.display_model import GraphNode, UmlNode, CommentNode
 from typing import List, Set, Dict, Tuple, Optional
-from gui.popup_menuitems import *
+from gui.shape_menuitems import *
 
 
 class UmlShapeHandler(ogl.ShapeEvtHandler):
@@ -128,32 +128,29 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
 
         self.accel_entries : List[wx.AcceleratorEntry] = []
 
-        def add_menuitem(item_text, method, submenu=False, key_code=None):
-            if submenu:
-                to_menu = self.submenu
-            else:
-                to_menu = self.popupmenu
+        def add_menuitem(text, method, id=None, submenu=False, key_code=None, keycode_only=False):
 
             item: wx.MenuItem = None
-            # print("wiring", item_text)
-            if item_text == "Properties...\ts":
-                item = to_menu.Append(MENU_ID_SHAPE_PROPERTIES, item_text)
-                print('yep1')
-            elif item_text == "Begin - Remember selected class as FROM node (for drawing lines)\tq":
-                item = to_menu.Append(MENU_ID_BEGIN_LINE, item_text)
-                print('yep2')
-            elif item_text == "Cancel Line Begin\tx":
-                item = to_menu.Append(MENU_ID_CANCEL_LINE, item_text)
-                print('yep3')
-            else:
-                item = to_menu.Append(wx.ID_ANY, item_text)
-            self.frame.Bind(wx.EVT_MENU, method, item)
-            # self.frame.Bind(wx.EVT_UPDATE_UI, self.TestUpdateUI, item)
 
-            if key_code:
+            # FUN FACT: Keyboard shortcuts in wxPython are actually menu events
+            # (i.e. wx.EVT_MENU), probably because the shortcuts are usually also a menu item.
+            # Id's seems to be 'broadcast' and anything bound to that id gets called
+            if not id:
+                id = wx.ID_ANY
+
+            if keycode_only:
+                # Bind() accepts a menu item as third param or just plain id
+                self.frame.Bind(wx.EVT_MENU, method, id)
+            else:
+                to_menu = self.submenu if submenu else self.popupmenu
+                item = to_menu.Append(id, text)
+                self.frame.Bind(wx.EVT_MENU, method, item)  # item or item.GetId() or id - are ok
+                # self.frame.Bind(wx.EVT_UPDATE_UI, self.TestUpdateUI, item)
+
+            if key_code:  # accelerator tables work using keycodes and menu/key 'event' int ids
                 # https://wxpython.org/Phoenix/docs/html/wx.AcceleratorEntryFlags.enumeration.html#wx-acceleratorentryflags
                 entry = wx.AcceleratorEntry()
-                entry.Set(wx.ACCEL_NORMAL, key_code, item.GetId())
+                entry.Set(wx.ACCEL_NORMAL, key_code, id)
                 self.accel_entries.append(entry)
 
             return item
@@ -167,24 +164,29 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         def add_properties():
             add_menuitem("Properties...\ts",
                          self.OnNodeProperties,
+                         id=MENU_ID_SHAPE_PROPERTIES,
                          key_code=ord('S'),
                          )
 
-        def add_from():
+        def add_from(keycode_only=False):
             item : wx.MenuItem = add_menuitem(
                 "Begin - Remember selected class as FROM node (for drawing lines)\tq",
                 self.OnDrawBegin,
+                id=MENU_ID_BEGIN_LINE,
                 submenu=True,
-                key_code=ord('Q')
+                key_code=ord('Q'),
+                keycode_only=keycode_only
             )
             # item.Enable(False)  # hmm, accelerator still fires :-(
 
-        def add_from_cancel():
+        def add_from_cancel(keycode_only=False):
             add_menuitem(
                 "Cancel Line Begin\tx",
                 self.OnCancelDrawBegin,
+                id=MENU_ID_CANCEL_LINE,
                 submenu=True,
-                key_code = ord('X')
+                key_code = ord('X'),
+                keycode_only = keycode_only
             )
 
         def add_association_edge():
@@ -229,6 +231,8 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             add_separator()
             if not from_node:
                 add_from()
+            else:
+                add_from(keycode_only=True)  # always allow begin line draw as shortcut
 
         if is_umlclass:
             if started_connecting:
@@ -250,6 +254,8 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         if is_umlclass or is_comment:
             if from_node:
                 add_from_cancel()
+            else:
+                add_from_cancel(keycode_only=True)  # always allow begin line cancel as shortcut
 
         add_submenu_to_popup()
 
