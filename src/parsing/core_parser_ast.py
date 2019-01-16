@@ -1043,7 +1043,7 @@ class Visitor(T):
 
     # S
     def visit_ExtSlice(self, node):
-        for idx, item in node.dims:
+        for idx, item in enumerate(node.dims):  # ANDY added enumerate
             if idx:
                 self.write(", ")
             self.visit(item)

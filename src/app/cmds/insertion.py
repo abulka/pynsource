@@ -84,9 +84,9 @@ class CmdInsertUmlClass(UtilCmdUmlClass):
 
             node = displaymodel.AddUmlNode(id, attrs, methods)
             shape = umlcanvas.CreateUmlShape(node)
-            displaymodel.classnametoshape[
-                node.id
-            ] = shape  # Record the name to shape map so that we can wire up the links later.
+            # displaymodel.classnametoshape[
+            #     node.id
+            # ] = shape  # Record the name to shape map so that we can wire up the links later.
 
             node.shape.Show(True)
 
@@ -131,9 +131,9 @@ class CmdEditUmlClass(UtilCmdUmlClass):
                 gui.delete_shape_view(shape)
 
                 shape = umlcanvas.CreateUmlShape(node)
-                displaymodel.classnametoshape[
-                    node.id
-                ] = shape  # Record the name to shape map so that we can wire up the links later.
+                # displaymodel.classnametoshape[
+                #     node.id
+                # ] = shape  # Record the name to shape map so that we can wire up the links later.
 
                 # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
                 for edge in displaymodel.graph.edges:
@@ -198,6 +198,8 @@ class CmdInsertComment(UtilCmdComment):
         """
         Pops up a comment dialog box, creates both a graph node and a shape,
         associates them, then adds them to the `self.context.displaymodel.classnametoshape` mapping.
+
+        TODO However there is no edge being created in the graph model - why?
         """
 
         id = "C" + str(random.randint(1, 9999))
@@ -210,7 +212,7 @@ class CmdInsertComment(UtilCmdComment):
             shape = self.context.umlcanvas.createCommentShape(node)
 
             # Record the name to shape map so that we can wire up the links later.
-            self.context.displaymodel.classnametoshape[node.id] = shape
+            # self.context.displaymodel.classnametoshape[node.id] = shape
 
             node.shape.Show(True)
             self.context.umlcanvas.mega_refresh()
@@ -246,9 +248,9 @@ class CmdEditComment(UtilCmdComment):
             gui.delete_shape_view(shape)
 
             shape = umlcanvas.createCommentShape(node)
-            displaymodel.classnametoshape[
-                node.id
-            ] = shape  # Record the name to shape map so that we can wire up the links later.
+            # displaymodel.classnametoshape[
+            #     node.id
+            # ] = shape  # Record the name to shape map so that we can wire up the links later.
 
             # # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
             # for edge in model.graph.edges:

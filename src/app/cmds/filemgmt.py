@@ -27,9 +27,6 @@ class CmdFileImportBase(CmdBase):  # BASE
     def execute(self):
         assert self.files
 
-        # these are tuples between class names.
-        self.context.displaymodel.ClearAssociations()  # WHY DO WE WANT TO DESTROY THIS VALUABLE INFO?
-
         if self.files:
             for f in self.files:
                 # pmodel, debuginfo = old_parser(f)
@@ -44,7 +41,7 @@ class CmdFileImportBase(CmdBase):  # BASE
                 # from parsing.dump_pmodel import dump_old_structure
                 # print dump_old_structure(pmodel)
 
-                self.context.displaymodel.build_displaymodel(pmodel)
+                self.context.displaymodel.build_graphmodel(pmodel)
 
                 # p = PySourceAsJava()
                 # p.optionModuleAsClass = 0
@@ -52,7 +49,7 @@ class CmdFileImportBase(CmdBase):  # BASE
                 # p.Parse(f)
                 # self.context.displaymodel.ConvertParseModelToUmlModel(p)
 
-        self.context.umlcanvas.build_view()
+        self.context.umlcanvas.displaymodel.build_view()
 
         # Layout
         self.context.umlcanvas.layout_and_position_shapes()
@@ -208,7 +205,7 @@ class CmdFileLoadWorkspaceBase(CmdBase):  # BASE
             return
 
         # build view from display model
-        umlcanvas.build_view(translatecoords=False)
+        umlcanvas.displaymodel.build_view(translatecoords=False)
 
         # set layout coords to be in sync with world, so that if expand scale things will work
         self.context.coordmapper.Recalibrate()

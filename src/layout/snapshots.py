@@ -45,7 +45,7 @@ class GraphSnapshotMgr:
             )
             # self.umlcanvas.DumpStatus()
             # self.umlcanvas.observers.CMD_DUMP_UML_WORKSPACE()
-            # self.umlcanvas.app.run.CmdDumpUmlWorkspace()
+            # self.umlcanvas.app.run.CmdDumpDisplayModel()
 
         else:
             print("No such snapshot", snapshot_number + 1)

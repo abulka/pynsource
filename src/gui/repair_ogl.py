@@ -1,5 +1,5 @@
 """
-Monkey Patch Repair of OGL Version. 1.0
+Monkey Patch Repair of OGL Version. 1.1
 Andy Bulka 2018.
 abulka@gmail.com
 

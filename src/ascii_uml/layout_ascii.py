@@ -36,7 +36,7 @@ an 'alias' which looks like this:
 +-----------------------------+                                     +----------------------+
 |        UmlShapeCanvas       |                                     |     MyEvtHandler     |
 |-----------------------------|                                     |----------------------|
-| scrollStepX                 |  ---->  [ LayoutBasic ]             | log                  |
+| scrollStepX                 |  ---->  [ Laymanwoman ]             | log                  |
 | scrollStepY                 |  ---->  [ OverlapRemoval ]          | frame                |
 
 

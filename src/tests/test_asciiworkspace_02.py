@@ -42,7 +42,7 @@ class TestCaseAscii_02(unittest.TestCase):
 +-----------------------------+
 |        UmlShapeCanvas       |
 |-----------------------------|
-| scrollStepX                 |  ---->  [ LayoutBasic ]
+| scrollStepX                 |  ---->  [ Laymanwoman ]
 | scrollStepY                 |  ---->  [ OverlapRemoval ]
 | classnametoshape            |  ---->  [ CoordinateMapper ]
 | log                         |  ---->  [ GraphLayoutSpring ]
@@ -72,7 +72,7 @@ class TestCaseAscii_02(unittest.TestCase):
             lines[0],
         )
         self.assertEqual(
-            "| topHandler |  ---->  [ TopHandler ]                    | scrollStepX                 |  ---->  [ LayoutBasic ]      \n",
+            "| topHandler |  ---->  [ TopHandler ]                    | scrollStepX                 |  ---->  [ Laymanwoman ]      \n",
             lines[4],
         )
 

@@ -324,8 +324,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         event.Skip()
 
-    def OnDumpUmlWorkspace(self, event):
-        self.app.run.CmdDumpUmlWorkspace()
+    def OnDumpDisplayModel(self, event):
+        self.app.run.CmdDumpDisplayModel()
 
     def OnSaveGraphToConsole(self, event):
         self.app.run.CmdFileSaveWorkspaceToConsole()
@@ -518,11 +518,13 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         self.popupmenu.AppendSeparator()
 
-        item = self.popupmenu.Append(wx.ID_ANY, "Load Graph from text...")
-        self.frame.Bind(wx.EVT_MENU, self.OnLoadGraphFromText, item)
-
-        item = self.popupmenu.Append(wx.ID_ANY, "Dump Graph to console")
-        self.frame.Bind(wx.EVT_MENU, self.OnSaveGraphToConsole, item)
+        # Developer only tools
+        #
+        # item = self.popupmenu.Append(wx.ID_ANY, "Load Graph from text...")
+        # self.frame.Bind(wx.EVT_MENU, self.OnLoadGraphFromText, item)
+        #
+        # item = self.popupmenu.Append(wx.ID_ANY, "Dump Graph to console")
+        # self.frame.Bind(wx.EVT_MENU, self.OnSaveGraphToConsole, item)
 
         self.popupmenu.AppendSeparator()
 
@@ -534,8 +536,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
         self.popupmenu.AppendSeparator()
 
-        item = self.popupmenu.Append(wx.ID_ANY, "DumpUmlWorkspace")
-        self.frame.Bind(wx.EVT_MENU, self.OnDumpUmlWorkspace, item)
+        item = self.popupmenu.Append(wx.ID_ANY, "Dump Display Model")
+        self.frame.Bind(wx.EVT_MENU, self.OnDumpDisplayModel, item)
 
         self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))
 

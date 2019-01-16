@@ -3,8 +3,9 @@
 
 header
 <font color=red>Note:</font>
-15th Jan 2019
+16th Jan 2019
 After the refactoring of UmlShapeHandler and creation of ShapeMenuMgr
+And the removal of the old displaymodel - now just use pure Graph nodes
 endheader
 
 class UmlCanvas <<ogl.ShapeCanvas>> {
@@ -16,8 +17,7 @@ class UmlCanvas <<ogl.ShapeCanvas>> {
     app
     frame
     canvas_resizer    <color:Red><u>ref23</u>
-    displaymodel
-    layout
+    displaymodel  <color:royalBlue><-- self.displaymodel = DisplayModel(self) so that display model can call back and create shapes
     snapshot_mgr
     coordmapper
     layouter
@@ -26,42 +26,41 @@ class UmlCanvas <<ogl.ShapeCanvas>> {
     log
     ---
     <b>__init__()
-    <color:Green>NewEdgeMarkFrom()
-    <color:Green>NewEdgeMarkTo()
     InitSizeAndObjs()
-    AllToLayoutCoords()
-    AllToWorldCoords()
+    Clear()  <color:royalBlue> <-- self.GetDiagram().DeleteAllShapes(), called from outside this class
+    -- shape creation --
+    CreateUmlShape()
+    <b>createCommentShape()
+    CreateImageShape()
+    createNodeShape()
+    CreateUmlEdge()
+    -- selection and canvas focus --
+    focus_canvas()  <color:royalBlue><-- NEW, sets up accelerator table for the X key when shapes lose focus
+    SelectNodeNow()
+    -- refresh related --
+    mega_refresh()  <color:Salmon><- called by a lot of places
+    layout_and_position_shapes()
+    remove_overlaps()  <color:royalBlue><- called by UmlShapeHandler's <b>OnEndDragLeft</b></color> <color:Red><u>ref22</u>
+    delete_shape_view() <color:Salmon><- called by build_view(), CmdNodeDeleteBase, CmdEditUmlClass (edit props), CmdEditComment
     -- bound handlers --
+    OnLeftClick()   <color:royalBlue> <-- Override of ShapeCanvas method</color>, calls self.app.run.CmdDeselectAllShapes()
     <b>onKeyPress()</b>     <color:royalBlue><-- handles ESC, and RIGHT/LEFT to expand layout
-    <b>onKeyChar()</b>     <color:royalBlue><-- handles popup menu shortcuts Q, W, E etc
+    <b>onKeyChar()</b>     <color:royalBlue><-- handles popup menu shortcuts D, 1, 2 etc
     OnWheelZoom()
     OnDestroy()
-    OnLeftClick()   <color:royalBlue> <-- Override of ShapeCanvas method</color>, calls self.app.run.CmdDeselectAllShapes()
-    -- called by this class itself --
-    CmdTrimScrollbars()
+    CmdTrimScrollbars()   <color:royalBlue> <-- Secret developer only command
     -- called by handlers in MainApp or other external --
     <b>CmdRememberLayout1()
     CmdRememberLayout2()
     CmdRestoreLayout1()
     CmdRestoreLayout2()
-    SelectNodeNow()
-    focus_canvas()  <color:royalBlue><-- NEW, sets up accelerator table for the X key when shapes lose focus
-    --
-    delete_shape_view() <color:Salmon><- called by build_view(), CmdNodeDeleteBase, CmdEditUmlClass (edit props), CmdEditComment
-    Clear()  <color:royalBlue> <-- self.GetDiagram().DeleteAllShapes(), called from outside this class
-    -- shape creation --
-    CreateImageShape()
-    CreateUmlShape()
-    newRegion()
-    createNodeShape()
-    <b>createCommentShape()
+    <color:Green>NewEdgeMarkFrom()
+    <color:Green>NewEdgeMarkTo()
+    OnCancelLine
+    -- utility --
     new_evthandler_housekeeping()   <color:royalBlue> <-- self.<b>observers</b>.NOTIFY_EVT_HANDLER_CREATED(evthandler)</color>  <color:Red><u>ref61</u>
-    CreateUmlEdge()
-    ---
-    build_view()  <color:Salmon><- IMPORTANT
-    mega_refresh()  <color:Salmon><- called by a lot of places
-    layout_and_position_shapes()
-    remove_overlaps()  <color:royalBlue><- called by UmlShapeHandler's <b>OnEndDragLeft</b></color> <color:Red><u>ref22</u>
+    AllToLayoutCoords()
+    AllToWorldCoords()
 
     .. def __init__(self, parent, log, frame): ..
 
@@ -119,6 +118,35 @@ UmlCanvas ..> DisplayModel : displaymodel
 UmlCanvas ..> ogl.Diagram : diagram
 UmlCanvas <.. ogl.Diagram : canvas
 UmlShapeHandler --|> ShapeEvtHandler
+
+class DisplayModel {
+    graph
+    umlcanvas
+    -- Essential --
+    Clear()
+    build_graphmodel(pmodel)  <color:royalBlue><- creates UmlGraph of nodes/edges from parse model
+    build_view()  <color:royalBlue><- adds umlcanvas OGL Shapes to Graph nodes/edges
+    --- Graph Node/Edge creation (no shapes involved) --
+    AddUmlNode(id, attrs=[], meths=[])
+    AddCommentNode(id, comment)
+    AddUmlEdge(from_node, to_node, edge_type)
+    -- utility --
+    Dump()
+    decouple_node_from_shape() <color:royalBlue><- no longer does anything!!
+    delete_node_for_shape(shape)
+    merge_attrs_and_meths(node, attrs, meths)
+}
+
+DisplayModel ..> UmlGraph : graph
+DisplayModel ..> UmlCanvas : umlcanvas
+
+class UmlGraph {
+    nodes
+    edges
+    Clear()
+}
+
+UmlGraph --|> Graph
 
 class MainApp {
     log

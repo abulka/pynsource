@@ -2,7 +2,7 @@ from .base_cmd import CmdBase
 import wx
 
 
-class CmdDumpUmlWorkspace(CmdBase):
+class CmdDumpDisplayModel(CmdBase):
     def execute(self):
         # Also called by Snapshot manager.
         # When create Snapshot manager we pass ourselves as a controller and DumpStatus() is expected to exist.

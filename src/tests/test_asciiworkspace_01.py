@@ -62,7 +62,7 @@ class TestCaseAscii_01(unittest.TestCase):
 +-----------------------------+
 |        UmlShapeCanvas       |
 |-----------------------------|
-| scrollStepX                 |  ---->  [ LayoutBasic ]
+| scrollStepX                 |  ---->  [ Laymanwoman ]
 | scrollStepY                 |  ---->  [ OverlapRemoval ]
 | classnametoshape            |  ---->  [ CoordinateMapper ]
 | log                         |  ---->  [ GraphLayoutSpring ]
@@ -234,7 +234,7 @@ class TestCaseAscii_01(unittest.TestCase):
         w.AddColumn(
             """
 +-------------+
-| LayoutBasic |
+| Laymanwoman |
 +-------------+
 """
         )

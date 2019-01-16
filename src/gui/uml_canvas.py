@@ -1,20 +1,7 @@
-# Uml canvas
-
-if __name__ == "__main__":
-    import sys
-
-    if ".." not in sys.path:
-        sys.path.append("..")
-
-import random
-
-from generate_code.gen_java import PySourceAsJava
-
 from view.display_model import DisplayModel
 from view.display_model import CommentNode
 from .uml_shapes import *
 from .coord_utils import setpos, getpos, Move2
-from layout.layout_basic import LayoutBasic
 from layout.snapshots import GraphSnapshotMgr
 from layout.layout_spring import GraphLayoutSpring
 from layout.overlap_removal import OverlapRemoval
@@ -24,7 +11,6 @@ import wx
 import wx.lib.ogl as ogl
 from .uml_shape_handler import UmlShapeHandler
 from common.architecture_support import *
-
 from gui.repair_ogl import repairOGL
 from gui.shape_menu_mgr import MENU_ID_CANCEL_LINE
 
@@ -32,158 +18,8 @@ repairOGL()
 
 ogl.Shape.Move2 = Move2
 
-# class DiagramAndy(ogl.Diagram):
-#
-#     def RedrawORI(self, dc):
-#         """Redraw the shapes in the diagram on the specified device context."""
-#         if self._shapeList:
-#             for object in self._shapeList:
-#                 object.Draw(dc)
-#
-#     # def Redraw(self, dc):
-#     #     """Redraw the shapes in the diagram on the specified device context."""
-#     #     if self._shapeList:
-#     #         for object in self._shapeList:
-#     #             print "redrawing", object, object.GetX(), object.GetY()
-#     #             object.Draw(dc)
-#
-# class ShapeCanvasAndy(ogl.ShapeCanvas):
-#     """Custom ogl canvas for mucking around"""
-#
-#     def DrawORI(self):
-#         """
-#         Update the buffer with the background and redraw the full diagram.
-#         """
-#         dc = wx.MemoryDC(self._buffer)
-#
-#         dc.SetBackground(wx.Brush(self.GetBackgroundColour(), wx.BRUSHSTYLE_SOLID))
-#         dc.Clear() # make sure you clear the bitmap!
-#
-#         if self.GetDiagram():
-#             self.GetDiagram().Redraw(dc)
-#         print("andy draw ori")
-#
-#     def OnPaintORI(self, evt):
-#         """
-#         The paint handler, uses :class:`BufferedPaintDC` to draw the
-#         buffer to the screen.
-#         """
-#         dc = wx.PaintDC(self)
-#         self.PrepareDC(dc)
-#         dc.DrawBitmap(self._buffer, 0, 0)
-#         print("andy onPaint ori")
-#
-#     def DrawNEW(self):
-#         """
-#         Update the buffer with the background and redraw the full diagram.
-#         """
-#         # dc = wx.MemoryDC(self._buffer)
-#         #
-#         # dc.SetBackground(wx.Brush(self.GetBackgroundColour(), wx.BRUSHSTYLE_SOLID))
-#         # dc.Clear() # make sure you clear the bitmap!
-#         #
-#         # if self.GetDiagram():
-#         #     self.GetDiagram().Redraw(dc)
-#         # print("andy draw")
-#
-#     def OnPaintNEWNEW(self, evt):
-#
-#         dc = wx.PaintDC(self)
-#         self.PrepareDC(dc)
-#         dc.SetUserScale(self.scalex,self.scaley)
-#         dc.DrawBitmap(self._buffer, 0, 0)
-#
-#         # # dc.BeginDrawing()
-#         # # for item in self.diagram.shapes + self.nodes:
-#         # #     item.draw(dc)
-#         # dc.SetBackground(wx.Brush(self.GetBackgroundColour(), wx.BRUSHSTYLE_SOLID))
-#         #
-#         # dc.SetBrush(wx.CYAN_BRUSH)
-#         # dc.SetPen(wx.Pen('MEDIUM FOREST GREEN', 4))
-#         #
-#         # if self.GetDiagram():
-#         #     self.GetDiagram().Redraw(dc)
-#         #
-#
-#         # if self.GetDiagram()._shapeList:
-#         #     for object in self.GetDiagram()._shapeList:
-#         #         print "shapelist item", object
-#         #         # object.Draw(dc)
-#         #         dc.SetBrush(wx.RED_BRUSH)
-#         #         dc.SetPen(wx.Pen('MEDIUM FOREST GREEN', 4))
-#         #
-#         #         # last_x = object.GetX()
-#         #         # last_y = object.GetY()
-#         #         # last_width = object.GetWidth()
-#         #         # last_height = object.GetHeight()
-#         #         # dc.DrawRectangle(object.GetX(),object.GetY(),object.GetWidth(), object.GetHeight())
-#
-#         # Big
-#         # dc.SetBrush(wx.CYAN_BRUSH)
-#         # dc.SetPen(wx.Pen('MEDIUM FOREST GREEN', 4))
-#         # r = float(random.randint(200,400))
-#         # print "random width is", r
-#         # dc.DrawRectangle(320.0,320.0,r,400.0)
-#
-#         # dc.SetBrush(wx.YELLOW_BRUSH)
-#         # rx = float(random.randint(250,450))
-#         # ry = float(random.randint(50,150))
-#         # rwidth = float(random.randint(50,150))
-#         # rheight = float(random.randint(50,150))
-#         # dc.DrawRectangle(rx, ry, rwidth, rheight)
-#
-#         # dc.SetBrush(wx.BLUE_BRUSH)
-#         # dc.DrawRectangle(last_x, last_y, last_width, last_height)
-#         # print "last", last_x, last_y, last_width, last_height
-#
-#         print("andy onPaint")
-#
-#         # dc.EndDrawing()
-#
-#     def OnMouseEvent(self, evt):
-#         ogl.ShapeCanvas.OnMouseEvent(self, evt)
-#         # print "mouse stuff..."  # Andy
-#         self.Refresh()  # Andy
-
-# class RectangleShapeAndy(ogl.RectangleShape):
-#     # def Draw(self, dc):
-#     #     ogl.RectangleShape.Draw(self, dc)
-#     #     # print "RectangleShapeAndy Draw ...... ", self._visible
-#     #
-#     # def OnDraw(self, dc):
-#     #     ogl.RectangleShape.OnDraw(self, dc)
-#     #     # print "RectangleShapeAndy OnDraw ,,,, ", self._visible
-#     #     #
-#     #     # dc.SetBrush(wx.GREEN_BRUSH)
-#     #     # dc.SetPen(wx.Pen('MEDIUM FOREST GREEN', 4))
-#     #     # dc.DrawRectangle(self.GetX(),self.GetY(),self.GetWidth(), self.GetHeight())
-#
-#     def OnDragLeft(self, draw, x, y, keys = 0, attachment = 0):
-#         # ogl.RectangleShape.OnDragLeft(self, draw, x, y, keys = 0, attachment = 0)  # useless these days
-#
-#         # xx, yy = self._canvas.Snap(x, y)
-#         # xx, yy = x, y  # if don't want snapping
-#         #
-#         # w, h = self.GetBoundingBoxMax()
-#         # dc = wx.ClientDC(self.GetCanvas())  # wx.ClientDC doesn't work these days
-#         # self.GetCanvas().PrepareDC(dc)
-#         # self.Move(dc, xx, yy)
-#
-#         self.SetX(x)
-#         self.SetY(y)
-#
-#     def OnBeginDragLeft(self, x, y, keys = 0, attachment = 0):
-#         self.SetX(x)
-#         self.SetY(y)
-#
-#     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
-#         self.SetX(x)
-#         self.SetY(y)
-
-# repairOGL()
 
 class UmlCanvas(ogl.ShapeCanvas):
-    # class UmlCanvas(ShapeCanvasAndy):
 
     def __init__(self, parent, log, frame):
         ogl.ShapeCanvas.__init__(self, parent)
@@ -210,7 +46,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.Bind(wx.EVT_WINDOW_DESTROY, self.OnDestroy)
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
         self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
-        # self.Bind(wx.EVT_CHAR, self.onKeyChar)
+        self.Bind(wx.EVT_CHAR, self.onKeyChar)
 
         self.font1 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
@@ -243,175 +79,13 @@ class UmlCanvas(ogl.ShapeCanvas):
         #
         # assert not self.canvas_resizer.canvas_too_small(), "InitSizeAndObjs being called too early - please set up enclosing frame size first"
 
-        self.displaymodel = DisplayModel()
-        self.layout = LayoutBasic(
-            leftmargin=5,
-            topmargin=5,
-            verticalwhitespace=50,
-            horizontalwhitespace=50,
-            maxclassesperline=7,
-        )
+        self.displaymodel = DisplayModel(self)
         self.snapshot_mgr = GraphSnapshotMgr(graph=self.displaymodel.graph, umlcanvas=self)
         self.coordmapper = CoordinateMapper(self.displaymodel.graph, self.GetSize())
         self.layouter = GraphLayoutSpring(self.displaymodel.graph, gui=self)
         self.overlap_remover = OverlapRemoval(self.displaymodel.graph, margin=50, gui=self)
 
         self.focus_canvas()
-
-    def focus_canvas(self):
-        """ accelerator stuff
-        this is what is called when shape is deselected
-        the only acceleration should be to cancel the pending line drawing
-        """
-        accel_tbl = wx.AcceleratorTable([
-            (wx.ACCEL_NORMAL, ord('X'), MENU_ID_CANCEL_LINE),
-        ])
-        self.frame.SetAcceleratorTable(accel_tbl)
-        self.frame.Bind(wx.EVT_MENU, self.OnCancelLine, id=MENU_ID_CANCEL_LINE)
-
-    def OnCancelLine(self, event):
-        if True or self.new_edge_from:
-            print("Line drawing cancelled")
-        self.new_edge_from = None
-        self.frame.SetStatusText("")
-
-    def AllToLayoutCoords(self):
-        self.coordmapper.AllToLayoutCoords()
-
-    def AllToWorldCoords(self):
-        self.coordmapper.AllToWorldCoords()
-
-    def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
-        # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
-        self.app.run.CmdDeselectAllShapes()
-        self.focus_canvas()
-
-    def onKeyPress(self, event):
-        keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
-
-        if self.working:
-            event.Skip()
-            return
-        self.working = True
-
-        if keycode == wx.WXK_ESCAPE:
-            self.frame.SetStatusText("ESC key detected: Abort Layout")
-            self.kill_layout = True
-
-            # # HACK PLAY
-            # shape = RectangleShapeAndy(50,50)
-            # self.AddShape(shape)
-            # shape.SetX(random.randint(40,80))
-            # shape.SetY(random.randint(40,80))
-            # shape.Show(True)
-            # self.Refresh()
-            # # END HACK PLAY
-
-        if keycode == wx.WXK_RIGHT:
-            self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
-
-        elif keycode == wx.WXK_LEFT:
-            self.app.run.CmdLayoutContract(remove_overlaps=not event.ShiftDown())
-
-        self.working = False
-        event.Skip()
-
-    # def onKeyChar(self, event):
-    #     """
-    #     These are secret keycodes not exposed on the menu
-    #     Normally shortcuts added on the menu work fine.
-    #     """
-    #     if event.GetKeyCode() >= 256:
-    #         event.Skip()
-    #         return
-    #     if self.working:
-    #         event.Skip()
-    #         return
-    #     self.working = True
-    #
-    #     keycode = chr(event.GetKeyCode())
-    #     print("keycode", keycode)
-    #
-    #     if keycode in ["q", "Q"]:
-    #         self.NewEdgeMarkFrom()
-    #
-    #     elif keycode in ["w", "W"]:
-    #         self.NewEdgeMarkTo(edge_type="composition")
-    #
-    #     elif keycode in ["e", "E"]:
-    #         self.NewEdgeMarkTo(edge_type="generalisation")
-    #
-    #     elif keycode in ["a", "A"]:
-    #         self.NewEdgeMarkTo(edge_type="association")
-    #
-    #     elif keycode in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-    #         todisplay = ord(keycode) - ord("1")
-    #         self.snapshot_mgr.Restore(todisplay)
-    #
-    #     elif keycode == "P":
-    #         self.Refresh()
-    #
-    #     elif keycode in ["d", "D"]:
-    #         self.app.run.CmdDumpUmlWorkspace()
-    #
-    #     elif keycode == "s":
-    #         self.CmdTrimScrollbars()
-    #
-    #     elif keycode == "G":  # and event.ShiftDown() and event.ControlDown():
-    #         self.app.run.CmdBuildColourChartWorkspace()
-    #
-    #     elif keycode in ["h", "H"]:
-    #         self.app.run.CmdColourSequential(color_range_offset=(keycode == "H"))
-    #
-    #     self.working = False
-    #
-    #     event.Skip()  # makes an annoying beep if enabled
-
-    def CmdTrimScrollbars(self):
-        self.canvas_resizer.resize_virtual_canvas_tofit_bounds(
-            shrinkage_leeway=0, bounds_dirty=True
-        )
-
-    def CmdRememberLayout1(self):
-        self.snapshot_mgr.QuickSave(slot=1)
-
-    def CmdRememberLayout2(self):
-        self.snapshot_mgr.QuickSave(slot=2)
-
-    def CmdRestoreLayout1(self):
-        self.snapshot_mgr.QuickRestore(slot=1)
-
-    def CmdRestoreLayout2(self):
-        self.snapshot_mgr.QuickRestore(slot=2)
-
-    def SelectNodeNow(self, shape):
-        canvas = shape.GetCanvas()
-
-        self.app.run.CmdDeselectAllShapes()
-
-        dc = wx.ClientDC(canvas)
-        canvas.PrepareDC(dc)
-
-        # Could pass None as dc if you don't want to trigger the OnDrawControlPoints(dc) handler
-        # immediately - e.g. if you want to do a complete redraw of everything later anyway
-        shape.Select(True, dc)
-
-        # change colour when select
-        # shape.SetBrush(wx.WHITE_BRUSH) #wx.Brush("WHEAT", wx.SOLID))
-        # canvas.Refresh(False) # works
-        # canvas.Redraw(dc) # works too
-        # shape.Draw(dc) # works too, most efficient
-
-        # canvas.Refresh(False)   # t/f or don't use - doesn't seem to make a difference
-
-        # self.UpdateStatusBar(shape)  # only available in the shape evt handler (this method used to live there...)
-
-    def delete_shape_view(self, shape):
-        # View
-        self.app.run.CmdDeselectAllShapes()
-        for line in shape.GetLines()[:]:
-            line.Delete()
-        shape.Delete()
 
     def Clear(self):
         self.frame.SetStatusText("Draw: Clear")
@@ -431,78 +105,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         ):  # Hack on Linux so that onKeyChar bindings take hold properly.
             wx.CallLater(1500, self.app.context.wxapp.multiText.SetFocus)
             wx.CallLater(1500, self.SetFocus)
-
-    def NewEdgeMarkFrom(self):
-        selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
-        if not selected:
-            self.frame.SetStatusText("Please select a node")
-            return
-
-        if self.new_edge_from:
-            print("warning, new_edge_from already set")
-        self.new_edge_from = selected[0].node
-        self.frame.SetStatusText(f"Line begun from \"{self.new_edge_from.id}\" - now select destination node and r.click to join")
-
-    def NewEdgeMarkTo(self, edge_type="composition"):
-        selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
-        if not selected:
-            self.frame.SetStatusText("Please select a node")
-            return
-
-        tonode = selected[0].node
-        self.frame.SetStatusText("To %s" % tonode.id)
-
-        if self.new_edge_from == None:
-            self.frame.SetStatusText("Please set from node first")
-            return
-
-        if self.new_edge_from.id == tonode.id:
-            self.frame.SetStatusText("Can't link to self")
-            return
-
-        if not self.displaymodel.graph.FindNodeById(self.new_edge_from.id):
-            self.frame.SetStatusText("From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id)
-            return
-
-        edge = self.displaymodel.graph.AddEdge(
-            tonode, self.new_edge_from, weight=None
-        )  # swap direction as is a directional composition.
-        # TODO should also arguably add to umlworkspace's associations_composition or associations_generalisation list (or create a new one for unlabelled associations like the one we are creating here)
-        # edge['uml_edge_type'] = ''
-        edge["uml_edge_type"] = edge_type
-        self.CreateUmlEdge(edge)
-        self.new_edge_from = None  # reset from after each connection, for UI clarity
-        self.mega_refresh()
-
-    def CreateImageShape(self, F):
-        # shape = ogl.BitmapShape()
-        shape = BitmapShapeResizable()
-        img = wx.Image(F, wx.BITMAP_TYPE_ANY)
-
-        # adjusted_img = img.AdjustChannels(factor_red = 1., factor_green = 1., factor_blue = 1., factor_alpha = 0.5)
-        # adjusted_img = img.Rescale(10,10)
-        adjusted_img = img
-
-        bmp = wx.Bitmap(adjusted_img)
-        shape.SetBitmap(bmp)
-
-        self.GetDiagram().AddShape(shape)
-        shape.Show(True)
-
-        evthandler = UmlShapeHandler(
-            self.log, self.frame, self
-        )  # just init the handler with whatever will be convenient for it to know.
-        evthandler.SetShape(shape)
-        evthandler.SetPreviousHandler(shape.GetEventHandler())
-        shape.SetEventHandler(evthandler)
-        self.new_evthandler_housekeeping(evthandler)
-
-        setpos(shape, 0, 0)
-        # setpos(shape, node.left, node.top)
-        # node.width, node.height = shape.GetBoundingBoxMax()
-        # node.shape = shape
-        # shape.node = node
-        return shape
 
     def CreateUmlShape(self, node):
         def newRegion(font, name, textLst, maxWidth, totHeight=10):
@@ -597,30 +199,13 @@ class UmlCanvas(ogl.ShapeCanvas):
         # ACTUALLY I now do set the pos of the shape, see above,
         # just before the AddShape() call.
         #
-        node.width, node.height = (
-            shape.GetBoundingBoxMax()
-        )  # TODO: Shouldn't this be in node coords not world coords?
+        # TODO: Shouldn't this be in node coords not world coords?
+        node.width, node.height = shape.GetBoundingBoxMax()
+
         node.shape = shape
         shape.node = node
+
         return shape
-
-    def createNodeShape(self, node):  # FROM SPRING LAYOUT
-        shape = ogl.RectangleShape(node.width, node.height)
-        shape.AddText(node.id)
-        setpos(shape, node.left, node.top)
-        # shape.SetDraggable(True, True)
-        self.AddShape(shape)
-        node.shape = shape
-        shape.node = node
-
-        # wire in the event handler for the new shape
-        evthandler = UmlShapeHandler(
-            None, self.frame, self
-        )  # just init the handler with whatever will be convenient for it to know.
-        evthandler.SetShape(shape)
-        evthandler.SetPreviousHandler(shape.GetEventHandler())
-        shape.SetEventHandler(evthandler)
-        self.new_evthandler_housekeeping(evthandler)
 
     def createCommentShape(self, node):
         # shape = ogl.TextShape( node.width, node.height )
@@ -655,13 +240,53 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.new_evthandler_housekeeping(evthandler)
         return shape
 
-    def new_evthandler_housekeeping(self, evthandler):
-        # notify app of this new evthandler so app can
-        # assign the evthandler's .app attribute.
-        # Or could have just done:
-        #   evthandler.app = self.app
-        # here.  But we may need observer for other things later.
-        self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler)
+    def CreateImageShape(self, F):
+        # shape = ogl.BitmapShape()
+        shape = BitmapShapeResizable()
+        img = wx.Image(F, wx.BITMAP_TYPE_ANY)
+
+        # adjusted_img = img.AdjustChannels(factor_red = 1., factor_green = 1., factor_blue = 1., factor_alpha = 0.5)
+        # adjusted_img = img.Rescale(10,10)
+        adjusted_img = img
+
+        bmp = wx.Bitmap(adjusted_img)
+        shape.SetBitmap(bmp)
+
+        self.GetDiagram().AddShape(shape)
+        shape.Show(True)
+
+        evthandler = UmlShapeHandler(
+            self.log, self.frame, self
+        )  # just init the handler with whatever will be convenient for it to know.
+        evthandler.SetShape(shape)
+        evthandler.SetPreviousHandler(shape.GetEventHandler())
+        shape.SetEventHandler(evthandler)
+        self.new_evthandler_housekeeping(evthandler)
+
+        setpos(shape, 0, 0)
+        # setpos(shape, node.left, node.top)
+        # node.width, node.height = shape.GetBoundingBoxMax()
+        # node.shape = shape
+        # shape.node = node
+        return shape
+
+    def createNodeShape(self, node):  # FROM SPRING LAYOUT
+        shape = ogl.RectangleShape(node.width, node.height)
+        shape.AddText(node.id)
+        setpos(shape, node.left, node.top)
+        # shape.SetDraggable(True, True)
+        self.AddShape(shape)
+        node.shape = shape
+        shape.node = node
+
+        # wire in the event handler for the new shape
+        evthandler = UmlShapeHandler(
+            None, self.frame, self
+        )  # just init the handler with whatever will be convenient for it to know.
+        evthandler.SetShape(shape)
+        evthandler.SetPreviousHandler(shape.GetEventHandler())
+        shape.SetEventHandler(evthandler)
+        self.new_evthandler_housekeeping(evthandler)
 
     def CreateUmlEdge(self, edge):
         """
@@ -721,6 +346,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             line = LineShapeCustom()  # used to be ogl.LineShape()
 
         line.SetCanvas(self)
+        edge["line"] = line
 
         if edge_label == "association":
             line.SetPen(wx.Pen(colour=wx.BLACK, width=1, style=wx.SHORT_DASH)) # or try PENSTYLE_DOT
@@ -736,44 +362,38 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.GetDiagram().AddShape(line)
         line.Show(True)
 
-    def OnWheelZoom(self, event):
-        # print "OnWheelZoom"
-        if self.working:
-            return
-        self.working = True
-
-        SCROLL_AMOUNT = 40
-        if not event.ControlDown():
-            oldscrollx = self.GetScrollPos(wx.HORIZONTAL)
-            oldscrolly = self.GetScrollPos(wx.VERTICAL)
-            if event.GetWheelRotation() < 0:
-                self.Scroll(oldscrollx, oldscrolly + SCROLL_AMOUNT)
-            else:
-                self.Scroll(oldscrollx, max(0, oldscrolly - SCROLL_AMOUNT))
-        else:
-            if event.GetWheelRotation() < 0:
-                self.app.run.CmdLayoutContract(remove_overlaps=not event.ShiftDown())
-            else:
-                self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
-
-        self.working = False
-
-    def remove_overlaps(self, watch_removals=True):
+    def focus_canvas(self):
+        """ accelerator stuff
+        this is what is called when shape is deselected
+        the only acceleration should be to cancel the pending line drawing
         """
-        Returns T/F if any overlaps found, so caller can decide whether to
-        redraw the screen
+        accel_tbl = wx.AcceleratorTable([
+            (wx.ACCEL_NORMAL, ord('X'), MENU_ID_CANCEL_LINE),
+        ])
+        self.frame.SetAcceleratorTable(accel_tbl)
+        self.frame.Bind(wx.EVT_MENU, self.OnCancelLine, id=MENU_ID_CANCEL_LINE)
 
-        Called by
+    def SelectNodeNow(self, shape):
+        canvas = shape.GetCanvas()
 
-            CmdInsertUmlClass, CmdInsertImage, CmdLayoutExpandContractBase,
-            umlcanvas.OnWheelZoom_OverlapRemoval_Defunct,
-            umlcanvas.layout_and_position_shapes,
-            UmlShapeHandler.OnEndDragLeft
-            UmlShapeHandler.OnSizingEndDragLeft
-            LayoutBlackboard.LayoutLoopTillNoChange
-        """
-        self.overlap_remover.RemoveOverlaps(watch_removals=watch_removals)
-        return self.overlap_remover.GetStats()["total_overlaps_found"] > 0
+        self.app.run.CmdDeselectAllShapes()
+
+        dc = wx.ClientDC(canvas)
+        canvas.PrepareDC(dc)
+
+        # Could pass None as dc if you don't want to trigger the OnDrawControlPoints(dc) handler
+        # immediately - e.g. if you want to do a complete redraw of everything later anyway
+        shape.Select(True, dc)
+
+        # change colour when select
+        # shape.SetBrush(wx.WHITE_BRUSH) #wx.Brush("WHEAT", wx.SOLID))
+        # canvas.Refresh(False) # works
+        # canvas.Redraw(dc) # works too
+        # shape.Draw(dc) # works too, most efficient
+
+        # canvas.Refresh(False)   # t/f or don't use - doesn't seem to make a difference
+
+        # self.UpdateStatusBar(shape)  # only available in the shape evt handler (this method used to live there...)
 
     def mega_refresh(self, recalibrate=False, auto_resize_canvas=True):
         """
@@ -851,6 +471,221 @@ class UmlCanvas(ogl.ShapeCanvas):
         if self.remove_overlaps():
             self.mega_refresh()
 
+    def remove_overlaps(self, watch_removals=True):
+        """
+        Returns T/F if any overlaps found, so caller can decide whether to
+        redraw the screen
+
+        Called by
+
+            CmdInsertUmlClass, CmdInsertImage, CmdLayoutExpandContractBase,
+            umlcanvas.OnWheelZoom_OverlapRemoval_Defunct,
+            umlcanvas.layout_and_position_shapes,
+            UmlShapeHandler.OnEndDragLeft
+            UmlShapeHandler.OnSizingEndDragLeft
+            LayoutBlackboard.LayoutLoopTillNoChange
+        """
+        self.overlap_remover.RemoveOverlaps(watch_removals=watch_removals)
+        return self.overlap_remover.GetStats()["total_overlaps_found"] > 0
+
+    def delete_shape_view(self, shape):
+        # View
+        self.app.run.CmdDeselectAllShapes()
+        for line in shape.GetLines()[:]:
+            line.Delete()
+        shape.Delete()
+
+    def OnLeftClick(self, x, y, keys):  # Override of ShapeCanvas method
+        # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
+        self.app.run.CmdDeselectAllShapes()
+        self.focus_canvas()
+
+    def onKeyPress(self, event):
+        keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
+
+        if self.working:
+            event.Skip()
+            return
+        self.working = True
+
+        if keycode == wx.WXK_ESCAPE:
+            self.frame.SetStatusText("ESC key detected: Abort Layout")
+            self.kill_layout = True
+
+            # # HACK PLAY
+            # shape = RectangleShapeAndy(50,50)
+            # self.AddShape(shape)
+            # shape.SetX(random.randint(40,80))
+            # shape.SetY(random.randint(40,80))
+            # shape.Show(True)
+            # self.Refresh()
+            # # END HACK PLAY
+
+        if keycode == wx.WXK_RIGHT:
+            self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
+
+        elif keycode == wx.WXK_LEFT:
+            self.app.run.CmdLayoutContract(remove_overlaps=not event.ShiftDown())
+
+        self.working = False
+        event.Skip()
+
+    def onKeyChar(self, event):
+        """
+        These are secret keycodes not exposed on any/the main menu
+        Normally shortcuts added on the main menu work fine.  But popup menu items are done via
+        accelerator table, which gets first pick of the key, otherwise the key comes here
+        """
+        if event.GetKeyCode() >= 256:
+            event.Skip()
+            return
+        if self.working:
+            event.Skip()
+            return
+        self.working = True
+
+        keycode = chr(event.GetKeyCode())
+        print("keycode", keycode)
+
+        if keycode in ["", ""]:
+            pass
+
+        # These are now handled by the global accelerator table.
+        #
+        # if keycode in ["q", "Q"]:
+        #     self.NewEdgeMarkFrom()
+        #
+        # elif keycode in ["w", "W"]:
+        #     self.NewEdgeMarkTo(edge_type="composition")
+        #
+        # elif keycode in ["e", "E"]:
+        #     self.NewEdgeMarkTo(edge_type="generalisation")
+        #
+        # elif keycode in ["a", "A"]:
+        #     self.NewEdgeMarkTo(edge_type="association")
+        #
+
+        elif keycode in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+            todisplay = ord(keycode) - ord("1")
+            self.snapshot_mgr.Restore(todisplay)
+
+        elif keycode == "P":
+            self.Refresh()
+
+        elif keycode in ["d", "D"]:
+            self.app.run.CmdDumpDisplayModel()
+
+        elif keycode == "s":
+            self.CmdTrimScrollbars()
+
+        elif keycode == "G":  # and event.ShiftDown() and event.ControlDown():
+            self.app.run.CmdBuildColourChartWorkspace()
+
+        elif keycode in ["h", "H"]:
+            self.app.run.CmdColourSequential(color_range_offset=(keycode == "H"))
+
+        self.working = False
+
+        # event.Skip()  # makes an annoying beep if enabled
+
+    def OnWheelZoom(self, event):
+        # print "OnWheelZoom"
+        if self.working:
+            return
+        self.working = True
+
+        SCROLL_AMOUNT = 40
+        if not event.ControlDown():
+            oldscrollx = self.GetScrollPos(wx.HORIZONTAL)
+            oldscrolly = self.GetScrollPos(wx.VERTICAL)
+            if event.GetWheelRotation() < 0:
+                self.Scroll(oldscrollx, oldscrolly + SCROLL_AMOUNT)
+            else:
+                self.Scroll(oldscrollx, max(0, oldscrolly - SCROLL_AMOUNT))
+        else:
+            if event.GetWheelRotation() < 0:
+                self.app.run.CmdLayoutContract(remove_overlaps=not event.ShiftDown())
+            else:
+                self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
+
+        self.working = False
+
+    def OnDestroy(self, evt):
+        for shape in self.GetDiagram().GetShapeList():
+            if shape.GetParent() == None:
+                shape.SetCanvas(None)
+
+    def CmdTrimScrollbars(self):
+        self.canvas_resizer.resize_virtual_canvas_tofit_bounds(
+            shrinkage_leeway=0, bounds_dirty=True
+        )
+
+    def CmdRememberLayout1(self):
+        self.snapshot_mgr.QuickSave(slot=1)
+
+    def CmdRememberLayout2(self):
+        self.snapshot_mgr.QuickSave(slot=2)
+
+    def CmdRestoreLayout1(self):
+        self.snapshot_mgr.QuickRestore(slot=1)
+
+    def CmdRestoreLayout2(self):
+        self.snapshot_mgr.QuickRestore(slot=2)
+
+    def NewEdgeMarkFrom(self):
+        selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
+        if not selected:
+            self.frame.SetStatusText("Please select a node")
+            return
+
+        if self.new_edge_from:
+            print("warning, new_edge_from already set")
+        self.new_edge_from = selected[0].node
+        self.frame.SetStatusText(f"Line begun from \"{self.new_edge_from.id}\" - now select destination node and r.click to join")
+
+    def NewEdgeMarkTo(self, edge_type="composition"):
+        selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
+        if not selected:
+            self.frame.SetStatusText("Please select a node")
+            return
+
+        tonode = selected[0].node
+        self.frame.SetStatusText("To %s" % tonode.id)
+
+        if self.new_edge_from == None:
+            self.frame.SetStatusText("Please set from node first")
+            return
+
+        if self.new_edge_from.id == tonode.id:
+            self.frame.SetStatusText("Can't link to self")
+            return
+
+        if not self.displaymodel.graph.FindNodeById(self.new_edge_from.id):
+            self.frame.SetStatusText("From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id)
+            return
+
+        edge = self.displaymodel.graph.AddEdge(
+            tonode, self.new_edge_from, weight=None
+        )  # swap direction as is a directional composition.
+        edge["uml_edge_type"] = edge_type
+        self.CreateUmlEdge(edge)
+        self.new_edge_from = None  # reset from after each connection, for UI clarity
+        self.mega_refresh()
+
+    def OnCancelLine(self, event):
+        if True or self.new_edge_from:
+            print("Line drawing cancelled")
+        self.new_edge_from = None
+        self.frame.SetStatusText("")
+
+    def new_evthandler_housekeeping(self, evthandler):
+        # notify app of this new evthandler so app can
+        # assign the evthandler's .app attribute.
+        # Or could have just done:
+        #   evthandler.app = self.app
+        # here.  But we may need observer for other things later.
+        self.observers.NOTIFY_EVT_HANDLER_CREATED(evthandler)
+
     def get_umlboxshapes(self):
         """
         Return list of all uml classes and comment shapes
@@ -869,52 +704,9 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     umlboxshapes = property(get_umlboxshapes)
 
-    def OnDestroy(self, evt):
-        for shape in self.GetDiagram().GetShapeList():
-            if shape.GetParent() == None:
-                shape.SetCanvas(None)
+    def AllToLayoutCoords(self):
+        self.coordmapper.AllToLayoutCoords()
 
-    def build_view(self, translatecoords=True):
-        """
-        Builds the shapes from the display model, attaching shapes to nodes
-        and in the case of edge shapes, attaching them to ??
-
-        This is an important method.
-
-        Called by
-            CmdFileLoadWorkspaceBase.load_model_from_text_and_build_shapes()
-
-            CmdFileImportBase - and its subclasses
-                class CmdFileImportFromFilePath(CmdFileImportBase):  # was class CmdFileImportSource(CmdBase):
-                class CmdFileImportViaDialog(CmdFileImportBase):  # was class CmdFileImport(CmdBase):
-
-            CmdBuildColourChartWorkspace
-
-        Args:
-            translatecoords: ?
-
-        Returns:
-        """
-        if translatecoords:
-            self.AllToWorldCoords()
-
-        # Clear existing visualisation, including any attached edges/lines
-        for node in self.displaymodel.graph.nodes:
-            if node.shape:
-                self.delete_shape_view(node.shape)
-                node.shape = None
-
-        # Create fresh visualisation
-        for node in self.displaymodel.graph.nodes:
-            assert not node.shape
-            if isinstance(node, CommentNode) or hasattr(node, "comment"):
-                shape = self.createCommentShape(node)
-            else:
-                shape = self.CreateUmlShape(node)
-            self.displaymodel.classnametoshape[
-                node.id
-            ] = shape  # Record the name to shape map so that we can wire up the links later.
-
-        for edge in self.displaymodel.graph.edges:
-            self.CreateUmlEdge(edge)
+    def AllToWorldCoords(self):
+        self.coordmapper.AllToWorldCoords()
 

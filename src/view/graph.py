@@ -14,6 +14,15 @@ class Graph:
     def __init__(self):
         self.Clear()
         self.persistence = GraphPersistence(self)
+        self.nodeSet = {}
+        self.nodes = []
+        self.edges = []
+        self.layoutMinX = 0
+        self.layoutMaxX = 0
+        self.layoutMinY = 0
+        self.layoutMaxY = 0
+        self.file_version = -1
+        self.filedata_list = []
 
     def Clear(self):
         self.nodeSet = {}
@@ -514,7 +523,7 @@ class GraphNode:
 
     def __str__(self):
         return (
-            "Node %15s: x/left,y/top (% 4d, % 4d) w,h (% 4d, % 4d) layoutPosX,layoutPosY (% 2.2f, % 2.2f)"
+            "Node %15s: x/left,y/top (% 4d, % 4d) w,h (% 4d, % 4d) layoutPosX,layoutPosY (% 2.2f, % 2.2f) shape=%s"
             % (
                 self.id,
                 self.left,
@@ -523,5 +532,6 @@ class GraphNode:
                 self.height,
                 self.layoutPosX,
                 self.layoutPosY,
+                getattr(self, "shape", None),
             )
         )
