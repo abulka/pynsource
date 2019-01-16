@@ -1,4 +1,3 @@
-wxpython
 configobj
 requests
 typed_ast

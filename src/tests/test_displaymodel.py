@@ -4,10 +4,9 @@ from parsing.api import old_parser, new_parser
 from parsing.dump_pmodel import dump_old_structure
 from view.display_model import DisplayModel
 from view.display_model import Graph, GraphNode, UmlNode
-from gui.uml_shapes import DividedShape, CommentShape
-from gui.uml_lines import LineShapeCustom
 from unittest import mock
 from textwrap import dedent
+import os
 
 def parse_source(source_code, options):
     with tempfile.NamedTemporaryFile(mode="wt") as temp:  # TODO use streams not temporary files
@@ -108,6 +107,7 @@ class TestCaseDisplayModel(unittest.TestCase):
         self.assertCountEqual(node.meths, ["__init__", "method1"])  # relies on edge duplicate fix
 
     # @mock.patch('gui.umlcanvas')  # how to patch the right thing?
+    @unittest.skipIf('TRAVIS' in os.environ, "no wxpython possible on travis")
     def test_display_model_simplification(self):
         """
         Ensure old display model is no more.
@@ -163,6 +163,10 @@ class TestCaseDisplayModel(unittest.TestCase):
         # self.edge_check_line(fred_sam)
 
     def create_mock_umlcanvas(self, dmodel):
+        # this indirectly assumes wx
+        from gui.uml_shapes import DividedShape, CommentShape
+        from gui.uml_lines import LineShapeCustom
+
         umlcanvas = mock.MagicMock()
         umlcanvas.CreateUmlShape.return_value = mock.MagicMock(spec=DividedShape)
         umlcanvas.createCommentShape.return_value = mock.MagicMock(spec=CommentShape)
