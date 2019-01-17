@@ -6,6 +6,10 @@ from parsing.dump_pmodel import dump_old_structure
 
 
 class CmdDumpDisplayModel(CmdBase):
+
+    def __init__(self, parse_models=False):
+        self.parse_models = parse_models
+
     def execute(self):
         # Also called by Snapshot manager.
         # When create Snapshot manager we pass ourselves as a controller and DumpStatus() is expected to exist.
@@ -14,10 +18,12 @@ class CmdDumpDisplayModel(CmdBase):
         # http://stackoverflow.com/questions/1823058/how-to-print-number-with-commas-as-thousands-separators-in-python-2-x
         locale.setlocale(locale.LC_ALL, "")
 
-        # self.dump_parse_models()
-        table = self.context.coordmapper.DumpCalibrationInfo(dump_nodes=False, doprint=False)
-        self.dump_overlaps(into_existing_table=table)
-        self.context.displaymodel.Dump()
+        if self.parse_models:
+            self.dump_parse_models()
+        else:
+            table = self.context.coordmapper.DumpCalibrationInfo(dump_nodes=False, doprint=False)
+            self.dump_overlaps(into_existing_table=table)
+            self.context.displaymodel.Dump()
 
     def dump_parse_models(self):
         for pmodel in self.context.displaymodel.pmodels_i_have_seen:

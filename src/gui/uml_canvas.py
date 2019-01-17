@@ -576,7 +576,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.Refresh()
 
         elif keycode in ["d", "D"]:
-            self.app.run.CmdDumpDisplayModel()
+            self.app.run.CmdDumpDisplayModel(parse_models=keycode == "D")
 
         elif keycode == "s":
             self.CmdTrimScrollbars()
