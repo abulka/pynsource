@@ -1,10 +1,10 @@
 # CoordinateMapper
 
 import locale
+locale.setlocale(locale.LC_ALL, "")
+# http://stackoverflow.com/questions/1823058/how-to-print-number-with-commas-as-thousands-separators-in-python-2-x
 
-locale.setlocale(
-    locale.LC_ALL, ""
-)  # http://stackoverflow.com/questions/1823058/how-to-print-number-with-commas-as-thousands-separators-in-python-2-x
+from beautifultable import BeautifulTable
 
 
 class CustomException(Exception):
@@ -100,7 +100,60 @@ class CoordinateMapper:
 
         # self.DumpCalibrationInfo("is_function_end", new_world_size, scale)
 
-    def DumpCalibrationInfo(self, dump_mode=None, new_world_size=None, scale=None, dump_nodes=True):
+    def DumpCalibrationInfo(self, dump_mode=None, new_world_size=None, scale=None, dump_nodes=True, doprint=True):
+
+        t = BeautifulTable()
+        # t.column_headers = ["items", "info1", "info2"]
+
+        if dump_mode == "is_function_start":
+            t.append_row(["CoordinateMapper.Recalibrate START, calling with: new_world_size, scale",
+                          new_world_size,
+                          scale])
+        elif dump_mode == "is_function_end":
+            t.append_row(["CoordinateMapper.Recalibrate END",
+                          "",
+                          ""])
+
+        t.append_row(["scale and radius", self.scale, self.radius])
+
+        # subtable support not yet released, cos of newline support issue in beautifuletable
+        # subtable1 = BeautifulTable()
+        # subtable1.column_headers = ["scale", "radius"]
+        # subtable1.append_row([self.scale, self.radius])
+
+        t.append_row(["world_size", self.world_size[0], self.world_size[1]])
+
+        t.append_row(["layout MinX MinY",
+                      "%2.2f" % self.graph.layoutMinX,
+                      "%2.2f" % self.graph.layoutMinY])
+        t.append_row(["layout MaxX Maxy",
+                      "%2.2f" % self.graph.layoutMaxX,
+                      "%2.2f" % self.graph.layoutMaxY])
+
+        t.append_row(["layout width height",
+                      "%2.2f" % (self.graph.layoutMaxX - self.graph.layoutMinX),
+                      "%2.2f" % (self.graph.layoutMaxY - self.graph.layoutMinY)
+                      ])
+
+        t.append_row(["factorX factorY",
+                      locale.format_string("%d", self.factorX, grouping=True),
+                      locale.format_string("%d", self.factorY, grouping=True)
+                      ])
+
+        # t.append_row([subtable1, "", "", ""])
+
+        if doprint:
+            t.column_alignments[0] = BeautifulTable.ALIGN_LEFT
+            t.row_separator_char = ''
+            print(t)
+        else:
+            return t
+
+        if dump_nodes:
+            for node in self.graph.nodes:
+                print(node)
+
+    def DumpCalibrationInfo_OLD(self, dump_mode=None, new_world_size=None, scale=None, dump_nodes=True):
         indent = ""
         if dump_mode == "is_function_start":
             print()
@@ -135,8 +188,8 @@ class CoordinateMapper:
         )
         print(
             indent + "factorX factorY\t\t\t",
-            locale.format("%d", self.factorX, grouping=True),
-            locale.format("%d", self.factorY, grouping=True),
+            locale.format_string("%d", self.factorX, grouping=True),
+            locale.format_string("%d", self.factorY, grouping=True),
         )
         if dump_nodes:
             for node in self.graph.nodes:

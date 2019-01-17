@@ -101,7 +101,7 @@ class CanvasResizer(object):
         oldscrollx = self.canvas.GetScrollPos(wx.HORIZONTAL)
         oldscrolly = self.canvas.GetScrollPos(wx.VERTICAL)
 
-        print("Setting virtual size to %d,%d" % (bounds_width, bounds_height))
+        # print("Setting virtual size to %d,%d" % (bounds_width, bounds_height))
 
         self.canvas.SetScrollbars(
             1, 1, bounds_width, bounds_height, oldscrollx, oldscrolly, noRefresh=True

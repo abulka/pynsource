@@ -5,7 +5,8 @@ from base64 import b64encode
 from typing import List, Set, Dict, Tuple, Optional
 from pprint import pprint
 from base64 import b64decode
-
+from beautifultable import BeautifulTable
+from termcolor import colored  # also install colorama to make this work on windows
 
 class UmlGraph(Graph):
     def create_new_node(self, id, l, t, w, h):
@@ -343,6 +344,63 @@ class DisplayModel:
         return node
 
     def Dump(self):
+
+        # Utility
+
+        def node_name(node: GraphNode):
+            name: str = node.id
+            if hasattr(node, "comment"):  # colourise_comments
+                name = colored(name, "yellow")
+            return name
+
+        def edge_name_colourise(edgetype: str):
+            # 'grey',
+            # 'red',
+            # 'green',
+            # 'yellow',
+            # 'blue',
+            # 'magenta',
+            # 'cyan',
+            # 'white',
+            if edgetype == "association":
+                edgetype = colored(edgetype, "blue")
+            if edgetype == "generalisation":
+                edgetype = colored(edgetype, "green")
+            if edgetype == "composition":
+                edgetype = colored(edgetype, "cyan")
+            return edgetype
+
+        # Main
+
+        t = BeautifulTable()
+        t.column_headers = ["node", "coords", "widths", "shape"]
+        for node in self.graph.nodes:
+            name = node_name(node)
+            t.append_row([name, (node.left, node.top), (node.width, node.height), node.shape])
+        t.column_alignments['node'] = BeautifulTable.ALIGN_LEFT
+        t.row_separator_char = ''
+        print(t)
+
+        e = BeautifulTable(max_width=240)
+        e.column_headers = ["edge", "from", "symbol", "to", "shape"]
+        e.column_alignments['shape'] = BeautifulTable.ALIGN_LEFT
+        for edge in self.graph.edges:
+            source = node_name(edge["source"])
+            target = node_name(edge["target"])
+            edgetype = edge_name_colourise(edge["uml_edge_type"])
+            shape = edge.get("shape", None)
+            if edgetype == "generalisation":
+                symbol = "--|>"
+            elif edgetype == "composition":
+                source, target = target, source  # around the wrong way? - fix
+                symbol = "--->"
+            else:
+                symbol = "---"
+            e.append_row([edgetype, source, symbol, target, shape])
+        e.row_separator_char = ''
+        print(e)
+
+    def Dump_plain_old(self):
         def line(ch="-"):
             return ch * 70
 
