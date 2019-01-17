@@ -4,3 +4,5 @@ requests
 py2app
 typed_ast
 astpretty
+BeautifulTable
+termcolor

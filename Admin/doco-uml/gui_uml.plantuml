@@ -33,7 +33,7 @@ class UmlCanvas <<ogl.ShapeCanvas>> {
     <b>createCommentShape()
     CreateImageShape()
     createNodeShape()
-    CreateUmlEdge()
+    CreateUmlEdgeShape()
     -- selection and canvas focus --
     focus_canvas()  <color:royalBlue><-- NEW, sets up accelerator table for the X key when shapes lose focus
     SelectNodeNow()

@@ -250,12 +250,9 @@ class DisplayModel:
                 shape = self.umlcanvas.createCommentShape(node)
             else:
                 shape = self.umlcanvas.CreateUmlShape(node)
-            # self.displaymodel.classnametoshape[
-            #     node.id
-            # ] = shape  # Record the name to shape map so that we can wire up the links later.
 
         for edge in self.graph.edges:
-            self.umlcanvas.CreateUmlEdge(edge)
+            self.umlcanvas.CreateUmlEdgeShape(edge)
 
     def AddUmlNode(self, id, attrs=[], meths=[]):
         node = self.graph.FindNodeById(id)
@@ -353,15 +350,8 @@ class DisplayModel:
                 name = colored(name, "yellow")
             return name
 
-        def edge_name_colourise(edgetype: str):
-            # 'grey',
-            # 'red',
-            # 'green',
-            # 'yellow',
-            # 'blue',
-            # 'magenta',
-            # 'cyan',
-            # 'white',
+        def edgetype_colourise(edgetype: str):
+            # 'grey', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white',
             if edgetype == "association":
                 edgetype = colored(edgetype, "blue")
             if edgetype == "generalisation":
@@ -369,6 +359,15 @@ class DisplayModel:
             if edgetype == "composition":
                 edgetype = colored(edgetype, "cyan")
             return edgetype
+
+        def edgetype_symbol(edgetype: str):
+            if edgetype == "generalisation":
+                symbol = "--|>"
+            elif edgetype == "composition":
+                symbol = "--->"
+            else:
+                symbol = "---"
+            return symbol
 
         # Main
 
@@ -387,51 +386,14 @@ class DisplayModel:
         for edge in self.graph.edges:
             source = node_name(edge["source"])
             target = node_name(edge["target"])
-            edgetype = edge_name_colourise(edge["uml_edge_type"])
-            shape = edge.get("shape", None)
-            if edgetype == "generalisation":
-                symbol = "--|>"
-            elif edgetype == "composition":
+            edgetype = edgetype_colourise(edge["uml_edge_type"])
+            symbol = edgetype_symbol(edgetype)
+            if edgetype == "composition":
                 source, target = target, source  # around the wrong way? - fix
-                symbol = "--->"
-            else:
-                symbol = "---"
+            shape = edge.get("shape", None)
             e.append_row([edgetype, source, symbol, target, shape])
         e.row_separator_char = ''
         print(e)
-
-    def Dump_plain_old(self):
-        def line(ch="-"):
-            return ch * 70
-
-        print()
-        print("     DisplayModel (Graph)   ")
-        print()
-
-        # The nodeSet is just a dictionary of unique nodes, good info but not generally
-        # needing to be dumped.
-        #
-        # print(line("-"), "graph.nodeSet is")
-        # pprint(list(self.graph.nodeSet.keys()))
-
-        print(line("-"), "self.graph.nodes")
-        print()
-        for node in self.graph.nodes:
-            print(node)
-        print(line("-"), "self.graph.edges")
-        for edge in self.graph.edges:
-            source = edge["source"].id
-            target = edge["target"].id
-            edgetype = edge["uml_edge_type"]
-            shape = edge.get("shape", None)
-            if edgetype == "generalisation":
-                symbol = "--|>"
-            elif edgetype == "composition":
-                source, target = target, source  # around the wrong way? - fix
-                symbol = "--->"
-            else:
-                symbol = "---"
-            print("from %40s %s %-40s  (%s)  shape=%s" % (source, symbol, target, edgetype, shape))
 
     def decouple_node_from_shape(self, shape):
         pass

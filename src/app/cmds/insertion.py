@@ -2,8 +2,9 @@ from .base_cmd import CmdBase
 import wx
 import random
 from dialogs.DialogComment import DialogComment
-from gui.uml_shapes import DividedShape
+from gui.uml_shapes import DividedShape, CommentShape
 from dialogs.DialogUmlNodeEdit import DialogUmlNodeEdit
+from typing import List, Set, Dict, Tuple, Optional
 
 
 """
@@ -84,9 +85,6 @@ class CmdInsertUmlClass(UtilCmdUmlClass):
 
             node = displaymodel.AddUmlNode(id, attrs, methods)
             shape = umlcanvas.CreateUmlShape(node)
-            # displaymodel.classnametoshape[
-            #     node.id
-            # ] = shape  # Record the name to shape map so that we can wire up the links later.
 
             node.shape.Show(True)
 
@@ -131,13 +129,10 @@ class CmdEditUmlClass(UtilCmdUmlClass):
                 gui.delete_shape_view(shape)
 
                 shape = umlcanvas.CreateUmlShape(node)
-                # displaymodel.classnametoshape[
-                #     node.id
-                # ] = shape  # Record the name to shape map so that we can wire up the links later.
 
                 # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
                 for edge in displaymodel.graph.edges:
-                    umlcanvas.CreateUmlEdge(edge)
+                    umlcanvas.CreateUmlEdgeShape(edge)
 
                 node.shape.Show(True)
                 umlcanvas.mega_refresh()
@@ -196,10 +191,7 @@ class CmdInsertComment(UtilCmdComment):
 
     def execute(self):
         """
-        Pops up a comment dialog box, creates both a graph node and a shape,
-        associates them, then adds them to the `self.context.displaymodel.classnametoshape` mapping.
-
-        TODO However there is no edge being created in the graph model - why?
+        Pops up a comment dialog box, creates both a graph node and a shape, and associates them
         """
 
         id = "C" + str(random.randint(1, 9999))
@@ -210,9 +202,6 @@ class CmdInsertComment(UtilCmdComment):
                 id += "2"
             node = self.context.displaymodel.AddCommentNode(id, comment)
             shape = self.context.umlcanvas.createCommentShape(node)
-
-            # Record the name to shape map so that we can wire up the links later.
-            # self.context.displaymodel.classnametoshape[node.id] = shape
 
             node.shape.Show(True)
             self.context.umlcanvas.mega_refresh()
@@ -225,38 +214,15 @@ class CmdEditComment(UtilCmdComment):
         self.shape = shape
 
     def execute(self):
-        """  """
-        umlcanvas = gui = self.context.umlcanvas
-        wxapp = self.context.wxapp
-        displaymodel = self.context.displaymodel
         shape = self.shape
-
+        umlcanvas = gui = self.context.umlcanvas
         node = shape.node
 
-        # node is a regular node, its the node.shape that is different for a comment
-        assert not isinstance(node.shape, DividedShape)
-
         result, comment = self.display_dialog(node.comment)
-
-        # TODO review this code !!!!! and also need to call this class instead of the above umlclass class
-        # somehow - perhaps by checking in the GUI invoker of the type.
-        # also make comment shape unique - not just a rectangle.
         if result:
             node.comment = comment
-
-            displaymodel.decouple_node_from_shape(shape)
-            gui.delete_shape_view(shape)
-
-            shape = umlcanvas.createCommentShape(node)
-            # displaymodel.classnametoshape[
-            #     node.id
-            # ] = shape  # Record the name to shape map so that we can wire up the links later.
-
-            # # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
-            # for edge in model.graph.edges:
-            #     umlcanvas.CreateUmlEdge(edge)
-
-            node.shape.Show(True)
+            shape.ClearText()
+            shape.AddText(node.comment)
             umlcanvas.mega_refresh()
 
     def undo(self):  # override

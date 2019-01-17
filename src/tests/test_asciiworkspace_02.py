@@ -44,7 +44,7 @@ class TestCaseAscii_02(unittest.TestCase):
 |-----------------------------|
 | scrollStepX                 |  ---->  [ Laymanwoman ]
 | scrollStepY                 |  ---->  [ OverlapRemoval ]
-| classnametoshape            |  ---->  [ CoordinateMapper ]
+| evenfreddycansee            |  ---->  [ CoordinateMapper ]
 | log                         |  ---->  [ GraphLayoutSpring ]
 | frame                       |  ---->  [ UmlWorkspace ]
 | save_gdi                    |

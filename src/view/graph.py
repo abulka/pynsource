@@ -53,7 +53,7 @@ class Graph:
             self.nodes.append(node)
         return node
 
-    def FindEdge(self, from_node, to_node, edge_type):
+    def FindEdge(self, from_node, to_node, edge_type) -> Dict:
         """
         Attempt at duplication avoidance, used by display_model.py
         returns edge if it is found, and matches all params

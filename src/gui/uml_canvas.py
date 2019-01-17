@@ -288,7 +288,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.SetEventHandler(evthandler)
         self.new_evthandler_housekeeping(evthandler)
 
-    def CreateUmlEdge(self, edge):
+    def CreateUmlEdgeShape(self, edge):
         """
         @startuml
 
@@ -346,7 +346,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             line = LineShapeCustom()  # used to be ogl.LineShape()
 
         line.SetCanvas(self)
-        edge["line"] = line
+        edge["shape"] = line
 
         if edge_label == "association":
             line.SetPen(wx.Pen(colour=wx.BLACK, width=1, style=wx.SHORT_DASH)) # or try PENSTYLE_DOT
@@ -668,7 +668,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             tonode, self.new_edge_from, weight=None
         )  # swap direction as is a directional composition.
         edge["uml_edge_type"] = edge_type
-        self.CreateUmlEdge(edge)
+        self.CreateUmlEdgeShape(edge)
         self.new_edge_from = None  # reset from after each connection, for UI clarity
         self.mega_refresh()
 
