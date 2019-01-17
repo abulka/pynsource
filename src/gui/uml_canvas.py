@@ -175,7 +175,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.region1 = (
             regionName
         )  # Andy added, for later external reference to classname from just having the shape instance.
-        print("shape.region1", shape.region1)
 
         shape.SetDraggable(True, True)
         shape.SetCanvas(self)

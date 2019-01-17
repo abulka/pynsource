@@ -25,8 +25,6 @@ class CmdFileNew(CmdBase):
 
 class CmdFileImportBase(CmdBase):  # BASE
     def execute(self):
-        assert self.files
-
         if self.files:
             for f in self.files:
                 # pmodel, debuginfo = old_parser(f)
@@ -39,22 +37,14 @@ class CmdFileImportBase(CmdBase):  # BASE
                     self.context.wxapp.MessageBox(pmodel.errors)
 
                 # from parsing.dump_pmodel import dump_old_structure
-                # print dump_old_structure(pmodel)
+                # print(dump_old_structure(pmodel))
 
                 self.context.displaymodel.build_graphmodel(pmodel)
 
-                # p = PySourceAsJava()
-                # p.optionModuleAsClass = 0
-                # p.verbose = 0
-                # p.Parse(f)
-                # self.context.displaymodel.ConvertParseModelToUmlModel(p)
-
-        self.context.umlcanvas.displaymodel.build_view()
-
-        # Layout
-        self.context.umlcanvas.layout_and_position_shapes()
-
-        self.context.frame.Layout()  # needed when running phoenix
+            self.context.umlcanvas.displaymodel.build_view()
+            self.context.umlcanvas.GetDiagram().ShowAll(1)  # need this, yes
+            self.context.umlcanvas.layout_and_position_shapes()
+            self.context.umlcanvas.mega_refresh()
 
 
 class CmdFileImportFromFilePath(CmdFileImportBase):  # was class CmdFileImportSource(CmdBase):

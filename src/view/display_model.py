@@ -135,10 +135,12 @@ class DisplayModel:
     def __init__(self, canvas=None):
         self.graph = UmlGraph()
         self.umlcanvas = canvas
+        self.pmodels_i_have_seen = []  # just for reference and dumping purposes
         self.Clear()
 
     def Clear(self):
         self.graph.Clear()
+        self.pmodels_i_have_seen = []
 
     def build_graphmodel(self, pmodel):
         """
@@ -164,6 +166,8 @@ class DisplayModel:
 
         Note AddUmlNode, AddUmlEdge are methods on the umlcanvas.
         """
+        self.pmodels_i_have_seen.append(pmodel)
+
         generalisations = []
         compositions = []
         associations = []  # are no pure associations in a pmodel, but mention for completeness
@@ -241,11 +245,13 @@ class DisplayModel:
         for node in self.graph.nodes:
             if node.shape:
                 self.umlcanvas.delete_shape_view(node.shape)
+                print(f"DELETED SHAPE {node.shape} {self.obj_id(node.shape)}")
                 node.shape = None
 
         # Create fresh visualisation
         for node in self.graph.nodes:
             assert not node.shape
+            print(f"building SHAPE for node {node.id}")
             if isinstance(node, CommentNode) or hasattr(node, "comment"):
                 shape = self.umlcanvas.createCommentShape(node)
             else:
@@ -369,17 +375,13 @@ class DisplayModel:
                 symbol = "---"
             return symbol
 
-        def obj_id(obj) -> str:
-            # as hex, just the last few digits of the id, to reduce noise.  None protection.
-            return f"{id(obj):x}"[-3:] if obj else ''
-
         # Main
 
         t = BeautifulTable(max_width=260)
         t.column_headers = ["node", "coords", "widths", "shape"]
         for node in self.graph.nodes:
             name = node_name(node)
-            t.append_row([name, (node.left, node.top), (node.width, node.height), f"{node.shape} {obj_id(node.shape)}"])
+            t.append_row([name, (node.left, node.top), (node.width, node.height), f"{node.shape} {self.obj_id(node.shape)}"])
         t.column_alignments['node'] = BeautifulTable.ALIGN_LEFT
         t.row_separator_char = ''
         print(t)
@@ -395,7 +397,7 @@ class DisplayModel:
             if edgetype == "composition":
                 source, target = target, source  # around the wrong way? - fix
             shape = edge.get("shape", None)
-            e.append_row([edgetype, source, symbol, target, f"{shape} {obj_id(shape)}"])
+            e.append_row([edgetype, source, symbol, target, f"{shape} {self.obj_id(shape)}"])
         e.row_separator_char = ''
         print(e)
 
@@ -414,4 +416,8 @@ class DisplayModel:
         """
         node.attrs = list(set(attrs + node.attrs))
         node.meths = list(set(meths + node.meths))
+
+    def obj_id(self, obj) -> str:
+        # as hex, just the last few digits of the id, to reduce noise.  None protection.
+        return f"{id(obj):x}"[-3:] if obj else ''
 

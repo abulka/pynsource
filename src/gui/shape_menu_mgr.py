@@ -221,7 +221,8 @@ class ShapeMenuMgr:
         # Utility functions to add specific things to the menu - nicer way for algorithm to refer to
 
         def add_submenu_to_popup():
-            self.popupmenu.Append(wx.ID_ANY, "Draw Line", self.submenu)
+            # self.popupmenu.Append(wx.ID_ANY, "Draw Line", self.submenu)
+            self.popupmenu.AppendSubMenu(self.submenu, "Draw Line", "Line drawing operations")
 
         def add_separator():
             self.popupmenu.AppendSeparator()

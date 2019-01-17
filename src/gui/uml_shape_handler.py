@@ -52,6 +52,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         self.UpdateStatusBar(shape)
 
         shape.GetCanvas().canvas_resizer.resize_virtual_canvas_tofit_bounds(bounds_dirty=True)
+        canvas = shape.GetCanvas()
 
         # Invoke overlap removal (unless hold down shift key)
         KEY_SHIFT = 1
@@ -59,7 +60,6 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             # shape.GetCanvas().mega_refresh()   # do we need this?  did quite well without it before
             pass
         else:
-            canvas = shape.GetCanvas()
             if canvas.remove_overlaps():
                 pass
 
