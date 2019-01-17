@@ -221,7 +221,8 @@ class DisplayModel:
         and in the case of edge shapes, attaching them to the relevant graph edge dictionary entry.
 
         This is an important method.
-        Updates existing shapes by defaults, with option to zap all shapes
+        Updates existing shapes by default, with option to zap all shapes (which used to be
+                                                                            the default behaviour)
 
         Returns: -
         """
@@ -237,18 +238,18 @@ class DisplayModel:
 
         # Create fresh visualisation (or update existing)
         for node in self.graph.nodes:
-            if node.shape:
-                print(f"updating existing SHAPE for node {node.id}")
-                if isinstance(node, CommentNode) or hasattr(node, "comment"):
+            if isinstance(node, CommentNode) or hasattr(node, "comment"):
+                # Comment shape
+                if node.shape:
                     node.shape.ClearText()
                     node.shape.AddText(node.comment)
                 else:
+                    self.umlcanvas.createCommentShape(node)
+            else:
+                # UML class shape
+                if node.shape:
                     node.shape.ClearRegions()
                     self.umlcanvas.CreateUmlShape(node, update_existing_shape=node.shape)
-            else:
-                print(f"building SHAPE for node {node.id}")
-                if isinstance(node, CommentNode) or hasattr(node, "comment"):
-                    self.umlcanvas.createCommentShape(node)
                 else:
                     self.umlcanvas.CreateUmlShape(node)
 
