@@ -235,6 +235,10 @@ class DisplayModel:
                 if node.shape:
                     self.umlcanvas.delete_shape_view(node.shape)
                     node.shape = None
+            for edge in self.graph.edges:
+                if edge.get("shape", None):
+                    self.umlcanvas.delete_shape_view(edge["shape"])
+                    edge["shape"] = None
 
         # Create fresh visualisation (or update existing)
         for node in self.graph.nodes:

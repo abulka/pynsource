@@ -145,13 +145,13 @@ class TestCaseDisplayModel(unittest.TestCase):
 
         umlcanvas = self.create_mock_umlcanvas(dmodel)
 
-        dmodel.build_view()
+        dmodel.build_view(purge_existing_shapes=True)  # doesn't matter t/f cos first build
         self.assertTrue(umlcanvas.CreateUmlShape.called)
         self.assertFalse(umlcanvas.createCommentShape.called)
-        self.assertTrue(umlcanvas.CreateUmlEdge.called)
+        self.assertTrue(umlcanvas.CreateUmlEdgeShape.called)
 
         self.assertEqual(umlcanvas.CreateUmlShape.call_count, 3)
-        self.assertEqual(umlcanvas.CreateUmlEdge.call_count, 2)
+        self.assertEqual(umlcanvas.CreateUmlEdgeShape.call_count, 2)
 
         # Tests - cannot test these cos deep functionality not present in mocked umlcanvas.
 
