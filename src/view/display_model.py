@@ -369,13 +369,17 @@ class DisplayModel:
                 symbol = "---"
             return symbol
 
+        def obj_id(obj) -> str:
+            # as hex, just the last few digits of the id, to reduce noise.  None protection.
+            return f"{id(obj):x}"[-3:] if obj else ''
+
         # Main
 
-        t = BeautifulTable()
+        t = BeautifulTable(max_width=260)
         t.column_headers = ["node", "coords", "widths", "shape"]
         for node in self.graph.nodes:
             name = node_name(node)
-            t.append_row([name, (node.left, node.top), (node.width, node.height), node.shape])
+            t.append_row([name, (node.left, node.top), (node.width, node.height), f"{node.shape} {obj_id(node.shape)}"])
         t.column_alignments['node'] = BeautifulTable.ALIGN_LEFT
         t.row_separator_char = ''
         print(t)
@@ -391,7 +395,7 @@ class DisplayModel:
             if edgetype == "composition":
                 source, target = target, source  # around the wrong way? - fix
             shape = edge.get("shape", None)
-            e.append_row([edgetype, source, symbol, target, shape])
+            e.append_row([edgetype, source, symbol, target, f"{shape} {obj_id(shape)}"])
         e.row_separator_char = ''
         print(e)
 

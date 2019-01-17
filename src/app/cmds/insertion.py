@@ -112,8 +112,25 @@ class CmdEditUmlClass(UtilCmdUmlClass):
         wxapp = self.context.wxapp
         displaymodel = self.context.displaymodel
         shape = self.shape
-
         node = shape.node
+
+        # EXPERIMENT
+        # id, attrs, methods = "fred", ["freds attrs"], ["freds methods", "doB"]
+        result, id, attrs, methods = self.display_dialog(node.id, node.attrs, node.meths)
+        if result:
+            displaymodel.graph.RenameNode(node, id)  # id is same as uml class name being represented
+            node.attrs = attrs
+            node.meths = methods
+
+            shape.ClearRegions()
+            umlcanvas.CreateUmlShape(node, update_existing_shape=shape)
+            # print(shape.region1)
+            # shape.ClearText(regionId=0)
+            # shape.region1.SetText(attrs)
+            # shape.region2.SetText(methods)
+            umlcanvas.mega_refresh()
+
+        return
 
         # node is a regular node, its the node.shape that is different for a comment
         if isinstance(node.shape, DividedShape):

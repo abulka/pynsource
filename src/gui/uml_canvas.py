@@ -106,7 +106,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             wx.CallLater(1500, self.app.context.wxapp.multiText.SetFocus)
             wx.CallLater(1500, self.SetFocus)
 
-    def CreateUmlShape(self, node):
+    def CreateUmlShape(self, node, update_existing_shape:DividedShape=None):
         def newRegion(font, name, textLst, maxWidth, totHeight=10):
             # Taken from Boa, but put into the canvas class instead of the scrolled window class.
             region = ogl.ShapeRegion()
@@ -129,7 +129,10 @@ class UmlCanvas(ogl.ShapeCanvas):
 
             return region, maxWidth, totHeight
 
-        shape = DividedShape(width=99, height=98, canvas=self)
+        if update_existing_shape:
+            shape = update_existing_shape
+        else:
+            shape = DividedShape(width=99, height=98, canvas=self)
         maxWidth = 10  # min node width, grows as we update it with text widths
 
         """
@@ -172,6 +175,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.region1 = (
             regionName
         )  # Andy added, for later external reference to classname from just having the shape instance.
+        print("shape.region1", shape.region1)
 
         shape.SetDraggable(True, True)
         shape.SetCanvas(self)
