@@ -215,7 +215,7 @@ class DisplayModel:
         build_edges(compositions, "composition")
         # build_edges(associations, "associations")
 
-    def build_view(self, translatecoords=True):
+    def build_view_HARSH(self, translatecoords=True):
         """
         Builds the shapes from the display model, attaching shapes to nodes
         and in the case of edge shapes, attaching them to the relevant graph edge dictionary entry
@@ -253,12 +253,44 @@ class DisplayModel:
             assert not node.shape
             print(f"building SHAPE for node {node.id}")
             if isinstance(node, CommentNode) or hasattr(node, "comment"):
-                shape = self.umlcanvas.createCommentShape(node)
+                self.umlcanvas.createCommentShape(node)
             else:
-                shape = self.umlcanvas.CreateUmlShape(node)
+                self.umlcanvas.CreateUmlShape(node)
 
         for edge in self.graph.edges:
             self.umlcanvas.CreateUmlEdgeShape(edge)
+
+    def build_view(self, translatecoords=True):  # New version which updates existing shapes
+        if translatecoords:
+            self.umlcanvas.AllToWorldCoords()
+
+        # # Clear existing visualisation, including any attached edges/lines
+        # for node in self.graph.nodes:
+        #     if node.shape:
+        #         self.umlcanvas.delete_shape_view(node.shape)
+        #         print(f"DELETED SHAPE {node.shape} {self.obj_id(node.shape)}")
+        #         node.shape = None
+
+        # Create fresh visualisation
+        for node in self.graph.nodes:
+            if node.shape:
+                print(f"updating existing SHAPE for node {node.id}")
+                if isinstance(node, CommentNode) or hasattr(node, "comment"):
+                    node.shape.ClearText()
+                    node.shape.AddText(node.comment)
+                else:
+                    node.shape.ClearRegions()
+                    self.umlcanvas.CreateUmlShape(node, update_existing_shape=node.shape)
+            else:
+                print(f"building SHAPE for node {node.id}")
+                if isinstance(node, CommentNode) or hasattr(node, "comment"):
+                    self.umlcanvas.createCommentShape(node)
+                else:
+                    self.umlcanvas.CreateUmlShape(node)
+
+        for edge in self.graph.edges:
+            if not edge.get("shape", None):
+                self.umlcanvas.CreateUmlEdgeShape(edge)
 
     def AddUmlNode(self, id, attrs=[], meths=[]):
         node = self.graph.FindNodeById(id)
