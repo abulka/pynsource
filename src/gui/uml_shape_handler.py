@@ -125,4 +125,3 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             if colour_index != None:
                 msg += "colour_index %d" % colour_index
         self.frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d) %s" % (x, y, width, height, msg))
-

@@ -8,6 +8,7 @@ MENU_ID_SHAPE_PROPERTIES = wx.NewIdRef()
 MENU_ID_BEGIN_LINE = wx.NewIdRef()
 MENU_ID_CANCEL_LINE = wx.NewIdRef()
 
+
 class ShapeMenuMgr:
     """
     Builds the MenuItems used in the r.click popup and also builds the accelerator table.
@@ -183,15 +184,14 @@ class ShapeMenuMgr:
 
         self.popupmenu = wx.Menu()  # This is the popup menu to which we attach menu items
         self.submenu = wx.Menu()  # This is the sub menu within the popupmenu
-        self.accel_entries : List[wx.AcceleratorEntry] = []
+        self.accel_entries: List[wx.AcceleratorEntry] = []
 
     def BuildPopupMenuItems(self):
         self.popupmenu = wx.Menu()  # This is the popup menu to which we attach menu items
         self.submenu = wx.Menu()  # This is the sub menu within the popupmenu
-        self.accel_entries : List[wx.AcceleratorEntry] = []
+        self.accel_entries: List[wx.AcceleratorEntry] = []
 
         def add_menuitem(text, method, id=None, submenu=False, key_code=None, keycode_only=False):
-
             def check_id(id):
                 """
                 Accelerator tables need unique ids, whereas direct menuitem binding with Bind(...source=menuitem)
@@ -228,20 +228,21 @@ class ShapeMenuMgr:
             self.popupmenu.AppendSeparator()
 
         def add_properties():
-            add_menuitem("Properties...\ts",
-                         self.OnNodeProperties,
-                         id=MENU_ID_SHAPE_PROPERTIES,
-                         key_code=ord('S'),
-                         )
+            add_menuitem(
+                "Properties...\ts",
+                self.OnNodeProperties,
+                id=MENU_ID_SHAPE_PROPERTIES,
+                key_code=ord("S"),
+            )
 
         def add_from(keycode_only=False):
-            item : wx.MenuItem = add_menuitem(
+            item: wx.MenuItem = add_menuitem(
                 "Begin - Remember selected class as FROM node (for drawing lines)\tq",
                 self.OnDrawBegin,
                 id=MENU_ID_BEGIN_LINE,
                 submenu=True,
-                key_code=ord('Q'),
-                keycode_only=keycode_only
+                key_code=ord("Q"),
+                keycode_only=keycode_only,
             )
             # item.Enable(False)  # hmm, accelerator still fires :-(
 
@@ -251,16 +252,16 @@ class ShapeMenuMgr:
                 self.OnCancelDrawBegin,
                 id=MENU_ID_CANCEL_LINE,
                 submenu=True,
-                key_code = ord('X'),
-                keycode_only = keycode_only
+                key_code=ord("X"),
+                keycode_only=keycode_only,
             )
 
         def add_association_edge():
             add_menuitem(
                 "End - Draw Line TO selected comment/class (association - dashed)\ta",
                 self.OnDrawEnd3,
-                key_code = ord('A'),
-                submenu = True
+                key_code=ord("A"),
+                submenu=True,
             )
 
         def add_generalise_composition_edges():
@@ -268,13 +269,13 @@ class ShapeMenuMgr:
                 "End - Draw Line TO selected class (composition)\tw",
                 self.OnDrawEnd1,
                 submenu=True,
-                key_code = ord('W'),
+                key_code=ord("W"),
             )
             add_menuitem(
                 "End - Draw Line TO selected class (generalisation)\te",
                 self.OnDrawEnd2,
-                submenu = True,
-                key_code=ord('E'),
+                submenu=True,
+                key_code=ord("E"),
             )
 
         def add_reset_image_size():
@@ -289,7 +290,7 @@ class ShapeMenuMgr:
         # Look around...
 
         shape = self.shapehandler.GetShape()
-        from_node : GraphNode = self.shapehandler.umlcanvas.new_edge_from
+        from_node: GraphNode = self.shapehandler.umlcanvas.new_edge_from
         is_bitmap = shape.__class__.__name__ == "BitmapShapeResizable"
         if is_bitmap:
             is_comment = is_umlclass = False
@@ -345,7 +346,7 @@ class ShapeMenuMgr:
         self.frame.SetAcceleratorTable(accel_tbl)
 
     # Handy Redirections
-    
+
     def GetShape(self):
         return self.shapehandler.GetShape()
 
@@ -353,7 +354,7 @@ class ShapeMenuMgr:
         self.shapehandler.focus_shape()
 
     # Handlers
-    
+
     def OnNodeProperties(self, event):
         node_edit_multi_purpose(self.GetShape(), self.shapehandler.app)
 
@@ -389,4 +390,3 @@ class ShapeMenuMgr:
 
     def OnPopupMenuCancel(self, event):
         pass
-

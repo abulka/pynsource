@@ -8,6 +8,7 @@ from base64 import b64decode
 from beautifultable import BeautifulTable
 from termcolor import colored  # also install colorama to make this work on windows
 
+
 class UmlGraph(Graph):
     def create_new_node(self, id, l, t, w, h):
         # subclasses overriding, opportunity to create different instance type
@@ -382,14 +383,21 @@ class DisplayModel:
         t.column_headers = ["node", "coords", "widths", "shape"]
         for node in self.graph.nodes:
             name = node_name(node)
-            t.append_row([name, (node.left, node.top), (node.width, node.height), f"{node.shape} {self.obj_id(node.shape)}"])
-        t.column_alignments['node'] = BeautifulTable.ALIGN_LEFT
-        t.row_separator_char = ''
+            t.append_row(
+                [
+                    name,
+                    (node.left, node.top),
+                    (node.width, node.height),
+                    f"{node.shape} {self.obj_id(node.shape)}",
+                ]
+            )
+        t.column_alignments["node"] = BeautifulTable.ALIGN_LEFT
+        t.row_separator_char = ""
         print(t)
 
         e = BeautifulTable(max_width=240)
         e.column_headers = ["edge", "from", "symbol", "to", "shape"]
-        e.column_alignments['shape'] = BeautifulTable.ALIGN_LEFT
+        e.column_alignments["shape"] = BeautifulTable.ALIGN_LEFT
         for edge in self.graph.edges:
             source = node_name(edge["source"])
             target = node_name(edge["target"])
@@ -399,7 +407,7 @@ class DisplayModel:
                 source, target = target, source  # around the wrong way? - fix
             shape = edge.get("shape", None)
             e.append_row([edgetype, source, symbol, target, f"{shape} {self.obj_id(shape)}"])
-        e.row_separator_char = ''
+        e.row_separator_char = ""
         print(e)
 
     def decouple_node_from_shape(self, shape):
@@ -420,5 +428,4 @@ class DisplayModel:
 
     def obj_id(self, obj) -> str:
         # as hex, just the last few digits of the id, to reduce noise.  None protection.
-        return f"{id(obj):x}"[-3:] if obj else ''
-
+        return f"{id(obj):x}"[-3:] if obj else ""

@@ -20,7 +20,6 @@ ogl.Shape.Move2 = Move2
 
 
 class UmlCanvas(ogl.ShapeCanvas):
-
     def __init__(self, parent, log, frame):
         ogl.ShapeCanvas.__init__(self, parent)
         # ShapeCanvasAndy.__init__(self, parent)  # ANDY HACK OGL
@@ -106,7 +105,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             wx.CallLater(1500, self.app.context.wxapp.multiText.SetFocus)
             wx.CallLater(1500, self.SetFocus)
 
-    def CreateUmlShape(self, node, update_existing_shape:DividedShape=None):
+    def CreateUmlShape(self, node, update_existing_shape: DividedShape = None):
         def newRegion(font, name, textLst, maxWidth, totHeight=10):
             # Taken from Boa, but put into the canvas class instead of the scrolled window class.
             region = ogl.ShapeRegion()
@@ -352,7 +351,9 @@ class UmlCanvas(ogl.ShapeCanvas):
         edge["shape"] = line
 
         if edge_label == "association":
-            line.SetPen(wx.Pen(colour=wx.BLACK, width=1, style=wx.SHORT_DASH)) # or try PENSTYLE_DOT
+            line.SetPen(
+                wx.Pen(colour=wx.BLACK, width=1, style=wx.SHORT_DASH)
+            )  # or try PENSTYLE_DOT
         else:
             line.SetPen(wx.BLACK_PEN)
 
@@ -370,9 +371,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         this is what is called when shape is deselected
         the only acceleration should be to cancel the pending line drawing
         """
-        accel_tbl = wx.AcceleratorTable([
-            (wx.ACCEL_NORMAL, ord('X'), MENU_ID_CANCEL_LINE),
-        ])
+        accel_tbl = wx.AcceleratorTable([(wx.ACCEL_NORMAL, ord("X"), MENU_ID_CANCEL_LINE)])
         self.frame.SetAcceleratorTable(accel_tbl)
         self.frame.Bind(wx.EVT_MENU, self.OnCancelLine, id=MENU_ID_CANCEL_LINE)
 
@@ -644,7 +643,9 @@ class UmlCanvas(ogl.ShapeCanvas):
         if self.new_edge_from:
             print("warning, new_edge_from already set")
         self.new_edge_from = selected[0].node
-        self.frame.SetStatusText(f"Line begun from \"{self.new_edge_from.id}\" - now select destination node and r.click to join")
+        self.frame.SetStatusText(
+            f'Line begun from "{self.new_edge_from.id}" - now select destination node and r.click to join'
+        )
 
     def NewEdgeMarkTo(self, edge_type="composition"):
         selected = [s for s in self.GetDiagram().GetShapeList() if s.Selected()]
@@ -664,7 +665,9 @@ class UmlCanvas(ogl.ShapeCanvas):
             return
 
         if not self.displaymodel.graph.FindNodeById(self.new_edge_from.id):
-            self.frame.SetStatusText("From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id)
+            self.frame.SetStatusText(
+                "From node %s doesn't seem to be in graph anymore!" % self.new_edge_from.id
+            )
             return
 
         edge = self.displaymodel.graph.AddEdge(
@@ -712,4 +715,3 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def AllToWorldCoords(self):
         self.coordmapper.AllToWorldCoords()
-

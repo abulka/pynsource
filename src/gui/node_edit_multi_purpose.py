@@ -1,6 +1,7 @@
 from gui.uml_shapes import CommentShape
 from typing import List, Set, Dict, Tuple, Optional
 
+
 def node_edit_multi_purpose(shape, app):
     """
     Edit a uml class node or a comment node

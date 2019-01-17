@@ -113,7 +113,9 @@ class CmdEditUmlClass(UtilCmdUmlClass):
 
         result, id, attrs, methods = self.display_dialog(node.id, node.attrs, node.meths)
         if result:
-            displaymodel.graph.RenameNode(node, id)  # id is same as uml class name being represented
+            displaymodel.graph.RenameNode(
+                node, id
+            )  # id is same as uml class name being represented
             node.attrs = attrs
             node.meths = methods
 

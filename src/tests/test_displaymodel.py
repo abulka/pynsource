@@ -8,6 +8,7 @@ from unittest import mock
 from textwrap import dedent
 import os
 
+
 def parse_source(source_code, options):
     with tempfile.NamedTemporaryFile(mode="wt") as temp:  # TODO use streams not temporary files
         temp.write(source_code)
@@ -21,10 +22,12 @@ class TestCaseDisplayModel(unittest.TestCase):
         """
         1. Ensure no duplicate edges when add to displaymodel from same parsemodel twice
         """
-        source_code = dedent("""
+        source_code = dedent(
+            """
             class Fred(Mary, Sam):
                 pass
-        """)
+        """
+        )
         pmodel, debuginfo = parse_source(source_code, options={})
         # print(pmodel.classlist)
         # print((dump_old_structure(pmodel)))
@@ -54,19 +57,23 @@ class TestCaseDisplayModel(unittest.TestCase):
         can miss out on their full set of attrs/methods depending on the order of pmodels.
         (cos attrs/methods might not be merging)
         """
-        source_code1 = dedent("""
+        source_code1 = dedent(
+            """
             class Fred(Mary):
                 pass
-        """)
+        """
+        )
         pmodel1, debuginfo = parse_source(source_code1, options={})
 
-        source_code2 = dedent("""
+        source_code2 = dedent(
+            """
             class Fred(Mary):
                 def __init__(self):
                     self.attr1 = None
                 def method1(self):
                     pass
-        """)
+        """
+        )
         pmodel2, debuginfo = parse_source(source_code2, options={})
 
         # now add both pmodels to the same display model - hopefully
@@ -107,7 +114,7 @@ class TestCaseDisplayModel(unittest.TestCase):
         self.assertCountEqual(node.meths, ["__init__", "method1"])  # relies on edge duplicate fix
 
     # @mock.patch('gui.umlcanvas')  # how to patch the right thing?
-    @unittest.skipIf('TRAVIS' in os.environ, "no wxpython possible on travis")
+    @unittest.skipIf("TRAVIS" in os.environ, "no wxpython possible on travis")
     def test_display_model_simplification(self):
         """
         Ensure old display model is no more.
@@ -115,10 +122,12 @@ class TestCaseDisplayModel(unittest.TestCase):
             - node shapes are attached to nodes as node.shape
             - edge shapes are attached to each edge mapping dictionary
         """
-        source_code = dedent("""
+        source_code = dedent(
+            """
             class Fred(Mary, Sam):
                 pass
-        """)
+        """
+        )
         pmodel, debuginfo = parse_source(source_code, options={})
         dmodel = DisplayModel()
         dmodel.build_graphmodel(pmodel)
@@ -189,11 +198,13 @@ class TestCaseDisplayModel(unittest.TestCase):
     #     self.assertIsInstance(edge["line"], LineShapeCustom)
 
     def test_display_model_general1(self):
-        source_code = dedent("""
+        source_code = dedent(
+            """
             class Fred(Big):
                 self.a = A()
                 self.a2 = A()
-        """)
+        """
+        )
         pmodel, debuginfo = parse_source(source_code, options={})
         dmodel = DisplayModel()
         dmodel.build_graphmodel(pmodel)
@@ -207,7 +218,6 @@ class TestCaseDisplayModel(unittest.TestCase):
         self.assertIsNotNone(a)
         self.assertIsNotNone(dmodel.graph.FindEdge(fred, big, "generalisation"))
         self.assertIsNotNone(dmodel.graph.FindEdge(a, fred, "composition"))
-
 
 
 """
