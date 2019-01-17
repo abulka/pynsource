@@ -215,63 +215,27 @@ class DisplayModel:
         build_edges(compositions, "composition")
         # build_edges(associations, "associations")
 
-    def build_view_HARSH(self, translatecoords=True):
+    def build_view(self, translatecoords=True, purge_existing_shapes=False):
         """
         Builds the shapes from the display model, attaching shapes to nodes
-        and in the case of edge shapes, attaching them to the relevant graph edge dictionary entry
+        and in the case of edge shapes, attaching them to the relevant graph edge dictionary entry.
 
         This is an important method.
+        Updates existing shapes by defaults, with option to zap all shapes
 
-        Called by
-            CmdFileLoadWorkspaceBase.load_model_from_text_and_build_shapes()
-
-            CmdFileImportBase - and its subclasses
-                class CmdFileImportFromFilePath(CmdFileImportBase):  # was class CmdFileImportSource(CmdBase):
-                class CmdFileImportViaDialog(CmdFileImportBase):  # was class CmdFileImport(CmdBase):
-
-            CmdBuildColourChartWorkspace
-
-        This used to live in Umlcanvas.
-
-        Args:
-            translatecoords: ?
-
-        Returns:
+        Returns: -
         """
         if translatecoords:
             self.umlcanvas.AllToWorldCoords()
 
         # Clear existing visualisation, including any attached edges/lines
-        for node in self.graph.nodes:
-            if node.shape:
-                self.umlcanvas.delete_shape_view(node.shape)
-                print(f"DELETED SHAPE {node.shape} {self.obj_id(node.shape)}")
-                node.shape = None
+        if purge_existing_shapes:
+            for node in self.graph.nodes:
+                if node.shape:
+                    self.umlcanvas.delete_shape_view(node.shape)
+                    node.shape = None
 
-        # Create fresh visualisation
-        for node in self.graph.nodes:
-            assert not node.shape
-            print(f"building SHAPE for node {node.id}")
-            if isinstance(node, CommentNode) or hasattr(node, "comment"):
-                self.umlcanvas.createCommentShape(node)
-            else:
-                self.umlcanvas.CreateUmlShape(node)
-
-        for edge in self.graph.edges:
-            self.umlcanvas.CreateUmlEdgeShape(edge)
-
-    def build_view(self, translatecoords=True):  # New version which updates existing shapes
-        if translatecoords:
-            self.umlcanvas.AllToWorldCoords()
-
-        # # Clear existing visualisation, including any attached edges/lines
-        # for node in self.graph.nodes:
-        #     if node.shape:
-        #         self.umlcanvas.delete_shape_view(node.shape)
-        #         print(f"DELETED SHAPE {node.shape} {self.obj_id(node.shape)}")
-        #         node.shape = None
-
-        # Create fresh visualisation
+        # Create fresh visualisation (or update existing)
         for node in self.graph.nodes:
             if node.shape:
                 print(f"updating existing SHAPE for node {node.id}")
