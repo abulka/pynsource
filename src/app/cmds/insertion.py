@@ -2,14 +2,15 @@ from .base_cmd import CmdBase
 import wx
 import random
 from dialogs.DialogComment import DialogComment
-from gui.uml_shapes import DividedShape, CommentShape
 from dialogs.DialogUmlNodeEdit import DialogUmlNodeEdit
 from typing import List, Set, Dict, Tuple, Optional
 
 
 """
-Inserting and editing regular UML Class nodes/shapes
-
+Inserting and editing 
+    - regular UML Class nodes/shapes
+    - comments
+    - images (no editing)
 """
 
 
@@ -87,12 +88,9 @@ class CmdInsertUmlClass(UtilCmdUmlClass):
             shape = umlcanvas.CreateUmlShape(node)
 
             node.shape.Show(True)
-
             umlcanvas.remove_overlaps()
             umlcanvas.mega_refresh()
-
             umlcanvas.SelectNodeNow(node.shape)
-
             # wxapp.RefreshAsciiUmlTab()  # Don't do this because somehow the onKeyChar and onKeyPress handlers are unbound from the UmlCanvas shape canvas
 
     def undo(self):  # override
@@ -109,13 +107,10 @@ class CmdEditUmlClass(UtilCmdUmlClass):
     def execute(self):
         """  """
         umlcanvas = gui = self.context.umlcanvas
-        wxapp = self.context.wxapp
         displaymodel = self.context.displaymodel
         shape = self.shape
         node = shape.node
 
-        # EXPERIMENT
-        # id, attrs, methods = "fred", ["freds attrs"], ["freds methods", "doB"]
         result, id, attrs, methods = self.display_dialog(node.id, node.attrs, node.meths)
         if result:
             displaymodel.graph.RenameNode(node, id)  # id is same as uml class name being represented
@@ -124,42 +119,7 @@ class CmdEditUmlClass(UtilCmdUmlClass):
 
             shape.ClearRegions()
             umlcanvas.CreateUmlShape(node, update_existing_shape=shape)
-            # print(shape.region1)
-            # shape.ClearText(regionId=0)
-            # shape.region1.SetText(attrs)
-            # shape.region2.SetText(methods)
             umlcanvas.mega_refresh()
-
-        return
-
-        # node is a regular node, its the node.shape that is different for a comment
-        if isinstance(node.shape, DividedShape):
-            result, id, attrs, methods = self.display_dialog(node.id, node.attrs, node.meths)
-            if result:
-                displaymodel.graph.RenameNode(
-                    node, id
-                )  # need special rename cos of underlying graph plumbing - perhaps put setter on id?
-                node.attrs = attrs
-                node.meths = methods
-
-                displaymodel.decouple_node_from_shape(shape)
-                gui.delete_shape_view(shape)
-
-                shape = umlcanvas.CreateUmlShape(node)
-
-                # TODO Hmmm - how does new shape get hooked up if the line mapping uses old name!??  Cos of graph's edge info perhaps?
-                for edge in displaymodel.graph.edges:
-                    umlcanvas.CreateUmlEdgeShape(edge)
-
-                node.shape.Show(True)
-                umlcanvas.mega_refresh()
-
-                # TODO Why doesn't this select the node?
-                # self.SelectNodeNow(node.shape)
-                # self.mega_refresh()
-        else:
-            # Comment node
-            wx.MessageBox(node.comment)
 
     def undo(self):  # override
         """ undo insert new node """
