@@ -15,6 +15,7 @@ if __name__ == "__main__":
 # GUI Frame class that spins off the worker thread
 from dialogs.FrameDeepLayout import FrameDeepLayout
 
+SHOW_FINAL_LAYOUT_ONLY = False
 
 class MainBlackboardFrame(FrameDeepLayout):
     def __init__(self, *args, **kwargs):
@@ -75,7 +76,7 @@ class MainBlackboardFrame(FrameDeepLayout):
 
     def OnClose(self, event):
         self.StopComputation()
-        wx.FutureCall(500, self.Destroy)
+        wx.CallLater(500, self.Destroy)
 
     def OnCancelClick(self, event):
         if self.btnCancelClose.GetLabel() == "Close":
@@ -88,7 +89,7 @@ class MainBlackboardFrame(FrameDeepLayout):
 
     def OnResult(self, event):
         """Show Result status."""
-        # print event
+        # print(event)  # uncomment this to watch our custom events come streaming in
 
         def log(msg):
             wx.CallAfter(self.m_textCtrl1.AppendText, msg + "\n")
@@ -97,10 +98,18 @@ class MainBlackboardFrame(FrameDeepLayout):
             log(event.logmsg)
 
         if event.cmd:
-            if event.cmd == "snapshot_mgr_restore_0":
-                wx.CallAfter(self.blackboard.umlcanvas.snapshot_mgr.Restore, 0)
-                wx.CallAfter(self.btnCancelClose.SetFocus)
+            if event.cmd == "snapshot_mgr_restore_0":  # show final, best result
+                if SHOW_FINAL_LAYOUT_ONLY:
+                    # keep dialog up and just show final result
+                    wx.CallAfter(self.blackboard.umlcanvas.snapshot_mgr.Restore, 0)  # this causes recursion bug
+                    wx.CallAfter(self.btnCancelClose.SetFocus)
+                    wx.CallAfter(self.blackboard.umlcanvas.mega_refresh)
+                else:
+                    # close blackboard dialog and show 'animation' of worst to best layouts
+                    wx.CallAfter(self.blackboard.umlcanvas.mega_from_blackboard)
+                    self.Close()
             elif event.cmd == "mega_refresh":
+                # dangerous to call this if mega_refresh contains wx.SafeYield - causes recursion
                 wx.CallAfter(self.blackboard.umlcanvas.mega_refresh)
 
         if event.statusmsg:

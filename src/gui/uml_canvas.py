@@ -13,6 +13,7 @@ from .uml_shape_handler import UmlShapeHandler
 from common.architecture_support import *
 from gui.repair_ogl import repairOGL
 from gui.shape_menu_mgr import MENU_ID_CANCEL_LINE
+import time
 
 repairOGL()
 
@@ -460,6 +461,15 @@ class UmlCanvas(ogl.ShapeCanvas):
         # This cures so many phoenix refresh issues that I'm throwing it in here for fun too.
         self.frame.Layout()  # needed when running phoenix
 
+        wx.SafeYield()  # Needed on Mac to see result if in a compute loop.
+
+    def mega_from_blackboard(self):
+        MAX_SNAPSHOTS_TO_ANIMATE = 1
+        for snapshot_num in reversed(range(min(len(self.snapshot_mgr.snapshots), MAX_SNAPSHOTS_TO_ANIMATE))):
+            self.snapshot_mgr.Restore(snapshot_num)
+            if MAX_SNAPSHOTS_TO_ANIMATE > 1:
+                time.sleep(0.05)
+
     def layout_and_position_shapes(self):
         """
         Layouit and position shapes.
@@ -575,7 +585,9 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         elif keycode in ["1", "2", "3", "4", "5", "6", "7", "8"]:
             todisplay = ord(keycode) - ord("1")
-            self.snapshot_mgr.Restore(todisplay)
+            self.snapshot_mgr.Restore(todisplay)  # snapshot 1 becomes 0 as a param
+            self.mega_refresh()
+
 
         elif keycode == "P":
             self.Refresh()

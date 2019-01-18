@@ -32,10 +32,12 @@ class ResultEvent(wx.PyEvent):
         self.cmd = cmd
 
     def __str__(self):
-        return (
-            "ResultEvent(wx.PyEvent) logmsg=%(logmsg)-20s statusmsg=%(statusmsg)s progress=%(progress)d shouldStop=%(shouldStop)s cmd=%(cmd)s"
-            % self.__dict__
-        )
+        return f"ResultEvent: " \
+               f"shouldStop={str(self.shouldStop):<6}" \
+               f"progress={self.progress if self.progress is not None else '':<2} " \
+               f"cmd={self.cmd if self.cmd is not None else '':<25} " \
+               f"statusmsg={self.statusmsg if self.statusmsg is not None else '':<15} " \
+               f"logmsg={self.logmsg if self.logmsg is not None else '':<30} " \
 
 
 # Thread class that executes processing

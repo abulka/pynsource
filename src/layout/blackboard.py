@@ -3,7 +3,19 @@
 from view.graph import Graph
 from .layout_spring import GraphLayoutSpring
 
-ANIMATE_BLACKBOARD_ATTEMPTS = True
+"""
+Keep ANIMATE_BLACKBOARD_ATTEMPTS as False, since it sends an event to the Blackboard frame
+main thread (which is of course the same as the main frame, main thread) to do a mega_refresh().  
+mega_refresh() now does wx.SafeYield in order to see the effect of a refresh on Mac.  
+wx.SafeYield doesn't mix with wx.CallAfter because:
+    - wx.SafeYield() - processes other events/function calls in the main thread queue
+    - wx.CallAfter - adds a function call to the main thread queue   
+Thus -> thread -> self.outer_thread.Cmd("mega_refresh") -> EVT_RESULT -> main thread -> 
+     -> wx.CallAfter( mega_refresh ) -> mega_refresh() -> 
+     -> wx.SafeYield() -> process another function, which might eventually be another mega_refresh()?!!
+Then wx.SafeYield becomes recursively called and crashes.
+"""
+ANIMATE_BLACKBOARD_ATTEMPTS = False  # Please keep as False (see above explanation)
 ANIMATE_EVERY_DETAIL = False
 ANIMATE_LAYOUTS = False
 
@@ -140,11 +152,10 @@ class LayoutBlackboard(object):
         # self.umlcanvas.snapshot_mgr.DumpSnapshots('Sorted')
 
         """
-        can't do the snapshot restore
+        Can't do the snapshot restore
             self.umlcanvas.snapshot_mgr.Restore(0)
-        here since it will call mega_refresh(), and that is wx gui activity
-        which is not allowed from inside a thread.
-        So send a special message to trigger that call.
+        here since it will call mega_refresh(), and that is wx gui activity which is not allowed 
+        from inside a thread. So send a special message to trigger that call.
         """
         self.outer_thread.Cmd("snapshot_mgr_restore_0")
 

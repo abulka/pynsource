@@ -84,7 +84,7 @@ class CoordinateMapper:
         MIN_WORLD_DIMENSION = 20  # should probably be 200
         errmsg = "world coords too small, ensure a juicy, big enough frame.GetClientSize() or canvas.GetSize() value is being passed into CoordinateMapper either through the .__init__ or via .Recalibrate()"
         assert ww > MIN_WORLD_DIMENSION, errmsg
-        assert wh > MIN_WORLD_DIMENSION, errmsd
+        assert wh > MIN_WORLD_DIMENSION, errmsg
 
         lw = self.graph.layoutMaxX - self.graph.layoutMinX  # layout width
         lh = self.graph.layoutMaxY - self.graph.layoutMinY  # layout height
