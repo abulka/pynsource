@@ -7,7 +7,7 @@ from pprint import pprint
 from base64 import b64decode
 from beautifultable import BeautifulTable
 from termcolor import colored  # also install colorama to make this work on windows
-
+from gui.coord_utils import getpos
 
 class UmlGraph(Graph):
     def create_new_node(self, id, l, t, w, h):
@@ -222,11 +222,18 @@ class DisplayModel:
         and in the case of edge shapes, attaching them to the relevant graph edge dictionary entry.
 
         This is an important method.
+
+        translatecoords - sets node positions to shape positions, translating coordinate systems.
+            Can't remember why I added this. All uses of this methods call it with this
+            parameter False. TODO remove this param?
+            This is the culprit which keeps resetting the node positions after import!!
+
         Updates existing shapes by default, with option to zap all shapes (which used to be
                                                                             the default behaviour)
 
         Returns: -
         """
+
         if translatecoords:
             self.umlcanvas.AllToWorldCoords()
 
@@ -254,7 +261,10 @@ class DisplayModel:
                 # UML class shape
                 if node.shape:
                     node.shape.ClearRegions()
+                    oldx, oldy = node.shape._xpos, node.shape._ypos
                     self.umlcanvas.CreateUmlShape(node, update_existing_shape=node.shape)
+                    if node.shape._xpos != oldx or node.shape._ypos != oldy:
+                        print(f"Warning build_view(): reusing existing shape messed with coords {node.id} was {oldx}, {oldy} now {node.shape._xpos}, {node.shape._xpos}")
                 else:
                     self.umlcanvas.CreateUmlShape(node)
 
@@ -348,7 +358,7 @@ class DisplayModel:
         node = self.graph.AddNode(node)
         return node
 
-    def Dump(self):
+    def Dump(self, msg=""):
 
         # Utility
 
@@ -379,6 +389,9 @@ class DisplayModel:
 
         # Main
 
+        if msg:
+            print(msg)  # Extra explanatory info to give context re when the dump is being made
+
         t = BeautifulTable(max_width=260)
         t.column_headers = ["node", "coords", "widths", "shape"]
         for node in self.graph.nodes:
@@ -388,7 +401,7 @@ class DisplayModel:
                     name,
                     (node.left, node.top),
                     (node.width, node.height),
-                    f"{node.shape} {self.obj_id(node.shape)}",
+                    f"{node.shape} {self.obj_id(node.shape)} {self.get_shape_pos(node.shape)}",
                 ]
             )
         t.column_alignments["node"] = BeautifulTable.ALIGN_LEFT
@@ -406,7 +419,7 @@ class DisplayModel:
             if edgetype == "composition":
                 source, target = target, source  # around the wrong way? - fix
             shape = edge.get("shape", None)
-            e.append_row([edgetype, source, symbol, target, f"{shape} {self.obj_id(shape)}"])
+            e.append_row([edgetype, source, symbol, target, f"{shape} {self.obj_id(shape)} {self.get_shape_pos(shape)}"])
         e.row_separator_char = ""
         print(e)
 
@@ -429,3 +442,11 @@ class DisplayModel:
     def obj_id(self, obj) -> str:
         # as hex, just the last few digits of the id, to reduce noise.  None protection.
         return f"{id(obj):x}"[-3:] if obj else ""
+
+    def get_shape_pos(self, shape) -> str:
+        # as hex, just the last few digits of the id, to reduce noise.  None protection.
+        if shape:
+            x, y = getpos(shape)
+            return f"({int(x)},{int(y)})"
+        else:
+            return ""

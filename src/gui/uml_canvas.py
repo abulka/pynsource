@@ -179,7 +179,11 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.SetCanvas(self)
         shape.SetPen(wx.BLACK_PEN)  # Controls the color of the border of the shape
         shape.SetBrush(wx.Brush("WHEAT", wx.SOLID))
-        setpos(shape, node.left, node.top)
+        
+        if not update_existing_shape:
+            setpos(shape, node.left, node.top)
+            # should we also update node positions to match the shape positions?
+
         self.GetDiagram().AddShape(
             shape
         )  # self.AddShape is ok too, ShapeCanvas's AddShape is delegated back to Diagram's AddShape.  ShapeCanvas-->Diagram
@@ -442,9 +446,11 @@ class UmlCanvas(ogl.ShapeCanvas):
         dc = wx.ClientDC(self)
         self.PrepareDC(dc)
 
+        # self.displaymodel.Dump(msg="mega, before moves2 calls")
         for node in self.displaymodel.graph.nodes:
             node.shape.Move2(dc, node.left, node.top, display=False)
         self.Refresh()
+        # self.displaymodel.Dump(msg="mega, AFTER moves2 calls")
 
         self.Update()  # or wx.SafeYield()  # Without this the nodes don't paint during a "L" layout (edges do!?)
         # You need to be yielding or updating on a regular basis, so that when your OS/window manager sends repaint messages to your app, it can handle them. See http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh

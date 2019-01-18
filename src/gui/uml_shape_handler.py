@@ -46,8 +46,7 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             # Adjust the GraphNode to match the shape x,y
             shape.node.left, shape.node.top = newpos
         except:
-            # print("no node model attached to this shape!")
-            pass
+            print("Warning OnEndDragLeft: no node model attached to this shape?")
 
         self.UpdateStatusBar(shape)
 
@@ -124,4 +123,5 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
             colour_index = getattr(node, "colour_index", None)
             if colour_index != None:
                 msg += "colour_index %d" % colour_index
+            msg += f"node: {node.left}, {node.top}"
         self.frame.SetStatusText("Pos: (%d,%d)  Size: (%d, %d) %s" % (x, y, width, height, msg))

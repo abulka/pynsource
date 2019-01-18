@@ -25,6 +25,7 @@ class CmdFileNew(CmdBase):
 
 class CmdFileImportBase(CmdBase):  # BASE
     def execute(self):
+        workspace_was_empty: bool = len(self.context.displaymodel.graph.nodes) == 0
         if self.files:
             for f in self.files:
                 # pmodel, debuginfo = old_parser(f)
@@ -40,10 +41,20 @@ class CmdFileImportBase(CmdBase):  # BASE
                 # print(dump_old_structure(pmodel))
 
                 self.context.displaymodel.build_graphmodel(pmodel)
+                # self.context.displaymodel.Dump(msg="import, after build_graphmodel")
 
-            self.context.umlcanvas.displaymodel.build_view()
+            # translatecoords being True is the culprit which keeps resetting the node positions
+            self.context.umlcanvas.displaymodel.build_view(translatecoords=False)
+            # self.context.displaymodel.Dump(msg="import, after build_view")
+
             self.context.umlcanvas.GetDiagram().ShowAll(1)  # need this, yes
-            self.context.umlcanvas.layout_and_position_shapes()
+
+            if workspace_was_empty:  # don't layout if importing into canvas with existing shapes
+                self.context.umlcanvas.layout_and_position_shapes()
+            else:
+                # At least remove overlaps
+                self.context.overlap_remover.RemoveOverlaps(watch_removals=True)
+
             self.context.umlcanvas.mega_refresh()
 
 
