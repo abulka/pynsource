@@ -340,7 +340,7 @@ class OverlapRemoval:
             extra_proposal = Lookahead_NodeClashAvoidance(proposal)
             if extra_proposal:
                 return extra_proposal
-            extra_proposal = Lookahead_LineNodeClashAvoidance(proposal)
+            # extra_proposal = Lookahead_LineNodeClashAvoidance(proposal)  # Abandoned
             if extra_proposal:
                 return extra_proposal
             return None
@@ -359,33 +359,33 @@ class OverlapRemoval:
                 )  # use proposednode not movednode of course
                 return extra_proposal
 
-        def Lookahead_LineNodeClashAvoidance(proposal):
-            if not LINE_NODE_OVERLAP_REMOVAL_ENABLED:
-                return None
-            from geometry_experiments import (
-                CalcEdgeBounds,
-            )  # Don't need this import unless switch the forbidden LN avoiding logic on ;-)
-
-            movednode, lastmovedirection = proposal["node"], proposal["xory"]
-            # check for clashing with a line
-            proposednode = self.BuildProposedNode(proposal)
-            crossings, edges = self.graph.ProposedNodeHitsWhatLines(
-                proposednode, movingnode=proposal["node"]
-            )
-            if not crossings:
-                return None
-            # build a fake node that covers the bounds of the line ;-)
-            edge = edges[0]  # TODO - a bit random - there could be more edges
-            l, t, r, b = CalcEdgeBounds(edge["source"], edge["target"])
-            clashingnode = GraphNode("temp_clash", top=t, left=l, width=r - l, height=b - t)
-            extra_proposal = FindSecondMove(
-                lastmovedirection,
-                clashingnode,
-                proposednode,
-                ignorenode=movednode,
-                clashingnode_is_really_an_edge=True,
-            )
-            return extra_proposal
+        # def Lookahead_LineNodeClashAvoidance(proposal):
+        #
+        #     assert LINE_NODE_OVERLAP_REMOVAL_ENABLED
+        #
+        #     # Don't need this import unless switch the forbidden LN avoiding logic on ;-)
+        #     from geometry_experiments import CalcEdgeBounds  # see Research dir for this
+        #
+        #     movednode, lastmovedirection = proposal["node"], proposal["xory"]
+        #     # check for clashing with a line
+        #     proposednode = self.BuildProposedNode(proposal)
+        #     crossings, edges = self.graph.ProposedNodeHitsWhatLines(
+        #         proposednode, movingnode=proposal["node"]
+        #     )
+        #     if not crossings:
+        #         return None
+        #     # build a fake node that covers the bounds of the line ;-)
+        #     edge = edges[0]  # TODO - a bit random - there could be more edges
+        #     l, t, r, b = CalcEdgeBounds(edge["source"], edge["target"])
+        #     clashingnode = GraphNode("temp_clash", top=t, left=l, width=r - l, height=b - t)
+        #     extra_proposal = FindSecondMove(
+        #         lastmovedirection,
+        #         clashingnode,
+        #         proposednode,
+        #         ignorenode=movednode,
+        #         clashingnode_is_really_an_edge=True,
+        #     )
+        #     return extra_proposal
 
         def FindSecondMove(
             lastmovedirection,

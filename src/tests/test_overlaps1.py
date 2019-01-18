@@ -473,11 +473,8 @@ class OverlapTests(unittest.TestCase):
     def _LoadScenario6_linecrossing(self):
         self.g.LoadGraphFromStrings(TEST_GRAPH6)
 
+    @unittest.skipIf(not LINE_NODE_OVERLAP_REMOVAL_ENABLED, "line node overlap removal - abandoned this difficult idea")
     def test6_1LineCrossingNotNeeded(self):
-
-        if not LINE_NODE_OVERLAP_REMOVAL_ENABLED:
-            print("Test passed (disabled)", end=" ")
-            return
 
         self._LoadScenario6_linecrossing()
 
@@ -498,11 +495,8 @@ class OverlapTests(unittest.TestCase):
             self._ensureYorder("A", "m1", "C")
         )  # don't want this otherwise the line from A to C would be crossed
 
+    @unittest.skipIf(not LINE_NODE_OVERLAP_REMOVAL_ENABLED, "line node overlap removal - abandoned this difficult idea")
     def test6_2LineCrossingAvoided(self):
-
-        if not LINE_NODE_OVERLAP_REMOVAL_ENABLED:
-            print("Test passed (disabled)", end=" ")
-            return
 
         self._LoadScenario6_linecrossing()
 
@@ -524,11 +518,8 @@ class OverlapTests(unittest.TestCase):
         crossings = node.CalcLineIntersectionPoints(line_start_point, line_end_point)
         self.assertEqual(0, len(crossings))
 
+    @unittest.skipIf(not LINE_NODE_OVERLAP_REMOVAL_ENABLED, "line node overlap removal - abandoned this difficult idea")
     def test6_3LineCrossingAvoidedGoSnug(self):
-
-        if not LINE_NODE_OVERLAP_REMOVAL_ENABLED:
-            print("Test passed (disabled)", end=" ")
-            return
 
         self._LoadScenario6_linecrossing()
 
