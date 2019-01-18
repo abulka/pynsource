@@ -135,6 +135,9 @@ class CmdBootStrap(CmdBase):
         # bootstrap03()
         # self.umlcanvas.set_uml_canvas_size((9000,9000))
 
+        # Load an initial sample - handy for development
+        # self.app.run.CmdFileLoadWorkspaceSample1()
+
 
 # ------- Refresh
 
@@ -370,3 +373,17 @@ class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
         #    self.load_model_from_text_and_build_shapes(s)
         #
         # dialog.Destroy()
+
+
+class CmdFileLoadWorkspaceSample1(CmdFileLoadWorkspaceBase):
+    """
+    Quick load initial example for development purposes.
+    """
+
+    def execute(self):
+        from base64 import b64decode
+        from samples.files_as_resource import sample_files_dict
+        k = 'hexmvc_architecture1.pyns'
+        self.filepath = "(Sample %s)" % k
+        s = b64decode(sample_files_dict[k]).decode("utf-8")
+        self.load_model_from_text_and_build_shapes(s)

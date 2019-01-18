@@ -609,26 +609,42 @@ class UmlCanvas(ogl.ShapeCanvas):
         # event.Skip()  # makes an annoying beep if enabled
 
     def OnWheelZoom(self, event):
-        # print "OnWheelZoom"
         if self.working:
+            print("OnWheelZoom (uml_canvas) - working")
             return
         self.working = True
 
-        SCROLL_AMOUNT = 40
-        if not event.ControlDown():
-            oldscrollx = self.GetScrollPos(wx.HORIZONTAL)
-            oldscrolly = self.GetScrollPos(wx.VERTICAL)
-            if event.GetWheelRotation() < 0:
-                self.Scroll(oldscrollx, oldscrolly + SCROLL_AMOUNT)
-            else:
-                self.Scroll(oldscrollx, max(0, oldscrolly - SCROLL_AMOUNT))
-        else:
-            if event.GetWheelRotation() < 0:
-                self.app.run.CmdLayoutContract(remove_overlaps=not event.ShiftDown())
-            else:
-                self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
+        try:
+            if not event.ControlDown():
+                # print(f"OnWheelZoom (uml_canvas) {event} "
+                #       f"GetWheelRotation={event.GetWheelRotation():2} "
+                #       f"GetWheelAxis={event.GetWheelAxis():2} "
+                #       f"self.GetScrollPos(wx.HORIZONTAL)={self.GetScrollPos(wx.HORIZONTAL)} "
+                #       f"self.GetScrollPos(wx.VERTICAL)={self.GetScrollPos(wx.VERTICAL)} "
+                #       f"GetScrollRange(wx.HORIZONTAL)={self.GetScrollRange(wx.HORIZONTAL)} "
+                #       f"GetScrollRange(wx.VERTICAL)={self.GetScrollRange(wx.VERTICAL)}"
+                #       )
 
-        self.working = False
+                # self.Scroll(0, self.GetScrollRange(wx.VERTICAL))  # force scroll to bottom
+
+                if event.GetWheelAxis() == wx.MOUSE_WHEEL_VERTICAL:
+                    v = event.GetWheelRotation()
+                    if 'wxMac' in wx.PlatformInfo:
+                        v = -v
+                    self.Scroll(self.GetScrollPos(wx.HORIZONTAL),
+                                self.GetScrollPos(wx.VERTICAL) + v)
+                else:
+                    self.Scroll(self.GetScrollPos(wx.HORIZONTAL) + event.GetWheelRotation(),
+                                self.GetScrollPos(wx.VERTICAL))
+            else:
+                if event.GetWheelRotation() < 0:
+                    self.app.run.CmdLayoutContract(remove_overlaps=not event.ShiftDown())
+                else:
+                    self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
+        except Exception as e:
+            print(getattr(e, 'message', repr(e)))
+        finally:
+            self.working = False
 
     def OnDestroy(self, evt):
         for shape in self.GetDiagram().GetShapeList():
