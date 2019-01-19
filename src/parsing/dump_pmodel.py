@@ -110,20 +110,102 @@ N1 .. ClassDependency
 @enduml
 """
 
+from beautifultable import BeautifulTable
+from termcolor import colored  # also install colorama to make this work on windows
+
+
+# Util
+
+def repair_old_pmodels(pmodel):
+    # repair old parse models #TODO build this into the old parser so that we don't have to do this
+    for classname, classentry in list(pmodel.classlist.items()):
+        classentry.name = classname
+
+
+# TODO build this into ClassEntry
+def calc_classname(classentry):
+    if classentry.name_long:
+        return classentry.name_long
+    else:
+        return classentry.name
+
+
+# New dump
+
+def dump_pmodel(pmodel):
+    t = BeautifulTable(max_width=760)
+
+    # subtable = BeautifulTable()
+    # subtable.column_headers = ["name", "rank", "gender"]
+    # subtable.append_row(["Jacob", 1, "boy"])
+    # subtable.append_row(["Isabella", 1, "girl"])
+    # parent_table = BeautifulTable()
+    # parent_table.column_headers = ["Heading 1", "Heading 2"]
+    # parent_table.append_row(["Sample text", "Another sample text"])
+    # parent_table.append_row([subtable, "More sample text"])
+    # return parent_table
+
+    repair_old_pmodels(pmodel)
+
+    t.column_headers = ["class name", "inherits from", "attributes", "methods()", "module methods()", "is module", "class dependencies"]
+    t.column_alignments["attributes"] = BeautifulTable.ALIGN_LEFT
+    t.column_alignments["methods()"] = BeautifulTable.ALIGN_LEFT
+    t.column_alignments["module methods()"] = BeautifulTable.ALIGN_LEFT
+
+    have_display_module_methods_once = False
+
+    for classname, classentry in sorted(
+        list(pmodel.classlist.items()), key=lambda kv: calc_classname(kv[1])
+    ):
+        # Work out sub-tables first
+
+        if classentry.classdependencytuples:
+            t2 = BeautifulTable()
+            for _from,_to in classentry.classdependencytuples:
+                t2.append_row([_from,_to])
+        else:
+            t2 = ""
+
+        if classentry.attrs:
+            t3 = BeautifulTable()
+            t3.column_headers = ["name", "type"]
+            t3.column_alignments["name"] = BeautifulTable.ALIGN_LEFT
+            t3.row_separator_char = ""
+            for attrobj in classentry.attrs:
+                t3.append_row([attrobj.attrname, "\n".join(attrobj.attrtype)])
+        else:
+            t3 = ""
+
+        # t4 = BeautifulTable()
+        # t4.column_headers = ["of class", "of module"]
+        # t4.column_alignments["of class"] = BeautifulTable.ALIGN_LEFT
+        # t4.column_alignments["of module"] = BeautifulTable.ALIGN_LEFT
+        # t4.row_separator_char = ""
+        # t4.append_row(["\n".join(classentry.defs), "\n".join(pmodel.modulemethods)])
+
+        t.append_row(
+            [
+            calc_classname(classentry),
+            "\n".join(classentry.classesinheritsfrom),
+            t3,
+            "\n".join(classentry.defs),
+            "\n".join(pmodel.modulemethods) if not have_display_module_methods_once else "",
+            bool(classentry.ismodulenotrealclass),
+            t2,  #classentry.classdependencytuples,
+            ])
+        have_display_module_methods_once = True
+
+    t.column_alignments[0] = BeautifulTable.ALIGN_LEFT
+    t.row_separator_char = ""
+    return t
+
+
+# Old (non table) dump
 
 def dump_old_structure(pmodel):
     res = ""
 
-    # TODO build this into ClassEntry
-    def calc_classname(classentry):
-        if classentry.name_long:
-            return classentry.name_long
-        else:
-            return classentry.name
-
-    # repair old parse models #TODO build this into the old parser so that we don't have to do this
-    for classname, classentry in list(pmodel.classlist.items()):
-        classentry.name = classname
+    repair_old_pmodels(pmodel)
 
     for classname, classentry in sorted(
         list(pmodel.classlist.items()), key=lambda kv: calc_classname(kv[1])

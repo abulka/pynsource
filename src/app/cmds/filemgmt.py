@@ -132,11 +132,16 @@ class CmdBootStrap(CmdBase):
         def bootstrap06():
             self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("gui/uml_shapes.py")])
 
+        def bootstrap07():
+            # Load an initial sample - handy for development
+            self.app.run.CmdFileLoadWorkspaceSample1()
+
         # bootstrap03()
+        bootstrap05()
+        # bootstrap07()
         # self.umlcanvas.set_uml_canvas_size((9000,9000))
 
-        # Load an initial sample - handy for development
-        # self.app.run.CmdFileLoadWorkspaceSample1()
+
 
 
 # ------- Refresh

@@ -4,5 +4,5 @@ requests
 py2app
 typed_ast
 astpretty
-BeautifulTable
+git+https://github.com/pri22296/beautifultable.git
 termcolor
