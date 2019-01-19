@@ -291,19 +291,17 @@ class ShapeMenuMgr:
             add_menuitem("Cancel", self.OnPopupMenuCancel)
 
         def add_line_deletions():
-            # Add delete line entries to the submenu which allows the deletion of lines
-            umlcanvas = self.shapehandler.umlcanvas
-            edges = umlcanvas.displaymodel.graph.edges
-            edges_to_delete = []
-            add_submenu_separator()
+            """Add delete line entries to the submenu which allows the deletion of lines"""
+            displaymodel = self.shapehandler.umlcanvas.displaymodel
+            edges = displaymodel.graph.find_edges_for(shape.node)
             for edge in edges:
-                if edge["source"] == shape.node or edge["target"] == shape.node:
-                    edges_to_delete.append(edge)
-                    symbol_as_text = umlcanvas.displaymodel.edgetype_symbol(edge['uml_edge_type'])
-
                     # The lambda returns a function to call which locks in an extra param, the edge
                     add_menuitem(
-                        f"Delete Line \"{edge['source'].id}\" {symbol_as_text} \"{edge['target'].id}\" ({edge['uml_edge_type']})",
+                        f"Delete Line "
+                        f"\"{edge['source'].id}\" "
+                        f"{displaymodel.edgetype_symbol(edge['uml_edge_type'])} "
+                        f"\"{edge['target'].id}\" "
+                        f"({edge['uml_edge_type']})",
                         lambda evt, extra_info=edge: self.OnDeleteLine(evt, extra_info),
                         submenu=True,
                     )
@@ -363,6 +361,7 @@ class ShapeMenuMgr:
         add_separator()
         add_cancel()
 
+        add_submenu_separator()
         add_line_deletions()
 
         accel_tbl = wx.AcceleratorTable(self.accel_entries)

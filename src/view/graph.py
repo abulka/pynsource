@@ -53,6 +53,14 @@ class Graph:
             self.nodes.append(node)
         return node
 
+    def find_edges_for(self, node) -> List[Dict]:
+        """Find edges that refer to node"""
+        edges = []
+        for edge in self.edges:
+            if edge["source"] == node or edge["target"] == node:
+                edges.append(edge)
+        return edges
+
     def FindEdge(self, from_node, to_node, edge_type) -> Dict:
         """
         Attempt at duplication avoidance, used by display_model.py
