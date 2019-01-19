@@ -100,7 +100,10 @@ class Graph:
                 del self.nodeSet[node.id]
         for edge in self.edges[:]:
             if edge["source"].id == node.id or edge["target"].id == node.id:
-                self.edges.remove(edge)
+                self.delete_edge(edge)
+
+    def delete_edge(self, edge: Dict):
+        self.edges.remove(edge)
 
     # Special getter which sorts nodes
 

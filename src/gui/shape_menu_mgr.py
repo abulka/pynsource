@@ -290,6 +290,24 @@ class ShapeMenuMgr:
         def add_cancel():
             add_menuitem("Cancel", self.OnPopupMenuCancel)
 
+        def add_line_deletions():
+            # Add delete line entries to the submenu which allows the deletion of lines
+            umlcanvas = self.shapehandler.umlcanvas
+            edges = umlcanvas.displaymodel.graph.edges
+            edges_to_delete = []
+            add_submenu_separator()
+            for edge in edges:
+                if edge["source"] == shape.node or edge["target"] == shape.node:
+                    edges_to_delete.append(edge)
+                    symbol_as_text = umlcanvas.displaymodel.edgetype_symbol(edge['uml_edge_type'])
+
+                    # The lambda returns a function to call which locks in an extra param, the edge
+                    add_menuitem(
+                        f"Delete Line \"{edge['source'].id}\" {symbol_as_text} \"{edge['target'].id}\" ({edge['uml_edge_type']})",
+                        lambda evt, extra_info=edge: self.OnDeleteLine(evt, extra_info),
+                        submenu=True,
+                    )
+
         # Look around...
 
         shape = self.shapehandler.GetShape()
@@ -345,31 +363,15 @@ class ShapeMenuMgr:
         add_separator()
         add_cancel()
 
+        add_line_deletions()
+
         accel_tbl = wx.AcceleratorTable(self.accel_entries)
         self.frame.SetAcceleratorTable(accel_tbl)
 
-        # Add delete line entries to the submenu which allows the deletion of lines
-        umlcanvas = self.shapehandler.umlcanvas
-        edges = umlcanvas.displaymodel.graph.edges
-        edges_to_delete = []
-        add_submenu_separator()
-        for edge in edges:
-            if edge["source"] == shape.node or edge["target"] == shape.node:
-                edges_to_delete.append(edge)
-                symbol_as_text = umlcanvas.displaymodel.edgetype_symbol(edge['uml_edge_type'])
-
-                # The lambda returns a function to call which locks in an extra param, the edge
-                add_menuitem(
-                    f"Delete Line \"{edge['source'].id}\" {symbol_as_text} \"{edge['target'].id}\" ({edge['uml_edge_type']})",
-                    lambda evt, extra_info=edge: self.OnDeleteLine(evt, extra_info),
-                    submenu=True,
-                )
-
     def OnDeleteLine(self, event, extra_info):
         edge: Dict = extra_info
+        self.shapehandler.umlcanvas.displaymodel.graph.delete_edge(edge)
         edge["shape"].Delete()
-        edges = self.shapehandler.umlcanvas.displaymodel.graph.edges
-        edges.remove(edge)
         self.shapehandler.umlcanvas.mega_refresh()
 
     # Handy Redirections
