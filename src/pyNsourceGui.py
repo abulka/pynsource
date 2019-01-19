@@ -121,10 +121,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             # self.frame.Show()
             self.notebook.ChangeSelection(0)
 
-            # TODO - investgate re-enabling some of these?
-            # self.multiText.Bind( wx.EVT_CHAR, self.onKeyChar_Ascii_Text_window)
-            # self.multiText.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom_ascii)
-            # self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabPageChanged)
+            # self.multiText.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom_ascii)  # breaks scrolling
+            self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabPageChanged)  # builds ascii
 
         else:
             self.notebook = None
@@ -141,9 +139,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
                 self.panel_two, -1, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE | wx.HSCROLL
             )
             self.multiText.SetFont(
-                wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+                wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
             )  # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
-            self.multiText.Bind(wx.EVT_CHAR, self.onKeyChar_Ascii_Text_window)
 
             sizer = wx.BoxSizer(wx.VERTICAL)
             sizer.Add(self.multiText, 1, wx.EXPAND)
@@ -311,19 +308,6 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         # self.frame.GetEventHandler().ProcessEvent(event)
         # wx.PostEvent(self.frame, event)
 
-    def onKeyChar_Ascii_Text_window(self, event):
-        # See good tutorial http://www.blog.pythonlibrary.org/2009/08/29/wxpython-catching-key-and-char-events/
-        keycode = event.GetKeyCode()
-        controlDown = event.CmdDown()
-        altDown = event.AltDown()
-        shiftDown = event.ShiftDown()
-        # print keycode
-
-        if controlDown and keycode == 1:  # CTRL-A
-            self.multiText.SelectAll()
-
-        event.Skip()
-
     def OnDumpDisplayModel(self, event):
         self.app.run.CmdDumpDisplayModel()
 
@@ -422,10 +406,10 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         menu1.AppendSeparator()
         Add(menu1, "E&xit", "Alt-X", self.OnButton)
 
-        Add(menu2, "&Add Class...", "Ctrl-A", self.OnInsertClass)
+        Add(menu2, "&Add Class...", "Ctrl-1", self.OnInsertClass)
         if ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS:
-            Add(menu2, "&Insert Image...", "Ctrl-M", self.OnInsertImage)
-            Add(menu2, "&Insert Comment...", "Shift-I", self.OnInsertComment)
+            Add(menu2, "&Insert Comment...", "Ctrl-2", self.OnInsertComment)  # was Shift-I
+            Add(menu2, "&Insert Image...", "Ctrl-3", self.OnInsertImage)
         menu_item_delete_class = Add(
             menu2, "&Delete", "Del", self.OnDeleteNode, self.OnDeleteNode_update
         )
@@ -463,8 +447,8 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu3, "&Expand Layout", "Ctrl-.", self.app.run.CmdLayoutExpand)
         Add(menu3, "&Contract Layout", "Ctrl-,", self.app.run.CmdLayoutContract)
         menu3.AppendSeparator()
-        Add(menu3, "&Remember Layout", "Ctrl-1", self.OnRememberLayout2)
-        Add(menu3, "&Restore Layout", "Ctrl-2", self.OnRestoreLayout2)
+        Add(menu3, "&Remember Layout", "Ctrl-9", self.OnRememberLayout2)
+        Add(menu3, "&Restore Layout", "Ctrl-0", self.OnRestoreLayout2)
 
         Add(menu4, "&Help...", "F1", self.OnHelp)
         Add(menu4, "&Visit PyNSource Website...", "", self.OnVisitWebsite)
