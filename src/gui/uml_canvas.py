@@ -180,7 +180,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.SetCanvas(self)
         shape.SetPen(wx.BLACK_PEN)  # Controls the color of the border of the shape
         shape.SetBrush(wx.Brush("WHEAT", wx.SOLID))
-        
+
         if not update_existing_shape:
             setpos(shape, node.left, node.top)
             # should we also update node positions to match the shape positions?
@@ -382,7 +382,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.SetEventHandler(evthandler)
         self.new_evthandler_housekeeping(evthandler)
 
-
     def focus_canvas(self):
         """ accelerator stuff
         this is what is called when shape is deselected
@@ -477,7 +476,9 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def mega_from_blackboard(self):
         MAX_SNAPSHOTS_TO_ANIMATE = 1
-        for snapshot_num in reversed(range(min(len(self.snapshot_mgr.snapshots), MAX_SNAPSHOTS_TO_ANIMATE))):
+        for snapshot_num in reversed(
+            range(min(len(self.snapshot_mgr.snapshots), MAX_SNAPSHOTS_TO_ANIMATE))
+        ):
             self.snapshot_mgr.Restore(snapshot_num)
             if MAX_SNAPSHOTS_TO_ANIMATE > 1:
                 time.sleep(0.05)
@@ -600,7 +601,6 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.snapshot_mgr.Restore(todisplay)  # snapshot 1 becomes 0 as a param
             self.mega_refresh()
 
-
         elif keycode == "P":
             self.Refresh()
 
@@ -641,20 +641,23 @@ class UmlCanvas(ogl.ShapeCanvas):
 
                 if event.GetWheelAxis() == wx.MOUSE_WHEEL_VERTICAL:
                     v = event.GetWheelRotation()
-                    if 'wxMac' in wx.PlatformInfo:
+                    if "wxMac" in wx.PlatformInfo:
                         v = -v
-                    self.Scroll(self.GetScrollPos(wx.HORIZONTAL),
-                                self.GetScrollPos(wx.VERTICAL) + v)
+                    self.Scroll(
+                        self.GetScrollPos(wx.HORIZONTAL), self.GetScrollPos(wx.VERTICAL) + v
+                    )
                 else:
-                    self.Scroll(self.GetScrollPos(wx.HORIZONTAL) + event.GetWheelRotation(),
-                                self.GetScrollPos(wx.VERTICAL))
+                    self.Scroll(
+                        self.GetScrollPos(wx.HORIZONTAL) + event.GetWheelRotation(),
+                        self.GetScrollPos(wx.VERTICAL),
+                    )
             else:
                 if event.GetWheelRotation() < 0:
                     self.app.run.CmdLayoutContract(remove_overlaps=not event.ShiftDown())
                 else:
                     self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
         except Exception as e:
-            print(getattr(e, 'message', repr(e)))
+            print(getattr(e, "message", repr(e)))
         finally:
             self.working = False
 

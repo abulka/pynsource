@@ -9,6 +9,7 @@ from beautifultable import BeautifulTable
 from termcolor import colored  # also install colorama to make this work on windows
 from gui.coord_utils import getpos
 
+
 class UmlGraph(Graph):
     def create_new_node(self, id, l, t, w, h):
         # subclasses overriding, opportunity to create different instance type
@@ -264,7 +265,9 @@ class DisplayModel:
                     oldx, oldy = node.shape._xpos, node.shape._ypos
                     self.umlcanvas.CreateUmlShape(node, update_existing_shape=node.shape)
                     if node.shape._xpos != oldx or node.shape._ypos != oldy:
-                        print(f"Warning build_view(): reusing existing shape messed with coords {node.id} was {oldx}, {oldy} now {node.shape._xpos}, {node.shape._xpos}")
+                        print(
+                            f"Warning build_view(): reusing existing shape messed with coords {node.id} was {oldx}, {oldy} now {node.shape._xpos}, {node.shape._xpos}"
+                        )
                 else:
                     self.umlcanvas.CreateUmlShape(node)
 
@@ -310,7 +313,6 @@ class DisplayModel:
 
         Returns: graph node
         """
-        print("incoming id", id)
         if self.graph.FindNodeById(id):
             id += str(random.randint(1, 9999))
         t, l, w, h = (
@@ -412,7 +414,15 @@ class DisplayModel:
             if edgetype == "composition":
                 source, target = target, source  # around the wrong way? - fix
             shape = edge.get("shape", None)
-            e.append_row([edgetype, source, symbol, target, f"{shape} {self.obj_id(shape)} {self.get_shape_pos(shape)}"])
+            e.append_row(
+                [
+                    edgetype,
+                    source,
+                    symbol,
+                    target,
+                    f"{shape} {self.obj_id(shape)} {self.get_shape_pos(shape)}",
+                ]
+            )
         e.row_separator_char = ""
         print(e)
 
@@ -423,7 +433,6 @@ class DisplayModel:
             self.graph.delete_edge(edge)
         else:
             self.graph.DeleteNodeById(shape.node.id)
-            print("deleted node shape.node.id", shape.node.id)
 
     def merge_attrs_and_meths(self, node, attrs, meths):
         """
@@ -452,4 +461,3 @@ class DisplayModel:
         else:
             symbol = "---"
         return symbol
-

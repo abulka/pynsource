@@ -17,6 +17,7 @@ from dialogs.FrameDeepLayout import FrameDeepLayout
 
 SHOW_FINAL_LAYOUT_ONLY = False
 
+
 class MainBlackboardFrame(FrameDeepLayout):
     def __init__(self, *args, **kwargs):
         super(MainBlackboardFrame, self).__init__(*args, **kwargs)
@@ -101,7 +102,9 @@ class MainBlackboardFrame(FrameDeepLayout):
             if event.cmd == "snapshot_mgr_restore_0":  # show final, best result
                 if SHOW_FINAL_LAYOUT_ONLY:
                     # keep dialog up and just show final result
-                    wx.CallAfter(self.blackboard.umlcanvas.snapshot_mgr.Restore, 0)  # this causes recursion bug
+                    wx.CallAfter(
+                        self.blackboard.umlcanvas.snapshot_mgr.Restore, 0
+                    )  # this causes recursion bug
                     wx.CallAfter(self.btnCancelClose.SetFocus)
                     wx.CallAfter(self.blackboard.umlcanvas.mega_refresh)
                 else:

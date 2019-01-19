@@ -295,16 +295,16 @@ class ShapeMenuMgr:
             displaymodel = self.shapehandler.umlcanvas.displaymodel
             edges = displaymodel.graph.find_edges_for(shape.node)
             for edge in edges:
-                    # The lambda returns a function to call which locks in an extra param, the edge
-                    add_menuitem(
-                        f"Delete Line "
-                        f"\"{edge['source'].id}\" "
-                        f"{displaymodel.edgetype_symbol(edge['uml_edge_type'])} "
-                        f"\"{edge['target'].id}\" "
-                        f"({edge['uml_edge_type']})",
-                        lambda evt, extra_info=edge: self.OnDeleteLine(evt, extra_info),
-                        submenu=True,
-                    )
+                # The lambda returns a function to call which locks in an extra param, the edge
+                add_menuitem(
+                    f"Delete Line "
+                    f"\"{edge['source'].id}\" "
+                    f"{displaymodel.edgetype_symbol(edge['uml_edge_type'])} "
+                    f"\"{edge['target'].id}\" "
+                    f"({edge['uml_edge_type']})",
+                    lambda evt, extra_info=edge: self.OnDeleteLine(evt, extra_info),
+                    submenu=True,
+                )
 
         # First look around...
 
