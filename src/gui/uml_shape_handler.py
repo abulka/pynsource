@@ -27,9 +27,10 @@ class UmlShapeHandler(ogl.ShapeEvtHandler):
         Popup menu when r.click on shape.
         The popupmenu is already built and waiting, due to the call to BuildPopupMenuItems()
         via focus_shape() call, which happens when left or right click on a shape.
+        Don't specify a point at which to popup the menu, so that the scrolled window is taken into account
         """
         self._SelectNodeNow(x, y, keys, attachment)
-        self.frame.PopupMenu(self.shapemenu_mgr.popupmenu, wx.Point(x, y))
+        self.frame.PopupMenu(self.shapemenu_mgr.popupmenu)#, wx.Point(x, y))
 
     def OnLeftDoubleClick(self, x, y, keys, attachment):
         node_edit_multi_purpose(self.GetShape(), self.app)

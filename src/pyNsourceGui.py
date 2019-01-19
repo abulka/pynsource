@@ -492,12 +492,17 @@ class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnRightButtonMenu(self, event):  # Menu
         x, y = event.GetPosition()
 
+        # but hittest fails when canvas is scrolled !!  Fix.
+        adjusted_x = x + self.umlcanvas.GetScrollPos(wx.HORIZONTAL)
+        adjusted_y = y + self.umlcanvas.GetScrollPos(wx.VERTICAL)
+
         # Since our binding of wx.EVT_RIGHT_DOWN to here takes over all right click events
         # we have to manually figure out if we have clicked on shape
         # then allow natural shape node menu to kick in via UmlShapeHandler (defined above)
         hit_which_shapes = [
-            s for s in self.umlcanvas.GetDiagram().GetShapeList() if s.HitTest(x, y)
+            s for s in self.umlcanvas.GetDiagram().GetShapeList() if s.HitTest(adjusted_x, adjusted_y)
         ]
+        # print('hit_which_shapes', hit_which_shapes)  # hmm seems to pick up lines, too!
         if hit_which_shapes:
             event.Skip()
             return
