@@ -378,15 +378,6 @@ class DisplayModel:
                 edgetype = colored(edgetype, "cyan")
             return edgetype
 
-        def edgetype_symbol(edgetype: str):
-            if edgetype == "generalisation":
-                symbol = "--|>"
-            elif edgetype == "composition":
-                symbol = "--->"
-            else:
-                symbol = "---"
-            return symbol
-
         # Main
 
         if msg:
@@ -415,7 +406,7 @@ class DisplayModel:
             source = node_name(edge["source"])
             target = node_name(edge["target"])
             edgetype = edgetype_colourise(edge["uml_edge_type"])
-            symbol = edgetype_symbol(edgetype)
+            symbol = self.edgetype_symbol(edgetype)
             if edgetype == "composition":
                 source, target = target, source  # around the wrong way? - fix
             shape = edge.get("shape", None)
@@ -450,3 +441,13 @@ class DisplayModel:
             return f"({int(x)},{int(y)})"
         else:
             return ""
+
+    def edgetype_symbol(self, edgetype: str):
+        if edgetype == "generalisation":
+            symbol = "--|>"
+        elif edgetype == "composition":
+            symbol = "--->"
+        else:
+            symbol = "---"
+        return symbol
+
