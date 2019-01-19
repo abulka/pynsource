@@ -53,6 +53,11 @@ class Graph:
             self.nodes.append(node)
         return node
 
+    def find_edge_for_lineshape(self, shape) -> Dict:
+        edges = [edge for edge in self.edges if edge.get("shape", None) == shape]
+        assert len(edges) == 1
+        return edges[0]
+
     def find_edges_for(self, node) -> List[Dict]:
         """Find edges that refer to node"""
         edges = []

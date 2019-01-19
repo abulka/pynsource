@@ -416,14 +416,14 @@ class DisplayModel:
         e.row_separator_char = ""
         print(e)
 
-    def decouple_node_from_shape(self, shape):
-        pass
-
-    def delete_node_for_shape(self, shape):
-        # self.decouple_node_from_shape(shape)
-
-        self.graph.DeleteNodeById(shape.node.id)
-        print("deleted node shape.node.id", shape.node.id)
+    def delete_node_or_edge_for_shape(self, shape):
+        if "Line" in shape.GetShape().__class__.__name__:
+            # Delete the edge from the graph model
+            edge: Dict = self.graph.find_edge_for_lineshape(shape)
+            self.graph.delete_edge(edge)
+        else:
+            self.graph.DeleteNodeById(shape.node.id)
+            print("deleted node shape.node.id", shape.node.id)
 
     def merge_attrs_and_meths(self, node, attrs, meths):
         """

@@ -132,8 +132,7 @@ class DisplayModel {
     AddUmlEdge(from_node, to_node, edge_type)
     -- utility --
     Dump()
-    decouple_node_from_shape() <color:royalBlue><- no longer does anything!!
-    delete_node_for_shape(shape)
+    delete_node_or_edge_for_shape(shape) <color:royalBlue><- now handles edges/lines!
     merge_attrs_and_meths(node, attrs, meths)
 }
 

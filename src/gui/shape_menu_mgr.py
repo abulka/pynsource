@@ -306,9 +306,11 @@ class ShapeMenuMgr:
                         submenu=True,
                     )
 
-        # Look around...
+        # First look around...
 
         shape = self.shapehandler.GetShape()
+        if "Line" in shape.__class__.__name__:  # no popup menu for lines
+            return
         from_node: GraphNode = self.shapehandler.umlcanvas.new_edge_from
         is_bitmap = shape.__class__.__name__ == "BitmapShapeResizable"
         if is_bitmap:

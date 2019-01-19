@@ -371,6 +371,18 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.GetDiagram().AddShape(line)
         line.Show(True)
 
+        # New - add shape handler to lines - should probably add its own custom shape handler
+        shape = line
+        # wire in the event handler for the new shape
+        evthandler = UmlShapeHandler(
+            None, self.frame, self
+        )  # just init the handler with whatever will be convenient for it to know.
+        evthandler.SetShape(shape)
+        evthandler.SetPreviousHandler(shape.GetEventHandler())
+        shape.SetEventHandler(evthandler)
+        self.new_evthandler_housekeeping(evthandler)
+
+
     def focus_canvas(self):
         """ accelerator stuff
         this is what is called when shape is deselected
