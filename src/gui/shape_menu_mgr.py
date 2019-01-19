@@ -345,6 +345,43 @@ class ShapeMenuMgr:
         accel_tbl = wx.AcceleratorTable(self.accel_entries)
         self.frame.SetAcceleratorTable(accel_tbl)
 
+        # HACK
+        # print out the node/shape lines
+        edges = self.shapehandler.umlcanvas.displaymodel.graph.edges
+        edges_to_delete = []
+        for edge in edges:
+            if edge["source"] == shape.node or edge["target"] == shape.node:
+                print(edge)
+                edges_to_delete.append(edge)
+                add_menuitem(
+                    f"Delete Line {edge['source'].id} -- {edge['target'].id} ({edge['uml_edge_type']})",
+                    lambda evt, extra_info=edge: self.OnDeleteLine(evt, extra_info)
+                )
+        # for edge in edges_to_delete:
+        #     # delete all lines
+        #     edge["shape"].Delete()
+        #     edges.remove(edge)
+
+            # def delete_shape_view(self, shape):
+            #     # View
+            #     self.app.run.CmdDeselectAllShapes()
+            #     for line in shape.GetLines()[:]:
+            #         line.Delete()
+            #     shape.Delete()
+
+    def OnDeleteLine(self, event, extra_info):
+        print("del line", extra_info)
+        edge: Dict = extra_info
+        edge["shape"].Delete()
+        edges = self.shapehandler.umlcanvas.displaymodel.graph.edges
+        edges.remove(edge)
+        self.shapehandler.umlcanvas.mega_refresh()
+        # edges_to_delete = []
+        # for edge in edges_to_delete:
+        #     # delete all lines
+        #     edge["shape"].Delete()
+        #     edges.remove(edge)
+
     # Handy Redirections
 
     def GetShape(self):

@@ -136,7 +136,7 @@ class CmdBootStrap(CmdBase):
         # self.umlcanvas.set_uml_canvas_size((9000,9000))
 
         # Load an initial sample - handy for development
-        # self.app.run.CmdFileLoadWorkspaceSample1()
+        self.app.run.CmdFileLoadWorkspaceSample1()
 
 
 # ------- Refresh
