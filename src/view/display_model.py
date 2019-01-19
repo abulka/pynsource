@@ -402,11 +402,13 @@ class DisplayModel:
         e = BeautifulTable(max_width=240)
         e.column_headers = ["edge", "from", "symbol", "to", "shape"]
         e.column_alignments["shape"] = BeautifulTable.ALIGN_LEFT
+        e.column_alignments["from"] = BeautifulTable.ALIGN_LEFT
+        e.column_alignments["to"] = BeautifulTable.ALIGN_LEFT
         for edge in self.graph.edges:
             source = node_name(edge["source"])
             target = node_name(edge["target"])
             edgetype = edgetype_colourise(edge["uml_edge_type"])
-            symbol = self.edgetype_symbol(edgetype)
+            symbol = self.edgetype_symbol(edge["uml_edge_type"])
             if edgetype == "composition":
                 source, target = target, source  # around the wrong way? - fix
             shape = edge.get("shape", None)
