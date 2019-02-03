@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+
+        <title>Unified Modeling Language</title>
+
+        <link rel="stylesheet" type="text/css" href="joint.css" />
+        <link rel="stylesheet" type="text/css" href="umlcd.css" />
+    </head>
+    <body>
+        <div id="modelCanvas">
+            <div id="paper"></div>
+        </div>
+
+        <script src="jquery.js"></script>
+        <script src="lodash.js"></script>
+        <script src="backbone.js"></script>
+
+        <script src="joint.js"></script>
+        <script src="umlcd.js"></script>
+
+
+        <style>
+        /* ANDY EXTRAS */
+
+        #modelCanvas {
+            height:100vh; 
+            width: 100%;
+            overflow: scroll;
+        }        
+        </style>
+
+        <script>
+        // ANDY EXTRAS
+
+    function resize_now() {
+        // return
+        let canvas = $('#modelCanvas');
+        andypaper.setDimensions(canvas.width(), canvas.height() * 2);
+        // console.log('resizing', canvas.width(), canvas.height())
+    }
+    $(window).resize(function () {
+        resize_now()
+    });
+
+    resize_now()
+    andypaper.scale(2)
+
+
+    andypaper.$el.on('mousewheel DOMMouseScroll', function onMouseWheel(e) {
+        //function onMouseWheel(e){
+        // return
+        if (event.ctrlKey == true) {
+            e.preventDefault();
+            e = e.originalEvent;
+
+            var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) / 50;
+            var offsetX = (e.offsetX || e.clientX - $(this).offset().left);
+
+            var offsetY = (e.offsetY || e.clientY - $(this).offset().top);
+            var p = offsetToLocalPoint(offsetX, offsetY);
+            var newScale = V(andypaper.viewport).scale().sx + delta;
+            console.log(' delta' + delta + ' ' + 'offsetX' + offsetX + 'offsety--' + offsetY + 'p' + p.x + 'newScale' + newScale)
+            if (newScale > 0.4 && newScale < 2) {
+                andypaper.setOrigin(0, 0);
+                andypaper.scale(newScale, newScale, p.x, p.y);
+            }
+        }
+    });
+
+    function offsetToLocalPoint(x, y) {
+        var svgPoint = andypaper.svg.createSVGPoint();
+        svgPoint.x = x;
+        svgPoint.y = y;
+
+        var pointTransformed = svgPoint.matrixTransform(andypaper.viewport.getCTM().inverse());
+        return pointTransformed;
+    }        
+
+
+        </script>
+    </body>
+</html>
