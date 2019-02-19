@@ -106,3 +106,11 @@ http://pynsource.atug.com
 
 Help support the project by Donating or purchasing a Pro Edition license.  Future plans include
 undo/redo, recognition of Python type annotations, line labels, module and package visualisation.
+
+License
+-------
+
+The Community Edition is open source, GPL3 licensed.
+
+The Pro Edition is commercially licensed and requires a valid license to use.
+  
