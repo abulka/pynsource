@@ -102,7 +102,7 @@ Home Page and Documentation
 
 More screenshots, videos and documentation can be found at
 
-http://pynsource.atug.com
+www.pynsource.com
 
 Help support the project by Donating or purchasing a Pro Edition license.  Future plans include
 undo/redo, recognition of Python type annotations, line labels, module and package visualisation.

@@ -13,8 +13,8 @@ ABOUT_AUTHORS = """
 Andy Bulka
  
 With thanks to the free software authors Robin Dunn, Pierre Hjälm, Julian Smart, Erik R. Lechak and
-all those who contributed to wxPython, Python and its ecosystem of libraries. Also thanks to the wxasync
-project for bringing async/away support to wxPython.   
+all those who contributed to wxPython, OGL, Python and its ecosystem of libraries. Also thanks to the wxasync
+project for bringing async/await support to wxPython.   
 """.strip()
 
 ABOUT_AUTHOR = "(c) Andy Bulka 2004-2019"
@@ -28,8 +28,8 @@ published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
 Pynsource PRO edition is a Commercial product and requires a valid paid license.  Please
-support firther development of this project by purchasing a license
-http://pynsource.atug.com/buy
+support further development of this project by purchasing a license
+www.pynsource.com/buy
 
 Pynsource is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
