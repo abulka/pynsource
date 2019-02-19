@@ -1,0 +1,3 @@
+pytest --cov=. tests/
+coverage html
+open htmlcov/index.html

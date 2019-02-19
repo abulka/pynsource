@@ -14,8 +14,8 @@ class CmdNodeDeleteBase(CmdBase):
 
         gui.delete_shape_view(shape)
 
-        self.context.frame.Layout()  # needed when running phoenix
-        # self.context.umlcanvas.Refresh()
+        self.context.umlcanvas.extra_refresh()
+        self.context.umlcanvas.Refresh()  # needed for ogltwo
         # self.context.wxapp.RefreshAsciiUmlTab()
 
 

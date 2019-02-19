@@ -1,0 +1,30 @@
+# PynSource Version 1.2
+{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin. Comments are saved.'}
+{'type':'umlshape', 'id':'CmdFileSaveWorkspace', 'x':730, 'y':132, 'width':178, 'height':54, 'attrs': '', 'meths': 'execute'}
+{'type':'umlshape', 'id':'CmdFileLoadWorkspaceFromQuickPrompt', 'x':103, 'y':512, 'width':304, 'height':54, 'attrs': '', 'meths': 'execute'}
+{'type':'umlshape', 'id':'CmdFileImportViaDialog', 'x':43, 'y':282, 'width':195, 'height':84, 'attrs': 'context|files', 'meths': 'execute'}
+{'type':'umlshape', 'id':'CmdRefreshUmlWindow', 'x':191, 'y':616, 'width':170, 'height':54, 'attrs': '', 'meths': 'execute'}
+{'type':'umlshape', 'id':'CmdFileImportBase', 'x':402, 'y':7, 'width':153, 'height':54, 'attrs': '', 'meths': 'execute'}
+{'type':'umlshape', 'id':'CmdFileLoadWorkspaceViaDialog', 'x':411, 'y':601, 'width':254, 'height':84, 'attrs': 'filepath|context', 'meths': 'execute'}
+{'type':'umlshape', 'id':'CmdFileNew', 'x':899, 'y':240, 'width':94, 'height':54, 'attrs': '', 'meths': 'execute'}
+{'type':'umlshape', 'id':'CmdFileSaveWorkspaceToConsole', 'x':135, 'y':416, 'width':254, 'height':54, 'attrs': '', 'meths': 'execute'}
+{'type':'umlshape', 'id':'CmdBootStrap', 'x':930, 'y':323, 'width':111, 'height':154, 'attrs': 'frame|app|umlcanvas', 'meths': 'execute|bootstrap01|bootstrap02|bootstrap03|bootstrap04|bootstrap05|bootstrap06'}
+{'type':'umlshape', 'id':'CmdFileImportFromFilePath', 'x':283, 'y':233, 'width':220, 'height':74, 'attrs': 'files', 'meths': '__init__'}
+{'type':'umlshape', 'id':'CmdFileLoadWorkspaceFromFilepath', 'x':809, 'y':564, 'width':279, 'height':74, 'attrs': 'filepath', 'meths': '__init__'}
+{'type':'umlshape', 'id':'CmdFileLoadWorkspaceBase', 'x':532, 'y':406, 'width':232, 'height':84, 'attrs': 'filepath', 'meths': 'load_model_from_text_and_build_shapes|execute'}
+{'type':'umlshape', 'id':'CmdBase', 'x':557, 'y':270, 'width':69, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'CmdDeselectAllShapes', 'x':650, 'y':14, 'width':178, 'height':64, 'attrs': '', 'meths': 'execute|undo'}
+{'type':'comment', 'id':'C1247', 'x':17, 'y':11, 'width':255, 'height':221, 'comment': 'QSBjb21tYW5kIGNsYXNzCmhlaXJhcmNoeS4KCkhpdCBDTUQvQ3RybCBGIHRvCmNvbG91ciBzaWJsaW5nIGNsYXNzZXMKdG8gYXNzaXN0IHdpdGggY29tcHJlaGVuc2lvbi4KCkhpdCBDTUQvQ3RybCBMIHRvIGxheW91dC4KCkNNRC9DdHJsIE1vdXNld2hlZWwKb3IgVG91Y2hwYWQgdG8gem9vbSAoUHJvKS4KCkhpdCBDbWQvQ3RybCA5IHRvIHpvb20KdG8gZml0IChQcm8pLg=='}
+{'type':'edge', 'id':'CmdFileSaveWorkspace_to_CmdBase', 'source':'CmdFileSaveWorkspace', 'target':'CmdBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdFileLoadWorkspaceFromQuickPrompt_to_CmdFileLoadWorkspaceBase', 'source':'CmdFileLoadWorkspaceFromQuickPrompt', 'target':'CmdFileLoadWorkspaceBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdFileImportViaDialog_to_CmdFileImportBase', 'source':'CmdFileImportViaDialog', 'target':'CmdFileImportBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdRefreshUmlWindow_to_CmdBase', 'source':'CmdRefreshUmlWindow', 'target':'CmdBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdFileImportBase_to_CmdBase', 'source':'CmdFileImportBase', 'target':'CmdBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdFileLoadWorkspaceViaDialog_to_CmdFileLoadWorkspaceBase', 'source':'CmdFileLoadWorkspaceViaDialog', 'target':'CmdFileLoadWorkspaceBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdFileNew_to_CmdBase', 'source':'CmdFileNew', 'target':'CmdBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdFileSaveWorkspaceToConsole_to_CmdBase', 'source':'CmdFileSaveWorkspaceToConsole', 'target':'CmdBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdBootStrap_to_CmdBase', 'source':'CmdBootStrap', 'target':'CmdBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdFileImportFromFilePath_to_CmdFileImportBase', 'source':'CmdFileImportFromFilePath', 'target':'CmdFileImportBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdFileLoadWorkspaceFromFilepath_to_CmdFileLoadWorkspaceBase', 'source':'CmdFileLoadWorkspaceFromFilepath', 'target':'CmdFileLoadWorkspaceBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdFileLoadWorkspaceBase_to_CmdBase', 'source':'CmdFileLoadWorkspaceBase', 'target':'CmdBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdDeselectAllShapes_to_CmdBase', 'source':'CmdDeselectAllShapes', 'target':'CmdBase', 'uml_edge_type': 'generalisation'}

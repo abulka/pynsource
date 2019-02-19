@@ -9,7 +9,7 @@ class CmdLayout(CmdBase):
             return
         canvas.layout_and_position_shapes()
 
-        self.context.frame.Layout()  # needed when running phoenix
+        self.context.umlcanvas.extra_refresh()
 
     def undo(self):  # override
         """ Docstring """
@@ -30,7 +30,7 @@ class CmdLayoutExpandContractBase(CmdBase):  # BASE
         if self.remove_overlaps:
             self.context.umlcanvas.remove_overlaps(watch_removals=False)
         self.context.umlcanvas.mega_refresh()
-        self.context.frame.Layout()  # needed when running phoenix
+        self.context.umlcanvas.extra_refresh()
 
 
 class CmdLayoutExpand(CmdLayoutExpandContractBase):

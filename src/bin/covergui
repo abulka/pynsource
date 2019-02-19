@@ -1,0 +1,5 @@
+coverage erase
+coverage run pynsource-gui.py
+coverage html
+open htmlcov/index.html
+

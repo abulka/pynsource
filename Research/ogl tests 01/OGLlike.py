@@ -26,7 +26,7 @@ clipboard = []
 DEBUG_DRAG = False
 DEBUG_DRAWLINE = False
 DEBUG_CONNECT = False
-DEBUG_INODE_CONNECT = False
+DEBUG_INODE_CONNECT = True
 ##############
 
 
@@ -37,7 +37,7 @@ def menuMaker(frame, menus):
         menubar.Append(menu, m)
         for x in n:
             menu_text, help, handler = x[0], x[1], x[2]
-            id = NewId()
+            id = wx.NewIdRef()  # was wx.NewId()
             menu.Append(id, menu_text, help)
             frame.Bind(EVT_MENU, handler, id=id)
             # EVT_MENU(frame, id,  handler)  # old deprecated way
@@ -418,7 +418,8 @@ class ShapeCanvas(ScrolledWindow):
             return
 
         # ANDY
-        # print('OnLeftDown', item, type(item), type(ResizeableNode), isinstance(item, Node))
+        if DEBUG_DRAG:
+            print('Canvas OnLeftDown', item, type(item), type(ResizeableNode), isinstance(item, Node))
         if not isinstance(item, Node):
             """bring node to the front"""
             # print('ChangeShapeOrder', item)
@@ -456,7 +457,7 @@ class ShapeCanvas(ScrolledWindow):
             y = point[1] - self.currentPoint[1]
             if DEBUG_DRAG:
                 print(
-                    "Dragging %s mouse at %s currentPoint is %s thus moveto difference is %s,%s"
+                    "Dragging selected shapes %s mouse at %s currentPoint is %s thus moveto difference is %s,%s"
                     % (self.getSelectedShapes(), point, self.currentPoint, x, y)
                 )
             for i in self.getSelectedShapes():
@@ -993,15 +994,11 @@ class INode(ConnectableNode):
 
     def move(self, x, y):
         """
-        Dragging from an input doesn't make sense?
+        Dragging from an input to an output - backwards :-)
         """
-        print(
-            "INode - Dragging from an input doesn't make sense? unless repositioning to re-attach?",
-            self,
-        )
         self.cf.deselect()
         ci = ConnectionShape()
-        self.cf.container.shapes.insert(0, ci)
+        self.cf.diagram.shapes.insert(0, ci)
         ci.setOutput(self.item, self.index)
         ci.x[0], ci.y[0] = self.item.getPort("input", self.index)
         self.cf.showOutputs()
@@ -1062,6 +1059,13 @@ class ResizeableNode(Node):
         PointShape.draw(self, dc)
 
     def move(self, x, y):
+        """Resize" scenario - Changes coords of the point on the shape that this ResizeableNode
+        is attached to (viz. self.item) which can be a regular shape or even a ConnectionShape.
+        Called via canvas.OnMotion since in this scenario, a ResizeableNode is the object in
+        canvas.getSelectedShapes (OnMotion calls .move on all things in canvas.getSelectedShapes()).
+        Remember though that ConnectionShape self corrects its own xy points during the draw,
+        which means you can never "resize" a ConnectionShape line.
+        """
         self.item.x[self.index] += x
         self.item.y[self.index] += y
 
@@ -1167,6 +1171,7 @@ class CodeFrame(Frame):
             ("Point", "Playing with points", self.newPointShape),
             ("Lines", "Plotting", self.newLinesShape),
             ("Ellipse\tCtrl+l", "Ellipse", self.newEllipseShape),
+            ("Make Multiple\tCtrl+m", "make multiple nodes and connect them", self.make_multiple),
         ]
 
         menus["&Zoom"] = [
@@ -1204,13 +1209,64 @@ class CodeFrame(Frame):
         ################
 
         # CMD-W to close Frame by attaching the key bind event to accellerator table
-        randomId = wx.NewId()
+        randomId = wx.NewIdRef()  # was wx.NewId()
         self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=randomId)
         accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord("W"), randomId)])
         self.SetAcceleratorTable(accel_tbl)
 
     def OnCloseWindow(self, event):
         self.Destroy()
+
+    def make_multiple(self, event):
+        i = CodeBlock()
+        # self.canvas.AddShape(i)
+        self.canvas.InsertShape(i, 999)
+
+        i2 = CodeBlock()
+        # self.canvas.AddShape(i)
+        self.canvas.InsertShape(i2, 999)
+
+        self.canvas.deselect()
+        self.canvas.Refresh()
+
+        self.join_shapes(i, i2)
+
+    def join_shapes(self, fromShape, toShape):
+        print(f"fromShape {fromShape} toShape {toShape}")
+
+        cf = self.canvas  # shape canvas
+        item = fromShape
+        index = 0
+
+        # DRAG BEGIN
+        # from class ONode(ConnectableNode) def move(self, x, y):
+        cf.deselect()
+        ci = ConnectionShape()
+        cf.diagram.shapes.insert(0, ci)
+        ci.setInput(item, index)
+        ci.x[1], ci.y[1] = item.getPort("output", index)
+        cf.showInputs()
+        cf.select(ci)
+
+        # DRAG END
+        items = [ci]  # the connection shape, alone in an array - usually this info comes in via 2nd param of leftUp(self, items)
+        item = toShape
+        index = 0
+        # from class INode(ConnectableNode) def leftUp(self, items):
+        print(
+            "inode leftup",
+            items,
+            "ConnectionShape.input",
+            items[0].input,
+            "ConnectionShape.output",
+            items[0].output,
+        )
+        if len(items) == 1 and isinstance(items[0], ConnectionShape):
+            connection_shape = items[0]
+            print("found connection_shape", connection_shape)
+            if connection_shape.output is None:  # means its not connected to anything
+                connection_shape.setOutput(item, index)
+
 
     def zoomin(self, event):
         self.canvas.scalex = max(self.canvas.scalex + 0.05, 0.3)

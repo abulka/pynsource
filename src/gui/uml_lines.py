@@ -1,20 +1,40 @@
 import math
-
+from gui.settings import PRO_EDITION
 import wx
+import sys
 
-from wx.lib.ogl import LineShape
-from wx.lib.ogl import GetPointOnLine
-from wx.lib.ogl import GetArrowPoints
-from wx.lib.ogl import ARROW_POSITION_START
-from wx.lib.ogl import ARROW_POSITION_MIDDLE
-from wx.lib.ogl import ARROW_POSITION_END
+if PRO_EDITION:
+    # import ogl
+    from ogl2 import LineShape
+    from ogl2 import GetPointOnLine
+    from ogl2 import GetArrowPoints
+    from ogl2 import ARROW_POSITION_START
+    from ogl2 import ARROW_POSITION_MIDDLE
+    from ogl2 import ARROW_POSITION_END
 
-from wx.lib.ogl import ARROW_HOLLOW_CIRCLE
-from wx.lib.ogl import ARROW_FILLED_CIRCLE
-from wx.lib.ogl import ARROW_ARROW
-from wx.lib.ogl import ARROW_SINGLE_OBLIQUE
-from wx.lib.ogl import ARROW_DOUBLE_OBLIQUE
-from wx.lib.ogl import ARROW_METAFILE
+    from ogl2 import ARROW_HOLLOW_CIRCLE
+    from ogl2 import ARROW_FILLED_CIRCLE
+    from ogl2 import ARROW_ARROW
+    from ogl2 import ARROW_SINGLE_OBLIQUE
+    from ogl2 import ARROW_DOUBLE_OBLIQUE
+    from ogl2 import ARROW_METAFILE
+
+    from ogl2 import ShapeRegion, RectangleShape, Selectable
+else:
+    # import wx.lib.ogl as ogl
+    from wx.lib.ogl import LineShape
+    from wx.lib.ogl import GetPointOnLine
+    from wx.lib.ogl import GetArrowPoints
+    from wx.lib.ogl import ARROW_POSITION_START
+    from wx.lib.ogl import ARROW_POSITION_MIDDLE
+    from wx.lib.ogl import ARROW_POSITION_END
+    from wx.lib.ogl import ARROW_HOLLOW_CIRCLE
+    from wx.lib.ogl import ARROW_FILLED_CIRCLE
+    from wx.lib.ogl import ARROW_ARROW
+    from wx.lib.ogl import ARROW_SINGLE_OBLIQUE
+    from wx.lib.ogl import ARROW_DOUBLE_OBLIQUE
+    from wx.lib.ogl import ARROW_METAFILE
+    # from ogl import RectangleShape
 
 # Custom styles
 ARROW_UML_GENERALISATION = 200
@@ -22,7 +42,7 @@ ARROW_UML_COMPOSITION = 201
 ARROW_UML_AGGREGATION = 202
 
 
-class LineShapeCustom(LineShape):
+class LineShapeUml(LineShape):
     """
     Custom lines for UML purposes
     Entire DrawArrow() method replicated here, and enhanced
@@ -430,3 +450,4 @@ class LineShapeCustom(LineShape):
 
 
 """
+

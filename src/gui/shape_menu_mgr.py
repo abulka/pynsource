@@ -2,6 +2,9 @@ import wx
 from typing import List, Set, Dict, Tuple, Optional
 from view.display_model import GraphNode, UmlNode, CommentNode
 from gui.node_edit_multi_purpose import node_edit_multi_purpose
+from gui.settings import PRO_EDITION
+
+unregistered = not PRO_EDITION
 
 # not all are defined, as the rest of the ids are auto allocated, just nice not to waste id's :-)
 MENU_ID_SHAPE_PROPERTIES = wx.NewIdRef()
@@ -191,7 +194,7 @@ class ShapeMenuMgr:
         self.submenu = wx.Menu()  # This is the sub menu within the popupmenu
         self.accel_entries: List[wx.AcceleratorEntry] = []
 
-        def add_menuitem(text, method, id=None, submenu=False, key_code=None, keycode_only=False):
+        def add_menuitem(text, method, id=None, submenu=False, key_code=None, keycode_only=False, image=None):
             def check_id(id):
                 """
                 Accelerator tables need unique ids, whereas direct menuitem binding with Bind(...source=menuitem)
@@ -216,6 +219,9 @@ class ShapeMenuMgr:
                 entry.Set(wx.ACCEL_NORMAL, key_code, id)
                 self.accel_entries.append(entry)
 
+            if image:
+                item.SetBitmap(image)
+
             return item
 
         # Utility functions to add specific things to the menu - nicer way for algorithm to refer to
@@ -236,6 +242,23 @@ class ShapeMenuMgr:
                 self.OnNodeProperties,
                 id=MENU_ID_SHAPE_PROPERTIES,
                 key_code=ord("S"),
+            )
+
+        def add_pro_advert():
+            from media import images
+
+            name = "Edition lets you drag drop to connect!"
+            # id = wx.ID_ANY
+            # # id = wx.NewIdRef()
+            # to_menu = self.submenu
+            # menu_item = to_menu.Append(id, name, name)
+            # menu_item.SetBitmap(images.pro.GetBitmap())
+
+            item: wx.MenuItem = add_menuitem(
+                "Edition lets you drag drop to connect!  Learn More...",
+                self.OnProDragDrop,
+                submenu=True,
+                image=images.pro.GetBitmap()
             )
 
         def add_from(keycode_only=False):
@@ -306,65 +329,87 @@ class ShapeMenuMgr:
                     submenu=True,
                 )
 
-        # First look around...
+        # Line popup menu item helpers
+
+        def add_edge_types():
+            add_menuitem("Generalisation --|>\tE", self.OnLineConvertToGeneralisation, key_code=ord("E"))
+            add_menuitem("Composition    <>--\tW", self.OnLineConvertToComposition, key_code=ord("W"))
+            add_menuitem("Association    ----\tA", self.OnLineConvertToAssociation, key_code=ord("A"))
+            add_separator()
+            add_menuitem("Reverse Link\tR", self.OnLineConvertToReverse, key_code=ord("R"))
+            add_separator()
+            add_menuitem("Delete\tDel", self.OnRightClickDeleteNode)
+            add_separator()
+
+
+        # Main Logic - First look around...
 
         shape = self.shapehandler.GetShape()
         if "Line" in shape.__class__.__name__:  # no popup menu for lines
-            return
-        from_node: GraphNode = self.shapehandler.umlcanvas.new_edge_from
-        is_bitmap = shape.__class__.__name__ == "BitmapShapeResizable"
-        if is_bitmap:
-            is_comment = is_umlclass = False
+            add_edge_types()
+            add_cancel()
         else:
-            is_comment = isinstance(shape.node, CommentNode)
-            is_umlclass = isinstance(shape.node, UmlNode)
-        assert not is_umlclass == (is_comment or is_bitmap)
-        started_connecting = from_node != None
-        from_is_comment = isinstance(from_node, CommentNode)
+            if not hasattr(shape, "node"):
+                return
+            from_node: GraphNode = self.shapehandler.umlcanvas.new_edge_from
+            is_bitmap = shape.__class__.__name__ == "BitmapShapeResizable"
+            if is_bitmap:
+                is_comment = is_umlclass = False
+            else:
+                is_comment = isinstance(shape.node, CommentNode)
+                is_umlclass = isinstance(shape.node, UmlNode)
+            assert not is_umlclass == (is_comment or is_bitmap)
+            started_connecting = from_node != None
+            from_is_comment = isinstance(from_node, CommentNode)
 
-        # The algorithm that builds the menu
+            # The algorithm that builds the menu
 
-        if is_umlclass or is_comment:
-            add_properties()
+            if unregistered:
+                add_pro_advert()
+                add_submenu_separator()
+
+            if is_umlclass or is_comment:
+                add_properties()
+                add_separator()
+                if not from_node:
+                    add_from()
+                else:
+                    add_from(keycode_only=True)  # always allow begin line draw as shortcut
+
+            if is_umlclass:
+                if started_connecting:
+                    add_association_edge()
+                    if not from_is_comment:
+                        add_generalise_composition_edges()
+                else:
+                    pass  # don't offer 'to' menu choices cos haven't started connecting yet
+            elif is_comment:
+                if started_connecting:
+                    add_association_edge()
+                else:
+                    pass  # don't offer 'to' menu choices cos haven't started connecting yet
+            elif is_bitmap:
+                add_reset_image_size()
+            else:
+                raise RuntimeError("Right click on unknown shape")
+
+            if is_umlclass or is_comment:
+                if from_node:
+                    add_from_cancel()
+                else:
+                    add_from_cancel(keycode_only=True)  # always allow begin line cancel as shortcut
+
+            if not is_bitmap:
+                add_submenu_to_popup()
+
             add_separator()
-            if not from_node:
-                add_from()
-            else:
-                add_from(keycode_only=True)  # always allow begin line draw as shortcut
+            add_delete()
+            add_separator()
+            add_cancel()
 
-        if is_umlclass:
-            if started_connecting:
-                add_association_edge()
-                if not from_is_comment:
-                    add_generalise_composition_edges()
-            else:
-                pass  # don't offer 'to' menu choices cos haven't started connecting yet
-        elif is_comment:
-            if started_connecting:
-                add_association_edge()
-            else:
-                pass  # don't offer 'to' menu choices cos haven't started connecting yet
-        elif is_bitmap:
-            add_reset_image_size()
-        else:
-            raise RuntimeError("Right click on unknown shape")
-
-        if is_umlclass or is_comment:
-            if from_node:
-                add_from_cancel()
-            else:
-                add_from_cancel(keycode_only=True)  # always allow begin line cancel as shortcut
-
-        if not is_bitmap:
-            add_submenu_to_popup()
-
-        add_separator()
-        add_delete()
-        add_separator()
-        add_cancel()
-
-        add_submenu_separator()
-        add_line_deletions()
+            if is_umlclass or is_comment:
+                add_submenu_separator()
+                add_line_deletions()
 
         accel_tbl = wx.AcceleratorTable(self.accel_entries)
         self.frame.SetAcceleratorTable(accel_tbl)
@@ -386,7 +431,7 @@ class ShapeMenuMgr:
     # Handlers
 
     def OnNodeProperties(self, event):
-        node_edit_multi_purpose(self.GetShape(), self.shapehandler.app)
+        node_edit_multi_purpose(self.GetShape(), self.shapehandler.umlcanvas.app)
 
     def OnDrawBegin(self, event):
         self.GetShape().GetCanvas().NewEdgeMarkFrom()
@@ -416,7 +461,27 @@ class ShapeMenuMgr:
         self.shapehandler.UpdateStatusBar(shape)
 
     def OnRightClickDeleteNode(self, event):
-        self.shapehandler.app.run.CmdNodeDelete(self.GetShape())
+        self.shapehandler.umlcanvas.app.run.CmdNodeDelete(self.GetShape())
+
+    def OnProDragDrop(self, event):
+        # self.shapehandler.umlcanvas.app.context.wxapp.MessageBox("asd")  # quick popup
+
+        from common.messages import PRO_DRAG_DROP_CONNECT_HELP, PRO_INFO_URL
+        import webbrowser
+        retCode = wx.MessageBox(PRO_DRAG_DROP_CONNECT_HELP.strip(), "Pro Edition Information", wx.YES_NO | wx.ICON_QUESTION)
+        if retCode == wx.YES:
+            webbrowser.open(PRO_INFO_URL)
 
     def OnPopupMenuCancel(self, event):
         pass
+
+    # Line handlers
+
+    def OnLineConvertToGeneralisation(self, event):
+        self.shapehandler.umlcanvas.app.run.CmdLineChangeToEdgeType(self.GetShape(), "generalisation")
+    def OnLineConvertToComposition(self, event):
+        self.shapehandler.umlcanvas.app.run.CmdLineChangeToEdgeType(self.GetShape(), "composition")
+    def OnLineConvertToAssociation(self, event):
+        self.shapehandler.umlcanvas.app.run.CmdLineChangeToEdgeType(self.GetShape(), "association")
+    def OnLineConvertToReverse(self, event):
+        self.shapehandler.umlcanvas.app.run.CmdLineChangeToReverse(self.GetShape())

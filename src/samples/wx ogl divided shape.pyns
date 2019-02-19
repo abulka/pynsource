@@ -1,0 +1,21 @@
+# PynSource Version 1.2
+{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin. Comments are saved.'}
+{'type':'umlshape', 'id':'RoundedRectangleShape', 'x':14, 'y':258, 'width':186, 'height':54, 'attrs': '', 'meths': '__init__'}
+{'type':'umlshape', 'id':'DividedShape', 'x':292, 'y':150, 'width':124, 'height':134, 'attrs': 'region1|region2|region3', 'meths': '__init__|BuildRegions|FlushText|ReformatRegions|OnSizingEndDragLeft'}
+{'type':'umlshape', 'id':'CompositeShape', 'x':463, 'y':132, 'width':128, 'height':54, 'attrs': '', 'meths': '__init__'}
+{'type':'umlshape', 'id':'CompositeDivisionShape', 'x':639, 'y':127, 'width':195, 'height':54, 'attrs': '', 'meths': '__init__'}
+{'type':'umlshape', 'id':'DiamondShape', 'x':854, 'y':128, 'width':111, 'height':54, 'attrs': '', 'meths': '__init__'}
+{'type':'umlshape', 'id':'DividedShapeSmall', 'x':217, 'y':340, 'width':153, 'height':104, 'attrs': 'region1', 'meths': '__init__|BuildRegions|ReformatRegions|OnSizingEndDragLeft'}
+{'type':'umlshape', 'id':'ogl.RectangleShape', 'x':46, 'y':173, 'width':161, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'ogl.DividedShape', 'x':306, 'y':41, 'width':144, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'ogl.CompositeShape', 'x':536, 'y':30, 'width':161, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'ogl.PolygonShape', 'x':834, 'y':25, 'width':144, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'comment', 'id':'C708', 'x':14, 'y':15, 'width':250, 'height':121, 'comment': 'UHluc291cmNlIGlzIGJ1aWx0IG9uIHRvcApvZiB3eFB5dGhvbiBhbmQgdGhlIAp3eC5vZ2wgc2hhcGUgYW5kIApkaWFncmFtbWluZyBsaWJyYXJ5LgoKVGhpcyBpcyBhIHBvcnRpb24gb2YgdGhlCnd4Lm9nbCBhcmNoaXRlY3R1cmUu'}
+{'type':'comment', 'id':'C9316', 'x':474, 'y':248, 'width':417, 'height':122, 'comment': 'SW4gUHluc291cmNlLCBVTUwgY2xhc3NlcyBhcmUgZGlzcGxheWVkIG9uIHRoZQp3b3Jrc3BhY2UgdXNpbmcgdGhlIHd4Lm9nbCBEaXZpZGVkU2hhcGUgY2xhc3MsCndoaWNoIGNvbnZlbmllbnRseSwgaGFzIHNlcGFyYXRlIHNlY3Rpb25zIGZvcjoKCiAtIHRoZSBjbGFzcyBuYW1lCiAtIHRoZSBjbGFzcyBhdHRyaWJ1dGVzCiAtIHRoZSBjbGFzcyBtZXRob2Rz'}
+{'type':'edge', 'id':'RoundedRectangleShape_to_ogl.RectangleShape', 'source':'RoundedRectangleShape', 'target':'ogl.RectangleShape', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'DividedShape_to_ogl.DividedShape', 'source':'DividedShape', 'target':'ogl.DividedShape', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CompositeShape_to_ogl.CompositeShape', 'source':'CompositeShape', 'target':'ogl.CompositeShape', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CompositeDivisionShape_to_ogl.CompositeShape', 'source':'CompositeDivisionShape', 'target':'ogl.CompositeShape', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'DiamondShape_to_ogl.PolygonShape', 'source':'DiamondShape', 'target':'ogl.PolygonShape', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'DividedShapeSmall_to_DividedShape', 'source':'DividedShapeSmall', 'target':'DividedShape', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'DividedShape_to_C9316', 'source':'DividedShape', 'target':'C9316', 'uml_edge_type': 'association'}

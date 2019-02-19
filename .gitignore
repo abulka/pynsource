@@ -4,7 +4,9 @@ venv/
 .idea/
 dist/
 build/
-src/setup.py
 .eggs
 .vscode/
 Research/wxglade/*/*~
+.coverage
+htmlcov/
+src/tests/logs/

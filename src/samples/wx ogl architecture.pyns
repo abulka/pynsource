@@ -1,0 +1,30 @@
+# PynSource Version 1.2
+{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin. Comments are saved.'}
+{'type':'umlshape', 'id':'UmlShapeCanvas', 'x':174, 'y':8, 'width':172, 'height':504, 'attrs': 'scrollStepX|scrollStepY|classnametoshape|log|frame|save_gdi|working|font1|font2|umlworkspace|layout|coordmapper|layouter|overlap_remover', 'meths': '__init__|AllToLayoutCoords|AllToWorldCoords|onKeyPress|CmdInsertNewNode|CmdZapShape|Clear|ConvertParseModelToUmlModel|BuildEdgeModel|Go|CreateUmlShape|newRegion|CreateUmlEdge|OnWheelZoom|ChangeScale|stage1|stage2|stateofthenation|stateofthespring|RedrawEverything|ReLayout|LayoutAndPositionShapes|setSize|DecorateShape|createNodeShape|AdjustShapePosition|Redraw222|get_umlboxshapes|OnDestroy|OnLeftClick|DeselectAllShapes'}
+{'type':'umlshape', 'id':'Log', 'x':787, 'y':144, 'width':64, 'height':54, 'attrs': '', 'meths': 'WriteText'}
+{'type':'umlshape', 'id':'MainApp', 'x':573, 'y':67, 'width':178, 'height':464, 'attrs': 'log|andyapptitle|frame|notebook|umlcanvas|yuml|asciiart|multiText|popupmenu|next_menu_id|printData|box|canvas|preview', 'meths': 'OnInit|OnResizeFrame|OnRightButtonMenu|OnBuildGraphFromUmlWorkspace|OnSaveGraphToConsole|OnSaveGraph|OnLoadGraphFromText|OnLoadGraph|LoadGraph|OnTabPageChanged|InitMenus|Add|FileImport|FileImport2|FileImport3|FileNew|FilePrint|OnAbout|OnVisitWebsite|OnCheckForUpdates|OnHelp|OnDeleteNode|OnLayout|OnRefreshUmlWindow|MessageBox|OnButton|OnCloseFrame'}
+{'type':'umlshape', 'id':'MyEvtHandler', 'x':10, 'y':142, 'width':130, 'height':194, 'attrs': 'log|frame|shapecanvas|popupmenu', 'meths': '__init__|UpdateStatusBar|OnLeftClick|_SelectNodeNow|OnEndDragLeft|OnSizingEndDragLeft|OnMovePost|OnPopupItemSelected|OnRightClick|RightClickDeleteNode'}
+{'type':'umlshape', 'id':'ogl', 'x':66, 'y':13, 'width':35, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'wx', 'x':646, 'y':11, 'width':27, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'UmlCanvas', 'x':380, 'y':413, 'width':86, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'LayoutBasic', 'x':389, 'y':39, 'width':102, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'CoordinateMapper', 'x':387, 'y':353, 'width':144, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'GraphLayoutSpring', 'x':400, 'y':211, 'width':153, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'OverlapRemoval', 'x':405, 'y':128, 'width':128, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'Frame', 'x':791, 'y':314, 'width':52, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'ImageViewer', 'x':789, 'y':262, 'width':102, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'comment', 'id':'C1399', 'x':764, 'y':7, 'width':207, 'height':100, 'comment': 'VGhlIGJhc2ljIGFyY2hpdGVjdHVyZQpvZiBQeW5zb3VyY2UgLSBub3cgCnNsaWdodGx5IG91dCBvZiBkYXRlLgoKSGl0IENNRCBGIHRvIGNvbG91ciAKc2libGluZyBjbGFzc2VzLg=='}
+{'type':'comment', 'id':'C3335', 'x':190, 'y':551, 'width':283, 'height':64, 'comment': 'TW9zdCBvZiB0aGUgVU1MIHNoYXBlIGVkaXRpbmcKb2NjdXJzIGluIHRoaXMgY2xhc3MsIGluY2wuCnBvcHVwIG1lbnVzLCBzaGFwZSBlZGl0aW5nIGV0Yy4='}
+{'type':'edge', 'id':'UmlShapeCanvas_to_ogl', 'source':'UmlShapeCanvas', 'target':'ogl', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'MainApp_to_wx', 'source':'MainApp', 'target':'wx', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'MyEvtHandler_to_ogl', 'source':'MyEvtHandler', 'target':'ogl', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'UmlCanvas_to_UmlShapeCanvas', 'source':'UmlCanvas', 'target':'UmlShapeCanvas', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'LayoutBasic_to_UmlShapeCanvas', 'source':'LayoutBasic', 'target':'UmlShapeCanvas', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'CoordinateMapper_to_UmlShapeCanvas', 'source':'CoordinateMapper', 'target':'UmlShapeCanvas', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'GraphLayoutSpring_to_UmlShapeCanvas', 'source':'GraphLayoutSpring', 'target':'UmlShapeCanvas', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'OverlapRemoval_to_UmlShapeCanvas', 'source':'OverlapRemoval', 'target':'UmlShapeCanvas', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Log_to_MainApp', 'source':'Log', 'target':'MainApp', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Frame_to_MainApp', 'source':'Frame', 'target':'MainApp', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'UmlShapeCanvas_to_MainApp', 'source':'UmlShapeCanvas', 'target':'MainApp', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'ImageViewer_to_MainApp', 'source':'ImageViewer', 'target':'MainApp', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'UmlCanvas_to_C3335', 'source':'UmlCanvas', 'target':'C3335', 'uml_edge_type': 'association'}

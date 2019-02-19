@@ -23,7 +23,7 @@ class HelpWindow(wx.Frame):
             self,
             parent,
             id=wx.ID_ANY,
-            title="PyNSource Quick Help",
+            title="Pynsource Quick Help",
             pos=wx.DefaultPosition,
             size=wx.Size(637, 679),
             style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL,

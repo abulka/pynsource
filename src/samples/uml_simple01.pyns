@@ -1,5 +1,0 @@
-{'type':'node', 'id':'A', 'x':219, 'y':40, 'width':22, 'height':31, 'attrs':'', 'meths':''}
-{'type':'node', 'id':'B', 'x':285, 'y':165, 'width':21, 'height':31, 'attrs':'', 'meths':''}
-{'type':'node', 'id':'B2', 'x':174, 'y':160, 'width':32, 'height':31, 'attrs':'', 'meths':''}
-{'type':'edge', 'id':'B_to_A', 'source':'B', 'target':'A', 'uml_edge_type':'generalisation'}
-{'type':'edge', 'id':'B2_to_A', 'source':'B2', 'target':'A', 'uml_edge_type':'generalisation'}

@@ -42,7 +42,7 @@ class GraphPersistence:
 
         if self.ori_file_version > PERSISTENCE_CURRENT_VERSION:
             msg = (
-                "Cannot read newer pyNsource file format %1.1f - I only understand up to version %1.1f.  Please upgrade PyNSource and retry loading this file."
+                "Cannot read newer pyNsource file format %1.1f - I only understand up to version %1.1f.  Please upgrade Pynsource and retry loading this file."
                 % (self.ori_file_version, PERSISTENCE_CURRENT_VERSION)
             )
             return False, msg

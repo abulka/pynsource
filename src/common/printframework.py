@@ -1,5 +1,3 @@
-# Version 1.5 (clone of 1.4c with wx changes - Andy)
-
 import wx
 
 
@@ -8,6 +6,7 @@ class MyPrintout(wx.Printout):
         wx.Printout.__init__(self)
         self.canvas = canvas
         self.log = log
+        self.bounds_func = self._fit_diagram_to_paper
 
     def OnBeginDocument(self, start, end):
         # self.log.WriteText("wxPrintout.OnBeginDocument\n")
@@ -30,16 +29,23 @@ class MyPrintout(wx.Printout):
         super(MyPrintout, self).OnPreparePrinting()
 
     def HasPage(self, page):
+        """Validate whether a page should be printed.  This is the key to avoiding
+        the 9999 pages bug.  You must implement this properly and not simply return True.
+        """
         # self.log.WriteText("wxPrintout.HasPage: %d\n" % page)
-
-        # If GetPageInfo is setup correctly, this can
-        # always return True.
-        return True
+        # print("HasPage called", page)  # always gets called with page param 1 ?
+        # If GetPageInfo is setup correctly, this can always return True. NOT SO!!!!
+        # return True  # Do not do this
+        return page <= 1  # This luckily restricts the printing result, but not the display of 9999
 
     def GetPageInfo(self):
+        """Customise this to return num pages etc.  Unfortunately
+          'pageTo' is being ignored in favour of 9999 - bad wxpython bug
+          see my issue https://github.com/wxWidgets/Phoenix/issues/1151
+        """
         # self.log.WriteText("wxPrintout.GetPageInfo\n")
-        # This will print just 1 page
-        return (1, 1, 1, 1)
+        # Tell the printing system to print just 1 page
+        return (1, 1, 1, 1)  # minPage, maxPage, pageFrom, pageTo
 
     def OnPrintPage(self, page):
         # self.log.WriteText("wxPrintout.OnPrintPage: %d\n" % page)
@@ -50,7 +56,9 @@ class MyPrintout(wx.Printout):
 
         canvasMaxX = self.canvas.GetSize()[0]
         canvasMaxY = self.canvas.GetSize()[1]
-        canvasMaxX, canvasMaxY = self.IncreasePrintAreaSize(canvasMaxX, canvasMaxY)
+
+        # canvasMaxX, canvasMaxY = self._fit_diagram_to_paper(canvasMaxX, canvasMaxY)
+        canvasMaxX, canvasMaxY = self.bounds_func(canvasMaxX, canvasMaxY)
 
         # Let's have at least 50 device units margin
         marginX = 50
@@ -61,15 +69,7 @@ class MyPrintout(wx.Printout):
         maxY = canvasMaxY + (2 * marginY)
 
         # Get the size of the DC in pixels
-        try:
-            (w, h) = dc.GetSizeTuple()  # classic wxpython
-        except AttributeError:
-            (
-                w,
-                h,
-            ) = (
-                dc.GetSize()
-            )  # pheonix - see https://wxpython.org/Phoenix/docs/html/classic_vs_phoenix.html
+        (w, h) = dc.GetSize()  # was GetSizeTuple() in classic wxpython
 
         # Calculate a suitable scaling factor
         scaleX = float(w) / maxX
@@ -93,7 +93,7 @@ class MyPrintout(wx.Printout):
 
         return True
 
-    def IncreasePrintAreaSize(self, maxX, maxY):
+    def _fit_diagram_to_paper(self, maxX, maxY):
         # Increase maxX, maxY by taking into account the positions of the shapes
         # this fixes the print preview bug which didn't allocated enough space and only used the current window size -Andy
         shapelist = self.canvas.GetDiagram().GetShapeList()

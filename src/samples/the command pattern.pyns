@@ -1,0 +1,12 @@
+# PynSource Version 1.2
+{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin. Comments are saved.'}
+{'type':'umlshape', 'id':'CmdFileImportViaDialog', 'x':19, 'y':361, 'width':195, 'height':84, 'attrs': 'context|files', 'meths': 'execute'}
+{'type':'umlshape', 'id':'CmdFileImportBase', 'x':197, 'y':97, 'width':153, 'height':54, 'attrs': '', 'meths': 'execute'}
+{'type':'umlshape', 'id':'CmdBootStrap', 'x':14, 'y':100, 'width':111, 'height':154, 'attrs': 'frame|app|umlcanvas', 'meths': 'execute|bootstrap01|bootstrap02|bootstrap03|bootstrap04|bootstrap05|bootstrap06'}
+{'type':'umlshape', 'id':'CmdFileImportFromFilePath', 'x':293, 'y':359, 'width':220, 'height':74, 'attrs': 'files', 'meths': '__init__'}
+{'type':'umlshape', 'id':'CmdBase', 'x':187, 'y':10, 'width':69, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'comment', 'id':'C6778', 'x':412, 'y':20, 'width':297, 'height':104, 'comment': 'Q29tbWFuZHMgaW4gUHluc291cmNlIGFyZQpyZXByZXNlbnRlZCBieSBjb21tYW5kIGNsYXNzZXMuCgpUaGlzIHdpbGwgb25lIGRheSBhbGxvdyBmb3IgYQp1bmRvL3JlZG8gcXVldWUu'}
+{'type':'edge', 'id':'CmdFileImportViaDialog_to_CmdFileImportBase', 'source':'CmdFileImportViaDialog', 'target':'CmdFileImportBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdFileImportBase_to_CmdBase', 'source':'CmdFileImportBase', 'target':'CmdBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdBootStrap_to_CmdBase', 'source':'CmdBootStrap', 'target':'CmdBase', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'CmdFileImportFromFilePath_to_CmdFileImportBase', 'source':'CmdFileImportFromFilePath', 'target':'CmdFileImportBase', 'uml_edge_type': 'generalisation'}

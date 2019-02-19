@@ -4,6 +4,8 @@ import random
 from dialogs.DialogComment import DialogComment
 from dialogs.DialogUmlNodeEdit import DialogUmlNodeEdit
 from typing import List, Set, Dict, Tuple, Optional
+import copy
+from gui.settings import PRO_EDITION
 
 
 """
@@ -55,7 +57,7 @@ class UtilCmdUmlClass(CmdBase):  # Not Used directly, please subclass
 
             attrs = string_to_list_smart(dialog.txtAttrs.Value)
             methods = string_to_list_smart(dialog.txtMethods.Value)
-            print(id, attrs, methods)
+            # print("display_dialog", id, attrs, methods)
         else:
             result, id, attrs, methods = False, None, None, None
         dialog.Destroy()
@@ -230,7 +232,7 @@ class CmdInsertImage(CmdBase):
             message="choose",
             defaultDir=thisdir,
             defaultFile="",
-            wildcard="*.jpg",
+            wildcard="*.jpg|*.png|*.bmp",
             style=wx.FC_OPEN,
             pos=wx.DefaultPosition,
         )
@@ -239,25 +241,92 @@ class CmdInsertImage(CmdBase):
 
             config["LastDirInsertImage"] = dlg.GetDirectory()  # remember dir path
             config.write()
+            self.create_new_image_node(filename)
         dlg.Destroy()
 
-        self.create_new_image_node(filename)
 
     def create_new_image_node(self, filename=None):
         import os
 
-        if not filename:
-            curr_dir = os.path.dirname(os.path.abspath(__file__))
-            filename = os.path.join(
-                curr_dir, "..\\..\..\\Research\\wx doco\\Images\\SPLASHSCREEN.BMP"
-            )
-            print(filename)
-
-        self.context.umlcanvas.CreateImageShape(filename)
-        self.context.umlcanvas.remove_overlaps()
-        self.context.umlcanvas.mega_refresh()
-        # self.SelectNodeNow(node.shape)
+        if filename:
+            self.context.umlcanvas.CreateImageShape(filename)
+            self.context.umlcanvas.remove_overlaps()
+            self.context.umlcanvas.mega_refresh()
+            # self.SelectNodeNow(node.shape)
 
     def undo(self):  # override
         """ Docstring """
         # not implemented
+
+
+"""
+Duplicate
+"""
+
+class CmdDuplicate(UtilCmdUmlClass):
+    """ Duplicate UML class"""
+
+    def execute(self):
+        """ insert the new node and refresh the ascii tab too """
+        umlcanvas = self.context.umlcanvas
+        wxapp = self.context.wxapp
+        displaymodel = self.context.displaymodel
+
+        selected = [s for s in umlcanvas.GetDiagram().GetShapeList() if s.Selected()]
+        for shape in selected:
+
+            if not hasattr(shape, "node"):
+                self.context.wxapp.MessageBox("Duplicating images currently not supported, sorry.")
+                return
+
+            node = shape.node
+
+            # pick the next name
+            found = False
+            for i in range(999):
+                id = f"{node.id}_copy{i}"
+                if id not in displaymodel.graph.nodeSet:
+                    found = True
+                    break
+            if not found:
+                id = node.id + "_copy" + str(random.randint(1, 99999))
+            # Ensure unique name
+            while displaymodel.graph.FindNodeById(id):
+                id += "2"
+
+
+            if hasattr(node, "attrs"):
+                attrs = copy.copy(node.attrs)
+                methods = copy.copy(node.meths)
+                new_node = displaymodel.AddUmlNode(id, attrs, methods)
+                self.adjust_node_position_slightly(node, new_node)
+                new_shape = umlcanvas.CreateUmlShape(new_node)
+            elif hasattr(node, "comment"):
+                comment = copy.copy(node.comment)
+                new_node = displaymodel.AddCommentNode(id, comment)
+                self.adjust_node_position_slightly(node, new_node)
+                new_shape = umlcanvas.createCommentShape(new_node)
+            else:
+                print("Image duplication currently not supported")
+
+
+            new_node.shape.Show(True)
+            if PRO_EDITION:
+                umlcanvas.diagram.ChangeShapeOrder(new_node.shape, 9999)
+
+            # umlcanvas.remove_overlaps()
+            umlcanvas.mega_refresh()
+
+    def adjust_node_position_slightly(self, node, new_node):
+        """Position the new shape slightly below the old one, but the same size"""
+        offsetx = random.randint(2, 20)
+        offsety = random.randint(-int(node.height/3), int(node.height/3))
+        new_node.left = node.left + node.width + offsetx
+        new_node.top = node.top + offsety
+        new_node.width = node.width
+        new_node.height = node.height
+
+    def undo(self):  # override
+        """ undo insert new node """
+        # not implemented
+

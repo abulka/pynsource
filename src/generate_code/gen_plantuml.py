@@ -1,7 +1,16 @@
 import os
+import re
 import requests
 from .gen_base import ReportGenerator, CmdLineGenerator
+from pydbg import dbg
+import logging
+import functools
+from common.url_to_data import url_to_data
+from common.plantuml import deflate_and_encode
+import asyncio
+from async_lru import alru_cache
 
+log = logging.getLogger(__name__)
 
 class PySourceAsPlantUml(ReportGenerator):
     def __init__(self, ast=True):
@@ -107,10 +116,80 @@ class CmdLinePythonToPlantUml(CmdLineGenerator):
             print("Done!")
 
 
+@alru_cache(maxsize=32)
+async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str) -> str:
+    """Async version of getting image url from plantuml.  This does not get the actual image,
+    that is a separate call - unlike in a browser where that second call is done automatically.
+
+    Uses `url_to_data`, and only returns extracted url, no response object is returned by this
+    routine, cos it was never used by anyone recently.
+
+    I'm caching the result, though truthfully the call to `url_to_data` is already cached,
+    so it probably doesn't make much difference.
+    """
+    PLANTUML_URL_ON_INTERNET = "http://www.plantuml.com/plantuml/uml"
+    plant_uml_server = PLANTUML_URL_ON_INTERNET
+    log.info("plant_uml_server calculated to be %s" % (plant_uml_server,))
+
+    try:
+        url = os.path.join(plant_uml_server, deflate_and_encode(plant_uml_txt))
+
+        data, status_code = await url_to_data(url)
+        response_text = data.decode('utf-8')
+
+    except (ConnectionError, requests.exceptions.RequestException) as e:
+        # log.exception("Trying to render using plantuml server %s str(e)" % plant_uml_server)
+        log.error(
+            f"Error trying to fetch initial html from plantuml server {plant_uml_server} {str(e)}")
+        return None
+    except asyncio.TimeoutError as e:  # there is no string repr of this exception
+        print("time out getting plantuml html")
+        raise
+
+    if status_code == 200:
+        log.info("plant_uml_server responded with 200 ok")
+        regex = r'.*<p id="diagram".*\s*<.*img src=\"(.*?)\"'
+        image_url = re.findall(regex, response_text, re.MULTILINE)
+        if image_url:
+            # this is likely referencing localhost due to calc_plantuml_server_url() giving us a localhost
+            image_url = image_url[0]
+        else:
+            image_url = None
+        return image_url
+    else:
+        log.error(f"plant_uml_server responded with {status_code} ok")
+        return None
+
+@functools.lru_cache(maxsize=32)
 def plant_uml_create_png_and_return_image_url(plant_uml_txt):
-    plant_uml_server = "http://www.plantuml.com/plantuml/form"
-    response = requests.post(plant_uml_server, data={"text": plant_uml_txt})
+    """
+    Convert the plantuml text into a uml image url, using the plantuml server on the internet.
+
+    :param plant_uml_txt: plant uml text syntax
+    :return: a tuple: [image_url | None], response
+    """
+    # import hashlib
+    # dbg(hashlib.md5(plant_uml_txt.encode('utf-8')).hexdigest())
+
+    # plant_uml_server = calc_plantuml_server_url()
+    PLANTUML_URL_ON_INTERNET = "http://www.plantuml.com/plantuml/uml"
+    plant_uml_server = PLANTUML_URL_ON_INTERNET
+    log.info("plant_uml_server calculated to be %s" % (plant_uml_server,))
+
+    try:
+        # response = requests.post(plant_uml_server, data={'text': plant_uml_txt})
+
+        url = os.path.join(plant_uml_server, deflate_and_encode(plant_uml_txt))
+        response = requests.get(url)
+
+    except (ConnectionError, requests.exceptions.RequestException) as e:
+        # log.exception("Trying to render using plantuml server %s str(e)" % plant_uml_server)
+        log.error(f"Error trying to fetch initial html from plantuml server {plant_uml_server} {str(e)}")
+        return None, None
+
     if response.status_code == 200:
+        # print("plant_uml_server responded with 200 ok")
+        log.info("plant_uml_server responded with 200 ok")
 
         """
         Need to find the fragment:
@@ -119,18 +198,22 @@ def plant_uml_create_png_and_return_image_url(plant_uml_txt):
             </p>
         in the response.
         """
-        import re
-
         regex = r'.*<p id="diagram".*\s*<.*img src=\"(.*?)\"'
         image_url = re.findall(regex, response.text, re.MULTILINE)
         if image_url:
-            image_url = image_url[0]
+            image_url = image_url[
+                0
+            ]  # this is likely referencing localhost due to calc_plantuml_server_url() giving us a localhost
+            # if PLANT_UML_LOCAL:
+            #     image_url = normalise_plantuml_url(
+            #         image_url
+            #     )  # substitute the real host we are on.  doesn't really matter, cos always will dynamically repair in all list and update views - but need this repair for ztree1 non persistent debug view, so that can ipad in to e.g. http://192.168.0.3:8000/ztree1 whilst images being returned are refering to localhost which the ipad cannot reach (cos its a different machine)
         else:
             image_url = None
         return image_url, response
     else:
+        log.error("plant_uml_server responded with %d ok" % (response.status_code,))
         return None, response
-
 
 def plant_uml_create_png(plant_uml_txt, output_filename):
     image_url, response = plant_uml_create_png_and_return_image_url(plant_uml_txt)
@@ -148,3 +231,32 @@ def plant_uml_create_png(plant_uml_txt, output_filename):
             print("ok getting generating uml but error pulling down image")
     else:
         print("error calling plantuml server", response.status_code)
+
+# New
+
+def displaymodel_to_plantuml(displaymodel):
+    edge_lookup = {
+        "generalisation" : "--|>",
+        "composition" : "<--",
+        "association" : "..",
+    }  # TODO need to persist and represent cardinality, which is in the pmodel after all !!
+    result = ""
+    for node in displaymodel.graph.nodes:
+        if hasattr(node, "comment"):
+            result += f"note as {node.id}\n"
+            result += node.comment + "\n"
+            result += "end note\n\n"
+        else:
+            result += f"class {node.id} {{\n"
+            result += "\n".join([f"  {attr}" for attr in node.attrs])
+            result += "\n"
+            result += "\n".join([f"  {meth}()" for meth in node.meths])
+            result += "\n}\n\n"
+    for edge in displaymodel.graph.edges:
+        line = edge_lookup[edge['uml_edge_type']]
+        label = f": {edge['source'].id}" if edge['uml_edge_type'] in ("composition",) else ""
+        result += f"{edge['source'].id} {line} {edge['target'].id} {label}\n"
+        if edge['uml_edge_type'] == "association":
+            result += f"{edge['source'].id} {line}[hidden] {edge['target'].id} {label}\n"
+
+    return result

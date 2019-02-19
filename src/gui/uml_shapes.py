@@ -1,7 +1,11 @@
 # gui_umlshapes
 
+from gui.settings import PRO_EDITION
 import wx
-import wx.lib.ogl as ogl
+if PRO_EDITION:
+    import ogl2 as ogl
+else:
+    import wx.lib.ogl as ogl
 
 
 class DiamondShape(ogl.PolygonShape):
@@ -17,72 +21,72 @@ class DiamondShape(ogl.PolygonShape):
         self.Create(points)
 
 
-class RoundedRectangleShape(ogl.RectangleShape):
-    def __init__(self, w=0.0, h=0.0):
-        ogl.RectangleShape.__init__(self, w, h)
-        self.SetCornerRadius(-0.3)
-
-
-class CompositeDivisionShape(ogl.CompositeShape):
-    def __init__(self, canvas):
-        ogl.CompositeShape.__init__(self)
-
-        self.SetCanvas(canvas)
-
-        # create a division in the composite
-        self.MakeContainer()
-
-        # add a shape to the original division
-        shape2 = ogl.RectangleShape(40, 60)
-        self.GetDivisions()[0].AddChild(shape2)
-
-        # now divide the division so we get 2
-        self.GetDivisions()[0].Divide(wx.HORIZONTAL)
-
-        # and add a shape to the second division (and move it to the
-        # centre of the division)
-        shape3 = ogl.CircleShape(40)
-        shape3.SetBrush(wx.CYAN_BRUSH)
-        self.GetDivisions()[1].AddChild(shape3)
-        shape3.SetX(self.GetDivisions()[1].GetX())
-
-        for division in self.GetDivisions():
-            division.SetSensitivityFilter(0)
-
-
-class CompositeShape(ogl.CompositeShape):
-    def __init__(self, canvas):
-        ogl.CompositeShape.__init__(self)
-
-        self.SetCanvas(canvas)
-
-        constraining_shape = ogl.RectangleShape(120, 100)
-        constrained_shape1 = ogl.CircleShape(50)
-        constrained_shape2 = ogl.RectangleShape(80, 20)
-
-        constraining_shape.SetBrush(wx.BLUE_BRUSH)
-        constrained_shape2.SetBrush(wx.RED_BRUSH)
-
-        self.AddChild(constraining_shape)
-        self.AddChild(constrained_shape1)
-        self.AddChild(constrained_shape2)
-
-        constraint = ogl.Constraint(
-            ogl.CONSTRAINT_MIDALIGNED_BOTTOM,
-            constraining_shape,
-            [constrained_shape1, constrained_shape2],
-        )
-        self.AddConstraint(constraint)
-        self.Recompute()
-
-        # If we don't do this, the shapes will be able to move on their
-        # own, instead of moving the composite
-        constraining_shape.SetDraggable(False)
-        constrained_shape1.SetDraggable(False)
-        constrained_shape2.SetDraggable(False)
-
-        # If we don't do this the shape will take all left-clicks for itself
-        constraining_shape.SetSensitivityFilter(0)
+# class RoundedRectangleShape(ogl.RectangleShape):
+#     def __init__(self, w=0.0, h=0.0):
+#         ogl.RectangleShape.__init__(self, w, h)
+#         self.SetCornerRadius(-0.3)
+#
+#
+# class CompositeDivisionShape(ogl.CompositeShape):
+#     def __init__(self, canvas):
+#         ogl.CompositeShape.__init__(self)
+#
+#         self.SetCanvas(canvas)
+#
+#         # create a division in the composite
+#         self.MakeContainer()
+#
+#         # add a shape to the original division
+#         shape2 = ogl.RectangleShape(40, 60)
+#         self.GetDivisions()[0].AddChild(shape2)
+#
+#         # now divide the division so we get 2
+#         self.GetDivisions()[0].Divide(wx.HORIZONTAL)
+#
+#         # and add a shape to the second division (and move it to the
+#         # centre of the division)
+#         shape3 = ogl.CircleShape(40)
+#         shape3.SetBrush(wx.CYAN_BRUSH)
+#         self.GetDivisions()[1].AddChild(shape3)
+#         shape3.SetX(self.GetDivisions()[1].GetX())
+#
+#         for division in self.GetDivisions():
+#             division.SetSensitivityFilter(0)
+#
+#
+# class CompositeShape(ogl.CompositeShape):
+#     def __init__(self, canvas):
+#         ogl.CompositeShape.__init__(self)
+#
+#         self.SetCanvas(canvas)
+#
+#         constraining_shape = ogl.RectangleShape(120, 100)
+#         constrained_shape1 = ogl.CircleShape(50)
+#         constrained_shape2 = ogl.RectangleShape(80, 20)
+#
+#         constraining_shape.SetBrush(wx.BLUE_BRUSH)
+#         constrained_shape2.SetBrush(wx.RED_BRUSH)
+#
+#         self.AddChild(constraining_shape)
+#         self.AddChild(constrained_shape1)
+#         self.AddChild(constrained_shape2)
+#
+#         constraint = ogl.Constraint(
+#             ogl.CONSTRAINT_MIDALIGNED_BOTTOM,
+#             constraining_shape,
+#             [constrained_shape1, constrained_shape2],
+#         )
+#         self.AddConstraint(constraint)
+#         self.Recompute()
+#
+#         # If we don't do this, the shapes will be able to move on their
+#         # own, instead of moving the composite
+#         constraining_shape.SetDraggable(False)
+#         constrained_shape1.SetDraggable(False)
+#         constrained_shape2.SetDraggable(False)
+#
+#         # If we don't do this the shape will take all left-clicks for itself
+#         constraining_shape.SetSensitivityFilter(0)
 
 
 class DividedShape(ogl.DividedShape):
@@ -139,6 +143,7 @@ class DividedShape(ogl.DividedShape):
         dc = wx.ClientDC(canvas)  # used for measuring
         for region in self.GetRegions():
             text = region.GetText()
+            # print("ReformatRegions", text)
             self.FormatText(dc, text, rnum)
             rnum += 1
 

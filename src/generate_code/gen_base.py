@@ -2,6 +2,7 @@
 
 import os, glob
 from parsing.api import old_parser, new_parser
+from functools import cmp_to_key  # to still be able to use old style compare func in sort
 
 
 class ReportGenerator(object):
@@ -88,7 +89,7 @@ class ReportGenerator(object):
                     else:
                         return 1
 
-            classnames.sort(cmpfunc)
+            classnames.sort(key=cmp_to_key(cmpfunc))
 
         for (
             self.aclass

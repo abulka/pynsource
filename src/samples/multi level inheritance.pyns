@@ -1,0 +1,26 @@
+# PynSource Version 1.2
+{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin. Comments are saved.'}
+{'type':'umlshape', 'id':'HandleClassAttributes', 'x':73, 'y':418, 'width':186, 'height':214, 'attrs': 'attrslist|waitingfordot|waitingforsubsequentdot|waitingforvarname|waitingforequalsymbol|currvarname|lastcurrvarname|waitforappendopenbracket|nextvarnameisstatic|nextvarnameismany', 'meths': '__init__|On_newline|_Clearwaiting|JustGotASelfAttr|On_meat|_AddAttribute'}
+{'type':'umlshape', 'id':'HandleClasses', 'x':488, 'y':11, 'width':160, 'height':224, 'attrs': 'currclasslist|_currclass|nexttokenisclass|classlist|modulemethods|optionModuleAsClass|inbetweenClassAndFirstDef', 'meths': '__init__|On_deindent|_DeriveNestedClassName|PushCurrClass|PopCurrClass|GetCurrClassIndentLevel|GetCurrClass|_JustThenGotclass|On_newline|On_meat'}
+{'type':'umlshape', 'id':'AndyBasicParseEngine', 'x':686, 'y':3, 'width':178, 'height':204, 'attrs': 'meat|tokens|isfreshline|indentlevel', 'meths': '__init__|_ReadAllTokensFromFile|Parse|_ParseLoop|On_deindent|On_newline|On_meat|_Gotmeat|_Isblank|_Isnewline|_Ispadding'}
+{'type':'umlshape', 'id':'PynsourcePythonParser', 'x':801, 'y':434, 'width':186, 'height':54, 'attrs': '', 'meths': '__init__'}
+{'type':'umlshape', 'id':'ClassEntry', 'x':516, 'y':437, 'width':136, 'height':134, 'attrs': 'defs|attrs|classdependencytuples|classesinheritsfrom|ismodulenotrealclass', 'meths': '__init__|FindAttribute|AddAttribute'}
+{'type':'umlshape', 'id':'HandleClassStaticAttrs', 'x':519, 'y':286, 'width':195, 'height':114, 'attrs': '__waitingforequalsymbol|__staticattrname', 'meths': '__init__|__Clearwaiting|On_meat|__AddAttrModuleLevel'}
+{'type':'umlshape', 'id':'HandleDefs', 'x':93, 'y':258, 'width':160, 'height':124, 'attrs': 'currdef|nexttokenisdef|modulemethods|inbetweenClassAndFirstDef', 'meths': '__init__|_Gotdef|On_meat'}
+{'type':'umlshape', 'id':'HandleComposites', 'x':312, 'y':294, 'width':160, 'height':174, 'attrs': 'dummy|dummy2|lastselfattrname|waitingforclassname|waitingforOpenBracket|possibleclassname|dontdoanythingnow', 'meths': '__init__|JustGotASelfAttr|_ClearwaitingOnComposites|On_newline|On_meat'}
+{'type':'umlshape', 'id':'Attribute', 'x':697, 'y':516, 'width':86, 'height':84, 'attrs': 'attrname|attrtype', 'meths': '__init__'}
+{'type':'umlshape', 'id':'HandleModuleLevelDefsAndAttrs', 'x':754, 'y':250, 'width':254, 'height':144, 'attrs': 'moduleasclass|waitingforequalsymbolformoduleattr|modulelevelattrname', 'meths': '__init__|__Clearwaiting|Parse|On_meat|On_newline|_AddAttrModuleLevel'}
+{'type':'umlshape', 'id':'HandleInheritedClasses', 'x':260, 'y':74, 'width':195, 'height':154, 'attrs': 'currsuperclass|nexttokenisBracketOpenOrColon|nexttokenisSuperclass|nexttokenisComma|nexttokenisBracketOpen', 'meths': '__init__|_JustThenGotclass|_ClearwaitingInheriteClasses|On_newline|On_meat'}
+{'type':'umlshape', 'id':'object', 'x':927, 'y':39, 'width':60, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'comment', 'id':'C6032', 'x':33, 'y':10, 'width':204, 'height':207, 'comment': 'SHVnZSBpbmhlcml0YW5jZQp0cmVlIQoKVGhpcyB3YXMgdGhlCm9sZCBQeXRob24gcGFyc2VyCmluIFB5bnNvdXJjZSwgd2hpY2gKaXMgbm93IGRlcHJlY2F0ZWQKaW4gZmF2b3VyIG9mIHRoZSBidWlsdAppbiBQeXRob24gQVNUIHBhcnNlci4KClByZXNzIENNRCBGIChvciBDdHJsIEYpCnRvIGNvbG91ciB0aGUgVU1MIApzaGFwZXMu'}
+{'type':'edge', 'id':'HandleClassAttributes_to_HandleDefs', 'source':'HandleClassAttributes', 'target':'HandleDefs', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'HandleClasses_to_AndyBasicParseEngine', 'source':'HandleClasses', 'target':'AndyBasicParseEngine', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'AndyBasicParseEngine_to_object', 'source':'AndyBasicParseEngine', 'target':'object', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'PynsourcePythonParser_to_HandleModuleLevelDefsAndAttrs', 'source':'PynsourcePythonParser', 'target':'HandleModuleLevelDefsAndAttrs', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'HandleClassStaticAttrs_to_HandleComposites', 'source':'HandleClassStaticAttrs', 'target':'HandleComposites', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'HandleDefs_to_HandleInheritedClasses', 'source':'HandleDefs', 'target':'HandleInheritedClasses', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'HandleComposites_to_HandleClassAttributes', 'source':'HandleComposites', 'target':'HandleClassAttributes', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'HandleModuleLevelDefsAndAttrs_to_HandleClassStaticAttrs', 'source':'HandleModuleLevelDefsAndAttrs', 'target':'HandleClassStaticAttrs', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'HandleInheritedClasses_to_HandleClasses', 'source':'HandleInheritedClasses', 'target':'HandleClasses', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'Attribute_to_ClassEntry', 'source':'Attribute', 'target':'ClassEntry', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'ClassEntry_to_HandleComposites', 'source':'ClassEntry', 'target':'HandleComposites', 'uml_edge_type': 'composition'}

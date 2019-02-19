@@ -55,7 +55,7 @@ class Graph:
 
     def find_edge_for_lineshape(self, shape) -> Dict:
         edges = [edge for edge in self.edges if edge.get("shape", None) == shape]
-        assert len(edges) == 1
+        assert len(edges) == 1, f"Unexpected number {len(edges)} of graph edges {edges} for shape {shape}"
         return edges[0]
 
     def find_edges_for(self, node) -> List[Dict]:

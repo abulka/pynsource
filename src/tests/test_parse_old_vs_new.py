@@ -102,11 +102,11 @@ def reset_tests():
     results = []
 
 
-def test(filename, options={}):
+def _test(filename, options={}):
     results.append(parse_old_and_new(filename, options=options))
 
 
-def test_not(filename, expected_diffs=None, options={}):
+def _test_not(filename, expected_diffs=None, options={}):
     # expect parse to slightly fail, with a diff matching expected_diff
     result = parse_old_and_new(filename, print_diffs=False, options=options)
     if not result:
@@ -244,14 +244,14 @@ import unittest
 class TestCase_A(unittest.TestCase):
     def test_1_official_parsing(self):
         reset_tests()
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule01.py")
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule02.py")
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule03.py")
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule04.py")
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule05.py")  # (inner classes)
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule06.py")
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule07.py")
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule66.py")
+        _test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule01.py")
+        _test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule02.py")
+        _test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule03.py")
+        _test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule04.py")
+        _test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule05.py")  # (inner classes)
+        _test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule06.py")
+        _test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule07.py")
+        _test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule66.py")
         self.assertTrue(report("official parsing tests"))
 
     def test_2_subsidiary_parsing(self):
@@ -259,8 +259,8 @@ class TestCase_A(unittest.TestCase):
         # python -m unittest -v tests.test_parse_old_vs_new.TestCase_A.test_2_subsidiary_parsing
         reset_tests()
         options = {"TREAT_PROPERTY_DECORATOR_AS_PROP": False}
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_printframework.py", options=options)
-        test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_asciiworkspace.py", options=options)
+        _test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_printframework.py", options=options)
+        _test(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_asciiworkspace.py", options=options)
         self.assertTrue(report("subsidiary parsing tests"))
 
     def test_2a_treat_prop_as_prop(self):
@@ -290,7 +290,7 @@ class TestCase_A(unittest.TestCase):
 
         """
         reset_tests()
-        test_not(
+        _test_not(
             PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_asciiworkspace.py"
         )  # we expect the new parser to not match the old parser
         self.assertTrue(report("treat_prop_as_prop"))
@@ -298,12 +298,12 @@ class TestCase_A(unittest.TestCase):
     def test_3_ast_parsing_is_genuinely_better(self):
         # Expect these to fail cos ast parsing is genuinely better
         reset_tests()
-        test_not(
+        _test_not(
             PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule08_multiple_inheritance.py", expected_diffs
         )
-        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_command_pattern.py", expected_diffs)
-        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_pynsource.py", expected_diffs)
-        test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule09_intense.py", expected_diffs)
+        _test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_command_pattern.py", expected_diffs)
+        _test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_pynsource.py", expected_diffs)
+        _test_not(PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule09_intense.py", expected_diffs)
         self.assertTrue(report("ast parsing is genuinely better"))
 
 
@@ -331,5 +331,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # print parse_old_and_new('../../src/pyNsourceGui.py') # different - ok
+    # print parse_old_and_new('../../src/pynsource-gui.py') # different - ok
     # print parse_old_and_new('python-in/testmodule08_multiple_inheritance.py')

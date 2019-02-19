@@ -1,5 +1,6 @@
 from .asciiworkspace import AsciiWorkspace
 from typing import List, Set, Dict, Tuple, Optional
+from pydbg import dbg
 
 r"""
 HOW IT WORKS
@@ -79,6 +80,9 @@ class NodeWidthCalc:
                 self.maxlen = len(line)
 
     def calc(self):
+        if hasattr(self.node, "comment"):
+            return max([len(line) for line in self.node.comment.splitlines()])
+
         self.maxlen = len(self.node.id)
         if (
             self.node.__class__.__name__ == "UmlNode"
@@ -92,6 +96,7 @@ class model_to_ascii_builder:
     def __init__(self):
         self.result = ""
         self.pending_composition_line_output = []
+        self.pending_association_line_output = []  # New 2019
         # self.alternating_lines = False
 
     def line(self, ch="-", n=30, top_bottom=False):
@@ -110,9 +115,27 @@ class model_to_ascii_builder:
         result = self.line(n=maxwidth)
         for entry in lzt:
             result += "| %-*s |" % (maxwidth - 2, entry)
+            if self.pending_association_line_output:
+                edge = self.pending_association_line_output.pop()
+                # dbg(edge)
+                result += "  -----  [ %s ]" % (edge)
+                result += "\n"
+                result += "| %-*s |" % (maxwidth - 2, "")
             if self.pending_composition_line_output:  # and self.alternating_lines:
                 edge = self.pending_composition_line_output.pop()
+                # dbg(edge)
                 result += "  ---->  [ %s ]" % (edge)
+            # self.alternating_lines = not self.alternating_lines
+            result += "\n"
+        return result
+
+    def add_comment(self, comment, maxwidth):
+        result = self.line(n=maxwidth)
+        for entry in comment.split("\n"):
+            result += "| %-*s |" % (maxwidth - 2, entry)
+            if self.pending_association_line_output:  # and self.alternating_lines:
+                edge = self.pending_association_line_output.pop()
+                result += "  -----  [ %s ]" % (edge)
             # self.alternating_lines = not self.alternating_lines
             result += "\n"
         return result
@@ -142,7 +165,7 @@ class model_to_ascii_builder:
                 edge["source"].id
                 for edge in graph.edges
                 if edge["target"].id == node.id
-                and edge.get("uml_edge_type", "") != "generalisation"
+                and edge.get("uml_edge_type", "") == "composition"
             ]
         )
         # rels_composition = self.removeDuplicates([edge['source'].id for edge in graph.edges if edge['target'].id == node.id and edge.get('uml_edge_type', '') == 'composition'])
@@ -154,7 +177,15 @@ class model_to_ascii_builder:
                 and edge.get("uml_edge_type", "") == "generalisation"
             ]
         )
-        return rels_composition, rels_generalisation
+        rels_association = self.removeDuplicates(
+            [
+                edge["target"].id
+                for edge in graph.edges
+                if edge["source"].id == node.id
+                and edge.get("uml_edge_type", "") == "association"
+            ]
+        )
+        return rels_composition, rels_generalisation, rels_association
 
     def EnsureRootAsWideAsChild(self, maxwidth, child_node):
         # Ensure root or fc is as least as wide as its first child
@@ -230,6 +261,8 @@ class model_to_ascii_builder:
         i = 0
         for i in range(len(nodes)):
             node, annotation = nodes[i]
+            # dbg(node)
+            # dbg(annotation)
 
             if s:
                 """ Make decision re what to do with the last node"""
@@ -270,7 +303,12 @@ class model_to_ascii_builder:
                 maxwidth = self.EnsureRootAsWideAsChild(maxwidth, node_next_fc)
             maxwidth += 2
 
-            rels_composition, rels_generalisation = self.CalcRelations(node, graph)
+            rels_composition, rels_generalisation, rels_association = self.CalcRelations(node, graph)
+            # print()
+            # print(f"node {node.id}")
+            # dbg(rels_composition)
+            # dbg(rels_generalisation)
+            # dbg(rels_association)
 
             if rels_generalisation:
                 if annotation == "tab":
@@ -296,14 +334,20 @@ class model_to_ascii_builder:
                     )  # draw extra lines to match the 'tab' case where parents are listed, so that child nodes line up horizontally
 
             s += self.top_or_bottom_line(maxwidth)
-            s += "|%s|" % node.id.center(maxwidth, " ") + "\n"
+            s += "|%s|" % node.id.center(maxwidth, " ") + "\n"  # the node/class name
 
             self.pending_composition_line_output.extend(rels_composition)
+            self.pending_association_line_output.extend(rels_association)
 
-            if hasattr(node, "attrs") and node.attrs:
-                s += self.attrs_or_meths(node.attrs, maxwidth)
-            if hasattr(node, "meths") and node.meths:
-                s += self.attrs_or_meths(node.meths, maxwidth)
+            if hasattr(node, "attrs"):  # regular uml class
+                if node.attrs:
+                    s += self.attrs_or_meths(node.attrs, maxwidth)
+                if node.meths:
+                    s += self.attrs_or_meths(node.meths, maxwidth)
+                if not node.attrs and not node.meths:
+                    s += self.attrs_or_meths([" "], maxwidth)  # just draw edge lines
+            elif hasattr(node, "comment"):
+                s += self.add_comment(node.comment, maxwidth)
 
             s += self.top_or_bottom_line(maxwidth)
 

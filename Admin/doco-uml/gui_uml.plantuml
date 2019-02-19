@@ -22,7 +22,6 @@ class UmlCanvas <<ogl.ShapeCanvas>> {
     coordmapper
     layouter
     overlap_remover
-    observers  <color:royalBlue><-- my home grown multicast/observer pattern  <color:Red><u>ref61</u>
     log
     ---
     <b>__init__()
@@ -58,9 +57,21 @@ class UmlCanvas <<ogl.ShapeCanvas>> {
     <color:Green>NewEdgeMarkTo()
     OnCancelLine
     -- utility --
-    new_evthandler_housekeeping()   <color:royalBlue> <-- self.<b>observers</b>.NOTIFY_EVT_HANDLER_CREATED(evthandler)</color>  <color:Red><u>ref61</u>
     AllToLayoutCoords()
     AllToWorldCoords()
+    _float_point_to_int(self, point: Tuple[float, float]) -> Tuple[int, int]:
+    _report_mouse_position()
+    mouse_pos_in_client_coords()
+    <i>OnMotion(event):  # testing only, reports mouse position as you move it
+    <i>onScroll(event):  # testing only (also need to uncomment the Bind(wx.EVT_SCROLLWIN...
+    <i>_dump_screen_info()
+    -- zoom related (ogllike) --
+    _zoom(amount=0.25, set_to_scale=None, reset=False)
+    zoom_out(self, amount=0.25)
+    zoom_in(self, amount=0.25)
+    zoom_to_fit(self)
+    zoom_reset()
+    fix_scrollbars(deltax=None)
 
     .. def __init__(self, parent, log, frame): ..
 
@@ -78,7 +89,6 @@ class UmlCanvas <<ogl.ShapeCanvas>> {
     evthandler.SetShape(shape)
     evthandler.SetPreviousHandler(shape.GetEventHandler())
     shape.SetEventHandler(evthandler)
-    self.new_evthandler_housekeeping(evthandler)
 
     .. def onKeyPress(self, event): ..
 
@@ -206,6 +216,10 @@ class MainApp {
     MessageBox()
     OnButton()
     OnCloseFrame()
+    OnPageSetup()  <color:royalBlue><-- new page setup feature
+    FilePrint()  <color:royalBlue><-- really a print preview then print
+    FileNew()
+    model_to_ascii()
 
     .. def OnInit(self): ..
 

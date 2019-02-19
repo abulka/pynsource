@@ -14,16 +14,16 @@ class App(object):
         # model.app = self.controller.app = gui.app = server.app = self
 
         # Inject multicast dependencies / observers
-        self.context.umlcanvas.observers.add(self)
+        # self.context.umlcanvas.observers.add(self)
 
         # Inject normal dependencies
         # self.server.model = model
 
     # Housekeeping.
 
-    def NOTIFY_EVT_HANDLER_CREATED(self, evthandler):
-        # For new objects created during the lifetime of the app
-        evthandler.app = self
+    # def NOTIFY_EVT_HANDLER_CREATED(self, evthandler):
+    #     # For new objects created during the lifetime of the app
+    #     evthandler.app = self
 
     # Startup and Shutdown
 

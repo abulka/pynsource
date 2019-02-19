@@ -174,12 +174,12 @@ class TestCaseDisplayModel(unittest.TestCase):
     def create_mock_umlcanvas(self, dmodel):
         # this indirectly assumes wx
         from gui.uml_shapes import DividedShape, CommentShape
-        from gui.uml_lines import LineShapeCustom
+        from gui.uml_lines import LineShapeUml
 
         umlcanvas = mock.MagicMock()
         umlcanvas.CreateUmlShape.return_value = mock.MagicMock(spec=DividedShape)
         umlcanvas.createCommentShape.return_value = mock.MagicMock(spec=CommentShape)
-        umlcanvas.CreateUmlEdge.return_value = mock.MagicMock(spec=LineShapeCustom)
+        umlcanvas.CreateUmlEdge.return_value = mock.MagicMock(spec=LineShapeUml)
         umlcanvas.app.run.CmdDeselectAllShapes.return_value = None
         umlcanvas.displaymodel = dmodel
         dmodel.umlcanvas = umlcanvas
@@ -195,7 +195,7 @@ class TestCaseDisplayModel(unittest.TestCase):
     #
     # def edge_check_line(self, edge: dict):
     #     self.assertHasAttr(edge, "line")
-    #     self.assertIsInstance(edge["line"], LineShapeCustom)
+    #     self.assertIsInstance(edge["line"], LineShapeUml)
 
     def test_display_model_general1(self):
         source_code = dedent(

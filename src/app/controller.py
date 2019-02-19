@@ -18,6 +18,7 @@ from .cmds.selection import *
 from .cmds.filemgmt import *
 from .cmds.layouts import *
 from .cmds.colouring import *
+from .cmds.line_edge_type import *
 
 # TODO: Perhaps can add these modules to the globals within the
 # invoker class, to avoid having to import each module explicitly?

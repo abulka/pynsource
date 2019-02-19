@@ -75,7 +75,7 @@ class UmlGraph(Graph):
 
 class UmlNode(GraphNode):
     def __init__(self, id, left, top, width=60, height=60, attrs=[], meths=[]):
-        GraphNode.__init__(self, id, left, top, width=60, height=60)
+        GraphNode.__init__(self, id, left, top, width=width, height=height)
         self.attrs = attrs
         self.meths = meths
         self.shape = None
@@ -401,7 +401,7 @@ class DisplayModel:
         t.row_separator_char = ""
         print(t)
 
-        e = BeautifulTable(max_width=240)
+        e = BeautifulTable(max_width=340)
         e.column_headers = ["edge", "from", "symbol", "to", "shape"]
         e.column_alignments["shape"] = BeautifulTable.ALIGN_LEFT
         e.column_alignments["from"] = BeautifulTable.ALIGN_LEFT
@@ -420,7 +420,7 @@ class DisplayModel:
                     source,
                     symbol,
                     target,
-                    f"{shape} {self.obj_id(shape)} {self.get_shape_pos(shape)}",
+                    f"{type(shape).__name__} {self.obj_id(shape)} {self.get_shape_pos(shape)} {self.get_line_shape_innards(shape)}",
                 ]
             )
         e.row_separator_char = ""
@@ -449,7 +449,9 @@ class DisplayModel:
         # as hex, just the last few digits of the id, to reduce noise.  None protection.
         if shape:
             x, y = getpos(shape)
-            return f"({int(x)},{int(y)})"
+            width, height = shape.GetBoundingBoxMax()  # wx.ogl doesn't have shape._width etc. so derive
+            return f"({int(x):3},{int(y):3}) size: {width:3.0f}, {height:3.0f}"
+            # return f"({int(x)},{int(y)}) size: {shape._width}, {shape._height} {shape._lineControlPoints}"
         else:
             return ""
 
@@ -461,3 +463,12 @@ class DisplayModel:
         else:
             symbol = "---"
         return symbol
+
+    def get_line_shape_innards(self, shape) -> str:
+        # as hex, just the last few digits of the id, to reduce noise.  None protection.
+        if shape and hasattr(shape, "_lineControlPoints"):
+            points = ["(%3.0f, %3.0f)" % (real_p.Get()[0], real_p.Get()[1]) for real_p in shape._lineControlPoints]
+            return f"from: {shape._attachmentFrom} to: {shape._attachmentTo} _lcp: {' '.join(points)}"
+        else:
+            return ""
+

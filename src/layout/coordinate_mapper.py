@@ -266,7 +266,7 @@ class CoordinateMapper:
 
 if __name__ == "__main__":
 
-    from graph import Graph, GraphNode
+    from view.graph import Graph, GraphNode
 
     g = Graph()
 

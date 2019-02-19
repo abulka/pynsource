@@ -1,8 +1,0 @@
-# PynSource Version 1.0
-{'type':'node', 'id':'Editor', 'x':160, 'y':14, 'width':90, 'height':141, 'attrs':'topHandler|GUI|statechart', 'meths':'__init__|start'}
-{'type':'node', 'id':'TopHandler', 'x':10, 'y':90, 'width':100, 'height':30, 'attrs':'', 'meths':''}
-{'type':'node', 'id':'GUI', 'x':19, 'y':10, 'width':100, 'height':30, 'attrs':'', 'meths':''}
-{'type':'node', 'id':'Statechart', 'x':19, 'y':170, 'width':100, 'height':30, 'attrs':'', 'meths':''}
-{'type':'edge', 'id':'TopHandler_to_Editor', 'source':'TopHandler', 'target':'Editor', 'uml_edge_type':'composition'}
-{'type':'edge', 'id':'GUI_to_Editor', 'source':'GUI', 'target':'Editor', 'uml_edge_type':'composition'}
-{'type':'edge', 'id':'Statechart_to_Editor', 'source':'Statechart', 'target':'Editor', 'uml_edge_type':'composition'}

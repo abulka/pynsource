@@ -1,0 +1,10 @@
+# PynSource Version 1.2
+{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin. Comments are saved.'}
+{'type':'umlshape', 'id':'CmdLinePythonToAsciiArt', 'x':11, 'y':126, 'width':203, 'height':104, 'attrs': 'p', 'meths': '_GenerateAuxilliaryClasses|_CreateParser|_Process|ExportTo'}
+{'type':'umlshape', 'id':'PySourceAsText', 'x':288, 'y':119, 'width':202, 'height':114, 'attrs': '', 'meths': '__init__|_DumpAttribute|_DumpCompositeExtraFooter|_DumpClassNameAndGeneralisations|_DumpMethods|_Line|_DumpClassFooter'}
+{'type':'umlshape', 'id':'CmdLineGenerator', 'x':40, 'y':15, 'width':144, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'ReportGenerator', 'x':301, 'y':14, 'width':136, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'comment', 'id':'C6267', 'x':547, 'y':31, 'width':350, 'height':132, 'comment': 'VHdvIGdlbmVyYWxpc2F0aW9uIHJlbGF0aW9uc2hpcHMKYW5kIG9uZSBjb21wb3NpdGlvbiByZWxhdGlvbnNoaXAuCgpZb3UgY2FuIHJpZ2h0IGNsaWNrIG9uIGxpbmVzIHRvIGNoYW5nZQp0aGVpciB0eXBlIGFuZCB0aGVpciBkaXJlY3Rpb24uCgpUcnkgdGhlICJSIiBzaG9ydGN1dCB3aGlsc3QgYSBsaW5lIGlzIApzZWxlY3RlZCwgdG8gcmV2ZXJzZSB0aGUgbGluZSBkaXJlY3Rpb24h'}
+{'type':'edge', 'id':'CmdLinePythonToAsciiArt_to_CmdLineGenerator', 'source':'CmdLinePythonToAsciiArt', 'target':'CmdLineGenerator', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'PySourceAsText_to_ReportGenerator', 'source':'PySourceAsText', 'target':'ReportGenerator', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'PySourceAsText_to_CmdLinePythonToAsciiArt', 'source':'PySourceAsText', 'target':'CmdLinePythonToAsciiArt', 'uml_edge_type': 'composition'}

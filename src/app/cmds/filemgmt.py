@@ -3,6 +3,14 @@ from generate_code.gen_java import PySourceAsJava
 import wx
 import os
 from parsing.api import old_parser, new_parser
+from app.settings import RefreshPlantUmlEvent
+from gui.coord_utils import setpos, getpos
+from gui.settings import PRO_EDITION
+from gui.uml_lines import LineShape, LineShapeUml
+if PRO_EDITION:
+    from gui.uml_canvas import DividedShapeOglTwo as DividedShape
+else:
+    from gui.uml_canvas import DividedShape
 
 try:
     OPEN = wx.OPEN  # classic
@@ -18,6 +26,9 @@ class CmdFileNew(CmdBase):
         self.context.wxapp.RefreshAsciiUmlTab()
         self.context.wxapp.set_app_title("(Untitled)")
         self.context.umlcanvas.mega_refresh()
+
+        # was: self.context.wxapp.refresh_plantuml_view()
+        wx.PostEvent(self.context.frame, RefreshPlantUmlEvent())
 
 
 # ----- Importing python source code
@@ -57,6 +68,9 @@ class CmdFileImportBase(CmdBase):  # BASE
 
             self.context.umlcanvas.mega_refresh()
 
+            # self.context.wxapp.refresh_plantuml_view()
+            wx.PostEvent(self.context.frame, RefreshPlantUmlEvent())
+
 
 class CmdFileImportFromFilePath(CmdFileImportBase):  # was class CmdFileImportSource(CmdBase):
     def __init__(self, files=None):
@@ -70,11 +84,11 @@ class CmdFileImportViaDialog(CmdFileImportBase):  # was class CmdFileImport(CmdB
     def execute(self):
         self.context.wxapp.switch_to_ogl_uml_view()
 
-        thisdir = self.context.config.get("LastDirFileImport", os.getcwd())  # remember dir path
+        thisdir = self.context.config.get("LastDirFileImport", os.path.expanduser("~/"))
 
         dlg = wx.FileDialog(
             parent=self.context.frame,
-            message="choose",
+            message="Import Python files (*.py)   Hold Ctrl/Cmd to select multiple.",
             defaultDir=thisdir,
             defaultFile="",
             wildcard="*.py",
@@ -115,11 +129,11 @@ class CmdBootStrap(CmdBase):
 
         def bootstrap03():
             self.app.run.CmdFileLoadWorkspaceFromFilepath(
-                filepath=os.path.abspath("../tests/saved uml workspaces/uml05.pyns")
+                filepath=os.path.abspath("../src/samples/a simple example.pyns")
             )
 
         def bootstrap04():
-            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("pyNsourceGui.py")])
+            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("pynsource-gui.py")])
 
         def bootstrap05():
             self.app.run.CmdFileImportFromFilePath(
@@ -136,11 +150,21 @@ class CmdBootStrap(CmdBase):
             # Load an initial sample - handy for development
             self.app.run.CmdFileLoadWorkspaceSample1()
 
-        # bootstrap03()
-        bootstrap05()
-        # bootstrap07()
-        # self.umlcanvas.set_uml_canvas_size((9000,9000))
+        def bootstrap08():
+            # simple shape
+            self.app.run.CmdInsertSimple()
 
+        def bootstrap08():
+            # two simple shapes joined by a line
+            self.app.run.CmdInsertSingleLine()
+
+        # bootstrap03()
+        # bootstrap05()
+        bootstrap07()  # <-- good one
+        # bootstrap08()
+
+        # self.umlcanvas.set_uml_canvas_size((9000,9000))
+        # self.context.frame.ShowFullScreen(True)
 
 
 
@@ -149,7 +173,7 @@ class CmdBootStrap(CmdBase):
 
 class CmdRefreshUmlWindow(CmdBase):
     def execute(self):
-        self.context.frame.Layout()  # needed when running phoenix
+        self.context.umlcanvas.extra_refresh()
         self.context.umlcanvas.Refresh()
         self.context.wxapp.RefreshAsciiUmlTab()
 
@@ -159,23 +183,29 @@ class CmdRefreshUmlWindow(CmdBase):
 
 class CmdFileSaveWorkspace(CmdBase):
     def execute(self):
+        thisdir = self.context.config.get("LastDirFileOpen", os.path.expanduser("~/"))
         dlg = wx.FileDialog(
             parent=self.context.frame,
-            message="choose",
-            defaultDir="..\\tests\\saved uml workspaces",
+            message="Save Pynsource UML diagram (*.pyns)",
+            defaultDir=thisdir,
             defaultFile="",
             wildcard="*.pyns",
             style=wx.FD_SAVE,
             pos=wx.DefaultPosition,
         )
         if dlg.ShowModal() == wx.ID_OK:
+            self.context.config["LastDirFileOpen"] = dlg.GetDirectory()  # remember dir path
+            self.context.config.write()
+
             filename = dlg.GetPath()
+            self.context.wxapp.filehistory.AddFileToHistory(filename)  # remember file
 
             fp = open(filename, "w")
             fp.write(self.context.displaymodel.graph.GraphToString())
             fp.close()
 
             self.context.wxapp.set_app_title(filename)
+
 
         dlg.Destroy()
 
@@ -220,7 +250,7 @@ class CmdFileLoadWorkspaceBase(CmdBase):  # BASE
         self.context.coordmapper.Recalibrate()
         umlcanvas.AllToLayoutCoords()
 
-        self.context.frame.Layout()  # needed when running phoenix
+        umlcanvas.extra_refresh()
 
         # refresh view
         umlcanvas.GetDiagram().ShowAll(1)  # need this, yes
@@ -230,6 +260,9 @@ class CmdFileLoadWorkspaceBase(CmdBase):  # BASE
         self.context.wxapp.set_app_title(self.filepath)
 
         self.filepath = None
+
+        # send to frame not self to avoid EVT_WINDOW_DESTROY shutdown error
+        wx.PostEvent(self.context.frame, RefreshPlantUmlEvent())
 
     def execute(self):
         fp = open(self.filepath, "r")
@@ -259,20 +292,17 @@ class CmdFileLoadWorkspaceFromQuickPrompt(CmdFileLoadWorkspaceBase):
         dialog.SetClientSize(wx.Size(400, 200))  # make bigger
         if dialog.ShowModal() == wx.ID_OK:
             txt = dialog.GetValue()
-            print(txt)
             self.load_model_from_text_and_build_shapes(txt)
         dialog.Destroy()
 
 
 class CmdFileLoadWorkspaceViaDialog(CmdFileLoadWorkspaceBase):
     def execute(self):
-        thisdir = self.context.config.get(
-            "LastDirFileOpen", "..\\tests\\saved uml workspaces"
-        )  # remember dir path
+        thisdir = self.context.config.get("LastDirFileOpen", os.path.expanduser("~/"))
 
         dlg = wx.FileDialog(
             parent=self.context.frame,
-            message="choose",
+            message="Open Pynsource diagram file (*.pyns)",
             defaultDir=thisdir,
             defaultFile="",
             wildcard="*.pyns",
@@ -284,8 +314,10 @@ class CmdFileLoadWorkspaceViaDialog(CmdFileLoadWorkspaceBase):
 
             self.context.config["LastDirFileOpen"] = dlg.GetDirectory()  # remember dir path
             self.context.config.write()
+            self.context.wxapp.filehistory.AddFileToHistory(self.filepath)  # remember file
 
             super(CmdFileLoadWorkspaceViaDialog, self).execute()
+
 
         dlg.Destroy()
 
@@ -340,7 +372,7 @@ class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
     Reason for doing this: allows us to keep 'file' resources in the app itself,
     thus no need for loading external file - which is problematic e.g. on the mac
     
-    Run buildsamples.py to update it.
+    Run bin/_buildsamples.py to update it.
     """
 
     def execute(self):
@@ -351,8 +383,8 @@ class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
 
         dlg = wx.SingleChoiceDialog(
             self.context.frame,
-            "Choice:",
-            "Choose a Sample Uml Diagram",
+            "Diagrams:",
+            "Open a Sample UML Diagram",
             list(sample_files_dict.keys()),
             wx.CHOICEDLG_STYLE,
         )
@@ -360,10 +392,11 @@ class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
         if dlg.ShowModal() == wx.ID_OK:
             # self.log.WriteText('You selected: %s\n' % dlg.GetStringSelection())
             k = dlg.GetStringSelection()
-            self.filepath = "(Sample %s)" % k
+            self.filepath = "(Sample - %s)" % k
 
             s = b64decode(sample_files_dict[k]).decode("utf-8")
             self.load_model_from_text_and_build_shapes(s)
+
         dlg.Destroy()
 
         # dialog = DialogChooser(None)
@@ -380,6 +413,9 @@ class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
         # dialog.Destroy()
 
 
+
+# For development use
+
 class CmdFileLoadWorkspaceSample1(CmdFileLoadWorkspaceBase):
     """
     Quick load initial example for development purposes.
@@ -389,7 +425,107 @@ class CmdFileLoadWorkspaceSample1(CmdFileLoadWorkspaceBase):
         from base64 import b64decode
         from samples.files_as_resource import sample_files_dict
 
-        k = "hexmvc_architecture1.pyns"
+        # k = "classic example.pyns"
+        k = "simple inheritance.pyns"
+
         self.filepath = "(Sample %s)" % k
         s = b64decode(sample_files_dict[k]).decode("utf-8")
         self.load_model_from_text_and_build_shapes(s)
+
+import random
+class CmdInsertSimple(CmdFileLoadWorkspaceBase):
+    """ Insert new node """
+
+    def execute(self):
+        """ insert the new node and refresh the ascii tab too """
+        umlcanvas = self.context.umlcanvas
+        wxapp = self.context.wxapp
+        displaymodel = self.context.displaymodel
+
+        # self.umlcanvas.CmdInsertNewNode()
+
+        result, id, attrs, methods = True, \
+                                     "D" + str(random.randint(1, 99)),\
+                                     ["attribute 1", "attribute 2", "attribute 3"], \
+                                     ["method A", "method B", "method C", "method D"]
+
+        if result:
+            # Ensure unique name
+            while displaymodel.graph.FindNodeById(id):
+                id += "2"
+
+            node = displaymodel.AddUmlNode(id, attrs, methods)
+            node.left = 0
+            node.top = 0
+            node.width = 76
+            node.height = 124
+            shape = umlcanvas.CreateUmlShape(node)
+            # assert shape.x[0] == 0
+            # assert shape.y[0] == 0
+            # assert shape._width == 70
+            # assert shape._height == 70
+            node.shape.Show(True)
+            # umlcanvas.remove_overlaps()
+            umlcanvas.mega_refresh()
+            umlcanvas.SelectNodeNow(node.shape)
+            # wxapp.RefreshAsciiUmlTab()  # Don't do this because somehow the onKeyChar and onKeyPress handlers are unbound from the UmlCanvas shape canvas
+
+
+class CmdInsertSingleLine(CmdFileLoadWorkspaceBase):
+    """ two nodes joined by line - pure shape level test"""
+
+    def execute(self):
+        """ insert the new node and refresh the ascii tab too """
+        umlcanvas = self.context.umlcanvas
+        wxapp = self.context.wxapp
+        displaymodel = self.context.displaymodel
+
+        # assert PRO_EDITION
+
+        width = 50
+        height = 50
+
+        # fromShape = ogl.Block()
+        fromShape = DividedShape(width, height, umlcanvas, log=None, frame=self.context.frame)
+        umlcanvas.InsertShape(fromShape)  # , 999)  wx.ogl doesn't take depth index
+        fromShape.label = "A"
+        setpos(fromShape, 100, 0)
+        # fromShape.SetSize(50, 50)
+        fromShape.SetCanvas(umlcanvas)
+        fromShape.Show(True)  # needed for wx.ogl
+
+        # toShape = ogl.Block()
+        toShape = DividedShape(width, height, umlcanvas, log=None, frame=self.context.frame)
+        umlcanvas.InsertShape(toShape)  # , 999)  wx.ogl doesn't take depth index
+        toShape.label = "A"
+        setpos(toShape, 200, 0)
+        # toShape.SetSize(50, 50)
+        toShape.SetCanvas(umlcanvas)
+        toShape.Show(True)  # needed for wx.ogl
+
+        umlcanvas.Refresh()
+
+        # If don't want the line - development purposes
+        # return
+
+        arrowtype = None
+        line = LineShape()
+        line.SetCanvas(umlcanvas)
+        line.SetPen(wx.BLACK_PEN)
+        line.SetBrush(wx.BLACK_BRUSH)
+        if arrowtype:
+            line.AddArrow(arrowtype)
+        line.MakeLineControlPoints(2)
+
+        fromShape.AddLine(line, toShape)
+        umlcanvas.GetDiagram().AddShape(line)
+        line.Show(True)
+    
+        umlcanvas.Refresh()
+        if not PRO_EDITION:
+            umlcanvas.extra_refresh()  # wx.ogl needs
+
+        umlcanvas.select(line)
+        umlcanvas.zoom_in()
+        umlcanvas.zoom_in()
+        umlcanvas.zoom_in()

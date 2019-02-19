@@ -1,0 +1,8 @@
+# PynSource Version 1.2
+{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin. Comments are saved.'}
+{'type':'umlshape', 'id':'A', 'x':387, 'y':26, 'width':18, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'B', 'x':449, 'y':181, 'width':18, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'B2', 'x':344, 'y':182, 'width':27, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'comment', 'id':'C2019', 'x':10, 'y':10, 'width':312, 'height':141, 'comment': 'QjIgYW5kIEIgaW5oZXJpdCBmcm9tIEEuCgpEb3VibGUgY2xpY2sgb24gYW55IGNsYXNzIHRvIGVkaXQKaXRzIGF0dHJpYnV0ZXMgYW5kIG1ldGhvZHMuCgpIaXQgQ01EL0N0cmwgMSB0byBhZGQgbmV3IGNsYXNzZXMuCgpIaXQgQ01EL0N0cmwgMiB0byBhZGQgbmV3IGNvbW1lbnRzLg=='}
+{'type':'edge', 'id':'B_to_A', 'source':'B', 'target':'A', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'B2_to_A', 'source':'B2', 'target':'A', 'uml_edge_type': 'generalisation'}

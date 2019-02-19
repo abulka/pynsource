@@ -3,4 +3,8 @@ requests
 typed_ast
 astpretty
 termcolor
-git+https://github.com/pri22296/beautifultable.git
+beautifultable
+appdirs
+wxasync
+aiohttp
+async_lru

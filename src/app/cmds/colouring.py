@@ -31,13 +31,13 @@ class CmdColourSiblings(CmdBase):
         dc = wx.ClientDC(umlcanvas)
         umlcanvas.PrepareDC(dc)
         for node in self.context.displaymodel.graph.nodes:
-            clr = clrs[(node.colour_index + offset) % len(clrs)]
-            colour = wx.Brush(clr)
+            if not hasattr(node, "comment"):  # leave comments alone
+                clr = clrs[(node.colour_index + offset) % len(clrs)]
+                colour = wx.Brush(clr)
 
-            node.shape.SetBrush(colour)
-            # print "colour_index", node.id, node.colour_index, clr
-        umlcanvas.Redraw(dc)
-        self.context.frame.Layout()  # needed when running phoenix
+                node.shape.SetBrush(colour)
+                # print "colour_index", node.id, node.colour_index, clr
+        umlcanvas.mega_refresh()
 
 
 class CmdCycleColours(CmdBase):
@@ -69,9 +69,9 @@ class CmdCycleColours(CmdBase):
         dc = wx.ClientDC(umlcanvas)
         umlcanvas.PrepareDC(dc)
         for node in self.context.displaymodel.graph.nodes:
-            node.shape.SetBrush(self.colour)
-        umlcanvas.Redraw(dc)
-        self.context.frame.Layout()  # needed when running phoenix
+            if not hasattr(node, "comment"):  # leave comments alone
+                node.shape.SetBrush(self.colour)
+        umlcanvas.mega_refresh()
 
 
 class CmdColourSequential(CmdBase):
@@ -106,7 +106,7 @@ class CmdColourSequential(CmdBase):
             colour = wx.Brush(clr)
             node.shape.SetBrush(colour)
             # print "colour_index", node.id, node.colour_index, clr
-        umlcanvas.Redraw(dc)
+        umlcanvas.mega_refresh()
 
 
 class CmdBuildColourChartWorkspace(CmdBase):

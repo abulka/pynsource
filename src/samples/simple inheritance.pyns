@@ -1,0 +1,8 @@
+# PynSource Version 1.2
+{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin. Comments are saved.'}
+{'type':'umlshape', 'id':'MyPrintout', 'x':21, 'y':164, 'width':136, 'height':174, 'attrs': 'canvas|log', 'meths': '__init__|OnBeginDocument|OnEndDocument|OnBeginPrinting|OnEndPrinting|OnPreparePrinting|HasPage|GetPageInfo|OnPrintPage|IncreasePrintAreaSize'}
+{'type':'umlshape', 'id':'wx', 'x':74, 'y':30, 'width':27, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'comment', 'id':'C7818', 'x':276, 'y':83, 'width':387, 'height':75, 'comment': 'd3ggaXMgdGhlIGJhc2UgY2xhc3Mgb2YgTXlQcmludG91dC4KTm90ZSB0aGlzIGluaGVyaXRhbmNlIHJlbGF0aW9uc2hpcCBpcyBkcmF3bgp3aXRoIGEgc3RhbmRhcmQgVU1MIGxpbmUgc3R5bGUu'}
+{'type':'edge', 'id':'MyPrintout_to_wx', 'source':'MyPrintout', 'target':'wx', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'MyPrintout_to_C7818', 'source':'MyPrintout', 'target':'C7818', 'uml_edge_type': 'association'}
+{'type':'edge', 'id':'wx_to_C7818', 'source':'wx', 'target':'C7818', 'uml_edge_type': 'association'}
