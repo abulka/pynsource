@@ -5,6 +5,5 @@ astpretty
 termcolor
 beautifultable
 appdirs
-wxasync
 aiohttp
 async_lru
