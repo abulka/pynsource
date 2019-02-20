@@ -21,7 +21,7 @@ To run from source code you need Python 3:
 
     $ git clone https://github.com/abulka/pynsource.git
     $ cd pynsource
-    $ pip install -r requirements-dev.txt
+    $ pip install -r requirements.txt
     $ ./run
 
 Features
@@ -102,7 +102,9 @@ Home Page and Documentation
 
 More screenshots, videos and documentation can be found at
 
-www.pynsource.com
+http://www.andypatterns.com/index.php/products/pynsource/
+
+www.pynsource.com  (new site coming soon)
 
 Help support the project by Donating or purchasing a Pro Edition license.  Future plans include
 undo/redo, recognition of Python type annotations, line labels, module and package visualisation.
