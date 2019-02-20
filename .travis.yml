@@ -1,6 +1,7 @@
+# need xenial to get python 3.7, otherwise defaults to trusty which only goes to 3.6
+dist: xenial
 language: python
-python:
-  - "3.6"
+python: 3.7
 # command to install dependencies
 install: "pip install -r requirements.txt"
 # command to run tests
