@@ -4,7 +4,7 @@ WEB_VERSION_CHECK_URL = "http://www.atug.com/downloads/pynsource-latest.txt"
 WEB_VERSION_CHECK_URL_DEVEL = "http://www.atug.com/downloads/pynsource-latest-devel.txt"
 WEB_VERSION_CHECK_URL_TRACKED = "http://bit.ly/pynsource-update-check"
 WEB_VERSION_CHECK_URL_TRACKED_DEVEL = "http://bit.ly/pynsource-update-check-devel"
-WEB_PYNSOURCE_HOME_URL = "http://www.andypatterns.com/index.php/products/pynsource/"
+WEB_PYNSOURCE_HOME_URL = "http://www.pynsource.com"
 PYNSOURCE_CONFIG_FILE = "pynsource.ini"
 PYNSOURCE_CONFIGWX_FILE = "pynsource_wx.ini"
 PYNSOURCE_CONFIG_DIR = "Pynsource"
@@ -12,9 +12,7 @@ PYNSOURCE_CONFIG_DIR = "Pynsource"
 ABOUT_AUTHORS = """
 Andy Bulka
  
-With thanks to the free software authors Robin Dunn, Pierre Hjälm, Julian Smart, Erik R. Lechak and
-all those who contributed to wxPython, OGL, Python and its ecosystem of libraries. Also thanks to the wxasync
-project for bringing async/await support to wxPython.   
+With thanks to the free software authors Robin Dunn, Pierre Hjälm, Julian Smart, Erik R. Lechak and all those who contributed to wxPython, OGL, Python and its ecosystem of libraries. Also thanks to the wxasync project for bringing async/await support to wxPython.   
 """.strip()
 
 ABOUT_AUTHOR = "(c) Andy Bulka 2004-2019"
@@ -22,24 +20,14 @@ ABOUT_APPNAME = "Pynsource"
 VENDOR_NAME = "Wware"
 ABOUT_LICENSE = "License: GPL 3"
 ABOUT_LICENSE_PRO = "License: Purchased Pro"
-ABOUT_LICENSE_DETAILS = """Pynsource Community Edition is free software; you can redistribute
-it and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 2 of the License,
-or (at your option) any later version.
+ABOUT_LICENSE_DETAILS = """Pynsource Community Edition is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
-Pynsource PRO edition is a Commercial product and requires a valid paid license.  Please
-support further development of this project by purchasing a license
-www.pynsource.com/buy
+Pynsource PRO edition is a Commercial product and requires a valid paid license.  Please support further development of this project by purchasing a license www.pynsource.com/buy
 
-Pynsource is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Pynsource is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 """
 ABOUT_MSG = """
-Pynsource is a UML modelling tool for Python source code.
-
-Reverse engineer python source code into either a UML diagram
-or into Ascii Art UML which you can paste into your source code!
+UML diagramming and reverse engineering for Python.
 """
 # ABOUT_FEATURES = """
 # Resilient: doesn't import the python files, thus will never get "stuck" when syntax is wrong.

@@ -1087,7 +1087,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         from wx.adv import AboutDialogInfo, AboutBox
         from gui.settings import registered_to
 
-        license = "Community Edition" if unregistered else f"PRO Edition - registered to '{registered_to}' - thank you for your support."
+        license = "Community Edition" if unregistered else f"PRO Edition - registered to \"{registered_to}\" thank you for your support."
         info = AboutDialogInfo()
         if "wxMac" not in wx.PlatformInfo:  # image appears weird on left on mac so don't show
             info.SetIcon(wx.Icon('media/about.png', wx.BITMAP_TYPE_PNG))

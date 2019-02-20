@@ -87,7 +87,7 @@ community is happy there are no unwanted side effects.
 Background
 ----------
 The initial reason for these changes is because I use ogl heavily in my
-Pynsource UML tool for Python at http://www.andypatterns.com/index.php/products/pynsource/
+Pynsource UML tool for Python at http://www.pynsource.com
 """
 
 import wx
