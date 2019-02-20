@@ -102,9 +102,7 @@ Home Page and Documentation
 
 More screenshots, videos and documentation can be found at
 
-http://www.andypatterns.com/index.php/products/pynsource/
-
-www.pynsource.com  (new site coming soon)
+www.pynsource.com
 
 Help support the project by Donating or purchasing a Pro Edition license.  Future plans include
 undo/redo, recognition of Python type annotations, line labels, module and package visualisation.
