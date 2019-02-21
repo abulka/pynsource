@@ -604,14 +604,31 @@ class UmlCanvas(ogl.ShapeCanvas):
         dc = wx.ClientDC(self)
         self.PrepareDC(dc)
 
-        # self.displaymodel.Dump(msg="mega, before moves2 calls")
         for node in self.displaymodel.graph.nodes:
             node.shape.Move2(dc, node.left, node.top, display=False)
-        self.Refresh()
-        # self.displaymodel.Dump(msg="mega, AFTER moves2 calls")
+        # self.Refresh()
 
-        self.Update()  # or wx.SafeYield()  # Without this the nodes don't paint during a "L" layout (edges do!?)
-        # You need to be yielding or updating on a regular basis, so that when your OS/window manager sends repaint messages to your app, it can handle them. See http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh
+        """
+        Pretty sure Update() not doing anything useful anymore and is not needed.
+        
+        Calling this method immediately repaints the invalidated area of the window and all of 
+        its children recursively (this normally only happens when the flow of control returns to 
+        the event loop). 
+        
+        Notice that this function doesn’t invalidate any area of the window so nothing happens if 
+        nothing has been invalidated (i.e. marked as requiring a redraw). Use Refresh first if 
+        you want to immediately redraw the window unconditionally. 
+
+        https://wxpython.org/Phoenix/docs/html/wx.Window.html?highlight=wx.window#wx.Window.Update
+        
+        You need to be yielding or updating on a regular basis, so that when your OS/window 
+        manager sends repaint messages to your app, it can handle them. See 
+        http://stackoverflow.com/questions/10825128/wxpython-how-to-force-ui-refresh 
+        
+        Note that we have a wx.SafeYield() at the bottom of this method which is essential for
+        ongoing refresh during layout.
+        """
+        # self.Update()
 
         if auto_resize_canvas:
             zoom_info = self.prepare_zoom_info()
@@ -620,6 +637,8 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         # This cures so many phoenix refresh issues that I'm throwing it in here for fun too.
         self.extra_refresh()
+
+        self.Refresh()  # better place for refresh, also fixes problems when bundled and wx.ogl mode
 
         wx.SafeYield()  # Needed on Mac to see result if in a compute loop.
 
