@@ -33,12 +33,15 @@ try:
 except ImportError:
     pass  # python 3 already imports all built in exceptions
 
-STOP_ON_EXCEPTION = 1
-DEBUGINFO = 1
-DEBUGINFO_IMMEDIATE_PRINT = 0
+STOP_ON_EXCEPTION = True
+DEBUGINFO = True
+DEBUGINFO_IMMEDIATE_PRINT = False
 
 last_python_mode = 0
 
+if getattr(sys, 'frozen', False):
+    # running in a bundle
+    DEBUGINFO = False
 
 def as_str(obj):
     """
@@ -380,7 +383,11 @@ class Visitor(T):
             in order to create the relevant attribute and type (one or many).
             """
 
-        self.flush_state(whosgranddaddy())
+        if DEBUGINFO:
+            # this is cripplingly slow when bundled in pyinstaller
+            self.flush_state(whosgranddaddy())
+        else:
+            self.flush_state("")
 
         # At this point we have both lhs and rhs plus three flags and can
         # make a decision about what to create.
@@ -429,6 +436,8 @@ class Visitor(T):
     # MAIN VISIT METHODS
 
     def write(self, x, mynote=0):
+        if not DEBUGINFO:
+            return
         assert isinstance(x, str)
         if self.new_lines:
             if self.result:
