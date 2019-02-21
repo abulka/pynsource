@@ -48,6 +48,7 @@ import asyncio
 from asyncio.events import get_event_loop
 from app.settings import RefreshPlantUmlEvent, EVT_REFRESH_PLANTUML_EVENT
 from app.settings import CancelRefreshPlantUmlEvent, EVT_CANCEL_REFRESH_PLANTUML_EVENT
+from app.settings import ASYNC
 import datetime
 from contextlib import suppress
 import urllib.request, urllib.parse
@@ -78,6 +79,7 @@ from app.app import App
 import wx.lib.mixins.inspection  # Ctrl-Alt-I
 
 unregistered = not PRO_EDITION
+
 
 class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
 # class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
@@ -313,10 +315,16 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         #     wx.MessageBox("iconized?")
         # wx.CallAfter(self.minimized_on_mac_problem)
 
-        # Custom event bindings
-        # self.Bind(EVT_REFRESH_PLANTUML_EVENT, self.refresh_plantuml_view)  # bind custom event to synchronous handler - works OK
-        AsyncBind(EVT_REFRESH_PLANTUML_EVENT, self.refresh_plantuml_view, self.frame)  # don't specify id, and use self.frame not self
-        AsyncBind(EVT_CANCEL_REFRESH_PLANTUML_EVENT, self.cancel_refresh_plantuml_view, self.frame)
+        if ASYNC:
+            # Custom event bindings
+            # don't specify id, and use self.frame not self
+            AsyncBind(EVT_REFRESH_PLANTUML_EVENT, self.refresh_plantuml_view, self.frame)
+            AsyncBind(EVT_CANCEL_REFRESH_PLANTUML_EVENT,
+                      self.cancel_refresh_plantuml_view,
+                      self.frame)
+        else:
+            # bind custom event to synchronous handler - works OK
+            self.Bind(EVT_REFRESH_PLANTUML_EVENT, self.refresh_plantuml_view)
 
         """
         Only run bootstrap command at startup to load a sample file - only in dev mode 
@@ -334,7 +342,8 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
             wx.CallAfter(self.app.run.CmdBootStrap)
             wx.CallAfter(self.PostOglViewSwitch)  # ensure status bar message appears after loading
 
-        StartCoroutine(self.check_for_updates, self)
+        if ASYNC:
+            StartCoroutine(self.check_for_updates, self)
 
         # wx.lib.inspection.InspectionTool().Show()
 
@@ -730,9 +739,10 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         # Add(menu5, "test - add new DividedShape", "Ctrl-6", self.OnNewDividedShape)
         # menu5.AppendSeparator()
 
-        id = wx.NewIdRef()
-        menu_item = menu5.Append(id, "test - async call\tCtrl-6")
-        AsyncBind(wx.EVT_MENU, self.async_callback, menu5, id=id)
+        # if ASYNC:
+        #     id = wx.NewIdRef()
+        #     menu_item = menu5.Append(id, "test - async call\tCtrl-6")
+        #     AsyncBind(wx.EVT_MENU, self.async_callback, menu5, id=id)
 
         menu5.AppendSeparator()
 
@@ -1393,5 +1403,7 @@ if __name__ == "__main__":
     #     from multiprocessing import freeze_support  # allow joblib.Memory to be used in pyinstaller
     #     freeze_support()
 
-    # main()
-    main_async()
+    if ASYNC:
+        main_async()
+    else:
+        main()
