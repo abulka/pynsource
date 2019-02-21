@@ -13,7 +13,11 @@ Reverse engineer Python source code into UML class diagrams.
 Installation / Usage
 --------------------
 
-Ready to go binary apps for Mac and Windows are available from the releases download section.
+Ready to go binary apps:
+ * [Mac download](http://bit.ly/pynsource-mac-1-71) (just unzip and drag into Applications) 
+ * Windows _coming soon_
+ * Linux _coming soon_
+ 
 A commercial Pro Edition is also available with extra features like zoom and the ability to drag 
 to connect shapes.
 
