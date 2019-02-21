@@ -421,7 +421,10 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         # # GetUserConfigDir is ~/Library/Preferences
 
     def OnResizeFrame(self, event):  # ANDY  interesting - GetVirtualSize grows when resize frame
-        if event.EventObject == self.umlcanvas:
+        # print("OnResizeFrame event.EventObject", event.EventObject.__class__, event.EventObject == self.umlcanvas, isinstance(event.EventObject, wx.ScrolledWindow))
+
+        # if event.EventObject == self.umlcanvas:  # only works in ogl2 mode
+        if isinstance(event.EventObject, wx.ScrolledWindow):
 
             # Proportionally constrained resize.  Nice trick from http://stackoverflow.com/questions/6005960/resizing-a-wxpython-window
             # hsize = event.GetSize()[0] * 0.75
@@ -435,6 +438,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
             self.umlcanvas.fix_scrollbars()
 
             if 'wxMac' in wx.PlatformInfo:
+                # Protect against resizing to pure fullscreen, to avoid weird performance degredation
                 # Luckily the Messagebox kills the resize frame attempt!
                 # print(f"wx.DisplaySize()={wx.DisplaySize()}")
                 alarm = self.frame.GetScreenRect()[2] >= wx.DisplaySize()[0] and \
