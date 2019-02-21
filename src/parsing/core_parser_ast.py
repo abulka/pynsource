@@ -34,7 +34,7 @@ except ImportError:
     pass  # python 3 already imports all built in exceptions
 
 STOP_ON_EXCEPTION = True
-DEBUGINFO = True
+DEBUGINFO = False
 DEBUGINFO_IMMEDIATE_PRINT = False
 
 last_python_mode = 0
