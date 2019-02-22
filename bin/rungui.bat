@@ -1,2 +1,4 @@
+setlocal
 cd src
-python3 pynsource-gui.py
+python pynsource-gui.py
+endlocal

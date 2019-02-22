@@ -16,3 +16,5 @@ pydbg
 wxasync
 aiohttp
 async_lru
+Pillow
+
