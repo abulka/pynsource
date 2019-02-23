@@ -81,10 +81,19 @@ class CoordinateMapper:
 
         # Don't want the world size to be 0 or too small otherwise get insane
         # values when translate world to layout coords
+        """
+        However, as the comment in 
+            /home/andy/Devel/pynsource/src/gui/uml_canvas.py
+        says:
+            Don't assert canvas size sanity anymore as wxpython3 (phoenix) doesn't set canvas size
+            as quickly as wxpython2.8 does, even though frame has been sized and shown        
+        """
         MIN_WORLD_DIMENSION = 20  # should probably be 200
-        errmsg = "world coords too small, ensure a juicy, big enough frame.GetClientSize() or canvas.GetSize() value is being passed into CoordinateMapper either through the .__init__ or via .Recalibrate()"
-        assert ww > MIN_WORLD_DIMENSION, errmsg
-        assert wh > MIN_WORLD_DIMENSION, errmsg
+        errmsg = f"world coords too small {(ww, wh)}, ensure a juicy, big enough frame.GetClientSize() or canvas.GetSize() value is being passed into CoordinateMapper either through the .__init__ or via .Recalibrate()"
+        # assert ww > MIN_WORLD_DIMENSION, errmsg
+        # assert wh > MIN_WORLD_DIMENSION, errmsg
+        if ww <= MIN_WORLD_DIMENSION or wh <= MIN_WORLD_DIMENSION:
+            print(errmsg)
 
         lw = self.graph.layoutMaxX - self.graph.layoutMinX  # layout width
         lh = self.graph.layoutMaxY - self.graph.layoutMinY  # layout height

@@ -45,6 +45,7 @@ from configobj import ConfigObj  # pip install configobj
 from appdirs import AppDirs  # pip install appdirs
 from wxasync import AsyncBind, WxAsyncApp, StartCoroutine
 import asyncio
+import aiohttp
 from asyncio.events import get_event_loop
 from app.settings import RefreshPlantUmlEvent, EVT_REFRESH_PLANTUML_EVENT
 from app.settings import CancelRefreshPlantUmlEvent, EVT_CANCEL_REFRESH_PLANTUML_EVENT
@@ -340,7 +341,10 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
             # wx.CallLater(100, self.app.run.CmdRefreshUmlWindow)  # risky - may clash with wx.SafeYield()
         else:
             # running live in development mode
-            wx.CallAfter(self.app.run.CmdBootStrap)
+            # Load an initial diagram, for fun
+            wx.CallAfter(self.app.run.CmdBootStrap)  # causes safe yield warnings on linux?
+            # wx.CallLater(2000, self.app.run.CmdBootStrap)
+
             wx.CallAfter(self.PostOglViewSwitch)  # ensure status bar message appears after loading
 
         if ASYNC:
@@ -376,7 +380,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         except OSError:
             pass
         self.user_config_file = os.path.join(config_dir, PYNSOURCE_CONFIG_FILE)
-        # print("Pynsource config file path", self.user_config_file)
+        # print("Pynsource (configobj) config location", self.user_config_file)
 
         self.config = ConfigObj(self.user_config_file)
         self.config["keyword1"] = 100
@@ -406,6 +410,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         self.configwx = wx.FileConfig(localFilename=self.user_configwx_file)
 
         keyword3 = self.configwx.Read("keyword3")  # just testing
+        # print("Pynsource (wx.FileConfig) config location", self.user_configwx_file)
         # print(keyword3)
 
         """Experiments with using wx.StandardPaths"""
@@ -809,10 +814,11 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         self.filehistory.Load(self.configwx)
         self.filehistory.UseMenu(menu)
         self.Bind(wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
-        self.frame.Bind(wx.EVT_WINDOW_DESTROY, self.Cleanup)
+        self.frame.Bind(wx.EVT_WINDOW_DESTROY, self.Cleanup)  # not working on Linux?
 
     def Cleanup(self, *args):
         # A little extra cleanup is required for the FileHistory control
+        # print("Cleanup")
         self.filehistory.Save(self.configwx)
         del self.filehistory
         self.configwx.Write("keyword3", "a funny thing happened on the way to the cafe...")
@@ -1164,6 +1170,8 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         #     return None
         except asyncio.TimeoutError as e:  # there is no string repr of this exception
             print("time out getting latest version info")
+        except aiohttp.client_exceptions.ClientConnectorError as e:
+            print("connection error (no internet?) getting latest version info")
         else:
             print(f"checked url for updates: {url}")
 

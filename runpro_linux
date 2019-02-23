@@ -1,0 +1,9 @@
+cd src
+
+PYTHON=python
+#PYTHON=python3
+# PYTHON=/usr/local/bin/python3
+# PYTHON=/usr/local/Cellar/python/3.7.0/bin/python3
+#PYTHON=/usr/local/Cellar/python/3.7.2/bin/python3
+
+PYTHONPATH="/home/andy/Devel/ogl2/:/home/andy/Devel/pynsource-rego/" $PYTHON pynsource-gui.py
