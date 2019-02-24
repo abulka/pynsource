@@ -52,7 +52,7 @@ class DialogUmlNodeEdit ( wx.Dialog ):
 		bSizer14.Add( self.m_staticText2, 1, wx.ALL, 5 )
 
 		self.txtAttrs = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		self.txtAttrs.SetMaxLength( 0 )
+		# self.txtAttrs.SetMaxLength( 0 )
 		bSizer14.Add( self.txtAttrs, 3, wx.ALL|wx.EXPAND, 5 )
 
 
@@ -68,7 +68,7 @@ class DialogUmlNodeEdit ( wx.Dialog ):
 		bSizer13.Add( self.m_staticText3, 1, wx.ALL, 5 )
 
 		self.txtMethods = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		self.txtMethods.SetMaxLength( 0 )
+		# self.txtMethods.SetMaxLength( 0 )
 		bSizer13.Add( self.txtMethods, 3, wx.ALL|wx.EXPAND, 5 )
 
 

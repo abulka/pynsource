@@ -29,7 +29,7 @@ class DialogComment ( wx.Dialog ):
 		bSizer13 = wx.BoxSizer( wx.HORIZONTAL )
 
 		self.txt_comment = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		self.txt_comment.SetMaxLength( 0 )
+		# self.txt_comment.SetMaxLength( 0 )
 		bSizer13.Add( self.txt_comment, 1, wx.ALL|wx.EXPAND, 5 )
 
 
