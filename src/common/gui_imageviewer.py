@@ -22,7 +22,7 @@ from common.url_to_data import url_to_data
 
 
 ALLOW_DRAWING = True
-DEFAULT_IMAGE_SIZE = (20, 20)  # used to be 2000, 2000 for some reason
+DEFAULT_IMAGE_SIZE = (21, 21)  # used to be 2000, 2000 for some reason
 
 unregistered = not PRO_EDITION
 
@@ -130,6 +130,7 @@ class ImageViewer(wx.ScrolledWindow):
         try:
             self.Refresh()
             wx.SafeYield()  # Needed to "breathe" and refresh the UI
+            print("warning use of safe yield in image viewer")
         except RuntimeError:
             pass  # avoid error when shutting down tasks
 

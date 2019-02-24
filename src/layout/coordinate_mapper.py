@@ -94,6 +94,7 @@ class CoordinateMapper:
         # assert wh > MIN_WORLD_DIMENSION, errmsg
         if ww <= MIN_WORLD_DIMENSION or wh <= MIN_WORLD_DIMENSION:
             print(errmsg)
+            self.world_size = (1000, 1000)  # hack repair to see if it helps things - nope doesn't help
 
         lw = self.graph.layoutMaxX - self.graph.layoutMinX  # layout width
         lh = self.graph.layoutMaxY - self.graph.layoutMinY  # layout height

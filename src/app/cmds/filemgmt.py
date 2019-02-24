@@ -173,10 +173,11 @@ class CmdBootStrap(CmdBase):
 
 class CmdRefreshUmlWindow(CmdBase):
     def execute(self):
-        self.context.umlcanvas.extra_refresh()
-        self.context.umlcanvas.Refresh()
-        self.context.wxapp.RefreshAsciiUmlTab()
+        # self.context.umlcanvas.extra_refresh()
+        # self.context.umlcanvas.Refresh()
+        # self.context.wxapp.RefreshAsciiUmlTab()
 
+        self.context.umlcanvas.mega_refresh()
 
 # ------- Saving to persistence
 

@@ -10,7 +10,7 @@ from .canvas_resizer import CanvasResizer
 from common.architecture_support import *
 from gui.shape_menu_mgr import MENU_ID_CANCEL_LINE
 import time
-from gui.settings import PRO_EDITION, NATIVE_LINES_OGL_LIKE
+from gui.settings import PRO_EDITION, NATIVE_LINES_OGL_LIKE, ASYNC_BACKGROUND_REFRESH
 import wx
 from common.approx_equal import approx_equal
 from typing import List, Set, Dict, Tuple, Optional
@@ -122,6 +122,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.new_edge_from = None  # the 'from' node when creating new edges manually via UI
 
         self._kill_layout = False
+        self.mega_refresh_flag = False
 
         @property
         def kill_layout(self):
@@ -560,6 +561,13 @@ class UmlCanvas(ogl.ShapeCanvas):
         # self.UpdateStatusBar(shape)  # only available in the shape evt handler (this method used to live there...)
 
     def mega_refresh(self, recalibrate=False, auto_resize_canvas=True):
+        if ASYNC_BACKGROUND_REFRESH:
+            print("mega_refresh (outer) called")
+            self.mega_refresh_flag = True
+        else:
+            self._mega_refresh(recalibrate, auto_resize_canvas)
+
+    def _mega_refresh(self, recalibrate=False, auto_resize_canvas=True):
         """
         Refresh canvas.  There are a lot of ways to trigger a refresh
         and this is one of them.  Often you don't need this call and just
@@ -606,7 +614,14 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         for node in self.displaymodel.graph.nodes:
             node.shape.Move2(dc, node.left, node.top, display=False)
-        # self.Refresh()
+        if not PRO_EDITION:
+            """
+            Critical call, that draws shapes to dc, this is what mouse motion deep in wx.ogl is doing
+            Not needed in ogl2 because there is no use of double buffering and we draw everything
+            in one hit during a paint.  Though some of the residual ogl library code is still being used
+            and might need a proper call to draw?
+            """
+            self.Draw()
 
         """
         Pretty sure Update() not doing anything useful anymore and is not needed.
@@ -639,8 +654,8 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.extra_refresh()
 
         self.Refresh()  # better place for refresh, also fixes problems when bundled and wx.ogl mode
-
-        wx.SafeYield()  # Needed on Mac to see result if in a compute loop.
+        # causes keychar breakage issue
+        # wx.SafeYield()  # Needed on Mac to see result if in a compute loop.
 
     def prepare_zoom_info(self, delta=None):
         if PRO_EDITION:
@@ -809,8 +824,14 @@ class UmlCanvas(ogl.ShapeCanvas):
             self.snapshot_mgr.Restore(todisplay)  # snapshot 1 becomes 0 as a param
             self.mega_refresh()
 
-        # elif keycode == "P":
-        #     self.Refresh()
+        elif keycode == "r":
+            print("Refresh()")
+            self.Refresh()
+
+        elif keycode == "R":
+            print("menu Refresh()")
+            self.app.run.CmdRefreshUmlWindow()
+
 
         elif keycode in ["d", "D"]:
             self.app.run.CmdDumpDisplayModel(parse_models=keycode == "D")
@@ -830,7 +851,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         self.working = False
 
-        # event.Skip()  # makes an annoying beep if enabled
+        event.Skip()  # makes an annoying beep if enabled. But needed for Linux menu shortcuts to work!
 
     def OnWheelZoom(self, event):
         if self.working:

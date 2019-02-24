@@ -34,7 +34,7 @@ import sys
 from pydbg import dbg
 from common.messages import *
 import wx
-from gui.settings import PRO_EDITION
+from gui.settings import PRO_EDITION, ASYNC_BACKGROUND_REFRESH
 from common.printframework import MyPrintout
 from media import images
 from gui.settings import APP_VERSION
@@ -342,13 +342,16 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         else:
             # running live in development mode
             # Load an initial diagram, for fun
-            wx.CallAfter(self.app.run.CmdBootStrap)  # causes safe yield warnings on linux?
+            # wx.CallAfter(self.app.run.CmdBootStrap)  # causes safe yield warnings on linux?
             # wx.CallLater(2000, self.app.run.CmdBootStrap)
 
             wx.CallAfter(self.PostOglViewSwitch)  # ensure status bar message appears after loading
 
         if ASYNC:
             StartCoroutine(self.check_for_updates, self)
+
+        if ASYNC and ASYNC_BACKGROUND_REFRESH:
+            StartCoroutine(self.mega_refresh_check, self)
 
         # wx.lib.inspection.InspectionTool().Show()
 
@@ -1032,7 +1035,8 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
         m = model_to_ascii_builder()
         try:
-            wx.SafeYield()
+            # wx.SafeYield()
+            print("avoided safe yield in model to ascii")
             s = m.main(self.umlcanvas.displaymodel.graph)
             self.multiText.SetValue(str(s))
             if str(s).strip() == "":
@@ -1151,6 +1155,18 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         import webbrowser
 
         webbrowser.open(WEB_PYNSOURCE_HOME_URL)
+
+    async def mega_refresh_check(self):
+        print("mrcheck")
+        while True:
+            if self.umlcanvas.mega_refresh_flag:
+                print("mega refresh check find True!")
+                self.umlcanvas.mega_refresh_flag = False
+                self.umlcanvas._mega_refresh()
+            else:
+                self.umlcanvas.Refresh()
+                print("plain insurance refresh")
+            await asyncio.sleep(0.5)
 
     async def check_for_updates(self):
         await asyncio.sleep(15)
