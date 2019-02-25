@@ -776,10 +776,10 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         # Add(menu5, "test - add new DividedShape", "Ctrl-6", self.OnNewDividedShape)
         # menu5.AppendSeparator()
 
-        # if ASYNC:
-        #     id = wx.NewIdRef()
-        #     menu_item = menu5.Append(id, "test - async call\tCtrl-6")
-        #     AsyncBind(wx.EVT_MENU, self.async_callback, menu5, id=id)
+        if ASYNC:
+            id = wx.NewIdRef()
+            menu_item = menu5.Append(id, "test - async call\tCtrl-6")
+            AsyncBind(wx.EVT_MENU, self.async_callback, menu5, id=id)
 
         menu5.AppendSeparator()
 
@@ -1082,7 +1082,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         m = model_to_ascii_builder()
         try:
             # wx.SafeYield()
-            print("avoided safe yield in model to ascii")
+            # print("avoided safe yield in model to ascii")
             s = m.main(self.umlcanvas.displaymodel.graph)
             self.multiText.SetValue(str(s))
             if str(s).strip() == "":
@@ -1216,9 +1216,9 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
 
     async def check_for_updates(self):
         await asyncio.sleep(15)
-        print("hanging back even longer from doing a version check...")
+        # print("hanging back even longer from doing a version check...")
         await asyncio.sleep(15)
-        url = WEB_VERSION_CHECK_URL_TRACKED_DEVEL if self._running_andy_development_mode else WEB_VERSION_CHECK_URL_TRACKED
+        url = WEB_VERSION_CHECK_URL_TRACKED_DEVEL if self._running_andy_development_mode() else WEB_VERSION_CHECK_URL_TRACKED
         status_code = 0
         try:
             data, status_code = await url_to_data(url)
@@ -1241,7 +1241,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
             self._update_alert(info, alert_even_if_running_latest=False)
 
     def OnCheckForUpdates(self, event):
-        url = WEB_VERSION_CHECK_URL_TRACKED_DEVEL if self._running_andy_development_mode else WEB_VERSION_CHECK_URL_TRACKED
+        url = WEB_VERSION_CHECK_URL_TRACKED_DEVEL if self._running_andy_development_mode() else WEB_VERSION_CHECK_URL_TRACKED
         s = urllib.request.urlopen(url).read().decode("utf-8")
         print(f"manually checked url for updates: {url}")
         s = s.replace("\r", "")
@@ -1274,7 +1274,8 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
 
     def _running_andy_development_mode(self):
         return os.path.exists("/Users/Andy/Devel/pynsource-rego") or \
-                os.path.exists("/Users/andy/pynsource-rego")
+                os.path.exists("/Users/andy/pynsource-rego") or \
+                os.path.exists("/home/andy/Devel/pynsource-rego")
 
     # def OnHelpAlt(self, event):  # not used
     #     """manually build a frame with inner html window, no sizer involved"""

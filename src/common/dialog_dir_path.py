@@ -30,11 +30,11 @@ def dialog_path_pyinstaller_pop():
 
     if _clean_path(fs.GetPath()) != _clean_path(dir):
         fs.ChangePathTo(dir)
-        print("changed BACK to", dir)
+        # print("changed BACK to", dir)
 
     if _clean_path(os.getcwd()) != _clean_path(dir):
         os.chdir(dir)
-        print("python changed BACK to", dir)
+        # print("python changed BACK to", dir)
 
 def dialog_path_pyinstaller_push(frame: wx.Frame = None):
     """
@@ -64,14 +64,14 @@ def dialog_path_pyinstaller_push(frame: wx.Frame = None):
     fs = wx.FileSystem()
     if _clean_path(fs.GetPath()) != _clean_path(dir):
         fs.ChangePathTo(dir)
-        print("changed to", dir)
+        # print("changed to", dir)
 
     # Also change the python current dir, so that dialog boxes which create images from relative
     # paths can build the path properly.  wxformbuilder runs projects from the dialog/ dir
     # so the path root is dialog/
     if _clean_path(os.getcwd()) != _clean_path(dir):
         os.chdir(dir)
-        print("python changed to", dir)
+        # print("python changed to", dir)
 
     # self.MessageBox(fs.GetPath())
     return dir
