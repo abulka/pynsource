@@ -232,7 +232,7 @@ class CmdInsertImage(CmdBase):
             message="choose",
             defaultDir=thisdir,
             defaultFile="",
-            wildcard="*.jpg|*.png|*.bmp",
+            wildcard="Jpeg files|*.jpg;*.jpeg|(*.png)|*.png|(*.bmp)|*.bmp",
             style=wx.FC_OPEN,
             pos=wx.DefaultPosition,
         )
