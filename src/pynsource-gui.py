@@ -487,6 +487,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         if controlDown:
             direction = event.GetWheelRotation()
             self.ascii_art_zoom(direction)
+            self.multiText.ShowPosition(0)
 
         # don't need this explicit scroll code - it happens naturally
         # else:
@@ -500,7 +501,8 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         # self.frame.GetEventHandler().ProcessEvent(event)
         # wx.PostEvent(self.frame, event)
 
-        event.Skip()  # Need this or regular mouse wheel scrolling breaks
+        if not controlDown:
+            event.Skip()  # Need this or regular mouse wheel scrolling breaks
 
     def ascii_art_zoom(self, direction=1, amount=1, reset=False):
         if unregistered:
