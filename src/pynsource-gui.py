@@ -688,8 +688,9 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
 
         def Add(menu, name, shortcut=None, func=None, func_update=None, image=None):
 
-            if image:
-                name = f"{name:<30} (Pro)"
+            if "wxGTK" in wx.PlatformInfo:  # ubuntu gtk menus have images disallowed, so add text
+                if image:
+                    name = f"{name:<30} (Pro)"
 
             help_string = name
             if shortcut:
@@ -776,10 +777,10 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         # Add(menu5, "test - add new DividedShape", "Ctrl-6", self.OnNewDividedShape)
         # menu5.AppendSeparator()
 
-        if ASYNC:
-            id = wx.NewIdRef()
-            menu_item = menu5.Append(id, "test - async call\tCtrl-6")
-            AsyncBind(wx.EVT_MENU, self.async_callback, menu5, id=id)
+        # if ASYNC:
+        #     id = wx.NewIdRef()
+        #     menu_item = menu5.Append(id, "test - async call\tCtrl-6")
+        #     AsyncBind(wx.EVT_MENU, self.async_callback, menu5, id=id)
 
         menu5.AppendSeparator()
 

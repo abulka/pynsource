@@ -4,7 +4,7 @@ import wx
 PRO_EDITION=True
 NATIVE_LINES_OGL_LIKE=False
 ASYNC_BACKGROUND_REFRESH=False  # devel purposes only
-APP_VERSION = 1.71
+APP_VERSION = 1.72
 
 try:
     import rego
