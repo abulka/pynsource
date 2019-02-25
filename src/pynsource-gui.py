@@ -378,7 +378,13 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         main config file.
         On mac it is
             ~/Library/Preferences/Pynsource/pynsource.ini
+        On linux it is
+            ~/.Pynsource/pynsource.ini
         """
+        global PYNSOURCE_CONFIG_DIR
+        if "wxGTK" in wx.PlatformInfo:
+            PYNSOURCE_CONFIG_DIR = "." + PYNSOURCE_CONFIG_DIR
+
         config_dir = os.path.join(wx.StandardPaths.Get().GetUserConfigDir(), PYNSOURCE_CONFIG_DIR)
         try:
             os.makedirs(config_dir)
