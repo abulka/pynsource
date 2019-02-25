@@ -837,8 +837,27 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
     def add_last_viewed_files(self, menu):
         self.filehistory.Load(self.configwx)
         self.filehistory.UseMenu(menu)
+        self._filehistory_linux_workaround()
+
         self.Bind(wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
-        self.frame.Bind(wx.EVT_WINDOW_DESTROY, self.Cleanup)  # not working on Linux?
+        # self.frame.Bind(wx.EVT_WINDOW_DESTROY, self.Cleanup)  # not working on Linux?  Cleanup on wx.EVT_CLOSE instead
+
+    def _filehistory_linux_workaround(self):
+        """
+        Under Linux the paths, when loaded, they turn into horrible full paths.
+
+        ...The paths are shown relative to the current working directory, so
+        if that changes to the same location as the files then they are shown
+        with no path... Robin Dunn https://groups.google.com/forum/#!topic/wxpython-users/ckmTSrF9l54
+
+        Hmm - after loading one previous file from the history, or adding a new file to the history (which
+        happens when you load a previous file), then the history menu repairs itself.
+        So workaround by adding the latest menu item to the history again, to trigger the repair
+        """
+        if self.filehistory.Count > 0:
+            if "wxGTK" in wx.PlatformInfo:
+                path = self.filehistory.GetHistoryFile(0)
+                self.filehistory.AddFileToHistory(path)
 
     def Cleanup(self, *args):
         # A little extra cleanup is required for the FileHistory control
@@ -1406,6 +1425,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
     def OnCloseFrame(self, evt):
         if hasattr(self, "window") and hasattr(self.window, "ShutdownDemo"):
             self.umlcanvas.ShutdownDemo()
+        self.Cleanup()
         evt.Skip()
 
 
