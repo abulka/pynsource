@@ -681,7 +681,11 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
             pro_image = images.pro.GetBitmap() if unregistered else None
 
         def Add(menu, name, shortcut=None, func=None, func_update=None, image=None):
-            name_ori = name
+
+            if image:
+                name = f"{name:<30} (Pro)"
+
+            help_string = name
             if shortcut:
                 name = "%s\t%s" % (name, shortcut)
             id = self.next_menu_id
@@ -690,7 +694,17 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
             if "wxMac" in wx.PlatformInfo and name == "&About...":
                 id = wx.ID_ABOUT
 
-            menu_item = menu.Append(id, name, name_ori)
+            # Experimental stuff re creating menuitem first, setting image on it, then adding to menu
+            # in the hopes that it will make the image in the menu appear.  Fails on GTK/linux.
+            #
+            # item = wx.MenuItem(menu, -1, u"Test")
+            # # img = images.pro.GetBitmap()
+            # img = wx.Bitmap('media/Py22.png')
+            # print("img", img)
+            # item.SetBitmap(img)
+            # menu_item = menu.Append(item)
+
+            menu_item = menu.Append(id, name, help_string)
             self.Bind(wx.EVT_MENU, func, id=id)
             if func_update:
                 self.Bind(wx.EVT_UPDATE_UI, func_update, id=id)
@@ -796,7 +810,10 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu4, "&Report Bug...", "", self.OnReportBug)
         if unregistered:
             menu4.AppendSeparator()
-            Add(menu4, "&Purchase Pro Edition...", "", self.OnVisitWebsite, image=pro_image)
+            if "wxGTK" in wx.PlatformInfo:
+                Add(menu4, "&Purchase Pro Edition...  (go Pro)", "", self.OnVisitWebsite)
+            else:
+                Add(menu4, "&Purchase Pro Edition...", "", self.OnVisitWebsite, image=pro_image)
             Add(menu4, "&Enter License...", "", self.OnEnterLicense)
         if not "wxMac" in wx.PlatformInfo:
             menu4.AppendSeparator()
