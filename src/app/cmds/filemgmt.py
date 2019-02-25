@@ -257,7 +257,7 @@ class CmdFileLoadWorkspaceBase(CmdBase):  # BASE
         umlcanvas.GetDiagram().ShowAll(1)  # need this, yes
         umlcanvas.mega_refresh()
 
-        self.context.wxapp.RefreshAsciiUmlTab()
+        self.context.wxapp.RefreshAsciiUmlTab()  # could do later, on demand, but if viewing ascii tab then want now
         self.context.wxapp.set_app_title(self.filepath)
 
         self.filepath = None

@@ -193,11 +193,11 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         if "wxMac" in wx.PlatformInfo:  # Hack on Mac so that onKeyChar bindings take hold properly.
             wx.CallAfter(self.SetFocus)
-        elif (
-            "wxGTK" in wx.PlatformInfo
-        ):  # Hack on Linux so that onKeyChar bindings take hold properly.
-            wx.CallLater(1500, self.app.context.wxapp.multiText.SetFocus)
-            wx.CallLater(1500, self.SetFocus)
+        # elif (
+        #     "wxGTK" in wx.PlatformInfo
+        # ):  # Hack on Linux so that onKeyChar bindings take hold properly.
+        #     wx.CallLater(1500, self.app.context.wxapp.multiText.SetFocus)
+        #     wx.CallLater(1500, self.SetFocus)
 
     def CreateUmlShape(self, node, update_existing_shape: DividedShape = None):
 
