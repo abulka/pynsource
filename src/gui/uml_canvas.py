@@ -11,6 +11,7 @@ from common.architecture_support import *
 from gui.shape_menu_mgr import MENU_ID_CANCEL_LINE
 import time
 from gui.settings import PRO_EDITION, NATIVE_LINES_OGL_LIKE, ASYNC_BACKGROUND_REFRESH
+from gui.settings import DEFAULT_COMMENT_FONT_SIZE, DEFAULT_CLASS_HEADING_FONT_SIZE, DEFAULT_CLASS_ATTRS_METHS_FONT_SIZE
 import wx
 from common.approx_equal import approx_equal
 from typing import List, Set, Dict, Tuple, Optional
@@ -113,8 +114,10 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         # self.Bind(wx.EVT_SCROLLWIN, self.onScroll)  # not usually needed, testing only
 
-        self.font1 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
-        self.font2 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+        # These are the fonts for the divided shape regions 0 (the class name) and region 1, 2
+        # (the attributes and methods).
+        self.font1 = wx.Font(DEFAULT_CLASS_HEADING_FONT_SIZE, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+        self.font2 = wx.Font(DEFAULT_CLASS_ATTRS_METHS_FONT_SIZE, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
 
         self.working = False
         # flag to communicate with layout engine.  aborting keypress in gui should set this to true
@@ -364,8 +367,15 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.SetCanvas(self)
         shape.SetPen(wx.BLACK_PEN)
         shape.SetBrush(wx.YELLOW_BRUSH)
-        font2 = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+        font2 = wx.Font(DEFAULT_COMMENT_FONT_SIZE, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         shape.SetFont(font2)
+        if PRO_EDITION:
+            # so ogl2 respects the change - need to investigate
+            # how wx.ogl and ogl2 differ re this stuff and why ogl2 needs this
+            # certainly ogl2 has font for shape and font for each region, yet
+            # somehow wx.ogl is smarter and one call for the shape fixes the region shape
+            # fot but in ogl2 it doesn't and this extra call is needed.
+            shape.GetRegions()[0].SetFont(font2)
         for line in node.comment.split("\n"):
             shape.AddText(line)
 
@@ -799,7 +809,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.working = True
 
         keycode = chr(event.GetKeyCode())
-        print("keycode", keycode)
+        # print("keycode", keycode)
 
         if keycode in ["", ""]:
             pass

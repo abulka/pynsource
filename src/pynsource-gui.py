@@ -37,7 +37,7 @@ import wx
 from gui.settings import PRO_EDITION, ASYNC_BACKGROUND_REFRESH
 from common.printframework import MyPrintout
 from media import images
-from gui.settings import APP_VERSION
+from gui.settings import APP_VERSION, DEFAULT_ASCII_UML_FONT_SIZE
 from generate_code.gen_plantuml import displaymodel_to_plantuml
 from generate_code.gen_plantuml import plant_uml_create_png_and_return_image_url_async
 from common.dialog_dir_path import dialog_path_pyinstaller_push, dialog_path_pyinstaller_pop
@@ -150,7 +150,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
                 self.asciiart, wx.ID_ANY, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE | wx.HSCROLL
             )
             self.multiText.SetFont(
-                wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+                wx.Font(DEFAULT_ASCII_UML_FONT_SIZE, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
             )  # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
             asciiart_sizer.Add(self.multiText, 1, wx.EXPAND | wx.ALL, 0)
             self.asciiart.SetSizer(asciiart_sizer)
@@ -191,7 +191,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
 
             self.m_textCtrl2 = wx.TextCtrl(self.m_scrolledWindow4, wx.ID_ANY, wx.EmptyString,
                                            wx.DefaultPosition, wx.DefaultSize, style=wx.TE_MULTILINE | wx.HSCROLL)
-            self.m_textCtrl2.SetFont(wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False))
+            self.m_textCtrl2.SetFont(wx.Font(DEFAULT_ASCII_UML_FONT_SIZE, wx.MODERN, wx.NORMAL, wx.NORMAL, False))
             bSizer5.Add(self.m_textCtrl2, 1, wx.ALL | wx.EXPAND, 5)
 
             self.m_scrolledWindow4.SetSizer(bSizer5)
@@ -234,7 +234,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
                 self.panel_two, -1, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE | wx.HSCROLL
             )
             self.multiText.SetFont(
-                wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+                wx.Font(DEFAULT_ASCII_UML_FONT_SIZE, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
             )  # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
 
             sizer = wx.BoxSizer(wx.VERTICAL)
@@ -513,7 +513,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         MAX_FONT_SIZE = 65
 
         if reset:
-            self.multiText.SetFont(wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False))
+            self.multiText.SetFont(wx.Font(DEFAULT_ASCII_UML_FONT_SIZE, wx.MODERN, wx.NORMAL, wx.NORMAL, False))
             return
 
         if direction < 0:
