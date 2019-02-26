@@ -661,7 +661,7 @@ class UmlCanvas(ogl.ShapeCanvas):
                                                                    zoom_info=zoom_info)
 
         # This cures so many phoenix refresh issues that I'm throwing it in here for fun too.
-        self.extra_refresh()
+        # self.extra_refresh()
 
         self.Refresh()  # better place for refresh, also fixes problems when bundled and wx.ogl mode
 
@@ -685,12 +685,19 @@ class UmlCanvas(ogl.ShapeCanvas):
                 time.sleep(0.05)
 
     def extra_refresh(self):
-        # This cures so many phoenix refresh issues
-        # This triggers the sizers in the frame, and also triggers an on resize frame -
-        # so much overhead!? I don't need it in ogltwo mode.
-        # Still seems to be needed in in wx.ogl mode for some reason
+        """
+        Draws all shapes onto the buffered dc, which is only needed for wx.ogl not for ogl2
+        which doesn't use buffered dc and does most of its drawing on the dc offered by paint.
+
+        Historical note: when I first ported to phoenix I fixed a lot of new refresh problems
+        by calling self.frame.Layout() which was effective, but the wrong solution.  A simple
+        Draw() would have done it.  The layout solution was an accidental discovery and presumably
+        also has unnecessary overhead as it triggers the sizers in the frame, and also triggers an
+        on resize frame.
+        """
         if not PRO_EDITION:
-            self.frame.Layout()  # needed when running phoenix
+            self.Draw()
+            # self.frame.Layout()  # needed when running phoenix
 
     def layout_and_position_shapes(self):
         """
