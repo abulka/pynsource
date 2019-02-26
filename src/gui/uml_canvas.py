@@ -819,6 +819,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         keycode = chr(event.GetKeyCode())
         # print("keycode", keycode)
+        consumed = False
 
         if keycode in ["", ""]:
             pass
@@ -842,21 +843,26 @@ class UmlCanvas(ogl.ShapeCanvas):
             todisplay = ord(keycode) - ord("1")
             self.snapshot_mgr.Restore(todisplay)  # snapshot 1 becomes 0 as a param
             self.mega_refresh()
+            consumed = True
 
         elif keycode == "r":
             print("Refresh()")
             self.Refresh()
+            consumed = True
 
         elif keycode == "R":
             print("menu Refresh()")
             self.app.run.CmdRefreshUmlWindow()
+            consumed = True
 
 
         elif keycode in ["d", "D"]:
             self.app.run.CmdDumpDisplayModel(parse_models=keycode == "D")
+            consumed = True
 
         elif keycode == "s":
             self.CmdTrimScrollbars()
+            consumed = True
 
         #
         # Developer keys - creates a workspace filled with coloured shapes
@@ -870,7 +876,8 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         self.working = False
 
-        event.Skip()  # makes an annoying beep if enabled. But needed for Linux menu shortcuts to work!
+        if not consumed:  # avoid forwarding if consumed, otherwise makes an annoying beep on Mac
+            event.Skip()  # needed for Linux menu shortcuts to work!
 
     def OnWheelZoom(self, event):
         if self.working:
