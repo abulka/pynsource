@@ -71,6 +71,12 @@ class MyPrintout(wx.Printout):
         # Get the size of the DC in pixels
         (w, h) = dc.GetSize()  # was GetSizeTuple() in classic wxpython
 
+        if "wxGTK" in wx.PlatformInfo:
+            # Try to mitigate the black background bug under linux by drawing a white rect
+            dc.SetPen(wx.Pen(wx.WHITE, 1, wx.PENSTYLE_SOLID))  # change to wx.RED to see border
+            dc.SetBrush(wx.Brush(wx.WHITE, wx.BRUSHSTYLE_SOLID))
+            dc.DrawRectangle(0,0,w,h)
+
         # Calculate a suitable scaling factor
         scaleX = float(w) / maxX
         scaleY = float(h) / maxY

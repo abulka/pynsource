@@ -343,7 +343,8 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         else:
             # running live in development mode
             # Load an initial diagram, for fun
-            # wx.CallAfter(self.app.run.CmdBootStrap)  # causes safe yield warnings on linux?
+            if "wxGTK" not in wx.PlatformInfo:
+                wx.CallAfter(self.app.run.CmdBootStrap)  # causes safe yield warnings on linux?
             # wx.CallLater(2000, self.app.run.CmdBootStrap)
 
             wx.CallAfter(self.PostOglViewSwitch)  # ensure status bar message appears after loading
