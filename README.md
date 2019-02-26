@@ -1,7 +1,7 @@
 Pynsource
 =========
 
-Version number: Version 1.72
+Version number: Version 1.72 (Feb 26th 2019)
 
 Author: Andy Bulka
 
