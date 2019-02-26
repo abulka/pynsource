@@ -353,11 +353,24 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         if ASYNC and ASYNC_BACKGROUND_REFRESH:
             StartCoroutine(self.mega_refresh_check, self)
 
-        self.frame.SetIcon(wx.Icon(APP_ICON_PATH))  # Set app icon
+        self._set_app_icon()
 
         # wx.lib.inspection.InspectionTool().Show()
 
         return True
+
+    def _set_app_icon(self):
+        """
+        Set app icon, though for Mac you need to set up a .plist pointing to a .icns file when
+        bundling using pyinstaller
+        Though... somehow the official wxdemo seems to change mac icon running in devel mode?
+        """
+        try:
+            wd = sys._MEIPASS
+        except AttributeError:
+            wd = "."
+        path = os.path.join(wd, APP_ICON_PATH)
+        self.frame.SetIcon(wx.Icon(path))
 
     # def minimized_on_mac_problem(self):
     #     self.frame.Iconize(False) # start up non-minimised when packaged
@@ -1216,7 +1229,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
             await asyncio.sleep(0.5)
 
     async def check_for_updates(self):
-        await asyncio.sleep(15)
+        # await asyncio.sleep(15)
         # print("hanging back even longer from doing a version check...")
         await asyncio.sleep(15)
         url = WEB_VERSION_CHECK_URL_TRACKED_DEVEL if self._running_andy_development_mode() else WEB_VERSION_CHECK_URL_TRACKED

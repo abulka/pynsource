@@ -1,6 +1,10 @@
 {
- "latest_version" : 1.71,
+ "latest_version" : 1.72,
  "latest_announcement" : """
+1.72
+Improved Linux compatibility
+Misc fixes
+
 1.71
 Python 3 parsing support
 PlantUML view

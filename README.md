@@ -1,7 +1,7 @@
 Pynsource
 =========
 
-Version number: Version 1.71
+Version number: Version 1.72
 
 Author: Andy Bulka
 
@@ -14,7 +14,7 @@ Installation / Usage
 --------------------
 
 Ready to go binary apps:
- * [Mac download](http://bit.ly/pynsource-mac-1-71) (just unzip and drag into Applications) 
+ * [Mac download](http://bit.ly/pynsource-mac-1-72) (just unzip and drag into Applications) 
  * Windows _coming soon_
  * Linux _coming soon_
  
