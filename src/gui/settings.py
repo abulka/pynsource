@@ -27,5 +27,5 @@ DEFAULT_CLASS_ATTRS_METHS_FONT_SIZE = 9 if "wxGTK" in wx.PlatformInfo else 10
 DEFAULT_ASCII_UML_FONT_SIZE = 10 if "wxGTK" in wx.PlatformInfo else 14
 
 # APP_ICON_PATH = "/home/andy/.pyenv/versions/3.7.1/lib/python3.7/site-packages/wx/py/Py.ico"
-APP_ICON_PATH = "media/Py22.ico"
+APP_ICON_PATH = "media/pynsource.ico"
 
