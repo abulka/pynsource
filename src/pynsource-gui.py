@@ -37,7 +37,8 @@ import wx
 from gui.settings import PRO_EDITION, ASYNC_BACKGROUND_REFRESH
 from common.printframework import MyPrintout
 from media import images
-from gui.settings import APP_VERSION, DEFAULT_ASCII_UML_FONT_SIZE, APP_ICON_PATH
+from gui.settings import APP_VERSION, APP_ICON_PATH
+from gui.settings_wx import DEFAULT_ASCII_UML_FONT_SIZE
 from generate_code.gen_plantuml import displaymodel_to_plantuml
 from generate_code.gen_plantuml import plant_uml_create_png_and_return_image_url_async
 from common.dialog_dir_path import dialog_path_pyinstaller_push, dialog_path_pyinstaller_pop
