@@ -716,22 +716,23 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
             if "wxMac" in wx.PlatformInfo and name == "&About...":
                 id = wx.ID_ABOUT
 
-            # Experimental stuff re creating menuitem first, setting image on it, then adding to menu
-            # in the hopes that it will make the image in the menu appear.  Fails on GTK/linux.
-            #
-            # item = wx.MenuItem(menu, -1, u"Test")
-            # # img = images.pro.GetBitmap()
-            # img = wx.Bitmap('media/Py22.png')
-            # print("img", img)
-            # item.SetBitmap(img)
-            # menu_item = menu.Append(item)
+            if "wxMSW" in wx.PlatformInfo:
+                # Alternate technique for creating menuitem with image, that works under windows.
+                # Also works on Mac but not Linux because GTK disables images in menu items.
+                # The idea is to create the menuitem first, set the image and THEN add the menu item to the menu.
+                menu_item = wx.MenuItem(menu, id, name, help_string)
+                if image:
+                    menu_item.SetBitmap(image)
+                menu_item = menu.Append(menu_item)
+            else:
+                # Original technique, menu images work ok on mac, but not windows or linux
+                menu_item = menu.Append(id, name, help_string)
+                if image:
+                    menu_item.SetBitmap(image)
 
-            menu_item = menu.Append(id, name, help_string)
             self.Bind(wx.EVT_MENU, func, id=id)
             if func_update:
                 self.Bind(wx.EVT_UPDATE_UI, func_update, id=id)
-            if image:
-                menu_item.SetBitmap(image)
 
             self.next_menu_id = wx.NewIdRef()  # was wx.NewId()
             return menu_item
