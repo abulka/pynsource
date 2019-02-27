@@ -1182,8 +1182,10 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
 
         license = "Community Edition" if unregistered else f"PRO Edition - registered to \"{registered_to}\" thank you for your support."
         info = AboutDialogInfo()
-        if "wxMac" not in wx.PlatformInfo:  # image appears weird on left on mac so don't show
-            info.SetIcon(wx.Icon('media/about.png', wx.BITMAP_TYPE_PNG))
+
+        # image appears on left on all platforms, so make sure the image is small
+        # info.SetIcon(wx.Icon('media/pynsource.png', wx.BITMAP_TYPE_PNG)) # TODO fix path when deployed, disable for now
+
         info.SetName(ABOUT_APPNAME)
         info.SetVersion(str(APP_VERSION))
         info.SetWebSite(WEB_PYNSOURCE_HOME_URL, "Home Page")
