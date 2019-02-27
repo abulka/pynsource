@@ -134,7 +134,6 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str) ->
     try:
         # url = os.path.join(plant_uml_server, deflate_and_encode(plant_uml_txt))  # fails on windows cos \ char is not proper url
         url = plant_uml_server + "/" + deflate_and_encode(plant_uml_txt)
-        print("url is", url)
         data, status_code = await url_to_data(url)
         response_text = data.decode('utf-8')
 
@@ -151,9 +150,9 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str) ->
         log.info("plant_uml_server responded with 200 ok")
         regex = r'.*<p id="diagram".*\s*<.*img src=\"(.*?)\"'
         image_url = re.findall(regex, response_text, re.MULTILINE)
-        with open("response.html", "w") as fp:
-            fp.write(response_text)
-        print("image_url", image_url)
+        # with open("response.html", "w") as fp:
+        #     fp.write(response_text)
+        # print("image_url", image_url)
         if image_url:
             # this is likely referencing localhost due to calc_plantuml_server_url() giving us a localhost
             image_url = image_url[0]

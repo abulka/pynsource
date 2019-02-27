@@ -665,9 +665,13 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         self.Refresh()  # better place for refresh, also fixes problems when bundled and wx.ogl mode
 
-        if 'wxMac' in wx.PlatformInfo:
-            wx.SafeYield()  # Needed on Mac to see result if in a compute loop.
-                            # but causes keychar bind breakage issue in linux
+        if 'wxGTK' not in wx.PlatformInfo:
+            """
+            Needed on Mac to see result if in a compute loop.
+            but causes keychar bind breakage issue in linux
+            Also needed in Windows to stop blurring of lines during layout
+            """
+            wx.SafeYield()
 
     def prepare_zoom_info(self, delta=None):
         if PRO_EDITION:
