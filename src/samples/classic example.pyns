@@ -1,12 +1,12 @@
 # PynSource Version 1.2
 {'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin. Comments are saved.'}
-{'type':'umlshape', 'id':'Editor', 'x':73, 'y':192, 'width':70, 'height':104, 'attrs': 'topHandler|GUI|statechart', 'meths': '__init__|start'}
-{'type':'umlshape', 'id':'TopHandler', 'x':193, 'y':223, 'width':94, 'height':24, 'attrs': '', 'meths': ''}
-{'type':'umlshape', 'id':'GUI', 'x':224, 'y':266, 'width':35, 'height':24, 'attrs': '', 'meths': ''}
-{'type':'umlshape', 'id':'Statechart', 'x':248, 'y':133, 'width':94, 'height':24, 'attrs': '', 'meths': ''}
-{'type':'umlshape', 'id':'D41', 'x':298, 'y':293, 'width':35, 'height':94, 'attrs': 'a|b', 'meths': 'c|d'}
-{'type':'umlshape', 'id':'D26', 'x':389, 'y':253, 'width':35, 'height':94, 'attrs': 'a|b', 'meths': 'c|d'}
-{'type':'umlshape', 'id':'ParentClass', 'x':59, 'y':28, 'width':102, 'height':124, 'attrs': 'attribute 1|attribute 2|attribute 3', 'meths': 'method A|method B|method C|method D'}
+{'type':'umlshape', 'id':'Editor', 'x':45, 'y':204, 'width':90, 'height':138, 'attrs': 'topHandler|GUI|statechart', 'meths': '__init__|start'}
+{'type':'umlshape', 'id':'TopHandler', 'x':193, 'y':223, 'width':110, 'height':28, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'GUI', 'x':224, 'y':266, 'width':40, 'height':28, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'Statechart', 'x':248, 'y':133, 'width':110, 'height':28, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'D41', 'x':298, 'y':293, 'width':40, 'height':122, 'attrs': 'a|b', 'meths': 'c|d'}
+{'type':'umlshape', 'id':'D26', 'x':389, 'y':253, 'width':40, 'height':122, 'attrs': 'a|b', 'meths': 'c|d'}
+{'type':'umlshape', 'id':'ParentClass', 'x':10, 'y':5, 'width':120, 'height':170, 'attrs': 'attribute 1|attribute 2|attribute 3', 'meths': 'method A|method B|method C|method D'}
 {'type':'comment', 'id':'C8543', 'x':476, 'y':43, 'width':200, 'height':100, 'comment': 'aW5pdGlhbCBjb21tZW50'}
 {'type':'comment', 'id':'C3023', 'x':110, 'y':439, 'width':200, 'height':100, 'comment': 'dGhpcyBpcyBhIGNvbW1lbnQKdGhhdCByZWZlcnMgdG8gdHdvCmNsYXNzZXMu'}
 {'type':'edge', 'id':'TopHandler_to_Editor', 'source':'TopHandler', 'target':'Editor', 'uml_edge_type': 'composition'}
