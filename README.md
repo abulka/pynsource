@@ -32,8 +32,9 @@ You need Python 3, then simply:
     $ ./run
 
 Linux Users: To install wxPython, you will need to target a wheel specific to match your version 
-of Linux e.g. for Ubuntu 18.04  
-`pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04 wxPython`. 
+of Linux e.g.  
+`pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04 wxPython`
+for Ubuntu 18.04. 
 See [wxPython installation instructions](https://wiki.wxpython.org/How%20to%20install%20wxPython#Installing_wxPython-Phoenix_using_pip) 
 for more information.
 
