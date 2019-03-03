@@ -13,20 +13,30 @@ Reverse engineer Python source code into UML class diagrams.
 Installation / Usage
 --------------------
 
-Ready to go binary apps:
- * [Mac download](http://bit.ly/pynsource-mac-1-72) (just unzip and drag into Applications) 
- * Windows _coming soon_
- * Linux _coming soon_
- 
-A commercial Pro Edition is also available with extra features like zoom and the ability to drag 
-to connect shapes.
+### Ready to run binary apps ###
 
-To run from source code you need Python 3:
+ * [Mac download](http://bit.ly/pynsource-mac-1-72) (unzip and drag into Applications) 
+ * [Windows 10 download](http://bit.ly/pynsource-win-1-72) (unzip and run the exe - installer coming soon) 
+ * Linux - _snap package coming soon_
+ 
+A commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
+like zoom and the ability to drag to connect shapes.
+
+### To run from source code ###
+
+You need Python 3, then simply:
 
     $ git clone https://github.com/abulka/pynsource.git
     $ cd pynsource
     $ pip install -r requirements.txt
     $ ./run
+
+Linux Users: To install wxPython, you will need to target a wheel specific to match your version 
+of Linux e.g. for Ubuntu 18.04  
+`pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04 wxPython`. 
+See [wxPython installation instructions](https://wiki.wxpython.org/How%20to%20install%20wxPython#Installing_wxPython-Phoenix_using_pip) 
+for more information.
+
 
 Features
 --------
