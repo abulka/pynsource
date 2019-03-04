@@ -7,9 +7,10 @@ not the top left
 
 # Util
 
-from dataclasses import dataclass
+import platform
+if not "Linux" in platform.platform():  # Hard to get Python 3.7 on Linux esp to bundle via snaps
+    from dataclasses import dataclass
 from gui.settings import PRO_EDITION
-
 
 # Traditional useful functions
 
@@ -87,10 +88,17 @@ def percent_change(end, start):
         # print 'There is no change in value.'
         return 0
 
-@dataclass
-class ZoomInfo:
-    scale: float = 1
-    delta: float = None
+if "Linux" in platform.platform():
+    # Probably running under Python 3.6 which doesn't have data classes
+    class ZoomInfo:
+        def __init__(self, scale: float=1, delta: float=None):
+            self.scale = scale
+            self.delta = delta
+else:
+    @dataclass
+    class ZoomInfo:
+        scale: float = 1
+        delta: float = None
 
 if __name__ == "__main__":
     print(percent_change(9, 10))

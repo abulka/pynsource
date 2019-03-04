@@ -15,9 +15,11 @@ Installation / Usage
 
 ### Ready to run binary apps ###
 
- * [Mac download](http://bit.ly/pynsource-mac-1-72) (unzip and drag into Applications) 
+ * [Mac download](http://bit.ly/pynsource-mac-1-72) (unzip and drag app into Applications) 
  * [Windows 10 download](http://bit.ly/pynsource-win-1-72) (unzip and run the exe - installer coming soon) 
- * Linux - _snap package coming soon_
+ * [Ubuntu Linux 18.0.4 download](http://bit.ly/pynsource-ubuntu-18-1-72) (unzip and run the executable) 
+ * [Ubuntu Linux 16.0.4 download](http://bit.ly/pynsource-ubuntu-16-1-72) (unzip and run the executable) 
+ * Linux - _snap package being worked on_
  
 A commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
 like zoom and the ability to drag to connect shapes.

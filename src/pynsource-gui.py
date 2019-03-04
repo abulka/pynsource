@@ -601,7 +601,12 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
 
         # await self._refresh_plantuml_view(force)  # original technique doesn't give us task id
 
-        self.plantuml_refresh_task = asyncio.create_task(self._refresh_plantuml_view(force))
+        if sys.version_info[1] == 6:  # create_task not available in Python 3.6
+            loop = asyncio.get_event_loop()
+            self.plantuml_refresh_task = loop.create_task(self._refresh_plantuml_view(force))
+        else:
+            self.plantuml_refresh_task = asyncio.create_task(self._refresh_plantuml_view(force))
+
         await self.plantuml_refresh_task
 
     async def _refresh_plantuml_view(self, force=False):
