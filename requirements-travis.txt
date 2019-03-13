@@ -1,0 +1,10 @@
+configobj
+requests
+typed_ast==1.1.1
+astpretty
+termcolor
+beautifultable
+appdirs
+pydbg
+aiohttp
+async_lru

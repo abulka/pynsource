@@ -3,7 +3,7 @@ dist: xenial
 language: python
 python: 3.7
 # command to install dependencies
-install: "pip install -r requirements-test.txt"
+install: "pip install -r requirements-travis.txt"
 # command to run tests
 script: sh -c 'cd src && mkdir tests/logs && ./bin/testall'
 
