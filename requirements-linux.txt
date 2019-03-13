@@ -5,6 +5,14 @@ astpretty
 termcolor
 beautifultable
 appdirs
+py2app
+click
+pytest
+coverage
+pytest-cov
+black
 pydbg
 aiohttp
 async_lru
+Pillow
+
