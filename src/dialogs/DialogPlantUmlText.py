@@ -30,7 +30,6 @@ class DialogPlantUmlText ( wx.Dialog ):
 		bSizer13 = wx.BoxSizer( wx.VERTICAL )
 
 		self.txt_plantuml = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		self.txt_plantuml.SetMaxLength( 0 )
 		self.txt_plantuml.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Courier" ) )
 		self.txt_plantuml.Enable( False )
 
