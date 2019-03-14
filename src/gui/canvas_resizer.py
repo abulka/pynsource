@@ -5,6 +5,7 @@ from common.architecture_support import whoscalling2
 import wx
 from typing import List, Set, Dict, Tuple, Optional
 from enum import Enum
+from gui.settings import PRO_EDITION
 
 MIN_SENSIBLE_CANVAS_SIZE = 200
 
