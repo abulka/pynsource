@@ -191,7 +191,8 @@ class CanvasResizer(object):
             oldscrollx, oldscrolly,  # new scroll positions
             noRefresh=True
         )
-        self.canvas.OnSize(evt=None)  # fix for GTK - will create a larger _buffer
+        if not PRO_EDITION:
+            self.canvas.OnSize(evt=None)  # fix for GTK - will create a larger _buffer
 
         # Cache is different to last bounds value - cannot combine these concepts
         self.allshapes_bounds_last = bounds
