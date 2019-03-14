@@ -772,10 +772,14 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         menu1.AppendSeparator()
         Add(menu1, "E&xit", "Alt-X", self.OnButton)
 
-        Add(menu2, "&Add Class...", "Ctrl-1", self.OnInsertClass, self.uml_only_view_update)
+        K_ADD_CLASS = "F3" if "wxGTK" in wx.PlatformInfo else "Ctrl-1"
+        K_ADD_COMMENT = "F4" if "wxGTK" in wx.PlatformInfo else "Ctrl-2"
+        K_ADD_IMAGE = "F5" if "wxGTK" in wx.PlatformInfo else "Ctrl-3"
+
+        Add(menu2, "&Add Class...", K_ADD_CLASS, self.OnInsertClass, self.uml_only_view_update)
         if ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS:
-            Add(menu2, "&Insert Comment...", "Ctrl-2", self.OnInsertComment, self.uml_only_view_update)  # was Shift-I
-            Add(menu2, "&Insert Image...", "Ctrl-3", self.OnInsertImage, self.uml_only_view_update)
+            Add(menu2, "&Insert Comment...", K_ADD_COMMENT, self.OnInsertComment, self.uml_only_view_update)  # was Shift-I
+            Add(menu2, "&Insert Image...", K_ADD_IMAGE, self.OnInsertImage, self.uml_only_view_update)
         menu2.AppendSeparator()
         Add(menu2, "&Duplicate", "Ctrl-D", self.OnDuplicate, self.OnDuplicateNode_update)
         menu2.AppendSeparator()
