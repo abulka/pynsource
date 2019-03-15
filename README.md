@@ -1,7 +1,7 @@
 Pynsource
 =========
 
-Version number: Version 1.72 (Feb 26th 2019)
+Version number: Version 1.73 (March 15th 2019)
 
 Author: Andy Bulka
 
@@ -15,31 +15,27 @@ Installation / Usage
 
 ### Ready to run binary apps ###
 
- * [Mac download](http://bit.ly/pynsource-mac-1-72) (unzip and drag app into Applications) 
- * [Windows 10 download](http://bit.ly/pynsource-win-1-72) (unzip and run the exe - installer coming soon) 
- * [Ubuntu Linux 18.0.4 download](http://bit.ly/pynsource-ubuntu-18-1-72) (unzip and run the executable) 
- * [Ubuntu Linux 16.0.4 download](http://bit.ly/pynsource-ubuntu-16-1-72) (unzip and run the executable) 
+ * [Mac download](http://bit.ly/pynsource-mac-1-73) (unzip and drag app into the Applications directory) 
+ * [Windows 10 download](http://bit.ly/pynsource-win-1-73) (unzip and run the installer) 
+ * [Ubuntu Linux 18.0.4 download](http://bit.ly/pynsource-ubuntu-18-1-73) (unzip and run the executable) 
+ * [Ubuntu Linux 16.0.4 download](http://bit.ly/pynsource-ubuntu-16-1-73) (unzip and run the executable) 
  * Linux - _snap package being worked on_
  
-A commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
+An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
 like zoom and the ability to drag to connect shapes.
 
 ### To run from source code ###
 
-You need Python 3, then simply:
+You need Python 3.6 or later already installed, then simply:
 
     $ git clone https://github.com/abulka/pynsource.git
     $ cd pynsource
     $ pip install -r requirements.txt
     $ ./run
 
-Linux Users: To install wxPython, you will need to target a wheel specific to match your version 
-of Linux e.g.  
-`pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04 wxPython`
-for Ubuntu 18.04. 
-See [wxPython installation instructions](https://wiki.wxpython.org/How%20to%20install%20wxPython#Installing_wxPython-Phoenix_using_pip) 
-for more information.
-
+Linux Users: Please use the script `bin/install-linux` to pip install needed dependencies,
+including a wxPython wheel specific to Ubuntu 18. Edit the script to change to your version 
+number of Ubuntu. Or simply use the prebuilt binaries executables! 
 
 Features
 --------
