@@ -2,11 +2,12 @@
  "latest_version" : 1.73,
  "latest_announcement" : """
 1.73
-Misc bug fixes
+Windows/Linux fixed select object refresh bug
+  (you had to click twice to select an object)
 Major Linux bug fixes: 
-  refresh bug fixed, 
-  fixed hotkeys, 
-  fixed select refresh bug
+  scrolled area refresh bug fixed
+  fixed insert class and comment hotkeys
+Misc bug fixes
 
 1.72
 Improved Linux compatibility

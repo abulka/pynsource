@@ -26,7 +26,7 @@ like zoom and the ability to drag to connect shapes.
 
 ### To run from source code ###
 
-You need Python 3.6 or later already installed, then simply:
+You need Python 3.6 or later already installed, and pip3, then simply:
 
     $ git clone https://github.com/abulka/pynsource.git
     $ cd pynsource
