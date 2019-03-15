@@ -23,6 +23,7 @@ from common.url_to_data import url_to_data
 
 ALLOW_DRAWING = True
 DEFAULT_IMAGE_SIZE = (21, 21)  # used to be 2000, 2000 for some reason
+BMP_EXTRA_MARGIN = 20  # margin for plantuml images to allow scrolling them fully into view
 
 unregistered = not PRO_EDITION
 
@@ -164,6 +165,7 @@ class ImageViewer(wx.ScrolledWindow):
         #     return
 
         self.maxWidth, self.maxHeight = bmp.GetWidth(), bmp.GetHeight()
+        self.maxHeight += BMP_EXTRA_MARGIN  # stop bitmaps getting slightly clipped
 
         # dbg(bmp)
         # ANDY bmp.HasAlpha() does not work, since wx.Image has this method but wx.Bitmap
