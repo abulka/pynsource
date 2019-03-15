@@ -1,6 +1,14 @@
 {
- "latest_version" : 1.72,
+ "latest_version" : 1.73,
  "latest_announcement" : """
+1.73
+Windows/Linux fixed select object refresh bug
+  (you had to click twice to select an object)
+Major Linux bug fixes: 
+  scrolled area refresh bug fixed
+  fixed insert class and comment hotkeys
+Misc bug fixes
+
 1.72
 Improved Linux compatibility
 Misc fixes
@@ -12,7 +20,7 @@ Print and Print preview fixes
 Pro edition with faster performance, zoom, drag and drop to connect shapes
 """,
  "version_syntax_format" : 1,
- "download_url" : "http://pynsource.com/download.html"
+ "download_url" : "http://bit.ly/pynsource-upgrade-download"
 }
 
 # Upload this file to
