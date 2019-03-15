@@ -15,10 +15,10 @@ Installation / Usage
 
 ### Ready to run binary apps ###
 
- * [Mac download](http://bit.ly/pynsource-mac-1-72) (unzip and drag app into the Applications directory) 
- * [Windows 10 download](http://bit.ly/pynsource-win-1-72) (unzip and run the installer) 
- * [Ubuntu Linux 18.0.4 download](http://bit.ly/pynsource-ubuntu-18-1-72) (unzip and run the executable) 
- * [Ubuntu Linux 16.0.4 download](http://bit.ly/pynsource-ubuntu-16-1-72) (unzip and run the executable) 
+ * [Mac download](http://bit.ly/pynsource-mac-1-73) (unzip and drag app into the Applications directory) 
+ * [Windows 10 download](http://bit.ly/pynsource-win-1-73) (unzip and run the installer) 
+ * [Ubuntu Linux 18.0.4 download](http://bit.ly/pynsource-ubuntu-18-1-73) (unzip and run the executable) 
+ * [Ubuntu Linux 16.0.4 download](http://bit.ly/pynsource-ubuntu-16-1-73) (unzip and run the executable) 
  * Linux - _snap package being worked on_
  
 An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
