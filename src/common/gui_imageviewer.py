@@ -130,7 +130,7 @@ class ImageViewer(wx.ScrolledWindow):
         try:
             self.Refresh()
             wx.SafeYield()  # Needed to "breathe" and refresh the UI
-            print("warning use of safe yield in image viewer")
+            # print("warning use of safe yield in image viewer")
         except RuntimeError:
             pass  # avoid error when shutting down tasks
 

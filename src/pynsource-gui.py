@@ -113,7 +113,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         Its supposed to be true by default, however it is actually false by default on windows!.  Cannot turn off on Mac.
         """
         self.frame.SetDoubleBuffered(True)
-        print(self.frame.IsDoubleBuffered())
+        # print(self.frame.IsDoubleBuffered())
 
         # ANDY HACK SECTION - STOP BUILDING THE REST OF THE UI AND SHOW THE FRAME NOW!
         # self.frame.SetPosition((40, 40))

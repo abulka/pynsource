@@ -1,6 +1,13 @@
 {
- "latest_version" : 1.72,
+ "latest_version" : 1.73,
  "latest_announcement" : """
+1.73
+Misc bug fixes
+Major Linux bug fixes: 
+  refresh bug fixed, 
+  fixed hotkeys, 
+  fixed select refresh bug
+
 1.72
 Improved Linux compatibility
 Misc fixes
@@ -12,7 +19,7 @@ Print and Print preview fixes
 Pro edition with faster performance, zoom, drag and drop to connect shapes
 """,
  "version_syntax_format" : 1,
- "download_url" : "http://pynsource.com/download.html"
+ "download_url" : "http://bit.ly/pynsource-upgrade-download"
 }
 
 # Upload this file to
