@@ -1,0 +1,100 @@
+name: rubber-band-async # you probably want to 'snapcraft register <name>'
+version: git # just for humans, typically '1.2+git' or '1.3.2'
+summary: Rubberband wxPython app with wxasync clock # 79 char long summary
+description: |
+  Rubberband wxPython app with wxasync clock
+
+  To build this snap:
+    snapcraft
+  If you get trouble
+    snapcraft clean
+
+  Tip: since specifying parts or a step name is not yet supported (as of March 2019) these won't work:
+    snapcraft clean rubber-band-async -s pull
+    snapcraft clean rubber-band-async
+
+  Install the snap locally
+    sudo snap install --devmode --dangerous *.snap
+    snap list
+
+  Run
+    rubber-band-async -h
+
+  Ignore the warnings Gtk-Message: Failed to load module "canberra-gtk-module"
+  as these seem to happen to all snaps?
+
+  Publish
+    snapcraft login (use ubuntu one auth)
+    snapcraft register rubber-band-async
+    snapcraft push --release=stable rubber-band-async_0.6_amd64.snap <--- stable release (hard to do)
+
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
+base: core18
+
+apps:
+    rubber-band-async:
+        command: desktop-launch python3 $SNAP/usr/bin/testsnap.py
+        plugs: [x11, unity7, pulseaudio, home, gsettings, network]
+        environment:
+            LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
+
+parts:
+  desktop-gtk3:
+    build-packages:
+    - build-essential
+    - libgtk-3-dev
+    make-parameters:
+    - FLAVOR=gtk3
+    plugin: make
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: gtk
+    stage-packages:
+    - libxkbcommon0
+    - ttf-ubuntu-font-family
+    - dmz-cursor-theme
+    - light-themes
+    - adwaita-icon-theme
+    - gnome-themes-standard
+    - shared-mime-info
+    - libgtk-3-0
+    - libgdk-pixbuf2.0-0
+    - libglib2.0-bin
+    - libgtk-3-bin
+    - unity-gtk3-module
+    - libappindicator3-1
+    - locales-all
+    - xdg-user-dirs
+    - ibus-gtk3
+    - libibus-1.0-5
+    - fcitx-frontend-gtk3
+  rubber-band-async:
+    # See 'snapcraft plugins'
+    plugin: python
+    python-version: python3
+    source: .
+    stage-packages:
+        # - libc6
+        - libssl-dev
+        - libjpeg-dev
+        - libtiff-dev
+        - libsdl1.2-dev
+        - libnotify-dev
+        - freeglut3
+        - ibus-gtk3
+        - libwebkitgtk-3.0-0
+        - zlib1g
+        - libsm6
+        - libpulse0
+        - libslang2
+    #after: [desktop-gtk3]
+    python-packages:
+        #- https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04/wxPython-4.0.4-cp37-cp37m-linux_x86_64.whl
+        - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04/wxPython-4.0.4-cp36-cp36m-linux_x86_64.whl
+    #requirements:
+    #    - /root/project/requirements-linux.txt
+    override-build: |
+        snapcraftctl build
+        cp $SNAPCRAFT_PART_SRC/rubber-band-async.py $SNAPCRAFT_PART_INSTALL/usr/bin/
+        chmod +x $SNAPCRAFT_PART_INSTALL/usr/bin/rubber-band-async.py
