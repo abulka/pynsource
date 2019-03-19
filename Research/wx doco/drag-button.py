@@ -5,6 +5,8 @@ d = {}
 AUTHOR_MODE = True
 selected = None
 button1 = button2 = None
+working = False  # for keys
+
 
 class Meta:
     """
@@ -102,12 +104,14 @@ def on_panel_paint(event):
                 dc.DrawRectangle(bounds1)
 
 def check_mode_do_wiring():
-    global button1, button2
+    global button1, button2, box_tools
     if AUTHOR_MODE:
         print("Author mode enabled")
 
         if button1:
             bind_all()
+        box_tools.ShowItems(show=True)
+        # box_tools.Show()
     else:
         print("Author mode disabled")
         if button1:
@@ -116,10 +120,42 @@ def check_mode_do_wiring():
             # Bind to run code
             button1.Bind(wx.EVT_LEFT_UP, RunCode)
             button2.Bind(wx.EVT_LEFT_UP, RunCode)
+        box_tools.ShowItems(show=False)
+        # box_tools.Hide()
+        frame.SetStatusText("Run mode: Hit ESC to get back to Author mode")
+
+    m_checkBox1.SetValue(AUTHOR_MODE)
 
     # panel.Refresh(eraseBackground=True)
     panel.Refresh(eraseBackground=False)
     print(f"button1={button1}, button2={button2}")
+
+def onKeyPress(event):
+    global AUTHOR_MODE, working, frame
+
+    keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
+    print(keycode)
+
+    if working:
+        event.Skip()
+        return
+    working = True
+
+    if keycode == wx.WXK_ESCAPE:
+        frame.SetStatusText("ESC key detected: Back to Author mode")
+        if not AUTHOR_MODE:
+            AUTHOR_MODE = True
+            check_mode_do_wiring()
+    #
+    # if keycode == wx.WXK_RIGHT:
+    #     self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
+    #
+    elif keycode == wx.WXK_F3:
+        AUTHOR_MODE = not AUTHOR_MODE
+        check_mode_do_wiring()
+
+    working = False
+    event.Skip()
 
 def bind_all():
     global button1, button2
@@ -160,6 +196,14 @@ def clear_page(event):
 
 def add_widgets(event):
     global button1, button2
+    if button1 == None and button2 == None:
+        _add_widgets(None)
+        bind_all()
+    else:
+        print("Already have buttons on page!!")
+
+def _add_widgets(event):
+    global button1, button2
     global box, properties, panel
 
     button1 = wx.Button(panel, -1, "foo")
@@ -184,13 +228,13 @@ def add_widgets(event):
     m.fill = ["GREEN"]
 
     panel.Layout()
-    # bind_all()
 
 
 ######
 
 
 frame = wx.Frame(None, -1, 'Pytoolbook')
+frame.CreateStatusBar()
 panel = wx.Panel(frame)
 box = wx.BoxSizer(wx.VERTICAL)
 box_tools = wx.BoxSizer(wx.HORIZONTAL)
@@ -209,7 +253,7 @@ box.Add(box_tools, 0, wx.ALL)
 
 
 
-add_widgets(event=None)
+_add_widgets(event=None)
 
 
 
@@ -219,8 +263,7 @@ check_mode_do_wiring()
 
 panel.Bind(wx.EVT_MOTION, MouseMove)
 panel.Bind(wx.EVT_LEFT_UP, MouseUp)
-
-
+panel.Bind(wx.EVT_KEY_DOWN, onKeyPress)
 
 #####
 
@@ -340,8 +383,8 @@ class AttributeEditor(wx.Frame):
 
 # Connect Events
 m_checkBox1.Bind(wx.EVT_CHECKBOX, author_mode_click)
-button_clear.Bind(wx.EVT_LEFT_DOWN, clear_page)
-button_add_buttons.Bind(wx.EVT_LEFT_DOWN, add_widgets)
+button_clear.Bind(wx.EVT_LEFT_UP, clear_page)
+button_add_buttons.Bind(wx.EVT_LEFT_UP, add_widgets)
 
 panel.SetSizer(box)
 panel.Layout()
