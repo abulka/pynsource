@@ -35,36 +35,30 @@ base: core18
 
 apps:
     rubber-band-async:
-        command: desktop-launch python3 $SNAP/usr/bin/rubber_band_async.py
+        command: desktop-launch python3 $SNAP/rubber_band_async.py
         plugs: [x11, unity7, pulseaudio, home, gsettings, network]
         environment:
             LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
 
-    rubber-band-async-old:
-        command: desktop-launch python3 $SNAP/usr/bin/rubber_band_async.py
-        plugs: [x11, unity7, pulseaudio, home, gsettings, network]
-        environment:
-            LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
-    rubber0:
-        command: desktop-launch python3 $SNAP/usr/bin/rubber_band_async.py
-        plugs: [x11, unity7, pulseaudio, home, gsettings, network]
-        environment:
-            LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
-            PATH: $PATH:$SNAP/bin/
-            PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
-    rubber1:
-        command: python3 bin/testsnap.py
-    rubber2:
-        command: desktop-launch python3 $SNAP/bin/rubber_band_async.py
-    rubber3:
-        command: desktop-launch python3 $SNAP/bin/rubber_band_async.py
-        environment:
-          PATH: $PATH:$SNAP/bin/
-          PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
-    rubber4:
-        command: python3 usr/bin/report_snap_env.py
-    rubber5:
-        command: python3 usr/bin/report_snap_env.py
+    #Failed to generate snap metadata: The specified command '$SNAP/usr/bin/python -vvv' defined in the app {'command': '$SNAP/usr/bin/python -vvv'} does not exist or is not executable.
+    #Ensure that '$SNAP/usr/bin/python -vvv' is relative to the prime directory.
+    #
+    #python:
+    #    command: $SNAP/usr/bin/python -vvv
+    #python3:
+    #    command: $SNAP/usr/bin/python3 -vvv
+
+    # The specified command 'python' defined in the app 'python-nopath' does not exist or is not executable.
+    #
+    # python-nopath:
+    #    command: python -vvv
+
+    python3-nopath:
+        command: python3 -vvv
+    report:
+        command: python3 $SNAP/report_snap_env.py
+    report-hack:
+        command: python3 $SNAP/report_snap_env.py
         environment:
           PATH: $PATH:$SNAP/bin/
           PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
@@ -126,9 +120,3 @@ parts:
         - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04/wxPython-4.0.4-cp36-cp36m-linux_x86_64.whl
     requirements:
         - /root/project/requirements-linux.txt
-    override-build: |
-        snapcraftctl build
-        cp $SNAPCRAFT_PART_SRC/rubber_band_async.py $SNAPCRAFT_PART_INSTALL/usr/bin/
-        chmod +x $SNAPCRAFT_PART_INSTALL/usr/bin/rubber_band_async.py
-        cp $SNAPCRAFT_PART_SRC/report_snap_env.py $SNAPCRAFT_PART_INSTALL/usr/bin/
-        chmod +x $SNAPCRAFT_PART_INSTALL/usr/bin/report_snap_env.py
