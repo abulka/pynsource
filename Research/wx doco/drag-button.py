@@ -2,28 +2,46 @@ import wx
 
 app = wx.App(False)
 d = {}
-properties = {}
 AUTHOR_MODE = True
 selected = None
+button1 = button2 = None
 
-class HypercardProperty:
+class Meta:
+    """
+    Allows AttributeEditor to edit specified properties
+    of the Shape
+    """
     def __init__(self):
-        self.code = ""
-        self.props = {}
+        self.attributes = []
 
-def wMouseDown(e):
-    print("!!!", e.GetEventObject())
+    def AddAttribute(self, name):
+        self.attributes.append(name)
 
-def MouseDown(e):
+    def AddAttributes(self, atts):
+        self.attributes.extend(atts)
+
+    def RemoveAttribute(self, name):
+        self.attributes.remove(name)
+
+# def wMouseDown(e):
+#     print("!!!", e.GetEventObject())
+
+def MouseDown(event):
+    print("MouseDown")
     global selected
-    o           = e.GetEventObject()
-    sx,sy       = panel.ScreenToClient(o.GetPosition())
-    dx,dy       = panel.ScreenToClient(wx.GetMousePosition())
-    o._x,o._y   = (sx-dx, sy-dy)
-    d['d'] = o
+    o = event.GetEventObject()
     selected = o
-    panel.Refresh()
-    print(d)
+
+    if selected and event and event.ShiftDown():
+        f = AttributeEditor(None, -1, "props", selected)
+        f.Show(True)
+    else:
+        sx, sy = panel.ScreenToClient(o.GetPosition())
+        dx, dy = panel.ScreenToClient(wx.GetMousePosition())
+        o._x, o._y = (sx - dx, sy - dy)
+        d['d'] = o
+        panel.Refresh()
+
 
 def MouseMove(e):
     try:
@@ -51,14 +69,16 @@ def author_mode_click(event):
     # print("checkbox state is", event.GetEventObject(), event.GetEventObject().IsChecked())
     global AUTHOR_MODE
     AUTHOR_MODE = event.GetEventObject().IsChecked()
-    mode_switch()
+    check_mode_do_wiring()
     event.Skip()
 
 def RunCode(event):
     print("running code")
     obj = event.GetEventObject()
-    code = properties[obj].code
-    eval(code)
+    
+    # eval(code)
+    exec(str(obj.meta.code))
+
 
 def on_panel_paint(event):
     # print(f"on panel paint, AUTHOR_MODE {AUTHOR_MODE}, selected={selected}")
@@ -81,7 +101,8 @@ def on_panel_paint(event):
                 # dc.DrawRectangle(130, 15, 90, 60)
                 dc.DrawRectangle(bounds1)
 
-def mode_switch():
+def check_mode_do_wiring():
+    global button1, button2
     if AUTHOR_MODE:
         print("Author mode enabled")
 
@@ -98,9 +119,11 @@ def mode_switch():
 
     # panel.Refresh(eraseBackground=True)
     panel.Refresh(eraseBackground=False)
+    print(f"button1={button1}, button2={button2}")
 
 def bind_all():
     global button1, button2
+    print("bind_all", button1, button2)
     button1.Bind(wx.EVT_LEFT_DOWN, MouseDown)
     button2.Bind(wx.EVT_LEFT_DOWN, MouseDown)
 
@@ -112,6 +135,7 @@ def bind_all():
 
 def unbind_all():
     global button1, button2
+    print("unbind_all", button1, button2)
     button1.Unbind(wx.EVT_LEFT_DOWN)
     button2.Unbind(wx.EVT_LEFT_DOWN)
 
@@ -131,8 +155,40 @@ def clear_page(event):
     button2.Destroy()
     button1 = None
     button2 = None
-    properties = {}
     panel.Refresh(eraseBackground=False)
+
+
+def add_widgets(event):
+    global button1, button2
+    global box, properties, panel
+
+    button1 = wx.Button(panel, -1, "foo")
+    box.Add(button1, 0, wx.ALL, 10)
+    button2 = wx.Button(panel, -1, "bar")
+    box.Add(button2, 0, wx.ALL, 10)
+
+    m = button1.meta = Meta()
+    m.AddAttributes(["label", "pen", "fill"])
+    m.AddAttribute("code")
+    m.code = "print('hi there')"
+    m.label = "Code"
+    m.pen = ["BLACK", 2]
+    m.fill = ["GREEN"]
+
+    m = button2.meta = Meta()
+    m.AddAttributes(["label", "pen", "fill"])
+    m.AddAttribute("code")
+    m.code = r'wx.MessageBox(f"Hi from a button click")'
+    m.label = "Code ha ha"
+    m.pen = ["RED", 5]
+    m.fill = ["GREEN"]
+
+    panel.Layout()
+    # bind_all()
+
+
+######
+
 
 frame = wx.Frame(None, -1, 'Pytoolbook')
 panel = wx.Panel(frame)
@@ -151,44 +207,136 @@ box_tools.Add(button_add_buttons, 0, wx.ALL)
 
 box.Add(box_tools, 0, wx.ALL)
 
-button1 = wx.Button(panel, -1, "foo")
-box.Add(button1, 0, wx.ALL, 10)
-button2 = wx.Button(panel, -1, "bar")
-box.Add(button2, 0, wx.ALL, 10)
 
-properties[button1] = HypercardProperty()
-properties[button2] = HypercardProperty()
 
-properties[button1].code = "print('hi there')"
-# properties[button2].code = r'wx.MessageBox(f"Hi from a button click {button.GetLabel()}")'
-properties[button2].code = r'wx.MessageBox(f"Hi from a button click")'
+add_widgets(event=None)
+
+
 
 panel.Bind(wx.EVT_PAINT, on_panel_paint)
 
-mode_switch()
+check_mode_do_wiring()
 
 panel.Bind(wx.EVT_MOTION, MouseMove)
 panel.Bind(wx.EVT_LEFT_UP, MouseUp)
 
 
-def add_widgets(event):
-    print("adding widgets")
-    global button1, button2
-    global box, properties, panel
 
-    button1 = wx.Button(panel, -1, "foo")
-    box.Add(button1, 0, wx.ALL, 10)
-    button2 = wx.Button(panel, -1, "bar")
-    box.Add(button2, 0, wx.ALL, 10)
+#####
 
-    properties[button1] = HypercardProperty()
-    properties[button2] = HypercardProperty()
+from ast import literal_eval
 
-    properties[button1].code = "print('hi there')"
-    # properties[button2].code = r'wx.MessageBox(f"Hi from a button click {button.GetLabel()}")'
-    properties[button2].code = r'wx.MessageBox(f"Hi from a button click")'
-    panel.Layout()
-    bind_all()
+
+def get_type(input_data):
+    """
+    Guess type of input string
+
+    print(get_type("1"))        # <class 'int'>
+    print(get_type("1.2354"))   # <class 'float'>
+    print(get_type("True"))     # <class 'bool'>
+    print(get_type("abcd"))     # <class 'str'>
+
+    See https://stackoverflow.com/questions/22199741/identifying-the-data-type-of-an-input
+
+    Args:
+        input_data: str
+
+    Returns: type class
+    """
+    try:
+        return type(literal_eval(input_data))
+    except (ValueError, SyntaxError):
+        # A string, so return str
+        return str
+
+class AttributeEditor(wx.Frame):
+    def __init__(self, parent, ID, title, item):
+        print(f"attribute editor invoked on {item}, has attribute obj {item.meta}")
+
+        """Edits properties of 'item' as defined by the list of properties in item.attributes"""
+        wx.Frame.__init__(self, parent, ID, title, wx.DefaultPosition, wx.Size(200, 450))
+        self.item = item  # type wx.Button, not Block
+
+        # Create a box sizer for self
+        box = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(box)
+
+        tID = wx.NewIdRef()  # was wx.NewId()
+        self.list = wx.ListCtrl(self, tID, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT)
+        self.SetSize(self.GetSize())
+
+        self.list.InsertColumn(0, "Attribute")
+        self.list.InsertColumn(1, "Value")
+
+        self.accept = wx.Button(self, wx.ID_ANY, "Apply", size=(40, 20))
+
+        for c in range(len(item.meta.attributes)):
+            self.list.InsertItem(c, "")  # insert the list control item
+            self.list.SetItem(c, 0, str(item.meta.attributes[c]))  # set the list control item's 0 col
+
+            # set the list control item's 1 col to actual value of the attribute, converted into
+            # a string for display purposes
+            temp = str(eval("item.meta." + str(item.meta.attributes[c])))
+            self.list.SetItem(c, 1, temp)
+
+        # This is the area we edit in - first select the attribute and then edit in here
+        self.text = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE)
+        self.text.SetBackgroundColour((255, 255, 230))  # set text back color
+
+        # Close button
+        button = wx.Button(self, label="Close")
+
+        # The layout
+        box.Add(self.list, 1, wx.EXPAND)
+        box.Add(self.text, 1, wx.EXPAND)
+        box.Add(self.accept, 0, wx.EXPAND)
+        box.Add(button, 0, wx.EXPAND)
+
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.selectProp, self.list, tID)
+        self.Bind(wx.EVT_BUTTON, self.acceptProp, self.accept, self.accept.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, button)
+        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
+
+        self.accept.Disable()
+
+        # CMD-W to close Frame by attaching the key bind event to accellerator table
+        randomId = wx.NewIdRef()  # was wx.NewId()
+        self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=randomId)
+        accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord("W"), randomId)])
+        self.SetAcceleratorTable(accel_tbl)
+
+    def OnCloseMe(self, event):
+        self.Close(True)
+
+    def OnCloseWindow(self, event):
+        self.Destroy()
+
+    def selectProp(self, event):
+        """When you click on an item in the list control, populate the edit text area with its content"""
+        idx = self.list.GetFocusedItem()
+        prop = self.list.GetItem(idx, 0).GetText()
+        val = self.list.GetItem(idx, 1).GetText()
+        self.text.Clear()
+        self.text.WriteText(val)
+
+        self.accept.Enable()
+
+    def acceptProp(self, event):
+        """Write the edited value back into the property"""
+        idx = self.list.GetFocusedItem()
+        print(idx)
+        prop = self.list.GetItem(idx, 0).GetText()  # calc property name
+
+        if get_type(self.text.GetValue()) == str or self.text.GetNumberOfLines() > 1:
+            val = self.text.GetValue()  # string
+        else:
+            val = eval(self.text.GetValue())  # convert string back into Python data e.g int or list
+        setattr(self.item.meta, prop, val)
+
+        self.list.SetItem(idx, 1, str(getattr(self.item.meta, prop)))
+
+
+
 
 # Connect Events
 m_checkBox1.Bind(wx.EVT_CHECKBOX, author_mode_click)
