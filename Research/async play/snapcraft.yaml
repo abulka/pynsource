@@ -1,5 +1,5 @@
 name: rubber-band-async # you probably want to 'snapcraft register <name>'
-version: git # just for humans, typically '1.2+git' or '1.3.2'
+version: '0.1' # just for humans, typically '1.2+git' or '1.3.2'
 summary: Rubberband wxPython app with wxasync clock # 79 char long summary
 description: |
   Rubberband wxPython app with wxasync clock
@@ -35,10 +35,39 @@ base: core18
 
 apps:
     rubber-band-async:
-        command: desktop-launch python3 $SNAP/usr/bin/testsnap.py
+        command: desktop-launch python3 $SNAP/usr/bin/rubber_band_async.py
         plugs: [x11, unity7, pulseaudio, home, gsettings, network]
         environment:
             LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
+
+    rubber-band-async-old:
+        command: desktop-launch python3 $SNAP/usr/bin/rubber_band_async.py
+        plugs: [x11, unity7, pulseaudio, home, gsettings, network]
+        environment:
+            LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
+    rubber0:
+        command: desktop-launch python3 $SNAP/usr/bin/rubber_band_async.py
+        plugs: [x11, unity7, pulseaudio, home, gsettings, network]
+        environment:
+            LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
+            PATH: $PATH:$SNAP/bin/
+            PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
+    rubber1:
+        command: python3 bin/testsnap.py
+    rubber2:
+        command: desktop-launch python3 $SNAP/bin/rubber_band_async.py
+    rubber3:
+        command: desktop-launch python3 $SNAP/bin/rubber_band_async.py
+        environment:
+          PATH: $PATH:$SNAP/bin/
+          PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
+    rubber4:
+        command: python3 usr/bin/report_snap_env.py
+    rubber5:
+        command: python3 usr/bin/report_snap_env.py
+        environment:
+          PATH: $PATH:$SNAP/bin/
+          PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
 
 parts:
   desktop-gtk3:
@@ -69,6 +98,9 @@ parts:
     - ibus-gtk3
     - libibus-1.0-5
     - fcitx-frontend-gtk3
+  copy-stuff:
+    plugin: dump
+    source: .
   rubber-band-async:
     # See 'snapcraft plugins'
     plugin: python
@@ -92,9 +124,11 @@ parts:
     python-packages:
         #- https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04/wxPython-4.0.4-cp37-cp37m-linux_x86_64.whl
         - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04/wxPython-4.0.4-cp36-cp36m-linux_x86_64.whl
-    #requirements:
-    #    - /root/project/requirements-linux.txt
+    requirements:
+        - /root/project/requirements-linux.txt
     override-build: |
         snapcraftctl build
-        cp $SNAPCRAFT_PART_SRC/rubber-band-async.py $SNAPCRAFT_PART_INSTALL/usr/bin/
-        chmod +x $SNAPCRAFT_PART_INSTALL/usr/bin/rubber-band-async.py
+        cp $SNAPCRAFT_PART_SRC/rubber_band_async.py $SNAPCRAFT_PART_INSTALL/usr/bin/
+        chmod +x $SNAPCRAFT_PART_INSTALL/usr/bin/rubber_band_async.py
+        cp $SNAPCRAFT_PART_SRC/report_snap_env.py $SNAPCRAFT_PART_INSTALL/usr/bin/
+        chmod +x $SNAPCRAFT_PART_INSTALL/usr/bin/report_snap_env.py
