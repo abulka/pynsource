@@ -62,7 +62,7 @@ def dialog_path_pyinstaller_push(frame: wx.Frame = None):
     dir = os.path.join(wd, dialogs_dir)
     # dir = os.path.join(wd)
     # dir = os.path.join(wd, dialogs_dir, "help-images")
-    _display_dir(dir, frame)
+    # _display_dir(dir, frame)
 
     # Change the current directory, so that the html window sees image resources etc
     fs = wx.FileSystem()
