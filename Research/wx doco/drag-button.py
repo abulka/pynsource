@@ -1,4 +1,5 @@
 import wx
+import wx.stc as stc
 from textwrap import dedent
 
 app = wx.App(False)
@@ -317,6 +318,9 @@ def get_type(input_data):
         # A string, so return str
         return str
 
+SYNTAX_HIGHLIGHTING = True
+from syntax_highlighting import PythonSTC
+
 class AttributeEditor(wx.Frame):
     def __init__(self, parent, ID, title, item):
         print(f"attribute editor invoked on {item}, has attribute obj {item.meta}")
@@ -347,16 +351,42 @@ class AttributeEditor(wx.Frame):
             temp = str(eval("item.meta." + str(item.meta.attributes[c])))
             self.list.SetItem(c, 1, temp)
 
-        # This is the area we edit in - first select the attribute and then edit in here
-        self.text = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE)
-        self.text.SetBackgroundColour((255, 255, 230))  # set text back color
+        if SYNTAX_HIGHLIGHTING:
+            p = wx.Panel(self, -1, style=wx.NO_FULL_REPAINT_ON_RESIZE)
+            ed = PythonSTC(p, -1)
+            s = wx.BoxSizer(wx.HORIZONTAL)
+            s.Add(ed, 1, wx.EXPAND)
+            p.SetSizer(s)
+            p.SetAutoLayout(True)
+
+            # ed.SetText(demoText + open('syntax-highlighting.py').read())
+            # ed.SetText(open('/Users/Andy/Devel/pynsource/src/pynsource-gui.py').read())
+            ed.EmptyUndoBuffer()
+            ed.Colourise(0, -1)
+
+            # line numbers in the margin
+            ed.SetMarginType(1, stc.STC_MARGIN_NUMBER)
+            ed.SetMarginWidth(1, 25)
+
+            ed.SetUseTabs(False)  # use spaces to indent
+            ed.SetTabWidth(4)
+
+            self.text = ed
+            self.p = p
+        else:
+            # This is the area we edit in - first select the attribute and then edit in here
+            self.text = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE)
+            self.text.SetBackgroundColour((255, 255, 230))  # set text back color
 
         # Close button
         button = wx.Button(self, label="Close")
 
         # The layout
         box.Add(self.list, 1, wx.EXPAND)
-        box.Add(self.text, 1, wx.EXPAND)
+        if SYNTAX_HIGHLIGHTING:
+            box.Add(self.p, 3, wx.EXPAND)
+        else:
+            box.Add(self.text, 1, wx.EXPAND)
         box.Add(self.accept, 0, wx.EXPAND)
         box.Add(button, 0, wx.EXPAND)
 
@@ -384,8 +414,11 @@ class AttributeEditor(wx.Frame):
         idx = self.list.GetFocusedItem()
         prop = self.list.GetItem(idx, 0).GetText()
         val = self.list.GetItem(idx, 1).GetText()
-        self.text.Clear()
-        self.text.WriteText(val)
+        if SYNTAX_HIGHLIGHTING:
+            self.text.SetText(val)
+        else:
+            self.text.Clear()
+            self.text.WriteText(val)
 
         self.accept.Enable()
 
@@ -395,10 +428,17 @@ class AttributeEditor(wx.Frame):
         print(idx)
         prop = self.list.GetItem(idx, 0).GetText()  # calc property name
 
-        if get_type(self.text.GetValue()) == str or self.text.GetNumberOfLines() > 1:
-            val = self.text.GetValue()  # string
+        if SYNTAX_HIGHLIGHTING:
+            if get_type(self.text.GetText()) == str or self.text.GetNumberOfLines() > 1:
+                val = self.text.GetText()  # string
+            else:
+                val = eval(self.text.GetText())  # convert string back into Python data e.g int or list
         else:
-            val = eval(self.text.GetValue())  # convert string back into Python data e.g int or list
+            if get_type(self.text.GetValue()) == str or self.text.GetNumberOfLines() > 1:
+                val = self.text.GetValue()  # string
+            else:
+                val = eval(self.text.GetValue())  # convert string back into Python data e.g int or list
+
         setattr(self.item.meta, prop, val)
 
         self.list.SetItem(idx, 1, str(getattr(self.item.meta, prop)))
