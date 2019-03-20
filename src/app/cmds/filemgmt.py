@@ -199,6 +199,14 @@ class CmdFileSaveWorkspace(CmdBase):
             self.context.config.write()
 
             filename = dlg.GetPath()
+
+            # Split the extension from the path and normalise it to lowercase.
+            ext = os.path.splitext(filename)[-1].lower()
+            if ext != ".pyns":
+                print("correcting filename cos it has no extension", filename)
+                filename += ".pyns"
+                print(filename)
+                
             self.context.wxapp.filehistory.AddFileToHistory(filename)  # remember file
 
             fp = open(filename, "w")
