@@ -41,7 +41,7 @@ from gui.settings import APP_VERSION, APP_ICON_PATH
 from gui.settings_wx import DEFAULT_ASCII_UML_FONT_SIZE
 from generate_code.gen_plantuml import displaymodel_to_plantuml
 from generate_code.gen_plantuml import plant_uml_create_png_and_return_image_url_async
-from common.dialog_dir_path import dialog_path_pyinstaller_push, dialog_path_pyinstaller_pop
+from common.dialog_dir_path import dialog_path_pyinstaller_push, dialog_path_pyinstaller_pop, set_original_working_dir
 from configobj import ConfigObj  # pip install configobj
 from appdirs import AppDirs  # pip install appdirs
 from wxasync import AsyncBind, WxAsyncApp, StartCoroutine
@@ -377,7 +377,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         try:
             wd = sys._MEIPASS
         except AttributeError:
-            wd = "."
+            wd = os.path.dirname(os.path.realpath(__file__))  # "."
         path = os.path.join(wd, APP_ICON_PATH)
         self.frame.SetIcon(wx.Icon(path))
 
@@ -387,17 +387,15 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         """
         cwd_info = {}
 
-        cwd_info['cwd'] = os.getcwd()
+        cwd_info['getcwd'] = os.getcwd()
 
-        cwd_info['dir_path'] = os.path.dirname(os.path.realpath(__file__))
-
-        if "CWD_HACK" in os.environ:
-            cwd_info['CWD_HACK'] = os.environ["CWD_HACK"]
+        cwd_info['__file__'] = os.path.dirname(os.path.realpath(__file__))
 
         if "SNAP" in os.environ:
             cwd_info['SNAP'] = os.environ["SNAP"]
 
-        print(cwd_info)
+        # print(cwd_info)
+        set_original_working_dir(cwd_info['__file__'])  # more accurate
         self.cwd_info = cwd_info
 
 # def minimized_on_mac_problem(self):

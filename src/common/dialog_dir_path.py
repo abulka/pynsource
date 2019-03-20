@@ -5,7 +5,11 @@ import wx
 
 # remember current working directory, since opening help window and plantuml text dialog
 # changes it (via dialog_dir_path function)
-original_working_dir = os.getcwd()
+original_working_dir = os.getcwd()  # initial guess but can be wrong if run from a different dir, so adjust later
+
+def set_original_working_dir(path):
+    global original_working_dir
+    original_working_dir = path
 
 def _display_dir(d: str = '.', frame: wx.Frame = None):
     currentDirectory = pathlib.Path(d)
@@ -58,7 +62,7 @@ def dialog_path_pyinstaller_push(frame: wx.Frame = None):
     dir = os.path.join(wd, dialogs_dir)
     # dir = os.path.join(wd)
     # dir = os.path.join(wd, dialogs_dir, "help-images")
-    # _display_dir(dir, frame)
+    _display_dir(dir, frame)
 
     # Change the current directory, so that the html window sees image resources etc
     fs = wx.FileSystem()
