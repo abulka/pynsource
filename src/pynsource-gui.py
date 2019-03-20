@@ -56,6 +56,7 @@ from contextlib import suppress
 import urllib.request, urllib.parse
 from common.url_to_data import url_to_data
 import json
+from typing import List, Set, Dict, Tuple, Optional
 
 
 if PRO_EDITION:
@@ -335,6 +336,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
             self.Bind(EVT_REFRESH_PLANTUML_EVENT, self.refresh_plantuml_view)
 
         self.determine_cwd()
+        self.set_custom_window_position()
 
         """
         Only run bootstrap command at startup to load a sample file - only in dev mode 
@@ -398,6 +400,39 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         set_original_working_dir(cwd_info['__file__'])  # more accurate
         self.cwd_info = cwd_info
 
+    def set_custom_window_position(self):
+        """
+        Fix for people who have small or unusual displays
+
+        Edit your pynsource.ini file to add one or both entries:
+
+            WindowSize = 200, 400
+            WindowPosition = 210, 240
+
+        You can comment out those lines with # e.g.
+
+            #WindowSize = 200, 400
+            #WindowPosition = 210, 240
+
+        Returns: -
+        """
+
+        window_size = self.config.get("WindowSize", None)
+        window_pos = self.config.get("WindowPosition", None)
+
+        # def convert_to_tuple(ls: List[str, str]) -> Tuple[int, int]:
+        def convert_to_tuple(ls: List[str]) -> Tuple[int, int]:
+            pos = [int(i) for i in ls]
+            pos = tuple(pos)
+            return pos
+
+        if type(window_size) == list:
+            self.frame.SetSize(convert_to_tuple(window_size))
+
+        if type(window_pos) == list:
+            self.frame.SetPosition(convert_to_tuple(window_pos))
+
+
 # def minimized_on_mac_problem(self):
     #     self.frame.Iconize(False) # start up non-minimised when packaged
     #     if self.frame.IsIconized():
@@ -414,10 +449,17 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         """Config file.  I have two, the main original one, and a second one that uses wx config."""
 
         """
-        main config file.
-        On mac it is
+        Main config file pynsource.ini
+        
+        Mac:
             ~/Library/Preferences/Pynsource/pynsource.ini
-        On linux it is
+            e.g.
+            /Users/YOURNAME/Library/Preferences/Pynsource/pynsource.ini
+            
+        Windows:
+            C:\\Users\\YOURNAME\\AppData\\Roaming\\Pynsource\\pynsource.ini
+            
+        Linux:
             ~/.Pynsource/pynsource.ini
         """
         global PYNSOURCE_CONFIG_DIR
