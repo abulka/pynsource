@@ -33,6 +33,7 @@ apps:
         plugs: [x11, unity7, pulseaudio, home, gsettings, network]
         environment:
             LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
+            CWD_HACK: $SNAP
 
     #
     # Pure Python interpreter invocations that trace imports
