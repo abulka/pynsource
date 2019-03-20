@@ -570,7 +570,8 @@ class UmlCanvas(ogl.ShapeCanvas):
         # canvas.Refresh(False)   # t/f or don't use - doesn't seem to make a difference
 
         if not PRO_EDITION:  # fix selection change refresh bug on linux & windows
-            self.mega_refresh()
+            self.Draw()  # don't do self.mega_refresh() because it causes "drag unselected shape snaps back bug"
+            self.Refresh()
 
         # self.UpdateStatusBar(shape)  # only available in the shape evt handler (this method used to live there...)
 
