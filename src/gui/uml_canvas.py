@@ -10,6 +10,7 @@ from .canvas_resizer import CanvasResizer
 from common.architecture_support import *
 from gui.shape_menu_mgr import MENU_ID_CANCEL_LINE
 import time
+import pprint
 from gui.settings import PRO_EDITION, NATIVE_LINES_OGL_LIKE, ASYNC_BACKGROUND_REFRESH
 from gui.settings_wx import DEFAULT_COMMENT_FONT_SIZE, DEFAULT_CLASS_HEADING_FONT_SIZE, DEFAULT_CLASS_ATTRS_METHS_FONT_SIZE
 import wx
@@ -865,6 +866,10 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         elif keycode in ["d", "D"]:
             self.app.run.CmdDumpDisplayModel(parse_models=keycode == "D")
+            consumed = True
+
+        elif keycode in ["I"]:
+            self.app.context.wxapp.MessageBox(pprint.pformat(self.app.context.wxapp.cwd_info))
             consumed = True
 
         elif keycode == "s":
