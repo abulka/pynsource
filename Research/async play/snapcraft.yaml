@@ -40,27 +40,61 @@ apps:
         environment:
             LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
 
-    #Failed to generate snap metadata: The specified command '$SNAP/usr/bin/python -vvv' defined in the app {'command': '$SNAP/usr/bin/python -vvv'} does not exist or is not executable.
-    #Ensure that '$SNAP/usr/bin/python -vvv' is relative to the prime directory.
     #
-    #python:
-    #    command: $SNAP/usr/bin/python -vvv
-    #python3:
-    #    command: $SNAP/usr/bin/python3 -vvv
-
-    # The specified command 'python' defined in the app 'python-nopath' does not exist or is not executable.
+    # Pure Python interpreter invocations that trace imports
     #
-    # python-nopath:
-    #    command: python -vvv
 
-    python3-nopath:
+    python-v:
+        command: python3 -v
+    python-vvv:
         command: python3 -vvv
+
+
+
+    #
+    # Pure Python interpreter invocations
+    #
+
+    # For all python interpreter invocations (no script specified), both '' and site packages are automatically in sys path, $SNAP root is not.  
+    # Also os.getcwd() is the host's not the inner snap filesystem!
+    #
+    python:
+        command: python3
+
+    # Adding $SNAP explicitly works e.g. '/snap/rubber-band-async/x5',    <--- expected
+    # Though, suprisingly also adds the host's local dir to sys path e.g. '/home/andy/Devel/pynsource/Research',    <--- unexpected
+    #
+    python-add-root:
+        command: python3
+        environment:
+          PYTHONPATH: $PYTHONPATH:$SNAP
+
+    # Adding $SNAP/lib/python3.6/site-packages explicitly works but is unneccesary since site-packages is added automatically. 
+    # It just gets moved up to top of sys.path and not duplicated.
+    # Though, suprisingly also adds the host's local dir to sys path e.g. '/home/andy/Devel/pynsource/Research',    <--- unexpected
+    #
+    python-add-site:
+        command: python3
+        environment:
+          PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
+
+
+
+    #
+    # Run my diagnostic script
+    #
+
     report:
         command: python3 $SNAP/report_snap_env.py
-    report-hack:
+    report-add-root:
         command: python3 $SNAP/report_snap_env.py
         environment:
-          PATH: $PATH:$SNAP/bin/
+          # uneccesary since $SNAP or /root is added automatically
+          PYTHONPATH: $PYTHONPATH:$SNAP
+    report-add-site:
+        command: python3 $SNAP/report_snap_env.py
+        environment:
+          # uneccesary since site-packages is added automatically
           PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
 
 parts:
