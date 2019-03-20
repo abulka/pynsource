@@ -334,6 +334,8 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
             # bind custom event to synchronous handler - works OK
             self.Bind(EVT_REFRESH_PLANTUML_EVENT, self.refresh_plantuml_view)
 
+        self.determine_cwd()
+
         """
         Only run bootstrap command at startup to load a sample file - only in dev mode 
         """
@@ -379,7 +381,26 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         path = os.path.join(wd, APP_ICON_PATH)
         self.frame.SetIcon(wx.Icon(path))
 
-    # def minimized_on_mac_problem(self):
+    def determine_cwd(self):
+        """
+        Determine the place where Pynsource is running from, so can access media and html
+        """
+        cwd_info = {}
+
+        cwd_info['cwd'] = os.getcwd()
+
+        cwd_info['dir_path'] = os.path.dirname(os.path.realpath(__file__))
+
+        if "CWD_HACK" in os.environ:
+            cwd_info['CWD_HACK'] = os.environ["CWD_HACK"]
+
+        if "SNAP" in os.environ:
+            cwd_info['SNAP'] = os.environ["SNAP"]
+
+        print(cwd_info)
+        self.cwd_info = cwd_info
+
+# def minimized_on_mac_problem(self):
     #     self.frame.Iconize(False) # start up non-minimised when packaged
     #     if self.frame.IsIconized():
     #         wx.MessageBox("iconized?")
