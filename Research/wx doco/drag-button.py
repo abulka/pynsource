@@ -1,4 +1,5 @@
 import wx
+from textwrap import dedent
 
 app = wx.App(False)
 d = {}
@@ -214,7 +215,19 @@ def _add_widgets(event):
     m = button1.meta = Meta()
     m.AddAttributes(["label", "pen", "fill"])
     m.AddAttribute("code")
-    m.code = "print('hi there')"
+    m.code = dedent("""
+        # Hi there this is some code
+        # in Python Toolbook!
+        x = 11
+        y = 2
+        print(x + y)
+        for i in range(100):
+            print(i, end=" ")
+        print("done!")
+
+        # A gui message
+        #wx.MessageBox(f"Hi from a button click")
+    """).strip()
     m.label = "Code"
     m.pen = ["BLACK", 2]
     m.fill = ["GREEN"]
@@ -222,7 +235,19 @@ def _add_widgets(event):
     m = button2.meta = Meta()
     m.AddAttributes(["label", "pen", "fill"])
     m.AddAttribute("code")
-    m.code = r'wx.MessageBox(f"Hi from a button click")'
+    m.code = dedent("""
+        # Hi there this is some code
+        # in Python Toolbook!
+        x = 1
+        y = 2
+        print(x + y)
+        for i in range(100):
+            print(i, end=" ")
+        print("done!")
+        
+        # A gui message
+        wx.MessageBox(f"Hi from a button click")
+    """).strip()
     m.label = "Code ha ha"
     m.pen = ["RED", 5]
     m.fill = ["GREEN"]
@@ -297,7 +322,7 @@ class AttributeEditor(wx.Frame):
         print(f"attribute editor invoked on {item}, has attribute obj {item.meta}")
 
         """Edits properties of 'item' as defined by the list of properties in item.attributes"""
-        wx.Frame.__init__(self, parent, ID, title, wx.DefaultPosition, wx.Size(200, 450))
+        wx.Frame.__init__(self, parent, ID, title, wx.DefaultPosition, wx.Size(800, 550))
         self.item = item  # type wx.Button, not Block
 
         # Create a box sizer for self

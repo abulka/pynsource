@@ -3,6 +3,15 @@
 # Just paste this after the demo code obtained from a wxpython demo source.
 # Ensure you call the runTest() method which is supplied by each demo.
 #
+# And remove the existing:
+#
+# if __name__ == '__main__':
+#     import sys,os
+#     import run
+#     run.main(['', os.path.basename(sys.argv[0])] + sys.argv[1:])
+#
+# from the demo.
+
 
 
 class Log:
