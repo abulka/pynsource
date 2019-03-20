@@ -1,69 +1,148 @@
 name: pynsource
 version: git
 summary: 'Pynsource - reverse engineer Python source code into UML'
-description: "This is my-snap's description. You have a paragraph or two to tell the\nmost important story about your snap. Keep it under 100 words though,\nwe live in tweetspace and your description wants to look good in the snap\nstore.\n"
-grade: devel
-confinement: strict
+description: |
+  Pynsource - reverse engineer Python source code into UML
+  http://pynsource.com
+
+  Features
+    Generates UML diagrams from Python 3 or legacy Python source code
+    The only UML tool that recognises Python instance attributes (not just class attributes)
+    Layout algorithm
+    Toggle between UML, Ascii art UML and PlantUML views
+    Automatically colour sibling subclasses to enhance understanding
+    Print and Print preview
+    Windows 10, Mac OSX Mojave, Linux compatibility
+    Open Source
+  Pro edition with
+    Faster performance
+    Zoom
+    Drag and Drop to connect shapes
+    Optimal layout algorithm
+    Access to generated PlantUML markup text
+
+    Github repo https://github.com/abulka/pynsource
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
 base: core18
+
 apps:
-  pynsource:
-    command: 'desktop-launch python3 $SNAP/usr/bin/pynsource-gui.py'
-    plugs:
-      - x11
-      - unity7
-      - pulseaudio
-      - home
-      - gsettings
-      - network
+    pynsource:
+        command: desktop-launch python3 $SNAP/pynsource-gui.py
+        plugs: [x11, unity7, pulseaudio, home, gsettings, network]
+        environment:
+            LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
+
+    #
+    # Pure Python interpreter invocations that trace imports
+    #
+
+    python-v:
+        command: python3 -v
+    python-vvv:
+        command: python3 -vvv
+
+
+
+    #
+    # Pure Python interpreter invocations
+    #
+
+    # For all python interpreter invocations (no script specified), both '' and site packages are automatically in sys path, $SNAP root is not.
+    # Also os.getcwd() is the host's not the inner snap filesystem!
+    #
+    python:
+        command: python3
+
+    # Adding $SNAP explicitly works e.g. '/snap/pynsource/x5',    <--- expected
+    # Though, suprisingly also adds the host's local dir to sys path e.g. '/home/andy/Devel/pynsource/Research',    <--- unexpected
+    #
+    python-add-root:
+        command: python3
+        environment:
+          PYTHONPATH: $PYTHONPATH:$SNAP
+
+    # Adding $SNAP/lib/python3.6/site-packages explicitly works but is unneccesary since site-packages is added automatically.
+    # It just gets moved up to top of sys.path and not duplicated.
+    # Though, suprisingly also adds the host's local dir to sys path e.g. '/home/andy/Devel/pynsource/Research',    <--- unexpected
+    #
+    python-add-site:
+        command: python3
+        environment:
+          PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
+
+
+
+    #
+    # Run my diagnostic script
+    #
+
+    report:
+        command: python3 $SNAP/report_snap_env.py
+    report-add-root:
+        command: python3 $SNAP/report_snap_env.py
+        environment:
+          # uneccesary since $SNAP or /root is added automatically
+          PYTHONPATH: $PYTHONPATH:$SNAP
+    report-add-site:
+        command: python3 $SNAP/report_snap_env.py
+        environment:
+          # uneccesary since site-packages is added automatically
+          PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
+
 parts:
   desktop-gtk3:
     build-packages:
-      - build-essential
-      - libgtk-3-dev
+    - build-essential
+    - libgtk-3-dev
     make-parameters:
-      - FLAVOR=gtk3
+    - FLAVOR=gtk3
     plugin: make
-    source: 'https://github.com/ubuntu/snapcraft-desktop-helpers.git'
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
     source-subdir: gtk
     stage-packages:
-      - libxkbcommon0
-      - ttf-ubuntu-font-family
-      - dmz-cursor-theme
-      - light-themes
-      - adwaita-icon-theme
-      - gnome-themes-standard
-      - shared-mime-info
-      - libgtk-3-0
-      - libgdk-pixbuf2.0-0
-      - libglib2.0-bin
-      - libgtk-3-bin
-      - unity-gtk3-module
-      - libappindicator3-1
-      - locales-all
-      - xdg-user-dirs
-      - ibus-gtk3
-      - libibus-1.0-5
-      - fcitx-frontend-gtk3
+    - libxkbcommon0
+    - ttf-ubuntu-font-family
+    - dmz-cursor-theme
+    - light-themes
+    - adwaita-icon-theme
+    - gnome-themes-standard
+    - shared-mime-info
+    - libgtk-3-0
+    - libgdk-pixbuf2.0-0
+    - libglib2.0-bin
+    - libgtk-3-bin
+    - unity-gtk3-module
+    - libappindicator3-1
+    - locales-all
+    - xdg-user-dirs
+    - ibus-gtk3
+    - libibus-1.0-5
+    - fcitx-frontend-gtk3
+  copy-stuff:
+    plugin: dump
+    source: ./src
   pynsource:
+    # See 'snapcraft plugins'
     plugin: python
     python-version: python3
     source: ./src
     stage-packages:
-      - libssl-dev
-      - libjpeg-dev
-      - libtiff-dev
-      - libsdl1.2-dev
-      - libnotify-dev
-      - freeglut3
-      - ibus-gtk3
-      - libwebkitgtk-3.0-0
-      - zlib1g
-      - libsm6
-      - libpulse0
-      - libslang2
+        # - libc6
+        - libssl-dev
+        - libjpeg-dev
+        - libtiff-dev
+        - libsdl1.2-dev
+        - libnotify-dev
+        - freeglut3
+        - ibus-gtk3
+        - libwebkitgtk-3.0-0
+        - zlib1g
+        - libsm6
+        - libpulse0
+        - libslang2
     python-packages:
-      - 'https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04/wxPython-4.0.4-cp36-cp36m-linux_x86_64.whl'
+        - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04/wxPython-4.0.4-cp36-cp36m-linux_x86_64.whl
     requirements:
         - /root/project/requirements-linux.txt
-    override-build: "snapcraftctl build\ncp $SNAPCRAFT_PART_SRC/pynsource-gui.py $SNAPCRAFT_PART_INSTALL/usr/bin/\nchmod +x $SNAPCRAFT_PART_INSTALL/usr/bin/pynsource-gui.py\n"
-
