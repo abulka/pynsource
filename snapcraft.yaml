@@ -23,7 +23,7 @@ description: |
 
     Github repo https://github.com/abulka/pynsource
 
-grade: devel # must be 'stable' to release into candidate/stable channels
+grade: stable # devel # must be 'stable' to release into candidate/stable channels
 confinement: strict # use 'strict' once you have the right plugs and slots
 base: core18
 
