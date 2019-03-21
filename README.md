@@ -1,7 +1,7 @@
 Pynsource
 =========
 
-Version number: Version 1.73 (March 15th 2019)
+Version number: Version 1.74 (March 21st 2019)
 
 Author: Andy Bulka
 
@@ -15,11 +15,11 @@ Installation / Usage
 
 ### Ready to run binary apps ###
 
- * [Mac download](http://bit.ly/pynsource-mac-1-73) (unzip and drag app into the Applications directory) 
- * [Windows 10 download](http://bit.ly/pynsource-win-1-73) (unzip and run the installer) 
- * [Ubuntu Linux 18.0.4 download](http://bit.ly/pynsource-ubuntu-18-1-73) (unzip and run the executable) 
- * [Ubuntu Linux 16.0.4 download](http://bit.ly/pynsource-ubuntu-16-1-73) (unzip and run the executable) 
- * Linux - _snap package being worked on_
+ * [Mac download](http://bit.ly/pynsource-mac-1-74) (unzip and drag app into the Applications directory) 
+ * [Windows 10 download](http://bit.ly/pynsource-win-1-74) (unzip and run the installer) 
+ * [Ubuntu Linux 18.0.4 download](http://bit.ly/pynsource-ubuntu-18-1-74) (unzip and run the executable) 
+ * [Ubuntu Linux 16.0.4 download](http://bit.ly/pynsource-ubuntu-16-1-74) (unzip and run the executable) 
+ * [Linux snap installer](http://bit.ly/pynsource-snap) (install on any distro using Snapcraft) 
  
 An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
 like zoom and the ability to drag to connect shapes.
@@ -117,8 +117,14 @@ More screenshots, videos and documentation can be found at
 
 www.pynsource.com
 
+Help is built into the app - hit F1
+
+If you want more control over the Pynsource initial window size and position see 
+[this link](https://github.com/abulka/pynsource/issues/49#issuecomment-475069439)
+
 Help support the project by Donating or purchasing a Pro Edition license.  Future plans include
 undo/redo, recognition of Python type annotations, line labels, module and package visualisation.
+
 
 License
 -------
