@@ -1,7 +1,7 @@
 PRO_EDITION=True
 NATIVE_LINES_OGL_LIKE=False
 ASYNC_BACKGROUND_REFRESH=False  # devel purposes only
-APP_VERSION = 1.73
+APP_VERSION = 1.74
 
 try:
     import rego
