@@ -1,23 +1,13 @@
 {
- "latest_version" : 1.73,
+ "latest_version" : 1.74,
  "latest_announcement" : """
-1.73
-Windows/Linux fixed select object refresh bug
-  (you had to click twice to select an object)
-Major Linux bug fixes: 
-  scrolled area refresh bug fixed
-  fixed insert class and comment hotkeys
-Misc bug fixes
+Bug fixes:
+- fixed shape jumping back to drag start position if not selected (windows, linux)
+- add proper extension when saving files (linux)
 
-1.72
-Improved Linux compatibility
-Misc fixes
+config file enhancement for people who have small or unusual displays (mac, windows, linux)
 
-1.71
-Python 3 parsing support
-PlantUML view
-Print and Print preview fixes
-Pro edition with faster performance, zoom, drag and drop to connect shapes
+first snap release (linux)
 """,
  "version_syntax_format" : 1,
  "download_url" : "http://bit.ly/pynsource-upgrade-download"
