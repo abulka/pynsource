@@ -30,7 +30,8 @@ base: core18
 apps:
     pynsource:
         command: desktop-launch python3 $SNAP/pynsource-gui.py
-        plugs: [x11, unity7, pulseaudio, home, gsettings, network]
+        plugs: [x11, unity7, pulseaudio, home, gsettings, network, desktop, desktop-legacy]
+        desktop: usr/share/applications/pynsource.desktop
         environment:
             LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
 
@@ -123,6 +124,13 @@ parts:
   copy-stuff:
     plugin: dump
     source: ./src
+  copy-desktop-icon-stuff:
+    plugin: dump
+    source: snap/gui
+    organize:
+      # this worked! without it the two files end up in /prime not /prime/usr/share/applications/
+      pynsource.png: usr/share/applications/pynsource.png
+      pynsource.desktop: usr/share/applications/pynsource.desktop     
   pynsource:
     # See 'snapcraft plugins'
     plugin: python

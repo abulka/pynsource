@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Pynsource
+GenericName=UML application
+Comment=Pynsource UML reverse engineer Python source into diagrams
+Exec=pynsource
+Icon=${SNAP}/meta/gui/pynsource.png
+Terminal=false
+Type=Application
+Categories=Development;
+StartupNotify=true
