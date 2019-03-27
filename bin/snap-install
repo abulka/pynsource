@@ -1,1 +1,1 @@
-sudo snap install --devmode --dangerous pynsource_0+git.2d7ffe1-dirty_amd64.snap
+sudo snap install --devmode --dangerous *.snap
