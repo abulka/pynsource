@@ -1,4 +1,4 @@
-snapcraft push pynsource_0+git.8095336_amd64.snap
+snapcraft push *.snap
 echo look at the number returned e.g. 2
 echo then run
 echo snapcraft release pynsource 2 stable
