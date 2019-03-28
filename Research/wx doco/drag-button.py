@@ -148,10 +148,17 @@ def onKeyPress(event):
         if not AUTHOR_MODE:
             AUTHOR_MODE = True
             check_mode_do_wiring()
-    #
-    # if keycode == wx.WXK_RIGHT:
-    #     self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
-    #
+
+    if keycode == wx.WXK_RIGHT:  # export app
+        import subprocess
+
+        # s = subprocess.check_output(['ls', '-l', 'drag-button.py'])
+        s = subprocess.check_output(['rm', '-rf', 'dist'])
+        print(s)
+        s = subprocess.check_output(['pyinstaller', 'drag-button.py',  '--onefile',  '--windowed'])
+        print(s)
+
+
     elif keycode == wx.WXK_F3:
         AUTHOR_MODE = not AUTHOR_MODE
         check_mode_do_wiring()
