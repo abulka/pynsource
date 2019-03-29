@@ -1,6 +1,7 @@
 import wx
 import wx.stc as stc
 from textwrap import dedent
+import os, sys
 
 app = wx.App(False)
 d = {}
@@ -8,6 +9,15 @@ AUTHOR_MODE = True
 selected = None
 button1 = button2 = None
 working = False  # for keys
+
+try:
+    working_dir = sys._MEIPASS
+    DEPLOYED = True
+except AttributeError:
+    DEPLOYED = False
+DEVEL_AUTHORING = not DEPLOYED
+# DEVEL_AUTHORING = False  # debug override
+AUTHOR_MODE = DEVEL_AUTHORING
 
 
 class Meta:
@@ -124,9 +134,11 @@ def check_mode_do_wiring():
             button2.Bind(wx.EVT_LEFT_UP, RunCode)
         box_tools.ShowItems(show=False)
         # box_tools.Hide()
-        frame.SetStatusText("Run mode: Hit ESC to get back to Author mode")
+        if DEVEL_AUTHORING:
+            frame.SetStatusText("Run mode: Hit ESC to get back to Author mode")
 
-    m_checkBox1.SetValue(AUTHOR_MODE)
+    if DEVEL_AUTHORING:
+        m_checkBox1.SetValue(AUTHOR_MODE)
 
     # panel.Refresh(eraseBackground=True)
     panel.Refresh(eraseBackground=False)
@@ -144,24 +156,37 @@ def onKeyPress(event):
     working = True
 
     if keycode == wx.WXK_ESCAPE:
-        frame.SetStatusText("ESC key detected: Back to Author mode")
-        if not AUTHOR_MODE:
-            AUTHOR_MODE = True
-            check_mode_do_wiring()
+        if DEVEL_AUTHORING:
+            frame.SetStatusText("ESC key detected: Back to Author mode")
+            if not AUTHOR_MODE:
+                AUTHOR_MODE = True
+                check_mode_do_wiring()
 
     if keycode == wx.WXK_RIGHT:  # export app
-        import subprocess
+        if DEVEL_AUTHORING:
+            import subprocess
+            # s = subprocess.check_output('ls -l drag-button.py')
+            s = subprocess.check_output(['ls', '-l', 'drag-button.py'])
+            print(s)
 
-        # s = subprocess.check_output(['ls', '-l', 'drag-button.py'])
-        s = subprocess.check_output(['rm', '-rf', 'dist'])
-        print(s)
-        s = subprocess.check_output(['pyinstaller', 'drag-button.py',  '--onefile',  '--windowed'])
-        print(s)
+            # try:
+            #     s = subprocess.check_output(['ls', '-l', 'drag-button.pyZZ'])
+            #     # s = subprocess.check_output('ls -l drag-button.py')
+            #     print(s)
+            # except subprocess.CalledProcessError as e:
+            #     print("failed", e.returncode)
+            #     return
+
+            s = subprocess.check_output(['rm', '-rf', 'dist'])
+            print(s)
+            s = subprocess.check_output(['pyinstaller', 'drag-button.py',  '--onefile',  '--windowed'])
+            print(s)
 
 
     elif keycode == wx.WXK_F3:
-        AUTHOR_MODE = not AUTHOR_MODE
-        check_mode_do_wiring()
+        if DEVEL_AUTHORING:
+            AUTHOR_MODE = not AUTHOR_MODE
+            check_mode_do_wiring()
 
     working = False
     event.Skip()
@@ -272,15 +297,17 @@ panel = wx.Panel(frame)
 box = wx.BoxSizer(wx.VERTICAL)
 box_tools = wx.BoxSizer(wx.HORIZONTAL)
 
-m_checkBox1 = wx.CheckBox( panel, wx.ID_ANY, "Author Mode", wx.DefaultPosition, wx.DefaultSize, 0 )
-m_checkBox1.SetValue(AUTHOR_MODE)
-box_tools.Add( m_checkBox1, 0, wx.ALL, 5 )
+if DEVEL_AUTHORING:
 
-button_clear = wx.Button(panel, -1, "Clear All")
-box_tools.Add(button_clear, 0, wx.ALL)
+    m_checkBox1 = wx.CheckBox( panel, wx.ID_ANY, "Author Mode", wx.DefaultPosition, wx.DefaultSize, 0 )
+    m_checkBox1.SetValue(AUTHOR_MODE)
+    box_tools.Add( m_checkBox1, 0, wx.ALL, 5 )
 
-button_add_buttons = wx.Button(panel, -1, "Add Widgets")
-box_tools.Add(button_add_buttons, 0, wx.ALL)
+    button_clear = wx.Button(panel, -1, "Clear All")
+    box_tools.Add(button_clear, 0, wx.ALL)
+
+    button_add_buttons = wx.Button(panel, -1, "Add Widgets")
+    box_tools.Add(button_add_buttons, 0, wx.ALL)
 
 box.Add(box_tools, 0, wx.ALL)
 
@@ -454,9 +481,10 @@ class AttributeEditor(wx.Frame):
 
 
 # Connect Events
-m_checkBox1.Bind(wx.EVT_CHECKBOX, author_mode_click)
-button_clear.Bind(wx.EVT_LEFT_UP, clear_page)
-button_add_buttons.Bind(wx.EVT_LEFT_UP, add_widgets)
+if DEVEL_AUTHORING:
+    m_checkBox1.Bind(wx.EVT_CHECKBOX, author_mode_click)
+    button_clear.Bind(wx.EVT_LEFT_UP, clear_page)
+    button_add_buttons.Bind(wx.EVT_LEFT_UP, add_widgets)
 
 panel.SetSizer(box)
 panel.Layout()
