@@ -128,7 +128,11 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str) ->
     so it probably doesn't make much difference.
     """
     PLANTUML_URL_ON_INTERNET = "http://www.plantuml.com/plantuml/uml"
+    PLANTUML_URL_LOCAL = "http://localhost:8080/plantuml/uml"
+    import aiohttp
+
     plant_uml_server = PLANTUML_URL_ON_INTERNET
+    # plant_uml_server = PLANTUML_URL_LOCAL
     log.info("plant_uml_server calculated to be %s" % (plant_uml_server,))
 
     try:
@@ -137,7 +141,9 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str) ->
         data, status_code = await url_to_data(url)
         response_text = data.decode('utf-8')
 
-    except (ConnectionError, requests.exceptions.RequestException) as e:
+    except (ConnectionError,
+            requests.exceptions.RequestException,
+            aiohttp.client_exceptions.ClientConnectorError) as e:
         # log.exception("Trying to render using plantuml server %s str(e)" % plant_uml_server)
         log.error(
             f"Error trying to fetch initial html from plantuml server {plant_uml_server} {str(e)}")
