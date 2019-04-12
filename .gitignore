@@ -10,3 +10,4 @@ Research/wxglade/*/*~
 .coverage
 htmlcov/
 src/tests/logs/
+Research/wx doco/drag-button.spec
