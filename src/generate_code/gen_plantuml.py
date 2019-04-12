@@ -10,6 +10,7 @@ from common.url_to_data import url_to_data
 from common.plantuml import deflate_and_encode
 import asyncio
 from async_lru import alru_cache
+import aiohttp
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -119,7 +120,7 @@ class CmdLinePythonToPlantUml(CmdLineGenerator):
 
 
 @alru_cache(maxsize=32)
-async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str) -> str:
+async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str, plantuml_server_local_url: str) -> str:
     """Async version of getting image url from plantuml.  This does not get the actual image,
     that is a separate call - unlike in a browser where that second call is done automatically.
 
@@ -130,11 +131,9 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str) ->
     so it probably doesn't make much difference.
     """
     PLANTUML_URL_ON_INTERNET = "http://www.plantuml.com/plantuml/uml"
-    PLANTUML_URL_LOCAL = "http://localhost:8080/plantuml/uml"
-    import aiohttp
+    # PLANTUML_URL_LOCAL = "http://localhost:8080/plantuml/uml"
 
-    plant_uml_server = PLANTUML_URL_ON_INTERNET
-    # plant_uml_server = PLANTUML_URL_LOCAL
+    plant_uml_server = plantuml_server_local_url if plantuml_server_local_url else PLANTUML_URL_ON_INTERNET
     log.info("plant_uml_server calculated to be %s" % (plant_uml_server,))
 
     try:

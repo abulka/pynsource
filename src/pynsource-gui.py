@@ -680,6 +680,21 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
             2. self.plantuml.ViewImage(url=image_url) - contacts the plantuml server to get image
 
         'force' means do it regardless of what tab is visible
+
+        If there is an entry in
+
+            ~/Library/Preferences/Pynsource/pynsource.ini
+
+        and it contains
+
+            PlantUmlServerUrl = http://localhost:8080/plantuml/uml
+
+        then that will be used as the Plantuml server url, otherwise the url defaults to
+        "http://www.plantuml.com/plantuml/uml"
+
+        For instructions on installing PlantUML server see http://plantuml.com/server or
+        otherwise google for advice.
+
         """
         if force or self.viewing_plantuml_tab:
             if len(self.umlcanvas.displaymodel.graph.nodeSet) == 0:
@@ -692,8 +707,13 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
                     self.plantuml.render_in_progress(True, self.frame)
                     StartCoroutine(self.update_refresh_plantuml_view_clock, self)
 
-                    # internet connection errors getting initial plantuml html are handled internally to this function
-                    image_url = await plant_uml_create_png_and_return_image_url_async(plant_uml_txt)
+                    # internet connection errors getting initial plantuml html are
+                    # handled internally to this function
+                    plantuml_server_local_url = self.config.get("PlantUmlServerUrl", None)
+                    image_url = await plant_uml_create_png_and_return_image_url_async(
+                        plant_uml_txt,
+                        plantuml_server_local_url=plantuml_server_local_url
+                    )
 
                     # Simulate failures
                     # import random

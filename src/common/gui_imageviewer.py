@@ -111,11 +111,13 @@ class ImageViewer(wx.ScrolledWindow):
         self.error_msg = PLANTUML_VIEW_INTERNET_FAIL % msg
         # print(plant_uml_create_png_and_return_image_url.cache_info())
         plant_uml_create_png_and_return_image_url_async.cache_clear()
+        url_to_data.cache_clear()
         self.Refresh()
 
     def user_aborted(self):
         self.error_msg = PLANTUML_VIEW_USER_ABORT
         plant_uml_create_png_and_return_image_url_async.cache_clear()
+        url_to_data.cache_clear()
         self.Refresh()
 
     def render_in_progress(self, rendering: bool, frame):
