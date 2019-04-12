@@ -12,6 +12,7 @@ if sys.version_info >= (3, 0):
 
 import inspect
 import logging
+from common.logger import config_log
 import traceback
 from os import path
 
@@ -27,6 +28,7 @@ from parsing.quick_parse import QuickParse
 from common.logwriter import LogWriter, LogWriterNull
 
 log_proper = logging.getLogger(__name__)
+config_log(log_proper)
 
 try:
     from exceptions import SyntaxError
@@ -36,6 +38,9 @@ except ImportError:
 STOP_ON_EXCEPTION = True
 DEBUGINFO = False
 DEBUGINFO_IMMEDIATE_PRINT = False
+DEBUG_TO_LOG_PROPER = True
+DEBUG_TO_LOG_PROPER_FLUSH_STATE = False  # usually too verbose for log file
+DEBUG_TO_LOG_PROPER_PARSE_HISTORY = False  # very verbose
 
 last_python_mode = 0
 
@@ -134,6 +139,8 @@ def parse(filename, log=None, options={}):
     mode(_mode)
     pmodel = OldParseModel()
 
+    log_proper.info(f"Parsing {filename}, syntax mode {_mode}")
+
     if _mode == 2:
         generic_help = "If you are parsing Python 3 code, check the menu item 'File/Python 3."
     else:
@@ -144,7 +151,8 @@ def parse(filename, log=None, options={}):
         node = _ast_parse(filename)
     except SyntaxError as e:
         mode(0)  # reset
-        pmodel.errors = f"Syntax error in parsing\n'{filename}'\nassuming Python {_mode} syntax.\n\n{generic_help}"
+        pmodel.errors = f"Syntax error in parsing\n'{filename}'\n\n{e}\n\nPynsource is in Python {_mode} syntax mode.\n{generic_help}"
+        log_proper.error(" ".join(pmodel.errors.split()))  # remove multiple spaces
         return pmodel, ""
     except Exception as e:
         mode(0)  # reset
@@ -218,10 +226,15 @@ def _convert_ast_to_old_parser(node, filename, log, options={}):
             if DEBUGINFO:
                 debuginfo = "<br>".join(v.result)
                 logh.out(debuginfo)
+                if DEBUG_TO_LOG_PROPER:
+                    log_proper.error("Parsing Visit error: {0}".format(err) + v.result_as_compact_string)
                 logh.out_html_footer()
                 logh.finish()
             raise
 
+
+    if DEBUG_TO_LOG_PROPER and DEBUG_TO_LOG_PROPER_PARSE_HISTORY:
+        log_proper.debug(v.result_as_compact_string)
     debuginfo = "<br>".join(v.result)
     return v.model, debuginfo
 
@@ -243,6 +256,7 @@ class Visitor(T):
         self.imports_encountered = []
 
         self.result = []
+        self.result_for_log_proper = []
         self.indent_with = " " * 4
         self.indentation = 0
         self.new_lines = 0
@@ -327,34 +341,8 @@ class Visitor(T):
             self.current_class().classdependencytuples.append(t)
 
     def flush_state(self, msg=""):
-        self.write(
-            """
-                <table>
-                    <tr>
-                        <th>lhs</th>
-                        <th>rhs</th>
-                        <th>made_assignment</th>
-                        <th>made_append_call</th>
-                        <th>made_rhs_call</th>
-                        <th>pos_rhs_call_pre_first_bracket</th>
-                        <th>in_class_static_area</th>
-                        <th>in_method_in_class_area</th>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td>%s</td>
-                        <td>%s</td>
-                        <td>%s</td>
-                        <td>%s</td>
-                        <td>%s</td>
-                        <td>%s</td>
-                        <td>%s</td>
-                        <td>%s</td>
-                        <td>%s</td>
-                    </tr>
-                </table>
-            """
-            % (
+        if DEBUG_TO_LOG_PROPER and DEBUG_TO_LOG_PROPER_FLUSH_STATE:
+            self.result_for_log_proper.append(f"| state: lhs=%s rhs=%s made_assignment=%s made_append_call=%s made_rhs_call=%s pos_rhs_call_pre_first_bracket=%s in_class_static_area=%s in_method_in_class_area=%s msg=%s |" % (
                 self.lhs,
                 self.rhs,
                 self.made_assignment,
@@ -363,13 +351,66 @@ class Visitor(T):
                 self.pos_rhs_call_pre_first_bracket,
                 self.in_class_static_area(),
                 self.in_method_in_class_area(),
-                msg,
-            ),
-            mynote=0,
-        )
+                msg
+            ))
+        if DEBUGINFO:
+            self.write(
+                """
+                    <table>
+                        <tr>
+                            <th>lhs</th>
+                            <th>rhs</th>
+                            <th>made_assignment</th>
+                            <th>made_append_call</th>
+                            <th>made_rhs_call</th>
+                            <th>pos_rhs_call_pre_first_bracket</th>
+                            <th>in_class_static_area</th>
+                            <th>in_method_in_class_area</th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td>%s</td>
+                            <td>%s</td>
+                            <td>%s</td>
+                            <td>%s</td>
+                            <td>%s</td>
+                            <td>%s</td>
+                            <td>%s</td>
+                            <td>%s</td>
+                            <td>%s</td>
+                        </tr>
+                    </table>
+                """
+                % (
+                    self.lhs,
+                    self.rhs,
+                    self.made_assignment,
+                    self.made_append_call,
+                    self.made_rhs_call,
+                    self.pos_rhs_call_pre_first_bracket,
+                    self.in_class_static_area(),
+                    self.in_method_in_class_area(),
+                    msg,
+                ),
+                mynote=0,
+            )
 
         if self.made_import:
-            self.write("self.imports_encountered %s" % self.imports_encountered, mynote=2)
+            msg = "self.imports_encountered %s" % self.imports_encountered
+
+            if DEBUG_TO_LOG_PROPER:
+                self.result_for_log_proper.append(msg)
+            if DEBUGINFO:
+                self.write(msg, mynote=2)
+
+    @property
+    def result_as_compact_string(self):
+        s = " ".join(self.result_for_log_proper)
+        s = s.replace("<br>", " ")
+        s = s.replace("<hr>", " ")
+        s = s.replace("\n", " ")
+        s = " ".join(s.split())  # remove multiple spaces
+        return "Parse History: " + s
 
     def flush(self):
         """
@@ -436,6 +477,8 @@ class Visitor(T):
     # MAIN VISIT METHODS
 
     def write(self, x, mynote=0):
+        if DEBUG_TO_LOG_PROPER:
+            self.result_for_log_proper.append(x)
         if not DEBUGINFO:
             return
         assert isinstance(x, str)

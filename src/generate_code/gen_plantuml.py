@@ -4,6 +4,7 @@ import requests
 from .gen_base import ReportGenerator, CmdLineGenerator
 from pydbg import dbg
 import logging
+from common.logger import config_log
 import functools
 from common.url_to_data import url_to_data
 from common.plantuml import deflate_and_encode
@@ -11,6 +12,7 @@ import asyncio
 from async_lru import alru_cache
 
 log = logging.getLogger(__name__)
+config_log(log)
 
 class PySourceAsPlantUml(ReportGenerator):
     def __init__(self, ast=True):

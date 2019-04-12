@@ -7,6 +7,8 @@ from app.settings import RefreshPlantUmlEvent
 from gui.coord_utils import setpos, getpos
 from gui.settings import PRO_EDITION
 from gui.uml_lines import LineShape, LineShapeUml
+import logging
+from common.logger import config_log
 if PRO_EDITION:
     from gui.uml_canvas import DividedShapeOglTwo as DividedShape
 else:
@@ -19,6 +21,8 @@ except AttributeError:
     OPEN = wx.FD_OPEN  # pheonix
     MULTIPLE = wx.FD_MULTIPLE
 
+log = logging.getLogger(__name__)
+config_log(log)
 
 class CmdFileNew(CmdBase):
     def execute(self):
@@ -101,7 +105,7 @@ class CmdFileImportViaDialog(CmdFileImportBase):  # was class CmdFileImport(CmdB
             self.context.config.write()
 
             self.files = dlg.GetPaths()
-            print("Importing...", self.files)
+            log.info("Importing... %s" % self.files)
             wx.BeginBusyCursor(cursor=wx.HOURGLASS_CURSOR)
 
             super(CmdFileImportViaDialog, self).execute()
