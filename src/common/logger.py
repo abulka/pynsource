@@ -6,7 +6,7 @@ On production DEBUG will
 """
 
 import logging
-from app import settings
+from gui import settings
 import os
 
 

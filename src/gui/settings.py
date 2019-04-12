@@ -20,3 +20,6 @@ if not PRO_EDITION:
 # APP_ICON_PATH = "/home/andy/.pyenv/versions/3.7.1/lib/python3.7/site-packages/wx/py/Py.ico"
 APP_ICON_PATH = "media/pynsource.ico"
 
+
+LOG_FILENAME = "/tmp/pynsource_debug.log"
+LOG_TO_CONSOLE = False
