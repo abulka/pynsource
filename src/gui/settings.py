@@ -1,7 +1,7 @@
 PRO_EDITION=True
 NATIVE_LINES_OGL_LIKE=False
 ASYNC_BACKGROUND_REFRESH=False  # devel purposes only
-APP_VERSION = 1.74
+APP_VERSION = 1.75
 
 try:
     import rego
@@ -20,6 +20,4 @@ if not PRO_EDITION:
 # APP_ICON_PATH = "/home/andy/.pyenv/versions/3.7.1/lib/python3.7/site-packages/wx/py/Py.ico"
 APP_ICON_PATH = "media/pynsource.ico"
 
-
-LOG_FILENAME = "/tmp/pynsource_debug.log"
 LOG_TO_CONSOLE = False

@@ -7,8 +7,35 @@ On production DEBUG will
 
 import logging
 from gui import settings
-import os
+import os, sys
+from appdirs import user_log_dir
+from common.messages import ABOUT_APPNAME as APP_NAME
 
+log = logging.getLogger(__name__)
+
+def get_log_file_path(file_name):
+    """
+    Returns path of log file.
+    Creates the directory if needed.
+
+    Args:
+        file_name: e.g. debug.log
+
+    Returns: full path e.g. ~/library/logs/pynsource/debug.log
+
+    """
+    # log.debug(f'user_log_dir() is {user_log_dir()}')
+    if sys.platform == 'win32':
+        dir = os.path.normpath(
+            os.path.join(user_log_dir(), os.path.join('..', '..', 'Roaming', APP_NAME)))
+    else:
+        dir = user_log_dir(APP_NAME).lower()
+    os.makedirs(dir, exist_ok=True)
+    path = os.path.join(dir, file_name)
+    return path
+
+LOG_FILENAME = get_log_file_path('debug.log')
+# print(f'LOG_FILENAME is {LOG_FILENAME}')
 
 def log_info(log):
     """
@@ -31,7 +58,7 @@ def log_info(log):
 
 
 try:
-    os.remove(settings.LOG_FILENAME)
+    os.remove(LOG_FILENAME)
 except:
     pass
 
@@ -57,7 +84,7 @@ def config_log(log):
     # formatter = logging.Formatter('%(levelname)s - %(message)s')
 
     # create the logging file handler, use append to keep adding to file
-    fh = logging.FileHandler(settings.LOG_FILENAME, 'a',
+    fh = logging.FileHandler(LOG_FILENAME, 'a',
                              'utf-8')  # force to utf08 because python assumes the system default which on windows is sometimes something old and dumb like cp1252
     fh.setLevel(logging.DEBUG)
     fh.setFormatter(formatter)
@@ -88,3 +115,6 @@ def config_log(log):
 def turn_off_logging(log):
     noop = logging.NullHandler()
     log.addHandler(noop)
+
+config_log(log)
+log.info(f'LOG_FILENAME is {LOG_FILENAME}')

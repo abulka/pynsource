@@ -57,6 +57,7 @@ import urllib.request, urllib.parse
 from common.url_to_data import url_to_data
 import json
 from typing import List, Set, Dict, Tuple, Optional
+import webbrowser
 
 
 if PRO_EDITION:
@@ -926,6 +927,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu4, "&Visit Pynsource Website...", "", self.OnVisitWebsite)
         Add(menu4, "&Check for Updates...", "", self.OnCheckForUpdates)
         Add(menu4, "&Report Bug...", "", self.OnReportBug)
+        Add(menu4, "View &Log...", "", self.OnViewLog)
         if unregistered:
             menu4.AppendSeparator()
             if "wxGTK" in wx.PlatformInfo:
@@ -1114,10 +1116,12 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))
 
     def OnReportBug(self, event):
-        import webbrowser
-
         # webbrowser.open("http://code.google.com/p/pynsource/issues/list")
         webbrowser.open("https://github.com/abulka/pynsource/issues")
+
+    def OnViewLog(self, event):
+        from common.logger import LOG_FILENAME
+        webbrowser.open('file://' + LOG_FILENAME)
 
     def OnRememberLayout1(self, event):
         self.umlcanvas.CmdRememberLayout1()
