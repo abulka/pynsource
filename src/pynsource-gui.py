@@ -728,6 +728,7 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
                     else:
                         self.frame.SetStatusText(STATUS_TEXT_UML_VIEW_NO_PLANTUML_RESPONSE)
                         self.plantuml.clear_cos_connection_error()
+                        self.plantuml.plantuml_text = plant_uml_txt  # fixed - ensure plantuml_text always available
                 finally:
                     self.plantuml.render_in_progress(False, self.frame)
 

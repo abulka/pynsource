@@ -222,7 +222,19 @@ PlantUML rendering requires an internet connection.
 
 
 Tip: This could simply be a one off server timeout.
-""".strip() + "  " + PLANTUML_TRY_AGAIN_HELP
+""".strip() + "  " + PLANTUML_TRY_AGAIN_HELP + """
+
+
+
+
+
+More Help:
+----------
+
+1. Your PlantUML text is still available if you r.click on this page.
+
+2. To use a local PlantUML server, edit your pynsource.ini and add e.g. PlantUmlServerUrl = http://localhost:8080/plantuml/uml
+"""
 
 PLANTUML_VIEW_USER_ABORT = """
 User cancelled PlantUML rendering.
