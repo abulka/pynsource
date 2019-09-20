@@ -116,6 +116,11 @@ class CmdFileImportViaDialog(CmdFileImportBase):  # was class CmdFileImport(CmdB
         dlg.Destroy()
 
 
+class CmdFileImportViaArgs(CmdFileImportBase):
+    def __init__(self, files=None):
+        self.files = files
+
+
 class CmdBootStrap(CmdBase):
     def execute(self):
         self.frame = self.context.frame

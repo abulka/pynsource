@@ -96,6 +96,8 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
         wx.InitAllImageHandlers()
         self.andyapptitle = "Pynsource"
 
+        self.args = sys.argv[1:]
+
         self.frame = wx.Frame(
             None,
             -1,
@@ -366,6 +368,9 @@ class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
             StartCoroutine(self.mega_refresh_check, self)
 
         self._set_app_icon()
+
+        if self.args:
+            wx.CallAfter(self.app.run.CmdFileImportViaArgs, self.args)
 
         # wx.lib.inspection.InspectionTool().Show()
 
