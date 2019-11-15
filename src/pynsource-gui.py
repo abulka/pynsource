@@ -85,11 +85,11 @@ import wx.lib.mixins.inspection  # Ctrl-Alt-I
 unregistered = not PRO_EDITION
 
 
-class MainApp(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
+class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 # class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnInit(self):
         self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)  # needed for window 10
-        self.Init()  # initialize the inspection tool
+        # self.Init()  # initialize the inspection tool
         self.log = Log()
         self.working = False
         self.printData = None

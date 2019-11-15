@@ -13,7 +13,7 @@ coverage
 pytest-cov
 black
 pydbg
-git+https://github.com/sirk390/wxasync@0386f570c669d4db1e61075dbaf75884631a0dc8
+wxasync
 aiohttp
 async_lru
 Pillow
