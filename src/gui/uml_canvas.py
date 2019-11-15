@@ -670,11 +670,13 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         self.Refresh()  # better place for refresh, also fixes problems when bundled and wx.ogl mode
 
-        if 'wxGTK' not in wx.PlatformInfo:
+        if 'wxMSW' in wx.PlatformInfo:
             """
-            Needed on Mac to see result if in a compute loop.
-            but causes keychar bind breakage issue in linux
-            Also needed in Windows to stop blurring of lines during layout
+            'wxMac': needed to see interim layout results if in a compute loop - but when using it in wxasync mode messes with 
+                     async and eventing leading to slowdown (causes gradual slowdown of wxpython events due to the wx.SafeYield())
+            'wxGTK': causes keychar bind breakage issue in linux
+            'wxMSW': can see interim layout results ok without it, used to need it to stop blurring of lines during layout 
+                     but cannot see this problem anymore, so we could potentially no use this call at all - leave it in for now for windows only
             """
             wx.SafeYield()
 
