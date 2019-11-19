@@ -10,15 +10,15 @@
 <p><img src="help-images/help01.jpg" /></p>
 <p>Import one or more python files and they will be reverse engineered and represented as a UML diagram.&nbsp; Layout the diagram as you like and print it to paper or to pdf.</p>
 <p><img src="help-images/pro.jpg" /> The Pro version of Pynsource, released in 2019, substitutes a faster graphics engine which allows for zoom, zoom to fit and drag drop line connection between shapes.&nbsp; Please support the Pro version so that more features can be added e.g. undo, advanced Python parsing, UML line annotations etc.</p>
-<p><img src="help-images/gituml.jpg" /> For an exciting new online version of Pynsource which integrates with Github, please
-    <a target="_blank" href="mailto:abulka@gmail.com?subject=GitUML beta request">email</a>
-    to request to get onto the beta program.</p>
+<h3>Video Tutorial on Youtube now available</h3>
+Check out the new <a href="https://youtu.be/FEXeDI18LMs">Youtube video tutorial</a> on basic usage of Pynsource, hopefully I'll be able to make some more videos soon.
 <h3>Importing Python files</h3>
 <p>Import multiple files by multiple selecting files (hold ctrl and/or shift) in the file open dialog.</p>
 <p>You can import repeatedly and incoming classes will be <strong>added</strong> and wired up to existing classes on the workspace.  The positions of existing classes will not be affected by new, incoming UML objects.</p>
 <p>The default parsing mode is Python 3 syntax.  To switch to Python 2 syntax mode, toggle the menu item <b>"File / Python 3 mode"</b></p>
 <h3>Adding classes</h3>
-<p>Whilst Pynsource is mainly a reverse engineering tool, you can delete classes and add new classes.&nbsp;</p>
+<p>Whilst Pynsource is mainly a reverse engineering tool, you can add and delete classes and relationships without reference to any Python code at all.
+    You can use Pynsource as a general UML class diagram editor.&nbsp;</p>
 <h3>Adding Lines</h3>
 <p>You can delete or change existing association lines, as well as create new ones.</p>
 <p>Drag lines directly between UML shapes. E.g. Drag between a shape's white port to any other shape's white port.</p>
@@ -70,14 +70,69 @@ Zooming will be towards the mouse position.</p>
 <p>There is a limitation on the size of diagram which this service will render.</p>
 <p>There is no ability to select and move shapes.
     You can however switch to the main UML view, where everthing is editable, then switch back to PlantUML view (the UML image will be re-rendered).</p>
-<p>Printing, zooming (pro) and saving of images (pro) are available whilst in PlantUML view.</p>
+<p>Printing, zooming (pro) and saving of images (pro) are also available whilst in PlantUML view.</p>
+
+<h4>Debugging PlantUML server rendering failures</h4>
+<p>If you are having problems generating PlantUML diagrams, view the <b>Pynsource log file</b> using the menu 
+    <pre>Help / View Log...        
+    </pre> which will show the calls to the 
+    PlantUML urls and importantly, the internet response codes. A response code of <b>200</b> means OK.
+    You can copy and paste the logs to 
+    <a target="_blank" href="mailto:abulka@gmail.com?subject=Pynsource support request">support</a>
+    if you would like some help diagnosing the issue.</p>
+<h4>Running your own PlantUML server</h4>
+<p>If you have trouble accessing the internet, or you want faster rendering speed and larger diagrams capacity, consider running your own plantUML server 
+    and tell Pynsource to use it. Simply add the line <pre>PlantUmlServerUrl = http://localhost:8080/plantuml/uml        
+    </pre> to your Pynsource config file. 
+</p>
+<p>
+    The location of your Pynsource config file varies on each operating system and can be viewed in the log file (see above) - 
+    look for the entry <i>Pynsource (configobj) config location</i>.  
+    For example on Mac the config file is <code>~/Library/Preferences/Pynsource/pynsource.ini</code>
+</p>
+<h4>To install PlantUML server on Mac:</h4>
+First
+<pre>
+install <a href="https://brew.sh/">Brew</a>
+</pre>
+If you don't have Java installed
+<pre>
+brew tap adoptopenjdk/openjdk
+brew cask install adoptopenjdk8
+</pre>
+then
+<pre>
+brew install maven
+git clone https://github.com/plantuml/plantuml-server.git
+cd plantuml-server
+mvn jetty:run
+
+verify by visiting your local page
+http://localhost:8080/plantuml/
+
+You can specify the port at which it runs:
+mvn jetty:run -Djetty.port=9999
+</pre>
+
+<h4>To install PlantUML server on Linux:</h4>
+Install Java then
+<pre>
+sudo apt install maven
+git clone https://github.com/plantuml/plantuml-server.git
+cd plantuml-server
+mvn jetty:run    
+</pre>
+
 <hr />
 <h3>Known Bugs in Mac version</h3>
 <ul>
 <li>When printing, the default page range in the print dialog box appears as 1-9999. Only the one page will actually be physically printed (thankfully).</li>
-<li>"Pure" full-screen on Mac is prevented due to slower performance, please limit yourself to "regular" maximised mode (hold ALT when pressing the maximise icon).</li>
+<li>"Pure" full-screen on Mac is prevented (on Community Edition only, PRO is OK) due to slower performance, please limit yourself to "regular" maximised mode (hold ALT when pressing the maximise icon).</li>
 </ul>
 <p>These limitations are due bugs in the underlying wxPython GUI toolkit on Mac.</p>
+<h3>News</h3>
+<p><img src="help-images/gituml.jpg" /> For an exciting new online version of Pynsource which integrates with Github, please visit 
+    <a href="http://gituml.com">GitUML</a> where you can set up a free account. It supports Java and Python.</p>
 
 </body>
 </html>
