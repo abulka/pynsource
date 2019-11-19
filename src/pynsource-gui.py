@@ -548,7 +548,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
             self.umlcanvas.fix_scrollbars()
 
-            if 'wxMac' in wx.PlatformInfo:# and not PRO_EDITION:
+            if 'wxMac' in wx.PlatformInfo and not PRO_EDITION:
                 # Protect against resizing to pure fullscreen, to avoid weird performance degredation
                 # Luckily the Messagebox kills the resize frame attempt!
                 # print(f"wx.DisplaySize()={wx.DisplaySize()}")
