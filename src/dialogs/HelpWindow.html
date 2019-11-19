@@ -146,8 +146,15 @@ For example:
 python3 src/pynsource-gui.py FILE1.PY FILE2.PY etc.
 e.g.
 python3 src/pynsource-gui.py src/app/cmds/l*.py
-</pre><p>Pynsource currrently assumes that the files to be analysed are Python 3 - this is not yet
-configurable, but could be changed in src/pynsource-gui.py line 379 by passing a 2 instead of a 3.
+</pre>
+If you are running the binary Pynsource you simply invoke the exe  and then the list of Python files you want to reverse engineer.
+In this way, PRO users can take advantage of this feature.
+On Mac, the command is a little trickier e.g.
+<pre>
+/Applications/pynsource.app/Contents/MacOS/Pynsource FILE1.PY FILE2.PY</pre>
+<p>Tip: Pynsource currrently assumes that the files to be analysed are Python 3 - this is not yet
+configurable, but could be changed if you are running from source code: 
+in src/pynsource-gui.py line 379 by passing a 2 instead of a 3.
 </p>
 </body>
 </html>
