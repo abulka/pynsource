@@ -35,7 +35,7 @@ def get_log_file_path(file_name):
     return path
 
 LOG_FILENAME = get_log_file_path('debug.log')
-# print(f'LOG_FILENAME is {LOG_FILENAME}')
+print(f'LOG_FILENAME is {LOG_FILENAME}')
 
 def log_info(log):
     """

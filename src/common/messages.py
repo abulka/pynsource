@@ -179,7 +179,9 @@ Click Yes to learn more about the Pro Edition.
 PRO_INFO_URL = WEB_PYNSOURCE_HOME_URL  # TODO, change to be more specific
 
 PURE_MAC_FULLSCREEN_WARNING = """
-Pure fullscreen on Mac slows down this app due to a wxPython bug.
+Pure fullscreen (on Mac only) slows down this app due to a wxPython OGL bug. 
+
+** This limitation does not affect the PRO edition which uses a different, faster rendering engine. **
 
 Please limit yourself to maximised mode (hold ALT when pressing the maximise icon, or just double click on the titlebar).
 

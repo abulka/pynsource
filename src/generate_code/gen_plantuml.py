@@ -140,6 +140,7 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str, pl
         # url = os.path.join(plant_uml_server, deflate_and_encode(plant_uml_txt))  # fails on windows cos \ char is not proper url
         url = plant_uml_server + "/" + deflate_and_encode(plant_uml_txt)
         data, status_code = await url_to_data(url)
+        log.info(f"Response from plant_uml_server status_code {status_code}")
         response_text = data.decode('utf-8')
 
     except (ConnectionError,
@@ -150,7 +151,7 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str, pl
             f"Error trying to fetch initial html from plantuml server {plant_uml_server} {str(e)}")
         return None
     except asyncio.TimeoutError as e:  # there is no string repr of this exception
-        print("time out getting plantuml html")
+        log.error("TimeoutError getting plantuml html")
         raise
 
     if status_code == 200:

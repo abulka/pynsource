@@ -19,7 +19,12 @@ from common.messages import *
 import datetime
 from app.settings import CancelRefreshPlantUmlEvent, EVT_CANCEL_REFRESH_PLANTUML_EVENT
 from common.url_to_data import url_to_data
+import logging
+from common.logger import config_log
 
+
+log = logging.getLogger(__name__)
+config_log(log)
 
 ALLOW_DRAWING = True
 DEFAULT_IMAGE_SIZE = (21, 21)  # used to be 2000, 2000 for some reason
@@ -147,13 +152,17 @@ class ImageViewer(wx.ScrolledWindow):
             # print(url_to_data.cache_info())
             try:
                 data, status = await url_to_data(url)
+                log.info(f"(2nd, image grabbing) Response from plant_uml_server status_code {status}")
+
             except asyncio.TimeoutError as e:  # there is no string repr of this exception
                 self.clear_cos_connection_error(msg="(timeout)")
                 url_to_data.cache_clear()  # so if retry you won't get the same error
+                log.error("TimeoutError getting plantuml IMAGE")
                 return
 
             if status != 200:
                 self.clear_cos_connection_error(msg=f"(bad response {status})")
+                log.error(f"Error getting plantuml IMAGE, (bad response {status})")
                 return
 
             stream = io.BytesIO(data)

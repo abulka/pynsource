@@ -78,11 +78,15 @@ ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS = True
 from gui.uml_canvas import UmlCanvas
 from gui.wx_log import Log
 from ascii_uml.layout_ascii import model_to_ascii_builder
-
+import logging
+from common.logger import config_log
 from app.app import App
 import wx.lib.mixins.inspection  # Ctrl-Alt-I
 
 unregistered = not PRO_EDITION
+
+log = logging.getLogger(__name__)
+config_log(log)
 
 
 class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
@@ -369,6 +373,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         self._set_app_icon()
 
+        log.info(f"Version {APP_VERSION} running, ASYNC={ASYNC}, PRO={PRO_EDITION}")
+
         if self.args:
             wx.CallAfter(self.app.run.CmdFileImportViaArgs, self.args)
 
@@ -478,7 +484,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         except OSError:
             pass
         self.user_config_file = os.path.join(config_dir, PYNSOURCE_CONFIG_FILE)
-        # print("Pynsource (configobj) config location", self.user_config_file)
+        log.info("Pynsource (configobj) config location %s" % self.user_config_file)
 
         self.config = ConfigObj(self.user_config_file)
         self.config["keyword1"] = 100
@@ -491,7 +497,6 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
                 self.config[key] = os.path.expanduser("~/")
 
         self.config.write()
-        # print("Pynsource config", self.config)
 
 
         """
@@ -508,7 +513,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.configwx = wx.FileConfig(localFilename=self.user_configwx_file)
 
         keyword3 = self.configwx.Read("keyword3")  # just testing
-        # print("Pynsource (wx.FileConfig) config location", self.user_configwx_file)
+        log.info("Pynsource (wx.FileConfig) config location %s" % self.user_configwx_file)
         # print(keyword3)
 
         """Experiments with using wx.StandardPaths"""
@@ -523,6 +528,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         # # GetConfigDir is /Library/Preferences
         # # GetUserDataDir is ~/Library/Application Support/pynsource-gui
         # # GetUserConfigDir is ~/Library/Preferences
+
+        log.info("Main config contents: %s" % self.config)
 
     def OnResizeFrame(self, event):  # ANDY  interesting - GetVirtualSize grows when resize frame
         # print("OnResizeFrame event.EventObject", event.EventObject.__class__, event.EventObject == self.umlcanvas, isinstance(event.EventObject, wx.ScrolledWindow))
@@ -541,7 +548,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
             self.umlcanvas.fix_scrollbars()
 
-            if 'wxMac' in wx.PlatformInfo:
+            if 'wxMac' in wx.PlatformInfo:# and not PRO_EDITION:
                 # Protect against resizing to pure fullscreen, to avoid weird performance degredation
                 # Luckily the Messagebox kills the resize frame attempt!
                 # print(f"wx.DisplaySize()={wx.DisplaySize()}")
@@ -726,13 +733,15 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
                     # if random.randint(1,2) == 1:
                     #     image_url = None
 
+                    log.info("image_url of UML %s" % image_url)
+
                     if image_url:
                         await self.plantuml.ViewImage(url=image_url)
                         self.plantuml.plantuml_text = plant_uml_txt
                         self.frame.SetStatusText(STATUS_TEXT_UML_VIEW)
                     else:
                         self.frame.SetStatusText(STATUS_TEXT_UML_VIEW_NO_PLANTUML_RESPONSE)
-                        self.plantuml.clear_cos_connection_error()
+                        self.plantuml.clear_cos_connection_error(msg=f"(no image_url from plantuml at {plantuml_server_local_url})") # this is what I was just getting
                         self.plantuml.plantuml_text = plant_uml_txt  # fixed - ensure plantuml_text always available
                 finally:
                     self.plantuml.render_in_progress(False, self.frame)
@@ -1344,6 +1353,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         await asyncio.sleep(15)
         url = WEB_VERSION_CHECK_URL_TRACKED_DEVEL if self._running_andy_development_mode() else WEB_VERSION_CHECK_URL_TRACKED
         status_code = 0
+        log.info(f"Version check url {url}")
         try:
             data, status_code = await url_to_data(url)
             response_text = data.decode('utf-8')
@@ -1355,11 +1365,11 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         #         f"Error trying to fetch initial html from plantuml server {plant_uml_server} {str(e)}")
         #     return None
         except asyncio.TimeoutError as e:  # there is no string repr of this exception
-            print("time out getting latest version info")
+            log.info("TimeoutError getting latest version info")
         except aiohttp.client_exceptions.ClientConnectorError as e:
-            print("connection error (no internet?) getting latest version info")
+            log.info("connection error (no internet?) getting latest version info")
         else:
-            print(f"checked url for updates: {url}")
+            log.info(f"Version update response: {status_code}")
 
         if status_code == 200:
             self._update_alert(info, alert_even_if_running_latest=False)
@@ -1389,12 +1399,12 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
                     f"You seem to have a pre-release version {APP_VERSION} - congratulations!  Stable version is {ver}"
                 )
             else:
-                print("you have a future version of Pynsource!")
+                log.info("You have a future version of Pynsource!")
         else:
             if alert_even_if_running_latest:
                 self.MessageBox("You already have the latest version:  %s" % APP_VERSION)
             else:
-                print("latest version ok")
+                log.info("latest version ok")
 
     def _running_andy_development_mode(self):
         return os.path.exists("/Users/Andy/Devel/pynsource-rego") or \
