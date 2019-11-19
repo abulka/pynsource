@@ -117,8 +117,27 @@ class CmdFileImportViaDialog(CmdFileImportBase):  # was class CmdFileImport(CmdB
 
 
 class CmdFileImportViaArgs(CmdFileImportBase):
-    def __init__(self, files=None):
+    """
+    Gets called when you pass arguments to Pynsource on the command line, 
+    which reverse engineers and generates a diagram from those Python files.
+    Example Usages:
+        python3 src/pynsource-gui.py src/layout/overlap_removal.py src/layout/layout_spring.py
+        python3 src/pynsource-gui.py src/layout/*.py
+        python3 src/pynsource-gui.py src/app/cmds/*.py
+        python3 src/pynsource-gui.py src/app/cmds/l*.py
+    
+    Assumes the files to be analysed are Python 3 - this is not yet
+    configurable, but could be changed in src/pynsource-gui.py line 379 by passing a 2 instead of a 3.
+    
+    If running the PRO edition (the command would be)
+        cd src; PYTHONPATH="/Users/andy/Devel/ogl2/:/Users/andy/Devel/pynsource-rego/" python3 pynsource-gui.py layout/overlap_removal.py ; cd ..
+    or more simply
+        PYTHONPATH="/Users/andy/Devel/ogl2/:/Users/andy/Devel/pynsource-rego/" python3 src/pynsource-gui.py src/layout/overlap_removal.py
+    """
+    def __init__(self, files=None, mode=3):
         self.files = files
+        self.mode = mode
+        log.info("Importing files passed on command line, Python mode is {self.mode} files are {files}")
 
 
 class CmdBootStrap(CmdBase):

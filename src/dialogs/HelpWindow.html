@@ -130,9 +130,24 @@ mvn jetty:run
 <li>"Pure" full-screen on Mac is prevented (on Community Edition only, PRO is OK) due to slower performance, please limit yourself to "regular" maximised mode (hold ALT when pressing the maximise icon).</li>
 </ul>
 <p>These limitations are due bugs in the underlying wxPython GUI toolkit on Mac.</p>
-<h3>News</h3>
+<h3>Latest News</h3>
 <p><img src="help-images/gituml.jpg" /> For an exciting new online version of Pynsource which integrates with Github, please visit 
     <a href="http://gituml.com">GitUML</a> where you can set up a free account. It supports Java and Python.</p>
-
+<h3>Latest Features</h3>
+<h4>Full Screen Mode on Mac</h4>
+<p><img src="help-images/pro.jpg" /> True full screen mode on Mac is now enabled for Pro users.</p>
+<h4>Command Line use</h4>
+<p>
+You can pass arguments to Pynsource on the command line, 
+which reverse engineers and generates a diagram from those Python files.
+For example:   
+</p>
+<pre>
+python3 src/pynsource-gui.py FILE1.PY FILE2.PY etc.
+e.g.
+python3 src/pynsource-gui.py src/app/cmds/l*.py
+</pre><p>Pynsource currrently assumes that the files to be analysed are Python 3 - this is not yet
+configurable, but could be changed in src/pynsource-gui.py line 379 by passing a 2 instead of a 3.
+</p>
 </body>
 </html>

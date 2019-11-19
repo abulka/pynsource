@@ -376,7 +376,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         log.info(f"Version {APP_VERSION} running, ASYNC={ASYNC}, PRO={PRO_EDITION}")
 
         if self.args:
-            wx.CallAfter(self.app.run.CmdFileImportViaArgs, self.args)
+            wx.CallAfter(self.app.run.CmdFileImportViaArgs, self.args, 3)  # default to Python 3 reverse engineering
 
         # wx.lib.inspection.InspectionTool().Show()
 
@@ -1068,7 +1068,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.plantuml.zoom(reset=True)
 
     def OnPythonMode(self, event):
-        print("python 3 syntax mode state now:", self.item_python3_mode.IsChecked())
+        log.info("python 3 syntax mode state now: %s" % self.item_python3_mode.IsChecked())
 
     def OnRightButtonMenu(self, event):  # Menu
         x, y = event.GetPosition()
