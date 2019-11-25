@@ -1,13 +1,17 @@
 {
- "latest_version" : 1.74,
+ "latest_version" : 1.75,
  "latest_announcement" : """
-Bug fixes:
-- fixed shape jumping back to drag start position if not selected (windows, linux)
-- add proper extension when saving files (linux)
+ - Asyncronous performance fixes (Mac)
 
-config file enhancement for people who have small or unusual displays (mac, windows, linux)
+- Line joining accuracy improvements (Pro)
 
-first snap release (linux)
+- Ability to pass files you want to reverse engineer via the command line
+
+- Better debugging via Help/Logs... of PlantUML rendering via internet
+
+- Improved Help including
+  - YouTube video tutorial link
+  - How to set up a local PlantUML server (optional)
 """,
  "version_syntax_format" : 1,
  "download_url" : "http://bit.ly/pynsource-upgrade-download"
