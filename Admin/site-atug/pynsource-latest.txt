@@ -12,6 +12,8 @@
 - Improved Help including
   - YouTube video tutorial link
   - How to set up a local PlantUML server (optional)
+
+- Ability to go true fullscreen on Mac (Pro) - Note: Windows and Linux already can go fullscreen for both Community Edition and Pro.
 """,
  "version_syntax_format" : 1,
  "download_url" : "http://bit.ly/pynsource-upgrade-download"
