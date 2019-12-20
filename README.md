@@ -129,6 +129,12 @@ When using PlantUML view, if you want to run your own PlantUML server (faster, l
 Help support the project by Donating or purchasing a Pro Edition license.  Future plans include
 undo/redo, recognition of Python type annotations, line labels, module and package visualisation.
 
+Study the Source Code
+---------------------
+
+Create instant UML and [Literate Code Map](http://bit.ly/lcodemaps) diagrams of this GitHub project.
+
+[![button](https://www.dropbox.com/s/auynuqlfbrrxyhm/open_in_gituml_flat.png?raw=1)](http://localhost:8000/ztree_scratchpad?user=abulka&repo=pynsource&commit=master)
 
 License
 -------
