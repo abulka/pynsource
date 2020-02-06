@@ -263,13 +263,14 @@ def _convert_ast_to_old_parser(node, filename, log, options={}):
         # debug output goes to special html formatted log file controlled by 'logh' object
         logh.out("Parsing Visit error: {0}".format(err), force_print=True)
         logh.out_wrap_in_html(traceback.format_exc(), style_class="stacktrace")
+        if DEBUGINFO():
+            debuginfo = "<br>".join(v.result)
+            logh.out(debuginfo)
+            logh.out(f"<br>model.errors: '{v.model.errors}'<br>")
+            logh.out_html_footer()
+            logh.finish()
+
         if STOP_ON_EXCEPTION:
-            if DEBUGINFO():
-                debuginfo = "<br>".join(v.result)
-                logh.out(debuginfo)
-                logh.out(f"<br>model.errors: '{v.model.errors}'<br>")
-                logh.out_html_footer()
-                logh.finish()
             raise
 
 
@@ -1083,12 +1084,18 @@ class Visitor(T):
     # S
     def visit_Dict(self, node):
         self.write("{")
-        for idx, (key, value) in enumerate(zip(node.keys, node.values)):
-            if idx:
-                self.write(", ")
-            self.visit(key)
-            self.write(": ")
-            self.visit(value)
+
+        # Skip visiting inside the dictionary - no point getting confused by syntax like
+        #     "varin = {**self.optStruct['ModelVars'], **data}"
+        # all we want are big picture classes, functions, methods etc.
+        # 
+        # for idx, (key, value) in enumerate(zip(node.keys, node.values)):
+        #     if idx:
+        #         self.write(", ")
+        #     self.visit(key)
+        #     self.write(": ")
+        #     self.visit(value)
+        
         self.write("}")
 
     # S
