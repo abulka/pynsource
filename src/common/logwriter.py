@@ -5,6 +5,7 @@ class LogWriter:
     def __init__(self, in_filename=None, out_filename=None, print_to_console=False):
 
         self.print_to_console = print_to_console
+        self.out_filename = ""
 
         # TODO should allow both 'in_filename' and 'out_filename' to be separately specified
 
@@ -81,7 +82,8 @@ class LogWriter:
 
 class LogWriterNull:
     def __init__(self, in_filename=None, out_filename=None, print_to_console=False):
-        pass
+        self.print_to_console = print_to_console
+        self.out_filename = out_filename
 
     def finish(self):
         pass
