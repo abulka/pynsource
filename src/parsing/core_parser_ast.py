@@ -26,6 +26,7 @@ from parsing.keywords import pythonbuiltinfunctions
 from parsing.parse_rhs_analyser import RhsAnalyser
 from parsing.quick_parse import QuickParse
 from common.logwriter import LogWriter, LogWriterNull
+from common.logger import LOG_FILENAME
 
 log_proper = logging.getLogger(__name__)
 config_log(log_proper)
@@ -35,8 +36,10 @@ try:
 except ImportError:
     pass  # python 3 already imports all built in exceptions
 
-STOP_ON_EXCEPTION = True
-DEBUGINFO = False
+STOP_ON_EXCEPTION = False  # this is only for deep debugging - want this OFF so that errors get reported to GUI
+_DEBUGINFO = False
+def DEBUGINFO(): return _DEBUGINFO
+def set_DEBUGINFO(flag: bool): global _DEBUGINFO; _DEBUGINFO = flag  # allow setting from outside this module
 DEBUGINFO_IMMEDIATE_PRINT = False
 DEBUG_TO_LOG_PROPER = True
 DEBUG_TO_LOG_PROPER_FLUSH_STATE = False  # usually too verbose for log file
@@ -158,8 +161,12 @@ def parse(filename, log=None, options={}):
         mode(0)  # reset
         pmodel.errors = f"General exception in parsing\n'{filename}'\nassuming Python {_mode} syntax - exception is: {e}.\n\n{generic_help}"
         return pmodel, ""
+    else:
+        msg = f"Ok parsing the file {filename} - no syntax errors encountered"
+        log_proper.info(msg)
+        log.out(msg)
 
-    pmodel, debuginfo = _convert_ast_to_old_parser(node, filename, log, options)
+    pmodel, debuginfo = _convert_ast_to_old_parser(node, filename, log, options)  # guaranteed to return ok, any exception in pmodel.errors (string)
     mode(0)  # reset
     return pmodel, debuginfo  # 'debuginfo' is string of html
 
@@ -198,6 +205,28 @@ def _ast_parse(filename):
 
     return root
 
+def _remove_html_tags(text):
+    """Remove html tags from a string"""
+    import re
+    clean = re.compile('<.*?>')
+    s = re.sub(clean, '\n', text)
+    # now get rid of blank lines and insert newlines only on visit_* occurrances
+    lines = s.splitlines()
+    new_s = ""
+    for line in lines:
+        if line.strip() != "":
+            if line.startswith("visit_"):
+                new_s += "\n\t"
+            new_s += line.strip() + " "
+    return new_s
+
+def _extract_source_code_line(filename, lineno):
+    with open(filename) as f:
+        our_lines = f.readlines()
+        if lineno < len(our_lines):
+            return our_lines[lineno - 1].strip()
+        else:
+            return f"?line {lineno} exceeds num lines in file {len(our_lines)}, last source code line is {our_lines[-1].strip()}"
 
 def _convert_ast_to_old_parser(node, filename, log, options={}):
     """
@@ -220,21 +249,32 @@ def _convert_ast_to_old_parser(node, filename, log, options={}):
     try:
         v.visit(node)
     except Exception as err:
+
+        source_code_line = _extract_source_code_line(filename, v.latest_lineno)
+        v.model.errors += f" Pynsource couldn't handle AST area in file {filename} at lineno {v.latest_lineno} coloffset {v.latest_col_offset} - source code:\n\n \"{source_code_line}\""
+        v.model.errors += f"\n\nPlease report this to https://github.com/abulka/pynsource/issues"
+        v.model.errors += f"\n\nThere may be more detail in the log file {LOG_FILENAME}"
+
+        if DEBUG_TO_LOG_PROPER:  # output goes to regular python logging
+            log_proper.error(f"html version of debug info may exist at: '{logh.out_filename}'")
+            log_proper.error(f"model.errors: '{v.model.errors}'")
+            # log_proper.error(f"Parsing Visit error: {err}, Debug info: {v.result_for_log_proper_cleaned}")  # very verbose                    
+
+        # debug output goes to special html formatted log file controlled by 'logh' object
         logh.out("Parsing Visit error: {0}".format(err), force_print=True)
         logh.out_wrap_in_html(traceback.format_exc(), style_class="stacktrace")
         if STOP_ON_EXCEPTION:
-            if DEBUGINFO:
+            if DEBUGINFO():
                 debuginfo = "<br>".join(v.result)
                 logh.out(debuginfo)
-                if DEBUG_TO_LOG_PROPER:
-                    log_proper.error("Parsing Visit error: {0}".format(err) + v.result_as_compact_string)
+                logh.out(f"<br>model.errors: '{v.model.errors}'<br>")
                 logh.out_html_footer()
                 logh.finish()
             raise
 
 
     if DEBUG_TO_LOG_PROPER and DEBUG_TO_LOG_PROPER_PARSE_HISTORY:
-        log_proper.debug(v.result_as_compact_string)
+        log_proper.debug(v.result_for_log_proper_cleaned)
     debuginfo = "<br>".join(v.result)
     return v.model, debuginfo
 
@@ -255,11 +295,14 @@ class Visitor(T):
         self.init_lhs_rhs()
         self.imports_encountered = []
 
-        self.result = []
-        self.result_for_log_proper = []
+        self.result = []                 # accumulated visitor debug info with html
+        self.result_for_log_proper = []  # accumulated visitor debug info without html
         self.indent_with = " " * 4
         self.indentation = 0
         self.new_lines = 0
+
+        self.latest_lineno = 0
+        self.latest_col_offset = 0
 
         self.treat_property_decorator_as_prop = options.get(
             "TREAT_PROPERTY_DECORATOR_AS_PROP", TREAT_PROPERTY_DECORATOR_AS_PROP
@@ -353,7 +396,7 @@ class Visitor(T):
                 self.in_method_in_class_area(),
                 msg
             ))
-        if DEBUGINFO:
+        if DEBUGINFO():
             self.write(
                 """
                     <table>
@@ -400,16 +443,17 @@ class Visitor(T):
 
             if DEBUG_TO_LOG_PROPER:
                 self.result_for_log_proper.append(msg)
-            if DEBUGINFO:
+            if DEBUGINFO():
                 self.write(msg, mynote=2)
 
     @property
-    def result_as_compact_string(self):
+    def result_for_log_proper_cleaned(self):
         s = " ".join(self.result_for_log_proper)
-        s = s.replace("<br>", " ")
-        s = s.replace("<hr>", " ")
-        s = s.replace("\n", " ")
-        s = " ".join(s.split())  # remove multiple spaces
+        s = _remove_html_tags(s)
+        # s = s.replace("<br>", " ")
+        # s = s.replace("<hr>", " ")
+        # s = s.replace("\n", " ")
+        # s = " ".join(s.split())  # remove multiple spaces
         return "Parse History: " + s
 
     def flush(self):
@@ -424,7 +468,7 @@ class Visitor(T):
             in order to create the relevant attribute and type (one or many).
             """
 
-        if DEBUGINFO:
+        if DEBUGINFO():
             # this is cripplingly slow when bundled in pyinstaller
             self.flush_state(whosgranddaddy())
         else:
@@ -479,7 +523,7 @@ class Visitor(T):
     def write(self, x, mynote=0):
         if DEBUG_TO_LOG_PROPER:
             self.result_for_log_proper.append(x)
-        if not DEBUGINFO:
+        if not DEBUGINFO():
             return
         assert isinstance(x, str)
         if self.new_lines:
@@ -492,7 +536,14 @@ class Visitor(T):
         if DEBUGINFO_IMMEDIATE_PRINT:
             print(x)
 
+    def _record_line_number(self, node):
+        if node:
+            self.write(f"Line: {node.lineno} col_offset: {node.col_offset}", mynote=2)  # 2 means red colour
+            self.latest_lineno = node.lineno
+            self.latest_col_offset = node.col_offset
+
     def newline(self, node=None, extra=0):
+        self._record_line_number(node)
         self.new_lines = max(self.new_lines, 1 + extra)
 
         # A
