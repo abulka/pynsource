@@ -39,7 +39,8 @@ def reverse_engineer(files, mode, graph, prop_decorator, version):
                                                    "TREAT_PROPERTY_DECORATOR_AS_PROP": prop_decorator})
         if pmodel.errors:
             print(pmodel.errors)
-        click.echo(f"Parse model for '{f}':")
+        assert f == pmodel.filename
+        click.echo(f"Parse model for '{pmodel.filename}':")
         click.echo(dump_pmodel(pmodel))
 
         if graph:

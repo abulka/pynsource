@@ -117,6 +117,7 @@ class OldParseModel(object):
         self.classlist = {}
         self.modulemethods = []
         self.errors = ""
+        self.filename = ""  # new, 2020, way of getting module name
 
 
 def parse(filename, log=None, options={}):
@@ -143,6 +144,7 @@ def parse(filename, log=None, options={}):
     pmodel = OldParseModel()
 
     log_proper.info(f"Parsing {filename}, syntax mode {_mode}")
+    pmodel.filename = filename  # new, 2020
 
     if _mode == 2:
         generic_help = "If you are parsing Python 3 code, check the menu item 'File/Python 3."
@@ -167,6 +169,7 @@ def parse(filename, log=None, options={}):
         log.out(msg)
 
     pmodel, debuginfo = _convert_ast_to_old_parser(node, filename, log, options)  # guaranteed to return ok, any exception in pmodel.errors (string)
+    pmodel.filename = filename  # new, 2020
     mode(0)  # reset
     return pmodel, debuginfo  # 'debuginfo' is string of html
 

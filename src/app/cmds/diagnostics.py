@@ -26,6 +26,7 @@ class CmdDumpDisplayModel(CmdBase):
 
     def dump_parse_models(self):
         for pmodel in self.context.displaymodel.pmodels_i_have_seen:
+            print("\nfilename", pmodel.filename)
             # print(dump_old_structure(pmodel))
             print(dump_pmodel(pmodel))
 
