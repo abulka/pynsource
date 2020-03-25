@@ -195,6 +195,19 @@ def dump_pmodel(pmodel):
             ])
         have_display_module_methods_once = True
 
+    # No classes but there are module methods yet to display
+    if pmodel.modulemethods and not have_display_module_methods_once:
+        t.append_row(
+            [
+            "",
+            "",
+            "",
+            "",
+            "\n".join(pmodel.modulemethods),
+            "",
+            "",
+            ])
+
     t.column_alignments[0] = BeautifulTable.ALIGN_LEFT
     t.row_separator_char = ""
     return t
