@@ -2,7 +2,7 @@ from .base_cmd import CmdBase
 import wx
 from beautifultable import BeautifulTable
 from termcolor import colored  # also install colorama to make this work on windows
-from parsing.dump_pmodel import dump_old_structure, dump_pmodel
+from parsing.dump_pmodel import dump_old_structure, dump_pmodel, dump_pmodel_methods
 
 
 class CmdDumpDisplayModel(CmdBase):
@@ -29,6 +29,13 @@ class CmdDumpDisplayModel(CmdBase):
             print("\nfilename", pmodel.filename)
             # print(dump_old_structure(pmodel))
             print(dump_pmodel(pmodel))
+
+        # Also dump as list of methods
+        print("")
+        print("Simple List of Methods:")
+        print("")
+        for pmodel in self.context.displaymodel.pmodels_i_have_seen:
+            print(dump_pmodel_methods(pmodel))            
 
     def dump_overlaps(self, into_existing_table=None):
         if into_existing_table:
