@@ -1,7 +1,7 @@
 import os
 import click
 import textwrap
-from parsing.dump_pmodel import dump_old_structure, dump_pmodel
+from parsing.dump_pmodel import dump_old_structure, dump_pmodel, dump_pmodel_methods
 from parsing.api import new_parser
 import common.messages
 from view.display_model import DisplayModel
@@ -12,10 +12,24 @@ from gui.settings import APP_VERSION
 @click.argument('files', nargs=-1)
 @click.option('--mode', default=3, help='Python 3 or Python 2 syntax mode')
 @click.option('--graph', is_flag=True, default=False, help='Build graph of nodes representing class relationships')
+@click.option('--methods-list', is_flag=True, default=False, help='Dump simple list of methods')
 @click.option('--prop-decorator', is_flag=True, default=False, help='Treat property decorated methods as attributes, not methods')
 @click.option('--version', is_flag=True, default=False, help='Display version number')
-def reverse_engineer(files, mode, graph, prop_decorator, version):
-    """reverse engineer python source code"""
+def reverse_engineer(files, mode, graph, methods_list, prop_decorator, version):
+    """Pynsource CLI - Reverse engineer python source code into UML
+
+    This command line tool doesn't actualy generate diagrams, but it does parse Python code into the 
+    underlying 'pmodel' (parse model) that the Pynsource GUI graphic diagrammer uses.  Used for debugging.
+    
+    Examples of use:
+
+        python3 ./src/pynsource-cli.py a.py b.py
+
+        python3 ./src/pynsource-cli.py --graph src/common/command_pattern.py
+
+        python3 ./src/pynsource-cli.py --methods-list src/common/*.py
+
+    """
 
     if version:
         click.echo(f"Pynsource CLI version {APP_VERSION}")
@@ -39,12 +53,17 @@ def reverse_engineer(files, mode, graph, prop_decorator, version):
                                                    "TREAT_PROPERTY_DECORATOR_AS_PROP": prop_decorator})
         if pmodel.errors:
             print(pmodel.errors)
-        assert f == pmodel.filename
-        click.echo(f"Parse model for '{pmodel.filename}':")
-        click.echo(dump_pmodel(pmodel))
 
-        if graph:
-            displaymodel.build_graphmodel(pmodel)  # will append
+        if methods_list: # Dump simple list of methods
+            click.echo(dump_pmodel_methods(pmodel))
+
+        else:  # Dump table of underlying pmodel
+            assert f == pmodel.filename
+            click.echo(f"Parse model for '{pmodel.filename}':")
+            click.echo(dump_pmodel(pmodel))
+
+            if graph:  # Dump table of display model
+                displaymodel.build_graphmodel(pmodel)  # will append
 
     if graph:
         displaymodel.Dump(msg="Final display model Graph containing all parse models:")

@@ -112,6 +112,7 @@ N1 .. ClassDependency
 
 from beautifultable import BeautifulTable
 from termcolor import colored  # also install colorama to make this work on windows
+import os
 
 
 # Util
@@ -242,4 +243,43 @@ def dump_old_structure(pmodel):
         for adef in classentry.defs:
             res += "    %s()\n" % adef
     res += "    modulemethods %s\n" % (pmodel.modulemethods)
+    return res
+
+
+# New dump all methods, as per request https://github.com/abulka/pynsource/issues/66 
+
+def dump_pmodel_methods(pmodel):
+    """
+    Generate text file with all class, methods, functions signatures.
+    myModule1.myClass2.mymethod(arg1, ...)
+    myModule2.myClass3.mymethod(arg1, ...)
+    """
+    res = ""
+
+    repair_old_pmodels(pmodel)
+
+    module_name = os.path.basename(pmodel.filename).replace(".py", "")
+
+    filename_msg = f"File: {pmodel.filename}"  # name of file
+    res += f"{filename_msg}\n{'-'*len(filename_msg)}\n"  # underline
+
+    # module methods (not in a class)
+    was_content = False
+    for adef in pmodel.modulemethods:
+        res += f"{module_name}.{adef}()\n"
+        was_content = True
+    if was_content:
+        res += "\n"
+
+    # methods in each class
+    for classname, classentry in sorted(
+        list(pmodel.classlist.items()), key=lambda kv: calc_classname(kv[1])
+    ):
+        was_content = False
+        for adef in classentry.defs:
+            res += f"{module_name}.{calc_classname(classentry)}.{adef}()\n"
+            was_content = True
+        if was_content:
+            res += "\n"
+
     return res
