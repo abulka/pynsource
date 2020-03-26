@@ -49,7 +49,7 @@ last_python_mode = 0
 
 if getattr(sys, 'frozen', False):
     # running in a bundle
-    DEBUGINFO = False
+    _DEBUGINFO = False
 
 def as_str(obj):
     """
@@ -156,8 +156,9 @@ def parse(filename, log=None, options={}):
         node = _ast_parse(filename)
     except SyntaxError as e:
         mode(0)  # reset
-        pmodel.errors = f"Syntax error in parsing\n'{filename}'\n\n{e}\n\nPynsource is in Python {_mode} syntax mode.\n{generic_help}"
-        log_proper.error(" ".join(pmodel.errors.split()))  # remove multiple spaces
+        pmodel.errors = f"Syntax error in parsing\n'{filename}'\n\n{_format_syntax_error_nicely(e)}\nPynsource is in Python {_mode} syntax mode.\n{generic_help}"
+        # log_proper.error(" ".join(pmodel.errors.split()))  # remove multiple spaces
+        log_proper.error(pmodel.errors)  # changed my mind, log again with newlines intact ;-)
         return pmodel, ""
     except Exception as e:
         mode(0)  # reset
@@ -173,6 +174,11 @@ def parse(filename, log=None, options={}):
     mode(0)  # reset
     return pmodel, debuginfo  # 'debuginfo' is string of html
 
+def _format_syntax_error_nicely(e):
+    try:
+        return f"'{e.msg}' on line {e.lineno}:\n\n{e.text}"
+    except:
+        return repr(e)
 
 def _ast_parse(filename):
     """
@@ -224,6 +230,8 @@ def _remove_html_tags(text):
     return new_s
 
 def _extract_source_code_line(filename, lineno):
+    if lineno == 0:
+        return f"UNKNOWN source code since line number is 0 ?"
     with open(filename) as f:
         our_lines = f.readlines()
         if lineno < len(our_lines):
@@ -249,19 +257,28 @@ def _convert_ast_to_old_parser(node, filename, log, options={}):
     qp = QuickParse(filename, logh)
     v = Visitor(qp, logh, options)
 
+    # Give visitor access to source code, for diagnostic purposes
+    with open(filename) as f:
+        v.source_code_lines = f.readlines()
+
     try:
         v.visit(node)
     except Exception as err:
+        # traceback.print_exception(type(ex), ex, ex.__traceback__)
 
         source_code_line = _extract_source_code_line(filename, v.latest_lineno)
-        v.model.errors += f" Pynsource couldn't handle AST area in file {filename} at lineno {v.latest_lineno} coloffset {v.latest_col_offset} - source code:\n\n \"{source_code_line}\""
+        v.model.errors += f"Pynsource couldn't handle traversing AST in file {filename} corresponding to approx. lineno {v.latest_lineno} coloffset {v.latest_col_offset} - source code:\n\n {source_code_line}"
         v.model.errors += f"\n\nPlease report this to https://github.com/abulka/pynsource/issues"
-        v.model.errors += f"\n\nThere may be more detail in the log file {LOG_FILENAME}"
+        v.model.errors += f"\n\nLog file location:\n{LOG_FILENAME}"
+        v.model.errors += f"\n\nActual exception:\n\n{err}"
 
         if DEBUG_TO_LOG_PROPER:  # output goes to regular python logging
             log_proper.error(f"html version of debug info may exist at: '{logh.out_filename}'")
             log_proper.error(f"model.errors: '{v.model.errors}'")
-            # log_proper.error(f"Parsing Visit error: {err}, Debug info: {v.result_for_log_proper_cleaned}")  # very verbose                    
+
+            # IMPORTANT TO LEAVE THIS IN because it reports the actual exception in the proper log
+            log_proper.error(f"Parsing Visit error: {err}, Debug info: {v.result_for_log_proper_cleaned}")  # very verbose                
+            log_proper.error(f"Full traceback: {traceback.format_exc()}")
 
         # debug output goes to special html formatted log file controlled by 'logh' object
         logh.out("Parsing Visit error: {0}".format(err), force_print=True)
@@ -292,6 +309,7 @@ class Visitor(T):
     def __init__(self, quick_parse, logh, options={}):
 
         self.model = OldParseModel()
+        self.source_code_lines = []  # new for 2020, helps with diagnostics only
         self.logh = logh
         self.stack_classes = []
         self.stack_module_functions = [False]
@@ -542,9 +560,20 @@ class Visitor(T):
 
     def _record_line_number(self, node):
         if node:
-            self.write(f"Line: {node.lineno} col_offset: {node.col_offset}", mynote=2)  # 2 means red colour
+            msg = f"Line: {node.lineno} col_offset: {node.col_offset}"
+            self.write(msg, mynote=2)  # 2 means red colour
             self.latest_lineno = node.lineno
             self.latest_col_offset = node.col_offset
+
+            # 
+            # Heavy debug point - comment out in production
+            # 
+            def get_source_code_line(lineno):
+                return self.source_code_lines[lineno - 1].rstrip()
+            def get_source_code_line_caret(col_offset):
+                return f"{' ' * col_offset}^"
+            log_proper.debug(get_source_code_line(node.lineno))
+            log_proper.debug(get_source_code_line_caret(node.col_offset))
 
     def newline(self, node=None, extra=0):
         self._record_line_number(node)
@@ -823,6 +852,7 @@ class Visitor(T):
     def visit_Pass(self, node):
         self.newline(node)
         self.write("pass")
+        # raise RuntimeError("fake exception in AST visitor for testing purposes - comment this out!")
 
     # S
     def visit_Print(self, node):
