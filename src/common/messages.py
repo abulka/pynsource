@@ -20,7 +20,7 @@ Also thanks to the wxasync project for bringing
 async/await support to wxPython.   
 """.strip()
 
-ABOUT_AUTHOR = "(c) Andy Bulka 2004-2019"
+ABOUT_AUTHOR = "(c) Andy Bulka 2004-2020"
 ABOUT_APPNAME = "Pynsource"
 VENDOR_NAME = "Wware"
 ABOUT_LICENSE = "License: GPL 3"

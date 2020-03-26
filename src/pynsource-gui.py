@@ -1296,7 +1296,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         # info.SetIcon(wx.Icon('media/pynsource.png', wx.BITMAP_TYPE_PNG)) # TODO fix path when deployed, disable for now
 
         info.SetName(ABOUT_APPNAME)
-        info.SetVersion(str(APP_VERSION))
+        # info.SetVersion(str(APP_VERSION))
+        info.SetVersion(str(APP_VERSION) + " beta 1")
         info.SetWebSite(WEB_PYNSOURCE_HOME_URL, "Home Page")
         info.SetDescription(f"{ABOUT_MSG}\n{license}\n")
         # info.Description = wordwrap(ABOUT_MSG, 350, wx.ClientDC(self.frame))
