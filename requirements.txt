@@ -11,10 +11,8 @@ click
 pytest
 coverage
 pytest-cov
-black
 pydbg
 wxasync
 aiohttp
 async_lru
 Pillow
-

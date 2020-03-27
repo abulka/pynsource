@@ -11,3 +11,4 @@ Research/wxglade/*/*~
 htmlcov/
 src/tests/logs/
 Research/wx doco/drag-button.spec
+.python-version
