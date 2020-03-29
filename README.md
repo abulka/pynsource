@@ -24,20 +24,26 @@ Installation / Usage
 An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
 like zoom and the ability to drag to connect shapes.
 
-**Note**: Latest snap is 1.76 beta 2 - if you want the latest master (29th March 2020) as an easy to excecute app.  Improvements include better logging and reporting of Python parsing syntax errors.  If you need a Mac or Windows beta binary, please let me know.
+**Note**: Latest snap is 1.76 beta 2 - if you want the latest master (29th March 2020).  Improvements include better logging and reporting of Python parsing syntax errors.  If you need a Mac or Windows beta binary, please let me know.
 
 ### To run from source code ###
 
-You need Python 3.6 or later already installed, and pip3, then simply:
+You need `python3`, specifically Python 3.7 or later *(Linux can be Python 3.6)*  installed, and `pip3`, then simply:
 
     $ git clone https://github.com/abulka/pynsource.git
     $ cd pynsource
-    $ pip install -r requirements.txt
-    $ ./run
+    $ pip3 install -r requirements.txt
+    $ ./run (Mac, Linux) .\bin\rungui.bat (Windows 10)
 
 Linux Users: Please use the script `bin/install-linux` to pip install needed dependencies,
 including a wxPython wheel specific to Ubuntu 18. Edit the script to change to your version 
-number of Ubuntu. Or simply use the prebuilt binaries executables! 
+number of Ubuntu.
+
+The GUI toolkit [wxpython](https://wxpython.org/) that `Pynsource` relies on unfortunately needs a ‘proper’ **framework** Python environment to run in, which means no virtual environments - use your main Python e.g. brew Python on a Mac or an official install from python.org for Windows 10. The default Python 3 on Ubuntu 18.04 is fine too. 
+However I've recently discovered that you can use a [pyenv](https://github.com/pyenv/pyenv) environment for building and running Pynsource, see [this issue](https://github.com/abulka/pynsource/issues/68#issuecomment-605612292) for more info on how to do this.
+
+Or simply use the prebuilt binaries executables listed above! 
+Or install via the one-click [Linux snap](http://bit.ly/pynsource-snap).
 
 Features
 --------
