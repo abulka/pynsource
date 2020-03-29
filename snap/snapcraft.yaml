@@ -37,29 +37,27 @@ apps:
             LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
 
     #
-    # Pure Python interpreter invocations that trace imports
+    # SUB-COMMANDS
+    # 
+    # After building (snapcraft) and installing the snap locally (sudo snap install --devmode --dangerous *.snap),
+    # as well as being able to 'pynsource' from the terminal, you can run a subcommand with e.g. 'pynsource.report'
+    #
+    # For all python interpreter invocations (no script specified), both '' and site packages are automatically in sys path, $SNAP root is not.
+    # Also os.getcwd() is the host's not the inner snap filesystem!
     #
 
+    # Run Python interpreter - run with 'pynsource.python'
+    python:
+        command: python3
+
+    # Run Python interpreter and trace imports - run with e.g. 'pynsource.python-v'
     python-v:
         command: python3 -v
     python-vvv:
         command: python3 -vvv
 
-
-
-    #
-    # Pure Python interpreter invocations
-    #
-
-    # For all python interpreter invocations (no script specified), both '' and site packages are automatically in sys path, $SNAP root is not.
-    # Also os.getcwd() is the host's not the inner snap filesystem!
-    #
-    python:
-        command: python3
-
     # Adding $SNAP explicitly works e.g. '/snap/pynsource/x5',    <--- expected
     # Though, suprisingly also adds the host's local dir to sys path e.g. '/home/andy/Devel/pynsource/Research',    <--- unexpected
-    #
     python-add-root:
         command: python3
         environment:
@@ -68,20 +66,16 @@ apps:
     # Adding $SNAP/lib/python3.6/site-packages explicitly works but is unneccesary since site-packages is added automatically.
     # It just gets moved up to top of sys.path and not duplicated.
     # Though, suprisingly also adds the host's local dir to sys path e.g. '/home/andy/Devel/pynsource/Research',    <--- unexpected
-    #
     python-add-site:
         command: python3
         environment:
           PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
 
-
-
-    #
-    # Run my diagnostic script
-    #
-
+    # Run my diagnostic script - run with e.g. 'pynsource.report'
     report:
         command: python3 $SNAP/report_snap_env.py
+
+    # Run my diagnostic script - various experimental variants playing with PYTHONPATH
     report-add-root:
         command: python3 $SNAP/report_snap_env.py
         environment:
@@ -97,6 +91,9 @@ parts:
   copy-stuff:
     plugin: dump
     source: ./src
+  copy-stuff-diagnostics:
+    plugin: dump
+    source: ./snap/local/andy-diagnostics
   copy-desktop-icon-stuff:
     plugin: dump
     source: snap/gui
@@ -105,12 +102,10 @@ parts:
       pynsource.png: usr/share/applications/pynsource.png
       pynsource.desktop: usr/share/applications/pynsource.desktop     
   pynsource:
-    # See 'snapcraft plugins'
     plugin: python
     python-version: python3
     source: ./src
     stage-packages:
-        # - libc6
         - libssl-dev
         - libjpeg-dev
         - libtiff-dev
