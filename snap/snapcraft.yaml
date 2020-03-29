@@ -151,6 +151,7 @@ parts:
         - libpulse0
         - libslang2
         - libsdl1.2debian
+        - libgtk2.0-0
     python-packages:
         - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04/wxPython-4.0.4-cp36-cp36m-linux_x86_64.whl
         - wxasync
