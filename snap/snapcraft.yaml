@@ -42,24 +42,20 @@ apps:
     # For all python interpreter invocations (no script specified), both '' and site packages are automatically in sys path, $SNAP root is not.
     # Also os.getcwd() is the host's not the inner snap filesystem!
     #
-
     # Run Python interpreter - run with 'pynsource.python'
     python:
         command: python3
-
     # Run Python interpreter and trace imports - run with e.g. 'pynsource.python-v'
     python-v:
         command: python3 -v
     python-vvv:
         command: python3 -vvv
-
     # Adding $SNAP explicitly works e.g. '/snap/pynsource/x5',    <--- expected
     # Though, suprisingly also adds the host's local dir to sys path e.g. '/home/andy/Devel/pynsource/Research',    <--- unexpected
     python-add-root:
         command: python3
         environment:
           PYTHONPATH: $PYTHONPATH:$SNAP
-
     # Adding $SNAP/lib/python3.6/site-packages explicitly works but is unneccesary since site-packages is added automatically.
     # It just gets moved up to top of sys.path and not duplicated.
     # Though, suprisingly also adds the host's local dir to sys path e.g. '/home/andy/Devel/pynsource/Research',    <--- unexpected
@@ -67,11 +63,9 @@ apps:
         command: python3
         environment:
           PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
-
     # Run my diagnostic script - run with e.g. 'pynsource.report'
     report:
         command: python3 $SNAP/report_snap_env.py
-
     # Run my diagnostic script - various experimental variants playing with PYTHONPATH
     report-add-root:
         command: python3 $SNAP/report_snap_env.py
@@ -106,7 +100,6 @@ parts:
         - libwebkitgtk-3.0-0
         - zlib1g
         - libsm6
-        - libpulse0
         - libslang2
         - libsdl1.2debian
         - libgtk2.0-0
