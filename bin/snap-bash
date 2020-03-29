@@ -1,0 +1,14 @@
+echo
+echo after getting the prompt, type
+echo
+echo sudo bash
+echo cd /root/prime
+echo
+echo
+multipass shell snapcraft-pynsource
+echo
+echo
+echo shutting the session or you will get snapcraft build errors
+echo
+multipass stop snapcraft-pynsource
+echo ok

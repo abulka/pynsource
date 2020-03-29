@@ -1,0 +1,4 @@
+echo shutting the session or you will get snapcraft build errors
+echo
+multipass stop snapcraft-pynsource
+echo ok
