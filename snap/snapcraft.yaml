@@ -34,7 +34,7 @@ apps:
         plugs: [unity7, audio-playback, home, network]
 
     #
-    # SUB-COMMANDS
+    # SUB-COMMANDS (diagnotic use only)
     # 
     # After building (snapcraft) and installing the snap locally (sudo snap install --devmode --dangerous *.snap),
     # as well as being able to 'pynsource' from the terminal, you can run a subcommand with e.g. 'pynsource.report'
