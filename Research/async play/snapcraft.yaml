@@ -1,5 +1,5 @@
 name: rubber-band-async # you probably want to 'snapcraft register <name>'
-version: '0.1' # just for humans, typically '1.2+git' or '1.3.2'
+version: '0.2' # just for humans, typically '1.2+git' or '1.3.2'
 summary: Rubberband wxPython app with wxasync clock # 79 char long summary
 description: |
   Rubberband wxPython app with wxasync clock
@@ -9,133 +9,38 @@ description: |
   If you get trouble
     snapcraft clean
 
-  Tip: since specifying parts or a step name is not yet supported (as of March 2019) these won't work:
-    snapcraft clean rubber-band-async -s pull
-    snapcraft clean rubber-band-async
-
   Install the snap locally
     sudo snap install --devmode --dangerous *.snap
     snap list
 
   Run
-    rubber-band-async -h
-
-  Ignore the warnings Gtk-Message: Failed to load module "canberra-gtk-module"
-  as these seem to happen to all snaps?
+    rubber-band-async
 
   Publish
     snapcraft login (use ubuntu one auth)
     snapcraft register rubber-band-async
-    snapcraft push --release=stable rubber-band-async_0.6_amd64.snap <--- stable release (hard to do)
+    snapcraft push --release=stable rubber-band-async_0.6_amd64.snap   <--- stable release
 
 
-grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: strict # use 'strict' once you have the right plugs and slots
+grade: devel
+confinement: strict
 base: core18
 
 apps:
     rubber-band-async:
-        command: desktop-launch python3 $SNAP/rubber_band_async.py
-        plugs: [x11, unity7, pulseaudio, home, gsettings, network]
-        environment:
-            LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
-
-    #
-    # Pure Python interpreter invocations that trace imports
-    #
-
-    python-v:
-        command: python3 -v
-    python-vvv:
-        command: python3 -vvv
-
-
-
-    #
-    # Pure Python interpreter invocations
-    #
-
-    # For all python interpreter invocations (no script specified), both '' and site packages are automatically in sys path, $SNAP root is not.  
-    # Also os.getcwd() is the host's not the inner snap filesystem!
-    #
-    python:
-        command: python3
-
-    # Adding $SNAP explicitly works e.g. '/snap/rubber-band-async/x5',    <--- expected
-    # Though, suprisingly also adds the host's local dir to sys path e.g. '/home/andy/Devel/pynsource/Research',    <--- unexpected
-    #
-    python-add-root:
-        command: python3
-        environment:
-          PYTHONPATH: $PYTHONPATH:$SNAP
-
-    # Adding $SNAP/lib/python3.6/site-packages explicitly works but is unneccesary since site-packages is added automatically. 
-    # It just gets moved up to top of sys.path and not duplicated.
-    # Though, suprisingly also adds the host's local dir to sys path e.g. '/home/andy/Devel/pynsource/Research',    <--- unexpected
-    #
-    python-add-site:
-        command: python3
-        environment:
-          PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
-
-
-
-    #
-    # Run my diagnostic script
-    #
-
-    report:
-        command: python3 $SNAP/report_snap_env.py
-    report-add-root:
-        command: python3 $SNAP/report_snap_env.py
-        environment:
-          # uneccesary since $SNAP or /root is added automatically
-          PYTHONPATH: $PYTHONPATH:$SNAP
-    report-add-site:
-        command: python3 $SNAP/report_snap_env.py
-        environment:
-          # uneccesary since site-packages is added automatically
-          PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
+        command: python3 $SNAP/rubber_band_async.py
+        extensions: [gnome-3-28]
+        plugs: [unity7, audio-playback, home, network]
 
 parts:
-  desktop-gtk3:
-    build-packages:
-    - build-essential
-    - libgtk-3-dev
-    make-parameters:
-    - FLAVOR=gtk3
-    plugin: make
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-subdir: gtk
-    stage-packages:
-    - libxkbcommon0
-    - ttf-ubuntu-font-family
-    - dmz-cursor-theme
-    - light-themes
-    - adwaita-icon-theme
-    - gnome-themes-standard
-    - shared-mime-info
-    - libgtk-3-0
-    - libgdk-pixbuf2.0-0
-    - libglib2.0-bin
-    - libgtk-3-bin
-    - unity-gtk3-module
-    - libappindicator3-1
-    - locales-all
-    - xdg-user-dirs
-    - ibus-gtk3
-    - libibus-1.0-5
-    - fcitx-frontend-gtk3
   copy-stuff:
     plugin: dump
     source: .
   rubber-band-async:
-    # See 'snapcraft plugins'
     plugin: python
     python-version: python3
     source: .
     stage-packages:
-        # - libc6
         - libssl-dev
         - libjpeg-dev
         - libtiff-dev
@@ -148,9 +53,11 @@ parts:
         - libsm6
         - libpulse0
         - libslang2
-    #after: [desktop-gtk3]
+        - libsdl1.2debian
+        - libgtk2.0-0
+        - libpcre3
+        - liblzma5        
     python-packages:
-        #- https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04/wxPython-4.0.4-cp37-cp37m-linux_x86_64.whl
         - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04/wxPython-4.0.4-cp36-cp36m-linux_x86_64.whl
     requirements:
         - /root/project/requirements-linux.txt
