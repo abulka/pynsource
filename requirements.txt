@@ -1,4 +1,6 @@
-wxpython
+# wxPython==4.1.0a1.dev4616+ef1edacc --pre -f https://wxpython.org/Phoenix/snapshot-builds/ ; sys_platform == "darwin"
+http://wxpython.org/Phoenix/snapshot-builds/wxPython-4.1.0a1.dev4616+ef1edacc-cp37-cp37m-macosx_10_9_x86_64.whl ; sys_platform == "darwin"
+wxpython ; sys_platform != "darwin"
 configobj
 requests
 typed_ast==1.1.1
