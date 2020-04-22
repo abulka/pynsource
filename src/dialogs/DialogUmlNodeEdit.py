@@ -33,11 +33,15 @@ class DialogUmlNodeEdit ( wx.Dialog ):
 
 		self.m_staticText1.SetMinSize( wx.Size( 55,-1 ) )
 
-		bSizer12.Add( self.m_staticText1, 1, wx.ALL, 5 )
+		bSizer12.Add( self.m_staticText1, 1, 0, 5 )
 
-		self.txtClassName = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER )
-		self.txtClassName.SetMaxLength( 0 )
-		bSizer12.Add( self.txtClassName, 3, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+		bSizer10 = wx.BoxSizer( wx.VERTICAL )
+
+		self.txtClassName = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer10.Add( self.txtClassName, 1, wx.EXPAND, 5 )
+
+
+		bSizer12.Add( bSizer10, 2, wx.EXPAND, 5 )
 
 
 		bSizer11.Add( bSizer12, 0, wx.EXPAND, 5 )
@@ -49,11 +53,15 @@ class DialogUmlNodeEdit ( wx.Dialog ):
 
 		self.m_staticText2.SetMinSize( wx.Size( 55,-1 ) )
 
-		bSizer14.Add( self.m_staticText2, 1, wx.ALL, 5 )
+		bSizer14.Add( self.m_staticText2, 1, 0, 5 )
+
+		bSizer91 = wx.BoxSizer( wx.VERTICAL )
 
 		self.txtAttrs = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		# self.txtAttrs.SetMaxLength( 0 )
-		bSizer14.Add( self.txtAttrs, 3, wx.ALL|wx.EXPAND, 5 )
+		bSizer91.Add( self.txtAttrs, 3, wx.EXPAND, 5 )
+
+
+		bSizer14.Add( bSizer91, 2, wx.ALL|wx.EXPAND, 5 )
 
 
 		bSizer11.Add( bSizer14, 2, wx.EXPAND, 5 )
@@ -65,14 +73,18 @@ class DialogUmlNodeEdit ( wx.Dialog ):
 
 		self.m_staticText3.SetMinSize( wx.Size( 55,-1 ) )
 
-		bSizer13.Add( self.m_staticText3, 1, wx.ALL, 5 )
+		bSizer13.Add( self.m_staticText3, 1, 0, 5 )
+
+		bSizer111 = wx.BoxSizer( wx.VERTICAL )
 
 		self.txtMethods = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
-		# self.txtMethods.SetMaxLength( 0 )
-		bSizer13.Add( self.txtMethods, 3, wx.ALL|wx.EXPAND, 5 )
+		bSizer111.Add( self.txtMethods, 3, wx.ALL|wx.EXPAND, 5 )
 
 
-		bSizer11.Add( bSizer13, 2, wx.EXPAND, 5 )
+		bSizer13.Add( bSizer111, 2, wx.EXPAND, 5 )
+
+
+		bSizer11.Add( bSizer13, 2, wx.ALL|wx.EXPAND, 5 )
 
 		bSizer4 = wx.BoxSizer( wx.HORIZONTAL )
 
@@ -107,15 +119,7 @@ class DialogUmlNodeEdit ( wx.Dialog ):
 
 		self.Centre( wx.BOTH )
 
-		# Connect Events
-		self.txtClassName.Bind( wx.EVT_TEXT_ENTER, self.OnClassNameEnter )
-
 	def __del__( self ):
 		pass
-
-
-	# Virtual event handlers, overide them in your derived class
-	def OnClassNameEnter( self, event ):
-		event.Skip()
 
 
