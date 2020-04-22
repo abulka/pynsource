@@ -171,8 +171,13 @@ def parse(filename, log=None, options={}):
 
     pmodel, debuginfo = _convert_ast_to_old_parser(node, filename, log, options)  # guaranteed to return ok, any exception in pmodel.errors (string)
     pmodel.filename = filename  # new, 2020
+    warn_if_no_classes_found(pmodel)  # new, 2020
     mode(0)  # reset
     return pmodel, debuginfo  # 'debuginfo' is string of html
+
+def warn_if_no_classes_found(pmodel):
+    if len(pmodel.classlist) == 0:
+        pmodel.errors += f"{path.basename(pmodel.filename)} had no classes."
 
 def _format_syntax_error_nicely(e):
     try:

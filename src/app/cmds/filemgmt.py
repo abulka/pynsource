@@ -41,6 +41,8 @@ class CmdFileNew(CmdBase):
 class CmdFileImportBase(CmdBase):  # BASE
     def execute(self):
         workspace_was_empty: bool = len(self.context.displaymodel.graph.nodes) == 0
+        pmodels = []
+        msgs = ""
         if self.files:
             for f in self.files:
                 # pmodel, debuginfo = old_parser(f)
@@ -50,13 +52,23 @@ class CmdFileImportBase(CmdBase):  # BASE
                 pmodel, debuginfo = new_parser(f, options={"mode": mode})
                 if pmodel.errors:
                     # print(pmodel.errors)
-                    self.context.wxapp.MessageBox(pmodel.errors)
+                    msgs += pmodel.errors + "\n"
+                else:
+                    pmodels.append(pmodel)
 
                 # from parsing.dump_pmodel import dump_old_structure
                 # print(dump_old_structure(pmodel))
 
                 self.context.displaymodel.build_graphmodel(pmodel)
                 # self.context.displaymodel.Dump(msg="import, after build_graphmodel")
+
+            msgs += "\n"
+            for pmodel in pmodels:
+                msgs += f"{os.path.basename(pmodel.filename)} detected {len(pmodel.classlist)} classes.\n"
+
+            if msgs:
+                dlg = wx.MessageDialog(self.context.frame, msgs, "Import Notes", wx.ICON_WARNING)
+                dlg.ShowModal()
 
             # translatecoords being True is the culprit which keeps resetting the node positions
             self.context.umlcanvas.displaymodel.build_view(translatecoords=False)
