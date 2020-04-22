@@ -1,1 +1,3 @@
-bin/rungui
+cd src
+PYTHON=python3
+$PYTHON pynsource-gui.py

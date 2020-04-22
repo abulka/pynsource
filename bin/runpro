@@ -1,3 +1,5 @@
+# Mac
+
 cd src
 
 PYTHON=python3
@@ -5,4 +7,4 @@ PYTHON=python3
 # PYTHON=/usr/local/Cellar/python/3.7.0/bin/python3
 #PYTHON=/usr/local/Cellar/python/3.7.2/bin/python3
 
-$PYTHON pynsource-gui.py
+PYTHONPATH="/Users/andy/Devel/ogl2/:/Users/andy/Devel/pynsource-rego/" $PYTHON pynsource-gui.py
