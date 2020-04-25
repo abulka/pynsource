@@ -17,7 +17,7 @@ class QuickParse(object):
 
         # secret regular expression based preliminary scan for classes and module defs
         # Feed the file text into findall(); it returns a list of all the found strings
-        with open(filename, "r") as f:
+        with open(filename, "r", encoding='utf-8') as f:
             source = f.read()
         self.quick_found_classes = re.findall(
             REGEX_FOR_CLASSES, source, re.MULTILINE

@@ -196,7 +196,7 @@ def _ast_parse(filename):
     :param filename: python file to parse
     :return: ast root tree node
     """
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding='utf-8') as f:
         source = f.read()
 
     node = ast.parse(source)
@@ -237,7 +237,7 @@ def _remove_html_tags(text):
 def _extract_source_code_line(filename, lineno):
     if lineno == 0:
         return f"UNKNOWN source code since line number is 0 ?"
-    with open(filename) as f:
+    with open(filename, encoding='utf-8') as f:
         our_lines = f.readlines()
         if lineno < len(our_lines):
             return our_lines[lineno - 1].strip()
@@ -263,7 +263,7 @@ def _convert_ast_to_old_parser(node, filename, log, options={}):
     v = Visitor(qp, logh, options)
 
     # Give visitor access to source code, for diagnostic purposes
-    with open(filename) as f:
+    with open(filename, encoding='utf-8') as f:
         v.source_code_lines = f.readlines()
 
     try:
