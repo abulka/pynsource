@@ -24,8 +24,6 @@ Installation / Usage
 An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
 like zoom and the ability to drag to connect shapes.
 
-**Note**: Latest snap is 1.76 beta 2 - if you want the latest master (29th March 2020) as a snap on Linux.  Improvements include better logging and reporting of Python parsing syntax errors.  **Mac Users** - latest master (30 March 2020) contains a `requirements.txt` fix for the [Mac Dark Mode](https://github.com/wxWidgets/Phoenix/issues/1132) issue.  If you need a Mac or Windows beta binary, please let me know.
-
 ### To run from source code ###
 
 You need `python3`, specifically Python 3.7 or later *(Linux can be Python 3.6)*  installed, and `pip3`, then simply:
