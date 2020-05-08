@@ -3,7 +3,9 @@ Pynsource
 
 Version number: Version 1.76 (Apr 22 2020)
 
-Author: Andy Bulka
+Author: [Andy Bulka](www.andypatterns.com)
+
+![Python application](https://github.com/abulka/pynsource/workflows/Python%20application/badge.svg)
 
 Overview
 --------
@@ -42,6 +44,17 @@ However I've recently discovered that you can use a [pyenv](https://github.com/p
 
 Or simply use the prebuilt binaries executables listed above! 
 Or install via the one-click [Linux snap](http://bit.ly/pynsource-snap).
+
+#### To run the tests
+
+```
+sh -c 'cd src && mkdir tests/logs && ./bin/testall'
+```
+
+The environment variable `TRAVIS` can be set to avoid tests that involve loading the wxPython package - this is especially needed on Travis and GitHub actions. It may also not be possible on your machine if you are running certain Python environments e.g. I had a problem with a framework pyenv install on my Mac running any tests that imported `wx`, even though Pynsource itself ran OK.  P.S. The subset of packages `requirements-travis.txt` is all you need to run the tests, and these exclude wx.
+
+![Python application](https://github.com/abulka/pynsource/workflows/Python%20application/badge.svg)
+
 
 Features
 --------
