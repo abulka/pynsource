@@ -65,6 +65,7 @@ def as_str(obj):
     :return: string e.g. 'And'
     """
     s = repr(obj)
+    s = s.replace("typed_ast.", "")
     _from = s.index(".") + 1
     _to = s.index("'", _from)
     return s[_from:_to]
@@ -1296,7 +1297,8 @@ class Visitor(T):
             self.visit(node.type)
             if node.name is not None:
                 self.write(" as ")
-                if "_ast27." in str(type(node)) or "_ast." in str(type(node)):
+                s = repr(type(node)).replace("typed_ast.", "")
+                if "_ast27." in s or "_ast." in s:
                     self.visit(node.name)  # Name object, in Python 2
                 else:
                     self.write(

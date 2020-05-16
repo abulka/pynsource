@@ -2,7 +2,7 @@ http://wxpython.org/Phoenix/snapshot-builds/wxPython-4.1.0a1.dev4685+8750ef29-cp
 wxpython ; sys_platform != "darwin"
 configobj
 requests
-typed_ast==1.1.1
+typed_ast
 astpretty
 termcolor
 beautifultable
