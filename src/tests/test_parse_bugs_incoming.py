@@ -85,7 +85,7 @@ class TestIncomingBugs(unittest.TestCase):
         print(pmodel)
 
 
-    @unittest.skip("todo")
+    @unittest.skip("not necessary because sorting in display model is what's important, which is done")
     def test_sorted_attributes(self):
         # see also 'test_plantuml_sorted' in src/tests/test_parse_plantuml.py
         source_code = dedent("""

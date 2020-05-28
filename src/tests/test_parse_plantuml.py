@@ -93,7 +93,7 @@ class TestCasePlantUml01(unittest.TestCase):
         # self._dump(self.p, expected)
         self.assertEqual(expected, str(self.p).strip())
 
-    @unittest.skip("todo")
+    @unittest.skip("not necessary because sorting in display model is what's important, which is done")
     def test_plantuml_sorted(self):
         # see also 'test_sorted_attributes' in src/tests/test_parse_bugs_incoming.py
         source = dedent("""
