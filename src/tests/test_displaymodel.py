@@ -7,14 +7,7 @@ from view.display_model import Graph, GraphNode, UmlNode
 from unittest import mock
 from textwrap import dedent
 import os
-
-
-def parse_source(source_code, options):
-    with tempfile.NamedTemporaryFile(mode="wt") as temp:  # TODO use streams not temporary files
-        temp.write(source_code)
-        temp.flush()
-        pmodel, debuginfo = new_parser(temp.name, options)
-    return pmodel, debuginfo
+from parsing.parse_source import parse_source
 
 
 class TestCaseDisplayModel(unittest.TestCase):

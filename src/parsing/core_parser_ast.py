@@ -1200,7 +1200,8 @@ class Visitor(T):
     # S
     def visit_Yield(self, node):
         self.write("yield ")
-        self.visit(node.value)
+        if node.value:  # may not be returning a value from yield
+            self.visit(node.value)
 
     # S
     def visit_Lambda(self, node):

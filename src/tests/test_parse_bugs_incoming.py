@@ -6,13 +6,15 @@ from parsing.api import old_parser, new_parser
 from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
 from common.logwriter import LogWriter
 from parsing.core_parser_ast import set_DEBUGINFO, DEBUGINFO
+from textwrap import dedent
+from parsing.parse_source import parse_source
 
 
 class TestIncomingBugs(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test01(self):
+    def test_bug_pyplecs(self):
         """
         """
         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_bug_pyplecs.py"
@@ -67,4 +69,33 @@ class TestIncomingBugs(unittest.TestCase):
         # assert gotevent1
         # assert not gotevent3
 
- 
+
+    def test_yield(self):
+        source_code = dedent(
+            """
+            class Test():
+                def gen(self):
+                    yield 20
+                    yield
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, options={"mode": 3})
+        self.assertEqual(pmodel.errors, "")
+        print(pmodel)
+
+
+"""
+To set up a launch config in vscode
+
+    {
+        "name": "test PYTHON parsing edge cases - test_yield",
+        "type": "python",
+        "request": "launch",
+        "cwd": "${workspaceRoot}/src",
+        "module": "unittest",
+        "args": [
+            "tests.test_parse_bugs_incoming.TestIncomingBugs.test_yeild",
+        ],
+    },  
+
+"""
