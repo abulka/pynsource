@@ -203,8 +203,8 @@ class DisplayModel:
                 for parentclass in classentry.classesinheritsfrom:
                     AddGeneralisation(classname, parentclass)
 
-            classAttrs = [attrobj.attrname for attrobj in classentry.attrs]  # type Attribute class
-            classMeths = classentry.defs
+            classAttrs = sorted([attrobj.attrname for attrobj in classentry.attrs])  # type Attribute class
+            classMeths = sorted(classentry.defs)
             node = self.AddUmlNode(classname, classAttrs, classMeths)
 
         # ensure no duplicate relationships exist
@@ -438,8 +438,8 @@ class DisplayModel:
         """
         adds new attrs and meths into existing node, avoiding duplicates
         """
-        node.attrs = list(set(attrs + node.attrs))
-        node.meths = list(set(meths + node.meths))
+        node.attrs = sorted(list(set(attrs + node.attrs)))
+        node.meths = sorted(list(set(meths + node.meths)))
 
     def obj_id(self, obj) -> str:
         # as hex, just the last few digits of the id, to reduce noise.  None protection.
