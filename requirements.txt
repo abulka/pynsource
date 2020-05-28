@@ -1,5 +1,4 @@
-http://wxpython.org/Phoenix/snapshot-builds/wxPython-4.1.0a1.dev4685+8750ef29-cp37-cp37m-macosx_10_9_x86_64.whl; sys_platform == "darwin"
-wxpython ; sys_platform != "darwin"
+wxpython
 configobj
 requests
 typed_ast
