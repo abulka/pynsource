@@ -21,6 +21,7 @@ class PySourceAsPlantUml(ReportGenerator):
         self.result = ""
 
     def calc_plant_uml(self, optimise=False):
+        """Optimise not used for anything, so use for sorting attributes and members"""
         self.result = ""
 
         classnames = list(self.pmodel.classlist.keys())

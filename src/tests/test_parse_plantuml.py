@@ -4,6 +4,9 @@
 import unittest
 from generate_code.gen_plantuml import PySourceAsPlantUml
 from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
+from textwrap import dedent
+from parsing.parse_source import parse_source_gen_plantuml
+from parsing.dump_pmodel import dump_pmodel
 
 # python -m unittest tests.test_parse_plantuml
 
@@ -28,14 +31,13 @@ class TestCasePlantUml01(unittest.TestCase):
         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule08_multiple_inheritance.py"
         self.p.Parse(FILE)
         self.p.calc_plant_uml(optimise=False)
-        expected = """
-
-class Fred {
-}
-
-Mary <|- Fred
-Sam <|- Fred
-""".strip()
+        expected = dedent("""
+            class Fred {
+            }
+            
+            Mary <|- Fred
+            Sam <|- Fred
+            """).strip()
         # self._dump(self.p, expected)
         self.assertEqual(expected, str(self.p).strip())
 
@@ -65,29 +67,47 @@ Sam <|- Fred
         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule01.py"
         self.p.Parse(FILE)
         self.p.calc_plant_uml(optimise=False)
-        expected = """
+        expected = dedent("""
+            class ParseMeTest {
+                a
+                b
+                d
+                e
+                e2
+                f
+                __init__()
+                IsInBattle()
+                DoA()
+            }
 
-class ParseMeTest {
-    a
-    b
-    d
-    e
-    e2
-    f
-    __init__()
-    IsInBattle()
-    DoA()
-}
+            ParseMeTest ..> Blah : b
+            ParseMeTest *--> "*" Blah : f
 
-ParseMeTest ..> Blah : b
-ParseMeTest *--> "*" Blah : f
+            class ParseMeTest2 {
+                _secretinfo
+                DoB()
+            }
 
-class ParseMeTest2 {
-    _secretinfo
-    DoB()
-}
-
-ParseMeTest <|- ParseMeTest2
-""".strip()
+            ParseMeTest <|- ParseMeTest2
+        """).strip()
         # self._dump(self.p, expected)
         self.assertEqual(expected, str(self.p).strip())
+
+    @unittest.skip("todo")
+    def test_plantuml_sorted(self):
+        # see also 'test_sorted_attributes' in src/tests/test_parse_bugs_incoming.py
+        source = dedent("""
+            class ParseMeTest:
+                def __init__(self):
+                    self.z = 1
+                    self.a = 1
+                def aa(self): pass
+                def zz(self): pass
+                def bb(self): pass
+        """)
+        options = None
+        pmodel, plantuml = parse_source_gen_plantuml(source, options)
+
+        t = dump_pmodel(pmodel)
+        print(t)
+

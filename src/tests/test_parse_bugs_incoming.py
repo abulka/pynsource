@@ -8,6 +8,7 @@ from common.logwriter import LogWriter
 from parsing.core_parser_ast import set_DEBUGINFO, DEBUGINFO
 from textwrap import dedent
 from parsing.parse_source import parse_source
+from parsing.dump_pmodel import dump_pmodel
 
 
 class TestIncomingBugs(unittest.TestCase):
@@ -82,6 +83,26 @@ class TestIncomingBugs(unittest.TestCase):
         pmodel, debuginfo = parse_source(source_code, options={"mode": 3})
         self.assertEqual(pmodel.errors, "")
         print(pmodel)
+
+
+    @unittest.skip("todo")
+    def test_sorted_attributes(self):
+        # see also 'test_plantuml_sorted' in src/tests/test_parse_plantuml.py
+        source_code = dedent("""
+            class ParseMeTest:
+                def __init__(self):
+                    self.z = 1
+                    self.a = 1
+                def aa(self): pass
+                def zz(self): pass
+                def bb(self): pass
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, options={"mode": 3})
+        self.assertEqual(pmodel.errors, "")
+
+        t = dump_pmodel(pmodel)
+        print(t)
 
 
 """
