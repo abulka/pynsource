@@ -110,7 +110,7 @@ ALL_SYMBOLS.update(CMPOP_SYMBOLS)
 ALL_SYMBOLS.update(UNARYOP_SYMBOLS)
 
 TREAT_PROPERTY_DECORATOR_AS_PROP = True
-PROPERTY_DECORATORS = ["property", ".setattr"]
+PROPERTY_DECORATORS = { "property", "setter" }  # for setter, its actually '@somemeth.setter' but we strip out the 'somemeth'
 
 
 class OldParseModel(object):
@@ -736,14 +736,10 @@ class Visitor(T):
             self.treat_property_decorator_as_prop
             and self.current_class()
             and len(node.decorator_list)
+            and PROPERTY_DECORATORS.intersection([decorator.id.split('.')[-1] for decorator in node.decorator_list if hasattr(decorator, "id")])
         ):
-            for decorator in node.decorator_list:
-                for prop_match in PROPERTY_DECORATORS:
-                    if hasattr(decorator, "id") and prop_match in decorator.id:
-                        self.current_class().AddAttribute(attrname=node.name, attrtype=["static"])
-                        break
-                    elif hasattr(decorator, "attr") and prop_match == decorator.value:
-                        pass
+            self.current_class().AddAttribute(attrname=node.name, attrtype=["normal"])  # not sure why I had 'static' here in the past
+
 
         elif self.current_class():
             self.current_class().defs.append(node.name)

@@ -18,6 +18,7 @@ class TestIncomingBugs(unittest.TestCase):
     def test_bug_pyplecs(self):
         """
         """
+        # breakpoint()
         FILE = PYTHON_CODE_EXAMPLES_TO_PARSE + "testmodule_bug_pyplecs.py"
 
         # Can also run using
@@ -31,20 +32,24 @@ class TestIncomingBugs(unittest.TestCase):
         old_debug_info_value = DEBUGINFO()
         set_DEBUGINFO(True)
         try:
-            self.p, debuginfo = new_parser(FILE, log, options={"mode": 3})
+            pmodel, debuginfo = new_parser(FILE, log, options={"mode": 3})
         finally:
             set_DEBUGINFO(old_debug_info_value)
 
-        log.out("<hr><h1>Errors:</h1>")
-        log.out_wrap_in_html(self.p.errors)
-        log.out("<hr><h1>debuginfo:</h1>")
+        # this log finishing is all written out automatically in new_parser / parse / _convert_ast_to_old_parser
+        # if there is an error- otherwise we have to do it ourselves.
+        #
+        if not pmodel.errors:
+            # log.out("<hr><h1>Errors (shouldn't be any):</h1>")
+            # log.out_wrap_in_html(pmodel.errors)
+            log.out("<hr><h1>debuginfo:</h1>")
+            log.out(debuginfo)
+            log.out_html_footer()
+            log.finish()
 
-        log.out(debuginfo)
-        log.out_html_footer()
-        log.finish()
-
-        self.assertEqual(self.p.errors, "")
-        print(self.p)
+        self.assertEqual(pmodel.errors, "")
+        # print(dump_pmodel(pmodel))
+        # print("html log file is", log.out_filename)
 
         # -------------------------------------------------------
 
@@ -104,6 +109,28 @@ class TestIncomingBugs(unittest.TestCase):
         t = dump_pmodel(pmodel)
         print(t)
 
+    def test_staticmethod(self):
+        # https://github.com/abulka/pynsource/issues/74
+        source_code = dedent(
+            """
+            class Test():
+                @staticmethod
+                def hi():
+                    pass
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, options={"mode": 3}, html_debug_root_name="statictest")
+        self.assertEqual(pmodel.errors, "")
+        classNames = [classname for classname, classentry in pmodel.classlist.items()]
+        # print(classNames)
+        # print(dump_pmodel(pmodel))
+        assert "Test" in classNames
+        assert classNames == ["Test"]
+        classentry = pmodel.classlist["Test"]
+        # print(classentry)
+        assert len(classentry.defs) == 1
+        assert "hi" in classentry.defs
+
 
 """
 To set up a launch config in vscode
@@ -118,5 +145,12 @@ To set up a launch config in vscode
             "tests.test_parse_bugs_incoming.TestIncomingBugs.test_yeild",
         ],
     },  
+
+To set up a launch config in pycharm
+
+    Unittests, Target: Module name:
+        tests.test_parse_bugs_incoming.TestIncomingBugs.test_staticmethod
+    Working directory:
+        /Users/andy/Devel/pynsource/src
 
 """
