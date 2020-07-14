@@ -110,7 +110,6 @@ ALL_SYMBOLS.update(CMPOP_SYMBOLS)
 ALL_SYMBOLS.update(UNARYOP_SYMBOLS)
 
 TREAT_PROPERTY_DECORATOR_AS_PROP = True
-PROPERTY_DECORATORS = { "property", "setter" }  # for setter, its actually '@somemeth.setter' but we strip out the 'somemeth'
 
 
 class OldParseModel(object):
@@ -718,6 +717,46 @@ class Visitor(T):
         self.write("\nvisit_FunctionDef\n", mynote=1)
         self.write("def %s(" % node.name)
 
+        def has_property_decorator(node):
+            """
+            Determines if method 'node' has a property (get or set) decorator.
+            
+            node.decorator_list items can be of 
+                - Name
+                - Attribute
+            objects, though Attribute.value is a Name object too
+
+            For a @property getter the ast looks like:
+                decorator_list=[Name(lineno=64, col_offset=5, id='property', ctx=Load())],
+
+            For a @myval.setter the ast looks like:
+                decorator_list=[
+                    Attribute(
+                        lineno=38,
+                        col_offset=5,
+                        value=Name(lineno=38, col_offset=5, id='myval', ctx=Load()),
+                        attr='setter',
+                        ctx=Load(),
+                    ),
+
+            :returns: bool
+           """
+            method_name = node.name
+            for decorator in node.decorator_list:
+                if hasattr(decorator, "id"):  # its a Name, look for getter
+                    self.write(f"has_property_decorator of method {method_name} found decorator {decorator.id}", mynote=1)
+                    if decorator.id == "property":
+                        return True  # found the getter
+                elif hasattr(decorator, "attr") and decorator.attr == 'setter':  # its an Attribute, look for setter
+                    self.write(f"has_property_decorator of method {method_name} found decorator {decorator.attr}", mynote=1)
+                    if hasattr(decorator, "value"):  # the inner Name
+                        # ensure the Name object contains the same name as the method, just being cautious
+                        name_obj = decorator.value
+                        if hasattr(name_obj, "id") and name_obj.id == method_name:
+                            return True  # found the setter
+            return False
+
+
         # A
         if not self.current_class() and not self.am_inside_module_function():
             self.model.modulemethods.append(node.name)
@@ -736,10 +775,9 @@ class Visitor(T):
             self.treat_property_decorator_as_prop
             and self.current_class()
             and len(node.decorator_list)
-            and PROPERTY_DECORATORS.intersection([decorator.id.split('.')[-1] for decorator in node.decorator_list if hasattr(decorator, "id")])
+            and has_property_decorator(node)
         ):
             self.current_class().AddAttribute(attrname=node.name, attrtype=["normal"])  # not sure why I had 'static' here in the past
-
 
         elif self.current_class():
             self.current_class().defs.append(node.name)
