@@ -134,95 +134,20 @@ class TestIncomingBugs(unittest.TestCase):
 
     def test_decorators(self):
         """
-        Create class vars from methods marked with property decorator, and methods from all other
-        decorators.
-
-        Notes:
-
-            Static methods
-            ----------------
-            For a static method the ast parsed decorator.id would be
-            'staticmethod'
-
-            Scanning for classmethods should work similarly.
-
-            Properties
-            ----------------
-            For a @property the ast parsed decorator.id would be
-            'property'
-            viz:
-                decorator_list=[Name(lineno=64, col_offset=5, id='property', ctx=Load())],
-
-            For a setter e.g. @myval.setter you would think that the ast parsed decorator.id would be
-            'myval.setter', but its actually just 
-            'myval'
-            thus need to scan further for 
-            'setter' as the decorator.attr
-            viz:
-
-                decorator_list=[
-                    Attribute(
-                        lineno=38,
-                        col_offset=5,
-                        value=Name(lineno=38, col_offset=5, id='myval', ctx=Load()),
-                        attr='setter',
-                        ctx=Load(),
-                    ),
-
-            aside:
-                Not to be confused with the 'setattr' function
-                setattr(object, name, value)	
-                This is the counterpart of getattr()
-                .setattr(o, 'foobar', 3) <=> o.foobar = 3. 
-                Creates attribute if it doesn't exist. Nothing to do with decorators.
-
-            Abstract methods
-            ----------------
-
-            The builtin abc module helps materialize Abstract Base Classes. It has the abstractmethod() method which is a decorator
-            indicating abstract methods. For the abstractmethod() to work, it is required that the metaclass is ABCMeta (defined in
-            the abc module itself) or derived from it. Subclasses of any class with this setup cannot be instantiated unless all of
-            its abstract methods are implemented.
-            see https://www.djangospin.com/object-oriented-python/inheritance-and-polymorphism/ 
-
-            Junk Notes
-            ----------
-
-            A @property decorator is found in a Name decorator.id == 'property'
-            A @myval.setter decorator is found in an Attribute decorator.attr == 'setter' decorator.value
-            First Approach:
-            ---------------
-            decorator_names = [decorator.id for decorator in node.decorator_list if hasattr(decorator, "id")]
-            # might result in something like 
-            ['staticmethod', 'classmethod', 'abstractmethod', 'abc.abstractmethod', 'property', 'myval.setter']
-            # where 'abc' is the abc abstract class library and is thus reserved and known, but 'myval' can be any user
-            # defined name.  Perhaps strip off the prefixes
-            decorator_names = [decorator.id.split('.')[-1] for decorator in node.decorator_list if hasattr(decorator, "id")]
-            ['staticmethod', 'classmethod', 'abstractmethod', 'abstractmethod', 'property', 'setter']
-            the ones that trigger methods becoming properties are only ['property', 'setter']
-            # 
-            result = PROPERTY_DECORATORS.intersection([decorator.id.split('.')[-1] for decorator in node.decorator_list if hasattr(decorator, "id")])
-
-            setter e.g. you would think that the ast parsed decorator.id would be
-            'myval.setter', but its actually just 'myval' thus need to scan further for 
-            'setter' as the decorator.attr viz:
-
-            Second Approach:
-            ---------------
-            decorator_names = [decorator.id for decorator in node.decorator_list if hasattr(decorator, "id")]
-            # might result in something like 
-            ['staticmethod', 'classmethod', 'abstractmethod', 'abc.abstractmethod', 'property', 'myval']
-
-
-
+        Ensure we create class attributes from methods marked with property decorators, 
+        and create methods for all other decorator types.
         """
         source_code = dedent(
             """
-            # staticmethod - TODO should also have a test for class methods
+            # staticmethod and classmthod
 
             class Test():
                 @staticmethod
                 def hi():
+                    pass
+                
+                @classmethod
+                def there(cls):
                     pass
 
             # static method, can call directly on class (no instance needed)
@@ -296,15 +221,16 @@ class TestIncomingBugs(unittest.TestCase):
         self.assertEqual(pmodel.errors, "")
         classNames = [classname for classname, classentry in pmodel.classlist.items()]
         # print(classNames)
-        print(dump_pmodel(pmodel))
+        # print(dump_pmodel(pmodel))
         assert "Test" in classNames
         assert "AbstractAnimal" in classNames
         assert "Crop" in classNames
         assert "PropsClass" in classNames
 
         classentry = pmodel.classlist["Test"]
-        assert len(classentry.defs) == 1
-        assert "hi" in classentry.defs
+        assert len(classentry.defs) == 2
+        assert "hi" in classentry.defs  # staticmethod
+        assert "there" in classentry.defs  # classmethod
 
         classentry = pmodel.classlist["AbstractAnimal"]
         assert len(classentry.defs) == 1

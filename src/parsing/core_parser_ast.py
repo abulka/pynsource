@@ -721,10 +721,16 @@ class Visitor(T):
             """
             Determines if method 'node' has a property (get or set) decorator.
             
-            node.decorator_list items can be of 
-                - Name
-                - Attribute
-            objects, though Attribute.value is a Name object too
+            node.decorator_list items can be one of two types of object:
+                - Name          .id contains the decorator name e.g.
+                                ['staticmethod', 'classmethod', 'abstractmethod', 'abc.abstractmethod', 'property']
+                - Attribute     .attr contains the rhs of the decorator name e.g. for @myval.setter
+                                ['setter']
+                                .attr.value.id contains the lhs of the decorator e.g. 'myval'
+                                Note that Attribute.value is an inner Name object.
+            
+            Typically a list of decorator id's might look like:
+                ['staticmethod', 'classmethod', 'abstractmethod', 'abstractmethod', 'property', 'setter']
 
             For a @property getter the ast looks like:
                 decorator_list=[Name(lineno=64, col_offset=5, id='property', ctx=Load())],
@@ -744,11 +750,11 @@ class Visitor(T):
             method_name = node.name
             for decorator in node.decorator_list:
                 if hasattr(decorator, "id"):  # its a Name, look for getter
-                    self.write(f"has_property_decorator of method {method_name} found decorator {decorator.id}", mynote=1)
+                    self.write(f" found decorator {decorator.id}", mynote=1)
                     if decorator.id == "property":
                         return True  # found the getter
-                elif hasattr(decorator, "attr") and decorator.attr == 'setter':  # its an Attribute, look for setter
-                    self.write(f"has_property_decorator of method {method_name} found decorator {decorator.attr}", mynote=1)
+                elif hasattr(decorator, "attr") and decorator.attr == 'setter':  # its an Attribute, setter, look for method_name
+                    self.write(f" found decorator {decorator.attr}", mynote=1)
                     if hasattr(decorator, "value"):  # the inner Name
                         # ensure the Name object contains the same name as the method, just being cautious
                         name_obj = decorator.value
