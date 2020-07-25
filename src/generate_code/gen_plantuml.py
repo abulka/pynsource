@@ -266,7 +266,12 @@ def displaymodel_to_plantuml(displaymodel):
             result += "\n}\n\n"
     for edge in displaymodel.graph.edges:
         line = edge_lookup[edge['uml_edge_type']]
-        label = f": {edge['source'].id}" if edge['uml_edge_type'] in ("composition",) else ""
+
+        # See issue https://github.com/abulka/pynsource/issues/78
+        # This code displays types instead of attributes, which is not useful, so stop doing it for now
+        # label = f": {edge['source'].id}" if edge['uml_edge_type'] in ("composition",) else ""
+        label = ""
+
         result += f"{edge['source'].id} {line} {edge['target'].id} {label}\n"
         if edge['uml_edge_type'] == "association":
             result += f"{edge['source'].id} {line}[hidden] {edge['target'].id} {label}\n"
