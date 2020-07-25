@@ -25,7 +25,7 @@ Pro Edition
 LICENCE: Commercial
 
 The pro edition of Pynsource requires a valid paid license.  Please
-support firther development of this project by purchasing a license
+support further development of this project by purchasing a license
 http://pynsource.atug.com/buy
 """
 
