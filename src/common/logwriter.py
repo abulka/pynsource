@@ -41,7 +41,7 @@ class LogWriter:
             <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
             <html>
             <head>
-              <title>My first styled page</title>
+              <title>Pynsource Parse Log as HTML</title>
               <style type="text/css">
                 body { background:DarkSeaGreen; font-family:monospace; }
                 .dump1 { background:lightblue; margin:3px; padding:5px; font-size:1.2em;}

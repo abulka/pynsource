@@ -708,6 +708,7 @@ class Visitor(T):
 
     def visit_Expr(self, node):
         # self.write("visit_Expr")
+        self.detect_attribute_when_no_assignment(node)  # NEW July 2020
         self.newline(node)
         self.generic_visit(node)
 
@@ -780,16 +781,7 @@ class Visitor(T):
         elif self.current_class():
             self.current_class().defs.append(node.name)
 
-        def scan_args_for_type_annotations(node):
-            for arg in node.args.args:
-                if hasattr(arg, "annotation") and arg.annotation != None:
-                    self.write(f" found type annotation '{arg.annotation.id}' on method parameter {arg.arg}", mynote=1)
-                    if self.current_class():
-                        self.add_composite_dependency((arg.arg, arg.annotation.id))
-                    else:
-                        pass  # should add to module dependencies (supported by GitUML only, at the moment)
-
-        scan_args_for_type_annotations(node)
+        self.scan_args_for_type_annotations(node)  # NEW July 2020
 
         # A
         self.push_a_function_or_method()
@@ -1006,6 +998,68 @@ class Visitor(T):
                 self.visit(node.tback)
 
     # Expressions
+
+    # A
+    def visit_AnnAssign(self, node):
+
+        def scan_assignment_for_type_annotations(node):
+            if hasattr(node, "annotation") and node.annotation != None:
+                self.write(f" found type annotation '{node.annotation.id}' on assignment to {_to_full_var}", mynote=2)
+                if self.current_class():
+                    self.add_composite_dependency((_to, node.annotation.id))
+                else:
+                    pass  # should add to module dependencies (supported by GitUML only, at the moment)
+
+        def nice_target_name(target) -> str:
+            # target typically has .value.id and .attr
+            try:
+                return f"{target.value.id}.{target.attr}"
+            except AttributeError as e:
+                return "self.pynsource_parse_error"  # hack to avoid parse failures
+        _to_full_var = nice_target_name(node.target)
+        _to = _to_full_var.split('.')[-1]
+
+        self.write(f"\nvisit_AnnAssign {_to_full_var}\n", mynote=1)
+        self.newline(node)
+
+        scan_assignment_for_type_annotations(node)
+
+        # The following logic directly copied from 'visit_Assign' - but adjusted since can't have
+        # multiple lhs when using type annotations. Also have to guard against None (see explanation).
+        self.visit(node.target)
+
+        self.write(" = ")
+
+        # A
+        self.lhs_recording = False  # are parsing the rhs now
+
+        """Have to protect against AnnAssign.value (the value being assigned) being None when 
+        parsing "self.fred: Fred" whereas when parsing "self.fred: Fred = None" AnnAssign.value 
+        is NameConstant(value=None) thus CAN be visited. Note that compared to the normal 
+        Assign.value node parsing (see visit_Assign method) when parsing "self.fred = None" 
+        Assign.value is a nice NameConstant(value=None) thus CAN be visited whereas when parsing 
+        "self.fred" where you might think the dangerous situation of Assign.value being None will 
+        arise, funnily enough it doesn't because the Python AST parser handles this syntax using 
+        visit_Expr instead. 
+        
+        ------------------------------|------------------------------------------------------
+        Expression                    | AnnAssign.value (type annotation assignment AST node)
+        ------------------------------|------------------------------------------------------
+            self.fred: Fred             None                        <- guard against
+            self.fred: Fred = None      NameConstant(value=None)
+            
+                                      |------------------------------------------------------
+                                      | Assign.value (traditional assignment AST node)
+                                      |------------------------------------------------------
+            self.fred                   n/a                     <- is parsed via visit_Expr instead
+            self.fred = None            NameConstant(value=None)
+            
+        """
+        if node.value:  # have to guard against None here but not in visit_Assign (see explanation above)
+            self.visit(node.value)  # node.value is an ast obj, can't print it
+
+        # A
+        self.made_assignment = True
 
     def visit_Attribute(self, node):
         self.visit(node.value)
@@ -1350,6 +1404,51 @@ class Visitor(T):
                     )  # Name is a str in Python 3, don't visit the 'as xxxx' tree if python3, cos haven't figured out the new tree yet, plus no reason to?
         self.write(":")
         self.body(node.body)
+
+    # Util methods re assignment and type annotation - July 2020
+
+    def scan_args_for_type_annotations(self, node):
+        """
+        Called from visit_Func - parse the arguments to the function/method for type annotations
+        """
+        for arg in node.args.args:
+            if hasattr(arg, "annotation") and arg.annotation != None:
+                self.write(f" found type annotation '{arg.annotation.id}' on method parameter {arg.arg}", mynote=1)
+                if self.current_class():
+                    self.add_composite_dependency((arg.arg, arg.annotation.id))
+                else:
+                    pass  # should add to module dependencies (supported by GitUML only, at the moment)
+
+    def detect_attribute_when_no_assignment(self, node):
+        """
+        Called from an visit_Expr - normally we don't parse expressions at all, however this meant lone
+        attribute declarations like `self.fred` were being missed.  This function picks up on this case.
+
+        body=[
+            Expr(          <- node
+                lineno=4,
+                col_offset=8,
+                value=Attribute(
+                    lineno=4,
+                    col_offset=8,
+                    value=Name(lineno=4, col_offset=8, id='self', ctx=Load()),
+                    attr='restaurant',
+                    ctx=Load(),
+                ),
+            ),
+        """
+        if hasattr(node, "value") and isinstance(node.value, ast.Attribute) and hasattr(node.value, 'attr'):
+            attr_name = node.value.attr
+            if self.current_class():
+                self.write(f" attribute '{attr_name}' without assignment - created!", mynote=2)
+                # TODO AddAttribute() won't create duplicates, will add extra attrtypes, but unfortunately won't update an 
+                # existing attrtype - which may mean that a "many" detected later via .append() won't replace a "normal" -  fix
+                self.current_class().AddAttribute(attrname=attr_name, attrtype=["normal"])
+            else:
+                pass  # should create attribute in Module (currently GitUML only)
+
+    # END Util methods
+
 
     # Note
     # S means this code is uneccesary for 99% of extraction of info I want.  I only put it in to stop some errors re huge accumulating rhs
