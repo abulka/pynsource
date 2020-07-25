@@ -123,6 +123,22 @@ class TestParseTypeAnnotations(unittest.TestCase):
         self.assertIn(('fred', 'Fred'), classentry.classdependencytuples)
         self.assertIn(('xx', 'Mary'), classentry.classdependencytuples)
 
+    def test_type_annotation_builtin_types_skipped(self):
+        # Skip creating references to built in types like 'bool' etc
+        source_code = dedent(
+            """
+            class Customer:
+                def __init__(self):
+                    self.a: bool
+                    self.b: int
+                    self.c: str
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, options={"mode": 3}, html_debug_root_name="test_type_annotation_builtin_types_skipped")
+        self.assertEqual(pmodel.errors, "")
+        classentry = pmodel.classlist["Customer"]
+        self.assertEqual(len(classentry.classdependencytuples), 0)
+
 
 class TestNoAssignmentShouldStillCreateAttrs(unittest.TestCase):
 
