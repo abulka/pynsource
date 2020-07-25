@@ -765,18 +765,10 @@ class Visitor(T):
 
         # A
         if not self.current_class() and not self.am_inside_module_function():
+            # assert node.name in self.quick_parse.quick_found_module_defs  # not always true cos quick parse isn't smart
             self.model.modulemethods.append(node.name)
-            if (
-                node.name not in self.quick_parse.quick_found_module_defs
-            ):  # TODO how to repro this failure, it was only reported by Charlie - issue #31
-                # raise RuntimeError("quickfound ref issue %s should be in %s" % (node.name, self.quick_parse.quick_found_module_defs))
-                pass
-                # print('Parse assert WARNING: node.name', node.name,
-                #       'is not in quick_found_module_defs - its probably indented due to a'
-                #       'wrapping if or try structure - no way quick parsing can detect this.',
-                #       self.quick_parse.quick_found_module_defs)
 
-        # look for decorator @property definition and treat as property
+        # look for decorator @property definition and treat method as property
         elif (
             self.treat_property_decorator_as_prop
             and self.current_class()
@@ -787,6 +779,17 @@ class Visitor(T):
 
         elif self.current_class():
             self.current_class().defs.append(node.name)
+
+        def scan_args_for_type_annotations(node):
+            for arg in node.args.args:
+                if hasattr(arg, "annotation") and arg.annotation != None:
+                    self.write(f" found type annotation '{arg.annotation.id}' on method parameter {arg.arg}", mynote=1)
+                    if self.current_class():
+                        self.add_composite_dependency((arg.arg, arg.annotation.id))
+                    else:
+                        pass  # should add to module dependencies (supported by GitUML only, at the moment)
+
+        scan_args_for_type_annotations(node)
 
         # A
         self.push_a_function_or_method()
