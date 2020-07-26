@@ -111,6 +111,9 @@ ALL_SYMBOLS.update(UNARYOP_SYMBOLS)
 
 TREAT_PROPERTY_DECORATOR_AS_PROP = True
 
+BUILT_IN_TYPES = ('int', 'float', 'bool', 'str', 'bytes', 'List', 'Set', 'Dict', 'Tuple', 'Optional',
+    'Callable', 'Iterator', 'Union', 'Any', 'Mapping', 'MutableMapping', 'Sequence', 'Iterable', 'Set',
+    'Match', 'AnyStr', 'IO', 'Callable', 'TypeVar')  # I think I identified them all!
 
 class OldParseModel(object):
     def __init__(self):
@@ -407,7 +410,7 @@ class Visitor(T):
         return c
 
     def add_composite_dependency(self, t):
-        if t not in self.current_class().classdependencytuples:
+        if t[1] not in BUILT_IN_TYPES and t not in self.current_class().classdependencytuples:
             self.current_class().classdependencytuples.append(t)
 
     def flush_state(self, msg=""):
