@@ -1013,7 +1013,12 @@ class Visitor(T):
         def nice_target_name(target) -> str:
             # target typically has .value.id and .attr
             try:
-                return f"{target.value.id}.{target.attr}"
+                if isinstance(target, ast.Attribute):
+                    return f"{target.value.id}.{target.attr}"
+                elif isinstance(target, ast.Name):
+                    return f"{target.id}"
+                else:
+                    return "self.pynsource_parse_error_var"  # hack to avoid parse failures
             except AttributeError as e:
                 return "self.pynsource_parse_error"  # hack to avoid parse failures
         _to_full_var = nice_target_name(node.target)
@@ -1060,6 +1065,7 @@ class Visitor(T):
 
         # A
         self.made_assignment = True
+        self.flush()  # this fixes the old bug where x = 100 on a line by itself in a module didn't get a variable created unless there was a statement following it
 
     def visit_Attribute(self, node):
         self.visit(node.value)
