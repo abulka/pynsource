@@ -30,7 +30,7 @@ You need `python3`, specifically Python 3.7 or later *(Linux can be Python 3.6)*
     $ git clone https://github.com/abulka/pynsource.git
     $ cd pynsource
     $ pip3 install -r requirements.txt
-    $ ./bin/run (Mac, Linux) or
+    $ ./bin/run           (Mac, Linux) or
     $ .\bin\run-win10.bat (Windows 10)
 
 Linux Users: Please use the script `bin/install-linux` to pip install needed dependencies,
@@ -46,14 +46,15 @@ If you are on linux, then install Pynsource via the one-click [Linux snap](http:
 ### To run the tests
 
 ```
-./bin/testall
+./bin/testall            (Mac, Linux) or
+.\bin\testall-win10.bat  (Windows 10)
 ```
 
-from the root of the project.
+from the root of the project. You may need to alter the version of Python being invoked by the script e.g. `python` or `python3`.
 
 The environment variable `TRAVIS` is set by the script to avoid tests that involve loading the wxPython package - this is especially needed on Travis and GitHub actions. It may also not be possible on your machine if you are running certain Python environments e.g. I had a problem with a framework pyenv install on my Mac running any tests that imported `wx`, even though Pynsource itself ran OK.  P.S. The subset of packages `requirements-travis.txt` is all you need to run the tests, and these exclude wx.
 
-Alternatively you can also run all the tests by `cd src` then `./bin/testall` (there is a testall script both in ./bin/ and in src/bin).
+Alternatively you can also run all the tests by `cd src` then `./bin/testall` (because there is a testall script both in ./bin/ and in src/bin - for Mac/Linux, anyway).
 
 ### Current Test Suite status
 

@@ -9,7 +9,9 @@ import tempfile
 
 class TestQuickParseProper(unittest.TestCase):
     def scan(self, source_code):
-        with tempfile.NamedTemporaryFile(mode="wt") as temp:
+        # Re temporary files, win10 needs delete=False otherwise other routines cannot access.
+        # Need to pass "wt" since we're writing text, not bytes - helps python3 compatibility.
+        with tempfile.NamedTemporaryFile(mode="wt", delete=False) as temp:
             temp.write(source_code)
             temp.flush()
             qp = QuickParse(temp.name)

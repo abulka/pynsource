@@ -12,7 +12,9 @@ Useful functions to parse Python source code as strings.
 def parse_source(source_code, options, html_debug_root_name=""):
     old_debug_info_value = DEBUGINFO()
 
-    with tempfile.NamedTemporaryFile(mode="wt") as temp:  # TODO use streams not temporary files
+    # Re temporary files, win10 needs delete=False otherwise other routines cannot access.
+    # Need to pass "wt" since we're writing text, not bytes - helps python3 compatibility.
+    with tempfile.NamedTemporaryFile(mode="wt", delete=False) as temp:  # TODO use streams not temporary files
         temp.write(source_code)
         temp.flush()
 
@@ -43,7 +45,9 @@ def parse_source(source_code, options, html_debug_root_name=""):
     return pmodel, debuginfo
 
 def parse_source_gen_plantuml(source_code, optimise=False):
-    with tempfile.NamedTemporaryFile(mode="wt") as temp:  # TODO use streams not temporary files
+    # Re temporary files, win10 needs delete=False otherwise other routines cannot access.
+    # Need to pass "wt" since we're writing text, not bytes - helps python3 compatibility.
+    with tempfile.NamedTemporaryFile(mode="wt", delete=False) as temp:  # TODO use streams not temporary files
         temp.write(source_code)
         temp.flush()
         p = PySourceAsPlantUml()
