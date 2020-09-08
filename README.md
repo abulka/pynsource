@@ -1,5 +1,4 @@
-Pynsource
-=========
+# Pynsource
 
 Version number: Version 1.76 (Apr 22 2020)
 
@@ -7,13 +6,11 @@ Author: [Andy Bulka](www.andypatterns.com)
 
 ![Python application](https://github.com/abulka/pynsource/workflows/Python%20application/badge.svg)
 
-Overview
---------
+## Overview
 
 Reverse engineer Python source code into UML class diagrams.
 
-Installation / Usage
---------------------
+## Installation / Usage
 
 ### Ready to run binary apps ###
 
@@ -46,19 +43,24 @@ However I've recently discovered that you can use a [pyenv](https://github.com/p
 Or simply use the prebuilt binaries executables listed above! 
 If you are on linux, then install Pynsource via the one-click [Linux snap](http://bit.ly/pynsource-snap).
 
-#### To run the tests
+### To run the tests
 
 ```
-sh -c 'cd src && mkdir tests/logs && ./bin/testall'
+./bin/testall
 ```
 
-The environment variable `TRAVIS` can be set to avoid tests that involve loading the wxPython package - this is especially needed on Travis and GitHub actions. It may also not be possible on your machine if you are running certain Python environments e.g. I had a problem with a framework pyenv install on my Mac running any tests that imported `wx`, even though Pynsource itself ran OK.  P.S. The subset of packages `requirements-travis.txt` is all you need to run the tests, and these exclude wx.
+from the root of the project.
+
+The environment variable `TRAVIS` is set by the script to avoid tests that involve loading the wxPython package - this is especially needed on Travis and GitHub actions. It may also not be possible on your machine if you are running certain Python environments e.g. I had a problem with a framework pyenv install on my Mac running any tests that imported `wx`, even though Pynsource itself ran OK.  P.S. The subset of packages `requirements-travis.txt` is all you need to run the tests, and these exclude wx.
+
+Alternatively you can also run all the tests by `cd src` then `./bin/testall` (there is a testall script both in ./bin/ and in src/bin).
+
+### Current Test Suite status
 
 ![Python application](https://github.com/abulka/pynsource/workflows/Python%20application/badge.svg)
 
 
-Features
---------
+# Features
 
  - Generates UML diagrams from Python 3 or legacy Python source code
  - The only UML tool that recognises Python instance attributes (not just class attributes) 
@@ -75,8 +77,7 @@ Features
     - Optimal layout algorithm
     - Access to generated PlantUML markup text 
 
-Examples
---------
+# Examples
 
 ![](https://www.dropbox.com/s/aq4hu3hfdvtxkp8/pynsource-comments.png?raw=1)
 
@@ -120,8 +121,7 @@ Examples of PlantUML view:
 
 Note: PlantUML view requires an internet connection.
                                     
-What does Pynsource mean?
--------------------------
+## What does Pynsource mean?
 
     Py = Python
     N = and
@@ -130,34 +130,33 @@ What does Pynsource mean?
 Long Answer: Since it was built in Australia, which is famous for its meat pies and sauce
    at football matches, Pie-and-Sauce.  Where Py = Python and Source = source code.
    
-Home Page and Documentation
----------------------------
+## Home Page and Documentation
 
 More screenshots, videos and documentation can be found at
 
 www.pynsource.com
 
-Help is built into the app - hit F1
+Help is built into the app - hit `F1`
 
-[Youtube video tutorial](https://youtu.be/FEXeDI18LMs) on basic usage of Pynsource (pro edition is featured).
+View a [Youtube video tutorial](https://youtu.be/FEXeDI18LMs) on the basic usage of Pynsource (pro edition is featured).
 
 If you want more control over the Pynsource initial window size and position see 
 [this link](https://github.com/abulka/pynsource/issues/49#issuecomment-475069439)
 
-When using PlantUML view, if you want to run your own PlantUML server (faster, larger diagrams), see the Pynsource built in help for installation and configuration instructions.  
+## Run your own PlantUML server
+When using PlantUML view (which is not necessary to use the app), if you want to run your own PlantUML server (faster, larger diagrams, more secure), see the Pynsource built in help for installation and configuration instructions.  
 
-Help support the project by Donating or purchasing a Pro Edition license.  Future plans include
+## Support the project
+Help support the project by [purchasing a Pro Edition license](https://pynsource.com/pricing.html) which contains extra features.  Future plans include
 undo/redo, recognition of Python type annotations, line labels, module and package visualisation.
 
-Study the Source Code
----------------------
+## Study the Source Code
 
 Create instant UML and [Literate Code Map](http://bit.ly/lcodemaps) diagrams of this GitHub project.
 
 [![button](https://www.dropbox.com/s/auynuqlfbrrxyhm/open_in_gituml_flat.png?raw=1)](http://gituml.com/ztree_scratchpad?user=abulka&repo=pynsource&commit=master)
 
-License
--------
+## License
 
 The Community Edition is open source, GPL3 licensed.
 

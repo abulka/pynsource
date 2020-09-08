@@ -1,3 +1,4 @@
+mkdir -p tests/logs
 # avoid wx by setting the TRAVIS env var, which happens automatically on travis and
 # is set explicitly in .github/workflows/pythonapp.yml 
 export TRAVIS=1
