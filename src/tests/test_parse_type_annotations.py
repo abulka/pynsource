@@ -139,6 +139,46 @@ class TestParseTypeAnnotations(unittest.TestCase):
         classentry = pmodel.classlist["Customer"]
         self.assertEqual(len(classentry.classdependencytuples), 0)
 
+    def test_function_annotation_1(self):
+        # Ensure can parse function annotation return types - see https://github.com/abulka/pynsource/issues/79
+        """
+        The reported error was caused by type having a '.' in the type e.g. Exception.ArithmeticError where we got
+            annotation=Attribute(
+               value=Name(lineno=6, col_offset=27, id='Exception', ctx=Load()),
+               attr='ArithmeticError',
+        rather than
+            annotation=Name(lineno=7, col_offset=27, id='Exception', ctx=Load()),
+
+        The solution is for the parser to check if the annotation is an ast.Attribute or ast.Name 
+        (see line 1425 in src/parsing/core_parser_ast.py)
+        """
+        source_code = dedent(
+            """
+            def func1(x: Exception) -> None: pass
+            def func1(x: Exception.ArithmeticError) -> float: pass
+            """
+        )
+        pmodel, debuginfo = parse_source(source_code, options={"mode": 3}, html_debug_root_name="test_function_annotation_1")
+        self.assertIn("had no classes.", pmodel.errors)
+
+    def test_function_annotation_2(self):
+        source_code = dedent(
+            """
+            class Customer:
+                def meth1(self, param: Exception.ArithmeticError) -> None:
+                    pass
+                def meth2(self, param: Exception) -> SomeOtherClass:
+                    pass
+            """
+        )
+        pmodel, debuginfo = parse_source(source_code, options={"mode": 3}, html_debug_root_name="test_function_annotation_2")
+        self.assertEqual(pmodel.errors, "")
+        classentry = pmodel.classlist["Customer"]
+        self.assertEqual(len(classentry.classdependencytuples), 2)  # Ideally should also find 'SomeOtherClass' dependency? thus 3 dependencies
+        self.assertIn(('param', 'Exception'), classentry.classdependencytuples)
+        self.assertIn(('param', 'Exception.ArithmeticError'), classentry.classdependencytuples)
+        # self.assertIn(('??', 'SomeOtherClass'), classentry.classdependencytuples)  # TODO think about this
+
 
 class TestNoAssignmentShouldStillCreateAttrs(unittest.TestCase):
 

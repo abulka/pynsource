@@ -1422,9 +1422,16 @@ class Visitor(T):
         """
         for arg in node.args.args:
             if hasattr(arg, "annotation") and arg.annotation != None:
-                self.write(f" found type annotation '{arg.annotation.id}' on method parameter {arg.arg}", mynote=1)
+                if isinstance(arg.annotation, ast.Attribute) and hasattr(arg.annotation, 'attr'):
+                    _type = f"{arg.annotation.value.id}.{arg.annotation.attr}"  # type is SomeType.SomeSubType - need to generalise one day
+                elif isinstance(arg.annotation, ast.Name):
+                    _type = arg.annotation.id # type is just 'SomeType'
+                else:
+                    _type = 'UnknownType'
+                self.write(f" found type annotation '{_type}' on method parameter {arg.arg}", mynote=1)
+
                 if self.current_class():
-                    self.add_composite_dependency((arg.arg, arg.annotation.id))
+                    self.add_composite_dependency((arg.arg, _type))
                 else:
                     pass  # should add to module dependencies (supported by GitUML only, at the moment)
 
