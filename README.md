@@ -33,7 +33,8 @@ You need `python3`, specifically Python 3.7 or later *(Linux can be Python 3.6)*
     $ git clone https://github.com/abulka/pynsource.git
     $ cd pynsource
     $ pip3 install -r requirements.txt
-    $ ./run (Mac, Linux) .\bin\rungui.bat (Windows 10)
+    $ ./bin/run (Mac, Linux) or
+    $ .\bin\run-win10.bat (Windows 10)
 
 Linux Users: Please use the script `bin/install-linux` to pip install needed dependencies,
 including a wxPython wheel specific to Ubuntu 18. Edit the script to change to your version 
@@ -43,7 +44,7 @@ The GUI toolkit [wxpython](https://wxpython.org/) that `Pynsource` relies on unf
 However I've recently discovered that you can use a [pyenv](https://github.com/pyenv/pyenv) environment for building and running Pynsource, see [this issue](https://github.com/abulka/pynsource/issues/68#issuecomment-605612292) for more info on how to do this.
 
 Or simply use the prebuilt binaries executables listed above! 
-Or install via the one-click [Linux snap](http://bit.ly/pynsource-snap).
+If you are on linux, then install Pynsource via the one-click [Linux snap](http://bit.ly/pynsource-snap).
 
 #### To run the tests
 
