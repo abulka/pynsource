@@ -37,7 +37,7 @@ import wx
 from gui.settings import PRO_EDITION, ASYNC_BACKGROUND_REFRESH
 from common.printframework import MyPrintout
 from media import images
-from gui.settings import APP_VERSION, APP_ICON_PATH
+from gui.settings import APP_VERSION, APP_VERSION_FULL, APP_ICON_PATH
 from gui.settings_wx import DEFAULT_ASCII_UML_FONT_SIZE
 from generate_code.gen_plantuml import displaymodel_to_plantuml
 from generate_code.gen_plantuml import plant_uml_create_png_and_return_image_url_async
@@ -373,7 +373,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         self._set_app_icon()
 
-        log.info(f"Version {APP_VERSION} running, ASYNC={ASYNC}, PRO={PRO_EDITION}")
+        log.info(f"Version {APP_VERSION_FULL} running, ASYNC={ASYNC}, PRO={PRO_EDITION}")
 
         if self.args:
             wx.CallAfter(self.app.run.CmdFileImportViaArgs, self.args, 3)  # default to Python 3 reverse engineering
@@ -1289,7 +1289,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         from wx.adv import AboutDialogInfo, AboutBox
         from gui.settings import registered_to
 
-        license = "Community Edition" if unregistered else f"PRO Edition - registered to \"{registered_to}\" thank you for your support."
+        license = "Community Edition" if unregistered else f"PRO Edition - registered to \"{registered_to}\"\nThank you for your support!"
         info = AboutDialogInfo()
 
         # image appears on left on all platforms, so make sure the image is small
@@ -1297,7 +1297,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         info.SetName(ABOUT_APPNAME)
         # info.SetVersion(str(APP_VERSION))
-        info.SetVersion(str(APP_VERSION) + " beta 1")
+        info.SetVersion(APP_VERSION_FULL)
         info.SetWebSite(WEB_PYNSOURCE_HOME_URL, "Home Page")
         info.SetDescription(f"{ABOUT_MSG}\n{license}\n")
         # info.Description = wordwrap(ABOUT_MSG, 350, wx.ClientDC(self.frame))
@@ -1397,13 +1397,13 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         elif ver < APP_VERSION:
             if alert_even_if_running_latest:
                 self.MessageBox(
-                    f"You seem to have a pre-release version {APP_VERSION} - congratulations!  Stable version is {ver}"
+                    f"You seem to have a pre-release version {APP_VERSION_FULL} - congratulations!  Stable version is {ver}"
                 )
             else:
                 log.info("You have a future version of Pynsource!")
         else:
             if alert_even_if_running_latest:
-                self.MessageBox("You already have the latest version:  %s" % APP_VERSION)
+                self.MessageBox("You already have the latest version:  %s" % APP_VERSION_FULL)
             else:
                 log.info("latest version ok")
 

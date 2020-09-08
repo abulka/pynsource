@@ -6,7 +6,7 @@ from parsing.api import new_parser
 import common.messages
 from view.display_model import DisplayModel
 import glob
-from gui.settings import APP_VERSION
+from gui.settings import APP_VERSION, APP_VERSION_FULL
 
 @click.command()
 @click.argument('files', nargs=-1)
@@ -32,7 +32,7 @@ def reverse_engineer(files, mode, graph, methods_list, prop_decorator, version):
     """
 
     if version:
-        click.echo(f"Pynsource CLI version {APP_VERSION}")
+        click.echo(f"Pynsource CLI version {APP_VERSION_FULL}")
 
     click.echo(f"Files to parse: {files}")
     # click.echo(graph)
