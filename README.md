@@ -12,20 +12,14 @@ Reverse engineer Python source code into UML class diagrams.
 
 ## Installation / Usage
 
-### Ready to run binary apps ###
+Pynsource binary app installers for Mac / Windows / Linux - see [Downloads](DOWNLOADS.md)
 
- * [Mac download](http://bit.ly/pynsource-mac-1-76) (unzip and drag app into the Applications directory) 
- * [Windows 10 download](https://bit.ly/pynsource-win-1-73-setup-zip) (unzip and run the installer) 
- * [Ubuntu Linux 18.0.4 download](http://bit.ly/pynsource-ubuntu-18-1-76) (unzip and run the executable) 
- * [Ubuntu Linux 16.0.4 download](http://bit.ly/pynsource-ubuntu-16-1-76) (unzip and run the executable) 
- * [Linux snap installer](http://bit.ly/pynsource-snap) (install on any distro using Snapcraft) 
- 
 An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
 like zoom and the ability to drag to connect shapes.
 
 ### To run from source code ###
 
-You need `python3`, specifically Python 3.7 or later *(Linux can be Python 3.6)*  installed, and `pip3`, then simply:
+You need `python3`, specifically Python 3.7 or later installed *(Linux can use Python 3.6)*. You also need `pip3` (which should come with Python 3), then simply:
 
     $ git clone https://github.com/abulka/pynsource.git
     $ cd pynsource
@@ -37,29 +31,10 @@ Linux Users: Please use the script `bin/install-linux` to pip install needed dep
 including a wxPython wheel specific to Ubuntu 18. Edit the script to change to your version 
 number of Ubuntu.
 
-The GUI toolkit [wxpython](https://wxpython.org/) that `Pynsource` relies on unfortunately needs a ‘proper’ **framework** Python environment to run in, which means no virtual environments - use your main Python e.g. brew Python on a Mac or an official install from python.org for Windows 10. The default Python 3 on Ubuntu 18.04 is fine too. 
+The GUI toolkit [wxpython](https://wxpython.org/) that `Pynsource` relies on  needs a ‘proper’ **framework** Python environment to run in, which means no virtual environments - use your main Python e.g. brew Python on a Mac or an official install from python.org for Windows 10. The default Python 3 on Ubuntu 18.04 is fine too. 
 However I've recently discovered that you can use a [pyenv](https://github.com/pyenv/pyenv) environment for building and running Pynsource, see [this issue](https://github.com/abulka/pynsource/issues/68#issuecomment-605612292) for more info on how to do this.
 
 Or simply use the prebuilt binaries executables listed above! 
-If you are on linux, then install Pynsource via the one-click [Linux snap](http://bit.ly/pynsource-snap).
-
-### To run the tests
-
-```
-./bin/testall            (Mac, Linux) or
-.\bin\testall-win10.bat  (Windows 10)
-```
-
-from the root of the project. You may need to alter the version of Python being invoked by the script e.g. `python` or `python3`.
-
-The environment variable `TRAVIS` is set by the script to avoid tests that involve loading the wxPython package - this is especially needed on Travis and GitHub actions. It may also not be possible on your machine if you are running certain Python environments e.g. I had a problem with a framework pyenv install on my Mac running any tests that imported `wx`, even though Pynsource itself ran OK.  P.S. The subset of packages `requirements-travis.txt` is all you need to run the tests, and these exclude wx.
-
-Alternatively you can also run all the tests by `cd src` then `./bin/testall` (because there is a testall script both in ./bin/ and in src/bin - for Mac/Linux, anyway).
-
-### Current Test Suite status
-
-![Python application](https://github.com/abulka/pynsource/workflows/Python%20application/badge.svg)
-
 
 # Features
 
@@ -134,28 +109,47 @@ Long Answer: Since it was built in Australia, which is famous for its meat pies 
 ## Home Page and Documentation
 
 More screenshots, videos and documentation can be found at
-
 www.pynsource.com
 
-Help is built into the app - hit `F1`
+- Help is built into the app - hit `F1`
 
-View a [Youtube video tutorial](https://youtu.be/FEXeDI18LMs) on the basic usage of Pynsource (pro edition is featured).
+- View a [Youtube video tutorial](https://youtu.be/FEXeDI18LMs) on the basic usage of Pynsource (pro edition is featured).
 
-If you want more control over the Pynsource initial window size and position see 
+- If you want more control over the Pynsource initial window size and position see 
 [this link](https://github.com/abulka/pynsource/issues/49#issuecomment-475069439)
 
-## Run your own PlantUML server
+### Run your own PlantUML server
 When using PlantUML view (which is not necessary to use the app), if you want to run your own PlantUML server (faster, larger diagrams, more secure), see the Pynsource built in help for installation and configuration instructions.  
 
-## Support the project
+### Support the project
 Help support the project by [purchasing a Pro Edition license](https://pynsource.com/pricing.html) which contains extra features.  Future plans include
 undo/redo, recognition of Python type annotations, line labels, module and package visualisation.
+
+## Running the tests
+
+Download the source code, install the dependencies (see above) then
+
+```
+./bin/testall            (Mac, Linux) or
+.\bin\testall-win10.bat  (Windows 10)
+```
+
+from the root of the project. You may need to alter the version of Python being invoked by the script e.g. `python` or `python3`.
+
+The environment variable `TRAVIS` is set by the script to avoid tests that involve loading the wxPython package - this is especially needed on Travis and GitHub actions. It may also not be possible on your machine if you are running certain Python environments e.g. I had a problem with a framework pyenv install on my Mac running any tests that imported `wx`, even though Pynsource itself ran OK.  P.S. The subset of packages `requirements-travis.txt` is all you need to run the tests, and these exclude wx.
+
+Alternatively you can also run all the tests by `cd src` then `./bin/testall` (because there is a testall script both in ./bin/ and in src/bin - for Mac/Linux, anyway).
+
+### Current Test Suite status
+
+![Python application](https://github.com/abulka/pynsource/workflows/Python%20application/badge.svg)
 
 ## Study the Source Code
 
 Create instant UML and [Literate Code Map](http://bit.ly/lcodemaps) diagrams of this GitHub project.
 
 [![button](https://www.dropbox.com/s/auynuqlfbrrxyhm/open_in_gituml_flat.png?raw=1)](http://gituml.com/ztree_scratchpad?user=abulka&repo=pynsource&commit=master)
+
 
 # Changelog
 
