@@ -4,7 +4,7 @@
 
 *September 2020*
 
-- Type annotations support e.g. the type annotation `param: SomeClass` will create a UML dependency to `SomeClass`
+- Type annotations support e.g. the type annotation `param: SomeClass` will create a UML dependency to `SomeClass` etc.
 
 - Static method detection bugfix
 

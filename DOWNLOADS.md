@@ -1,6 +1,6 @@
 # Pynsource Download Links
 
-The latest version is `1.76`
+The latest version is `1.76` - released Apr 22, 2020
 
 * [Mac download](http://bit.ly/pynsource-mac-1-76) (unzip and drag app into the Applications directory) 
  * [Windows 10 download](https://bit.ly/pynsource-win-1-73-setup-zip) (unzip and run the installer) 

@@ -1,13 +1,9 @@
 {
- "latest_version" : 1.76,
+ "latest_version" : 1.77,
  "latest_announcement" : """
-- Dark Mode Support (Mac)
+- Type annotations support e.g. the type annotation `param: SomeClass` will create a UML dependency to `SomeClass` etc.
 
-- Import report dialog after importing Python files
-
-- Improved handling of modules with syntax errors
-
-- Improved logging of parsing process
+- Static method detection bugfix
 """,
  "version_syntax_format" : 1,
  "download_url" : "http://bit.ly/pynsource-upgrade-download"
