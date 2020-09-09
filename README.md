@@ -13,6 +13,7 @@ Reverse engineer Python source code into UML class diagrams.
 ## Installation / Usage
 
 Pynsource binary app installers for Mac / Windows / Linux - see [Downloads](DOWNLOADS.md)
+<!-- https://github.com/abulka/pynsource/blob/master/DOWNLOADS.md -->
 
 An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
 like zoom and the ability to drag to connect shapes.
@@ -39,7 +40,8 @@ Or simply use the prebuilt binaries executables listed above!
 # Features
 
  - Generates UML diagrams from Python 3 or legacy Python source code
- - The only UML tool that recognises Python instance attributes (not just class attributes) 
+ - The only UML tool that recognises Python instance attributes (not just class attributes)
+ - Type annotation support *(new for 2020)*
  - Layout algorithm
  - Toggle between UML, Ascii art UML and PlantUML views
  - Automatically colour sibling subclasses to enhance understanding
@@ -154,6 +156,7 @@ Create instant UML and [Literate Code Map](http://bit.ly/lcodemaps) diagrams of 
 # Changelog
 
 View the [Changelog](CHANGELOG.md)
+<!-- https://github.com/abulka/pynsource/blob/master/CHANGELOG.md -->
 
 # License
 
