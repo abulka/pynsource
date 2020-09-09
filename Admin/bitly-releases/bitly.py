@@ -14,6 +14,7 @@ from dataclasses import dataclass  # requires 3.7
 from typing import List, Set, Dict, Tuple, Optional
 import pprint
 from beautifultable import BeautifulTable
+from textwrap import dedent
 
 releaseUrl = "https://github.com/abulka/pynsource/releases/tag/version-1.77"
 
@@ -21,8 +22,8 @@ response = requests.get(releaseUrl)
 assert response.status_code == 200
 
 html_doc = response.text
-with open("junk.html", "w") as fp:
-    fp.write(html_doc)
+# with open("junk.html", "w") as fp:
+#     fp.write(html_doc)
 
 soup = BeautifulSoup(html_doc, "html.parser")
 # print(soup)
@@ -135,3 +136,17 @@ for os, downloadEntity in downloads.items():
     )
 print("Bitly Entries to create (click on each link in turn (in vscode terminal) to ensure it exists and triggers a download)")
 print(t)
+print()
+
+htmlFragmentForWebsite = dedent(f"""
+<p>The latest version is <code>1.77</code></p>
+<ul>
+    <li><a href="{downloads["mac"].bitlyUrl}" rel="nofollow">Mac download</a> (unzip and drag app into the Applications directory)</li>
+    <li><a href="{downloads["win"].bitlyUrl}" rel="nofollow">Windows 10 download</a> (unzip and run the installer)</li>
+    <li><a href="{downloads["ubuntu-18"].bitlyUrl}" rel="nofollow">Ubuntu Linux 18.0.4 download</a> (unzip and run the executable)</li>
+    <li><a href="{downloads["ubuntu-16"].bitlyUrl}" rel="nofollow">Ubuntu Linux 16.0.4 download</a> (unzip and run the executable)</li>
+    <li><a href="http://bit.ly/pynsource-snap" rel="nofollow">Linux snap installer</a> (one-click install on any Ubuntu distro)</li>
+</ul>
+""")
+print("Fragment of HTML to put on official website on downloads page")
+print(htmlFragmentForWebsite)
