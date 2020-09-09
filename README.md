@@ -157,7 +157,11 @@ Create instant UML and [Literate Code Map](http://bit.ly/lcodemaps) diagrams of 
 
 [![button](https://www.dropbox.com/s/auynuqlfbrrxyhm/open_in_gituml_flat.png?raw=1)](http://gituml.com/ztree_scratchpad?user=abulka&repo=pynsource&commit=master)
 
-## License
+# Changelog
+
+View the [Changelog](CHANGELOG.md)
+
+# License
 
 The Community Edition is open source, GPL3 licensed.
 
