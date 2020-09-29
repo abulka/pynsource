@@ -4,11 +4,131 @@ import pprint
 import sys
 import json
 
-
 sys.path.append("../../src")
 pprint.pprint(sys.path)
 from layout.overlap_removal import OverlapRemoval, LINE_NODE_OVERLAP_REMOVAL_ENABLED
 from view.graph import Graph, GraphNode
+# from data_testgraphs import *  # e.g. TEST_GRAPH1
+
+"""
+    Overlap remover as a server API. Send up JSON get back JSON.
+    JSON we send up is a list of nodes and edges. See Research/overlap_removal_server/payload1.js 
+
+    Start server:
+        python -m flask run flask_main.py
+        python -m flask run --no-reload flask_main.py
+
+    Example of usage:
+        POST to http://127.0.0.1:5000/overlaps
+            {
+                nodes: [
+                    { id: "a", label: "A", left: 0, top: 0, width: 250, height: 250 },
+                    { id: "a1", label: "A1", left: 0, top: 0 },
+                    { id: "a2", label: "A2", left: 0, top: 0 }
+                ],
+                edges: [
+                    { from: "a", to: "a1" },
+                    { from: "a", to: "a2" },
+                ]
+            }
+            which as proper JSON is:
+                {"nodes":[{"id":"a","label":"A","left":0,"top":0,"width":250,"height":250},{"id":"a1","label":"A1","left":0,"top":0},{"id":"a2","label":"A2","left":0,"top":0}],"edges":[{"from":"a","to":"a1"},{"from":"a","to":"a2"}]}
+
+        Response contains the modified graph of nodes and edges with new left, top positions
+        as well as some metadata e.g. JSON
+            {
+            "error": "none", 
+            "graph": {
+                "edges": [
+                {
+                    "from": "a", 
+                    "to": "a1"
+                }, 
+                {
+                    "from": "a", 
+                    "to": "a2"
+                }
+                ], 
+                "nodes": [
+                {
+                    "height": 60, 
+                    "id": "a", 
+                    "left": 0, 
+                    "top": 0, 
+                    "width": 60
+                }, 
+                {
+                    "height": 60, 
+                    "id": "a1", 
+                    "left": 65, 
+                    "top": 0, 
+                    "width": 60
+                }, 
+                {
+                    "height": 60, 
+                    "id": "a2", 
+                    "left": 130, 
+                    "top": 0, 
+                    "width": 60
+                }
+                ]
+            }, 
+            "graph_as_string": "# PynSource Version 1.2\n{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin. Comments are saved.'}\n{'type':'', 'id':'a', 'x':0, 'y':0, 'width':60, 'height':60}\n{'type':'', 'id':'a1', 'x':65, 'y':0, 'width':60, 'height':60}\n{'type':'', 'id':'a2', 'x':130, 'y':0, 'width':60, 'height':60}\n{'type':'', 'id':'a_to_a1', 'source':'a', 'target':'a1'}\n{'type':'', 'id':'a_to_a2', 'source':'a', 'target':'a2'}\n", 
+            "total_contractive_moves": 0, 
+            "total_cycles": 4, 
+            "total_expansive_moves": 3, 
+            "total_overlaps_found": 5, 
+            "total_postmove_fixes": 0, 
+            "warning_msg": "", 
+            "were_all_overlaps_removed": true
+            }
+
+    Test (postman):
+        pm.test("Status code is 200", function () { pm.response.to.have.status(200); });
+        pm.test("all overlaps removed", function () { 
+            pm.response.to.have.status(200); 
+            
+            // check actual json payload, convert to dict
+            var jsonData = JSON.parse(responseBody);
+            
+            pm.expect(jsonData.error).to.equal('none');
+            pm.expect(_.get(jsonData, 'error')).to.equal('none');
+
+            // ensure all overlaps were removed    
+            pm.expect(jsonData.were_all_overlaps_removed).to.equal(true);
+
+            // check specific values    
+            let a = _.findNode('a', jsonData);
+            pm.expect(a).to.have.property('height');
+            pm.expect(a.left).to.equal(0);
+            pm.expect(a.top).to.equal(0);
+            
+            pm.expect(_.findNode('a1', jsonData).left).to.equal(65);
+        });
+
+    Postman tip:
+        Put common shared scripts in the collection pre-request scripts, 
+        which is trickily accessed via the collections ... button then Edit / Pre-request Scripts.
+
+        Define them on Object and then it will be available on any object including underscore _ object
+        https://stackoverflow.com/questions/45673961/how-to-write-global-functions-in-postman 
+
+        Object.prototype.sayHello = function(name){
+            console.log(`Hello! ${name}`);
+        };
+
+        Object.prototype.findNode = function(id, jsonData) {
+            if (id === undefined) {
+                console.log('id is undefined');
+                return;
+            }
+            for (let node of jsonData.graph.nodes)
+                if (node.id == id)
+                    return node;
+            return undefined;
+        };
+
+"""
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -61,51 +181,82 @@ def remove_overlaps_ping():
         were_all_overlaps_removed = overlap_remover.RemoveOverlaps()
         basic_info = {
             "error": "none",
-            "were_all_overlaps_removed": were_all_overlaps_removed
+            "were_all_overlaps_removed": were_all_overlaps_removed,
         }
         return {**basic_info, **(overlap_remover.GetStats())}
     else:  # GET
         return {"error": "GET not really supported, mate"}
+
 
 def overlap_remover_core(data):
     class FakeGui:
         def mega_refresh(self, recalibrate=False, auto_resize_canvas=True):
             pass
 
-    g = graph_fromData(data)
+    g = graph_fromDict(data)
+    print('got incoming graph', g.GraphToString())
     overlap_remover = OverlapRemoval(g, margin=5, gui=FakeGui())
-
     were_all_overlaps_removed = overlap_remover.RemoveOverlaps()
+    print('graph after overlap removal', g.GraphToString(), overlap_remover.GetStats())
+
     basic_info = {
         "error": "none",
         "were_all_overlaps_removed": were_all_overlaps_removed,
         "graph_as_string": g.GraphToString(),
-        "graph": graph_toData(g)
+        "graph": graph_toDict(g),
     }
     return {**basic_info, **(overlap_remover.GetStats())}
 
-    
-def graph_fromData(data: dict) -> Graph:
+
+def graph_fromDict(data: dict) -> Graph:
     # should be a method on Graph called .fromJSON() but this takes a dict so maybe don't bother
     g = Graph()
     nodes_created = {}
-    for node in data["nodes"]:
-        id = node["id"]
-        width = getattr(node, "width", 60)
-        height = getattr(node, "height", 60)
-        gnode = GraphNode(id, node["left"], node["top"], width, height)
-        nodes_created[id] = gnode
-    for edge in data["edges"]:
-        # ah have to get the references to the nodes created and add edges 
-        from_node_id, to_node_id = edge["from"], edge["to"]
-        from_node = nodes_created[from_node_id]
-        to_node = nodes_created[to_node_id]
-        g.AddEdge(from_node, to_node)
+    if "nodes" in data.keys():
+        for node in data["nodes"]:
+            id = node["id"]
+            # label = node["label"]  # not used
+            width = node.get("width", 60)
+            height = node.get("height", 60)
+            
+            # gnode = GraphNode(id, node["left"], node["top"], width, height)  # or
+            gnode = g.create_new_node(id, node["left"], node["top"], width, height)
+
+            g.AddNode(gnode)
+            nodes_created[id] = gnode
+    if "edges" in data.keys():
+        for edge in data["edges"]:
+            # ah have to get the references to the nodes created and add edges
+            from_node_id, to_node_id = edge["from"], edge["to"]
+            from_node = nodes_created[from_node_id]
+            to_node = nodes_created[to_node_id]
+            g.AddEdge(from_node, to_node)
     return g
 
-def graph_toData(g: Graph) -> dict:
+
+def graph_toDict(g: Graph) -> dict:
     # should be a method on Graph called .fromJSON() but this returns a dict so maybe don't bother
-    return {"warning": "to be implemented"}
+    data = {"nodes": [], "edges": []}
+
+    for node in g.nodes:
+        data["nodes"].append(
+            {
+                "id": node.id,
+                # "label": node.id,   # not used
+                "left": node.left,
+                "top": node.top,
+                "right": node.right,
+                "bottom": node.bottom,
+                "width": node.width,
+                "height": node.height,
+            }
+        )
+    for edge in g.edges:
+        data["edges"].append(
+            {"from": edge["source"].id, "to": edge["target"].id,}
+        )
+    return data
+
 
 @app.route("/echo", methods=["POST"])
 def json_echo():
@@ -115,7 +266,8 @@ def json_echo():
         if not json_dict:
             return {"error": "could not decode any json, sorry - got None"}
         pprint.pprint(json_dict)
-        return request.get_json() # just send it straight back
+        return request.get_json()  # just send it straight back
+
 
 @app.route("/overlaps", methods=["POST"])
 def remove_overlaps():
@@ -126,6 +278,25 @@ def remove_overlaps():
             return {"error": "could not decode any json, sorry - got None"}
         json_result = overlap_remover_core(json_dict)
         return json_result
+
+
+@app.route("/test-graph1", methods=["GET"])
+def get_test_graph1():
+    # {"nodes": [{"id": "D25", "left": 7, "top": 6, "width": 159, "height": 106}, {"id": "D13", "left": 6, "top": 119, "width": 119, "height": 73}, {"id": "m1", "left": 171, "top": 9, "width": 139, "height": 92}]}
+    data = {
+        "nodes": [
+            {"id": "D25", "left": 7, "top": 6, "width": 159, "height": 106},
+            {"id": "D13", "left": 6, "top": 119, "width": 119, "height": 73},
+            {"id": "m1", "left": 171, "top": 9, "width": 139, "height": 92},
+        ]
+    }
+    # generate payload for test1_1MoveLeftPushedBackHorizontally01
+    # {"nodes": [{"id": "D25", "left": 7, "top": 6, "width": 159, "height": 106}, {"id": "D13", "left": 6, "top": 119, "width": 119, "height": 73}, {"id": "m1", "left": 150, "top": 9, "width": 139, "height": 92}]}
+    data["nodes"][2]["left"] = 150
+    data["nodes"][2]["top"] = 9
+    print(json.dumps(data))
+
+    return data
 
 
 app.run()
