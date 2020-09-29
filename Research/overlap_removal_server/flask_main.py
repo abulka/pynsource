@@ -1,5 +1,6 @@
 import flask
 from flask import request
+from flask_cors import CORS  # pip install -U flask-cors (allow anyone to call this api)
 import pprint
 import sys
 import json
@@ -131,6 +132,7 @@ from view.graph import Graph, GraphNode
 """
 
 app = flask.Flask(__name__)
+CORS(app)  # allow anyone to call this API https://stackoverflow.com/questions/20035101/why-does-my-javascript-code-receive-a-no-access-control-allow-origin-header-i
 app.config["DEBUG"] = True
 
 
@@ -216,9 +218,22 @@ def graph_fromDict(data: dict) -> Graph:
         for node in data["nodes"]:
             id = node["id"]
             # label = node["label"]  # not used
-            width = node.get("width", 60)
-            height = node.get("height", 60)
-            
+
+            # if you don't supply 'width' and 'height' but do supply 'right' and 'bottom' 
+            # then 'width' and 'height' will be calculated for you. 
+            width = node.get("width", None)
+            height = node.get("height", None)
+            if not width:
+                if node.get("right") is not None:
+                    width = node["right"] - node["left"]
+                else:
+                    width = 60
+            if not height:
+                if node.get("bottom") is not None:
+                    height = node["bottom"] - node["top"]
+                else:
+                    height = 60
+
             # gnode = GraphNode(id, node["left"], node["top"], width, height)  # or
             gnode = g.create_new_node(id, node["left"], node["top"], width, height)
 
