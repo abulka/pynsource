@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Network</title>
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <style type="text/css">
+    #mynetwork {
+      height: 500px;
+      /* width: 600px; */
+
+      /* full width */
+      /* margin-left: calc(50% - 50vw);
+      width: 100vw; */
+
+      /* leave a bit of a right margin to match left margin - but its not symmetrical when browser resized */
+      width: 98vw;
+
+      border: 1px solid lightgray;
+    }
+  </style>
+</head>
+
+<body>
+  <p>stuff here...</p>
+  <div id="mynetwork"></div>
+
+
+  <input type="checkbox" id="physicsSwitch" checked>
+  <label for="physicsSwitch">Physics</label><br>
+  <input type="checkbox" id="enablePhysicsDuringDrag" checked>
+  <label for="enablePhysicsDuringDrag">Physics during drag</label><br>
+
+  <!-- <button id="doLayoutAndRemoveOverlaps">Layout + RemoveOverlaps</button> -->
+  <button id="removeOverlaps">removeOverlaps</button>
+  <button id="doLayout">doLayout (+ removeOverlaps)</button>
+
+  <!-- <iframe class="scribd_iframe_embed" title="UML Graph Layout - Andy Talk - March 2011" src="https://www.scribd.com/embeds/55976194/content?start_page=1&view_mode=scroll&access_key=key-n7a9tizaxzpe46py3l9" data-auto-height="true" data-aspect-ratio="null" scrolling="no" width="100%" height="600" frameborder="0"></iframe><p  style="   margin: 12px auto 6px auto;   font-family: Helvetica,Arial,Sans-serif;   font-style: normal;   font-variant: normal;   font-weight: normal;   font-size: 14px;   line-height: normal;   font-size-adjust: none;   font-stretch: normal;   -x-system-font: none;   display: block;"   ><a title="View UML Graph Layout - Andy Talk - March 2011 on Scribd" href="https://www.scribd.com/presentation/55976194/UML-Graph-Layout-Andy-Talk-March-2011#from_embed"  style="text-decoration: underline;">UML Graph Layout - Andy Tal...</a> by <a title="View tcab22's profile on Scribd" href="https://www.scribd.com/user/5064053/tcab22#from_embed"  style="text-decoration: underline;">tcab22</a></p> -->
+
+  <script type="text/javascript">
+
+    $(document).ready(function () {
+
+      let are_dragging = false
+      network.on('dragging', function (params) {
+        are_dragging = true
+        // changing options whilst dragging not ideal - stabilisation event doesn't fire
+        // if (enablePhysicsDuringDrag != options.physics.enabled) {
+        //   options.physics.enabled = enablePhysicsDuringDrag
+        //   network.setOptions(options)
+        // }
+      });
+      network.on('dragEnd', function (params) {
+        are_dragging = false
+        if (!options.physics.enabled)
+          remove_overlaps()
+
+        // if (enablePhysicsDuringDrag) {
+        //   options.physics.enabled = $('#physicsSwitch').prop('checked')
+        //   network.setOptions(options)
+        // }
+        // else
+        //   remove_overlaps()
+        console.log('drag end, physics=', options.physics.enabled)
+      });
+
+      network.on('stabilized', function (params) {
+        console.log('stabilized ok', params)
+        if (!are_dragging) {
+          remove_overlaps();
+          // network.stopSimulation()  // hmm will cause a stabilised event again though
+        }
+      });
+
+      network.on('hoverNode', function (params) {
+        let id = params.node
+        let node = nodes.get(id)
+        let positions = network.getPositions([id])// list of ids in, dict of positions e.g. nodeId1: {x: xValue, y:yValue}, out
+        let x = positions[id].x
+        let y = positions[id].y
+        console.log('hovering over node id ' + id, x, y, network.getBoundingBox(params.node));
+      });
+
+
+      // event - buttons and checkboxes
+
+      $('#removeOverlaps').on('click', function (event) {
+        console.log('removeOverlaps')
+        remove_overlaps()
+      })
+
+      $('#doLayout').on('click', function (event) {
+        console.log('doLayout')
+
+        // options.physics.enabled = true
+        // network.setOptions(options)
+        // options.physics.enabled = $('#physicsSwitch').prop('checked')
+
+        network.stabilize(100)
+        console.log('doLayout should have called network.stabilize!')
+
+      })
+
+      // $('#doLayoutAndRemoveOverlaps').on('click', function (event) {
+      //   network.stabilize(100)
+      //   // remove_overlaps() hmm - this should happen onstabilized event!?
+      // })
+
+      $('#physicsSwitch').on('change', function (event) {
+        console.log('physicsSwitch', this.checked)
+        options.physics.enabled = this.checked
+        network.setOptions(options)
+      })
+
+      $('#enablePhysicsDuringDrag').on('change', function (event) {
+        console.log('enablePhysicsDuringDrag', this.checked)
+        enablePhysicsDuringDrag = this.checked
+
+        // change immediately cos cannot change whilst dragging
+        if (enablePhysicsDuringDrag != options.physics.enabled) {
+          options.physics.enabled = enablePhysicsDuringDrag
+          network.setOptions(options)
+        }        
+      })
+
+      // ensure no overlaps on load
+      network.stabilize(10)
+      // remove_overlaps()
+
+    })
+
+  </script>
+
+  <style>
+    #popup {
+      z-index: 92000;
+      position: absolute;
+      display: none;
+      /* display: block; */
+      background-color: aquamarine;
+      /* margin: 0;
+      padding: 0; */
+      opacity: 0.7;
+    }
+
+    div#cellBatchAttrPopUp {
+      display: none;
+      position: absolute;
+      z-index: 2000;
+      padding: 4px 8px;
+      color: #333;
+      white-space: nowrap;
+      -moz-border-radius: 5px;
+      -webkit-border-radius: 5px;
+      border-radius: 5px;
+      -moz-box-shadow: 0px 0px 4px #222;
+      -webkit-box-shadow: 0px 0px 4px #222;
+      box-shadow: 0px 0px 4px #222;
+      background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+      background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #eeeeee), color-stop(1, #cccccc));
+      background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
+      background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+      background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
+      background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
+    }
+  </style>
+
+  <script src="settings.js"></script>
+  <script src="init.js"></script>
+  <script src="animated-move.js"></script>
+  <script src="remove-overlaps.js"></script>
+  <script src="editing_offline.js"></script>
+  <script src="editing.js"></script>
+
+</body>
+
+
+</html>

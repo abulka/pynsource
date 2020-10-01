@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+  <title>Network | Basic usage</title>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.15.0/vis.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.15.0/vis.css" rel="stylesheet" type="text/css" />
+  
+  <style type="text/css">
+    #mynetwork {
+      width: 1400px;
+      height: 800px;
+      border: 1px solid lightgray;
+    }
+  </style>
+</head>
+<body>
+
+<div id="mynetwork"></div>
+
+<script type="text/javascript">
+	// create an array with nodes
+	var nodes = new vis.DataSet([
+		{id: 1, label: 'Node 1'},
+		{id: 2, label: 'Node 2'},
+		{id: 3, label: 'Node 3'},
+		{id: 4, label: 'Node 4'},
+		{id: 5, label: 'Node 5'}
+	]);
+
+	// create an array with edges
+	var edges = new vis.DataSet([
+		{from: 1, to: 3},
+		{from: 1, to: 2},
+		{from: 2, to: 4},
+		{from: 2, to: 5}
+	]);
+
+	// container element
+	var container = document.getElementById('mynetwork');
+
+	var data = {
+		nodes: nodes,
+		edges: edges
+	};
+
+	// disable physics
+	var options = {physics: {enabled: false}};
+
+	// create network
+	var network = new vis.Network(container, data, options);
+
+	// get original positions
+	var positions = network.getPositions();
+	
+	// animation properties
+	var k = 0, lambda = 0, tick = 10, totalTime = 500;
+		
+	// toy example start x, y coordinates nodes
+	var x_start = 0, y_start = 0
+
+	// nr of steps, given tick time and total animation time
+	var nrOfSteps = Math.floor( totalTime / tick);
+
+	// perform moveNode every tick nr of milliseconds
+	timer = setInterval(function(){
+		
+		// iteration counter
+		k++;
+
+		// lambda (for convex combination)
+		var l = k / nrOfSteps;
+
+		for (i = 1; i < nodes.length; i++) { 
+		
+			// get target positions 
+			var x_target = positions[i].x;
+			var y_target = positions[i].y;
+			
+			// compute the convex combination of x_start and x_target to find intermediate x and move node to it, same for y
+			var xt = x_start * (1 - l) + x_target * l;
+			var yt = y_start * (1 - l) + y_target * l;
+			
+			// move node
+		    network.moveNode(i,xt,yt);
+		}
+	
+		// stop if we have reached nr of steps
+		if(k == nrOfSteps){
+			clearInterval(timer)
+		} 
+	},tick);
+
+</script>
+</body>
+</html>
