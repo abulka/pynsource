@@ -28,9 +28,8 @@ You need `python3`, specifically Python 3.7 or later installed *(Linux can use P
     $ ./bin/run           (Mac, Linux) or
     $ .\bin\run-win10.bat (Windows 10)
 
-Linux Users: Please use the script `bin/install-linux` to pip install needed dependencies,
-including a wxPython wheel specific to Ubuntu 18. Edit the script to change to your version 
-number of Ubuntu.
+Linux Users: Please use the script `bin/install-linux-18.04` to pip install needed Ubuntu dependencies, including a wxPython wheel specific to `Ubuntu 18.04`. Use the script `bin/install-linux-20.04` if you are installing on `Ubuntu 20.04`.  If you are using a different
+version of Ubuntu simply edit the script to change the url of wxpython accordingly.
 
 The GUI toolkit [wxpython](https://wxpython.org/) that `Pynsource` relies on  needs a ‘proper’ **framework** Python environment to run in, which means no virtual environments - use your main Python e.g. brew Python on a Mac or an official install from python.org for Windows 10. The default Python 3 on Ubuntu 18.04 is fine too. 
 However I've recently discovered that you can use a [pyenv](https://github.com/pyenv/pyenv) environment for building and running Pynsource, see [this issue](https://github.com/abulka/pynsource/issues/68#issuecomment-605612292) for more info on how to do this.
