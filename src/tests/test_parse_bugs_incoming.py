@@ -265,15 +265,7 @@ class TestIncomingBugs(unittest.TestCase):
                                          options={"mode": 3}, 
                                          html_debug_root_name="test_issue_80")
         self.assertEqual(pmodel.errors, "")
-        # classNames = [classname for classname, classentry in pmodel.classlist.items()]
-        # # print(classNames)
-        # # print(dump_pmodel(pmodel))
-        # assert "Test" in classNames
-        # assert classNames == ["Test"]
-        # classentry = pmodel.classlist["Test"]
-        # # print(classentry)
-        # assert len(classentry.defs) == 1
-        # assert "hi" in classentry.defs
+        # print(dump_pmodel(pmodel))
 
     def test_issue_81(self):
         # https://github.com/abulka/pynsource/issues/81

@@ -15,6 +15,7 @@ import logging
 from common.logger import config_log
 import traceback
 from os import path
+from textwrap import dedent
 
 import astpretty  # pip install astpretty
 
@@ -542,12 +543,21 @@ class Visitor(T):
             elif self.in_method_in_class_area() and self.lhs[0] == "self" and len(self.lhs) > 1:
                 t = create_attr_please(self.lhs[1])
             else:
-                pass  # in module area
+                t = None  # in module area
 
             if self.lhs[0] == "self" and len(self.rhs) > 0:
                 ra = RhsAnalyser(visitor=self)
                 if ra.is_rhs_reference_to_a_class():
-                    self.add_composite_dependency((t, ra.rhs_ref_to_class))
+                    if t:
+                        self.add_composite_dependency((t, ra.rhs_ref_to_class))
+                    else:
+                        msg = f"Would love to add a dependency to {ra.rhs_ref_to_class} but " \
+                              f"lhs is ? - so adding ref from current class {self.current_class().name} " \
+                              "which may not make sense.  This is usually a situation where you are " \
+                              "assigning to the variable 'self' or something weird."
+                        log_proper.warning(msg)
+                        self.write(msg, mynote=1)
+                        self.add_composite_dependency((self.current_class().name, ra.rhs_ref_to_class))
 
         self.init_lhs_rhs()
         # self.flush_state()
