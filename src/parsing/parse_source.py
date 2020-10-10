@@ -34,6 +34,7 @@ def parse_source(source_code, options, html_debug_root_name=""):
             set_DEBUGINFO(old_debug_info_value)
 
         if html_debug_root_name:
+            log.ensure_is_open()  # file is sometimes closed, so reopen it
             log.out("<hr><h1>Errors:</h1>")
             log.out_wrap_in_html(pmodel.errors)
             log.out("<hr><h1>debuginfo:</h1>")

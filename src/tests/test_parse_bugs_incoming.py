@@ -249,6 +249,54 @@ class TestIncomingBugs(unittest.TestCase):
         assert "myval" in attrnames
 
 
+    def test_issue_80(self):
+        # https://github.com/abulka/pynsource/issues/80
+        source_code = dedent("""
+            class Foo(object):
+            
+                @classmethod
+                def create(cls,VAR1):
+                    self = Foo()  # <-- this is needed to cause the error
+                    self.var1 = VAR1  # <-  error here
+                    return self
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, 
+                                         options={"mode": 3}, 
+                                         html_debug_root_name="test_issue_80")
+        self.assertEqual(pmodel.errors, "")
+        # classNames = [classname for classname, classentry in pmodel.classlist.items()]
+        # # print(classNames)
+        # # print(dump_pmodel(pmodel))
+        # assert "Test" in classNames
+        # assert classNames == ["Test"]
+        # classentry = pmodel.classlist["Test"]
+        # # print(classentry)
+        # assert len(classentry.defs) == 1
+        # assert "hi" in classentry.defs
+
+    def test_issue_81(self):
+        # https://github.com/abulka/pynsource/issues/81
+        source_code = dedent("""
+            variable = 'a'
+            print(f'{variable=}')
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, 
+                                         options={"mode": 3}, 
+                                         html_debug_root_name="test_issue_81")
+        self.assertEqual(pmodel.errors, "")
+
+
+
+
+
+
+
+
+
+
+
 
 """
 To set up a launch config in vscode

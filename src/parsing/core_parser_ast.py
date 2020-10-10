@@ -43,7 +43,7 @@ def set_DEBUGINFO(flag: bool): global _DEBUGINFO; _DEBUGINFO = flag  # allow set
 DEBUGINFO_IMMEDIATE_PRINT = False
 DEBUG_TO_LOG_PROPER = True
 DEBUG_TO_LOG_PROPER_FLUSH_STATE = False  # usually too verbose for log file
-DEBUG_TO_LOG_PROPER_PARSE_HISTORY = False  # very verbose
+DEBUG_TO_LOG_PROPER_PARSE_HISTORY = True  # very verbose and a little weird/hard to interpret
 
 last_python_mode = 0
 
@@ -284,9 +284,17 @@ def _convert_ast_to_old_parser(node, filename, log, options={}):
             log_proper.error(f"html version of debug info may exist at: '{logh.out_filename}'")
             log_proper.error(f"model.errors: '{v.model.errors}'")
 
-            # IMPORTANT TO LEAVE THIS IN because it reports the actual exception in the proper log
-            log_proper.error(f"Parsing Visit error: {err}, Debug info: {v.result_for_log_proper_cleaned}")  # very verbose                
+            """IMPORTANT TO LEAVE THIS IN because it reports the actual exception in the proper log"""
+            # very verbose and a little weird to interpret, so leave it out                
+            # log_proper.error(f"Parsing Visit error: {err}, Debug info: {v.result_for_log_proper_cleaned}")
+
+            # this is more normal and easier to figure out where the pynsource ast parser crashed
             log_proper.error(f"Full traceback: {traceback.format_exc()}")
+
+            # DEBUG_TO_LOG_PROPER_PARSE_HISTORY adds some visit history info somehow, 
+            # so may be useful on ocassion of an error.
+            if DEBUG_TO_LOG_PROPER and DEBUG_TO_LOG_PROPER_PARSE_HISTORY:
+                log_proper.debug(v.result_for_log_proper_cleaned)
 
         # debug output goes to special html formatted log file controlled by 'logh' object
         logh.out("Parsing Visit error: {0}".format(err), force_print=True)
@@ -301,9 +309,6 @@ def _convert_ast_to_old_parser(node, filename, log, options={}):
         if STOP_ON_EXCEPTION:
             raise
 
-
-    if DEBUG_TO_LOG_PROPER and DEBUG_TO_LOG_PROPER_PARSE_HISTORY:
-        log_proper.debug(v.result_for_log_proper_cleaned)
     debuginfo = "<br>".join(v.result)
     return v.model, debuginfo
 

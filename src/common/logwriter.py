@@ -22,6 +22,14 @@ class LogWriter:
     def finish(self):
         self.f.close()
 
+    def ensure_is_open(self):
+        try:
+            # file is sometimes closed in error conditions, so reopen it
+            self.out("<br/>")
+        except ValueError as e:
+            print(e, "re-opening html log file cos it was closed...")
+            self.f = open(self.out_filename, "a")
+
     def out(self, s, force_print=False):
         if self.print_to_console or force_print:
             print(s)
