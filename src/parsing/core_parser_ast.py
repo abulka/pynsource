@@ -154,6 +154,7 @@ def parse(filename, log=None, options={}):
         generic_help = "If you are parsing Python 3 code, check the menu item 'File/Python 3."
     else:
         generic_help = "If you are parsing Python 2 code, uncheck the menu item 'File/Python 3."
+        generic_help += f"\nBe aware that Pynsource is running under Python {sys.version} and thus cannot handle syntax > than that version."
     generic_help += "\n\nOr of course you may be dealing with a real syntax error :-)"
 
     try:

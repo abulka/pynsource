@@ -267,8 +267,17 @@ class TestIncomingBugs(unittest.TestCase):
         self.assertEqual(pmodel.errors, "")
         # print(dump_pmodel(pmodel))
 
+    @unittest.skip('Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
     def test_issue_81(self):
         # https://github.com/abulka/pynsource/issues/81
+        """
+        This ability to specify an = sign after a variable in an fstring is a Python 3.8
+        feature. See "f-strings support = for self-documenting expressions and debugging" in
+        https://docs.python.org/3/whatsnew/3.8.html
+        Pynsource will have to be running under Python 3.8 to handle this syntax.
+        Pynsource release binaries currently run under Python 3.7.
+        Running Pynsource from source under Python 3.8 will allow you to parse this 3.8 syntax.
+        """
         source_code = dedent("""
             variable = 'a'
             print(f'{variable=}')
