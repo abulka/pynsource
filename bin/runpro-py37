@@ -1,0 +1,5 @@
+# Mac, development - adjust to your environment
+
+cd src
+PYTHON=/Users/andy/.pyenv/versions/3.7.5/bin/python
+PYTHONPATH="/Users/andy/Devel/ogl2/:/Users/andy/Devel/pynsource-rego/" $PYTHON pynsource-gui.py

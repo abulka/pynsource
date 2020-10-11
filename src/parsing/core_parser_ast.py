@@ -1,5 +1,7 @@
 import sys
 
+ast = None  # we dynamically assign either native ast, typed_ast.ast27 or typed_ast.ast3 to this in mode()
+
 # S
 from ast import *  # only used for all the symbols like '_ast.And' etc which are stored into our
 
@@ -154,14 +156,14 @@ def parse(filename, log=None, options={}):
         generic_help = "If you are parsing Python 3 code, check the menu item 'File/Python 3."
     else:
         generic_help = "If you are parsing Python 2 code, uncheck the menu item 'File/Python 3."
-        generic_help += f"\nBe aware that Pynsource is running under Python {sys.version} and thus cannot handle syntax > than that version."
+        generic_help += f"\n\nBe aware that Pynsource is running under Python {sys.version} and thus cannot handle syntax > than that version."
     generic_help += "\n\nOr of course you may be dealing with a real syntax error :-)"
 
     try:
         node = _ast_parse(filename)
     except SyntaxError as e:
         mode(0)  # reset
-        pmodel.errors = f"Syntax error in parsing\n'{filename}'\n\n{_format_syntax_error_nicely(e)}\nPynsource is in Python {_mode} syntax mode.\n{generic_help}"
+        pmodel.errors = f"Syntax error in parsing\n'{filename}'\n\n{_format_syntax_error_nicely(e)}\n\nPynsource is in Python {_mode} syntax mode.\n{generic_help}"
         # log_proper.error(" ".join(pmodel.errors.split()))  # remove multiple spaces
         log_proper.error(pmodel.errors)  # changed my mind, log again with newlines intact ;-)
         return pmodel, ""
@@ -1205,8 +1207,13 @@ class Visitor(T):
         # A
         self.record_lhs_rhs(node.id)
 
-    def visit_Str(self, node):
-        self.write(repr(node.s))
+    # Cos Python 3.8 reports: PendingDeprecationWarning: visit_Str is deprecated; add visit_Constant
+    if sys.version_info.minor >= 8:
+        def visit_Constant(self, node):
+            self.write(repr(node.s))
+    else:
+        def visit_Str(self, node):
+            self.write(repr(node.s))
 
     # S
     def visit_Bytes(self, node):
@@ -1491,6 +1498,7 @@ def mode(python=0):
     """
     Switch parser mode to deal with python 2 or 3 syntax.
 
+
     :param python: 0 means use native Python ast, 2 or 3 means use typed_ast (which only works in Python 3)
     :return: -
     """
@@ -1499,6 +1507,18 @@ def mode(python=0):
         assert sys.version_info >= (3, 0)
         # print('mode 3')
         ast = typed_ast.ast3
+
+        # Fix the fact that typed ast can't parse fstring variables and other 3.8 syntax
+        # We revert to the built in ast which is ok.
+        # NOTE: The official word on this is: https://github.com/python/typed_ast
+        # typed_ast will not be updated to support parsing Python 3.8 and newer.
+        # Instead, it is recommended to use the stdlib ast module there, which
+        # has been augmented to support extracting type comments and has limited
+        # support for parsing older versions of Python 3.
+        if sys.version_info[1] >= 8:
+            log_proper.debug(f"using native ast cos python 3.8 or above")
+            ast = ast_native
+
     elif python == 2:
         assert sys.version_info >= (3, 0)
         # print('mode 2')

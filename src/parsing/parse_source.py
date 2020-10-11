@@ -1,3 +1,4 @@
+import os
 import tempfile
 from parsing.api import old_parser, new_parser
 from generate_code.gen_plantuml import PySourceAsPlantUml
@@ -41,7 +42,7 @@ def parse_source(source_code, options, html_debug_root_name=""):
             log.out(debuginfo)
             log.out_html_footer()
             log.finish()
-            print(f"html debug info is in '{log.out_filename}'")
+            print(f"\nHTML LOG parsing debug info is in {os.path.abspath(log.out_filename)}")
 
     return pmodel, debuginfo
 

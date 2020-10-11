@@ -1,6 +1,4 @@
-# Unit tests for pyNsource that
-# check that one to many works in the case of a test submitted by Antonio
-
+import sys
 import unittest
 from parsing.api import old_parser, new_parser
 from tests.settings import PYTHON_CODE_EXAMPLES_TO_PARSE
@@ -9,6 +7,8 @@ from parsing.core_parser_ast import set_DEBUGINFO, DEBUGINFO
 from textwrap import dedent
 from parsing.parse_source import parse_source
 from parsing.dump_pmodel import dump_pmodel
+
+# Unit tests for incoming Pynsource parsing bugs
 
 
 class TestIncomingBugs(unittest.TestCase):
@@ -267,16 +267,18 @@ class TestIncomingBugs(unittest.TestCase):
         self.assertEqual(pmodel.errors, "")
         # print(dump_pmodel(pmodel))
 
-    @unittest.skip('Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
+    @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
     def test_issue_81(self):
         # https://github.com/abulka/pynsource/issues/81
+        """"""  # avoid test message grabbing first line of the docstring below
         """
         This ability to specify an = sign after a variable in an fstring is a Python 3.8
         feature. See "f-strings support = for self-documenting expressions and debugging" in
         https://docs.python.org/3/whatsnew/3.8.html
         Pynsource will have to be running under Python 3.8 to handle this syntax.
         Pynsource release binaries currently run under Python 3.7.
-        Running Pynsource from source under Python 3.8 will allow you to parse this 3.8 syntax.
+        Running the latest master of Pynsource from source under Python 3.8 will allow you to parse this 3.8 syntax.
+        I hope to update the Pynsource release binaries to Python 3.8 in the next release.
         """
         source_code = dedent("""
             variable = 'a'
@@ -286,8 +288,9 @@ class TestIncomingBugs(unittest.TestCase):
         pmodel, debuginfo = parse_source(source_code, 
                                          options={"mode": 3}, 
                                          html_debug_root_name="test_issue_81")
-        self.assertEqual(pmodel.errors, "")
-
+        self.assertNotIn("error", pmodel.errors)
+        self.assertIn("had no classes", pmodel.errors)
+        print(sys.version_info.minor)
 
 
 

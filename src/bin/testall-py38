@@ -1,0 +1,5 @@
+mkdir -p tests/logs
+export TRAVIS=1
+PYTHON=/Users/andy/.pyenv/versions/3.8.6/bin/python
+$PYTHON --version
+$PYTHON -m unittest discover -v -s tests
