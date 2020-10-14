@@ -1426,14 +1426,15 @@ class Visitor(T):
             self.write(" ")
             self.visit(node.type)
             if node.name is not None:
-                self.write(" as ")
-                s = repr(type(node)).replace("typed_ast.", "")
-                if "_ast27." in s or "_ast." in s:
-                    self.visit(node.name)  # Name object, in Python 2
-                else:
-                    self.write(
-                        node.name
-                    )  # Name is a str in Python 3, don't visit the 'as xxxx' tree if python3, cos haven't figured out the new tree yet, plus no reason to?
+                self.write(f" as {node.name}")  # no need to  self.visit(node.name)
+                # This code breaks with python >= 3.8 which uses regular built in ast
+                # s = repr(type(node)).replace("typed_ast.", "")
+                # if "_ast27." in s or "_ast." in s:
+                #     self.visit(node.name)  # Name object, in Python 2
+                # else:
+                #     self.write(
+                #         node.name
+                #     )  # Name is a str in Python 3, don't visit the 'as xxxx' tree if python3, cos haven't figured out the new tree yet, plus no reason to?
         self.write(":")
         self.body(node.body)
 
