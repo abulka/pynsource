@@ -30,25 +30,15 @@ You need `python3`, specifically Python 3.7 or later installed *(Linux can use P
 
 Ubuntu Linux Users: Please use the script `bin/install-linux-18.04` to pip install needed Ubuntu dependencies, including a wxPython wheel specific to `Ubuntu 18.04`. Use the script `bin/install-linux-20.04` if you are installing on `Ubuntu 20.04`.  If you are using a different version of Ubuntu simply edit the script to change the url of wxpython accordingly. 
 
-Fedora Linux Users: can use the script `bin/install-linux-fedora-31` in conjunction with Python 3.8. There is no wxpython wheel for Python 3.9 so simply install Python 3.8 using [pyenv](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
+Fedora Linux Users: can use the script `bin/install-linux-fedora-31` see [detailed steps](INSTALL-TIPS.md).
 
-    curl https://pyenv.run | bash
-    # update your .bashrc and restart your shell
-    sudo dnf install make gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel tk-devel libffi-devel
-    # now that pyenv is installed, install a versions of Python
-    sudo dnf install python3-devel
-    PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.8.8
-    # now that a specific version of Python is installed, activate it globally or just locally
-    cd pynsource
-    pyenv local 3.8.8
-    bin/install-linux-fedora-31
+### A note on wxPython
 
-Alternatively run the prebuilt [Fedora Pynsource binary](https://github.com/abulka/pynsource/releases/download/version-1.77/pynsource-1.77-fedora-31.zip) from the terminal `./Pynsource` and it should start up ok, even though its of a type `application/x-sharedlib`. 
+The GUI toolkit [wxpython](https://wxpython.org/) that `Pynsource` relies on  needs a ‘proper’ **framework/shared** Python environment to run in, which ideally means using your main Python e.g. brew Python on a Mac or an official install from python.org for Windows 10. The default Python 3 on Ubuntu 18.04 is fine too. 
 
-The GUI toolkit [wxpython](https://wxpython.org/) that `Pynsource` relies on  needs a ‘proper’ **framework** Python environment to run in, which means no virtual environments - use your main Python e.g. brew Python on a Mac or an official install from python.org for Windows 10. The default Python 3 on Ubuntu 18.04 is fine too. 
-However I've recently discovered that you can use a [pyenv](https://github.com/pyenv/pyenv) framework Python environment for building and running Pynsource, see [this issue](https://github.com/abulka/pynsource/issues/68#issuecomment-605612292) for more info on how to do this. E.g. `PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.8.6` on Mac or `PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.8.8` on linux.
+If you need to use a virtual environment I recommend `pyenv`. You can use a [pyenv](https://github.com/pyenv/pyenv) framework/shared Python environment for building and running Pynsource, as long as you pass a special flag when installing Python through `pyenv` - see [this issue](https://github.com/abulka/pynsource/issues/68#issuecomment-605612292) for more info on how to do this. E.g. `PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.8.6` on Mac or `PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.8.8` on linux.
 
-Or simply use the prebuilt binaries executables listed above! 
+Or simply use the ready-to-go prebuilt binary executables - see [Downloads](DOWNLOADS.md)
 
 # Features
 
