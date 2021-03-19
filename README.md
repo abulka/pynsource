@@ -30,7 +30,7 @@ You need `python3`, specifically Python 3.7 or later installed *(Linux can use P
 
 Ubuntu Linux Users: Please use the script `bin/install-linux-18.04` to pip install needed Ubuntu dependencies, including a wxPython wheel specific to `Ubuntu 18.04`. Use the script `bin/install-linux-20.04` if you are installing on `Ubuntu 20.04`.  If you are using a different version of Ubuntu simply edit the script to change the url of wxpython accordingly. 
 
-Fedora Linux Users: can use the script `bin/install-linux-fedora-31` see [detailed steps](INSTALL-TIPS.md).
+Fedora Linux Users: can use the script `bin/install-linux-fedora-33` see [detailed steps](INSTALL-TIPS.md).
 
 ### A note on wxPython
 

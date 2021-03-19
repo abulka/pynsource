@@ -1,6 +1,6 @@
 # Fedora installation tips
 
-Fedora Linux Users: can use the script `bin/install-linux-fedora-31` in conjunction with Python 3.8. There is no wxpython wheel for Python 3.9 so simply install Python 3.8 using [pyenv](https://github.com/pyenv/pyenv/wiki#suggested-build-environment) e.g.
+Fedora Linux Users: can use the script `bin/install-linux-fedora-33` in conjunction with Python 3.8. There is no wxpython wheel for Python 3.9 so simply install Python 3.8 using [pyenv](https://github.com/pyenv/pyenv/wiki#suggested-build-environment) e.g.
 
     $ sudo dnf install make gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel tk-devel libffi-devel
     $ curl https://pyenv.run | bash
@@ -19,13 +19,13 @@ Now that a specific version of Python is installed, activate it globally or just
 
 Run the script that installs Pynsource and its dependencies
 
-    $ bin/install-linux-fedora-31
+    $ bin/install-linux-fedora-33
 
 Finally, run Pynsource
 
     $ bin/run
 
-Alternatively run the prebuilt [Fedora Pynsource binary](https://github.com/abulka/pynsource/releases/download/version-1.77/pynsource-1.77-fedora-31.zip) from the terminal like this
+Alternatively run the prebuilt [Fedora Pynsource binary](https://github.com/abulka/pynsource/releases/download/version-1.77/pynsource-1.77-fedora-33.zip) from the terminal like this
 
     `./Pynsource`
 

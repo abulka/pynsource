@@ -1,4 +1,4 @@
-echo for Fedora 31 and Python 3.8
+echo for Fedora 33 and wxPython for Fedora 31 (latest I could find) and Python 3.8
 pip3 install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/fedora-31 wxPython
 pip3 install wxasync  --no-dependencies
 pip3 install -r requirements-linux.txt
