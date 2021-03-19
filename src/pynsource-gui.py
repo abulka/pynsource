@@ -365,8 +365,13 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
             wx.CallAfter(self.PostOglViewSwitch)  # ensure status bar message appears after loading
 
-        if ASYNC:
-            StartCoroutine(self.check_for_updates, self)
+        try:
+            if ASYNC:
+                StartCoroutine(self.check_for_updates, self)
+        except Exception as e:
+            print(e)
+            print("Error checking for latest version during startup - you are probably running on fedora? Exception bypassed.")
+            # raise e
 
         if ASYNC and ASYNC_BACKGROUND_REFRESH:
             StartCoroutine(self.mega_refresh_check, self)
@@ -1584,7 +1589,8 @@ def main_async():
 
     # Let's also cancel all running tasks:
     # https://stackoverflow.com/questions/37278647/fire-and-forget-python-async-await
-    pending = asyncio.Task.all_tasks()
+    # pending = asyncio.Task.all_tasks()
+    pending = asyncio.all_tasks()
     for task in pending:
         # print("Cancelling leftover task...", task._coro.cr_code.co_name, task._state)
         task.cancel()
