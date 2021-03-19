@@ -6,6 +6,7 @@ The latest version is `1.77` - released Sep 9, 2020
  * [Windows 10 download](http://bit.ly/pynsource-win-1-77) (unzip and run the installer) 
  * [Ubuntu Linux 18.0.4 download](http://bit.ly/pynsource-1-77-ubuntu-18) (unzip and run the executable) 
  * [Ubuntu Linux 16.0.4 download](http://bit.ly/pynsource-1-77-ubuntu-16) (unzip and run the executable) 
+ * [Ubuntu Fedora 31 download](https://github.com/abulka/pynsource/releases/download/version-1.77/pynsource-1.77-fedora-31.zip) (unzip and run the executable via the terminal e.g. `./Pynsource`)
  * [Linux snap installer](http://bit.ly/pynsource-snap) (one-click install on any Ubuntu distro) 
  
 ## Ubuntu Snap Installation
