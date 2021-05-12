@@ -279,7 +279,7 @@ def _convert_ast_to_old_parser(node, filename, log, options={}):
         # traceback.print_exception(type(ex), ex, ex.__traceback__)
 
         source_code_line = _extract_source_code_line(filename, v.latest_lineno)
-        v.model.errors += f"Pynsource couldn't handle traversing AST in file {filename} corresponding to approx. lineno {v.latest_lineno} coloffset {v.latest_col_offset} - source code:\n\n {source_code_line}"
+        v.model.errors += f"error Pynsource couldn't handle traversing AST in file {filename} corresponding to approx. lineno {v.latest_lineno} coloffset {v.latest_col_offset} - source code:\n\n {source_code_line}"
         v.model.errors += f"\n\nPlease report this to https://github.com/abulka/pynsource/issues"
         v.model.errors += f"\n\nLog file location:\n{LOG_FILENAME}"
         v.model.errors += f"\n\nActual exception:\n\n{err}"
@@ -1025,9 +1025,20 @@ class Visitor(T):
 
         def scan_assignment_for_type_annotations(node):
             if hasattr(node, "annotation") and node.annotation != None:
-                self.write(f" found type annotation '{node.annotation.id}' on assignment to {_to_full_var}", mynote=2)
+
+                # All the cases are listed https://docs.python.org/3/library/ast.html#ast.AnnAssign 
+                # we only handle a subset as minimally as possible, should enhance
+                if hasattr(node.annotation, 'id'):
+                    annotation_id = node.annotation.id
+                else:
+                    if hasattr(node.annotation, 'slice') and hasattr(node.annotation.slice, 'value') and hasattr(node.annotation.slice.value, 'id'):
+                        annotation_id = node.annotation.slice.value.id
+                    else:
+                        annotation_id = 'Unknown Type'
+
+                self.write(f" found type annotation '{annotation_id}' on assignment to {_to_full_var}", mynote=2)
                 if self.current_class():
-                    self.add_composite_dependency((_to, node.annotation.id))
+                    self.add_composite_dependency((_to, annotation_id))
                 else:
                     pass  # should add to module dependencies (supported by GitUML only, at the moment)
 

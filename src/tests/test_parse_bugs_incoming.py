@@ -293,6 +293,20 @@ class TestIncomingBugs(unittest.TestCase):
         print(sys.version_info.minor)
 
 
+    @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
+    def test_issue_typehint_optional(self):
+        """"""  # avoid test message grabbing first line of the docstring below
+        source_code = dedent("""
+            x: Optional[str]
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, 
+                                         options={"mode": 3}, 
+                                         html_debug_root_name="test_issue_typehint_optional")
+        self.assertNotIn("error", pmodel.errors)
+        self.assertIn("had no classes", pmodel.errors)
+
+
 
 
 
