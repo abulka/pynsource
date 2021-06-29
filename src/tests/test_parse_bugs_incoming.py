@@ -317,15 +317,36 @@ class TestIncomingBugs(unittest.TestCase):
         source code reproduces the problem.
         """
         source_code = dedent("""
-class A:
-    def method1(self):
-        self.pages: List[SnapFileView2D] = list()
+            class A:
+                def method1(self):
+                    self.pages: List[SnapFileView2D] = list()
         """
         )
         pmodel, debuginfo = parse_source(source_code, 
                                          options={"mode": 3}, 
                                          html_debug_root_name="test_issue_subscript_issue_93")
         self.assertNotIn("error", pmodel.errors)
+
+
+    @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
+    def test_issue_walrus_issue_94(self):
+        """This seems to pass OK under Python 3.9
+        Hmm - perhaps this error only happens with lower version of
+        Python - will need to check. As it stands, it looks promising 
+        that no changes to the Pynsource parser are needed, 
+        only a Python version bump. That is, assuming the 
+        source code reproduces the problem.
+        """
+        source_code = dedent("""
+            if (pair := chairs.get(number, None)) is None:
+                pass
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, 
+                                         options={"mode": 3}, 
+                                         html_debug_root_name="test_issue_walrus_issue_94")
+        self.assertNotIn("error", pmodel.errors)
+        # print(dump_pmodel(pmodel))
 
 
 
