@@ -307,7 +307,7 @@ class TestIncomingBugs(unittest.TestCase):
         self.assertIn("had no classes", pmodel.errors)
 
 
-    @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
+    # @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
     def test_issue_subscript_issue_93(self):
         """This seems to pass OK under Python 3.9
         Hmm - perhaps this error only happens with lower version of
@@ -326,6 +326,7 @@ class TestIncomingBugs(unittest.TestCase):
                                          options={"mode": 3}, 
                                          html_debug_root_name="test_issue_subscript_issue_93")
         self.assertNotIn("error", pmodel.errors)
+        print(dump_pmodel(pmodel))
 
 
     @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
