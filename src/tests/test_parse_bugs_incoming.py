@@ -348,6 +348,28 @@ class TestIncomingBugs(unittest.TestCase):
         self.assertNotIn("error", pmodel.errors)
         # print(dump_pmodel(pmodel))
 
+    @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
+    def test_issue_class_type_annotation_85(self):
+        """This seems to pass OK under Python 3.9
+        Hmm - perhaps this error only happens with lower version of
+        Python - will need to check. As it stands, it looks promising 
+        that no changes to the Pynsource parser are needed, 
+        only a Python version bump. That is, assuming the 
+        source code reproduces the problem.
+        """
+        source_code = dedent("""
+            class SimpleHttpTask(Task):
+                url = None
+                method = "GET"
+                client: requests.Session = requests.Session()
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, 
+                                         options={"mode": 3}, 
+                                         html_debug_root_name="test_issue_class_type_annotation_85")
+        self.assertNotIn("error", pmodel.errors)
+        # print(dump_pmodel(pmodel))
+
 
 
 
