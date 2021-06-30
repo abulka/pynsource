@@ -1,0 +1,2 @@
+cd src
+python -m unittest tests.test_parse_bugs_incoming.TestIncomingBugs.test_issue_subscript_issue_93
