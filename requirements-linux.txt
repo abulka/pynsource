@@ -15,4 +15,4 @@ pydbg
 aiohttp
 async_lru
 Pillow
-
+wxasync==0.41

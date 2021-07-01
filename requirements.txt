@@ -12,7 +12,7 @@ pytest
 coverage
 pytest-cov
 pydbg
-wxasync
+wxasync==0.41
 aiohttp
 async_lru
 Pillow

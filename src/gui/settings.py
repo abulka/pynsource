@@ -2,8 +2,8 @@ PRO_EDITION=True
 NATIVE_LINES_OGL_LIKE=False
 ASYNC_BACKGROUND_REFRESH=False  # devel purposes only
 
-APP_VERSION = 1.77
-BETA = ""  # leave blank to turn off beta
+APP_VERSION = 1.78
+BETA = "1"  # leave blank to turn off beta
 APP_VERSION_FULL = f"{APP_VERSION}"
 if BETA:
     APP_VERSION_FULL += f"-{BETA}" 

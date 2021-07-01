@@ -450,7 +450,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.frame.SetPosition(convert_to_tuple(window_pos))
 
 
-# def minimized_on_mac_problem(self):
+    # def minimized_on_mac_problem(self):
     #     self.frame.Iconize(False) # start up non-minimised when packaged
     #     if self.frame.IsIconized():
     #         wx.MessageBox("iconized?")
