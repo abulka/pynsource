@@ -42,6 +42,7 @@ class CmdDumpDisplayModel(CmdBase):
             t = into_existing_table
         else:
             t = BeautifulTable()
+            t.set_style(BeautifulTable.STYLE_BOX)  # nice ─── chars
         t.rows.append(
             [
                 "bounds",

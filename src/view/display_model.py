@@ -386,6 +386,7 @@ class DisplayModel:
             print(msg)  # Extra explanatory info to give context re when the dump is being made
 
         t = BeautifulTable(maxwidth=260)
+        t.set_style(BeautifulTable.STYLE_BOX)  # nice ─── chars
         t.columns.header = ["node", "coords", "widths", "shape"]
         for node in self.graph.nodes:
             name = node_name(node)
@@ -401,6 +402,7 @@ class DisplayModel:
         print(t)
 
         e = BeautifulTable(maxwidth=340)
+        e.set_style(BeautifulTable.STYLE_GRID)  # nice ─── chars
         e.columns.header = ["edge", "from", "symbol", "to", "shape"]
         e.columns.alignment["shape"] = BeautifulTable.ALIGN_LEFT
         e.columns.alignment["from"] = BeautifulTable.ALIGN_LEFT

@@ -116,6 +116,8 @@ class CoordinateMapper:
     ):
 
         t = BeautifulTable()
+        t.set_style(BeautifulTable.STYLE_BOX)  # nice ─── chars
+        
         # t.columns.header = ["items", "info1", "info2"]
 
         if dump_mode == "is_function_start":

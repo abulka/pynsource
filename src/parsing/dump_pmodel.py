@@ -135,6 +135,7 @@ def calc_classname(classentry):
 
 def dump_pmodel(pmodel):
     t = BeautifulTable(maxwidth=760)
+    t.set_style(BeautifulTable.STYLE_BOX)  # nice ─── chars
 
     # subtable = BeautifulTable()
     # subtable.columns.header = ["name", "rank", "gender"]
@@ -162,6 +163,7 @@ def dump_pmodel(pmodel):
 
         if classentry.classdependencytuples:
             t2 = BeautifulTable()
+            t2.set_style(BeautifulTable.STYLE_BOX)  # nice ─── chars
             for _from,_to in classentry.classdependencytuples:
                 t2.rows.append([_from,_to])
         else:
@@ -169,6 +171,7 @@ def dump_pmodel(pmodel):
 
         if classentry.attrs:
             t3 = BeautifulTable()
+            t3.set_style(BeautifulTable.STYLE_BOX_DOUBLED)  # nice ─── chars
             t3.columns.header = ["name", "type"]
             t3.columns.alignment["name"] = BeautifulTable.ALIGN_LEFT
             for attrobj in classentry.attrs:
