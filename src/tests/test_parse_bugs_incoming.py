@@ -306,57 +306,12 @@ class TestIncomingBugs(unittest.TestCase):
         self.assertNotIn("error", pmodel.errors)
         self.assertIn("had no classes", pmodel.errors)
 
+    # June 2021 tests
 
-    # @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
-    def test_issue_subscript_issue_93(self):
-        """This seems to pass OK under Python 3.9
-        Hmm - perhaps this error only happens with lower version of
-        Python - will need to check. As it stands, it looks promising 
-        that no changes to the Pynsource parser are needed, 
-        only a Python version bump. That is, assuming the 
-        source code reproduces the problem.
-        """
-        source_code = dedent("""
-            class A:
-                def method1(self):
-                    self.pages: List[SnapFileView2D] = list()
-        """
-        )
-        pmodel, debuginfo = parse_source(source_code, 
-                                         options={"mode": 3}, 
-                                         html_debug_root_name="test_issue_subscript_issue_93")
-        self.assertNotIn("error", pmodel.errors)
-        print(dump_pmodel(pmodel))
-
-
-    # @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
-    def test_issue_walrus_issue_94(self):
-        """This seems to pass OK under Python 3.9
-        Hmm - perhaps this error only happens with lower version of
-        Python - will need to check. As it stands, it looks promising 
-        that no changes to the Pynsource parser are needed, 
-        only a Python version bump. That is, assuming the 
-        source code reproduces the problem.
-        """
-        source_code = dedent("""
-            if (pair := chairs.get(number, None)) is None:
-                pass
-        """
-        )
-        pmodel, debuginfo = parse_source(source_code, 
-                                         options={"mode": 3}, 
-                                         html_debug_root_name="test_issue_walrus_issue_94")
-        self.assertNotIn("error", pmodel.errors)
-        # print(dump_pmodel(pmodel))
-
-    # @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
     def test_issue_class_type_annotation_85(self):
-        """This seems to pass OK under Python 3.9
-        Hmm - perhaps this error only happens with lower version of
-        Python - will need to check. As it stands, it looks promising 
-        that no changes to the Pynsource parser are needed, 
-        only a Python version bump. That is, assuming the 
-        source code reproduces the problem.
+        """Seems ok under pythons 3.7, 2.8 and 3.9. 
+        Release 1.77 failed under linux and windows and some builds on Mac, 
+        but this problem has seems to have gone away by rebuilding the executables - mysterious.
         """
         source_code = dedent("""
             class SimpleHttpTask(Task):
@@ -370,6 +325,53 @@ class TestIncomingBugs(unittest.TestCase):
                                          html_debug_root_name="test_issue_class_type_annotation_85")
         self.assertNotIn("error", pmodel.errors)
         # print(dump_pmodel(pmodel))
+
+    def test_issue_subscript_issue_93(self):
+        """Tricky variable annotation, used to fail in Python 3.9 but passed in 3.7 and 3.8. 
+        Changed visit_AnnAssign() to fix this, passes now under all Python versions.
+        """
+        source_code = dedent("""
+            class Issue93:
+                def method1(self):
+                    self.pages: List[SnapFileView2D] = list()
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, 
+                                         options={"mode": 3}, 
+                                         html_debug_root_name="test_issue_subscript_issue_93")
+        self.assertNotIn("error", pmodel.errors)
+        # print(dump_pmodel(pmodel))
+        classNames = [classname for classname, classentry in pmodel.classlist.items()]
+        assert "Issue93" in classNames
+        classentry = pmodel.classlist["Issue93"]
+        assert len(classentry.defs) == 1
+        assert "method1" in classentry.defs
+        assert len(classentry.attrs) == 1
+        attrnames = [attr_tuple.attrname for attr_tuple in classentry.attrs]
+        assert "pages" in attrnames
+        self.assertEqual(len(classentry.classdependencytuples), 1)
+        self.assertEqual(classentry.classdependencytuples[0], ('pages', 'SnapFileView2D'))
+
+
+    @unittest.skipIf(sys.version_info.minor < 9, 'Need to upgrade Pynsource to run in Python 3.9 to handle this syntax')
+    def test_issue_walrus_issue_94(self):
+        """Only Python 3.9 and higher can handle this new walrus syntax"""
+        source_code = dedent("""
+            class Issue94:
+                def method1(self):
+                    if (pair := chairs.get(number, None)) is None:
+                        pass
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, 
+                                         options={"mode": 3}, 
+                                         html_debug_root_name="test_issue_walrus_issue_94")
+        self.assertNotIn("error", pmodel.errors)
+        # print(dump_pmodel(pmodel))
+        classNames = [classname for classname, classentry in pmodel.classlist.items()]
+        assert "Issue94" in classNames
+
+
 
 
 

@@ -1028,13 +1028,17 @@ class Visitor(T):
 
                 # All the cases are listed https://docs.python.org/3/library/ast.html#ast.AnnAssign 
                 # we only handle a subset as minimally as possible, should enhance
+                annotation_id = 'UnknownType'
                 if hasattr(node.annotation, 'id'):
                     annotation_id = node.annotation.id
                 else:
-                    if hasattr(node.annotation, 'slice') and hasattr(node.annotation.slice, 'value') and hasattr(node.annotation.slice.value, 'id'):
-                        annotation_id = node.annotation.slice.value.id
-                    else:
-                        annotation_id = 'Unknown Type'
+                    if hasattr(node.annotation, 'slice'):
+                        if hasattr(node.annotation.slice, 'value'): # <= python 3.8 and under
+                            if hasattr(node.annotation.slice.value, 'id'):
+                                annotation_id = node.annotation.slice.value.id
+                        else:
+                            if hasattr(node.annotation.slice, 'id'): # >= python 3.9 
+                                annotation_id = node.annotation.slice.id
 
                 self.write(f" found type annotation '{annotation_id}' on assignment to {_to_full_var}", mynote=2)
                 if self.current_class():
