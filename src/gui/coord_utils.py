@@ -10,7 +10,7 @@ not the top left
 import platform
 import sys
 
-if not "Linux" in platform.platform() and sys.version_info.minor >= 7:  # Hard to get Python 3.7 on Linux esp to bundle via snaps
+if sys.version_info.minor >= 7:
     from dataclasses import dataclass
 from gui.settings import PRO_EDITION
 
@@ -90,8 +90,8 @@ def percent_change(end, start):
         # print 'There is no change in value.'
         return 0
 
-if "Linux" in platform.platform() or sys.version_info.minor < 7:
-    # Probably running under Python 3.6 which doesn't have data classes
+if sys.version_info.minor < 7:
+    # If running under Python 3.6 which doesn't have data classes
     class ZoomInfo:
         def __init__(self, scale: float=1, delta: float=None):
             self.scale = scale
