@@ -329,7 +329,7 @@ class TestIncomingBugs(unittest.TestCase):
         print(dump_pmodel(pmodel))
 
 
-    @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
+    # @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
     def test_issue_walrus_issue_94(self):
         """This seems to pass OK under Python 3.9
         Hmm - perhaps this error only happens with lower version of
@@ -349,7 +349,7 @@ class TestIncomingBugs(unittest.TestCase):
         self.assertNotIn("error", pmodel.errors)
         # print(dump_pmodel(pmodel))
 
-    @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
+    # @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
     def test_issue_class_type_annotation_85(self):
         """This seems to pass OK under Python 3.9
         Hmm - perhaps this error only happens with lower version of

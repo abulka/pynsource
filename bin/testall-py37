@@ -1,2 +1,3 @@
+# invokes sub script, passes on any param passed to this script, to the sub script
 cd src
-bin/testall-py37
+bin/testall-py37 $1
