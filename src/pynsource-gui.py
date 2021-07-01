@@ -367,14 +367,14 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         try:
             if ASYNC:
-                StartCoroutine(self.check_for_updates, self)
+                StartCoroutine(self.check_for_updates, self.frame)
         except Exception as e:
             print(e)
-            print("Error checking for latest version during startup - you are probably running on fedora? Exception bypassed.")
+            print("Error checking for latest version during startup? Exception bypassed.")
             # raise e
 
         if ASYNC and ASYNC_BACKGROUND_REFRESH:
-            StartCoroutine(self.mega_refresh_check, self)
+            StartCoroutine(self.mega_refresh_check, self.frame)
 
         self._set_app_icon()
 
@@ -723,7 +723,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
                     plant_uml_txt = displaymodel_to_plantuml(self.umlcanvas.displaymodel)
 
                     self.plantuml.render_in_progress(True, self.frame)
-                    StartCoroutine(self.update_refresh_plantuml_view_clock, self)
+                    StartCoroutine(self.update_refresh_plantuml_view_clock, self.frame)
 
                     # internet connection errors getting initial plantuml html are
                     # handled internally to this function
