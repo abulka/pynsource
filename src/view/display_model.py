@@ -385,11 +385,11 @@ class DisplayModel:
         if msg:
             print(msg)  # Extra explanatory info to give context re when the dump is being made
 
-        t = BeautifulTable(max_width=260)
-        t.column_headers = ["node", "coords", "widths", "shape"]
+        t = BeautifulTable(maxwidth=260)
+        t.columns.header = ["node", "coords", "widths", "shape"]
         for node in self.graph.nodes:
             name = node_name(node)
-            t.append_row(
+            t.rows.append(
                 [
                     name,
                     (node.left, node.top),
@@ -397,15 +397,14 @@ class DisplayModel:
                     f"{node.shape} {self.obj_id(node.shape)} {self.get_shape_pos(node.shape)}",
                 ]
             )
-        t.column_alignments["node"] = BeautifulTable.ALIGN_LEFT
-        t.row_separator_char = ""
+        t.columns.alignment["node"] = BeautifulTable.ALIGN_LEFT
         print(t)
 
-        e = BeautifulTable(max_width=340)
-        e.column_headers = ["edge", "from", "symbol", "to", "shape"]
-        e.column_alignments["shape"] = BeautifulTable.ALIGN_LEFT
-        e.column_alignments["from"] = BeautifulTable.ALIGN_LEFT
-        e.column_alignments["to"] = BeautifulTable.ALIGN_LEFT
+        e = BeautifulTable(maxwidth=340)
+        e.columns.header = ["edge", "from", "symbol", "to", "shape"]
+        e.columns.alignment["shape"] = BeautifulTable.ALIGN_LEFT
+        e.columns.alignment["from"] = BeautifulTable.ALIGN_LEFT
+        e.columns.alignment["to"] = BeautifulTable.ALIGN_LEFT
         for edge in self.graph.edges:
             source = node_name(edge["source"])
             target = node_name(edge["target"])
@@ -414,7 +413,7 @@ class DisplayModel:
             if edgetype == "composition":
                 source, target = target, source  # around the wrong way? - fix
             shape = edge.get("shape", None)
-            e.append_row(
+            e.rows.append(
                 [
                     edgetype,
                     source,
@@ -423,7 +422,6 @@ class DisplayModel:
                     f"{type(shape).__name__} {self.obj_id(shape)} {self.get_shape_pos(shape)} {self.get_line_shape_innards(shape)}",
                 ]
             )
-        e.row_separator_char = ""
         print(e)
 
     def delete_node_or_edge_for_shape(self, shape):

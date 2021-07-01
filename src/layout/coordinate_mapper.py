@@ -116,10 +116,10 @@ class CoordinateMapper:
     ):
 
         t = BeautifulTable()
-        # t.column_headers = ["items", "info1", "info2"]
+        # t.columns.header = ["items", "info1", "info2"]
 
         if dump_mode == "is_function_start":
-            t.append_row(
+            t.rows.append(
                 [
                     "CoordinateMapper.Recalibrate START, calling with: new_world_size, scale",
                     new_world_size,
@@ -127,25 +127,25 @@ class CoordinateMapper:
                 ]
             )
         elif dump_mode == "is_function_end":
-            t.append_row(["CoordinateMapper.Recalibrate END", "", ""])
+            t.rows.append(["CoordinateMapper.Recalibrate END", "", ""])
 
-        t.append_row(["scale and radius", self.scale, self.radius])
+        t.rows.append(["scale and radius", self.scale, self.radius])
 
         # subtable support not yet released, cos of newline support issue in beautifuletable
         # subtable1 = BeautifulTable()
-        # subtable1.column_headers = ["scale", "radius"]
-        # subtable1.append_row([self.scale, self.radius])
+        # subtable1.columns.header = ["scale", "radius"]
+        # subtable1.rows.append([self.scale, self.radius])
 
-        t.append_row(["world_size", self.world_size[0], self.world_size[1]])
+        t.rows.append(["world_size", self.world_size[0], self.world_size[1]])
 
-        t.append_row(
+        t.rows.append(
             ["layout MinX MinY", "%2.2f" % self.graph.layoutMinX, "%2.2f" % self.graph.layoutMinY]
         )
-        t.append_row(
+        t.rows.append(
             ["layout MaxX Maxy", "%2.2f" % self.graph.layoutMaxX, "%2.2f" % self.graph.layoutMaxY]
         )
 
-        t.append_row(
+        t.rows.append(
             [
                 "layout width height",
                 "%2.2f" % (self.graph.layoutMaxX - self.graph.layoutMinX),
@@ -153,7 +153,7 @@ class CoordinateMapper:
             ]
         )
 
-        t.append_row(
+        t.rows.append(
             [
                 "factorX factorY",
                 locale.format_string("%d", self.factorX, grouping=True),
@@ -161,11 +161,10 @@ class CoordinateMapper:
             ]
         )
 
-        # t.append_row([subtable1, "", "", ""])
+        # t.rows.append([subtable1, "", "", ""])
 
         if doprint:
-            t.column_alignments[0] = BeautifulTable.ALIGN_LEFT
-            t.row_separator_char = ""
+            t.columns.alignment[0] = BeautifulTable.ALIGN_LEFT
             print(t)
         else:
             return t

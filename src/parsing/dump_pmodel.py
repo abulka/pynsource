@@ -134,24 +134,24 @@ def calc_classname(classentry):
 # New dump
 
 def dump_pmodel(pmodel):
-    t = BeautifulTable(max_width=760)
+    t = BeautifulTable(maxwidth=760)
 
     # subtable = BeautifulTable()
-    # subtable.column_headers = ["name", "rank", "gender"]
-    # subtable.append_row(["Jacob", 1, "boy"])
-    # subtable.append_row(["Isabella", 1, "girl"])
+    # subtable.columns.header = ["name", "rank", "gender"]
+    # subtable.rows.append(["Jacob", 1, "boy"])
+    # subtable.rows.append(["Isabella", 1, "girl"])
     # parent_table = BeautifulTable()
-    # parent_table.column_headers = ["Heading 1", "Heading 2"]
-    # parent_table.append_row(["Sample text", "Another sample text"])
-    # parent_table.append_row([subtable, "More sample text"])
+    # parent_table.columns.header = ["Heading 1", "Heading 2"]
+    # parent_table.rows.append(["Sample text", "Another sample text"])
+    # parent_table.rows.append([subtable, "More sample text"])
     # return parent_table
 
     repair_old_pmodels(pmodel)
 
-    t.column_headers = ["class name", "inherits from", "attributes", "methods()", "module methods()", "is module", "class dependencies"]
-    t.column_alignments["attributes"] = BeautifulTable.ALIGN_LEFT
-    t.column_alignments["methods()"] = BeautifulTable.ALIGN_LEFT
-    t.column_alignments["module methods()"] = BeautifulTable.ALIGN_LEFT
+    t.columns.header = ["class name", "inherits from", "attributes", "methods()", "module methods()", "is module", "class dependencies"]
+    t.columns.alignment["attributes"] = BeautifulTable.ALIGN_LEFT
+    t.columns.alignment["methods()"] = BeautifulTable.ALIGN_LEFT
+    t.columns.alignment["module methods()"] = BeautifulTable.ALIGN_LEFT
 
     have_display_module_methods_once = False
 
@@ -163,28 +163,26 @@ def dump_pmodel(pmodel):
         if classentry.classdependencytuples:
             t2 = BeautifulTable()
             for _from,_to in classentry.classdependencytuples:
-                t2.append_row([_from,_to])
+                t2.rows.append([_from,_to])
         else:
             t2 = ""
 
         if classentry.attrs:
             t3 = BeautifulTable()
-            t3.column_headers = ["name", "type"]
-            t3.column_alignments["name"] = BeautifulTable.ALIGN_LEFT
-            t3.row_separator_char = ""
+            t3.columns.header = ["name", "type"]
+            t3.columns.alignment["name"] = BeautifulTable.ALIGN_LEFT
             for attrobj in classentry.attrs:
-                t3.append_row([attrobj.attrname, "\n".join(attrobj.attrtype)])
+                t3.rows.append([attrobj.attrname, "\n".join(attrobj.attrtype)])
         else:
             t3 = ""
 
         # t4 = BeautifulTable()
-        # t4.column_headers = ["of class", "of module"]
-        # t4.column_alignments["of class"] = BeautifulTable.ALIGN_LEFT
-        # t4.column_alignments["of module"] = BeautifulTable.ALIGN_LEFT
-        # t4.row_separator_char = ""
-        # t4.append_row(["\n".join(classentry.defs), "\n".join(pmodel.modulemethods)])
+        # t4.columns.header = ["of class", "of module"]
+        # t4.columns.alignment["of class"] = BeautifulTable.ALIGN_LEFT
+        # t4.columns.alignment["of module"] = BeautifulTable.ALIGN_LEFT
+        # t4.rows.append(["\n".join(classentry.defs), "\n".join(pmodel.modulemethods)])
 
-        t.append_row(
+        t.rows.append(
             [
             calc_classname(classentry),
             "\n".join(classentry.classesinheritsfrom),
@@ -198,7 +196,7 @@ def dump_pmodel(pmodel):
 
     # No classes but there are module methods yet to display
     if pmodel.modulemethods and not have_display_module_methods_once:
-        t.append_row(
+        t.rows.append(
             [
             "",
             "",
@@ -209,8 +207,7 @@ def dump_pmodel(pmodel):
             "",
             ])
 
-    t.column_alignments[0] = BeautifulTable.ALIGN_LEFT
-    t.row_separator_char = ""
+    t.columns.alignment[0] = BeautifulTable.ALIGN_LEFT
     return t
 
 

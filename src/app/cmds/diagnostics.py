@@ -38,19 +38,19 @@ class CmdDumpDisplayModel(CmdBase):
             print(dump_pmodel_methods(pmodel))            
 
     def dump_overlaps(self, into_existing_table=None):
-        if into_existing_table:
+        if len(into_existing_table.rows) > 0:
             t = into_existing_table
         else:
             t = BeautifulTable()
-        t.append_row(
+        t.rows.append(
             [
                 "bounds",
                 self.context.displaymodel.graph.GetBounds()[0],
                 self.context.displaymodel.graph.GetBounds()[1],
             ]
         )
-        t.append_row(["node-node overlaps", self.context.overlap_remover.CountOverlaps(), ""])
-        t.append_row(
+        t.rows.append(["node-node overlaps", self.context.overlap_remover.CountOverlaps(), ""])
+        t.rows.append(
             [
                 "line-line intersections, crossings",
                 len(self.context.displaymodel.graph.CountLineOverLineIntersections()),
@@ -58,6 +58,5 @@ class CmdDumpDisplayModel(CmdBase):
             ]
         )
 
-        t.column_alignments[0] = BeautifulTable.ALIGN_LEFT
-        t.row_separator_char = ""
+        t.columns.alignment[0] = BeautifulTable.ALIGN_LEFT
         print(t)
