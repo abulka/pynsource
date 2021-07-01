@@ -1,6 +1,6 @@
 echo for Ubuntu 18.04
 pip3 install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04 wxPython
-pip3 install wxasync  --no-dependencies
+pip3 install wxasync==0.41  --no-dependencies
 pip3 install -r requirements-linux.txt
 sudo apt install libsdl1.2debian
 
