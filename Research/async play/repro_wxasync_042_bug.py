@@ -10,8 +10,8 @@
 import wx
 import time
 # from wxasync import AsyncBind, WxAsyncApp, StartCoroutine
-from wxasync041 import AsyncBind, WxAsyncApp, StartCoroutine  # OK
-# from wxasync042 import AsyncBind, WxAsyncApp, StartCoroutine  # FAILS
+# from wxasync041 import AsyncBind, WxAsyncApp, StartCoroutine  # OK
+from wxasync042 import AsyncBind, WxAsyncApp, StartCoroutine  # FAILED - but OK now if use self.frame below
 import asyncio
 from asyncio.events import get_event_loop
 import wx.lib.newevent
@@ -24,7 +24,7 @@ class MainApp(WxAsyncApp):
         self.frame = wx.Frame(None, -1, "test",)
         self.frame.CreateStatusBar()
         self.frame.Show(True)
-        StartCoroutine(self.async_callback, self)
+        StartCoroutine(self.async_callback, self.frame)  # 2nd param must be self.frame not just self
         return True
 
     async def async_callback(self):
