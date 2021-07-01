@@ -1590,14 +1590,19 @@ def main_async():
     # Let's also cancel all running tasks:
     # https://stackoverflow.com/questions/37278647/fire-and-forget-python-async-await
     # pending = asyncio.Task.all_tasks()
-    pending = asyncio.all_tasks()
-    for task in pending:
-        # print("Cancelling leftover task...", task._coro.cr_code.co_name, task._state)
-        task.cancel()
-        # Now we should await task to execute it's cancellation.
-        # Cancelled task raises asyncio.CancelledError that we can suppress:
-        with suppress(asyncio.CancelledError):
-            loop.run_until_complete(task)
+    try:
+        pending = asyncio.all_tasks()
+    except RuntimeError:
+        # print("No pending running tasks - ok")
+        pass
+    else:
+        for task in pending:
+            # print("Cancelling leftover task...", task._coro.cr_code.co_name, task._state)
+            task.cancel()
+            # Now we should await task to execute it's cancellation.
+            # Cancelled task raises asyncio.CancelledError that we can suppress:
+            with suppress(asyncio.CancelledError):
+                loop.run_until_complete(task)
 
 
 if __name__ == "__main__":
