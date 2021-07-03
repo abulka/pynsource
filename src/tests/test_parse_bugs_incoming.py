@@ -353,12 +353,14 @@ class TestIncomingBugs(unittest.TestCase):
         self.assertEqual(classentry.classdependencytuples[0], ('pages', 'SnapFileView2D'))
 
 
-    @unittest.skipIf(sys.version_info.minor < 9, 'Need to upgrade Pynsource to run in Python 3.9 to handle this syntax')
+    @unittest.skipIf(sys.version_info.minor < 8, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
     def test_issue_walrus_issue_94(self):
-        """Only Python 3.9 and higher can handle this new walrus syntax"""
+        """Only Python 3.8 and higher can handle this new walrus syntax"""
         source_code = dedent("""
             class Issue94:
                 def method1(self):
+                    chairs: dict[int, str]
+                    number: int
                     if (pair := chairs.get(number, None)) is None:
                         pass
         """
