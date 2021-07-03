@@ -1,3 +1,4 @@
+# linux users please use the script bin/install-linux-* and not this file
 wxpython
 configobj
 requests
