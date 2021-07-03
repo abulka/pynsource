@@ -4,6 +4,11 @@ Command Pattern
 Command Class and Command Manager for managing the queue.
 """
 
+import logging
+from common.logger import config_log
+log = logging.getLogger(__name__)
+config_log(log)
+
 
 class Command(object):
     """ Each command is a subclass of this. """
@@ -97,6 +102,8 @@ class CommandManager(object):
         Main API for driving the command manager.
         Pass in a command object.
         """
+        log.info(f'Command: {item}')
+
         item.execute()
 
         # Get rid of any commands in redo list (those above the pointer)

@@ -378,7 +378,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         self._set_app_icon()
 
-        log.info(f"Version {APP_VERSION_FULL} running, ASYNC={ASYNC}, PRO={PRO_EDITION}")
+        log.info(f"Pynsource version {APP_VERSION_FULL} running, ASYNC={ASYNC}, PRO={PRO_EDITION}")
+        log.info(f'wxPython version {wx.version()}')  # wx.VersionInfo().GetVersionString() doesn't work
 
         if self.args:
             wx.CallAfter(self.app.run.CmdFileImportViaArgs, self.args, 3)  # default to Python 3 reverse engineering

@@ -117,4 +117,6 @@ def turn_off_logging(log):
     log.addHandler(noop)
 
 config_log(log)
-log.info(f'LOG_FILENAME is {LOG_FILENAME}')
+log.info("-" * 60)
+log.info(f'This LOG_FILENAME is {LOG_FILENAME}')
+log.info(f'Python version {sys.version_info}')
