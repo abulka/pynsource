@@ -1,5 +1,6 @@
+# Install script for installing Pynsource dependencies, run this from root of Pynsource project e.g. bin/install-linux-nn.nn
 echo for Ubuntu 18.04
 pip3 install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04 wxPython
 pip3 install wxasync  --no-dependencies
-pip3 install -r bin/requirements-linux-common.txt
+pip3 install -r .requirement-extras/requirements-linux-common.txt
 sudo apt-get install git curl libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0

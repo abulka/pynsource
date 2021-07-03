@@ -20,7 +20,11 @@ like zoom and the ability to drag to connect shapes.
 
 ### To run from source code ###
 
-You need `python3`, at least Python 3.6. Running with later versions of Python gives you the ability to parse newer Python syntax e.g. importing code into Pynsource containing the walrus operator needs at least Pynsource running under Python 3.8 to work. For Mac or Windows run the following commands:
+You need `python3`, at least Python 3.6. Running with later versions of Python gives you the ability to parse newer Python syntax e.g. importing code into Pynsource containing the [walrus operator](https://realpython.com/lessons/assignment-expressions/) needs at least Pynsource running under Python 3.8 to work. 
+
+> Note Pynsource relies on the package [typed-ast](https://pypi.org/project/typed-ast/) for the ability to parse *both* Python 2 and Python 3. This package takes a while to get updated when a new Python gets released, so you might want to play it safe and run via an earlier version of Python. Tested OK in Python 3.9.
+
+For Mac or Windows run the following commands:
 
     $ git clone https://github.com/abulka/pynsource.git
     $ cd pynsource
@@ -151,8 +155,9 @@ Alternatively you can also run all the tests by `cd src` then `./bin/testall` (b
 
 ### Current Test Suite status
 
-![Python application](https://github.com/abulka/pynsource/workflows/Python%20application/badge.svg)
-
+- Tests run through Travis, controlled by  `.travis.yml` ![Travis test status](https://github.com/abulka/pynsource/workflows/Python%20application/badge.svg)
+- Tests also run through GitHub Actions, controlled by `.github/workflows/pythonapp.yml` ![Tests github actions workflow status](https://github.com/abulka/pynsource/actions/workflows/pythonapp.yml/badge.svg)
+  
 ## Study the Source Code
 
 Create instant UML and [Literate Code Map](http://bit.ly/lcodemaps) diagrams of this GitHub project.

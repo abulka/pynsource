@@ -27,7 +27,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         pip install wheel
-        if [ -f requirements-linux.txt ]; then pip install -r requirements-linux.txt; fi
+        if [ -f .requirement-extras/requirements-travis.txt ]; then pip install -r .requirement-extras/requirements-travis.txt; fi
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -38,4 +38,7 @@ jobs:
       run: |
         export TRAVIS=1
         sh -c 'cd src && mkdir tests/logs && ./bin/testall'
+    - name: Test with pytest
+      run: |
+        export TRAVIS=1
         #pytest src/tests

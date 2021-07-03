@@ -1,3 +1,4 @@
+# requirements for travis ci testing
 configobj
 requests
 typed_ast

@@ -1,5 +1,4 @@
 # linux users please use the script bin/install-linux-* and not this file
-wxpython
 configobj
 requests
 typed_ast
@@ -7,13 +6,16 @@ astpretty
 termcolor
 beautifultable
 appdirs
+pydbg
+aiohttp
+async_lru
+
+Pillow
 py2app
 click
 pytest
 coverage
 pytest-cov
-pydbg
+
+wxpython
 wxasync
-aiohttp
-async_lru
-Pillow
