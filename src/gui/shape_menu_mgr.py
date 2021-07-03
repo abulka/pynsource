@@ -248,7 +248,7 @@ class ShapeMenuMgr:
             from media import images
 
             msg = "Edition lets you drag drop to connect!  Learn More..."
-            if "wxGTK" in wx.PlatformInfo:  # ubuntu gtk menus have images disallowed, so add text
+            if "wxGTK" in wx.PlatformInfo or "wxMSW" in wx.PlatformInfo:  # ubuntu gtk all menus and windows popup menus have images disallowed, so add text
                 msg = '(Pro) ' + msg
             item: wx.MenuItem = add_menuitem(
                 msg,
