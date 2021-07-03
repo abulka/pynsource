@@ -247,15 +247,11 @@ class ShapeMenuMgr:
         def add_pro_advert():
             from media import images
 
-            name = "Edition lets you drag drop to connect!"
-            # id = wx.ID_ANY
-            # # id = wx.NewIdRef()
-            # to_menu = self.submenu
-            # menu_item = to_menu.Append(id, name, name)
-            # menu_item.SetBitmap(images.pro.GetBitmap())
-
+            msg = "Edition lets you drag drop to connect!  Learn More..."
+            if "wxGTK" in wx.PlatformInfo:  # ubuntu gtk menus have images disallowed, so add text
+                msg = '(Pro) ' + msg
             item: wx.MenuItem = add_menuitem(
-                "Edition lets you drag drop to connect!  Learn More...",
+                msg,
                 self.OnProDragDrop,
                 submenu=True,
                 image=images.pro.GetBitmap()
