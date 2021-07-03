@@ -60,8 +60,11 @@ class CmdFileImportBase(CmdBase):  # BASE
                 # print(dump_old_structure(pmodel))
 
                 from parsing.dump_pmodel import dump_pmodel
-                # print(dump_pmodel(pmodel))                
-                log.info(f'\n{dump_pmodel(pmodel)}')                
+                # print(dump_pmodel(pmodel))
+                try:
+                    log.info(f'\n{dump_pmodel(pmodel)}')
+                except:
+                    log.exception('You probably need to upgrade your version of beautifultable e.g. pip install beautifultable --upgrade')
 
                 self.context.displaymodel.build_graphmodel(pmodel)
                 # self.context.displaymodel.Dump(msg="import, after build_graphmodel")
