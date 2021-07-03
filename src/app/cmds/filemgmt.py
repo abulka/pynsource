@@ -59,6 +59,10 @@ class CmdFileImportBase(CmdBase):  # BASE
                 # from parsing.dump_pmodel import dump_old_structure
                 # print(dump_old_structure(pmodel))
 
+                from parsing.dump_pmodel import dump_pmodel
+                # print(dump_pmodel(pmodel))                
+                log.info(f'\n{dump_pmodel(pmodel)}')                
+
                 self.context.displaymodel.build_graphmodel(pmodel)
                 # self.context.displaymodel.Dump(msg="import, after build_graphmodel")
 
