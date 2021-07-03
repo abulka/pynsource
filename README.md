@@ -20,13 +20,15 @@ like zoom and the ability to drag to connect shapes.
 
 ### To run from source code ###
 
-You need `python3`, specifically Python 3.7 or later installed *(Linux can use Python 3.6)*. You also need `pip3` (which should come with Python 3), then simply:
+You need `python3`, at least Python 3.6. Running with later versions of Python gives you the ability to parse newer Python syntax e.g. importing code into Pynsource containing the walrus operator needs at least Pynsource running under Python 3.8 to work. For Mac or Windows run the following commands:
 
     $ git clone https://github.com/abulka/pynsource.git
     $ cd pynsource
     $ pip3 install -r requirements.txt
     $ ./bin/run           (Mac, Linux) or
     $ .\bin\run-win10.bat (Windows 10)
+
+For installing under Linux, run the provided script (more information below).
 
 If you have installed from requirements.txt and still getting errors, you might need to update your pip packages to the latest versions. For example on Mac or Linux you can run `pip install $(pip list --outdated --format=columns |tail -n +3|cut -d" " -f1) --upgrade`. Note this bash command can upgrade some packages too high (pip dependency resolver is not smart) e.g. `idna` 3.2 is too high for `requests`, in which case to repair the situation uninstall both `pip uninstall requests idna` then just install `pip install requests` which fixes things.
 
@@ -38,7 +40,7 @@ Fedora Linux Users: can use the script `bin/install-linux-fedora-33` see [detail
 
 The GUI toolkit [wxpython](https://wxpython.org/) that `Pynsource` relies on  needs a ‘proper’ **framework/shared** Python environment to run in, which ideally means using your main Python e.g. brew Python on a Mac or an official install from python.org for Windows 10. The default Python 3 on Ubuntu 18.04 is fine too. 
 
-If you need to use a virtual environment I recommend `pyenv`. You can use a [pyenv](https://github.com/pyenv/pyenv) framework/shared Python environment for building and running Pynsource, as long as you pass a special flag when installing Python through `pyenv` - see [this issue](https://github.com/abulka/pynsource/issues/68#issuecomment-605612292) for more info on how to do this. E.g. `PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.8.6` on Mac or `PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.8.8` on linux.
+If you need to use a virtual environment I recommend that you use `pyenv` to first install the version of python that you need. You must use a [pyenv](https://github.com/pyenv/pyenv) framework/shared Python environment for building and running Pynsource. To achieve this, pass a special flag when installing Python through `pyenv` - see [this issue](https://github.com/abulka/pynsource/issues/68#issuecomment-605612292) for more info. E.g. `PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.8.6` on Mac or e.g. `PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.8.8` on linux.  When running under vscode, ensure you enter the path to the python interpreter correctly, to work around a [subtle vscode issue](https://github.com/microsoft/vscode-python/issues/16604).
 
 Or simply use the ready-to-go prebuilt binary executables - see [Downloads](DOWNLOADS.md)
 
