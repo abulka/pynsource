@@ -156,7 +156,7 @@ Alternatively you can also run all the tests by `cd src` then `./bin/testall` (b
 ### Current Test Suite status
 
 - Tests run through Travis, controlled by  `.travis.yml` ![Travis test status](https://github.com/abulka/pynsource/workflows/Python%20application/badge.svg)
-- Tests also run through GitHub Actions, controlled by `.github/workflows/pythonapp.yml` ![Tests github actions workflow status](https://github.com/abulka/pynsource/actions/workflows/pythonapp.yml/badge.svg)
+- Tests also run through GitHub Actions, controlled by `.github/workflows/pythonapp.yml` ![Tests github actions workflow status](https://github.com/abulka/pynsource/actions/workflows/python-tests.yml/badge.svg)
   
 ## Study the Source Code
 

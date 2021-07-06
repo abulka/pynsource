@@ -1,0 +1,74 @@
+# To trigger the workflow on each push, branches: [ main ]
+# To trigger the workflow on push of tags beginning with v, tags: ['v*']
+# then
+# git tag v1.0
+# git push origin v1.0
+# or
+# git tag -a v1.0
+# git push --follow-tags
+
+name: multi project wxpython app built on mac
+on:
+  push:
+    # branches: [ main ]
+    tags: ['build-test*']
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+
+    - name: Check out current repo into a subdir
+      uses: actions/checkout@v2
+      with:
+        path: pynsource/
+
+    - name: Check out ogl2 (private)
+      uses: actions/checkout@v2
+      with:
+        repository: abulka/ogl2
+        token: ${{ secrets.my_pat }}
+        path: ogl2/
+
+    - name: Check out pynsource-rego (private)
+      uses: actions/checkout@v2
+      with:
+        repository: abulka/pynsource-rego
+        token: ${{ secrets.my_pat }}
+        path: pynsource-rego/
+
+    - name: View resulting directory structure
+      run: |
+        ls -l
+        ls -l pynsource/
+        ls -l pynsource-rego/
+        ls -l ogl2/
+
+    - name: Setup Python please
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install wxpython
+        pip install pyinstaller
+        pip install -r pynsource/requirements.txt
+    - name: Run Python and print version_info
+      run: |
+        python -c "import sys; print(sys.version_info)"
+        uname -a
+
+    - name: Build executable using Pyinstaller
+      run: |
+        cd pynsource/
+        python bin/_buildsamples.py
+        pyinstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
+        cp README.md dist/Readme.txt
+        ls -l dist/
+
+    - name: Save generated executable file as an artifact
+      uses: actions/upload-artifact@v2
+      with:
+        # The act of downloading zips up the artifact and adds the .zip to the downloaded file
+        name: pynsource-${{ github.ref }}
+        path: pynsource/dist/
