@@ -4,7 +4,7 @@
 # git tag v1.0
 # git push origin v1.0
 # or
-# git tag -a v1.0
+# git tag -a build-test-03
 # git push --follow-tags
 
 name: Pynsource app built on mac
@@ -46,7 +46,7 @@ jobs:
     - name: Setup Python please
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8    
+        python-version: 3.9    
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -70,5 +70,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         # The act of downloading zips up the artifact and adds the .zip to the downloaded file
-        name: pynsource-${{ github.event.release.tag_name }}
+        name: pynsource-${{ github.event.ref }}
         path: pynsource/dist/
