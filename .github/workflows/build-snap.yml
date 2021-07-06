@@ -1,6 +1,9 @@
 name: Pynsource app Ubuntu snap
 
-on: push
+on:
+  push:
+    # branches: [ main ]
+    tags: ['build-test*']
 
 jobs:
   my-snap-building-job:

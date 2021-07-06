@@ -99,6 +99,10 @@ jobs:
         python bin/_buildsamples.py
         pyinstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
         cp README.md dist/Readme.txt
+        if [ "$RUNNER_OS" == "macOS" ]; then
+          # remove the useless exe but leave the .app
+          rm dist/Pynsource
+        fi
         ls -l dist/
 
     - name: Get the tag name

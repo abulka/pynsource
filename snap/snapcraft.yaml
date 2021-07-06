@@ -112,4 +112,5 @@ parts:
         - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04/wxPython-4.0.4-cp36-cp36m-linux_x86_64.whl
         - wxasync
     requirements:
-        - /root/project/requirements-linux.txt
+        # - /root/project/requirements-linux.txt
+        - /root/project/.requirement-extras/requirements-linux-common.txt
