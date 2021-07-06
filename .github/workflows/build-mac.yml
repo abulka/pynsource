@@ -7,7 +7,7 @@
 # git tag -a v1.0
 # git push --follow-tags
 
-name: multi project wxpython app built on mac
+name: Pynsource app built on mac
 on:
   push:
     # branches: [ main ]
@@ -70,5 +70,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         # The act of downloading zips up the artifact and adds the .zip to the downloaded file
-        name: pynsource-${{ github.ref }}
+        name: pynsource-${{ github.event.release.tag_name }}
         path: pynsource/dist/
