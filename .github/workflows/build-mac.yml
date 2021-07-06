@@ -66,9 +66,12 @@ jobs:
         cp README.md dist/Readme.txt
         ls -l dist/
 
+    - name: Get the tag name
+      run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
     - name: Save generated executable file as an artifact
       uses: actions/upload-artifact@v2
       with:
         # The act of downloading zips up the artifact and adds the .zip to the downloaded file
-        name: pynsource-${{ github.event.ref }}
+        name: pynsource-mac-${{ env.TAG }}
         path: pynsource/dist/
