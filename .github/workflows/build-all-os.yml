@@ -109,5 +109,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         # The act of downloading zips up the artifact and adds the .zip to the downloaded file
-        name: pynsource-mac-${{ env.TAG }}
+        name: pynsource-${{ matrix.os }}-${{ env.TAG }}
         path: pynsource/dist/
