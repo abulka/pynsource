@@ -1,0 +1,36 @@
+name: Pynsource app Ubuntu snap
+
+on: push
+
+jobs:
+  my-snap-building-job:
+    runs-on: ubuntu-18.04  # ubuntu-20.04 breaks
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v1
+
+      # You can now run Snapcraft shell commands
+
+      - name: Use Snapcraft - show help
+        run: snapcraft --help
+
+      - name: Install Snapcraft with LXD - rather than multipass
+        uses: samuelmeuli/action-snapcraft@v1
+        with:
+          use_lxd: true
+
+      - name: Build snap
+        run: |
+          sg lxd -c 'snapcraft --use-lxd'
+          ls -l
+          # unsquashfs -l *.snap
+
+      - name: Save snap as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: mysnap_artifact
+          path: ./*.snap
