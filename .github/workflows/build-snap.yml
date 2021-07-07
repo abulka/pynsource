@@ -2,7 +2,7 @@ name: Pynsource app Ubuntu snap
 
 on:
   push:
-    # branches: [ main ]
+    # branches: [ master ]
     tags: ['build-test*']
 
 jobs:

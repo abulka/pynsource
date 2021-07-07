@@ -10,7 +10,7 @@
 name: Pynsource app built on all OS's
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
     # tags: ['build-test*']
 jobs:
   build:
