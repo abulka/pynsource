@@ -10,7 +10,8 @@
 name: Pynsource app built on all OS's
 on:
   push:
-    branches: [ master ]
+    # branches: [ master ]
+    branches: [ gh-building ]
     # tags: ['build-test*']
 jobs:
   build:
@@ -117,7 +118,9 @@ jobs:
 
     - name: Get the tag name
       shell: bash
-      run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+      run: |
+        echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+        echo "Calculated TAG env to be ${{ env.TAG }}"
 
     - name: Save generated executable file as an artifact
       uses: actions/upload-artifact@v2
