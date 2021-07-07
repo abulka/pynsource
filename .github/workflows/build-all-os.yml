@@ -129,6 +129,8 @@ jobs:
     # Note also that the env change above doesn't take effect till the next step, so no good
     # trying to access it above, do it here and in subsequent steps.
     - name: Report tag info
+      shell: bash
+      run: |
         echo "Calculated TAG env to be ${{ env.TAG }}"
         echo "Calculated TAG env to be $TAG"
 
