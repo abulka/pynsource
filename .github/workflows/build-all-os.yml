@@ -10,15 +10,16 @@
 name: Pynsource app built on all OS's
 on:
   push:
-    # branches: [ main ]
-    tags: ['build-test*']
+    branches: [ main ]
+    # tags: ['build-test*']
 jobs:
   build:
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-18.04, ubuntu-20.04, windows-latest]
+        # os: [macos-latest, ubuntu-18.04, ubuntu-20.04, windows-latest]
+        os: [windows-latest]
 
     # job level env
     env:
@@ -104,6 +105,15 @@ jobs:
           rm dist/Pynsource
         fi
         ls -l dist/
+
+    - name: Run Innosetup
+      if: ${{ runner.os == 'Windows' }}
+      run: |
+        cd pynsource
+        echo hi
+        dir
+        iscc ..\ogl2\bin\buildwin_setupexe.iss
+        dir dist
 
     - name: Get the tag name
       shell: bash
