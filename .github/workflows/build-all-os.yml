@@ -11,16 +11,16 @@ name: Pynsource app built on all OS's
 on:
   push:
     # branches: [ master ]
-    branches: [ gh-building ]
-    # tags: ['build-test*']
+    # branches: [ gh-building ]
+    tags: ['build-test*']
 jobs:
   build:
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        # os: [macos-latest, ubuntu-18.04, ubuntu-20.04, windows-latest]
-        os: [windows-latest]
+        os: [macos-latest, ubuntu-18.04, ubuntu-20.04, windows-latest]
+        # os: [windows-latest]
 
     # job level env
     env:
@@ -124,7 +124,7 @@ jobs:
         echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
 
         # whilst building without a tag, override the TAG with something real e.g. 'blah'
-        echo "TAG=blah" >> $GITHUB_ENV
+        # echo "TAG=blah" >> $GITHUB_ENV
 
     # Note also that the env change above doesn't take effect till the next step, so no good
     # trying to access it above, do it here and in subsequent steps.
