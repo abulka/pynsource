@@ -114,25 +114,34 @@ jobs:
         echo hi
         dir
         iscc ..\ogl2\bin\buildwin_github-actions.iss
-        dir dist
+        dir dist-inno
 
-    # Note this doesn't work when there is no tag on the push?  TAG is blank.
-    # Yet in the next step TAG is reported as 'refs/heads/gh-building' ?!
+    # Note this tag extraction step doesn't work when you are pushing without a tag
+    # For example, GITHUB_REF might be 'refs/heads/gh-building' instead of 'refs/tags/v99'
     - name: Get the tag name
       shell: bash
       run: |
         echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
-        echo "Calculated TAG env to be ${{ env.TAG }}"
 
         # whilst building without a tag, override the TAG with something real e.g. 'blah'
         echo "TAG=blah" >> $GITHUB_ENV
-        echo "Calculated TAG env (override) to be ${{ env.TAG }}"
-        echo "Calculated TAG env (override) to be $TAG"
 
+    # Note also that the env change above doesn't take effect till the next step, so no good
+    # trying to access it above, do it here and in subsequent steps.
+    - name: Report tag info
+        echo "Calculated TAG env to be ${{ env.TAG }}"
+        echo "Calculated TAG env to be $TAG"
 
     - name: Save generated executable file as an artifact
       uses: actions/upload-artifact@v2
       with:
         # The act of downloading zips up the artifact and adds the .zip to the downloaded file
-        name: pynsource-${{ matrix.os }}-${{ env.TAG }}
-        path: pynsource/dist/
+        name: pynsource-${{ matrix.os }}-${{ env.TAG }}  # to
+        path: pynsource/dist/  # from
+
+    - name: Save windows setup executable file as an artifact
+      if: ${{ runner.os == 'Windows' }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: pynsource-windows-setup-${{ env.TAG }}  # to
+        path: dist-inno/  # from
