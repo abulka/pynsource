@@ -116,11 +116,19 @@ jobs:
         iscc ..\ogl2\bin\buildwin_github-actions.iss
         dir dist
 
+    # Note this doesn't work when there is no tag on the push?  TAG is blank.
+    # Yet in the next step TAG is reported as 'refs/heads/gh-building' ?!
     - name: Get the tag name
       shell: bash
       run: |
         echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
         echo "Calculated TAG env to be ${{ env.TAG }}"
+
+        # whilst building without a tag, override the TAG with something real e.g. 'blah'
+        echo "TAG=blah" >> $GITHUB_ENV
+        echo "Calculated TAG env (override) to be ${{ env.TAG }}"
+        echo "Calculated TAG env (override) to be $TAG"
+
 
     - name: Save generated executable file as an artifact
       uses: actions/upload-artifact@v2
