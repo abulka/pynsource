@@ -112,7 +112,7 @@ jobs:
         cd pynsource
         echo hi
         dir
-        iscc ..\ogl2\bin\buildwin_setupexe.iss
+        iscc ..\ogl2\bin\buildwin_github-actions.iss
         dir dist
 
     - name: Get the tag name
