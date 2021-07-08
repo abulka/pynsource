@@ -173,25 +173,25 @@ jobs:
             name: pynsource-macos-latest-${{ env.TAG }}  # from this artifact name
             path: pynsource-macos-${{ env.TAG }}  # to this filename or dir
 
-        - uses: actions/download-artifact@v2
-          with:
-            name: pynsource-ubuntu-18.04-${{ env.TAG }}  # from this artifact name
-            path: pynsource-ubuntu-18.04-${{ env.TAG }}  # to this filename or dir
+        # - uses: actions/download-artifact@v2
+        #   with:
+        #     name: pynsource-ubuntu-18.04-${{ env.TAG }}  # from this artifact name
+        #     path: pynsource-ubuntu-18.04-${{ env.TAG }}  # to this filename or dir
 
-        - uses: actions/download-artifact@v2
-          with:
-            name: pynsource-ubuntu-20.04-${{ env.TAG }}  # from this artifact name
-            path: pynsource-ubuntu-20.04-${{ env.TAG }}  # to this filename or dir
+        # - uses: actions/download-artifact@v2
+        #   with:
+        #     name: pynsource-ubuntu-20.04-${{ env.TAG }}  # from this artifact name
+        #     path: pynsource-ubuntu-20.04-${{ env.TAG }}  # to this filename or dir
 
-        - uses: actions/download-artifact@v2
-          with:
-            name: pynsource-windows-latest-${{ env.TAG }}  # from this artifact name
-            path: pynsource-windows-just-exe-${{ env.TAG }}  # to this filename or dir
+        # - uses: actions/download-artifact@v2
+        #   with:
+        #     name: pynsource-windows-latest-${{ env.TAG }}  # from this artifact name
+        #     path: pynsource-windows-just-exe-${{ env.TAG }}  # to this filename or dir
 
-        - uses: actions/download-artifact@v2
-          with:
-            name: pynsource-windows-setup-${{ env.TAG }}  # from this artifact name
-            path: pynsource-windows-setup-${{ env.TAG }}  # to this filename or dir
+        # - uses: actions/download-artifact@v2
+        #   with:
+        #     name: pynsource-windows-setup-${{ env.TAG }}  # from this artifact name
+        #     path: pynsource-windows-setup-${{ env.TAG }}  # to this filename or dir
 
         # issue https://github.com/actions/upload-artifact#maintaining-file-permissions-and-case-sensitive-files 
         - name: Fix loss of executable permission issue on Mac artifact
@@ -205,10 +205,10 @@ jobs:
         - name: Zip up the artifacts
           run: |
             zip -r pynsource-macos-${{ env.TAG }}.zip pynsource-macos-${{ env.TAG }}
-            zip -r pynsource-ubuntu-18.04-${{ env.TAG }}.zip pynsource-ubuntu-18.04-${{ env.TAG }}
-            zip -r pynsource-ubuntu-20.04-${{ env.TAG }}.zip pynsource-ubuntu-20.04-${{ env.TAG }}
-            zip -r pynsource-windows-just-exe-${{ env.TAG }}.zip pynsource-windows-just-exe-${{ env.TAG }}
-            zip -r pynsource-windows-setup-${{ env.TAG }}.zip pynsource-windows-setup-${{ env.TAG }}
+            # zip -r pynsource-ubuntu-18.04-${{ env.TAG }}.zip pynsource-ubuntu-18.04-${{ env.TAG }}
+            # zip -r pynsource-ubuntu-20.04-${{ env.TAG }}.zip pynsource-ubuntu-20.04-${{ env.TAG }}
+            # zip -r pynsource-windows-just-exe-${{ env.TAG }}.zip pynsource-windows-just-exe-${{ env.TAG }}
+            # zip -r pynsource-windows-setup-${{ env.TAG }}.zip pynsource-windows-setup-${{ env.TAG }}
 
         - name: Release
           uses: softprops/action-gh-release@v1
@@ -218,7 +218,7 @@ jobs:
             draft: true
             files: |
               pynsource-macos-${{ env.TAG }}.zip
-              pynsource-ubuntu-18.04-${{ env.TAG }}.zip
-              pynsource-ubuntu-20.04-${{ env.TAG }}.zip
-              pynsource-windows-just-exe-${{ env.TAG }}.zip
-              pynsource-windows-setup-${{ env.TAG }}.zip
+              # pynsource-ubuntu-18.04-${{ env.TAG }}.zip
+              # pynsource-ubuntu-20.04-${{ env.TAG }}.zip
+              # pynsource-windows-just-exe-${{ env.TAG }}.zip
+              # pynsource-windows-setup-${{ env.TAG }}.zip
