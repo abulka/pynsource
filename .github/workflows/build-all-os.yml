@@ -6,6 +6,12 @@
 # or
 # git tag -a build-test-03
 # git push --follow-tags
+# 
+# If using tbump (tbump willl do a push of the annotated tag it creates, but not a --follow-tags, which is still ok)
+# tbump 1.77                    (specify what the next version is, current version stored in tbump.toml)
+# Diagnostic tbump uses:
+# tbump 1.77 --only-patch       (no git stuff)
+# tbump 1.77 --no-push          (do git stuff, but don't do the final push)
 
 name: Pynsource app built on all OS's
 on:
@@ -113,7 +119,8 @@ jobs:
         cd pynsource
         echo hi
         dir
-        iscc ..\ogl2\bin\buildwin_github-actions.iss
+        # iscc ..\ogl2\bin\buildwin_github-actions.iss
+        iscc .requirement-extras/buildwin_github-actions.iss
         dir dist-inno
 
     # Note this tag extraction step doesn't work when you are pushing without a tag

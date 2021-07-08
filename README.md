@@ -1,6 +1,6 @@
 # Pynsource
 
-Version number: Version 1.77 (Sep 9 2020)
+Version number: Version 1.78
 
 Author: [Andy Bulka](www.andypatterns.com)
 
