@@ -191,7 +191,7 @@ jobs:
             zip -r pynsource-macos-${{ env.TAG }}.zip pynsource-macos-${{ env.TAG }}
             zip -r pynsource-ubuntu-18.04-${{ env.TAG }}.zip pynsource-ubuntu-18.04-${{ env.TAG }}
             zip -r pynsource-ubuntu-20.04-${{ env.TAG }}.zip pynsource-ubuntu-20.04-${{ env.TAG }}
-            # zip -r pynsource-windows-just-exe-${{ env.TAG }}.zip pynsource-windows-just-exe-${{ env.TAG }}
+            # zip -r pynsource-windows-exe-no-installer-${{ env.TAG }}.zip pynsource-windows-just-exe-${{ env.TAG }}
             zip -r pynsource-windows-${{ env.TAG }}.zip pynsource-windows-setup-${{ env.TAG }}
 
         - name: Release
@@ -204,5 +204,5 @@ jobs:
               pynsource-macos-${{ env.TAG }}.zip
               pynsource-ubuntu-18.04-${{ env.TAG }}.zip
               pynsource-ubuntu-20.04-${{ env.TAG }}.zip
-              # pynsource-windows-just-exe-${{ env.TAG }}.zip
+              # pynsource-windows-exe-no-installer-${{ env.TAG }}.zip
               pynsource-windows-${{ env.TAG }}.zip
