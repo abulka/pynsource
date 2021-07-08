@@ -94,6 +94,7 @@ jobs:
         python bin/_buildsamples.py
         pyinstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
         cp README.md dist/Readme.txt
+        cp CHANGELOG.md dist/Changelog.txt
         if [ "$RUNNER_OS" == "macOS" ]; then
           # remove the useless exe but leave the .app
           rm dist/Pynsource
