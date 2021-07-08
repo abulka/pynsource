@@ -195,9 +195,11 @@ jobs:
         # issue https://github.com/actions/upload-artifact#maintaining-file-permissions-and-case-sensitive-files 
         - name: Fix loss of executable permission issue on Mac artifact
           run: |
+            pwd
             ls -l
-            chmod +x pynsource-macos-${{ env.TAG }}/pynsource.app/Contents/MacOS/pynsource
-            ls -l pynsource-macos-${{ env.TAG }}/pynsource.app/Contents/MacOS/
+            ls -lR pynsource-macos-${{ env.TAG }}
+            chmod +x pynsource-macos-${{ env.TAG }}/Pynsource.app/Contents/MacOS/pynsource
+            ls -lR pynsource-macos-${{ env.TAG }}
             
         - name: Zip up the artifacts
           run: |
