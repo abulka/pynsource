@@ -1,4 +1,4 @@
-name: Pynsource app Ubuntu snap
+name: Pynsource Snap
 
 on:
   push:

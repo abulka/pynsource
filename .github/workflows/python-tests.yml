@@ -3,7 +3,7 @@
 #
 # NOTE: I also have a travis integration running these tests :-)
 
-name: Run unittests
+name: Unittests
 
 on:
   push:

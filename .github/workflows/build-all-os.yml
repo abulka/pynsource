@@ -1,23 +1,10 @@
-# Production release (note tbump will push the annotated tag it creates, but does not --follow-tags, which is ok and achieves the same thing)
-# tbump 1.77                    (specify what the next version is, current version stored in tbump.toml)
-# 
-# Diagnostic tbump uses:
-# tbump 1.77 --only-patch       (no git stuff)
-# tbump 1.77 --no-push          (yes do git stuff, incl. commit, but don't do the final push)
-# 
-# Draft release (you can optionally be in a branch too)
-# edit release job step below to say draft: true
-# git tag -a pre-14
-# git push --follow-tags
-# 
-
-name: Pynsource app built on all OS's
+name: Pynsource app multi-OS
 on:
   push:
     # branches: [ master ]
     # branches: [ gh-building ]
     # tags: ['build-test*']
-    tags: ['pre-*']
+    tags: ['pre-*', 'version-*']
 jobs:
   build-all-os:
     runs-on: ${{ matrix.os }}
@@ -211,7 +198,7 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
-            draft: true
+            draft: ${{ !startsWith(env.TAG, 'version-') }}
             files: |
               pynsource-macos-${{ env.TAG }}.zip
               pynsource-ubuntu-18.04-${{ env.TAG }}.zip
