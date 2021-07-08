@@ -198,8 +198,11 @@ jobs:
           run: |
             pwd
             ls -l
+            echo recursive
             ls -lR pynsource-macos-${{ env.TAG }}
-            chmod +x pynsource-macos-${{ env.TAG }}/Pynsource.app/Contents/MacOS/pynsource
+            echo about to chmod
+            chmod +x pynsource-macos-${{ env.TAG }}/Pynsource.app/Contents/MacOS/Pynsource
+            echo after chmod
             ls -lR pynsource-macos-${{ env.TAG }}
             
         - name: Zip up the artifacts
