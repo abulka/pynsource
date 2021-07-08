@@ -3,7 +3,7 @@ NATIVE_LINES_OGL_LIKE=False
 ASYNC_BACKGROUND_REFRESH=False  # devel purposes only
 
 APP_VERSION = 1.78
-BETA = "1"  # leave blank to turn off beta
+BETA = "b2"  # leave blank to turn off beta annotation in about box, or set to e.g. "b2"
 APP_VERSION_FULL = f"{APP_VERSION}"
 if BETA:
     APP_VERSION_FULL += f"-{BETA}" 
