@@ -12,6 +12,8 @@
 # Diagnostic tbump uses:
 # tbump 1.77 --only-patch       (no git stuff)
 # tbump 1.77 --no-push          (do git stuff, but don't do the final push)
+# 
+# For a draft release, tag with 'build-test-nn' and edit below to set draft: true on the release step.
 
 name: Pynsource app built on all OS's
 on:
@@ -20,7 +22,7 @@ on:
     # branches: [ gh-building ]
     tags: ['build-test*']
 jobs:
-  build:
+  build-all-os:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -154,3 +156,66 @@ jobs:
       with:
         name: pynsource-windows-setup-${{ env.TAG }}  # to
         path: pynsource/dist-inno/  # from
+
+  # After the matrix is complete, have to 'download' all the assets in order to release them
+  release-job:
+      needs: [build-all-os]
+      runs-on: ubuntu-latest
+      steps:
+
+        - name: Get the tag name  # env vars do not survive from previous jobs
+          shell: bash
+          run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
+        - uses: actions/download-artifact@v2
+          with:
+            name: pynsource-macos-latest-${{ env.TAG }}  # from this artifact name
+            path: pynsource-macos-${{ env.TAG }}  # to this filename or dir
+
+        - uses: actions/download-artifact@v2
+          with:
+            name: pynsource-ubuntu-18.04-${{ env.TAG }}  # from this artifact name
+            path: pynsource-ubuntu-18.04-${{ env.TAG }}  # to this filename or dir
+
+        - uses: actions/download-artifact@v2
+          with:
+            name: pynsource-ubuntu-20.04-${{ env.TAG }}  # from this artifact name
+            path: pynsource-ubuntu-20.04-${{ env.TAG }}  # to this filename or dir
+
+        - uses: actions/download-artifact@v2
+          with:
+            name: pynsource-windows-latest-${{ env.TAG }}  # from this artifact name
+            path: pynsource-windows-just-exe-${{ env.TAG }}  # to this filename or dir
+
+        - uses: actions/download-artifact@v2
+          with:
+            name: pynsource-windows-setup-${{ env.TAG }}  # from this artifact name
+            path: pynsource-windows-setup-${{ env.TAG }}  # to this filename or dir
+
+        # issue https://github.com/actions/upload-artifact#maintaining-file-permissions-and-case-sensitive-files 
+        - name: Fix loss of executable permission issue on Mac artifact
+          run: |
+            ls -l
+            chmod +x pynsource-macos-${{ env.TAG }}/pynsource.app/Contents/MacOS/pynsource
+            ls -l pynsource-macos-${{ env.TAG }}/pynsource.app/Contents/MacOS/
+            
+        - name: Zip up the artifacts
+          run: |
+            zip -r pynsource-macos-${{ env.TAG }}.zip pynsource-macos-${{ env.TAG }}
+            zip -r pynsource-ubuntu-18.04-${{ env.TAG }}.zip pynsource-ubuntu-18.04-${{ env.TAG }}
+            zip -r pynsource-ubuntu-20.04-${{ env.TAG }}.zip pynsource-ubuntu-20.04-${{ env.TAG }}
+            zip -r pynsource-windows-just-exe-${{ env.TAG }}.zip pynsource-windows-just-exe-${{ env.TAG }}
+            zip -r pynsource-windows-setup-${{ env.TAG }}.zip pynsource-windows-setup-${{ env.TAG }}
+
+        - name: Release
+          uses: softprops/action-gh-release@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            draft: true
+            files: |
+              pynsource-macos-${{ env.TAG }}.zip
+              pynsource-ubuntu-18.04-${{ env.TAG }}.zip
+              pynsource-ubuntu-20.04-${{ env.TAG }}.zip
+              pynsource-windows-just-exe-${{ env.TAG }}.zip
+              pynsource-windows-setup-${{ env.TAG }}.zip
