@@ -1,0 +1,66 @@
+name: Pynsource Snap
+
+on:
+  push:
+    # branches: [ master ]
+    tags: ['build-test-*']
+
+jobs:
+  my-snap-building-job:
+    runs-on: ubuntu-18.04  # ubuntu-20.04 breaks
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      # https://github.com/marketplace/actions/snapcraft-action
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v1
+
+      # You can now run Snapcraft shell commands
+
+      - name: Use Snapcraft - show help
+        run: snapcraft --help
+
+      - name: Install Snapcraft with LXD - rather than multipass
+        uses: samuelmeuli/action-snapcraft@v1
+        with:
+          use_lxd: true
+
+      - name: Build snap
+        run: |
+          sg lxd -c 'snapcraft --use-lxd'
+          ls -l
+          # unsquashfs -l *.snap
+
+      - name: Save snap as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: mysnap_artifact
+          path: ./*.snap
+
+      # NEW STUFF
+      # The installed key seems to be for edge, as is the upload command below
+      # snapcraft export-login --snaps pynsource --channels edge -
+
+      - name: Auth to Ubuntu Store
+        uses: samuelmeuli/action-snapcraft@v1
+        with:
+          snapcraft_token: ${{ secrets.snapcraft_token }}
+          skip_install: true # optional, if already installed in an earlier step (yes, above)
+
+      # https://github.com/samuelmeuli/action-snapcraft/issues/28
+      - name: Snap upload
+        id: snapcraft
+        run: |
+          snapcraft upload *.snap --release edge
+
+          # This is for the next step, below - prob don't need to upload twice though?
+          # echo ::set-output name=snap::$(ls *.snap)
+
+      # - name: Snapcraft artifact upload
+      #   uses: actions/upload-artifact@v2
+      #   ...
+      #   with:
+      #     ...
+      #     path: ${{ steps.snapcraft.outputs.snap }}
