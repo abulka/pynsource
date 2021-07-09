@@ -21,6 +21,8 @@ tag_template = "version-{new_version}"
 # tbump.toml location.
 [[file]]
 src = "README.md"
+[[file]]
+src = "DOWNLOADS.md"
 
 # the search is not needed, but play it safe
 [[file]]
