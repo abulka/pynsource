@@ -1593,12 +1593,11 @@ def main_async():
     # pending = asyncio.Task.all_tasks()
     try:
         pending = asyncio.all_tasks()
-    except RuntimeError:
-        # print("No pending running tasks - ok")
-        pass
+    except (AttributeError, RuntimeError):
+        log.info("No pending running tasks on exit")
     else:
         for task in pending:
-            # print("Cancelling leftover task...", task._coro.cr_code.co_name, task._state)
+            log.info(f"Cancelling leftover task... {task._coro.cr_code.co_name} {task._state}")
             task.cancel()
             # Now we should await task to execute it's cancellation.
             # Cancelled task raises asyncio.CancelledError that we can suppress:
