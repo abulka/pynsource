@@ -1,0 +1,54 @@
+# Uncomment this if your project is hosted on GitHub:
+# github_url = "https://github.com/<user or organization>/<project>/"
+
+[version]
+current = "1.78"
+
+# Make sure this matches current_version before
+# using tbump
+regex = '''
+  (?P<major>\d+)
+  \.
+  (?P<minor>\d+)
+  '''
+
+[git]
+message_template = "Bump to {new_version}"
+tag_template = "version-{new_version}"
+
+# For each file to patch, add a [[file]] config
+# section containing the path of the file, relative to the
+# tbump.toml location.
+[[file]]
+src = "README.md"
+[[file]]
+src = "DOWNLOADS.md"
+
+# the search is not needed, but play it safe
+[[file]]
+src = "src/gui/settings.py"
+search = 'APP_VERSION = {current_version}'
+
+[[file]]
+src = ".requirement-extras/buildwin_github-actions.iss"
+search = 'AppVersion={current_version}'
+[[file]]
+src = ".requirement-extras/buildwin_github-actions.iss"
+search = 'VersionInfoVersion={current_version}'
+[[file]]
+src = ".requirement-extras/buildwin_github-actions.iss"
+search = 'OutputBaseFilename=pynsource-win-{current_version}-setup'
+
+# You can specify a list of commands to
+# run after the files have been patched
+# and before the git commit is made
+
+#  [[before_commit]]
+#  name = "check changelog"
+#  cmd = "grep -q {new_version} Changelog.rst"
+
+# Or run some commands after the git tag and the branch
+# have been pushed:
+#  [[after_push]]
+#  name = "publish"
+#  cmd = "./publish.sh"

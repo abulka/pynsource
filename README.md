@@ -1,6 +1,6 @@
 # Pynsource
 
-Version number: Version 1.77 (Sep 9 2020)
+Version number: Version 1.78
 
 Author: [Andy Bulka](www.andypatterns.com)
 
@@ -13,16 +13,17 @@ Reverse engineer Python source code into UML class diagrams.
 ## Installation / Usage
 
 Pynsource binary app installers for Mac / Windows / Linux - see [Downloads](DOWNLOADS.md)
-<!-- https://github.com/abulka/pynsource/blob/master/DOWNLOADS.md -->
+
+> Mac users please [right click open](https://www.howtogeek.com/205393/gatekeeper-101-why-your-mac-only-allows-apple-approved-software-by-default/) the first time, Mac Big Sur users need to first `xattr -dr com.apple.quarantine /Applications/Pynsource.app`
 
 An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
 like zoom and the ability to drag to connect shapes.
 
 ### To run from source code ###
 
-You need `python3`, at least Python 3.6. Running with later versions of Python gives you the ability to parse newer Python syntax e.g. importing code into Pynsource containing the [walrus operator](https://realpython.com/lessons/assignment-expressions/) needs at least Pynsource running under Python 3.8 to work. 
+You need Python 3.6 or higher. Running with later versions of Python gives you the ability to parse newer Python syntax e.g. importing code into Pynsource containing the [walrus operator](https://realpython.com/lessons/assignment-expressions/) needs at least Pynsource running under Python 3.8 to work. 
 
-> Note Pynsource relies on the package [typed-ast](https://pypi.org/project/typed-ast/) for the ability to parse *both* Python 2 and Python 3. This package takes a while to get updated when a new Python gets released, so you might want to play it safe and run via an earlier version of Python. Tested OK in Python 3.9.
+> Note Pynsource relies on the package [typed-ast](https://pypi.org/project/typed-ast/) for the ability to parse *both* Python 2 and Python 3. This package takes a while to get updated when a new Python gets released, so you might want to play it safe and run via Python 3.9 when Python 3.10 comes out.
 
 For Mac or Windows run the following commands:
 
@@ -46,7 +47,7 @@ The GUI toolkit [wxpython](https://wxpython.org/) that `Pynsource` relies on  ne
 
 If you need to use a virtual environment I recommend that you use `pyenv` to first install the version of python that you need. You must use a [pyenv](https://github.com/pyenv/pyenv) framework/shared Python environment for building and running Pynsource. To achieve this, pass a special flag when installing Python through `pyenv` - see [this issue](https://github.com/abulka/pynsource/issues/68#issuecomment-605612292) for more info. E.g. `PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.8.6` on Mac or e.g. `PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.8.8` on linux.  When running under vscode, ensure you enter the path to the python interpreter correctly, to work around a [subtle vscode issue](https://github.com/microsoft/vscode-python/issues/16604).
 
-Or simply use the ready-to-go prebuilt binary executables - see [Downloads](DOWNLOADS.md)
+Or simply use the ready-to-go prebuilt binary executables 🎉 - see [Downloads](DOWNLOADS.md)
 
 # Features
 

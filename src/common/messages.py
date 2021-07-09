@@ -1,9 +1,8 @@
 # Constants used by both pynsource and pynsourcegui
 
-WEB_VERSION_CHECK_URL = "http://www.atug.com/downloads/pynsource-latest.txt"
-WEB_VERSION_CHECK_URL_DEVEL = "http://www.atug.com/downloads/pynsource-latest-devel.txt"
-WEB_VERSION_CHECK_URL_TRACKED = "http://bit.ly/pynsource-update-check"
-WEB_VERSION_CHECK_URL_TRACKED_DEVEL = "http://bit.ly/pynsource-update-check-devel"
+WEB_VERSION_CHECK_URL_TRACKED = "http://bit.ly/pynsource-update-check-gh"
+WEB_VERSION_CHECK_URL_TRACKED_DEVEL = "https://bit.ly/pynsource-update-check-devel-gh"
+
 WEB_PYNSOURCE_HOME_URL = "http://www.pynsource.com"
 PYNSOURCE_CONFIG_FILE = "pynsource.ini"
 PYNSOURCE_CONFIGWX_FILE = "pynsource_wx.ini"
@@ -20,7 +19,7 @@ Also thanks to the wxasync project for bringing
 async/await support to wxPython.   
 """.strip()
 
-ABOUT_AUTHOR = "(c) Andy Bulka 2004-2020"
+ABOUT_AUTHOR = "(c) Andy Bulka 2004-2021"
 ABOUT_APPNAME = "Pynsource"
 VENDOR_NAME = "Wware"
 ABOUT_LICENSE = "License: GPL 3"
