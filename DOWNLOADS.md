@@ -2,7 +2,7 @@
 
 The latest version is `1.78`
 
-[Download](https://github.com/abulka/pynsource/releases/latest) the latest release.
+[Download](https://github.com/abulka/pynsource/releases/latest) the latest release. 👈
 
 ## Mac
 
