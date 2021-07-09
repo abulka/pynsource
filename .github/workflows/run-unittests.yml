@@ -2,7 +2,7 @@
 name: Unittests
 on:
   push:
-    branches: [ master, gh_building ]
+    branches: [ master, gh-building ]
   pull_request:
     branches: [ master ]
 jobs:
@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       python-version:
-        vers: [3.7, 3.8]
+        vers: [3.6, 3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v2
