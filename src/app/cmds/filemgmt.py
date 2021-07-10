@@ -41,37 +41,8 @@ class CmdFileNew(CmdBase):
 class CmdFileImportBase(CmdBase):  # BASE
     def execute(self):
         workspace_was_empty: bool = len(self.context.displaymodel.graph.nodes) == 0
-        pmodels = []
-        msgs = ""
         if self.files:
-            for f in self.files:
-                # pmodel, debuginfo = old_parser(f)
-                # pmodel, debuginfo = new_parser(f)
-                mode = getattr(self, "mode", 2)
-                # print(f"Importing Python in syntax mode {mode}")
-                pmodel, debuginfo = new_parser(f, options={"mode": mode})
-                if pmodel.errors:
-                    # print(pmodel.errors)
-                    msgs += pmodel.errors + "\n"
-                else:
-                    pmodels.append(pmodel)
-
-                # from parsing.dump_pmodel import dump_old_structure
-                # print(dump_old_structure(pmodel))
-
-                from parsing.dump_pmodel import dump_pmodel
-                # print(dump_pmodel(pmodel))
-                try:
-                    log.info(f'\n{dump_pmodel(pmodel)}')
-                except:
-                    log.exception('You probably need to upgrade your version of beautifultable e.g. pip install beautifultable --upgrade')
-
-                self.context.displaymodel.build_graphmodel(pmodel)
-                # self.context.displaymodel.Dump(msg="import, after build_graphmodel")
-
-            msgs += "\n"
-            for pmodel in pmodels:
-                msgs += f"{os.path.basename(pmodel.filename)} detected {len(pmodel.classlist)} classes.\n"
+            msgs = self._old_parse_and_build_graph()
 
             if msgs:
                 dlg = wx.MessageDialog(self.context.frame, msgs, "Import Notes", wx.ICON_WARNING)
@@ -93,6 +64,41 @@ class CmdFileImportBase(CmdBase):  # BASE
 
             # self.context.wxapp.refresh_plantuml_view()
             wx.PostEvent(self.context.frame, RefreshPlantUmlEvent())
+
+    def _old_parse_and_build_graph(self):
+        pmodels = []
+        msgs = ""
+        for f in self.files:
+            # pmodel, debuginfo = old_parser(f)
+            # pmodel, debuginfo = new_parser(f)
+            mode = getattr(self, "mode", 2)
+            # print(f"Importing Python in syntax mode {mode}")
+            pmodel, debuginfo = new_parser(f, options={"mode": mode})
+            if pmodel.errors:
+                # print(pmodel.errors)
+                msgs += pmodel.errors + "\n"
+            else:
+                pmodels.append(pmodel)
+
+            # from parsing.dump_pmodel import dump_old_structure
+            # print(dump_old_structure(pmodel))
+
+            from parsing.dump_pmodel import dump_pmodel
+            # print(dump_pmodel(pmodel))
+            try:
+                log.info(f'\n{dump_pmodel(pmodel)}')
+            except:
+                log.exception(
+                    'You probably need to upgrade your version of beautifultable e.g. pip install beautifultable --upgrade')
+
+            self.context.displaymodel.build_graphmodel(pmodel)
+            # self.context.displaymodel.Dump(msg="import, after build_graphmodel")
+
+        msgs += "\n"
+        for pmodel in pmodels:
+            msgs += f"{os.path.basename(pmodel.filename)} detected {len(pmodel.classlist)} classes.\n"
+
+        return msgs
 
 
 class CmdFileImportFromFilePath(CmdFileImportBase):  # was class CmdFileImportSource(CmdBase):
