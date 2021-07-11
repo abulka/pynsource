@@ -11,6 +11,10 @@ class Employee:
     def __init__(self, restaurant):
         self.restaurant: Restaurant = restaurant
 
+class Boss(Employee):
+    salary = 1000
+    reputation = 'good'
+    
 def test():
     pass
 
