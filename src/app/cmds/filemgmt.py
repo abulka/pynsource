@@ -86,11 +86,11 @@ class CmdFileImportBase(CmdBase):  # BASE
             mode = getattr(self, "mode", 2)
             visualise_modules = getattr(self, "visualise_modules", True)
             log.info(f"Parsing {f} mode {mode} visualise_modules {visualise_modules}")
-            alsm, debuginfo = parse_python(f, 
-                                           options={
-                                               "mode": mode, 
-                                               "visualise_modules": visualise_modules
-                                            })
+            alsm, debuginfo = parse_python(
+                f, 
+                options={
+                    "mode": mode, 
+                })
             if alsm.error:
                 print(alsm.error)
                 msgs += alsm.error + "\n"
@@ -99,7 +99,12 @@ class CmdFileImportBase(CmdBase):  # BASE
             # print(f'\n{alsm.dump()}')
             log.info(f'\n{alsm.dump()}')
 
-            self.context.displaymodel.build_graphmodel_from_alsm(alsm)
+            self.context.displaymodel.build_graphmodel_from_alsm(
+                alsm,
+                options={
+                    "visualise_modules": visualise_modules
+                })
+
             # self.context.displaymodel.Dump(msg="import, after build_graphmodel")
 
         msgs += "\n"
