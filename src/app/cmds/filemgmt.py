@@ -89,12 +89,12 @@ class CmdFileImportBase(CmdBase):  # BASE
             self.context.displaymodel.build_graphmodel_from_alsm(alsm)
             # self.context.displaymodel.Dump(msg="import, after build_graphmodel")
 
-            msgs += "\n"
-            for alsm in alsms:
-                msgs += f"{os.path.basename(alsm.name)} detected {len(alsm.classes)} classes.\n"
-                print(msgs)
+        msgs += "\n"
+        for alsm in alsms:
+            msgs += f"{os.path.basename(alsm.name)} detected {len(alsm.classes)} classes.\n"
+            print(msgs)
 
-            return msgs
+        return msgs
 
 
     def _old_parse_and_build_graph(self):
