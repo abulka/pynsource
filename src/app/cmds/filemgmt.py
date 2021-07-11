@@ -7,6 +7,7 @@ from app.settings import RefreshPlantUmlEvent
 from gui.coord_utils import setpos, getpos
 from gui.settings import PRO_EDITION, ALSM_PARSING
 from gui.uml_lines import LineShape, LineShapeUml
+from textwrap import dedent
 import logging
 from common.logger import config_log
 if PRO_EDITION:
@@ -46,8 +47,14 @@ class CmdFileImportBase(CmdBase):  # BASE
                 msgs = self._new_parse_and_build_graph()
             else:
                 msgs = self._old_parse_and_build_graph()
-                msgs += f"\n- Modules themselves not visualised as UML boxes (requires Pro)"
-                msgs += f"\n- Module level variables and functions not visualised (requires Pro)"
+                msgs += f"\nSuccess! 🎉\n"
+                msgs += dedent("""
+                Pynsource Pro Edition can:
+                - Display modules (.py) as UML boxes
+                - Module level variables visualised
+                - Module function names visualised
+                - Module →* Class (contains) lines visualised
+                """)
 
             if msgs:
                 dlg = wx.MessageDialog(self.context.frame, msgs, "Import Notes", wx.ICON_WARNING)
@@ -78,13 +85,18 @@ class CmdFileImportBase(CmdBase):  # BASE
         for f in self.files:
             mode = getattr(self, "mode", 2)
             visualise_modules = getattr(self, "visualise_modules", True)
-            alsm, debuginfo = parse_python(f, options={"mode": mode, "visualise_modules": visualise_modules})
+            log.info(f"Parsing {f} mode {mode} visualise_modules {visualise_modules}")
+            alsm, debuginfo = parse_python(f, 
+                                           options={
+                                               "mode": mode, 
+                                               "visualise_modules": visualise_modules
+                                            })
             if alsm.error:
                 print(alsm.error)
                 msgs += alsm.error + "\n"
             else:
                 alsms.append(alsm)
-            print(f'\n{alsm.dump()}')
+            # print(f'\n{alsm.dump()}')
             log.info(f'\n{alsm.dump()}')
 
             self.context.displaymodel.build_graphmodel_from_alsm(alsm)
@@ -93,7 +105,7 @@ class CmdFileImportBase(CmdBase):  # BASE
         msgs += "\n"
         for alsm in alsms:
             msgs += f"Module {os.path.basename(alsm.name)} - detected {len(alsm.classes)} classes.\n"
-            print(msgs)
+            log.info(msgs)
 
         return msgs
 

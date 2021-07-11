@@ -869,10 +869,19 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.Bind(wx.EVT_MENU, self.OnPythonMode, self.item_python3_mode)
         self.item_python3_mode.Check()
 
+        # Visualise Python Modules Checked Menu Item
+        id = wx.NewIdRef()
         self.item_visualise_modules = menu1.AppendCheckItem(
-            wx.ID_ANY, "Visualise Python Modules", help="Visualise Python Modules themselves as UML Boxes with module level vars and defs"
+            id, 
+            "Visualise Python Modules", 
+            help="Visualise Python Modules themselves as UML Boxes with module level vars and defs"
         )
+        if pro_image:
+            self.item_visualise_modules.SetBitmap(pro_image)
         self.Bind(wx.EVT_MENU, self.OnVisualiseModules, self.item_visualise_modules)
+        def visualise_modules_update(event):
+            event.Enable(PRO_EDITION)        
+        self.Bind(wx.EVT_UPDATE_UI, visualise_modules_update, id=id)
         self.item_visualise_modules.Check()
 
         menu1.AppendSeparator()
