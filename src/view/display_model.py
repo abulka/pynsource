@@ -258,6 +258,23 @@ class DisplayModel:
             class_attributes = sorted([attrobj.attr_name for attrobj in class_entry.attributes])  # type Attribute class
             class_methods = sorted(class_entry.methods)
             node = self.AddUmlNode(class_name, class_attributes, class_methods)
+        
+        # create a psuedo module class
+        module_variables = [attrobj.attr_name for attrobj in sorted(alsm.variables, key=lambda attrobj: attrobj.attr_name)]
+        module_functions = [adef for adef in sorted(alsm.functions)]
+        node = self.AddUmlNode(alsm.name, module_variables, module_functions)
+        # module points to each class inside it
+        for aclass in alsm.classes.keys():
+            add_dependency(aclass, alsm.name)
+        # module dependencies
+        for module_class_dependency in alsm.module_dependencies:
+            if isinstance(module_class_dependency, tuple):
+                from_var, to_class = module_class_dependency
+            else:
+                from_var = 'uses'
+                to_class = module_class_dependency
+            node = self.AddUmlNode(to_class)  # create it just in case its not there - will auto merge
+            add_dependency(to_class, alsm.name)  # 'from_var' should be a label on the edge
 
         build_edges(generalisations, "generalisation")
         build_edges(compositions, "composition")
