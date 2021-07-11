@@ -43,6 +43,10 @@ class CmdFileImportBase(CmdBase):  # BASE
         workspace_was_empty: bool = len(self.context.displaymodel.graph.nodes) == 0
         if self.files:
             msgs = self._old_parse_and_build_graph()
+            try:
+                msgs += self._new_parse_and_build_graph()
+            except Exception as e:
+                print(e)
 
             if msgs:
                 dlg = wx.MessageDialog(self.context.frame, msgs, "Import Notes", wx.ICON_WARNING)
@@ -64,6 +68,33 @@ class CmdFileImportBase(CmdBase):  # BASE
 
             # self.context.wxapp.refresh_plantuml_view()
             wx.PostEvent(self.context.frame, RefreshPlantUmlEvent())
+
+
+    def _new_parse_and_build_graph(self):
+        from alsm import parse_python
+        alsms = []
+        msgs = ""
+        for f in self.files:
+            mode = getattr(self, "mode", 2)
+            alsm, debuginfo = parse_python(f, options={"mode": mode})
+            if alsm.error:
+                print(alsm.error)
+                msgs += alsm.error + "\n"
+            else:
+                alsms.append(alsm)
+            print(f'\n{alsm.dump()}')
+            log.info(f'\n{alsm.dump()}')
+
+            # self.context.displaymodel.build_graphmodel_from_alsm(alsm)
+            # self.context.displaymodel.Dump(msg="import, after build_graphmodel")
+
+            msgs += "\n"
+            for alsm in alsms:
+                msgs += f"{os.path.basename(alsm.name)} detected {len(alsm.classes)} classes.\n"
+                print(msgs)
+
+            return msgs
+
 
     def _old_parse_and_build_graph(self):
         pmodels = []
