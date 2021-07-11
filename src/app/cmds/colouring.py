@@ -40,6 +40,8 @@ class CmdColourSiblings(CmdBase):
         umlcanvas.mega_refresh()
 
 
+from view.display_model import UmlModuleNode
+
 class CmdCycleColours(CmdBase):
 
     last_index = 0
@@ -69,7 +71,8 @@ class CmdCycleColours(CmdBase):
         dc = wx.ClientDC(umlcanvas)
         umlcanvas.PrepareDC(dc)
         for node in self.context.displaymodel.graph.nodes:
-            if not hasattr(node, "comment"):  # leave comments alone
+            # leave comments and modules alone
+            if not hasattr(node, "comment") and not isinstance(node, UmlModuleNode):
                 node.shape.SetBrush(self.colour)
         umlcanvas.mega_refresh()
 

@@ -245,6 +245,7 @@ class DisplayModel:
 
         generalisations: List[Tuple[str, str]] = []
         compositions: List[Tuple[str, str]] = []
+        associations: List[Tuple[str, str]] = []
         
         def build_edges(associations: Tuple[str, str], edge_type):
             for from_class_name, to_class_name in set(associations):  # avoid duplicates
@@ -257,15 +258,18 @@ class DisplayModel:
         def add_generalisation(class_name, parent_class):
             generalisations.append((class_name, parent_class))
 
-        def add_dependency(other_class, class_name):
+        def add_composition_dependency(other_class, class_name):
             compositions.append((other_class, class_name))  # reverse so arrows look correct
+
+        def add_module_dependency(other_class, class_name):
+            associations.append((other_class, class_name))
 
         # MAIN ALGORITHM BEGINS HERE
 
         for class_name, class_entry in list(alsm.classes.items()):
 
             for attr, other_class in class_entry.class_dependency_tuples:
-                add_dependency(other_class, class_name)
+                add_composition_dependency(other_class, class_name)
 
             if class_entry.classes_inherits_from:
                 for parent_class in class_entry.classes_inherits_from:
@@ -281,7 +285,7 @@ class DisplayModel:
         node = self.AddUmlModuleNode(alsm.name, module_variables, module_functions)
         # module points to each class inside it
         for aclass in alsm.classes.keys():
-            add_dependency(aclass, alsm.name)
+            add_module_dependency(aclass, alsm.name)
         # module dependencies
         for module_class_dependency in alsm.module_dependencies:
             if isinstance(module_class_dependency, tuple):
@@ -290,10 +294,11 @@ class DisplayModel:
                 from_var = 'uses'
                 to_class = module_class_dependency
             node = self.AddUmlNode(to_class)  # create it just in case its not there - will auto merge
-            add_dependency(to_class, alsm.name)  # 'from_var' should be a label on the edge
+            add_composition_dependency(to_class, alsm.name)  # 'from_var' should be a label on the edge
 
         build_edges(generalisations, "generalisation")
         build_edges(compositions, "composition")
+        build_edges(associations, "association")
 
 
     def build_view(self, translatecoords=True, purge_existing_shapes=False):

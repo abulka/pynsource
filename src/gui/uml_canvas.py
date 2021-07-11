@@ -334,10 +334,14 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         return shape
 
+
     def CreateUmlModuleShape(self, node, update_existing_shape: DividedShape = None):
         shape = self.CreateUmlShape(node, update_existing_shape)
+
         # change the colour to indicate its a module
-        shape.SetBrush(wx.Brush("CYAN", wx.SOLID))
+        # shape.SetBrush(wx.Brush("DARK TURQUOISE", wx.SOLID))
+        shape.SetBrush(wx.Brush("LIGHT BLUE", wx.SOLID))
+
 
     def createCommentShape(self, node):
 
