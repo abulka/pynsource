@@ -77,7 +77,8 @@ class CmdFileImportBase(CmdBase):  # BASE
         msgs = ""
         for f in self.files:
             mode = getattr(self, "mode", 2)
-            alsm, debuginfo = parse_python(f, options={"mode": mode})
+            visualise_modules = getattr(self, "visualise_modules", True)
+            alsm, debuginfo = parse_python(f, options={"mode": mode, "visualise_modules": visualise_modules})
             if alsm.error:
                 print(alsm.error)
                 msgs += alsm.error + "\n"
@@ -139,8 +140,9 @@ class CmdFileImportFromFilePath(CmdFileImportBase):  # was class CmdFileImportSo
 
 
 class CmdFileImportViaDialog(CmdFileImportBase):  # was class CmdFileImport(CmdBase):
-    def __init__(self, mode=2):
+    def __init__(self, mode=2, visualise_modules=True):
         self.mode = mode
+        self.visualise_modules = visualise_modules
 
     def execute(self):
         self.context.wxapp.switch_to_ogl_uml_view()

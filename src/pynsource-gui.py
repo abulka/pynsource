@@ -869,6 +869,12 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.Bind(wx.EVT_MENU, self.OnPythonMode, self.item_python3_mode)
         self.item_python3_mode.Check()
 
+        self.item_visualise_modules = menu1.AppendCheckItem(
+            wx.ID_ANY, "Visualise Python Modules", help="Visualise Python Modules themselves as UML Boxes with module level vars and defs"
+        )
+        self.Bind(wx.EVT_MENU, self.OnVisualiseModules, self.item_visualise_modules)
+        self.item_visualise_modules.Check()
+
         menu1.AppendSeparator()
         Add(menu1, "&Print / Preview...", "Ctrl-P", self.FilePrint)
         Add(menu1, "&Page Setup...", "", self.OnPageSetup)
@@ -1076,6 +1082,9 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
     def OnPythonMode(self, event):
         log.info("python 3 syntax mode state now: %s" % self.item_python3_mode.IsChecked())
 
+    def OnVisualiseModules(self, event):
+        log.info("visualise Python Modules state now: %s" % self.item_visualise_modules.IsChecked())
+
     def OnRightButtonMenu(self, event):  # Menu
         x, y = event.GetPosition()
         if PRO_EDITION:
@@ -1172,7 +1181,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnFileImport(self, event):
         mode = 3 if self.item_python3_mode.IsChecked() else 2
-        self.app.run.CmdFileImportViaDialog(mode=mode)
+        visualise_modules = self.item_visualise_modules.IsChecked()
+        self.app.run.CmdFileImportViaDialog(mode=mode, visualise_modules=visualise_modules)
 
     def OnViewTogglePlantUml(self, event):
         if GUI_LAYOUT == "MULTI_TAB_GUI":
