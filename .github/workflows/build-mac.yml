@@ -36,12 +36,20 @@ jobs:
         token: ${{ secrets.my_pat }}
         path: pynsource-rego/
 
+    - name: Check out alsm (private)
+      uses: actions/checkout@v2
+      with:
+        repository: abulka/alsm
+        token: ${{ secrets.my_pat }}
+        path: alsm/
+
     - name: View resulting directory structure
       run: |
         ls -l
         ls -l pynsource/
         ls -l pynsource-rego/
         ls -l ogl2/
+        ls -l alsm/
 
     - name: Setup Python please
       uses: actions/setup-python@v2
@@ -53,6 +61,7 @@ jobs:
         pip install wxpython
         pip install pyinstaller
         pip install -r pynsource/requirements.txt
+        pip install alsm/
     - name: Run Python and print version_info
       run: |
         python -c "import sys; print(sys.version_info)"
