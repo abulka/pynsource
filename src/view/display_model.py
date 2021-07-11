@@ -89,6 +89,22 @@ class UmlNode(GraphNode):
     classname = property(get_id, set_id)
 
 
+class UmlModuleNode(GraphNode):
+    def __init__(self, id, left, top, width=60, height=60, attrs=[], meths=[]):
+        GraphNode.__init__(self, id, left, top, width=width, height=height)
+        self.attrs = attrs
+        self.meths = meths
+        self.shape = None
+
+    def get_id(self):
+        return self.id
+
+    def set_id(self, val):
+        self.id = val
+
+    classname = property(get_id, set_id)
+
+
 class CommentNode(GraphNode):
     def __init__(self, id, left, top, width=60, height=60, comment=""):
         GraphNode.__init__(self, id, left, top, width, height)
@@ -262,7 +278,7 @@ class DisplayModel:
         # create a psuedo module class
         module_variables = [attrobj.attr_name for attrobj in sorted(alsm.variables, key=lambda attrobj: attrobj.attr_name)]
         module_functions = [adef for adef in sorted(alsm.functions)]
-        node = self.AddUmlNode(alsm.name, module_variables, module_functions)
+        node = self.AddUmlModuleNode(alsm.name, module_variables, module_functions)
         # module points to each class inside it
         for aclass in alsm.classes.keys():
             add_dependency(aclass, alsm.name)
@@ -326,13 +342,19 @@ class DisplayModel:
                 if node.shape:
                     node.shape.ClearRegions()
                     oldx, oldy = node.shape._xpos, node.shape._ypos
-                    self.umlcanvas.CreateUmlShape(node, update_existing_shape=node.shape)
+                    if isinstance(node, UmlModuleNode):
+                        self.umlcanvas.CreateUmlModuleShape(node, update_existing_shape=node.shape)
+                    else:
+                        self.umlcanvas.CreateUmlShape(node, update_existing_shape=node.shape)
                     if node.shape._xpos != oldx or node.shape._ypos != oldy:
                         print(
                             f"Warning build_view(): reusing existing shape messed with coords {node.id} was {oldx}, {oldy} now {node.shape._xpos}, {node.shape._xpos}"
                         )
                 else:
-                    self.umlcanvas.CreateUmlShape(node)
+                    if isinstance(node, UmlModuleNode):
+                        self.umlcanvas.CreateUmlModuleShape(node)
+                    else:
+                        self.umlcanvas.CreateUmlShape(node)
 
         for edge in self.graph.edges:
             if not edge.get("shape", None):
@@ -352,6 +374,23 @@ class DisplayModel:
             random.randint(60, 160),
         )
         node = UmlNode(id, t, l, w, h, attrs=attrs, meths=meths)
+        node = self.graph.AddNode(node)
+        return node
+
+    def AddUmlModuleNode(self, id, attrs=[], meths=[]):
+        node = self.graph.FindNodeById(id)
+        if node:
+            # could merge the nodes and their attributes etc. ?
+            # print 'Skipping', node.classname, 'already built shape...'
+            self.merge_attrs_and_meths(node, attrs, meths)
+            return node
+        t, l, w, h = (
+            random.randint(0, 100),
+            random.randint(0, 100),
+            random.randint(60, 160),
+            random.randint(60, 160),
+        )
+        node = UmlModuleNode(id, t, l, w, h, attrs=attrs, meths=meths)
         node = self.graph.AddNode(node)
         return node
 

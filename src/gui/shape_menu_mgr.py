@@ -1,6 +1,6 @@
 import wx
 from typing import List, Set, Dict, Tuple, Optional
-from view.display_model import GraphNode, UmlNode, CommentNode
+from view.display_model import GraphNode, UmlNode, UmlModuleNode, CommentNode
 from gui.node_edit_multi_purpose import node_edit_multi_purpose
 from gui.settings import PRO_EDITION
 
@@ -353,7 +353,7 @@ class ShapeMenuMgr:
                 is_comment = is_umlclass = False
             else:
                 is_comment = isinstance(shape.node, CommentNode)
-                is_umlclass = isinstance(shape.node, UmlNode)
+                is_umlclass = isinstance(shape.node, UmlNode) or isinstance(shape.node, UmlModuleNode)
             assert not is_umlclass == (is_comment or is_bitmap)
             started_connecting = from_node != None
             from_is_comment = isinstance(from_node, CommentNode)
