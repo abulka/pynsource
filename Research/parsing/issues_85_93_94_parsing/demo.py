@@ -1,5 +1,6 @@
 x = 10
 SETTINGS = 'something'
+module_ref = SomeOtherClass()
 
 class Customer:
     def __init__(self, restaurant):
@@ -14,7 +15,7 @@ class Employee:
 class Boss(Employee):
     salary = 1000
     reputation = 'good'
-    
+
 def test():
     pass
 

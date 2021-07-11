@@ -247,6 +247,8 @@ def plant_uml_create_png(plant_uml_txt, output_filename):
 # New
 
 def displaymodel_to_plantuml(displaymodel):
+    # TODO Should use AlsmMgr.calc_plant_uml()
+
     edge_lookup = {
         "generalisation" : "--|>",
         "composition" : "<--",
@@ -275,11 +277,28 @@ def displaymodel_to_plantuml(displaymodel):
         # See issue https://github.com/abulka/pynsource/issues/78
         # This code displays types instead of attributes, which is not useful, so stop doing it for now
         # label = f": {edge['source'].id}" if edge['uml_edge_type'] in ("composition",) else ""
+        # TODO but in alsm mode, we can have edge labels back! Should use AlsmMgr.calc_plant_uml()
         label = ""
-        _from = edge['source'].id.replace('.', '_')
-        _to = edge['target'].id.replace('.', '_')
-        result += f"{_from} {line} {_to} {label}\n"
-        if edge['uml_edge_type'] == "association":
-            result += f"{_from} {line}[hidden] {_to} {label}\n"
+        _from = edge['source'].id
+        _to = edge['target'].id
+        
+        _from_is_module = '.' in _from
+        _to_is_module = '.' in _to
+
+        if '.' in _from or '.' in _to:
+            _from = _from.replace('.', '_')
+            _to = _to.replace('.', '_')
+
+        if _to_is_module:  # its always the to side that is the module
+            if edge['uml_edge_type'] == "association":
+                label = ": contains >"
+                result += f"{_to} {line} {_from} {label}\n"
+                result += f"{_to} {line}[hidden] {_from} {label}\n"
+            else:  # normal directional ref
+                result += f"{_from} {line} {_to} {label}\n"
+        else:
+            result += f"{_from} {line} {_to} {label}\n"
+            if edge['uml_edge_type'] == "association":
+                result += f"{_from} {line}[hidden] {_to} {label}\n"
 
     return result
