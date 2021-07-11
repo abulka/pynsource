@@ -138,11 +138,13 @@ class DisplayModel:
         self.graph = UmlGraph()
         self.umlcanvas = canvas
         self.pmodels_i_have_seen = []  # just for reference and dumping purposes
+        self.alsms_i_have_seen = []  # just for reference and dumping purposes
         self.Clear()
 
     def Clear(self):
         self.graph.Clear()
         self.pmodels_i_have_seen = []
+        self.alsms_i_have_seen = []
 
     def build_graphmodel(self, pmodel):
         """
@@ -216,6 +218,50 @@ class DisplayModel:
         build_edges(generalisations, "generalisation")
         build_edges(compositions, "composition")
         # build_edges(associations, "associations")
+
+
+    def build_graphmodel_from_alsm(self, alsm):
+        """
+        Build the graph with node and edges, from the ALSM (parse model)
+        Shapes are added later by the build_view()
+        """
+        self.alsms_i_have_seen.append(alsm)
+
+        generalisations: List[Tuple[str, str]] = []
+        compositions: List[Tuple[str, str]] = []
+        
+        def build_edges(associations: Tuple[str, str], edge_type):
+            for from_class_name, to_class_name in set(associations):  # avoid duplicates
+                from_node = self.AddUmlNode(from_class_name)
+                to_node = self.AddUmlNode(to_class_name)
+                edge = self.AddUmlEdge(
+                    from_node, to_node, edge_type
+                )  # incl. duplicate protection in here
+
+        def add_generalisation(class_name, parent_class):
+            generalisations.append((class_name, parent_class))
+
+        def add_dependency(other_class, class_name):
+            compositions.append((other_class, class_name))  # reverse so arrows look correct
+
+        # MAIN ALGORITHM BEGINS HERE
+
+        for class_name, class_entry in list(alsm.classes.items()):
+
+            for attr, other_class in class_entry.class_dependency_tuples:
+                add_dependency(other_class, class_name)
+
+            if class_entry.classes_inherits_from:
+                for parent_class in class_entry.classes_inherits_from:
+                    add_generalisation(class_name, parent_class)
+
+            class_attributes = sorted([attrobj.attr_name for attrobj in class_entry.attributes])  # type Attribute class
+            class_methods = sorted(class_entry.methods)
+            node = self.AddUmlNode(class_name, class_attributes, class_methods)
+
+        build_edges(generalisations, "generalisation")
+        build_edges(compositions, "composition")
+
 
     def build_view(self, translatecoords=True, purge_existing_shapes=False):
         """

@@ -42,11 +42,12 @@ class CmdFileImportBase(CmdBase):  # BASE
     def execute(self):
         workspace_was_empty: bool = len(self.context.displaymodel.graph.nodes) == 0
         if self.files:
-            msgs = self._old_parse_and_build_graph()
-            try:
-                msgs += self._new_parse_and_build_graph()
-            except Exception as e:
-                print(e)
+            # msgs = self._old_parse_and_build_graph()
+            msgs = self._new_parse_and_build_graph()
+            # try:
+            #     msgs += self._new_parse_and_build_graph()
+            # except Exception as e:
+            #     print(e)
 
             if msgs:
                 dlg = wx.MessageDialog(self.context.frame, msgs, "Import Notes", wx.ICON_WARNING)
@@ -85,7 +86,7 @@ class CmdFileImportBase(CmdBase):  # BASE
             print(f'\n{alsm.dump()}')
             log.info(f'\n{alsm.dump()}')
 
-            # self.context.displaymodel.build_graphmodel_from_alsm(alsm)
+            self.context.displaymodel.build_graphmodel_from_alsm(alsm)
             # self.context.displaymodel.Dump(msg="import, after build_graphmodel")
 
             msgs += "\n"
