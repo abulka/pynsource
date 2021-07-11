@@ -259,7 +259,12 @@ def displaymodel_to_plantuml(displaymodel):
             result += node.comment + "\n"
             result += "end note\n\n"
         else:
-            result += f"class {node.id} {{\n"
+            if ".py" in node.id:
+                colour = "<< (M,lightgrey) >> #white"
+                name = node.id.replace('.', '_')
+                result += f"class {name} <<module>> {colour} {{\n"
+            else:
+                result += f"class {node.id} {{\n"
             result += "\n".join([f"  {attr}" for attr in node.attrs])
             result += "\n"
             result += "\n".join([f"  {meth}()" for meth in node.meths])
@@ -271,9 +276,10 @@ def displaymodel_to_plantuml(displaymodel):
         # This code displays types instead of attributes, which is not useful, so stop doing it for now
         # label = f": {edge['source'].id}" if edge['uml_edge_type'] in ("composition",) else ""
         label = ""
-
-        result += f"{edge['source'].id} {line} {edge['target'].id} {label}\n"
+        _from = edge['source'].id.replace('.', '_')
+        _to = edge['target'].id.replace('.', '_')
+        result += f"{_from} {line} {_to} {label}\n"
         if edge['uml_edge_type'] == "association":
-            result += f"{edge['source'].id} {line}[hidden] {edge['target'].id} {label}\n"
+            result += f"{_from} {line}[hidden] {_to} {label}\n"
 
     return result
