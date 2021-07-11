@@ -5,7 +5,7 @@ import os
 from parsing.api import old_parser, new_parser
 from app.settings import RefreshPlantUmlEvent
 from gui.coord_utils import setpos, getpos
-from gui.settings import PRO_EDITION
+from gui.settings import PRO_EDITION, ALSM_PARSING
 from gui.uml_lines import LineShape, LineShapeUml
 import logging
 from common.logger import config_log
@@ -42,12 +42,12 @@ class CmdFileImportBase(CmdBase):  # BASE
     def execute(self):
         workspace_was_empty: bool = len(self.context.displaymodel.graph.nodes) == 0
         if self.files:
-            # msgs = self._old_parse_and_build_graph()
-            msgs = self._new_parse_and_build_graph()
-            # try:
-            #     msgs += self._new_parse_and_build_graph()
-            # except Exception as e:
-            #     print(e)
+            if ALSM_PARSING:
+                msgs = self._new_parse_and_build_graph()
+            else:
+                msgs = self._old_parse_and_build_graph()
+                msgs += f"\n- Modules themselves not visualised as UML boxes (requires Pro)"
+                msgs += f"\n- Module level variables and functions not visualised (requires Pro)"
 
             if msgs:
                 dlg = wx.MessageDialog(self.context.frame, msgs, "Import Notes", wx.ICON_WARNING)
@@ -91,7 +91,7 @@ class CmdFileImportBase(CmdBase):  # BASE
 
         msgs += "\n"
         for alsm in alsms:
-            msgs += f"{os.path.basename(alsm.name)} detected {len(alsm.classes)} classes.\n"
+            msgs += f"Module {os.path.basename(alsm.name)} - detected {len(alsm.classes)} classes.\n"
             print(msgs)
 
         return msgs
@@ -128,7 +128,7 @@ class CmdFileImportBase(CmdBase):  # BASE
 
         msgs += "\n"
         for pmodel in pmodels:
-            msgs += f"{os.path.basename(pmodel.filename)} detected {len(pmodel.classlist)} classes.\n"
+            msgs += f"Module {os.path.basename(pmodel.filename)} - detected {len(pmodel.classlist)} classes.\n"
 
         return msgs
 
