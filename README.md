@@ -36,7 +36,7 @@ To build and install from source code, see [building from source](BUILDING.md)
     - Drag and Drop to connect shapes
     - Optimal layout algorithm
     - Access to generated PlantUML markup text
-    - Module Visualisation incl. variables and functions *(new for 2021, [youtube demo](https://www.youtube.com/watch?v=uURafo2F33U))*
+    - Module Visualisation incl. variables and functions *(new for 2021, [youtube demo](https://youtu.be/AovrE7nWGss))*
 
 # Examples
 
@@ -103,7 +103,7 @@ www.pynsource.com
 - Help is built into the app - hit `F1`
 
 - View a [Youtube video tutorial](https://youtu.be/FEXeDI18LMs) on the basic usage of Pynsource (pro edition is featured).
-- [Module Visualisation](https://www.youtube.com/watch?v=uURafo2F33U) youtube demo.
+- [Module Visualisation](https://youtu.be/AovrE7nWGss) youtube demo.
 
 - If you want more control over the Pynsource initial window size and position see 
 [this link](https://github.com/abulka/pynsource/issues/49#issuecomment-475069439)
