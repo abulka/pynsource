@@ -11,11 +11,6 @@
 
 - More informative logging (see Help / View Log...)
 
-Previous Release:
-
-- Type annotations support e.g. the type annotation `param: SomeClass` will create a UML dependency to `SomeClass` etc.
-
-- Static method detection bugfix
 """,
  "version_syntax_format" : 1,
  "download_url" : "http://bit.ly/pynsource-upgrade-download"
