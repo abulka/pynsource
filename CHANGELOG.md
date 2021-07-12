@@ -5,8 +5,8 @@
 *July 2021*
 
 - Built with Python 3.9 so Pynsource can handle parsing Python walrus operator
-- Various parsing of Python source code improvements
-- Various bug fixes
+- Module Visualisation incl. variables and functions (Pro)
+- Python parsing improvements and bug fixes (issues 85, 93, 94)
 - Latest version of wxPython, wxasync and other Python packages
 - More informative logging (see Help / View Log...)
 
