@@ -4,7 +4,12 @@ NATIVE_LINES_OGL_LIKE=False
 ASYNC_BACKGROUND_REFRESH=False  # devel purposes only
 
 APP_VERSION = 1.79
-BETA = ""  # leave blank to turn off beta annotation in about box, or set to e.g. "beta 2"
+
+# BETA marker does not affect version checking, its just an annotation in the about box.
+# Use it with a future APP_VERSION to make betas e.g. "beta 2"
+# Or use it with the current APP_VERSION to make post release patches e.g. ".2"
+BETA = ".1"  # leave blank to turn off beta annotation in about box
+
 APP_VERSION_FULL = f"{APP_VERSION}"
 if BETA:
     APP_VERSION_FULL += f"-{BETA}" 

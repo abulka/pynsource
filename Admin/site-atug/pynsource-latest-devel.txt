@@ -1,6 +1,18 @@
 {
- "latest_version" : 1.77,
+ "latest_version" : 1.79,
  "latest_announcement" : """
+- Built with Python 3.9 so Pynsource can handle parsing Python walrus operator
+
+- Module Visualisation incl. variables and functions (Pro)
+
+- Python parsing improvements and bug fixes (issues 85, 93, 94)
+
+- Latest version of wxPython, wxasync and other Python packages
+
+- More informative logging (see Help / View Log...)
+
+Previous Release:
+
 - Type annotations support e.g. the type annotation `param: SomeClass` will create a UML dependency to `SomeClass` etc.
 
 - Static method detection bugfix
