@@ -35,7 +35,8 @@ To build and install from source code, see [building from source](BUILDING.md)
     - Zoom
     - Drag and Drop to connect shapes
     - Optimal layout algorithm
-    - Access to generated PlantUML markup text 
+    - Access to generated PlantUML markup text
+    - Module Visualisation incl. variables and functions *(new for 2021, [youtube demo](https://www.youtube.com/watch?v=uURafo2F33U))*
 
 # Examples
 
@@ -80,6 +81,10 @@ Examples of PlantUML view:
 ![](https://www.dropbox.com/s/furf89q7b2brpr0/pynsource-plantuml-2.png?raw=1)
 
 Note: PlantUML view requires an internet connection.
+
+![](https://www.dropbox.com/s/3gqiyn7vlxbnhj3/pynsource-module-visualisation.gif?raw=1)
+
+Note: Module Visualisation is a Pro feature.
                                     
 ## What does Pynsource mean?
 
@@ -98,6 +103,7 @@ www.pynsource.com
 - Help is built into the app - hit `F1`
 
 - View a [Youtube video tutorial](https://youtu.be/FEXeDI18LMs) on the basic usage of Pynsource (pro edition is featured).
+- [Module Visualisation](https://www.youtube.com/watch?v=uURafo2F33U) youtube demo.
 
 - If you want more control over the Pynsource initial window size and position see 
 [this link](https://github.com/abulka/pynsource/issues/49#issuecomment-475069439)
@@ -107,27 +113,7 @@ When using PlantUML view (which is not necessary to use the app), if you want to
 
 ### Support the project
 Help support the project by [purchasing a Pro Edition license](https://pynsource.com/pricing.html) which contains extra features.  Future plans include
-undo/redo, recognition of Python type annotations, line labels, module and package visualisation.
-
-## Running the tests
-
-Download the source code, install the dependencies (see above) then
-
-```
-./bin/testall            (Mac, Linux) or
-.\bin\testall-win10.bat  (Windows 10)
-```
-
-from the root of the project. You may need to alter the version of Python being invoked by the script e.g. `python` or `python3`.
-
-The environment variable `TRAVIS` is set by the script to avoid tests that involve loading the wxPython package - this is especially needed on Travis and GitHub actions. It may also not be possible on your machine if you are running certain Python environments e.g. I had a problem with a framework pyenv install on my Mac running any tests that imported `wx`, even though Pynsource itself ran OK.  P.S. The subset of packages `requirements-travis.txt` is all you need to run the tests, and these exclude wx.
-
-Alternatively you can also run all the tests by `cd src` then `./bin/testall` (because there is a testall script both in ./bin/ and in src/bin - for Mac/Linux, anyway).
-
-### Current Test Suite status
-
-- Tests run through Travis, controlled by  `.travis.yml` ![Travis test status](https://github.com/abulka/pynsource/workflows/Python%20application/badge.svg)
-- Tests also run through GitHub Actions, controlled by `.github/workflows/pythonapp.yml` ![Tests github actions workflow status](https://github.com/abulka/pynsource/actions/workflows/python-tests.yml/badge.svg)
+undo/redo and line labels.
   
 ## Study the Source Code
 
