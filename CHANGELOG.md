@@ -1,6 +1,6 @@
 # Pynsource Change Log
 
-### 1.78
+### 1.79
 
 *July 2021*
 
@@ -14,6 +14,10 @@
   - Ubuntu 20.04 Pynsource: is built with Python 3.8, not Python 3.9 due to the unavailability of a Python 3.9 build of `wxPython` for Ubuntu 20.04. This should one day be remedied. You can still parse the Python walrus operator with Python 3.8 ok, so this version of Pynsource is still fully capable.
   - Snap Pynsource: is built with Python 3.6 because Python 3.6 is the default on `core18`. Building under `core20` which has Python 3.8 not currently possible due to the snapcraft Python plug and GNOME `gnome-3-38` not yet being compatible.
 
+### 1.78
+
+  - beta release
+  
 ### 1.77
 
 *September 2020*
