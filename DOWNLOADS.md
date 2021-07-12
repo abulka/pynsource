@@ -1,6 +1,6 @@
 # Download Pynsource 
 
-The latest version is `1.78`
+The latest version is `1.79`
 
 [Download](https://github.com/abulka/pynsource/releases/latest) the latest release. 👈
 

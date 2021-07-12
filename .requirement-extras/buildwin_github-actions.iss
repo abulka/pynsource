@@ -9,7 +9,7 @@ Name: {group}\Changelog; Filename: {app}\Changelog.txt
 [Setup]
 AppCopyright=Andy Bulka
 AppName=Pynsource
-AppVersion=1.78
+AppVersion=1.79
 DefaultDirName={commonpf}\Pynsource
 ShowLanguageDialog=yes
 AppPublisher=Andy Bulka - WWare
@@ -17,10 +17,10 @@ AppPublisherURL=http://www.pynsource.com
 UninstallDisplayIcon={app}\Pynsource.exe
 UninstallDisplayName=Pynsource
 DefaultGroupName=Pynsource
-VersionInfoVersion=1.78
+VersionInfoVersion=1.79
 ; cwd seems to be the location of THIS file, so relative links get us back to pynsource/
 OutputDir=..\dist-inno\
-OutputBaseFilename=pynsource-win-1.78-setup
+OutputBaseFilename=pynsource-win-1.79-setup
 ArchitecturesInstallIn64BitMode=x64
 
 [Files]
