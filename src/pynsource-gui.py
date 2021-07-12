@@ -870,13 +870,17 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.item_python3_mode.Check()
 
         # Visualise Python Modules Checked Menu Item
+        name = "Visualise Python Modules"
+        if pro_image and ("wxGTK" in wx.PlatformInfo or "wxMSW" in wx.PlatformInfo):
+            # ubuntu and windows checkbox menus images disallowed, so use text instead
+            name = f"{name:<30} (Pro)"        
         id = wx.NewIdRef()
         self.item_visualise_modules = menu1.AppendCheckItem(
             id, 
-            "Visualise Python Modules", 
+            name, 
             help="Visualise Python Modules themselves as UML Boxes with module level vars and defs"
         )
-        if pro_image:
+        if pro_image and "wxMac" in wx.PlatformInfo:
             self.item_visualise_modules.SetBitmap(pro_image)
         self.Bind(wx.EVT_MENU, self.OnVisualiseModules, self.item_visualise_modules)
         def visualise_modules_update(event):
