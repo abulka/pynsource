@@ -961,6 +961,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         Add(menu4, "&Help...", "F1", self.OnHelp)
         Add(menu4, "&Visit Pynsource Website...", "", self.OnVisitWebsite)
+        Add(menu4, "&Visit Pynsource Youtube Channel...", "", self.OnVisitYoutube)
         Add(menu4, "&Check for Updates...", "", self.OnCheckForUpdates)
         Add(menu4, "&Report Bug...", "", self.OnReportBug)
         Add(menu4, "View &Log...", "", self.OnViewLog)
@@ -1360,6 +1361,11 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         import webbrowser
 
         webbrowser.open(WEB_PYNSOURCE_HOME_URL)
+
+    def OnVisitYoutube(self, event):
+        import webbrowser
+
+        webbrowser.open(WEB_PYNSOURCE_YOUTUBE_URL)
 
     async def mega_refresh_check(self):
         print("mrcheck")
