@@ -1,9 +1,16 @@
 {
- "latest_version" : 1.77,
+ "latest_version" : 1.79,
  "latest_announcement" : """
-- Type annotations support e.g. the type annotation `param: SomeClass` will create a UML dependency to `SomeClass` etc.
+- Built with Python 3.9 so Pynsource can handle parsing Python walrus operator
 
-- Static method detection bugfix
+- Module Visualisation incl. variables and functions (Pro)
+
+- Python parsing improvements and bug fixes (issues 85, 93, 94)
+
+- Latest version of wxPython, wxasync and other Python packages
+
+- More informative logging (see Help / View Log...)
+
 """,
  "version_syntax_format" : 1,
  "download_url" : "http://bit.ly/pynsource-upgrade-download"
