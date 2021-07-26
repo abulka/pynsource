@@ -7,6 +7,7 @@ latest file format only. And then make an entry in PersistenceConvert() to
 handle the n-1 to n conversion (just the one step from the previous version to
 this new version n)
 """
+from textwrap import dedent, indent
 
 PERSISTENCE_UPGRADE_SEQUENCE = [0.9, 1.0, 1.1, 1.2]
 PERSISTENCE_CURRENT_VERSION = PERSISTENCE_UPGRADE_SEQUENCE[-1]
@@ -242,10 +243,10 @@ class GraphPersistence:
               https://web.archive.org/web/20140328030415/http://cgi5.cs.rpi.edu/research/groups/pb/punin/public_html/XGMML/draft-xgmml.html
             - Cytoscape is an open source data visualiser with advanced layouts https://cytoscape.org/ 
         """
-        from textwrap import dedent, indent
-        from view.display_model import CommentNode
+        from view.display_model import CommentNode  # avoid circular import
         nodes = ""
         edges = ""
+        visualise_attrs_as_nodes = False  # Just for fun, produces very messy graphs
 
         for node in self.graph.nodes:
             attrs = ''
@@ -274,6 +275,16 @@ class GraphPersistence:
             """).rstrip()
             nodes += str
 
+            if visualise_attrs_as_nodes and type(node) != CommentNode:
+                for attr in node.attrs:
+                    sub_node, sub_edge = self._gen_sub_node(node, attr, shape='ellipse')
+                    nodes += sub_node
+                    edges += sub_edge
+                for meth in node.meths:
+                    sub_node, sub_edge = self._gen_sub_node(node, meth, shape='hexagon')
+                    nodes += sub_node
+                    edges += sub_edge
+
         for edge in self.graph.edges:
             source = edge["source"].id
             target = edge["target"].id
@@ -293,3 +304,15 @@ class GraphPersistence:
                 </graph>        
         """
         return dedent(document).lstrip()
+
+    def _gen_sub_node(self, node, attr, shape='rectangle'):
+        attr_id = f"{node.id}:attr:{attr}"
+        sub_node = dedent(f"""
+                        <node id="{attr_id}" label="{attr}" weight="0">
+                            <graphics type="{shape}" x="{node.left}" y="{node.top}"></graphics>
+                        </node>
+                    """).rstrip()
+        sub_edge = dedent(f"""
+                        <edge source="{node.id}" target="{attr_id}" weight="0" label="Attribute ownership Edge from {node.id} to {attr_id}"></edge>
+                    """).rstrip()
+        return sub_node, sub_edge
