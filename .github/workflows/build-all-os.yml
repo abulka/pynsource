@@ -188,13 +188,16 @@ jobs:
             path: pynsource-windows-setup-${{ env.TAG }}  # to this filename or dir
 
         # issue https://github.com/actions/upload-artifact#maintaining-file-permissions-and-case-sensitive-files 
-        - name: Fix loss of executable permission issue on Mac artifact
+        - name: Fix loss of executable permission issue on Mac and Ubuntu artifact exes
           run: |
             pwd
             ls -l
             chmod +x pynsource-macos-${{ env.TAG }}/Pynsource.app/Contents/MacOS/Pynsource
             ls -lR pynsource-macos-${{ env.TAG }}
-            
+            # Ubuntu too
+            chmod +x pynsource-ubuntu-18.04-${{ env.TAG }}/Pynsource
+            chmod +x pynsource-ubuntu-20.04-${{ env.TAG }}/Pynsource
+
         - name: Zip up the artifacts
           run: |
             zip -r pynsource-macos-${{ env.TAG }}.zip pynsource-macos-${{ env.TAG }}
