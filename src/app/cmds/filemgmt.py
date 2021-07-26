@@ -327,6 +327,17 @@ class CmdFileSaveWorkspaceToConsole(CmdBase):
     def execute(self):
         print(self.context.displaymodel.graph.GraphToString())
 
+class CmdFileSaveWorkspaceToXML(CmdBase):
+    def execute(self):
+        xml = self.context.displaymodel.graph.GraphToXML()
+        print(xml)
+        DEST_FILE = "/Users/Andy/Devel/alsm-parsers/cytoscape-play/research/xgmml examples/test4.xml"
+        # save xml to file 
+        with open(DEST_FILE, "w") as f:
+            f.write(xml)
+        print('file saved to test4.xml')
+
+
 
 # ------- Loading from persistence
 

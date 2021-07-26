@@ -195,6 +195,11 @@ class GraphPersistence:
     def Save(self):
         """
         This code is now for saving version 1.2 persistence format.
+
+        Note 'subclass_persistence_str' is a | separated list of methods and attributes, 
+        or an encoded comment string e.g.
+            umlshape , 'attrs': 'canvas|log', 'meths': '__init__|OnBeginDocument|OnEndDocument|OnBeginPrinting|OnEndPrinting|OnPreparePrinting|HasPage|GetPageInfo|OnPrintPage|IncreasePrintAreaSize'
+            comment , 'comment': 'd3ggaXMgdGhlIGJhc2UgY2xhc3Mgb2YgTXlQcmludG91dC4KTm90ZSB0aGlzIGluaGVyaXRhbmNlIHJlbGF0aW9uc2hpcCBpcyBkcmF3bgp3aXRoIGEgc3RhbmRhcmQgVU1MIGxpbmUgc3R5bGUu'
         """
         nodes = ""
         edges = ""
@@ -229,3 +234,62 @@ class GraphPersistence:
             )
             edges += str
         return nodes + edges
+
+    def SaveXML(self):
+        """
+        - Experimental export to XGMML xml for importing into tools like Cytoscape which have advanced layout
+            - XGMML is an open standard node/edge format
+              https://web.archive.org/web/20140328030415/http://cgi5.cs.rpi.edu/research/groups/pb/punin/public_html/XGMML/draft-xgmml.html
+            - Cytoscape is an open source data visualiser with advanced layouts https://cytoscape.org/ 
+        """
+        from textwrap import dedent, indent
+        from view.display_model import CommentNode
+        nodes = ""
+        edges = ""
+
+        for node in self.graph.nodes:
+            attrs = ''
+            meths = ''
+            comment = ''
+            if type(node) == CommentNode:
+                shape = "rhombus"
+                comment = f"""<att name="comment" value="{node.comment}"/>"""
+            else:
+                shape = "rectangle"
+                attrs = f"""<att name="attrs" value="{",".join(node.attrs)}"/>"""
+                meths = f"""<att name="meths" value="{",".join(node.meths)}"/>"""
+            
+            # Wish we could visualise node.width and node.height, as well as
+            # being able to show methods/attributes as sub-nodes. For now, emit
+            # everything as attributes of the node
+            str = dedent(f"""
+                <node id="{node.id}" label="{node.id}" weight="0">
+                    <graphics type="{shape}" x="{node.left}" y="{node.top}"></graphics>
+                    {attrs if attrs else ''}
+                    {meths if meths else ''}
+                    {comment if comment else ''}
+                    <att name="width" value="{node.width}"/>
+                    <att name="height" value="{node.height}"/>
+                </node>
+            """).rstrip()
+            nodes += str
+
+        for edge in self.graph.edges:
+            source = edge["source"].id
+            target = edge["target"].id
+            str = dedent(f"""
+                <edge source="{source}" target="{target}" weight="0" label="Edge from {source} to {target}"></edge>
+            """).rstrip()
+            
+            edges += str
+
+        document = f"""
+            <?xml version="1.0"?>
+            <!DOCTYPE graph PUBLIC "-//John Punin//DTD graph description//EN" "http://www.cs.rpi.edu/~puninj/XGMML/xgmml.dtd">
+
+                <graph directed="1" graphic="1" Layout="points">
+                    {indent(nodes, ' ' * 20)}
+                    {indent(edges, ' ' * 20)}
+                </graph>        
+        """
+        return dedent(document).lstrip()

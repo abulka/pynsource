@@ -1,5 +1,11 @@
 # Pynsource Change Log
 
+### 1.79-3
+
+- Fix missing app icon on Mac and Ubuntu builds
+- Fix executable +x flag on ubuntu builds
+- Export diagram to XML for importing into tools like Cytoscape https://cytoscape.org/ which have advanced layouts and visualisations
+
 ### 1.79
 
 *July 2021*

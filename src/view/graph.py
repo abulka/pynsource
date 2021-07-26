@@ -302,6 +302,9 @@ class Graph:
     def GraphToString(self):
         return self.persistence.Save()
 
+    def GraphToXML(self):
+        return self.persistence.SaveXML()
+
     # Persistence continued
 
     def create_new_node(self, id, l, t, w, h):

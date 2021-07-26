@@ -640,6 +640,9 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
     def OnSaveGraphToConsole(self, event):
         self.app.run.CmdFileSaveWorkspaceToConsole()
 
+    def OnSaveGraphToXML(self, event):
+        self.app.run.CmdFileSaveWorkspaceToXML()
+
     def OnSaveGraph(self, event):
         self.app.run.CmdFileSaveWorkspace()
 
@@ -1143,6 +1146,9 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         #
         # item = self.popupmenu.Append(wx.ID_ANY, "Dump Graph to console")
         # self.frame.Bind(wx.EVT_MENU, self.OnSaveGraphToConsole, item)
+        # 
+        item = self.popupmenu.Append(wx.ID_ANY, "Dump Graph to XML")
+        self.frame.Bind(wx.EVT_MENU, self.OnSaveGraphToXML, item)
 
         self.popupmenu.AppendSeparator()
 
