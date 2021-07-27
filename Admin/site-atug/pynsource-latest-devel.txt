@@ -1,14 +1,17 @@
 {
- "latest_version" : 1.79,
+ "latest_version" : 1.80,
  "latest_announcement" : """
+- Fix missing app icon on Mac and Ubuntu builds
+
+- Fix executable +x flag on Ubuntu builds
+
+- Export diagram to XML for importing into tools like Cytoscape https://cytoscape.org/ which have advanced layouts and visualisations. See Pynsource built in help for instructions.
+
+Version 1.79:
 - Built with Python 3.9 so Pynsource can handle parsing Python walrus operator
-
 - Module Visualisation incl. variables and functions (Pro)
-
 - Python parsing improvements and bug fixes (issues 85, 93, 94)
-
 - Latest version of wxPython, wxasync and other Python packages
-
 - More informative logging (see Help / View Log...)
 
 """,
@@ -16,6 +19,6 @@
  "download_url" : "http://bit.ly/pynsource-upgrade-download"
 }
 
-# Upload this file to
-# http://www.atug.com/downloads/pynsource-latest.txt
-# Versions 1.51 and higher check for this file.
+# Versions 1.51 and higher check for this announcement file.
+# Commit this file to Github, Pynsource now checks GitHub repo directly
+# No longer checks http://www.atug.com/downloads/pynsource-latest.txt
