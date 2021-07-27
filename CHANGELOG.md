@@ -1,6 +1,6 @@
 # Pynsource Change Log
 
-### 1.79-3
+### 1.80
 
 - Fix missing app icon on Mac and Ubuntu builds
 - Fix executable +x flag on Ubuntu builds
