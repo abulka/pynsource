@@ -255,7 +255,7 @@ class GraphPersistence:
             label = ''
             colour = '#91CFEB'
             new_height = node.height
-            new_width = node.width + 30
+            new_width = node.width + 10
             if type(node) == CommentNode:
                 shape = "rectangle"
                 _comment = node.comment.replace('"', "'")  # avoid double quotes in the exported xml
@@ -275,6 +275,7 @@ class GraphPersistence:
                 <node id="{node.id}" label="{label}" weight="0">
                     <graphics type="{shape}" x="{node.left}" y="{node.top}" h="{new_height}" w="{new_width}" fill="{colour}" >
                         <att name="NODE_LABEL_POSITION" value="C,C,l,0.00,0.00" type="string" cy:type="String"/>
+                        <att name="NODE_LABEL_FONT_SIZE" value="10" type="string" cy:type="String"/>
                     </graphics>
                     {attrs if attrs else ''}
                     {meths if meths else ''}
@@ -337,7 +338,7 @@ class GraphPersistence:
 
     def _gen_uml_label_for_xml(self, node):
         cr = "&#xa;"
-        lh = 14
+        lh = 12
         new_height = node.height
         line = f"{cr}⎯⎯⎯{cr}"
         label = node.id
@@ -345,9 +346,13 @@ class GraphPersistence:
         if node.attrs:
             label += f"{line}{cr.join(node.attrs)}"
             new_height += lh
+            if len(node.attrs) > 20:
+                new_height += lh * 3  # large node need an extra height boost
         if node.meths:
             label += f"{line}{cr.join(node.meths)}"
             new_height += lh
+            if len(node.meths) > 20:
+                new_height += lh * 3  # large node need an extra height boost
         return label, new_height
 
     def _gen_comment_label_for_xml(self, node):

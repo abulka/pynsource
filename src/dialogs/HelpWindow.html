@@ -123,6 +123,30 @@ cd plantuml-server
 mvn jetty:run    
 </pre>
 
+<h3>Export to XML</h3>
+<p>Pynsource now supports exporting your diagrams to XML in the XGMML format.
+    Why would you do this? Its another way to access your UML diagram data in a standardised format. 
+    For example you can import the XML into cool apps like Cytoscape which have advanced layout features.</p>
+<p>
+    XGMML is an open standard node/edge format - see <a href="https://web.archive.org/web/20140328030415/http://cgi5.cs.rpi.edu/research/groups/pb/punin/public_html/XGMML/draft-xgmml.html">specification</a>.
+</p>
+<p>
+    Cytoscape is an open source data visualiser with advanced layouts, see <a href="https://cytoscape.org/">https://cytoscape.org/</a>
+</p>
+<h4>Instructions:</h4>
+<ol>
+    <li>
+        Export the diagram to an .xml file using <code>File/Export Diagram to XML...</code> or right click on the workspace.
+    </li>
+    <li>
+        Open the Cytoscape app and import the xml file using <code>File/Import/Network from file...</code>.
+    </li>
+    <li>
+        Run one of the many layout algorithms to view the diagram in different ways.  
+        Remember to install the (free) yFiles plugin for Cytoscape for more layout options.
+    </li>
+</ol>
+
 <hr />
 <h3>Known Bugs in Mac version</h3>
 <ul>

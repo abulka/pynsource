@@ -860,6 +860,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu1, "&Open...", "Ctrl-O", self.OnLoadGraph)
         Add(menu1, "Open Sample &Diagram...", "Ctrl-U", self.OnLoadGraphSample)
         Add(menu1, "&Save As...", "Ctrl-S", self.OnSaveGraph, self.uml_only_view_update)
+        Add(menu1, "&Export Diagram to XML...", "", self.OnSaveGraphToXML, self.uml_only_view_update)
         menu1.AppendSeparator()
         Add(menu1, "&Save PlantUML Image...", "", self.OnSavePlantUml, self.save_plantuml_update, image=pro_image)
         menu1.AppendSeparator()
@@ -1147,8 +1148,6 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         # item = self.popupmenu.Append(wx.ID_ANY, "Dump Graph to console")
         # self.frame.Bind(wx.EVT_MENU, self.OnSaveGraphToConsole, item)
         # 
-        item = self.popupmenu.Append(wx.ID_ANY, "Dump Graph to XML")
-        self.frame.Bind(wx.EVT_MENU, self.OnSaveGraphToXML, item)
 
         self.popupmenu.AppendSeparator()
 
@@ -1162,6 +1161,9 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         item = self.popupmenu.Append(wx.ID_ANY, "Dump Display Model (diagnostic)")
         self.frame.Bind(wx.EVT_MENU, self.OnDumpDisplayModel, item)
+
+        item = self.popupmenu.Append(wx.ID_ANY, "Export Diagram to XML...")
+        self.frame.Bind(wx.EVT_MENU, self.OnSaveGraphToXML, item)
 
         self.frame.PopupMenu(self.popupmenu, wx.Point(x, y))
 

@@ -328,14 +328,45 @@ class CmdFileSaveWorkspaceToConsole(CmdBase):
         print(self.context.displaymodel.graph.GraphToString())
 
 class CmdFileSaveWorkspaceToXML(CmdBase):
+    def via_dialog(self):
+        thisdir = self.context.config.get("LastDirFileOpen", os.path.expanduser("~/"))
+        dlg = wx.FileDialog(
+            parent=self.context.frame,
+            message="Save Pynsource UML diagram as XGMML (*.xml)",
+            defaultDir=thisdir,
+            defaultFile="",
+            wildcard="*.xml",
+            style=wx.FD_SAVE,
+            pos=wx.DefaultPosition,
+        )
+        if dlg.ShowModal() == wx.ID_OK:
+            self.context.config["LastDirFileOpen"] = dlg.GetDirectory()  # remember dir path
+            self.context.config.write()
+
+            filename = dlg.GetPath()
+
+            # Split the extension from the path and normalise it to lowercase.
+            ext = os.path.splitext(filename)[-1].lower()
+            if ext != ".xml":
+                filename += ".xml"
+
+            xml = self.context.displaymodel.graph.GraphToXML()
+            with open(filename, "w") as f:
+                f.write(xml)            
+        dlg.Destroy()        
+
     def execute(self):
-        xml = self.context.displaymodel.graph.GraphToXML()
-        print(xml)
-        DEST_FILE = "/Users/Andy/Devel/alsm-parsers/cytoscape-play/research/xgmml examples/test4.xml"
-        # save xml to file 
-        with open(DEST_FILE, "w") as f:
-            f.write(xml)
-        print('file saved to test4.xml')
+        quick_developer_mode = False
+        if quick_developer_mode:
+            # Developer use only
+            xml = self.context.displaymodel.graph.GraphToXML()
+            print(xml)
+            DEST_FILE = "/Users/Andy/Devel/alsm-parsers/cytoscape-play/research/xgmml examples/test4.xml"
+            with open(DEST_FILE, "w") as f:
+                f.write(xml)
+            print('file saved to test4.xml')
+        else:
+            self.via_dialog()
 
 
 

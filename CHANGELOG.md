@@ -3,8 +3,8 @@
 ### 1.79-3
 
 - Fix missing app icon on Mac and Ubuntu builds
-- Fix executable +x flag on ubuntu builds
-- Export diagram to XML for importing into tools like Cytoscape https://cytoscape.org/ which have advanced layouts and visualisations
+- Fix executable +x flag on Ubuntu builds
+- Export diagram to XML for importing into tools like Cytoscape https://cytoscape.org/ which have advanced layouts and visualisations. See Pynsource built in help for instructions.
 
 ### 1.79
 
