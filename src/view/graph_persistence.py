@@ -252,20 +252,30 @@ class GraphPersistence:
             attrs = ''
             meths = ''
             comment = ''
+            label = ''
+            colour = '#91CFEB'
+            new_height = node.height
+            new_width = node.width + 30
             if type(node) == CommentNode:
-                shape = "rhombus"
-                comment = f"""<att name="comment" value="{node.comment}"/>"""
-            else:
                 shape = "rectangle"
+                _comment = node.comment.replace('"', "'")  # avoid double quotes in the exported xml
+                comment = f"""<att name="comment" value="{_comment}"/>"""
+                label = self._gen_comment_label_for_xml(node)
+                colour = '#FFED50'
+            else:
+                shape = "ROUND_RECTANGLE"
                 attrs = f"""<att name="attrs" value="{",".join(node.attrs)}"/>"""
                 meths = f"""<att name="meths" value="{",".join(node.meths)}"/>"""
+                label, new_height = self._gen_uml_label_for_xml(node)
             
             # Wish we could visualise node.width and node.height, as well as
             # being able to show methods/attributes as sub-nodes. For now, emit
             # everything as attributes of the node
             str = dedent(f"""
-                <node id="{node.id}" label="{node.id}" weight="0">
-                    <graphics type="{shape}" x="{node.left}" y="{node.top}"></graphics>
+                <node id="{node.id}" label="{label}" weight="0">
+                    <graphics type="{shape}" x="{node.left}" y="{node.top}" h="{new_height}" w="{new_width}" fill="{colour}" >
+                        <att name="NODE_LABEL_POSITION" value="C,C,l,0.00,0.00" type="string" cy:type="String"/>
+                    </graphics>
                     {attrs if attrs else ''}
                     {meths if meths else ''}
                     {comment if comment else ''}
@@ -288,8 +298,28 @@ class GraphPersistence:
         for edge in self.graph.edges:
             source = edge["source"].id
             target = edge["target"].id
+
+            # Calculate visual look of edge
+            edge_type = edge.get("uml_edge_type", "")
+            edge_line_type = "SOLID"
+            edge_target_arrow_shape = "NONE"
+            edge_source_arrow_shape = "NONE"
+            if edge_type == "composition":
+                edge_source_arrow_shape = "ARROW"  # ARROW_SHORT
+                edge_target_arrow_shape = "OPEN_DIAMOND"
+            elif edge_type == "generalisation":
+                edge_target_arrow_shape = "OPEN_DELTA"
+            elif edge_type == "association":
+                edge_line_type = "DOT" # MARQUEE_DASH_DOT
+
             str = dedent(f"""
-                <edge source="{source}" target="{target}" weight="0" label="Edge from {source} to {target}"></edge>
+                <edge source="{source}" target="{target}" type="last" weight="0" label="Edge from {source} to {target}">
+                    <graphics width="2.0" fill="#848484">
+                        <att name="EDGE_LINE_TYPE" value="{edge_line_type}" type="string" cy:type="String"/>
+                        <att name="EDGE_SOURCE_ARROW_SHAPE" value="{edge_source_arrow_shape}" type="string" cy:type="String"/>
+                        <att name="EDGE_TARGET_ARROW_SHAPE" value="{edge_target_arrow_shape}" type="string" cy:type="String"/>
+                    </graphics>
+                </edge>
             """).rstrip()
             
             edges += str
@@ -304,6 +334,29 @@ class GraphPersistence:
                 </graph>        
         """
         return dedent(document).lstrip()
+
+    def _gen_uml_label_for_xml(self, node):
+        cr = "&#xa;"
+        lh = 14
+        new_height = node.height
+        line = f"{cr}⎯⎯⎯{cr}"
+        label = node.id
+        new_height += lh
+        if node.attrs:
+            label += f"{line}{cr.join(node.attrs)}"
+            new_height += lh
+        if node.meths:
+            label += f"{line}{cr.join(node.meths)}"
+            new_height += lh
+        return label, new_height
+
+    def _gen_comment_label_for_xml(self, node):
+        cr = "&#xa;"
+        comment = node.comment
+        comment = comment.replace('"', "'")  # avoid double quotes in the exported xml
+        comment = comment.split('\n')
+        label = "&#xa;".join(comment)
+        return label
 
     def _gen_sub_node(self, node, attr, shape='rectangle'):
         attr_id = f"{node.id}:attr:{attr}"
