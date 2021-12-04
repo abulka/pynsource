@@ -194,8 +194,12 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str, pl
         else:
             image_url = None
         log.info("extracted actual diagram image_url of %s" % image_url)
+
         if image_url.startswith("//"):
-            image_url = "http:" + image_url
+            from urllib.parse import urlparse
+            o = urlparse(plant_uml_server)
+            image_url = f"{o.scheme}:{image_url}"  # add the scheme back in e.g. http
+
         return image_url
     else:
         log.error(f"plant_uml_server responded with {status_code} ok")
