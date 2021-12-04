@@ -33,7 +33,7 @@ if PRO_EDITION:
     except ModuleNotFoundError:
         ALSM_PARSING = False
     if not ALSM_PARSING:
-        print(f"Python Module Visualisation could not be enabled 😳")
+        print(f"Python Module Visualisation could not be enabled - 'alsm' package not installed 😳")
 
 if not PRO_EDITION:
     print(f"Running Community Edition")
