@@ -373,8 +373,7 @@ class TestIncomingBugs(unittest.TestCase):
         classNames = [classname for classname, classentry in pmodel.classlist.items()]
         assert "Issue94" in classNames
 
-    @unittest.skipIf(sys.version_info.minor < 5, 'Need to upgrade Pynsource to run in Python 3.8 to handle this syntax')
-    def test_issue_walrus_issue_102(self):
+    def test_issue_matrix_issue_102(self):
         """It looks like the "new" matrix multiplication operator (see PEP-465) is not handled correctly."""
         source_code = dedent("""
             a = 1
@@ -388,6 +387,26 @@ class TestIncomingBugs(unittest.TestCase):
         self.assertNotIn("error", pmodel.errors)
         print(dump_pmodel(pmodel))
 
+    @unittest.skip("The fix is not yet implemented")
+    def test_issue_typing_103(self):
+        """It looks like parameter types that drill down more than two levels are causing the error.
+        So gym.spaces.Space fails but gym.spaces is OK."""
+        source_code = dedent("""
+            class A:
+                def __init__(self, p: gym.spaces.Space):
+                    pass
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, 
+                                         options={"mode": 3}, 
+                                         html_debug_root_name="test_issue_typing_103")
+        self.assertNotIn("error", pmodel.errors)
+        # print(dump_pmodel(pmodel))
+        classNames = [classname for classname, classentry in pmodel.classlist.items()]
+        assert "A" in classNames
+        classentry = pmodel.classlist["A"]
+        assert len(classentry.defs) == 1
+        assert "__init__" in classentry.defs
 
 
 
