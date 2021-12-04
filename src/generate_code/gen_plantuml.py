@@ -141,7 +141,7 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str, pl
         # url = os.path.join(plant_uml_server, deflate_and_encode(plant_uml_txt))  # fails on windows cos \ char is not proper url
         url = plant_uml_server + "/" + deflate_and_encode(plant_uml_txt)
         data, status_code = await url_to_data(url)
-        log.info(f"Response from plant_uml_server status_code {status_code}")
+        log.info(f"Response for url {url} from plant_uml_server status_code is {status_code}")
         response_text = data.decode('utf-8')
 
     except (ConnectionError,
@@ -156,8 +156,34 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str, pl
         raise
 
     if status_code == 200:
-        log.info("plant_uml_server responded with 200 ok")
-        regex = r'.*<p id="diagram".*\s*<.*img src=\"(.*?)\"'
+        log.info("plant_uml_server responded with 200 ok, see plantuml_server_response.html for full page response")
+        # with open("plantuml_server_response.html", "w") as f:
+        #     f.write(response_text)
+
+        # Scan for the actual image url within the plantuml html page
+        """
+        ORIGINAL PLANTUML RESPONSE
+
+        <p id="diagram">
+            
+                <img src="http://plantuml.dokku.nas/png/NP1DJyCm38Rl-HK-mc6LEB4J4b-2IGmg8Ku8LIRnMal5cPACCZx-EquBMzTBzFhn-rfsR8inmd9R1fRaDmc-3815USUeelMrlbN5mgcgZewrU90BgbcklDsyaQG_TYrkGdfNFvMbthicf0oqna07z1PZYJNr-ePIrWjP-Lr2hRl-GcmWZCE0SvMF_9axFyRO_hBkGoyokHQV2332vUdyP6wKSuJK4Bng70QpNur-eZ3tEP4QzR4q53YXM890BIRs4XjUvnakO2UcuzG0GbIFm-3WQNa7BGifsRPK6187UGDZHdyzctsVvGt7h2Y63IVmkM7dI5x-cvhQE_lYqF4B" alt="PlantUML diagram" />
+            
+        </p>
+
+
+        NEW 2021 PLANTUML RESPONSE - notice the extra id="theimg" tag
+
+        <p id="diagram">
+            
+            <img id="theimg" src="//www.plantuml.com/plantuml/png/NP1DJyCm38Rl-HK-mc6LEB4J4b-2IGmg8Ku8LIRnMal5cPACCZx-EquBMzTBzFhn-rfsR8inmd9R1fRaDmc-3815USUeelMrlbN5mgcgZewrU90BgbcklDsyaQG_TYrkGdfNFvMbthicf0oqna07z1PZYJNr-ePIrWjP-Lr2hRl-GcmWZCE0SvMF_9axFyRO_hBkGoyokHQV2332vUdyP6wKSuJK4Bng70QpNur-eZ3tEP4QzR4q53YXM890BIRs4XjUvnakO2UcuzG0GbIFm-3WQNa7BGifsRPK6187UGDZHdyzctsVvGt7h2Y63IVmkM7dI5x-cvhQE_jYwlW5" style="max-width: 100%; height: auto;" alt="PlantUML diagram"/>
+            
+        </p>
+
+
+        """
+        # regex = r'.*<p id="diagram".*\s*<.*img src=\"(.*?)\"'
+        regex = r'.*<p id="diagram".*\s*<.*img .*src=\"(.*?)\"'  # cater for NEW 2021 PLANTUML RESPONSE
+
         image_url = re.findall(regex, response_text, re.MULTILINE)
         # with open("response.html", "w") as fp:
         #     fp.write(response_text)
@@ -167,6 +193,9 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str, pl
             image_url = image_url[0]
         else:
             image_url = None
+        log.info("extracted actual diagram image_url of %s" % image_url)
+        if image_url.startswith("//"):
+            image_url = "http:" + image_url
         return image_url
     else:
         log.error(f"plant_uml_server responded with {status_code} ok")
