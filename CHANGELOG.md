@@ -1,5 +1,10 @@
 # Pynsource Change Log
 
+### 1.81
+
+- Adapt to new PlantUML server API which broke PlantUML diagram rendering
+- Matrix Multiplication operator @ now parsed correctly (fixes issue 102)
+
 ### 1.80
 
 - Fix missing app icon on Mac and Ubuntu builds

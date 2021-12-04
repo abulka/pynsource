@@ -89,6 +89,7 @@ BINOP_SYMBOLS = {
     as_str(BitAnd): "&",
     as_str(BitXor): "^",
     as_str(Pow): "**",
+    as_str(MatMult): "@",
 }
 
 CMPOP_SYMBOLS = {
