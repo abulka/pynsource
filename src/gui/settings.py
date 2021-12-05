@@ -3,7 +3,7 @@ ALSM_PARSING=False
 NATIVE_LINES_OGL_LIKE=False
 ASYNC_BACKGROUND_REFRESH=False  # devel purposes only
 
-APP_VERSION = 1.80
+APP_VERSION = 1.81
 
 # PATCH marker does not affect version checking, its just an annotation in the about box.
 # Use it with a future APP_VERSION to make betas e.g. "beta 2"
