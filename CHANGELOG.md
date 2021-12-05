@@ -4,6 +4,7 @@
 
 - Adapt to new PlantUML server API which broke PlantUML diagram rendering
 - Matrix Multiplication operator @ now parsed correctly (fixes issue 102)
+- Handle any type of nested string parameter annotation e.g. "A" or "A.B" or "A.B.C" etc. (fixes issue 103)
 
 ### 1.80
 
