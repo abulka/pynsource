@@ -387,13 +387,18 @@ class TestIncomingBugs(unittest.TestCase):
         self.assertNotIn("error", pmodel.errors)
         print(dump_pmodel(pmodel))
 
-    @unittest.skip("The fix is not yet implemented")
     def test_issue_typing_103(self):
         """It looks like parameter types that drill down more than two levels are causing the error.
         So gym.spaces.Space fails but gym.spaces is OK."""
         source_code = dedent("""
             class A:
                 def __init__(self, p: gym.spaces.Space):
+                    pass
+        """
+        )
+        source_code = dedent("""
+            class A:
+                def __init__(self, p: A.B.C):
                     pass
         """
         )
@@ -407,6 +412,8 @@ class TestIncomingBugs(unittest.TestCase):
         classentry = pmodel.classlist["A"]
         assert len(classentry.defs) == 1
         assert "__init__" in classentry.defs
+        self.assertEqual(len(classentry.classdependencytuples), 1)
+        self.assertEqual(classentry.classdependencytuples[0], ('p', 'A.B.C'))
 
 
 

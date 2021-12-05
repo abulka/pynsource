@@ -1454,19 +1454,24 @@ class Visitor(T):
         self.write(":")
         self.body(node.body)
 
-    # Util methods re assignment and type annotation - July 2020
+    # Util methods re assignment and type annotation - July 2020, Dec 2021
 
     def scan_args_for_type_annotations(self, node):
         """
         Called from visit_Func - parse the arguments to the function/method for type annotations
+        Within the for loop:
+            for arg in node.args.args:
+                At this point, for the Python syntax:
+                "func(param)"      arg.arg is "param" and arg.annotation is None
+                "func(param: A)"   arg.arg is "param" and arg.annotation is decoded into the nice "A"
+                "func(param: A.B)" arg.arg is "param" and arg.annotation is decoded into the nice "A.B" etc.
         """
         for arg in node.args.args:
             if hasattr(arg, "annotation") and arg.annotation != None:
-                if isinstance(arg.annotation, ast.Attribute) and hasattr(arg.annotation, 'attr'):
-                    _type = f"{arg.annotation.value.id}.{arg.annotation.attr}"  # type is SomeType.SomeSubType - need to generalise one day
-                elif isinstance(arg.annotation, ast.Name):
-                    _type = arg.annotation.id # type is just 'SomeType'
-                else:
+                try:
+                    _type = self.annotation_to_string(arg.annotation)
+                except AttributeError as e:
+                    log_proper.exception(f"Error parsing type annotation for parameter {arg.arg}")
                     _type = 'UnknownType'
                 self.write(f" found type annotation '{_type}' on method parameter {arg.arg}", mynote=1)
 
@@ -1474,6 +1479,17 @@ class Visitor(T):
                     self.add_composite_dependency((arg.arg, _type))
                 else:
                     pass  # should add to module dependencies (supported by GitUML only, at the moment)
+    
+    def annotation_to_string(self, annotation):
+        # Generalised, recursive drilling down to construct and return annotation string
+        # should handle any type of nested string annotation e.g. "A" or "A.B" or "A.B.C" etc.
+        assert annotation is not None
+        assert isinstance(annotation, ast.Name) or isinstance(annotation, ast.Attribute)
+        if isinstance(annotation, ast.Name):
+            return annotation.id
+        elif isinstance(annotation, ast.Attribute):
+            result = self.annotation_to_string(annotation.value)  # recurse
+            return f"{result}.{annotation.attr}"
 
     def detect_attribute_when_no_assignment(self, node):
         """
