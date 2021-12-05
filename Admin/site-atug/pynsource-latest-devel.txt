@@ -13,13 +13,6 @@ Previous version 1.80 changes:
 - Ability to Export diagram to XML
 * XML export is for importing into tools like Cytoscape https://cytoscape.org/ which have advanced layouts and visualisations. See Pynsource built in help for instructions.
 
-Previous version 1.79 changes:
-- Built with Python 3.9 so Pynsource can handle parsing Python walrus operator
-- Module (.py file) Visualisation incl. variables and functions (Pro)
-- Python parsing improvements and bug fixes (issues 85, 93, 94)
-- Latest version of wxPython, wxasync and other Python packages
-- More informative logging (see Help / View Log...)
-
 """,
  "version_syntax_format" : 1,
  "download_url" : "http://bit.ly/pynsource-upgrade-download"
