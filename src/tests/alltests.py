@@ -61,6 +61,7 @@ def suite():
         "test_parse_old_vs_new",
         "test_graph_nodes",
         "test_persistence_01",
+        "test_plantuml_html_scan",
     )  # ANDY - and so on
     alltests = unittest.TestSuite()
     for module in map(__import__, modules_to_test):
