@@ -82,12 +82,16 @@ Zooming will be towards the mouse position.</p>
     if you would like some help diagnosing the issue.</p>
 <h4>Running your own PlantUML server</h4>
 <p>If you have trouble accessing the internet, or you want faster rendering speed and larger diagrams capacity, consider running your own plantUML server 
-    and tell Pynsource to use it. Simply add the line <pre>PlantUmlServerUrl = http://localhost:8080/plantuml/uml        
-    </pre> to your Pynsource config file. 
+    and tell Pynsource to use it. Simply add e.g. the line <pre>PlantUmlServerUrl = http://localhost:8080/plantuml/uml        
+    </pre> to your Pynsource config file.
+</p>
+<p>Another example is <code>PlantUmlServerUrl = http://plantuml.dokku.nas/uml</code> 
+    which is the location of my PlantUML server running on my NAS, for example.
 </p>
 <p>
-    The location of your Pynsource config file varies on each operating system and can be viewed in the log file (see above) - 
-    look for the entry <i>Pynsource (configobj) config location</i>.  
+    The location of your Pynsource config file varies on each operating system. 
+    The exact path to the config file can be found by viewing the log file via the menu Help / View Log...
+    and look for the entry <i>Pynsource (configobj) config location</i>.  
     For example on Mac the config file is <code>~/Library/Preferences/Pynsource/pynsource.ini</code>
 </p>
 <h4>To install PlantUML server on Mac:</h4>

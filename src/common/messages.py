@@ -246,4 +246,4 @@ User cancelled PlantUML rendering.
 
 STATUS_TEXT_UML_VIEW = "SHIFT drag to draw with pen.  Right click on workspace for menu.  Drag to pan.  CMD/Ctrl + Mousewheel to zoom (Pro)."
 
-STATUS_TEXT_UML_VIEW_NO_PLANTUML_RESPONSE = "Error rendering with plantuml - do you have an internet connection?"
+STATUS_TEXT_UML_VIEW_NO_PLANTUML_RESPONSE = "Error rendering with plantuml - do you have an internet connection? Please check the log file for errors Help/View Log..."

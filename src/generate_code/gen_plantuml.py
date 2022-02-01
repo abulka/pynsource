@@ -162,7 +162,7 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str, pl
 
         # Scan for the actual image url within the plantuml html page
         """
-        ORIGINAL PLANTUML RESPONSE
+        ORIGINAL pre 2020 PLANTUML RESPONSE FORMAT
 
         <p id="diagram">
             
@@ -179,26 +179,43 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str, pl
             
         </p>
 
+        NEW 2022 PLANTUML RESPONSE - (1) the <p id="theimg" tag is now a div e.g. <div id="diagram", and also 
+                                     (2) the src= is on a totally new line, requiring . to match end of line (hence re.DOTALL) 
+                                         and be non greedy hence .*? etc.
+
+        </div>\n\n<div id="diagram">\n \n <img id="theimg"
+                src="//www.plantuml.com/plantuml/png/NP1DJyCm38Rl-HK-mc6LEB4J4b-2IGmg8Ku8LIRnMal5cPACCZx-EquBMzTBzFhn-rfsR8inmd9R1fRaDmc-3815USUeelMrlbN5mgcgZewrU90BgbcklDsyaQG_TYrkGdfNFvMbthicf0oqna07z1PZYJNr-ePIrWjP-Lr2hRl-GcmWZCE0SvMF_9axFyRO_hBkGoyokHQV2332vUdyP6wKSuJK4Bng70QpNur-eZ3tEP4QzR4q53YXM890BIRs4XjUvnakO2UcuzG0GbIFm-3WQNa7BGifsRPK6187UGDZHdyzctsVvGt7h2Y63IVmkM7dI5x-cvhQE_jYwlW5"
+                style="max-width: 100%; height: auto;" alt="PlantUML diagram" />\n \n</div>\n\n<div>\n
 
         """
-        # regex = r'.*<p id="diagram".*\s*<.*img src=\"(.*?)\"'
-        regex = r'.*<p id="diagram".*\s*<.*img .*src=\"(.*?)\"'  # cater for NEW 2021 PLANTUML RESPONSE
 
+        regex = r'.*<p id="diagram".*\s*<.*img src=\"(.*?)\"'  # cater for old, original plantuml html format
         image_url = re.findall(regex, response_text, re.MULTILINE)
+
+        if not image_url:
+            regex = r'.*<p id="diagram".*\s*<.*img .*src=\"(.*?)\"'  # cater for NEW 2021 PLANTUML RESPONSE
+            image_url = re.findall(regex, response_text, re.MULTILINE)
+
+        if not image_url:
+            regex = r'.*<div id=\"diagram\".*?\s*<.*?img .*?src=\"(.*?)\"' # cater for NEW 2022 PLANTUML RESPONSE, needs re.DOTALL
+            image_url = re.findall(regex, response_text, re.MULTILINE | re.DOTALL)
+
         # with open("response.html", "w") as fp:
         #     fp.write(response_text)
         # print("image_url", image_url)
         if image_url:
             # this is likely referencing localhost due to calc_plantuml_server_url() giving us a localhost
             image_url = image_url[0]
+
+            if image_url.startswith("//"):
+                from urllib.parse import urlparse
+                o = urlparse(plant_uml_server)
+                image_url = f"{o.scheme}:{image_url}"  # add the scheme back in e.g. http
         else:
             image_url = None
-        log.info("extracted actual diagram image_url of %s" % image_url)
+            log.error(f"could not extract image from plant_uml_server - plantuml server html format has probably changed - please report this to https://github.com/abulka/pynsource/issues")
 
-        if image_url.startswith("//"):
-            from urllib.parse import urlparse
-            o = urlparse(plant_uml_server)
-            image_url = f"{o.scheme}:{image_url}"  # add the scheme back in e.g. http
+        log.info("extracted actual diagram image_url of %s" % image_url)
 
         return image_url
     else:
