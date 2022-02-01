@@ -1,10 +1,5 @@
 # Mac
-
+echo "PRIVATE: This script is only used by the author Andy Bulka for development of the PRO version of pynsource - Macbook version."
 cd src
-
 PYTHON=python3
-# PYTHON=/usr/local/bin/python3
-# PYTHON=/usr/local/Cellar/python/3.7.0/bin/python3
-#PYTHON=/usr/local/Cellar/python/3.7.2/bin/python3
-
 PYTHONPATH="/Users/andy/Devel/ogl2/:/Users/andy/Devel/pynsource-rego/" $PYTHON pynsource-gui.py

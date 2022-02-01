@@ -1,5 +1,5 @@
 # Mac, development - adjust to your environment
-
+echo "PRIVATE: This script is only used by the author Andy Bulka for development of the PRO version of pynsource - Macbook version."
 cd src
 PYTHON=/Users/andy/.pyenv/versions/3.8.6/bin/python
 PYTHONPATH="/Users/andy/Devel/ogl2/:/Users/andy/Devel/pynsource-rego/" $PYTHON pynsource-gui.py

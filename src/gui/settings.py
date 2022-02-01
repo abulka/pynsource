@@ -34,6 +34,8 @@ if PRO_EDITION:
         ALSM_PARSING = False
     if not ALSM_PARSING:
         print(f"Python Module Visualisation could not be enabled - 'alsm' package not installed 😳")
+        print(f"  👉 This is a config error when debugging and developing the PRO version of pynsource, which only the author can do.")
+        print(f"  👉 Andy, please run: pip install ../alsm-parsers/alsm/ (see alsm README.md for more info)")
 
 if not PRO_EDITION:
     print(f"Running Community Edition")
