@@ -1,5 +1,14 @@
 # Pynsource Change Log
 
+*February 2022*
+
+### 1.82
+
+- fixed: Adapt (again, 2022) to new PlantUML server API which broke PlantUML diagram rendering
+- fixed: UML ascii art formatting on Mac using OSXEnableAutomaticDashSubstitution(False)
+
+*Late 2021*
+
 ### 1.81
 
 - Adapt to new PlantUML server API which broke PlantUML diagram rendering
