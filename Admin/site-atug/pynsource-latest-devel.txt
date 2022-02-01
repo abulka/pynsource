@@ -1,9 +1,9 @@
 {
  "latest_version" : 1.83,
  "latest_announcement" : """
-- fixed: Adapt (again, 2022) to new PlantUML server API which broke PlantUML diagram rendering
+- fixed: PlantUML diagrams due to PlantUML server changes (again)
 
-- fixed: UML ascii art formatting on Mac using OSXEnableAutomaticDashSubstitution(False)
+- fixed: UML Ascii Art formatting on Mac
 
 Previous version 1.81 changes:
 - Adapt to new PlantUML server API which broke PlantUML diagram rendering
