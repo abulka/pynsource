@@ -1,0 +1,224 @@
+name: Pynsource app multi-OS
+on:
+  push:
+    # branches: [ master ]
+    # branches: [ gh-building ]
+    # tags: ['build-test*']
+    tags: ['pre-*', 'version-*']
+jobs:
+  build-all-os:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # os: [windows-latest]
+        # os: [macos-latest]
+        # os: [macos-latest, ubuntu-18.04, ubuntu-20.04, windows-latest]
+        os: [ubuntu-18.04, ubuntu-20.04, windows-latest]
+
+    # set any job-wide environment variables
+    env:
+      PYTHON_VERSION: 3.9
+
+    steps:
+
+    - name: Downgrade Python to 3.8  # wxPython 3.9 not available on Ubuntu 20.04 yet
+      if: matrix.os == 'ubuntu-20.04'
+      run: echo "PYTHON_VERSION=3.8" >> $GITHUB_ENV
+
+    - name: Check out current repo into a subdir
+      uses: actions/checkout@v2
+      with:
+        path: pynsource/
+
+    - name: Check out ogl2 (private)
+      uses: actions/checkout@v2
+      with:
+        repository: abulka/ogl2
+        token: ${{ secrets.my_pat }}
+        path: ogl2/
+
+    - name: Check out pynsource-rego (private)
+      uses: actions/checkout@v2
+      with:
+        repository: abulka/pynsource-rego
+        token: ${{ secrets.my_pat }}
+        path: pynsource-rego/
+
+    - name: Check out ALSM (private)
+      uses: actions/checkout@v2
+      with:
+        repository: abulka/alsm
+        token: ${{ secrets.my_pat }}
+        path: alsm/
+
+    - name: View resulting directory structure
+      shell: bash
+      run: |
+        ls -l
+        ls -l pynsource/
+        ls -l pynsource-rego/
+        ls -l ogl2/
+        ls -l alsm/
+
+    - name: Setup Python please
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install wheel
+
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/${{ matrix.os }} wxPython
+          sudo apt-get install libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
+
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          pip install wxpython
+
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+            # choco install important_windows_software
+            pip install wxpython
+
+        else
+            echo "$RUNNER_OS not supported"
+            exit 1
+        fi
+
+        pip install -r pynsource/requirements.txt
+        pip install alsm/
+        pip install pyinstaller
+
+    - name: Run Python and print version_info
+      run: |
+        python -c "import sys; print(sys.version_info)"
+        # uname -a
+
+    - name: Build executable using Pyinstaller
+      shell: bash
+      run: |
+        cd pynsource/
+        python bin/_buildsamples.py
+        pyinstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
+        cp README.md dist/Readme.txt
+        cp CHANGELOG.md dist/Changelog.txt
+        if [ "$RUNNER_OS" == "macOS" ]; then
+          # remove the useless exe but leave the .app
+          rm dist/Pynsource
+        fi
+        ls -l dist/
+
+    - name: Run Innosetup
+      if: ${{ runner.os == 'Windows' }}
+      run: |
+        cd pynsource
+        echo hi
+        dir
+        # iscc ..\ogl2\bin\buildwin_github-actions.iss
+        iscc .requirement-extras/buildwin_github-actions.iss
+        dir dist-inno
+
+    # Note this tag extraction step doesn't work when you are pushing without a tag
+    # For example, GITHUB_REF might be 'refs/heads/gh-building' instead of 'refs/tags/v99'
+    - name: Get the tag name
+      shell: bash
+      run: |
+        echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
+        # whilst building without a tag, override the TAG with something real e.g. 'blah'
+        # echo "TAG=blah" >> $GITHUB_ENV
+
+    # Note also that the env change above doesn't take effect till the next step, so no good
+    # trying to access it above, do it here and in subsequent steps.
+    - name: Report tag info
+      shell: bash
+      run: |
+        echo "Calculated TAG env to be ${{ env.TAG }}"
+        echo "Calculated TAG env to be $TAG"
+
+    - name: Save generated executable file as an artifact
+      uses: actions/upload-artifact@v2
+      with:
+        # The act of downloading zips up the artifact and adds the .zip to the downloaded file
+        name: pynsource-${{ matrix.os }}-${{ env.TAG }}  # to
+        path: pynsource/dist/  # from
+
+    - name: Save windows setup executable file as an artifact
+      if: ${{ runner.os == 'Windows' }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: pynsource-windows-setup-${{ env.TAG }}  # to
+        path: pynsource/dist-inno/  # from
+
+  # After the matrix is complete, have to 'download' all the assets in order to release them
+  release-job:
+      needs: [build-all-os]
+      runs-on: ubuntu-latest
+      steps:
+
+        - name: Get the tag name  # env vars do not survive from previous jobs
+          shell: bash
+          run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
+        # DUE TO SIGNING ERROR ON GITHUB ACTIONS - BUILD MAC VERSION LOCALLY THEN UPLOAD TO RELEASES
+        # - uses: actions/download-artifact@v2
+        #   with:
+        #     name: pynsource-macos-latest-${{ env.TAG }}  # from this artifact name
+        #     path: pynsource-macos-${{ env.TAG }}  # to this filename or dir
+
+        - uses: actions/download-artifact@v2
+          with:
+            name: pynsource-ubuntu-18.04-${{ env.TAG }}  # from this artifact name
+            path: pynsource-ubuntu-18.04-${{ env.TAG }}  # to this filename or dir
+
+        - uses: actions/download-artifact@v2
+          with:
+            name: pynsource-ubuntu-20.04-${{ env.TAG }}  # from this artifact name
+            path: pynsource-ubuntu-20.04-${{ env.TAG }}  # to this filename or dir
+
+        - uses: actions/download-artifact@v2
+          with:
+            name: pynsource-windows-latest-${{ env.TAG }}  # from this artifact name
+            path: pynsource-windows-just-exe-${{ env.TAG }}  # to this filename or dir
+
+        - uses: actions/download-artifact@v2
+          with:
+            name: pynsource-windows-setup-${{ env.TAG }}  # from this artifact name
+            path: pynsource-windows-setup-${{ env.TAG }}  # to this filename or dir
+
+        # issue https://github.com/actions/upload-artifact#maintaining-file-permissions-and-case-sensitive-files 
+        - name: Fix loss of executable permission issue on Mac and Ubuntu artifact exes
+          run: |
+            pwd
+            ls -l
+            # DUE TO SIGNING ERROR ON GITHUB ACTIONS - BUILD MAC VERSION LOCALLY THEN UPLOAD TO RELEASES
+            # chmod +x pynsource-macos-${{ env.TAG }}/Pynsource.app/Contents/MacOS/Pynsource
+            # ls -lR pynsource-macos-${{ env.TAG }}
+            # Ubuntu too
+            chmod +x pynsource-ubuntu-18.04-${{ env.TAG }}/Pynsource
+            chmod +x pynsource-ubuntu-20.04-${{ env.TAG }}/Pynsource
+
+        - name: Zip up the artifacts
+          run: |
+            # DUE TO SIGNING ERROR ON GITHUB ACTIONS - BUILD MAC VERSION LOCALLY THEN UPLOAD TO RELEASES
+            # zip -r pynsource-macos-${{ env.TAG }}.zip pynsource-macos-${{ env.TAG }}
+            zip -r pynsource-ubuntu-18.04-${{ env.TAG }}.zip pynsource-ubuntu-18.04-${{ env.TAG }}
+            zip -r pynsource-ubuntu-20.04-${{ env.TAG }}.zip pynsource-ubuntu-20.04-${{ env.TAG }}
+            # zip -r pynsource-windows-exe-no-installer-${{ env.TAG }}.zip pynsource-windows-just-exe-${{ env.TAG }}
+            zip -r pynsource-windows-${{ env.TAG }}.zip pynsource-windows-setup-${{ env.TAG }}
+
+        - name: Release
+          uses: softprops/action-gh-release@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            draft: ${{ !startsWith(env.TAG, 'version-') }}
+            files: |
+              # pynsource-macos-${{ env.TAG }}.zip
+              pynsource-ubuntu-18.04-${{ env.TAG }}.zip
+              pynsource-ubuntu-20.04-${{ env.TAG }}.zip
+              # pynsource-windows-exe-no-installer-${{ env.TAG }}.zip
+              pynsource-windows-${{ env.TAG }}.zip
