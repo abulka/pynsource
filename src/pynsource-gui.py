@@ -1458,6 +1458,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def _running_andy_development_mode(self):
         return os.path.exists("/Users/Andy/Devel/pynsource-rego") or \
+                os.path.exists("/Volumes/SSD/Users/andy/Devel/pynsource-rego") or \
                 os.path.exists("/Users/andy/pynsource-rego") or \
                 os.path.exists("/home/andy/Devel/pynsource-rego")
 
