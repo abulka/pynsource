@@ -163,9 +163,15 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.multiText = wx.TextCtrl(
                 self.asciiart, wx.ID_ANY, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE | wx.HSCROLL
             )
+
+            if 'wxMac' in wx.PlatformInfo:
+                # Prevent '-' being turned into special dash which causes ascii lines to look wrong
+                self.multiText.OSXEnableAutomaticDashSubstitution(False)
+
             self.multiText.SetFont(
                 wx.Font(DEFAULT_ASCII_UML_FONT_SIZE, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
             )  # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
+            
             asciiart_sizer.Add(self.multiText, 1, wx.EXPAND | wx.ALL, 0)
             self.asciiart.SetSizer(asciiart_sizer)
             self.asciiart.Layout()
