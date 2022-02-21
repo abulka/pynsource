@@ -2,6 +2,10 @@
 
 *February 2022*
 
+### 1.84
+
+- fixed: more robust handling of type annotations on function and method arguments e.g. def foo(a: Optional[str]):
+
 ### 1.83
 
 - fixed: Adapt (again, 2022) to new PlantUML server API which broke PlantUML diagram rendering
