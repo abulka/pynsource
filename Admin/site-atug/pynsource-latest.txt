@@ -1,20 +1,15 @@
 {
- "latest_version" : 1.83,
+ "latest_version" : 1.84,
  "latest_announcement" : """
-- fixed: PlantUML diagrams due to PlantUML server changes (again)
+- fixed: more robust handling of type annotations on function and method arguments e.g. def foo(a: Optional[str])
 
+Recent changes:
+- fixed: PlantUML diagram rendering due to PlantUML server changes (again)
 - fixed: UML Ascii Art formatting on Mac
-
-Previous version 1.81 changes:
-- Adapt to new PlantUML server API which broke PlantUML diagram rendering
 - Matrix Multiplication operator @ now parsed correctly (fixes issue 102)
 - Handle any type of nested string parameter annotation e.g. "A" or "A.B" or "A.B.C" etc. (fixes issue 103)
-
-Previous version 1.80 changes:
 - Fix missing app icon on Mac and Ubuntu builds
-- Fix executable +x flag on Ubuntu builds
 - Ability to Export diagram to XML
-* XML export is for importing into tools like Cytoscape https://cytoscape.org/ which have advanced layouts and visualisations. See Pynsource built in help for instructions.
 
 """,
  "version_syntax_format" : 1,
