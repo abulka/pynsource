@@ -1470,7 +1470,7 @@ class Visitor(T):
             if hasattr(arg, "annotation") and arg.annotation != None:
                 try:
                     _type = self.annotation_to_string(arg.annotation)
-                except AttributeError as e:
+                except (AttributeError, AssertionError) as e:
                     log_proper.exception(f"Error parsing type annotation for parameter {arg.arg}")
                     _type = 'UnknownType'
                 self.write(f" found type annotation '{_type}' on method parameter {arg.arg}", mynote=1)
@@ -1484,12 +1484,15 @@ class Visitor(T):
         # Generalised, recursive drilling down to construct and return annotation string
         # should handle any type of nested string annotation e.g. "A" or "A.B" or "A.B.C" etc.
         assert annotation is not None
-        assert isinstance(annotation, ast.Name) or isinstance(annotation, ast.Attribute)
         if isinstance(annotation, ast.Name):
             return annotation.id
         elif isinstance(annotation, ast.Attribute):
             result = self.annotation_to_string(annotation.value)  # recurse
             return f"{result}.{annotation.attr}"
+        else:
+            # Not a type with a juicy name - we have likely encountered a Python BUILT_IN_TYPE
+            # a: Optional[str] or b: Sequence[int] etc.
+            return annotation.value.id  # e.g. 'Optional' or 'Sequence' etc.
 
     def detect_attribute_when_no_assignment(self, node):
         """

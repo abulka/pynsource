@@ -288,3 +288,71 @@ class TestNoAssignmentShouldStillCreateAttrs(unittest.TestCase):
         )
         pmodel, debuginfo = parse_source(source_code, options={"mode": 3}, html_debug_root_name="test_assignment_has_type_annotation")
         self._ensure_attrs_created(pmodel)
+
+
+class TestTypeHintsOnFunctionArguments(unittest.TestCase):
+    # Repro of python problem with type annotations on function arguments
+    """
+    Kyle noticed that generic type hints (in general) raise the same error if they are
+    specified on arguments in a function/method.  However, those specified on a
+    function/method return value work as expected.
+    
+    Example standalone Python file to parse:
+
+        from typing import Optional, Sequence, Mapping
+
+        def foo(a: Optional[str]):  # ERROR
+            return f"Got {a}"
+        print(foo("fred"))
+        print(foo(None))
+
+        def bar(b: Sequence[int]):  # ERROR
+            return f"Got {b}"
+        print(bar([1, 2, 3]))
+
+        def qaz() -> Mapping[str, str]:  # OKAY
+            return {'a': 'b', 'c': 'd'}
+        print(qaz())
+
+        # OUTPUT:
+        # Got fred
+        # Got None
+        # Got [1, 2, 3]
+        # {'a': 'b', 'c': 'd'}    
+    """
+
+    def testTypeHintsOptional(self):
+        source_code = dedent(
+        """
+            def foo(a: Optional[str]):  # ERROR
+                pass
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, options={"mode": 3}, html_debug_root_name="test_FunctionArguments_testTypeHintsOptional")
+        # self.assertEqual(pmodel.errors, "")  # too strict, cos I put no class warning in errors
+        self.assertNotIn("error", pmodel.errors)
+        self.assertIn("had no classes", pmodel.errors)
+
+    def testTypeHintsSequence(self):
+        source_code = dedent(
+        """
+            def bar(b: Sequence[int]):  # ERROR
+                pass
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, options={"mode": 3}, html_debug_root_name="test_FunctionArguments_testTypeHintsSequence")
+        # self.assertEqual(pmodel.errors, "")  # too strict, cos I put no class warning in errors
+        self.assertNotIn("error", pmodel.errors)
+        self.assertIn("had no classes", pmodel.errors)
+
+    def testTypeHintsMapping(self):
+        source_code = dedent(
+        """
+            def qaz() -> Mapping[str, str]:  # OKAY
+                return {'a': 'b', 'c': 'd'}
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, options={"mode": 3}, html_debug_root_name="test_FunctionArguments_testTypeHintsMapping")
+        # self.assertEqual(pmodel.errors, "")  # too strict, cos I put no class warning in errors
+        self.assertNotIn("error", pmodel.errors)
+        self.assertIn("had no classes", pmodel.errors)
