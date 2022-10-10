@@ -395,13 +395,13 @@ class ImageViewer(wx.ScrolledWindow):
                     print(f"Nothing to do, step of {newstep} already set.")
             else:
                 q = newstep / oldstep  # min(1, newstep)
-                newscrollx = oldscrollx / q
-                newscrolly = oldscrolly / q
+                newscrollx = int(oldscrollx / q)
+                newscrolly = int(oldscrolly / q)
                 # newvirtx = oldvirtx / q
                 # newvirty = oldvirty / q
                 # Aha - image size * step => virtual bounds
-                newvirtx = self.maxWidth / newstep * self.zoomscale
-                newvirty = self.maxHeight / newstep * self.zoomscale
+                newvirtx = int(self.maxWidth / newstep * self.zoomscale)
+                newvirty = int(self.maxHeight / newstep * self.zoomscale)
                 if printinfo:
                     print(f"OUT step {newstep}          new scroll {newscrollx}, {newscrolly} virt {newvirtx}, {newvirty} q {q}")
 
@@ -724,7 +724,7 @@ class ImageViewer(wx.ScrolledWindow):
         dc.SetPen(wx.Pen("MEDIUM FOREST GREEN", 4))
         for line in self.lines:
             for coords in line:
-                dc.DrawLine(*coords)
+                dc.DrawLine(*map(int, coords))
 
     def OnClearPenLines(self, event):
         self.clear_pen_lines()

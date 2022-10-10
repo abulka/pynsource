@@ -188,7 +188,7 @@ class CanvasResizer(object):
         # https://wxpython.org/Phoenix/docs/html/wx.Scrolled.html#wx.Scrolled.SetScrollbars
         self.canvas.SetScrollbars(
             1, 1,  # each scroll unit is 1 pixel, meaning scroll units match client coord units
-            bounds_width, bounds_height,  # new virtual size
+            int(bounds_width), int(bounds_height),  # new virtual size
             oldscrollx, oldscrolly,  # new scroll positions
             noRefresh=True
         )

@@ -258,8 +258,8 @@ class CommentShape(ogl.RectangleShape):
 
         # print("drawing comment shape....")
 
-        x1 = self._xpos - self._width / 2.0
-        y1 = self._ypos - self._height / 2.0
+        x1 = int(self._xpos - self._width / 2.0)
+        y1 = int(self._ypos - self._height / 2.0)
         x2 = x1 + self._width
         y2 = y1 + self._height
 
