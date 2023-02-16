@@ -5,7 +5,8 @@ python: 3.9
 # command to install dependencies
 install: "pip install -r .requirement-extras/requirements-travis.txt"
 # command to run tests
-script: sh -c 'cd src && mkdir tests/logs && ./bin/testall'
+# script: sh -c 'cd src && mkdir tests/logs && ./bin/testall'
+script: sh -c 'mkdir src/tests/logs && ./bin/testall'
 
 # Set up notification options
 notifications: 

@@ -415,6 +415,26 @@ class TestIncomingBugs(unittest.TestCase):
         self.assertEqual(len(classentry.classdependencytuples), 1)
         self.assertEqual(classentry.classdependencytuples[0], ('p', 'A.B.C'))
 
+    @unittest.skipIf(sys.version_info.minor < 10, 'Need to upgrade Pynsource to run in Python 3.10 to handle this syntax')
+    def test_issue_match_case_116(self):
+        """Python 3.10 introduces base statements."""
+        source_code = dedent("""
+            def get_day_name(day_num: int) -> str:
+                match day_num:
+                    case 0:
+                        return "Sunday"
+                    case 1:
+                        return "Monday"
+                    case _:
+                        return "Invalid day number"
+        """
+        )
+        pmodel, debuginfo = parse_source(source_code, 
+                                         options={"mode": 3}, 
+                                         html_debug_root_name="test_issue_match_case_116")
+        self.assertNotIn("error", pmodel.errors)
+        print(dump_pmodel(pmodel))
+
 
 
 

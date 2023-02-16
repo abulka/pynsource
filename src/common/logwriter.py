@@ -12,7 +12,8 @@ class LogWriter:
         if in_filename:
             out_filename = os.path.basename(in_filename)
             fileName, fileExtension = os.path.splitext(out_filename)
-            self.out_filename = "tests/logs/debug_%s.html" % fileName
+            # self.out_filename = "tests/logs/debug_%s.html" % fileName
+            self.out_filename = "src/tests/logs/debug_%s.html" % fileName
         else:
             self.out_filename = out_filename
         assert self.out_filename, "Must specify either in or out filename"

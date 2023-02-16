@@ -12,7 +12,8 @@ Reverse engineer Python source code into UML class diagrams.
 
 [Download](DOWNLOADS.md) - ready to run builds are available for Mac, Windows and Linux.
 
-> Mac users please [right click open](https://www.howtogeek.com/205393/gatekeeper-101-why-your-mac-only-allows-apple-approved-software-by-default/) the first time, Mac Big Sur users need to first `xattr -dr com.apple.quarantine /Applications/Pynsource.app`
+> Mac users please [right click open](https://www.howtogeek.com/205393/gatekeeper-101-why-your-mac-only-allows-apple-approved-software-by-default/) the first time, 
+Mac Big Sur, Monterey, Ventura users need to first `xattr -dr com.apple.quarantine /Applications/Pynsource.app`
 
 An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
 like zoom and the ability to drag to connect shapes.

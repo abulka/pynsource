@@ -1,2 +1,17 @@
-cd src
-bin/testall
+# cd src
+# bin/testall
+
+mkdir -p src/tests/logs
+
+# avoid wx by setting the TRAVIS env var, which happens automatically on travis and
+# is set explicitly in .github/workflows/pythonapp.yml 
+export TRAVIS=1
+
+# pick a version of python to run the tests with, useful when testing 3.8 parsing
+# cos just python3 may not pick up the right version, even if pyenv local is set ok
+PYTHON=python3
+#PYTHON=/Users/andy/.pyenv/versions/3.8.6/bin/python
+#PYTHON=/Users/andy/.pyenv/versions/3.7.5/bin/python
+
+$PYTHON --version
+$PYTHON -m unittest discover -v -s src

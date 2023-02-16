@@ -6,7 +6,7 @@ from parsing.api import new_parser, old_parser
 
 class TestJavaDelphiGen(unittest.TestCase):
     def test_1(self):
-        in_filename = "tests/testing-generate-java/python-in/utilcc.py"
+        in_filename = "src/tests/testing-generate-java/python-in/utilcc.py"
 
         p, debuginfo = old_parser(in_filename)
         pmodel_old = p.pmodel

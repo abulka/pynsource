@@ -9,14 +9,14 @@ import random
 import sys
 
 sys.path.append("../../src/")
-from layout.graph import *
+from view.graph import *
 from layout.layout_spring import GraphLayoutSpring
 from layout.overlap_removal import OverlapRemoval
 from layout.blackboard import LayoutBlackboard
 from layout.coordinate_mapper import CoordinateMapper
 from layout.snapshots import GraphSnapshotMgr
 
-from data_testgraphs import *
+from layout.data_testgraphs import *
 
 UNIT_TESTING_MODE = True
 

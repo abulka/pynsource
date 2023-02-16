@@ -7,8 +7,7 @@ from layout.overlap_removal import OverlapRemoval
 from view.graph import Graph, GraphNode
 import pprint
 
-sys.path.append("../Research/layout force spring")
-from data_testgraphs import *
+from layout.data_testgraphs import *
 
 
 class OverlapTests(unittest.TestCase):

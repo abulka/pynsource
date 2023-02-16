@@ -17,5 +17,8 @@ pytest
 coverage
 pytest-cov
 
+# wheel needed when running pip install ../alsm-parsers/alsm/
+wheel
+
 wxpython
 wxasync
