@@ -189,7 +189,7 @@ class CanvasResizer(object):
         self.canvas.SetScrollbars(
             1, 1,  # each scroll unit is 1 pixel, meaning scroll units match client coord units
             int(bounds_width), int(bounds_height),  # new virtual size
-            oldscrollx, oldscrolly,  # new scroll positions
+            int(oldscrollx), int(oldscrolly),  # new scroll positions
             noRefresh=True
         )
         if not PRO_EDITION:

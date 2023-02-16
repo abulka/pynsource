@@ -79,7 +79,7 @@ class ImageViewer(wx.ScrolledWindow):
         self.move_dy = 0
         self.last_drag_x = None  # previous drag position
         self.last_drag_y = None
-        self.SetScrollbars(1, 1, self.GetVirtualSize()[0], self.GetVirtualSize()[1])
+        self.SetScrollbars(1, 1, int(self.GetVirtualSize()[0]), int(self.GetVirtualSize()[1]))
         self.mywheelscroll = 0
         self.popupmenu = None
 
@@ -406,9 +406,9 @@ class ImageViewer(wx.ScrolledWindow):
                     print(f"OUT step {newstep}          new scroll {newscrollx}, {newscrolly} virt {newvirtx}, {newvirty} q {q}")
 
                 self.SetScrollbars(
-                    newstep, newstep,
-                    newvirtx, newvirty,  # new virtual size
-                    newscrollx, newscrolly,  # new scroll positions
+                    int(newstep), int(newstep),
+                    int(newvirtx), int(newvirty),  # new virtual size
+                    int(newscrollx), int(newscrolly),  # new scroll positions
                     noRefresh=True)
             # self.Refresh()
             if printinfo:

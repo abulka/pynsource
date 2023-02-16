@@ -264,7 +264,7 @@ class CommentShape(ogl.RectangleShape):
         y2 = y1 + self._height
 
         # simple box corner, but need to erase top right triangle portion of it - see below
-        dc.DrawRectangle(x2 - 10, y1, 10, 10)
+        dc.DrawRectangle(int(x2 - 10), int(y1), 10, 10)
 
         """
         Bit of a hacky way of doing it - draw a triangle to make it appear that the
@@ -279,4 +279,4 @@ class CommentShape(ogl.RectangleShape):
         dc.DrawPolygon(my_points)
 
         dc.SetPen(wx.Pen(wx.BLACK, 1, wx.PENSTYLE_SOLID))  # line
-        dc.DrawLine(x2 - 10, y1, x2, y1 + 10)
+        dc.DrawLine(int(x2 - 10), int(y1), int(x2), int(y1 + 10))
