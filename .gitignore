@@ -5,7 +5,6 @@ venv/
 dist/
 build/
 .eggs
-.vscode/
 Research/wxglade/*/*~
 .coverage
 htmlcov/
