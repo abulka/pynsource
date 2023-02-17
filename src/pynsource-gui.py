@@ -1626,27 +1626,34 @@ def main():
     # application = MainApp(redirect=True, filename='/tmp/pynsource.log')  # to view what's going on
     application.MainLoop()
 
-def main_async():
-    # see https://github.com/sirk390/wxasync
-    application = MainApp(0)
-    loop = get_event_loop()
-    loop.run_until_complete(application.MainLoop())
+# ASYNC VERSION
 
-    # Let's also cancel all running tasks:
-    # https://stackoverflow.com/questions/37278647/fire-and-forget-python-async-await
-    # pending = asyncio.Task.all_tasks()
+async def cleanup_tasks():
     try:
         pending = asyncio.all_tasks()
     except (AttributeError, RuntimeError):
         log.info("No pending running tasks on exit")
     else:
+        cancelled = set()
         for task in pending:
+            if task in cancelled:
+                continue
             log.info(f"Cancelling leftover task... {task._coro.cr_code.co_name} {task._state}")
             task.cancel()
-            # Now we should await task to execute it's cancellation.
-            # Cancelled task raises asyncio.CancelledError that we can suppress:
-            with suppress(asyncio.CancelledError):
-                loop.run_until_complete(task)
+            cancelled.add(task)
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+
+async def main_async():
+    # see https://github.com/sirk390/wxasync
+    application = MainApp(0)  # an instance of WxAsyncApp
+
+    try:
+        await application.MainLoop()
+    finally:
+        await cleanup_tasks()
 
 
 if __name__ == "__main__":
@@ -1671,6 +1678,7 @@ if __name__ == "__main__":
     #     freeze_support()
 
     if ASYNC:
-        main_async()
+        # main_async()
+        asyncio.run(main_async())
     else:
         main()
