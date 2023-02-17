@@ -1628,23 +1628,49 @@ def main():
 
 # ASYNC VERSION
 
+# async def cleanup_tasks():
+#     try:
+#         pending = asyncio.all_tasks()
+#     except (AttributeError, RuntimeError):
+#         log.info("No pending running tasks on exit")
+#     else:
+#         cancelled = set()
+#         for task in pending:
+#             if task in cancelled:
+#                 continue
+#             log.info(f"Cancelling leftover task... {task._coro.cr_code.co_name} {task._state}")
+#             task.cancel()
+#             cancelled.add(task)
+#             try:
+#                 await task
+#             except asyncio.CancelledError:
+#                 pass
+
+"""
+Both solutions should work to cancel all pending tasks, but the second one is
+more comprehensive in that it tries to wait for the tasks to be cancelled and
+suppresses the CancelledError that can be raised when a task is cancelled. The
+second solution also has the advantage of using the asyncio.wait function which
+can wait for multiple tasks to complete or be cancelled, which can make the
+cleanup process more efficient. The first solution does not try to wait for
+tasks to be cancelled and does not suppress the CancelledError.
+"""
 async def cleanup_tasks():
-    try:
-        pending = asyncio.all_tasks()
-    except (AttributeError, RuntimeError):
-        log.info("No pending running tasks on exit")
-    else:
-        cancelled = set()
-        for task in pending:
-            if task in cancelled:
-                continue
-            log.info(f"Cancelling leftover task... {task._coro.cr_code.co_name} {task._state}")
-            task.cancel()
-            cancelled.add(task)
-            try:
-                await task
-            except asyncio.CancelledError:
-                pass
+    # Cancel all pending tasks:
+    tasks = [task for task in asyncio.all_tasks() if task is not asyncio.current_task()]
+    for task in tasks:
+        task.cancel()
+
+    # Wait for tasks to be cancelled:
+    _, pending = await asyncio.wait(tasks, timeout=5)
+    for task in pending:
+        print(f"Task {task} did not finish in time and will be cancelled forcibly")
+        task.cancel()
+
+    # Gather and suppress the CancelledError for all tasks to complete their cancellation:
+    with suppress(asyncio.CancelledError):
+        await asyncio.gather(*tasks, return_exceptions=True)
+
 
 async def main_async():
     # see https://github.com/sirk390/wxasync
@@ -1654,6 +1680,8 @@ async def main_async():
         await application.MainLoop()
     finally:
         await cleanup_tasks()
+
+
 
 
 if __name__ == "__main__":
