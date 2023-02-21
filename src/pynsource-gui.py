@@ -1628,68 +1628,23 @@ def main():
 
 # ASYNC VERSION
 
-# async def cleanup_tasks():
-#     try:
-#         pending = asyncio.all_tasks()
-#     except (AttributeError, RuntimeError):
-#         log.info("No pending running tasks on exit")
-#     else:
-#         cancelled = set()
-#         for task in pending:
-#             if task in cancelled:
-#                 continue
-#             log.info(f"Cancelling leftover task... {task._coro.cr_code.co_name} {task._state}")
-#             task.cancel()
-#             cancelled.add(task)
-#             try:
-#                 await task
-#             except asyncio.CancelledError:
-#                 pass
-
-"""
-Both solutions should work to cancel all pending tasks, but the second one is
-more comprehensive in that it tries to wait for the tasks to be cancelled and
-suppresses the CancelledError that can be raised when a task is cancelled. The
-second solution also has the advantage of using the asyncio.wait function which
-can wait for multiple tasks to complete or be cancelled, which can make the
-cleanup process more efficient. The first solution does not try to wait for
-tasks to be cancelled and does not suppress the CancelledError.
-
-This also first checks if there are any tasks to wait for by verifying that the
-cancelled set is not empty. If the set is not empty, it calls asyncio.wait()
-with the cancelled set and proceeds with the rest of the cleanup algorithm as
-before. However, if the set is empty, it logs a message indicating that there
-are no tasks to wait for. This should avoid the ValueError you were seeing
-previously.
-
-We also handle the CancelledError and ignore it. You can do this using the
-asyncio.shield function. This function creates a new task that "shields" the
-provided coroutine from being cancelled. That way, if the coroutine is
-cancelled, the shield task will still complete and return the original
-coroutine's result or exception. The asyncio.shield function creates a new task
-that runs the provided coroutine (in this case, the cancelled tasks) and shields
-it from being cancelled. The gathered list contains the shield tasks for each
-cancelled task, which are then passed to asyncio.gather. The shield tasks are
-wrapped with suppress(asyncio.CancelledError) to ignore any CancelledError that
-might be raised when trying to cancel the tasks.
-
-"""
 async def cleanup_tasks():
-    # Cancel all pending tasks:
-    tasks = [task for task in asyncio.all_tasks() if task is not asyncio.current_task()]
-    for task in tasks:
-        task.cancel()
-
-    # Wait for tasks to be cancelled:
-    _, pending = await asyncio.wait(tasks, timeout=5)
-    for task in pending:
-        print(f"Task {task} did not finish in time and will be cancelled forcibly")
-        task.cancel()
-
-    # Gather and suppress the CancelledError for all tasks to complete their cancellation:
-    gathered = [asyncio.shield(task) for task in tasks]
-    with suppress(asyncio.CancelledError):
-        await asyncio.gather(*gathered, return_exceptions=True)
+    try:
+        pending = asyncio.all_tasks()
+    except (AttributeError, RuntimeError):
+        log.info("No pending running tasks on exit")
+    else:
+        cancelled = set()
+        for task in pending:
+            if task in cancelled:
+                continue
+            log.info(f"Cancelling leftover task... {task._coro.cr_code.co_name} {task._state}")
+            task.cancel()
+            cancelled.add(task)
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
 
 
 async def main_async():
