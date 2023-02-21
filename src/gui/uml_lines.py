@@ -179,6 +179,10 @@ class LineShapeUml(LineShape):
 
             dc.SetPen(self._pen)
             dc.SetBrush(self._brush)
+
+            # convert all points to integers - fix needed for Python 3.10
+            points = [[int(x), int(y)] for x, y in points]
+
             dc.DrawPolygon(points)
 
         # CUSTOM
@@ -206,6 +210,9 @@ class LineShapeUml(LineShape):
             # brush = wx.Brush("LIGHT BLUE")
             # dc.SetBrush(brush)
             dc.SetBrush(self.GetBackgroundBrush())
+
+            # convert all points to integers - fix needed for Python 3.10
+            points = [[int(x), int(y)] for x, y in points]
 
             dc.DrawPolygon(points)
 
@@ -259,6 +266,10 @@ class LineShapeUml(LineShape):
             dc.SetPen(self._pen)
             # dc.SetBrush(self.GetBackgroundBrush())
             dc.SetBrush(wx.Brush("BLACK"))
+
+            # convert all points to integers - fix needed for Python 3.10
+            points = [[int(x), int(y)] for x, y in points]
+
             dc.DrawPolygon(points)
 
         # END CUSTOM
