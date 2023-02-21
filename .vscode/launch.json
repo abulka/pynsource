@@ -19,7 +19,7 @@
       "cwd": "${workspaceFolder}/src",
       "program": "pynsource-gui.py",
       "console": "integratedTerminal",
-      "justMyCode": true
+      "justMyCode": false
     },
     {
       "name": "Python: pynsource PRO",
