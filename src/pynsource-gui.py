@@ -1654,6 +1654,25 @@ second solution also has the advantage of using the asyncio.wait function which
 can wait for multiple tasks to complete or be cancelled, which can make the
 cleanup process more efficient. The first solution does not try to wait for
 tasks to be cancelled and does not suppress the CancelledError.
+
+This also first checks if there are any tasks to wait for by verifying that the
+cancelled set is not empty. If the set is not empty, it calls asyncio.wait()
+with the cancelled set and proceeds with the rest of the cleanup algorithm as
+before. However, if the set is empty, it logs a message indicating that there
+are no tasks to wait for. This should avoid the ValueError you were seeing
+previously.
+
+We also handle the CancelledError and ignore it. You can do this using the
+asyncio.shield function. This function creates a new task that "shields" the
+provided coroutine from being cancelled. That way, if the coroutine is
+cancelled, the shield task will still complete and return the original
+coroutine's result or exception. The asyncio.shield function creates a new task
+that runs the provided coroutine (in this case, the cancelled tasks) and shields
+it from being cancelled. The gathered list contains the shield tasks for each
+cancelled task, which are then passed to asyncio.gather. The shield tasks are
+wrapped with suppress(asyncio.CancelledError) to ignore any CancelledError that
+might be raised when trying to cancel the tasks.
+
 """
 async def cleanup_tasks():
     # Cancel all pending tasks:
@@ -1668,8 +1687,9 @@ async def cleanup_tasks():
         task.cancel()
 
     # Gather and suppress the CancelledError for all tasks to complete their cancellation:
+    gathered = [asyncio.shield(task) for task in tasks]
     with suppress(asyncio.CancelledError):
-        await asyncio.gather(*tasks, return_exceptions=True)
+        await asyncio.gather(*gathered, return_exceptions=True)
 
 
 async def main_async():
