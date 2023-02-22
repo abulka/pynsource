@@ -1,5 +1,4 @@
 {
-    "python.pythonPath": "/Users/Andy/.pyenv/versions/3.9.9/Library/Frameworks/Python.framework/Versions/3.9/bin/python3.9",
     "python.testing.unittestArgs": [
         "-v",
         "-s",
