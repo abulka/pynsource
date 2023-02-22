@@ -1,6 +1,6 @@
 *.pyc
 out.png
-venv/
+venv*/
 .idea/
 dist/
 build/

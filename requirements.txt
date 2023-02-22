@@ -6,6 +6,11 @@ astpretty
 termcolor
 beautifultable
 appdirs
+
+# wheel needed when running pip install ../alsm-parsers/alsm/
+# also needed for installing pydbg which is a rust based print debugger thing
+wheel
+
 pydbg
 aiohttp
 async_lru
@@ -16,9 +21,6 @@ click
 pytest
 coverage
 pytest-cov
-
-# wheel needed when running pip install ../alsm-parsers/alsm/
-wheel
 
 wxpython
 wxasync
