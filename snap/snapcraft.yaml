@@ -1,118 +1,24 @@
 name: pynsource
 version: git
 summary: 'Pynsource - reverse engineer Python source code into UML'
-description: |
-  Pynsource - reverse engineer Python source code into UML
-  http://pynsource.com
-
-  Features
-    Generates UML diagrams from Python 3 or legacy Python source code
-    The only UML tool that recognises Python instance attributes (not just class attributes)
-    Layout algorithm
-    Toggle between UML, Ascii art UML and PlantUML views
-    Automatically colour sibling subclasses to enhance understanding
-    Print and Print preview
-    Windows 10, Mac OSX Mojave, Linux compatibility
-    Open Source
-  Pro edition with
-    Faster performance
-    Zoom
-    Drag and Drop to connect shapes
-    Optimal layout algorithm
-    Access to generated PlantUML markup text
-
-    Github repo https://github.com/abulka/pynsource
-
 grade: stable # devel # must be 'stable' to release into candidate/stable channels
 confinement: strict # use 'strict' once you have the right plugs and slots
-base: core18
-
+base: core22
 apps:
     pynsource:
         command: python3 $SNAP/pynsource-gui.py
-        extensions: [gnome-3-28]
+        extensions: [gnome]
         plugs: [unity7, audio-playback, home, network]
-
-    #
-    # SUB-COMMANDS (diagnostic use only)
-    # 
-    # After building (snapcraft) and installing the snap locally (sudo snap install --devmode --dangerous *.snap),
-    # as well as being able to 'pynsource' from the terminal, you can run a subcommand with e.g. 'pynsource.report'
-    #
-    # For all python interpreter invocations (no script specified), both '' and site packages are automatically in sys path, $SNAP root is not.
-    # Also os.getcwd() is the host's not the inner snap filesystem!
-    #
-    # Run Python interpreter - run with 'pynsource.python'
-    python:
-        command: python3
-    # Run Python interpreter and trace imports - run with e.g. 'pynsource.python-v'
-    python-v:
-        command: python3 -v
-    python-vvv:
-        command: python3 -vvv
-    # Adding $SNAP explicitly works e.g. '/snap/pynsource/x5',    <--- expected
-    # Though, suprisingly also adds the host's local dir to sys path e.g. '/home/andy/Devel/pynsource/Research',    <--- unexpected
-    python-add-root:
-        command: python3
-        environment:
-          PYTHONPATH: $PYTHONPATH:$SNAP
-    # Adding $SNAP/lib/python3.6/site-packages explicitly works but is unneccesary since site-packages is added automatically.
-    # It just gets moved up to top of sys.path and not duplicated.
-    # Though, suprisingly also adds the host's local dir to sys path e.g. '/home/andy/Devel/pynsource/Research',    <--- unexpected
-    python-add-site:
-        command: python3
-        environment:
-          PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
-    # Run my diagnostic script - run with e.g. 'pynsource.report'
-    report:
-        command: python3 $SNAP/report_snap_env.py
-    # Run my diagnostic script - various experimental variants playing with PYTHONPATH
-    report-add-root:
-        command: python3 $SNAP/report_snap_env.py
-        environment:
-          # uneccesary since $SNAP or /root is added automatically
-          PYTHONPATH: $PYTHONPATH:$SNAP
-    report-add-site:
-        command: python3 $SNAP/report_snap_env.py
-        environment:
-          # uneccesary since site-packages is added automatically
-          PYTHONPATH: $PYTHONPATH:$SNAP/lib/python3.6/site-packages
-    #
-    # END SUB-COMMANDS (diagnostic use only)
-    # 
-    
 parts:
   copy-stuff:
     plugin: dump
     source: ./src
-  copy-stuff-diagnostics:
-    plugin: dump
-    source: ./snap/local/andy-diagnostics
   pynsource:
     plugin: python
     python-version: python3
     source: ./src
-    stage-packages:
-        - libssl-dev
-        - libjpeg-dev
-        - libtiff-dev
-        - libsdl1.2-dev
-        - libnotify-dev
-        - freeglut3
-        - ibus-gtk3
-        - libwebkitgtk-3.0-0
-        - zlib1g
-        - libsm6
-        - libslang2
-        - libsdl1.2debian
-        - libgtk2.0-0
-        - libpcre3
-        - liblzma5
-        - libsdl2-mixer-2.0-0 
-        - libsdl2-image-2.0-0 
-        - libsdl2-2.0-0        
     python-packages:
-        - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-18.04/wxPython-4.1.1-cp36-cp36m-linux_x86_64.whl
+        - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxPython-4.2.0-cp310-cp310-linux_x86_64.whl
         - wxasync
-    requirements:
+    python-requirements:
         - /root/project/.requirement-extras/requirements-linux-common.txt

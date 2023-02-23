@@ -8,12 +8,11 @@ on:
 
 jobs:
   my-snap-building-job:
-    # runs-on: ubuntu-18.04  # ubuntu-20.04 breaks
-    runs-on: ubuntu-20.04  # TODO need to update the snapcraft.yaml to use python 3.10 etc.
+    runs-on: ubuntu-18.04  # ubuntu-20.04 breaks
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       # https://github.com/marketplace/actions/snapcraft-action
       - name: Install Snapcraft, LXD and set Auth
@@ -33,7 +32,7 @@ jobs:
           # unsquashfs -l *.snap
 
       - name: Save snap as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: snap_artifact
           path: ./*.snap
