@@ -17,7 +17,7 @@ jobs:
 
       # https://github.com/marketplace/actions/snapcraft-action
       - name: Install Snapcraft, LXD and set Auth
-        uses: samuelmeuli/action-snapcraft@v1
+        uses: samuelmeuli/action-snapcraft@v2
         with:
           use_lxd: true
           snapcraft_token: ${{ secrets.snapcraft_token }}
