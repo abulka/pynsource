@@ -17,11 +17,11 @@ jobs:
 
       # https://github.com/marketplace/actions/snapcraft-action
       # The error says `snap "lxd" is already installed` so does that mean we don't need this action anymore?
-      # - name: Install Snapcraft, LXD and set Auth
-      #   uses: samuelmeuli/action-snapcraft@master
-      #   with:
-      #     use_lxd: true
-      #     snapcraft_token: ${{ secrets.snapcraft_token }}
+      - name: Install Snapcraft, LXD and set Auth
+        uses: samuelmeuli/action-snapcraft@master
+        with:
+          # use_lxd: true
+          snapcraft_token: ${{ secrets.snapcraft_token }}
 
       # You can now run Snapcraft shell commands
       - name: Use Snapcraft - show help
