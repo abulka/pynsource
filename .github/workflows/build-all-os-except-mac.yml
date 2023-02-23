@@ -14,17 +14,18 @@ jobs:
         # os: [windows-latest]
         # os: [macos-latest]
         # os: [macos-latest, ubuntu-18.04, ubuntu-20.04, windows-latest]
-        os: [ubuntu-18.04, ubuntu-20.04, windows-latest]
+        os: [ubuntu-18.04, ubuntu-20.04, ubuntu-22.04 windows-latest]
 
     # set any job-wide environment variables
     env:
-      PYTHON_VERSION: 3.9
+      PYTHON_VERSION: 3.10
 
     steps:
 
-    - name: Downgrade Python to 3.8  # wxPython 3.9 not available on Ubuntu 20.04 yet
-      if: matrix.os == 'ubuntu-20.04'
-      run: echo "PYTHON_VERSION=3.8" >> $GITHUB_ENV
+    - name: Downgrade Python to 3.9  # wxPython 3.10 not available on Ubuntu 18.04, but 3.9 is
+      # see https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ to see what wxPython versions are available for each Python and linux OS
+      if: matrix.os == 'ubuntu-18.04'
+      run: echo "PYTHON_VERSION=3.9" >> $GITHUB_ENV
 
     - name: Check out current repo into a subdir
       uses: actions/checkout@v2
@@ -181,6 +182,11 @@ jobs:
 
         - uses: actions/download-artifact@v2
           with:
+            name: pynsource-ubuntu-22.04-${{ env.TAG }}  # from this artifact name
+            path: pynsource-ubuntu-22.04-${{ env.TAG }}  # to this filename or dir
+
+        - uses: actions/download-artifact@v2
+          with:
             name: pynsource-windows-latest-${{ env.TAG }}  # from this artifact name
             path: pynsource-windows-just-exe-${{ env.TAG }}  # to this filename or dir
 
@@ -200,6 +206,7 @@ jobs:
             # Ubuntu too
             chmod +x pynsource-ubuntu-18.04-${{ env.TAG }}/Pynsource
             chmod +x pynsource-ubuntu-20.04-${{ env.TAG }}/Pynsource
+            chmod +x pynsource-ubuntu-22.04-${{ env.TAG }}/Pynsource
 
         - name: Zip up the artifacts
           run: |
@@ -207,6 +214,7 @@ jobs:
             # zip -r pynsource-macos-${{ env.TAG }}.zip pynsource-macos-${{ env.TAG }}
             zip -r pynsource-ubuntu-18.04-${{ env.TAG }}.zip pynsource-ubuntu-18.04-${{ env.TAG }}
             zip -r pynsource-ubuntu-20.04-${{ env.TAG }}.zip pynsource-ubuntu-20.04-${{ env.TAG }}
+            zip -r pynsource-ubuntu-22.04-${{ env.TAG }}.zip pynsource-ubuntu-22.04-${{ env.TAG }}
             # zip -r pynsource-windows-exe-no-installer-${{ env.TAG }}.zip pynsource-windows-just-exe-${{ env.TAG }}
             zip -r pynsource-windows-${{ env.TAG }}.zip pynsource-windows-setup-${{ env.TAG }}
 
@@ -220,5 +228,6 @@ jobs:
               # pynsource-macos-${{ env.TAG }}.zip
               pynsource-ubuntu-18.04-${{ env.TAG }}.zip
               pynsource-ubuntu-20.04-${{ env.TAG }}.zip
+              pynsource-ubuntu-22.04-${{ env.TAG }}.zip
               # pynsource-windows-exe-no-installer-${{ env.TAG }}.zip
               pynsource-windows-${{ env.TAG }}.zip

@@ -1,5 +1,13 @@
 # Pynsource Change Log
 
+*February 2023*
+
+### 1.85 beta
+
+- fixed: Can parse Python 3.10 syntax
+- Apple Silicon Arm build available for Mac
+- Ubuntu 22.04 build available. All pynsource linux builds now use Python 3.10 except Ubuntu 18.04 which is still on Python 3.9
+
 *February 2022*
 
 ### 1.84
