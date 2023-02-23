@@ -14,40 +14,40 @@ jobs:
         # os: [windows-latest]
         # os: [macos-latest]
         # os: [macos-latest, ubuntu-18.04, ubuntu-20.04, windows-latest]
-        os: [ubuntu-18.04, ubuntu-20.04, ubuntu-22.04 windows-latest]
+        os: [ubuntu-20.04, ubuntu-22.04 windows-latest]
 
     # set any job-wide environment variables
     env:
-      PYTHON_VERSION: 3.10
+      PYTHON_VERSION: "3.10"      
 
     steps:
 
-    - name: Downgrade Python to 3.9  # wxPython 3.10 not available on Ubuntu 18.04, but 3.9 is
-      # see https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ to see what wxPython versions are available for each Python and linux OS
-      if: matrix.os == 'ubuntu-18.04'
-      run: echo "PYTHON_VERSION=3.9" >> $GITHUB_ENV
+    # - name: Downgrade Python to 3.9  # wxPython 3.10 not available on Ubuntu 18.04, but 3.9 is
+    #   # see https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ to see what wxPython versions are available for each Python and linux OS
+    #   if: matrix.os == 'ubuntu-18.04'
+    #   run: echo "PYTHON_VERSION=3.9" >> $GITHUB_ENV
 
     - name: Check out current repo into a subdir
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: pynsource/
 
     - name: Check out ogl2 (private)
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: abulka/ogl2
         token: ${{ secrets.my_pat }}
         path: ogl2/
 
     - name: Check out pynsource-rego (private)
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: abulka/pynsource-rego
         token: ${{ secrets.my_pat }}
         path: pynsource-rego/
 
     - name: Check out ALSM (private)
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: abulka/alsm
         token: ${{ secrets.my_pat }}
@@ -63,7 +63,7 @@ jobs:
         ls -l alsm/
 
     - name: Setup Python please
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
@@ -141,7 +141,7 @@ jobs:
         echo "Calculated TAG env to be $TAG"
 
     - name: Save generated executable file as an artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         # The act of downloading zips up the artifact and adds the .zip to the downloaded file
         name: pynsource-${{ matrix.os }}-${{ env.TAG }}  # to
@@ -149,7 +149,7 @@ jobs:
 
     - name: Save windows setup executable file as an artifact
       if: ${{ runner.os == 'Windows' }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: pynsource-windows-setup-${{ env.TAG }}  # to
         path: pynsource/dist-inno/  # from
@@ -165,32 +165,33 @@ jobs:
           run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
 
         # DUE TO SIGNING ERROR ON GITHUB ACTIONS - BUILD MAC VERSION LOCALLY THEN UPLOAD TO RELEASES
-        # - uses: actions/download-artifact@v2
+        # - uses: actions/download-artifact@v3
         #   with:
         #     name: pynsource-macos-latest-${{ env.TAG }}  # from this artifact name
         #     path: pynsource-macos-${{ env.TAG }}  # to this filename or dir
 
-        - uses: actions/download-artifact@v2
-          with:
-            name: pynsource-ubuntu-18.04-${{ env.TAG }}  # from this artifact name
-            path: pynsource-ubuntu-18.04-${{ env.TAG }}  # to this filename or dir
+        # 18.04 is not supported on github actions anymore
+        # - uses: actions/download-artifact@v3
+        #   with:
+        #     name: pynsource-ubuntu-18.04-${{ env.TAG }}  # from this artifact name
+        #     path: pynsource-ubuntu-18.04-${{ env.TAG }}  # to this filename or dir
 
-        - uses: actions/download-artifact@v2
+        - uses: actions/download-artifact@v3
           with:
             name: pynsource-ubuntu-20.04-${{ env.TAG }}  # from this artifact name
             path: pynsource-ubuntu-20.04-${{ env.TAG }}  # to this filename or dir
 
-        - uses: actions/download-artifact@v2
+        - uses: actions/download-artifact@v3
           with:
             name: pynsource-ubuntu-22.04-${{ env.TAG }}  # from this artifact name
             path: pynsource-ubuntu-22.04-${{ env.TAG }}  # to this filename or dir
 
-        - uses: actions/download-artifact@v2
+        - uses: actions/download-artifact@v3
           with:
             name: pynsource-windows-latest-${{ env.TAG }}  # from this artifact name
             path: pynsource-windows-just-exe-${{ env.TAG }}  # to this filename or dir
 
-        - uses: actions/download-artifact@v2
+        - uses: actions/download-artifact@v3
           with:
             name: pynsource-windows-setup-${{ env.TAG }}  # from this artifact name
             path: pynsource-windows-setup-${{ env.TAG }}  # to this filename or dir
@@ -204,7 +205,7 @@ jobs:
             # chmod +x pynsource-macos-${{ env.TAG }}/Pynsource.app/Contents/MacOS/Pynsource
             # ls -lR pynsource-macos-${{ env.TAG }}
             # Ubuntu too
-            chmod +x pynsource-ubuntu-18.04-${{ env.TAG }}/Pynsource
+            # chmod +x pynsource-ubuntu-18.04-${{ env.TAG }}/Pynsource
             chmod +x pynsource-ubuntu-20.04-${{ env.TAG }}/Pynsource
             chmod +x pynsource-ubuntu-22.04-${{ env.TAG }}/Pynsource
 
@@ -212,7 +213,7 @@ jobs:
           run: |
             # DUE TO SIGNING ERROR ON GITHUB ACTIONS - BUILD MAC VERSION LOCALLY THEN UPLOAD TO RELEASES
             # zip -r pynsource-macos-${{ env.TAG }}.zip pynsource-macos-${{ env.TAG }}
-            zip -r pynsource-ubuntu-18.04-${{ env.TAG }}.zip pynsource-ubuntu-18.04-${{ env.TAG }}
+            # zip -r pynsource-ubuntu-18.04-${{ env.TAG }}.zip pynsource-ubuntu-18.04-${{ env.TAG }}
             zip -r pynsource-ubuntu-20.04-${{ env.TAG }}.zip pynsource-ubuntu-20.04-${{ env.TAG }}
             zip -r pynsource-ubuntu-22.04-${{ env.TAG }}.zip pynsource-ubuntu-22.04-${{ env.TAG }}
             # zip -r pynsource-windows-exe-no-installer-${{ env.TAG }}.zip pynsource-windows-just-exe-${{ env.TAG }}
@@ -226,7 +227,7 @@ jobs:
             draft: ${{ !startsWith(env.TAG, 'version-') }}
             files: |
               # pynsource-macos-${{ env.TAG }}.zip
-              pynsource-ubuntu-18.04-${{ env.TAG }}.zip
+              # pynsource-ubuntu-18.04-${{ env.TAG }}.zip
               pynsource-ubuntu-20.04-${{ env.TAG }}.zip
               pynsource-ubuntu-22.04-${{ env.TAG }}.zip
               # pynsource-windows-exe-no-installer-${{ env.TAG }}.zip
