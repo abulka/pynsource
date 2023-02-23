@@ -16,7 +16,7 @@ aiohttp
 async_lru
 
 Pillow
-py2app
+# py2app - uses fcntl module which is not available on Windows - https://stackoverflow.com/questions/73272911/lux-api-package-installation-python
 click
 pytest
 coverage
