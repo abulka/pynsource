@@ -1657,7 +1657,12 @@ async def main_async():
         await cleanup_tasks()
 
 
-
+def run():
+    if ASYNC:
+        # main_async()
+        asyncio.run(main_async())
+    else:
+        main()
 
 if __name__ == "__main__":
 
@@ -1680,8 +1685,4 @@ if __name__ == "__main__":
     #     from multiprocessing import freeze_support  # allow joblib.Memory to be used in pyinstaller
     #     freeze_support()
 
-    if ASYNC:
-        # main_async()
-        asyncio.run(main_async())
-    else:
-        main()
+    run()

@@ -13,3 +13,4 @@ Research/wx doco/drag-button.spec
 .python-version
 *.snap
 junk*.py
+*.egg-info
