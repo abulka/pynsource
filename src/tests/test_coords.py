@@ -1,6 +1,6 @@
 import os
 import unittest
-from gui.settings import PRO_EDITION
+from gui.settings import PRO_EDITION, LOCAL_OGL
 
 if "TRAVIS" not in os.environ:
     if PRO_EDITION:
@@ -9,9 +9,12 @@ if "TRAVIS" not in os.environ:
         from ogl2 import OGLInitialize
         from ogl2 import line_control_points_to_xy_points
     else:
-        # import wx.lib.ogl as ogl
-        from wx.lib.ogl import Shape, RectangleShape, LineShape
-        from wx.lib.ogl import OGLInitialize
+        if LOCAL_OGL:
+            from ogl import Shape, RectangleShape, LineShape
+            from ogl import OGLInitialize
+        else:
+            from wx.lib.ogl import Shape, RectangleShape, LineShape
+            from wx.lib.ogl import OGLInitialize
     import wx
 
 from gui.coord_utils import getpos  # returns left, top

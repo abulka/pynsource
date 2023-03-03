@@ -90,15 +90,20 @@ The initial reason for these changes is because I use ogl heavily in my
 Pynsource UML tool for Python at http://www.pynsource.com
 """
 
+from gui.settings import LOCAL_OGL
 import wx
-import wx.lib.ogl as ogl
+if LOCAL_OGL:
+    import ogl
+    print("Repair OGL - Using local ogl")
+else:
+    import wx.lib.ogl as ogl
 
 
 def repairOGL():
 
     # general refresh hack
 
-    old_OnMouseEvent = wx.lib.ogl.canvas.ShapeCanvas.OnMouseEvent
+    old_OnMouseEvent = ogl.canvas.ShapeCanvas.OnMouseEvent
 
     def new_OnMouseEvent(self, event):
 
@@ -135,9 +140,9 @@ def repairOGL():
 
     # sizing
 
-    old_OnSizingBeginDragLeft = wx.lib.ogl.basic.Shape.OnSizingBeginDragLeft
-    old_OnSizingDragLeft = wx.lib.ogl.basic.Shape.OnSizingDragLeft
-    old_OnSizingEndDragLeft = wx.lib.ogl.basic.Shape.OnSizingEndDragLeft
+    old_OnSizingBeginDragLeft = ogl.basic.Shape.OnSizingBeginDragLeft
+    old_OnSizingDragLeft = ogl.basic.Shape.OnSizingDragLeft
+    old_OnSizingEndDragLeft = ogl.basic.Shape.OnSizingEndDragLeft
 
     def new_OnSizingBeginDragLeft(self, pt, x, y, keys=0, attachment=0):
         old_OnSizingBeginDragLeft(self, pt, x, y, keys=0, attachment=0)
@@ -149,9 +154,9 @@ def repairOGL():
 
     # monkey patch new methods to replace existing ogl class methods
 
-    wx.lib.ogl.canvas.ShapeCanvas.OnMouseEvent = new_OnMouseEvent
-    wx.lib.ogl.basic.Shape.OnBeginDragLeft = new_OnBeginDragLeft
-    wx.lib.ogl.basic.Shape.OnDragLeft = new_OnDragLeft
-    wx.lib.ogl.basic.Shape.OnEndDragLeft = new_OnEndDragLeft
-    wx.lib.ogl.basic.Shape.OnSizingBeginDragLeft = new_OnSizingBeginDragLeft
-    wx.lib.ogl.basic.Shape.OnSizingDragLeft = new_OnSizingDragLeft
+    ogl.canvas.ShapeCanvas.OnMouseEvent = new_OnMouseEvent
+    ogl.basic.Shape.OnBeginDragLeft = new_OnBeginDragLeft
+    ogl.basic.Shape.OnDragLeft = new_OnDragLeft
+    ogl.basic.Shape.OnEndDragLeft = new_OnEndDragLeft
+    ogl.basic.Shape.OnSizingBeginDragLeft = new_OnSizingBeginDragLeft
+    ogl.basic.Shape.OnSizingDragLeft = new_OnSizingDragLeft

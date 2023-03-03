@@ -1,11 +1,14 @@
 # gui_umlshapes
 
-from gui.settings import PRO_EDITION
+from gui.settings import PRO_EDITION, LOCAL_OGL
 import wx
 if PRO_EDITION:
     import ogl2 as ogl
 else:
-    import wx.lib.ogl as ogl
+    if LOCAL_OGL:
+        import ogl
+    else:
+        import wx.lib.ogl as ogl
 
 
 class DiamondShape(ogl.PolygonShape):

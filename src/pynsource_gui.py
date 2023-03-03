@@ -34,7 +34,7 @@ import sys
 from pydbg import dbg
 from common.messages import *
 import wx
-from gui.settings import PRO_EDITION, ASYNC_BACKGROUND_REFRESH
+from gui.settings import PRO_EDITION, ASYNC_BACKGROUND_REFRESH, LOCAL_OGL
 from common.printframework import MyPrintout
 from media import images
 from gui.settings import APP_VERSION, APP_VERSION_FULL, APP_ICON_PATH
@@ -64,7 +64,10 @@ if PRO_EDITION:
     import ogl2 as ogl
     from pro.gui_imageviewer2 import ImageViewer2 as ImageViewer
 else:
-    import wx.lib.ogl as ogl
+    if LOCAL_OGL:
+        import ogl
+    else:
+        import wx.lib.ogl as ogl
     from common.gui_imageviewer import ImageViewer
 
 WINDOW_SIZE = (1024, 768)

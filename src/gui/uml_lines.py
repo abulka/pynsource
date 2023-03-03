@@ -1,5 +1,5 @@
 import math
-from gui.settings import PRO_EDITION
+from gui.settings import PRO_EDITION, LOCAL_OGL
 import wx
 import sys
 
@@ -21,20 +21,32 @@ if PRO_EDITION:
 
     from ogl2 import ShapeRegion, RectangleShape, Selectable
 else:
-    # import wx.lib.ogl as ogl
-    from wx.lib.ogl import LineShape
-    from wx.lib.ogl import GetPointOnLine
-    from wx.lib.ogl import GetArrowPoints
-    from wx.lib.ogl import ARROW_POSITION_START
-    from wx.lib.ogl import ARROW_POSITION_MIDDLE
-    from wx.lib.ogl import ARROW_POSITION_END
-    from wx.lib.ogl import ARROW_HOLLOW_CIRCLE
-    from wx.lib.ogl import ARROW_FILLED_CIRCLE
-    from wx.lib.ogl import ARROW_ARROW
-    from wx.lib.ogl import ARROW_SINGLE_OBLIQUE
-    from wx.lib.ogl import ARROW_DOUBLE_OBLIQUE
-    from wx.lib.ogl import ARROW_METAFILE
-    # from ogl import RectangleShape
+    if LOCAL_OGL:
+        from ogl import LineShape
+        from ogl import GetPointOnLine
+        from ogl import GetArrowPoints
+        from ogl import ARROW_POSITION_START
+        from ogl import ARROW_POSITION_MIDDLE
+        from ogl import ARROW_POSITION_END
+        from ogl import ARROW_HOLLOW_CIRCLE
+        from ogl import ARROW_FILLED_CIRCLE
+        from ogl import ARROW_ARROW
+        from ogl import ARROW_SINGLE_OBLIQUE
+        from ogl import ARROW_DOUBLE_OBLIQUE
+        from ogl import ARROW_METAFILE
+    else:
+        from wx.lib.ogl import LineShape
+        from wx.lib.ogl import GetPointOnLine
+        from wx.lib.ogl import GetArrowPoints
+        from wx.lib.ogl import ARROW_POSITION_START
+        from wx.lib.ogl import ARROW_POSITION_MIDDLE
+        from wx.lib.ogl import ARROW_POSITION_END
+        from wx.lib.ogl import ARROW_HOLLOW_CIRCLE
+        from wx.lib.ogl import ARROW_FILLED_CIRCLE
+        from wx.lib.ogl import ARROW_ARROW
+        from wx.lib.ogl import ARROW_SINGLE_OBLIQUE
+        from wx.lib.ogl import ARROW_DOUBLE_OBLIQUE
+        from wx.lib.ogl import ARROW_METAFILE
 
 # Custom styles
 ARROW_UML_GENERALISATION = 200

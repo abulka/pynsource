@@ -1,9 +1,12 @@
 import wx
-from gui.settings import PRO_EDITION, NATIVE_LINES_OGL_LIKE
+from gui.settings import PRO_EDITION, NATIVE_LINES_OGL_LIKE, LOCAL_OGL
 if PRO_EDITION:
     import ogl2 as ogl
 else:
-    import wx.lib.ogl as ogl
+    if LOCAL_OGL:
+        import ogl
+    else:
+        import wx.lib.ogl as ogl
 
 from .coord_utils import setpos, getpos, ZoomInfo
 from gui.shape_menu_mgr import ShapeMenuMgr

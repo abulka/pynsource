@@ -11,7 +11,7 @@ from common.architecture_support import *
 from gui.shape_menu_mgr import MENU_ID_CANCEL_LINE
 import time
 import pprint
-from gui.settings import PRO_EDITION, NATIVE_LINES_OGL_LIKE, ASYNC_BACKGROUND_REFRESH
+from gui.settings import PRO_EDITION, NATIVE_LINES_OGL_LIKE, ASYNC_BACKGROUND_REFRESH, LOCAL_OGL
 from gui.settings_wx import DEFAULT_COMMENT_FONT_SIZE, DEFAULT_CLASS_HEADING_FONT_SIZE, DEFAULT_CLASS_ATTRS_METHS_FONT_SIZE
 import wx
 from common.approx_equal import approx_equal
@@ -22,7 +22,10 @@ if PRO_EDITION:
     from ogl2 import Connectable, Resizeable, Selectable, Attributable
     from .uml_shape_handler import UmlShapeHandlerOglTwo
 else:
-    import wx.lib.ogl as ogl
+    if LOCAL_OGL:
+        import ogl
+    else:
+        import wx.lib.ogl as ogl
     from gui.repair_ogl import repairOGL
     repairOGL()
     from .uml_shape_handler import UmlShapeHandler

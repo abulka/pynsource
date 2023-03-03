@@ -10,6 +10,8 @@ APP_VERSION = 1.84
 # Or use it with the current APP_VERSION to make post release patches e.g. "2"
 PATCH = "patched to use python 3.10"  # leave blank to turn off patch/beta annotation in about box
 
+LOCAL_OGL = True # use local copy of ogl.py, otherwise use wxPython's
+
 APP_VERSION_FULL = f"{APP_VERSION}"
 if PATCH:
     APP_VERSION_FULL += f"-{PATCH}" 
