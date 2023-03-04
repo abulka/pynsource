@@ -1,0 +1,7 @@
+python3 setup.py sdist
+#python3 setup.py sdist bdist_wheel
+
+echo Andy Tip: install in dev mode with 
+echo "    pip install -e ."
+echo uninstll with
+echo "    pip uninstall snap-wx-simple"

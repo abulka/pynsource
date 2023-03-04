@@ -1,0 +1,3 @@
+pip install ../alsm-parsers/alsm/
+pip install ../ogl2
+pip install ../pynsource-rego
