@@ -67,7 +67,7 @@ HELP_COMMAND_LINE_USAGE = """
 Usage: pynsource -v -m [-j|d outdir] | [-y outfile.png | nopng] sourcedir_or_pythonfiles...
 
 -a generate ascii art uml (default option, no need to specify)
-   NOTE: this ascii art is old alpha code - run the pynsource-gui.py
+   NOTE: this ascii art is old alpha code - run the pynsource_gui.py
     for superior uml as ascii
 -j generate java files, specify output folder for java files
 -d generate delphi files, specify output folder for delphi files
@@ -80,7 +80,7 @@ Usage: pynsource -v -m [-j|d outdir] | [-y outfile.png | nopng] sourcedir_or_pyt
 -x experimental test code (devel only)
 -p show parse model, no code generated, diagostic
 
-Note: pynsource uses an old alpha python parser.  pynsource-gui.py runs
+Note: pynsource uses an old alpha python parser.  pynsource_gui.py runs
       a newer, superior, ast based python parser.
       
 UML ASCI-ART EXAMPLES

@@ -197,18 +197,18 @@ class CmdFileImportViaArgs(CmdFileImportBase):
     Gets called when you pass arguments to Pynsource on the command line, 
     which reverse engineers and generates a diagram from those Python files.
     Example Usages:
-        python3 src/pynsource-gui.py src/layout/overlap_removal.py src/layout/layout_spring.py
-        python3 src/pynsource-gui.py src/layout/*.py
-        python3 src/pynsource-gui.py src/app/cmds/*.py
-        python3 src/pynsource-gui.py src/app/cmds/l*.py
+        python3 src/pynsource_gui.py src/layout/overlap_removal.py src/layout/layout_spring.py
+        python3 src/pynsource_gui.py src/layout/*.py
+        python3 src/pynsource_gui.py src/app/cmds/*.py
+        python3 src/pynsource_gui.py src/app/cmds/l*.py
     
     Assumes the files to be analysed are Python 3 - this is not yet
-    configurable, but could be changed in src/pynsource-gui.py line 379 by passing a 2 instead of a 3.
+    configurable, but could be changed in src/pynsource_gui.py line 379 by passing a 2 instead of a 3.
     
     If running the PRO edition (the command would be)
-        cd src; PYTHONPATH="/Users/andy/Devel/ogl2/:/Users/andy/Devel/pynsource-rego/" python3 pynsource-gui.py layout/overlap_removal.py ; cd ..
+        cd src; PYTHONPATH="/Users/andy/Devel/ogl2/:/Users/andy/Devel/pynsource-rego/" python3 pynsource_gui.py layout/overlap_removal.py ; cd ..
     or more simply
-        PYTHONPATH="/Users/andy/Devel/ogl2/:/Users/andy/Devel/pynsource-rego/" python3 src/pynsource-gui.py src/layout/overlap_removal.py
+        PYTHONPATH="/Users/andy/Devel/ogl2/:/Users/andy/Devel/pynsource-rego/" python3 src/pynsource_gui.py src/layout/overlap_removal.py
     """
     def __init__(self, files=None, mode=3):
         self.files = files
@@ -237,7 +237,7 @@ class CmdBootStrap(CmdBase):
             )
 
         def bootstrap04():
-            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("pynsource-gui.py")])
+            self.app.run.CmdFileImportFromFilePath(files=[os.path.abspath("pynsource_gui.py")])
 
         def bootstrap05():
             self.app.run.CmdFileImportFromFilePath(

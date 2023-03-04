@@ -1,8 +1,8 @@
 # To run Pynsource from source code
 
-You need Python 3.6 or higher. Running with later versions of Python gives you the ability to parse newer Python syntax e.g. importing code into Pynsource containing the [walrus operator](https://realpython.com/lessons/assignment-expressions/) needs at least Pynsource running under Python 3.8 to work. 
+You need Python 3.6 or higher. Running with later versions of Python gives you the ability to parse newer Python syntax e.g. importing code into Pynsource containing the [walrus operator](https://realpython.com/lessons/assignment-expressions/) needs at least Pynsource running under Python 3.8 to work. The latest tested version is Python 3.10.
 
-> Note Pynsource relies on the package [typed-ast](https://pypi.org/project/typed-ast/) for the ability to parse *both* Python 2 and Python 3. This package takes a while to get updated when a new Python gets released, so you might want to play it safe and run via Python 3.9 when Python 3.10 comes out.
+> Note Pynsource relies on the package [typed-ast](https://pypi.org/project/typed-ast/) for the ability to parse *both* Python 2 and Python 3. This package takes a while to get updated when a new Python gets released, so you might want to play it safe and run via Python 3.10 when Python 3.11 comes out.
 
 For Mac or Windows run the following commands:
 
@@ -48,3 +48,45 @@ The environment variable `TRAVIS` is set by the script to avoid tests that invol
 - Tests run through Travis, controlled by  `.travis.yml` ![Travis test status](https://github.com/abulka/pynsource/workflows/Python%20application/badge.svg)
 - Tests also run through GitHub Actions, controlled by `.github/workflows/pythonapp.yml` ![Tests github actions workflow status](https://github.com/abulka/pynsource/actions/workflows/python-tests.yml/badge.svg)
 
+# Building pynsource as a package
+
+You can build pynsource as a package with
+
+    $ python setup.py sdist
+    
+This will create a `dist` directory containing a `pynsource-<version>.tar.gz` file. You can then install this package with
+    
+    $ pip install dist/pynsource-<version>.tar.gz
+
+or install in dev mode with 
+
+    $ pip install -e .
+
+uninstall with
+
+    $ pip uninstall pynsource
+
+## Why do this?
+
+Installing pynsource as a package gives you two entry points
+    
+        $ pynsource
+        $ pynsource-cli
+
+Typing `pynsource` will run the GUI - which might be an easier way to launch pynsource than invoking python etc.
+
+Typing `pynsource-cli` is the command line interface. The command line interface is useful for batch processing of python files, e.g. to generate an analysis dump the structure of each python file. It won't produce diagrams though. So you can e.g. `pynsource-cli blah.py`.
+
+## virtual environments
+
+If you are using a virtual environment, ensure you install the package into the virtual environment. E.g. if you are using `pyenv` to manage your virtual environments, you can do this with    
+
+    $ pyenv activate <your-virtual-env>
+    $ pip install -e .
+    $ pynsource
+
+or if you are using venv
+
+    $ source venv/bin/activate
+    $ pip install -e .
+    $ pynsource

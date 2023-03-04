@@ -331,5 +331,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # print parse_old_and_new('../../src/pynsource-gui.py') # different - ok
+    # print parse_old_and_new('../../src/pynsource_gui.py') # different - ok
     # print parse_old_and_new('python-in/testmodule08_multiple_inheritance.py')
