@@ -32,8 +32,14 @@ parts:
     plugin: dump
     source: src/media
     organize:
-      "*": $SNAP/lib/python3.8/site-packages/media/
-      # "*": $SNAP/lib/$python/site-packages/media/
+      # "*": lib/python3.8/site-packages/media/
+      "*": lib/$python/site-packages/media/
+
+  # copy-media:
+  #   plugin: dump
+  #   source: src/media
+  #   organize:
+  #     '*': $SNAPCRAFT_INSTALL_PREFIX/lib/python*/dist-packages/media/
 
   build-the-python-stuff-please:
     plugin: python
@@ -79,3 +85,4 @@ parts:
       - nxagent
       - primus-libs
       - libpulse0
+    # after: [copy-media]
