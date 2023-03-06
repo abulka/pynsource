@@ -11,7 +11,8 @@ architectures:
   - build-on: [amd64]
 
 apps:
-  snap-wx-simple:
+  # You can also run with /snap/bin/pynsource. (hit TAB to autocomplete)
+  pynsource:
     command: bin/pynsource
     plugs: [home, network, network-bind, removable-media, audio-playback, desktop]
     environment:
@@ -31,11 +32,13 @@ parts:
     plugin: python
     source: .
     python-packages:
-        - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04/wxPython-4.2.0-cp38-cp38-linux_x86_64.whl
-        - wxasync
-        # - -r requirements-linux.txt
+      - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04/wxPython-4.2.0-cp38-cp38-linux_x86_64.whl
+      - wxasync
+      # - -r requirements-linux.txt
     requirements:
-        - /root/project/.requirement-extras/requirements-linux-common.txt
+      - /root/project/.requirement-extras/requirements-linux-common.txt
+    stage:
+      - src/media # is included in the setup.py package but not in the snap so add it manually        
     stage-packages:
       - libcairo2
       - libfontconfig1
