@@ -32,8 +32,8 @@ parts:
     plugin: dump
     source: src/media
     organize:
-      "*": $SNAP/lib/python3.8/site-packages/media
-      # "*": $SNAP/lib/$python/site-packages/media
+      "*": $SNAP/lib/python3.8/site-packages/media/
+      # "*": $SNAP/lib/$python/site-packages/media/
 
   build-the-python-stuff-please:
     plugin: python
@@ -42,17 +42,13 @@ parts:
       - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04/wxPython-4.2.0-cp38-cp38-linux_x86_64.whl
       - wxasync
       - wheel
-      # - -r requirements-linux.txt
     requirements:
       - /root/project/.requirement-extras/requirements-linux-common.txt
-    # filesets:
-    #   my-extra-dir:
-    #     - src/media/**
-    # stage:
-      # - /root/project/src/media # media is included in the setup.py package but not in the snap so add it manually        
-      # - ./media
-      # - ../src/media:/media      # nope
-      # - src/media
+    # install: |
+    #   # Create a 'media' directory inside the snap directory and copy the contents of 'src/media' to it
+    #   mkdir -p $SNAPCRAFT_PART_INSTALL/media
+    #   cp -R src/media/* $SNAPCRAFT_PART_INSTALL/media/
+
     stage-packages:
       - libcairo2
       - libfontconfig1
