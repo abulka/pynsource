@@ -6,6 +6,7 @@ astpretty
 termcolor
 beautifultable
 appdirs
+wheel
 pydbg
 aiohttp
 async_lru
