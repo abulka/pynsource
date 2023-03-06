@@ -28,6 +28,10 @@ environment:
   LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/snap/snap-wx-simple/current/usr/lib/x86_64-linux-gnu/pulseaudio
 
 parts:
+  copy-stuff:
+    plugin: dump
+    source: ./src/media
+
   build-the-python-stuff-please:
     plugin: python
     source: .
@@ -38,9 +42,9 @@ parts:
       # - -r requirements-linux.txt
     requirements:
       - /root/project/.requirement-extras/requirements-linux-common.txt
-    filesets:
-      my-extra-dir:
-        - src/media/**
+    # filesets:
+    #   my-extra-dir:
+    #     - src/media/**
     # stage:
       # - /root/project/src/media # media is included in the setup.py package but not in the snap so add it manually        
       # - ./media
