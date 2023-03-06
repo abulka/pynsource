@@ -30,7 +30,10 @@ environment:
 parts:
   copy-stuff:
     plugin: dump
-    source: ./src/media
+    source: src/media
+    organize:
+      "*": $SNAP/lib/python3.8/site-packages/media
+      # "*": $SNAP/lib/$python/site-packages/media
 
   build-the-python-stuff-please:
     plugin: python
