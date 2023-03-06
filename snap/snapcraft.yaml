@@ -38,10 +38,14 @@ parts:
       # - -r requirements-linux.txt
     requirements:
       - /root/project/.requirement-extras/requirements-linux-common.txt
-    stage:
+    filesets:
+      my-extra-dir:
+        - src/media/**
+    # stage:
       # - /root/project/src/media # media is included in the setup.py package but not in the snap so add it manually        
-      - ./media
+      # - ./media
       # - ../src/media:/media      # nope
+      # - src/media
     stage-packages:
       - libcairo2
       - libfontconfig1
