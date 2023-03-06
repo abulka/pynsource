@@ -1,0 +1,2 @@
+#snapcraft --use-lxd
+snapcraft --use-lxd --debug

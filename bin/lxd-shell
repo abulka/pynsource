@@ -1,0 +1,3 @@
+echo you may need to 
+echo lxc start snapcraft-pynsource
+lxc exec snapcraft-pynsource -- /bin/bash
