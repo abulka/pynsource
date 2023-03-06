@@ -30,10 +30,10 @@ parts:
   build-the-python-stuff-please:
     plugin: python
     source: .
-    requirements: requirements-linux.txt
     python-packages:
         - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04/wxPython-4.2.0-cp38-cp38-linux_x86_64.whl
         - wxasync
+        - -r requirements-linux.txt
     stage-packages:
       - libcairo2
       - libfontconfig1
