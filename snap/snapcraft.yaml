@@ -15,11 +15,11 @@ apps:
   pynsource:
     command: bin/pynsource
     plugs: [home, network, network-bind, removable-media, audio-playback, desktop]
-    environment:
-      # LANG: en_US.UTF-8
-      # LC_ALL: en_US.UTF-8
-      LANG: C.UTF-8
-      LC_ALL: C.UTF-8
+    # environment:
+    #   # LANG: en_US.UTF-8
+    #   # LC_ALL: en_US.UTF-8
+    #   LANG: C.UTF-8
+    #   LC_ALL: C.UTF-8
   python-v:
       command: bin/python3 -V
 
