@@ -1,0 +1,21 @@
+name: Pynsource Snap
+on:
+  push:
+    # branches: [ main ]
+    tags: ['v*', 'pre*']
+
+    # To trigger a build when above is set to tag
+    # git tag --l
+    # git tag -a v1.nn
+    # git push --follow-tags
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: snapcore/action-build@v1
+      id: snapcraft
+    - uses: actions/upload-artifact@v3
+      with:
+        name: snap
+        path: ${{ steps.snapcraft.outputs.snap }}

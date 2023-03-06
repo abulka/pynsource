@@ -1,10 +1,11 @@
 configobj
 requests
-typed_ast==1.1.1
+typed_ast
 astpretty
 termcolor
 beautifultable
 appdirs
+wheel
 py2app
 click
 pytest

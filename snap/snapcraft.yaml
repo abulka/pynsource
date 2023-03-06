@@ -1,24 +1,66 @@
 name: pynsource
 version: git
 summary: 'Pynsource - reverse engineer Python source code into UML'
+description: |
+      UML tool for Python. Reverse engineer Python source code into UML.
+
 grade: stable # devel # must be 'stable' to release into candidate/stable channels
-confinement: strict # use 'strict' once you have the right plugs and slots
-base: core22
+confinement: devmode # strict # use 'strict' once you have the right plugs and slots
+base: core20
+architectures:
+  - build-on: [amd64]
+
 apps:
-    pynsource:
-        command: python3 $SNAP/pynsource-gui.py
-        extensions: [gnome]
-        plugs: [unity7, audio-playback, home, network]
+  snap-wx-simple:
+    command: bin/pynsource
+    plugs: [home, network, network-bind, removable-media, audio-playback, desktop]
+    environment:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8 
+  python-v:
+      command: bin/python3 -V
+
+environment:
+  # Whilst usr/lib/x86_64-linux-gnu is in the LD_LIBRARY_PATH by default, and
+  # its subdirectories should also be searched, libpulsecommon-13.99.so is not found
+  # unless the full path is specified.
+  LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/snap/snap-wx-simple/current/usr/lib/x86_64-linux-gnu/pulseaudio
+
 parts:
-  copy-stuff:
-    plugin: dump
-    source: ./src
-  pynsource:
+  build-the-python-stuff-please:
     plugin: python
-    python-version: python3
-    source: ./src
+    source: .
+    requirements: requirements-linux.txt
     python-packages:
-        - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxPython-4.2.0-cp310-cp310-linux_x86_64.whl
+        - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04/wxPython-4.2.0-cp38-cp38-linux_x86_64.whl
         - wxasync
-    python-requirements:
-        - /root/project/.requirement-extras/requirements-linux-common.txt
+    stage-packages:
+      - libcairo2
+      - libfontconfig1
+      - cruft-common
+      - libgl1
+      - libgstreamer-plugins-base1.0-0
+      - libgstreamer1.0-0
+      - libgstreamer1.0-dev
+      - libgtk-3-0
+      - libjavascriptcoregtk-4.0-18
+      - libjpeg-turbo8
+      - libnotify4
+      - libpango-1.0-0
+      - libpangocairo-1.0-0
+      - libpangoft2-1.0-0
+      - libpcre2-32-0
+      - libpng16-16
+      - libsdl2-2.0-0
+      - libsm6
+      - libtiff5
+      - libwayland-client0
+      - libwayland-egl1
+      - libwebkit2gtk-4.0-37
+      - libx11-6
+      - libxtst6
+      - libxxf86vm1
+      - nsight-systems
+      - nxagent
+      - primus-libs
+      - libpulse0
