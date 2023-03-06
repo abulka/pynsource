@@ -1,6 +1,6 @@
 configobj
 requests
-typed_ast
+typed_ast==1.1.1
 astpretty
 termcolor
 beautifultable
