@@ -7,7 +7,7 @@ import urllib.request, urllib.parse, urllib.error
 from urllib.request import Request, urlopen
 import asyncio
 from io import StringIO
-from pydbg import dbg
+# from pydbg import dbg
 from gui.coord_utils import ZoomInfo
 from typing import List, Set, Dict, Tuple, Optional
 from media import images

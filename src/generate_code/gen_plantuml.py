@@ -2,7 +2,7 @@ import os
 import re
 import requests
 from .gen_base import ReportGenerator, CmdLineGenerator
-from pydbg import dbg
+# from pydbg import dbg
 import logging
 from common.logger import config_log
 import functools
