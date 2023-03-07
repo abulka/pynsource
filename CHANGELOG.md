@@ -4,9 +4,10 @@
 
 ### 1.85 beta
 
-- fixed: Can parse Python 3.10 syntax
+- Fixed: Pynsource can now parse Python 3.10 syntax
 - Apple Silicon Arm build available for Mac
-- Ubuntu 22.04 build available. All pynsource linux builds now use Python 3.10 except Ubuntu 18.04 which is still on Python 3.9
+- Ubuntu 22.04 / Mint 21 / Debian builds available.
+- Limitation: Ubuntu Snap still uses Python 3.6 so cannot parse Python 3.10 syntax. 
 
 *February 2022*
 

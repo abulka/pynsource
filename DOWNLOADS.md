@@ -2,7 +2,9 @@
 
 The latest version is `1.84`
 
-[Download](https://github.com/abulka/pynsource/releases/latest) the latest release. 👈
+[Download](https://github.com/abulka/pynsource/releases/latest) the latest stable release. 👈
+
+Python 3.10 syntax is now supported - see [1.85 beta 2 release](https://github.com/abulka/pynsource/releases/tag/pre-70)
 
 ## Mac
 
