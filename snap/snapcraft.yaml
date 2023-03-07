@@ -14,7 +14,7 @@ apps:
   # You can also run with /snap/bin/pynsource. (hit TAB to autocomplete)
   pynsource:
     command: bin/pynsource
-    plugs: [home, network, network-bind, removable-media, audio-playback, desktop]
+    plugs: [home, network, network-bind, removable-media, audio-playback, desktop, desktop-legacy]
     environment:
     #   # LANG: en_US.UTF-8
     #   # LC_ALL: en_US.UTF-8
@@ -45,11 +45,6 @@ parts:
       - wheel
     requirements:
       - /root/project/.requirement-extras/requirements-linux-common.txt
-    # install: |
-    #   # Create a 'media' directory inside the snap directory and copy the contents of 'src/media' to it
-    #   mkdir -p $SNAPCRAFT_PART_INSTALL/media
-    #   cp -R src/media/* $SNAPCRAFT_PART_INSTALL/media/
-
     stage-packages:
       - libcairo2
       - libfontconfig1
@@ -82,3 +77,4 @@ parts:
       - libpulse0
       - hicolor-icon-theme
       - gnome-icon-theme
+      - gdk-pixbuf-query-loaders
