@@ -8,7 +8,7 @@ APP_VERSION = 1.84
 # PATCH marker does not affect version checking, its just an annotation in the about box.
 # Use it with a future APP_VERSION to make betas e.g. "beta 2"
 # Or use it with the current APP_VERSION to make post release patches e.g. "2"
-PATCH = "patched to use python 3.10"  # leave blank to turn off patch/beta annotation in about box
+PATCH = "patched to use python 3.10 - beta2"  # leave blank to turn off patch/beta annotation in about box
 
 LOCAL_OGL = True # use local copy of ogl.py, otherwise use wxPython's
 
