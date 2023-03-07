@@ -22,7 +22,7 @@ apps:
       LC_ALL: C.UTF-8
     extensions:
       # HINT: Adds plugs and changes environment variables when building and running
-      - gnome
+      - gnome-3-38
   python-v:
       command: bin/python3 -V
 
