@@ -78,4 +78,5 @@ parts:
       - hicolor-icon-theme
       - gnome-icon-theme
       # - gdk-pixbuf-query-loaders
-      - gdk-pixbuf
+      # - gdk-pixbuf
+      # - libgdk-pixbuf2.0-dev # untried
