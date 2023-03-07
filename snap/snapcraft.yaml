@@ -47,6 +47,8 @@ parts:
     requirements:
       - setuptools
       - /root/project/.requirement-extras/requirements-linux-common.txt
+    build-packages:
+      - python3-setuptools
     stage-packages:
       - libcairo2
       - libfontconfig1
