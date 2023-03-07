@@ -77,4 +77,5 @@ parts:
       - libpulse0
       - hicolor-icon-theme
       - gnome-icon-theme
-      - gdk-pixbuf-query-loaders
+      # - gdk-pixbuf-query-loaders
+      - gdk-pixbuf
