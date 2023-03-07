@@ -20,7 +20,7 @@ apps:
     #   # LC_ALL: en_US.UTF-8
       LANG: C.UTF-8
       LC_ALL: C.UTF-8
-    extensions: [gnome-3-34]
+    extensions: [gnome-3-38]
   python-v:
       command: bin/python3 -V
 
