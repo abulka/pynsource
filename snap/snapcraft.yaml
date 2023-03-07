@@ -45,6 +45,7 @@ parts:
       - wxasync
       - wheel
     requirements:
+      - setuptools
       - /root/project/.requirement-extras/requirements-linux-common.txt
     stage-packages:
       - libcairo2
