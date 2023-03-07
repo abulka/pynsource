@@ -45,7 +45,7 @@ parts:
       - wxasync
       # - wheel cos python3-setuptools will give it to us
     requirements:
-      - setuptools
+      # - setuptools
       - /root/project/.requirement-extras/requirements-linux-common.txt
     build-packages:
       - python3-setuptools
@@ -84,5 +84,5 @@ parts:
       # - gdk-pixbuf-query-loaders
       # - gdk-pixbuf
       # - libgdk-pixbuf2.0-dev # untried
-      - python3-setuptools
-      - python3-pkg-resources
+      # - python3-setuptools
+      # - python3-pkg-resources
