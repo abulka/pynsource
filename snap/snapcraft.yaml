@@ -20,7 +20,9 @@ apps:
     #   # LC_ALL: en_US.UTF-8
       LANG: C.UTF-8
       LC_ALL: C.UTF-8
-    extensions: [gnome-3-38]
+    extensions:
+      # HINT: Adds plugs and changes environment variables when building and running
+      - gnome
   python-v:
       command: bin/python3 -V
 
@@ -29,6 +31,9 @@ environment:
   # its subdirectories should also be searched, libpulsecommon-13.99.so is not found
   # unless the full path is specified.
   LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/snap/snap-wx-simple/current/usr/lib/x86_64-linux-gnu/pulseaudio
+  
+  # WORKAROUND: Add python modules in Snap to search path
+  PYTHONPATH: ${SNAP}/lib/python3.8/site-packages:${SNAP}/usr/lib/python3/dist-packages
 
 parts:
   copy-stuff:
@@ -40,15 +45,59 @@ parts:
   build-the-python-stuff-please:
     plugin: python
     source: .
+
+    build-environment:
+      # WORKAROUND: The python plugin is broken with gnome extension
+      # https://forum.snapcraft.io/t/python-plugin-gnome-3-extension-error/33396/8?u=oleksis
+      - PATH: ${CRAFT_PART_INSTALL}/bin:${PATH:+:$PATH}
+      - PYTHONPATH: /usr/lib/python38.zip:/usr/lib/python38:/usr/lib/python3.8/lib-dynload:/root/.local/lib/python3.8/site-packages:/usr/local/lib/python3.8/dist-packages:/usr/lib/python3/dist-packages:/root/project${PYTHONPATH:+:$PYTHONPATH}
+      # WORKAROUND: The python plugin is broken with gnome extension
+      # - PATH: ${CRAFT_PART_INSTALL}/bin:${PATH}
+      # - PYTHONPATH: ""
+
     python-packages:
+      # - wheel
       - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04/wxPython-4.2.0-cp38-cp38-linux_x86_64.whl
       - wxasync
-      # - wheel cos python3-setuptools will give it to us
     requirements:
       # - setuptools
       - /root/project/.requirement-extras/requirements-linux-common.txt
+    stage:
+      # WORKAROUND: Skip venv from python plugin
+      - -bin/activate
+      - -bin/activate.csh
+      - -bin/activate.fish
+      - -bin/Activate.ps1
+      - -bin/python
+      - -bin/python3
+      - -bin/python3.8
+      - -bin/pip
+      - -bin/pip3
+      - -bin/pip3.8
+      - -pyvenv.cfg      
     build-packages:
+      - freeglut3
+      - freeglut3-dev
+      - libgl1-mesa-dev
+      - libglu1-mesa-dev
+      - libgstreamer-plugins-base1.0-dev
+      - libgtk-3-dev
+      - libjpeg-dev
+      - libnotify-dev
+      - libsdl2-dev
+      - libsm-dev
+      - libtiff-dev
+      - libwebkit2gtk-4.1-dev
+      - libxtst-dev
+      - libssl-dev
+      - libpulse-dev
+      - pkg-config
+      - python3.8
+      - python3.8-dev
+      - libpython3.8-dev
+      - python3.8-venv
       - python3-setuptools
+      - python3-wheel
     stage-packages:
       - libcairo2
       - libfontconfig1
