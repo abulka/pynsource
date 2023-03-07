@@ -81,3 +81,4 @@ parts:
       # - gdk-pixbuf-query-loaders
       # - gdk-pixbuf
       # - libgdk-pixbuf2.0-dev # untried
+      - python3-setuptools
