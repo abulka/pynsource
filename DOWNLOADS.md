@@ -10,9 +10,11 @@ Python 3.10 syntax is now supported - see [1.85 beta 2 release](https://github.c
 
 Unzip and drag app into the Applications directory.
 
-Mac users please [right click open](https://www.howtogeek.com/205393/gatekeeper-101-why-your-mac-only-allows-apple-approved-software-by-default/) the first time
+Mac users please [right click open](https://www.howtogeek.com/205393/gatekeeper-101-why-your-mac-only-allows-apple-approved-software-by-default/) the first time. 
+Mac Big Sur, Monterey, Ventura users need to first `xattr -dr com.apple.quarantine /Applications/Pynsource.app`. 
 
-> Mac Big Sur users need to first `xattr -dr com.apple.quarantine /Applications/Pynsource.app`
+> 🎉 Easier Technique for Mac Users: Right click on the supplied bash script `fix-permissions.command` and choose "Open" to apply the correct permissions to `Pynsource`.
+> Then you can copy the app to you Applications/ folder and run it as normal.
 
 ## Windows 10
 
@@ -20,9 +22,9 @@ Unzip and run the installer.
 
 ## Linux
 
-Unzip and run the standalone executables available for Ubuntu 18.04 and 20.04.
+Unzip and run the standalone executables available. These are named Ubuntu but run in any debian based system like Mint 21 etc.
 
-The benefit of the binaries is that they run via the latest version of Python available, and will be able to parse advanced Python syntax like the walrus operator. They can also be registered with a Pro license (snaps cannot).
+The benefit of the binaries is that they run via the latest version of Python available, and will be able to parse advanced Python syntax like the walrus operator or Python 3.10 match-case syntax. They can also be registered with a Pro license (Python snaps cannot).
 
 Special rare builds running version 1.77:
  * [Ubuntu Linux 16.0.4 download](http://bit.ly/pynsource-1-77-ubuntu-16) (unzip and run the executable) 
@@ -39,6 +41,8 @@ Note re snaps under Ubuntu 16.04 Due to a bug in Snapcraft, if you are trying to
     sudo snap install pynsource
     sudo snap install core
     pynsource 
+
+> Limitation: The Ubuntu Snap still uses Python 3.6 so cannot parse Python 3.10 syntax. The Canonical snap build system is buggy and poorly documented so I have not been able to get it to work with Python 3.10 yet.
 
 ## Pro Edition
 
