@@ -87,7 +87,8 @@ parts:
       - libsdl2-dev
       - libsm-dev
       - libtiff-dev
-      - libwebkit2gtk-4.1-dev
+      # - libwebkit2gtk-4.1-dev
+      - libwebkit2gtk-4.0-37
       - libxtst-dev
       - libssl-dev
       - libpulse-dev
