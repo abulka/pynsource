@@ -72,18 +72,6 @@ parts:
     organize:
       "*": lib/python3.10/site-packages/dialogs/
 
-  # copy-html:
-  #   plugin: dump
-  #   source: src/dialogs/
-  #   organize:
-  #     "HelpWindow.html": lib/python3.10/site-packages/dialogs/
-
-  # copy-help-images:
-  #   plugin: dump
-  #   source: src/dialogs/help-images
-  #   organize:
-  #     "*": lib/python3.10/site-packages/dialogs/help-images/
-
   build-the-python-stuff-please:
     plugin: python
     source: .

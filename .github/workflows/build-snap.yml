@@ -21,7 +21,7 @@ jobs:
         path: ${{ steps.snapcraft.outputs.snap }}
 
     # Uploads the snap to edge channel, test via: sudo snap refresh pynsource --edge
-    # - name: Snap upload
-    #   id: snapcraft
-    #   run: |
-    #     snapcraft upload *.snap --release edge
+    - name: Snap upload
+      id: snapcraft
+      run: |
+        snapcraft upload *.snap --release edge
