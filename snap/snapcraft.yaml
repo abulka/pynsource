@@ -6,7 +6,7 @@ description: |
 
 grade: stable # devel # must be 'stable' to release into candidate/stable channels
 confinement: devmode # strict # use 'strict' once you have the right plugs and slots
-base: core20
+base: core22
 architectures:
   - build-on: [amd64]
 
@@ -14,7 +14,17 @@ apps:
   # You can also run with /snap/bin/pynsource. (hit TAB to autocomplete)
   pynsource:
     command: bin/pynsource
-    plugs: [home, network, network-bind, removable-media, audio-playback, desktop]
+    plugs:
+      - desktop
+      - desktop-legacy
+      - x11
+      - pulseaudio
+      - home
+      - gsettings
+      - network
+      - network-bind
+      - removable-media
+    desktop: usr/share/applications/pynsource.desktop
     environment:
     #   # LANG: en_US.UTF-8
     #   # LC_ALL: en_US.UTF-8
@@ -22,7 +32,8 @@ apps:
       LC_ALL: C.UTF-8
     extensions:
       # HINT: Adds plugs and changes environment variables when building and running
-      - gnome-3-38
+      # - gnome-3-38
+      - gnome
   python-v:
       command: bin/python3 -V
 
@@ -30,17 +41,17 @@ environment:
   # Whilst usr/lib/x86_64-linux-gnu is in the LD_LIBRARY_PATH by default, and
   # its subdirectories should also be searched, libpulsecommon-13.99.so is not found
   # unless the full path is specified.
-  LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/snap/snap-wx-simple/current/usr/lib/x86_64-linux-gnu/pulseaudio
+  # LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/snap/snap-wx-simple/current/usr/lib/x86_64-linux-gnu/pulseaudio
   
   # WORKAROUND: Add python modules in Snap to search path
-  PYTHONPATH: ${SNAP}/lib/python3.8/site-packages:${SNAP}/usr/lib/python3/dist-packages
+  PYTHONPATH: ${SNAP}/lib/python3.10/site-packages:${SNAP}/usr/lib/python3/dist-packages
 
 parts:
   copy-stuff:
     plugin: dump
     source: src/media
     organize:
-      "*": lib/python3.8/site-packages/media/
+      "*": lib/python3.10/site-packages/media/
 
   build-the-python-stuff-please:
     plugin: python
@@ -50,31 +61,7 @@ parts:
       # WORKAROUND: The python plugin is broken with gnome extension
       # https://forum.snapcraft.io/t/python-plugin-gnome-3-extension-error/33396/8?u=oleksis
       - PATH: ${CRAFT_PART_INSTALL}/bin:${PATH:+:$PATH}
-      - PYTHONPATH: /usr/lib/python38.zip:/usr/lib/python38:/usr/lib/python3.8/lib-dynload:/root/.local/lib/python3.8/site-packages:/usr/local/lib/python3.8/dist-packages:/usr/lib/python3/dist-packages:/root/project${PYTHONPATH:+:$PYTHONPATH}
-      # WORKAROUND: The python plugin is broken with gnome extension
-      # - PATH: ${CRAFT_PART_INSTALL}/bin:${PATH}
-      # - PYTHONPATH: ""
-
-    python-packages:
-      # - wheel
-      - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04/wxPython-4.2.0-cp38-cp38-linux_x86_64.whl
-      - wxasync
-    requirements:
-      # - setuptools
-      - /root/project/.requirement-extras/requirements-linux-common.txt
-    stage:
-      # WORKAROUND: Skip venv from python plugin
-      - -bin/activate
-      - -bin/activate.csh
-      - -bin/activate.fish
-      - -bin/Activate.ps1
-      - -bin/python
-      - -bin/python3
-      - -bin/python3.8
-      - -bin/pip
-      - -bin/pip3
-      - -bin/pip3.8
-      - -pyvenv.cfg      
+      - PYTHONPATH: /usr/lib/python310.zip:/usr/lib/python3.10:/usr/lib/python3.10/lib-dynload:/root/.local/lib/python3.10/site-packages:/usr/local/lib/python3.10/dist-packages:/usr/lib/python3/dist-packages:/root/project${PYTHONPATH:+:$PYTHONPATH}
     build-packages:
       - freeglut3
       - freeglut3-dev
@@ -87,52 +74,125 @@ parts:
       - libsdl2-dev
       - libsm-dev
       - libtiff-dev
-      # - libwebkit2gtk-4.1-dev
-      - libwebkit2gtk-4.0-37
+      - libwebkit2gtk-4.1-dev
       - libxtst-dev
       - libssl-dev
       - libpulse-dev
       - pkg-config
-      - python3.8
-      - python3.8-dev
-      - libpython3.8-dev
-      - python3.8-venv
+      - python3.10
+      - python3.10-dev
+      - libpython3.10-dev
+      - python3.10-venv
       - python3-setuptools
       - python3-wheel
     stage-packages:
+      - yt-dlp
+      - freeglut3
+      - ibus-gtk3
+      - libasound2
+      - libasyncns0
+      - libatk-bridge2.0-0
+      - libatk1.0-0
+      - libatspi2.0-0
+      - libcairo-gobject2
       - libcairo2
+      - libdatrie1
+      - libdecor-0-0
+      - libdeflate0
+      - libepoxy0
+      - libflac8
+      - libglu1-mesa
       - libfontconfig1
-      - cruft-common
-      - libgl1
-      - libgstreamer-plugins-base1.0-0
-      - libgstreamer1.0-0
-      - libgstreamer1.0-dev
+      - libfribidi0
+      - libgbm1
+      - libgdk-pixbuf-2.0-0
+      - libgraphite2-3
       - libgtk-3-0
-      - libjavascriptcoregtk-4.0-18
+      - libharfbuzz0b
+      - libice6
+      - libjbig0
       - libjpeg-turbo8
       - libnotify4
+      - libogg0
+      - libopus0
       - libpango-1.0-0
       - libpangocairo-1.0-0
       - libpangoft2-1.0-0
       - libpcre2-32-0
-      - libpng16-16
+      - libpixman-1-0
+      - libpulse0
       - libsdl2-2.0-0
       - libsm6
+      - libsndfile1
+      - libthai0
       - libtiff5
+      - libvorbis0a
+      - libvorbisenc2
       - libwayland-client0
+      - libwayland-cursor0
       - libwayland-egl1
-      - libwebkit2gtk-4.0-37
+      - libwayland-server0
+      - libwebp7
       - libx11-6
+      - libx11-xcb1
+      - libxau6
+      - libxcb-render0
+      - libxcb-shm0
+      - libxcb1
+      - libxcomposite1
+      - libxcursor1
+      - libxdamage1
+      - libxdmcp6
+      - libxext6
+      - libxfixes3
+      - libxi6
+      - libxinerama1
+      - libxkbcommon0
+      - libxrandr2
+      - libxrender1
+      - libxss1
       - libxtst6
       - libxxf86vm1
-      - nsight-systems
-      - nxagent
-      - primus-libs
-      - libpulse0
-      - hicolor-icon-theme
-      - gnome-icon-theme
-      # - gdk-pixbuf-query-loaders
-      # - gdk-pixbuf
-      # - libgdk-pixbuf2.0-dev # untried
-      # - python3-setuptools
-      # - python3-pkg-resources
+      - libatomic1
+      - libdw1
+      - libegl1
+      - libenchant-2-2
+      - libevdev2
+      - libgl1
+      - libglvnd0
+      - libglx0
+      - libgstreamer-gl1.0-0
+      - libgstreamer-plugins-base1.0-0
+      - libgstreamer1.0-0
+      - libgstreamer1.0-dev
+      - libgudev-1.0-0
+      - libharfbuzz-icu0
+      - libhyphen0
+      - libjavascriptcoregtk-4.1-0
+      - libmanette-0.2-0
+      - libopengl0
+      - libopenjp2-7
+      - liborc-0.4-0
+      - libpsl5
+      - libsecret-1-0
+      - libsoup2.4-1
+      - libunwind8
+      - libwebkit2gtk-4.1-0
+      - libwebpdemux2
+      - libwoff1
+      - libxslt1.1    
+    python-requirements:
+      # - setuptools
+      - /root/project/.requirement-extras/requirements-linux-common.txt
+    python-packages:
+      # - pypubsub == 4.0.3
+      # - wheel
+      - wxasync
+      - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxPython-4.2.0-cp310-cp310-linux_x86_64.whl
+    override-build: |
+      # python3 -m pip install polib
+      # python3 setup.py build_trans
+      install -Dm644 "snap/gui/pynsource.desktop" -t "$CRAFT_PART_INSTALL/usr/share/applications/"
+      craftctl default
+    organize:
+      usr/lib/$CRAFT_ARCH_TRIPLET/pulseaudio/libpulsecommon-15.99.so: usr/lib/$CRAFT_ARCH_TRIPLET/libpulsecommon-15.99.so
