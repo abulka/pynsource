@@ -25,23 +25,35 @@ apps:
       - network-bind
       - removable-media
     desktop: usr/share/applications/pynsource.desktop
-    environment:
-    #   # LANG: en_US.UTF-8
-    #   # LC_ALL: en_US.UTF-8
-      LANG: C.UTF-8
-      LC_ALL: C.UTF-8
     extensions:
       # HINT: Adds plugs and changes environment variables when building and running
-      # - gnome-3-38
       - gnome
-  python-v:
-      command: bin/python3 -V
+  pynsource-cli:
+    command: bin/pynsource-cli
+    plugs:
+      - home
+      - network
+      - network-bind
+      - removable-media
+  python-version:
+    command: bin/python3
+    plugs:
+      - home
+      - network
+      - network-bind
+      - removable-media
 
 environment:
-  # Whilst usr/lib/x86_64-linux-gnu is in the LD_LIBRARY_PATH by default, and
-  # its subdirectories should also be searched, libpulsecommon-13.99.so is not found
-  # unless the full path is specified.
-  # LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/snap/snap-wx-simple/current/usr/lib/x86_64-linux-gnu/pulseaudio
+  # libpulsecommon fix:
+  # -------------------
+  #   Whilst usr/lib/x86_64-linux-gnu is in the LD_LIBRARY_PATH by default, and
+  #   its subdirectories should also be searched, libpulsecommon-13.99.so is not found
+  #   unless the full path is specified.
+  # 
+  #     LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/snap/snap-wx-simple/current/usr/lib/x86_64-linux-gnu/pulseaudio
+  # 
+  #   The other solution is to use the 'organize' keyword below to move the libpulsecommon file
+  #   to the expected location - this is what yt-dlg does so let's do that here too.
   
   # WORKAROUND: Add python modules in Snap to search path
   PYTHONPATH: ${SNAP}/lib/python3.10/site-packages:${SNAP}/usr/lib/python3/dist-packages
@@ -52,6 +64,25 @@ parts:
     source: src/media
     organize:
       "*": lib/python3.10/site-packages/media/
+
+  # To get the HelpWindow.html and the help-images folder into the snap
+  copy-dialogs:
+    plugin: dump
+    source: src/dialogs/
+    organize:
+      "*": lib/python3.10/site-packages/dialogs/
+
+  # copy-html:
+  #   plugin: dump
+  #   source: src/dialogs/
+  #   organize:
+  #     "HelpWindow.html": lib/python3.10/site-packages/dialogs/
+
+  # copy-help-images:
+  #   plugin: dump
+  #   source: src/dialogs/help-images
+  #   organize:
+  #     "*": lib/python3.10/site-packages/dialogs/help-images/
 
   build-the-python-stuff-please:
     plugin: python
@@ -182,16 +213,13 @@ parts:
       - libwoff1
       - libxslt1.1    
     python-requirements:
-      # - setuptools
       - /root/project/.requirement-extras/requirements-linux-common.txt
     python-packages:
-      # - pypubsub == 4.0.3
-      # - wheel
       - wxasync
       - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxPython-4.2.0-cp310-cp310-linux_x86_64.whl
     override-build: |
-      # python3 -m pip install polib
-      # python3 setup.py build_trans
+      # python3 -m pip install polib # install other stuff if we needed to
+      # python3 setup.py build_trans # build translations if we had them
       install -Dm644 "snap/gui/pynsource.desktop" -t "$CRAFT_PART_INSTALL/usr/share/applications/"
       craftctl default
     organize:
