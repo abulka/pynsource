@@ -423,7 +423,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         if "SNAP" in os.environ:
             cwd_info['SNAP'] = os.environ["SNAP"]
 
-        # print(cwd_info)
+        print("cwd_info", cwd_info)
         set_original_working_dir(cwd_info['__file__'])  # more accurate
         self.cwd_info = cwd_info
 
@@ -1362,6 +1362,10 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
     def OnEnterLicense(self, event):
         from dialogs.DialogRego import RegoDialog
         from gui.settings import enter_license
+
+        if "SNAP" in os.environ:
+            wx.MessageBox(f"Please download a binary build of Pynsource to register - snaps cannot be registered.")
+            return
 
         dialog = RegoDialog(None)
         dialog.m_textCtrl_name.Value = ""

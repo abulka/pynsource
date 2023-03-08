@@ -199,8 +199,8 @@ class BitmapShapeResizable(ogl.BitmapShape):
 
     def ResetSize(self):  # ANDY ADDED
         if self._bitmap.IsOk():  # Returns True if bitmap data is present.
-            w = self._ori_bmp.GetWidth()
-            h = self._ori_bmp.GetHeight()
+            w = int(self._ori_bmp.GetWidth()) # python 3.10 needs int
+            h = int(self._ori_bmp.GetHeight()) # python 3.10 needs int
             self.SetSize(w, h)
 
     def SetSize(self, w, h, recursive=True):
@@ -209,7 +209,7 @@ class BitmapShapeResizable(ogl.BitmapShape):
             # ANDY ADDED
             if self._bitmap.GetWidth() != w or self._bitmap.GetHeight() != h:
                 img = self._ori_bmp.ConvertToImage()
-                adjusted_img = img.Rescale(w, h, wx.IMAGE_QUALITY_HIGH)
+                adjusted_img = img.Rescale(int(w), int(h), wx.IMAGE_QUALITY_HIGH) # python 3.10 needs ints
                 bitmap = wx.Bitmap(adjusted_img)
                 self._bitmap = (
                     bitmap

@@ -22,6 +22,7 @@ except ModuleNotFoundError:
     # print("rego functionality not found")
     PRO_EDITION=False
     registered_to = ""
+    enter_license = lambda name, serial : None # dummy function when no rego library e.g. running from community source or snap
 else:
     PRO_EDITION = rego.are_registered(APP_VERSION)
     registered_to = rego.get_stored_serial_info()["name"] if rego.get_stored_serial_info() else ""
