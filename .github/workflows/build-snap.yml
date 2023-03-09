@@ -17,16 +17,16 @@ jobs:
     - uses: snapcore/action-build@v1
       id: snapcraft
 
-    - name: Modify Snap File to remove python symlinks - see https://forum.snapcraft.io/t/core22-gnome-extension-and-broken-symlinks/32900/4 
-      run: |
-        unsquashfs ${{ steps.snapcraft.outputs.snap }}
-        rm squashfs-root/bin/python*
-        snap pack squashfs-root
+    # - name: Modify Snap File to remove python symlinks - see https://forum.snapcraft.io/t/core22-gnome-extension-and-broken-symlinks/32900/4 
+    #   run: |
+    #     unsquashfs ${{ steps.snapcraft.outputs.snap }}
+    #     rm squashfs-root/bin/python*
+    #     snap pack squashfs-root
 
-    - uses: actions/upload-artifact@v3
-      with:
-        name: snap
-        path: squashfs-root.snap
+    # - uses: actions/upload-artifact@v3
+    #   with:
+    #     name: snap
+    #     path: squashfs-root.snap
 
     # Uploads the snap to edge channel, test via: sudo snap refresh pynsource --edge
     - name: Snap upload
