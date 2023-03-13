@@ -1,0 +1,28 @@
+# For linux users who want to install and actually build wxpython
+# which works on intel and also on linux on arm. You will first need to run
+# sudo apt-get install dpkg-dev build-essential python3-dev freeglut3-dev libgl1-mesa-dev libglu1-mesa-dev libgstreamer-plugins-base1.0-dev libgtk-3-dev libjpeg-dev libnotify-dev libpng-dev libsdl2-dev libsm-dev libtiff-dev libwebkit2gtk-4.0-dev libxtst-dev
+# and pip install attrdict3 (see https://github.com/wxWidgets/Phoenix/issues/2225)
+#wxPython>=4.0,<4.2.0 ; platform_system=="Linux" # See https://github.com/wxWidgets/Phoenix/issues/2225
+#wxPython==4.2.0 ; platform_system!="Linux"
+wxpython
+
+wxasync
+configobj
+requests
+typed_ast
+astpretty
+termcolor
+beautifultable
+appdirs
+wheel
+pydbg
+aiohttp
+async_lru
+
+Pillow
+py2app
+click
+#pytest
+#coverage
+#pytest-cov
+#black
