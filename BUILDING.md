@@ -35,6 +35,13 @@ If you need to use a virtual environment I recommend that you use `pyenv` to fir
 ## latest wxpython installation tips
 See also https://stackoverflow.com/questions/71821635/pip-cannot-install-wxpython-for-python-3-10-32-bit/75542856#75542856 on installing `wxpython` on linux.
 
+Linux users: This approach happens to build the wxpython wheel ourselves rather than using the sometime limited choice of prebuilt wheels. This works on `intel x86` and also on ubuntu `arm` (tested on ubuntu arm virtual machine running under UTM on mac M1 processor). You will first need to run:
+
+    $ sudo apt-get install dpkg-dev build-essential python3-dev freeglut3-dev libgl1-mesa-dev libglu1-mesa-dev libgstreamer-plugins-base1.0-dev libgtk-3-dev libjpeg-dev libnotify-dev libpng-dev libsdl2-dev libsm-dev libtiff-dev libwebkit2gtk-4.0-dev libxtst-dev
+
+    $ pip install attrdict3 (see https://github.com/wxWidgets/Phoenix/issues/2225)
+
+
 Or simply use the ready-to-go prebuilt binary executables of pynsource for all platforms, incl ubuntu, mint, popos (all ubuntu based) 🎉 - see [Downloads](DOWNLOADS.md)
 
 ## Running the tests
@@ -60,13 +67,6 @@ The environment variable `TRAVIS` is set by the script to avoid tests that invol
 You can build pynsource as a package with
 
     $ python setup.py sdist
-
-Linux users: This approach happens to build the wxpython wheel ourselves rather than using the sometime limited choice of prebuilt wheels. This works on `intel x86` and also on ubuntu `arm` (tested on ubuntu arm virtual machine running under UTM on mac M1 processor). You will first need to run:
-
-    $ sudo apt-get install dpkg-dev build-essential python3-dev freeglut3-dev libgl1-mesa-dev libglu1-mesa-dev libgstreamer-plugins-base1.0-dev libgtk-3-dev libjpeg-dev libnotify-dev libpng-dev libsdl2-dev libsm-dev libtiff-dev libwebkit2gtk-4.0-dev libxtst-dev
-
-    $ pip install attrdict3 (see https://github.com/wxWidgets/Phoenix/issues/2225)
-
     
 This will create a `dist` directory containing a `pynsource-<version>.tar.gz` file. You can then install this package with
     
@@ -76,7 +76,9 @@ or install in dev mode with
 
     $ pip install -e .
 
-run with:
+which actually installs lots of packages.
+
+Run with:
 
     pynsource
 

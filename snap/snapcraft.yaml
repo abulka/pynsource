@@ -35,28 +35,10 @@ apps:
       - network
       - network-bind
       - removable-media
-  python-version:
-    command: bin/python3
-    plugs:
-      - home
-      - network
-      - network-bind
-      - removable-media
 
 environment:
-  # libpulsecommon fix:
-  # -------------------
-  #   Whilst usr/lib/x86_64-linux-gnu is in the LD_LIBRARY_PATH by default, and
-  #   its subdirectories should also be searched, libpulsecommon-13.99.so is not found
-  #   unless the full path is specified.
-  # 
-  #     LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/snap/snap-wx-simple/current/usr/lib/x86_64-linux-gnu/pulseaudio
-  # 
-  #   The other solution is to use the 'organize' keyword below to move the libpulsecommon file
-  #   to the expected location - this is what yt-dlg does so let's do that here too.
-  
   # WORKAROUND: Add python modules in Snap to search path
-  PYTHONPATH: ${SNAP}/lib/python3.10/site-packages:${SNAP}/usr/lib/python3/dist-packages
+  # PYTHONPATH: ${SNAP}/lib/python3.10/site-packages:${SNAP}/usr/lib/python3/dist-packages
 
 parts:
   copy-stuff:
@@ -79,8 +61,8 @@ parts:
     build-environment:
       # WORKAROUND: The python plugin is broken with gnome extension
       # https://forum.snapcraft.io/t/python-plugin-gnome-3-extension-error/33396/8?u=oleksis
-      - PATH: ${CRAFT_PART_INSTALL}/bin:${PATH:+:$PATH}
-      - PYTHONPATH: /usr/lib/python310.zip:/usr/lib/python3.10:/usr/lib/python3.10/lib-dynload:/root/.local/lib/python3.10/site-packages:/usr/local/lib/python3.10/dist-packages:/usr/lib/python3/dist-packages:/root/project${PYTHONPATH:+:$PYTHONPATH}
+      # - PATH: ${CRAFT_PART_INSTALL}/bin:${PATH:+:$PATH}
+      # - PYTHONPATH: /usr/lib/python310.zip:/usr/lib/python3.10:/usr/lib/python3.10/lib-dynload:/root/.local/lib/python3.10/site-packages:/usr/local/lib/python3.10/dist-packages:/usr/lib/python3/dist-packages:/root/project${PYTHONPATH:+:$PYTHONPATH}
     build-packages:
       - freeglut3
       - freeglut3-dev
@@ -201,13 +183,11 @@ parts:
       - libwoff1
       - libxslt1.1    
     python-requirements:
-      - /root/project/.requirement-extras/requirements-linux-common.txt
+      - .requirement-extras/requirements-linux-common.txt
     python-packages:
       - wxasync
       - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxPython-4.2.0-cp310-cp310-linux_x86_64.whl
     override-build: |
-      # python3 -m pip install polib # install other stuff if we needed to
-      # python3 setup.py build_trans # build translations if we had them
       install -Dm644 "snap/gui/pynsource.desktop" -t "$CRAFT_PART_INSTALL/usr/share/applications/"
       craftctl default
     organize:
