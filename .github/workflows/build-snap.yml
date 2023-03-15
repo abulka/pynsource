@@ -17,6 +17,11 @@ jobs:
     - uses: snapcore/action-build@v1
       id: snapcraft
 
+    - uses: actions/upload-artifact@v3
+      with:
+        name: snap
+        path: ${{ steps.snapcraft.outputs.snap }}
+        
     # Uploads the snap to edge channel, test via: sudo snap refresh pynsource --edge
     # This fails because of symlink issues, hopefully snapcraft 7.3.1.post17+git8b3ed19b and later fix it
     # 
