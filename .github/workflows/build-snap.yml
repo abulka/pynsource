@@ -5,7 +5,7 @@ on:
     tags: ['v*', 'pre*']
 
     # To trigger a build when above is set to tag
-    # git tag --l
+    # git tag -l
     # git tag -a v1.nn
     # git push --follow-tags
 jobs:
