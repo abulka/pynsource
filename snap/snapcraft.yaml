@@ -36,10 +36,6 @@ apps:
       - network-bind
       - removable-media
 
-#environment:
-#  # WORKAROUND: Add python modules in Snap to search path
-#  PYTHONPATH: ${SNAP}/lib/python3.10/site-packages:${SNAP}/usr/lib/python3/dist-packages
-
 parts:
   copy-stuff:
     plugin: dump
@@ -57,36 +53,6 @@ parts:
   build-the-python-stuff-please:
     plugin: python
     source: .
-
-    build-environment:
-      # WORKAROUND: The python plugin is broken with gnome extension
-      # https://forum.snapcraft.io/t/python-plugin-gnome-3-extension-error/33396/8?u=oleksis
-      # Seem to need this otherwise get ERROR: Can not execute `setup.py` since setuptools is not available in the build environment.
-      #- PATH: ${CRAFT_PART_INSTALL}/bin:${PATH:+:$PATH}
-      #- PYTHONPATH: /usr/lib/python310.zip:/usr/lib/python3.10:/usr/lib/python3.10/lib-dynload:/root/.local/lib/python3.10/site-packages:/usr/local/lib/python3.10/dist-packages:/usr/lib/python3/dist-packages:/root/project${PYTHONPATH:+:$PYTHONPATH}
-#    build-packages:
-#      - freeglut3
-#      - freeglut3-dev
-#      - libgl1-mesa-dev
-#      - libglu1-mesa-dev
-#      - libgstreamer-plugins-base1.0-dev
-#      - libgtk-3-dev
-#      - libjpeg-dev
-#      - libnotify-dev
-#      - libsdl2-dev
-#      - libsm-dev
-#      - libtiff-dev
-#      - libwebkit2gtk-4.1-dev
-#      - libxtst-dev
-#      - libssl-dev
-#      - libpulse-dev
-#      - pkg-config
-#      - python3.10
-#      - python3.10-dev
-#      - libpython3.10-dev
-#      - python3.10-venv
-##      - python3-setuptools
-#    - python3-wheel
     stage-packages:
       - yt-dlp
       - freeglut3
