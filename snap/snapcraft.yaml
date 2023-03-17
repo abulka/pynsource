@@ -62,6 +62,7 @@ parts:
       - wxasync
       - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxPython-4.2.0-cp310-cp310-linux_x86_64.whl
     override-build: |
+      # this .desktop file ends up in /var/lib/snapd/desktop/applications/pynsource_pynsource.desktop not the usual /usr/share/applications
       install -Dm644 "snap/gui/pynsource.desktop" -t "$CRAFT_PART_INSTALL/usr/share/applications/"
       craftctl default
     organize:
