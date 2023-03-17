@@ -1,3 +1,4 @@
+# Requires snapcraft snapcraft 7.3.1.post21+gitfa823013 from edge or later to build this snap
 name: pynsource
 version: git
 summary: 'Pynsource - reverse engineer Python source code into UML'
@@ -11,7 +12,7 @@ architectures:
   - build-on: [amd64]
 
 apps:
-  # You can also run with /snap/bin/pynsource. (hit TAB to autocomplete)
+  # Once built and installed, you can also run with /snap/bin/pynsource. (hit TAB to autocomplete)
   pynsource:
     command: bin/pynsource
     plugs:
