@@ -37,7 +37,7 @@ apps:
       - removable-media
 
 parts:
-  copy-stuff:
+  copy-media:
     plugin: dump
     source: src/media
     organize:
