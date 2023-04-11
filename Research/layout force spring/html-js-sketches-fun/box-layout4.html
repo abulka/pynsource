@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Box and line layout algorithm</title>
+</head>
+<body>
+  <canvas id="canvas" width="1000" height="500"></canvas>
+
+  <p>
+    in js create a shape class with id, text, color, type.
+    create a box class which inherits from shape with x, y, width, height.
+    create a line class which inherits from shape with from, to which are ids.
+    create a text class which inherits from shape with x, y, width, height.
+    create a function which creates 20 random boxes of different sizes and colors and text, 
+     and creates 10 line shapes between random boxes with random colors,
+     and creates 5 text shapes with random sizes and colors and random text.
+    store the shapes in an array.
+  </p>
+  <p>
+    create a function which draws the shapes on the canvas. ensure that
+    when drawing a line between boxes do not draw into the area of the box, 
+    only between the boundaries of the box
+
+  </p>
+  <p>
+    create a layout algorithm that updates the shapes array so that boxes and
+    text shapes do not overlap, include a margin between shapes. optimise box
+    positions to minimise the number of lines crossing each other, ideally no
+    lines should cross other lines or other shapes.
+
+  </p>
+  <!-- Insert the JavaScript code here -->
+  <script>
+
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+
+let shapes = [];
+
+// Define the base Shape class
+class Shape {
+  constructor(id, text, color, type) {
+    this.id = id;
+    this.text = text;
+    this.color = color;
+    this.type = type;
+  }
+}
+
+// Define the Box class, which inherits from Shape
+class Box extends Shape {
+  constructor(id, text, color, type, x, y, width, height) {
+    super(id, text, color, type);
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+  }
+}
+
+// Define the Line class, which inherits from Shape
+class Line extends Shape {
+  constructor(id, text, color, type, from, to) {
+    super(id, text, color, type);
+    this.from = from;
+    this.to = to;
+  }
+}
+
+// Define the Text class, which inherits from Shape
+class Text extends Shape {
+  constructor(id, text, color, type, x, y, width, height) {
+    super(id, text, color, type);
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+  }
+}
+
+// Create a function to generate random colors
+function randomColor() {
+  return '#' + Math.floor(Math.random() * 16777215).toString(16);
+}
+
+// Create a function to generate random text
+function randomText() {
+  let text = '';
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  for (let i = 0; i < 5; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+
+  return text;
+}
+
+// Create a function to generate random shapes
+function generateShapes() {
+
+  // Generate 20 random boxes
+  for (let i = 0; i < 20; i++) {
+    const id = 'box-' + i;
+    const text = randomText();
+    const color = randomColor();
+    const type = 'box';
+    const x = Math.floor(Math.random() * 500);
+    const y = Math.floor(Math.random() * 500);
+    const width = Math.floor(Math.random() * 100) + 50;
+    const height = Math.floor(Math.random() * 100) + 50;
+
+    shapes.push(new Box(id, text, color, type, x, y, width, height));
+  }
+
+  // Generate 10 random lines
+  for (let i = 0; i < 10; i++) {
+    const id = 'line-' + i;
+    const text = '';
+    const color = randomColor();
+    const type = 'line';
+    const from = 'box-' + Math.floor(Math.random() * 20);
+    const to = 'box-' + Math.floor(Math.random() * 20);
+
+    shapes.push(new Line(id, text, color, type, from, to));
+  }
+
+  // Generate 5 random text shapes
+  for (let i = 0; i < 0; i++) {  // change to 5 to see the text shapes
+    const id = 'text-' + i;
+    const text = randomText();
+    const color = randomColor();
+    const type = 'text';
+    const x = Math.floor(Math.random() * 500);
+    const y = Math.floor(Math.random() * 500);
+    const width = Math.floor(Math.random() * 100) + 50;
+    const height = Math.floor(Math.random() * 100) + 50;
+
+    shapes.push(new Text(id, text, color, type, x, y, width, height));
+  }
+}
+
+// example usage:
+generateShapes();
+console.log(shapes);
+console.log('shapes.length: ' + shapes.length);
+
+
+function drawShapes(shapes) {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Clear the canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw each shape
+  shapes.forEach(shape => {
+    ctx.fillStyle = shape.color;
+    ctx.strokeStyle = shape.color;
+
+    switch (shape.type) {
+      case 'box':
+        ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
+        ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+
+        ctx.fillStyle = '#fff';
+        ctx.fillText(shape.text, shape.x + shape.width / 2, shape.y + shape.height / 2);
+        break;
+
+      // case 'line':
+      //   const fromShape = shapes.find(s => s.id === shape.from);
+      //   const toShape = shapes.find(s => s.id === shape.to);
+
+      //   if (fromShape && toShape) {
+      //     ctx.beginPath();
+      //     ctx.moveTo(fromShape.x + fromShape.width / 2, fromShape.y + fromShape.height / 2);
+      //     ctx.lineTo(toShape.x + toShape.width / 2, toShape.y + toShape.height / 2);
+      //     ctx.stroke();
+      //   }
+      //   break;
+
+      case 'line':
+        const fromShape = shapes.find(s => s.id === shape.from);
+        const toShape = shapes.find(s => s.id === shape.to);
+
+        if (fromShape && toShape) {
+          const x1 = fromShape.x + fromShape.width / 2;
+          const y1 = fromShape.y + fromShape.height / 2;
+          const x2 = toShape.x + toShape.width / 2;
+          const y2 = toShape.y + toShape.height / 2;
+
+          const dx = x2 - x1;
+          const dy = y2 - y1;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const unitDx = dx / dist;
+          const unitDy = dy / dist;
+
+          const fromX = fromShape.x + fromShape.width / 2 + unitDx * fromShape.width / 2;
+          const fromY = fromShape.y + fromShape.height / 2 + unitDy * fromShape.height / 2;
+          const toX = toShape.x + toShape.width / 2 - unitDx * toShape.width / 2;
+          const toY = toShape.y + toShape.height / 2 - unitDy * toShape.height / 2;
+
+          ctx.beginPath();
+          ctx.moveTo(fromX, fromY);
+          ctx.lineTo(toX, toY);
+          ctx.stroke();
+        }
+        break;
+
+      case 'text':
+        ctx.font = 'bold ' + shape.height + 'px Arial';
+        ctx.fillText(shape.text, shape.x, shape.y + shape.height);
+        break;
+    }
+  });
+}
+
+
+
+drawShapes(shapes);
+
+
+
+function layoutShapes(shapes, margin) {
+  const canvas = document.getElementById('canvas');
+  const width = canvas.width;
+  const height = canvas.height;
+  const kRepulsive = 10000;
+  const kAttractive = 0.1;
+
+  // Initialize positions of shapes randomly
+  shapes.forEach(shape => {
+    shape.x = Math.random() * (width - shape.width - margin * 2) + margin;
+    shape.y = Math.random() * (height - shape.height - margin * 2) + margin;
+  });
+
+  // Calculate forces between nodes
+  function calculateForces() {
+    shapes.forEach(shape => {
+      // Repulsive forces between all nodes
+      shapes.forEach(otherShape => {
+        if (shape !== otherShape) {
+          const dx = otherShape.x - shape.x;
+          const dy = otherShape.y - shape.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const force = kRepulsive / (dist * dist);
+          shape.fx -= force * dx / dist;
+          shape.fy -= force * dy / dist;
+        }
+      });
+
+      // Attractive forces along edges
+      if (shape.type === 'line') {
+        const fromShape = shapes.find(s => s.id === shape.from);
+        const toShape = shapes.find(s => s.id === shape.to);
+
+        if (fromShape && toShape) {
+          const dx = toShape.x + toShape.width / 2 - fromShape.x - fromShape.width / 2;
+          const dy = toShape.y + toShape.height / 2 - fromShape.y - fromShape.height / 2;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const force = kAttractive * (dist - margin * 2);
+          const unitDx = dx / dist;
+          const unitDy = dy / dist;
+
+          shape.fx += force * unitDx;
+          shape.fy += force * unitDy;
+          fromShape.fx -= force * unitDx;
+          fromShape.fy -= force * unitDy;
+          toShape.fx += force * unitDx;
+          toShape.fy += force * unitDy;            
+        }
+      }
+    });
+  }
+
+  // Update node positions based on forces
+  function updatePositions() {
+    shapes.forEach(shape => {
+      // check for NaN values in fx values
+      if (isNaN(shape.fx) || isNaN(shape.fy)) {
+        console.log('Found NaN values:', shape);
+      }
+      else {
+        shape.x += shape.fx;
+        shape.y += shape.fy;
+      }
+
+      // Constrain positions to canvas
+      shape.x = Math.max(margin, Math.min(width - margin - shape.width, shape.x));
+      shape.y = Math.max(margin, Math.min(height - margin - shape.height, shape.y));
+
+      // Reset forces
+      shape.fx = 0;
+      shape.fy = 0;
+    });
+  }
+
+  // Run the simulation
+  for (let i = 0; i < 100; i++) {
+    calculateForces();
+    updatePositions();
+    console.log(shapes)
+  }
+}
+
+function layout() {
+  layoutShapes(shapes, 20);
+  drawShapes(shapes);
+}
+
+
+
+// Add a button to generate the items
+const button = document.createElement('button');
+button.innerText = 'Generate Items';
+button.addEventListener('click', () => createItems(5, 5)); // set the desired values for n and m here
+document.body.appendChild(button);
+
+// Add a button to layout and redraw the items
+const button2 = document.createElement('button');
+button2.innerText = 'Layout Items';
+button2.addEventListener('click', () => layout());
+document.body.appendChild(button2);
+
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Box and line layout algorithm</title>
+</head>
+<body>
+  <canvas id="canvas" width="500" height="300"></canvas>
+
+  <!-- Insert the JavaScript code here -->
+  <script>
+
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+
+let items = [];
+
+// Helper function to generate a random number between min and max
+function getRandom(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+// Function to create n boxes and m lines between them
+function createItems(n, m) {
+  // Clear the canvas and reset the items array
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  items = [];
+
+  // Generate n boxes with randomized positions and sizes
+  const minWidth = 50;
+  const maxWidth = 150;
+  const minHeight = 50;
+  const maxHeight = 100;
+  for (let i = 0; i < n; i++) {
+    const x = getRandom(0, canvas.width - maxWidth);
+    const y = getRandom(0, canvas.height - maxHeight);
+    const width = getRandom(minWidth, maxWidth);
+    const height = getRandom(minHeight, maxHeight);
+    items.push({x, y, width, height});
+  }
+
+  // Generate m lines between random pairs of boxes
+  for (let i = 0; i < m; i++) {
+    const index1 = getRandom(0, n - 1);
+    const index2 = getRandom(0, n - 1);
+    if (index1 !== index2) {
+      drawLine(index1, index2);
+    }
+  }
+
+  // Draw the boxes
+  context.fillStyle = 'lightblue';
+  for (let i = 0; i < items.length; i++) {
+    const currentItem = items[i];
+    context.fillRect(currentItem.x, currentItem.y, currentItem.width, currentItem.height);
+  }
+}
+
+// Helper function to draw a line between two boxes
+function drawLine(index1, index2) {
+  const box1 = items[index1];
+  const box2 = items[index2];
+  context.beginPath();
+  context.moveTo(box1.x + box1.width / 2, box1.y + box1.height / 2);
+  context.lineTo(box2.x + box2.width / 2, box2.y + box2.height / 2);
+  context.stroke();
+}
+
+// Helper function to check for overlap between two items
+function checkOverlap(item1, item2, margin) {
+  return (
+    item1.x < item2.x + item2.width + margin &&
+    item1.x + item1.width + margin > item2.x &&
+    item1.y < item2.y + item2.height + margin &&
+    item1.y + item1.height + margin > item2.y
+  );
+}
+
+function layout() {
+  // Check for overlaps and move items to the right as needed
+  const margin = 10; // set the desired margin here
+  for (let i = 0; i < items.length; i++) {
+    const currentItem = items[i];
+    for (let j = 0; j < i; j++) {
+      const otherItem = items[j];
+      if (checkOverlap(currentItem, otherItem, margin)) {
+        currentItem.x = otherItem.x + otherItem.width + margin; // move to the right by the margin amount
+        // Draw the line between the two boxes
+        drawLine(i, j);
+      }
+    }
+  }
+  redraw()
+}
+
+// function redraw() {
+//   context.clearRect(0, 0, canvas.width, canvas.height);
+//   for (let i = 0; i < items.length; i++) {
+//     const currentItem = items[i];
+//     context.fillStyle = 'lightblue';
+//     context.fillRect(currentItem.x, currentItem.y, currentItem.width, currentItem.height);
+//   }
+  
+//   for (let i = 0; i < items.length; i++) {
+//     for (let j = 0; j < i; j++) {
+//       drawLine(i, j);
+//     }
+//   }
+// }
+
+function redraw() {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw the boxes
+  context.fillStyle = 'lightblue';
+  for (let i = 0; i < items.length; i++) {
+    const currentItem = items[i];
+    context.fillRect(currentItem.x, currentItem.y, currentItem.width, currentItem.height);
+  }
+
+  // Draw the original lines between boxes
+  context.strokeStyle = 'black';
+  for (let i = 0; i < items.length - 1; i++) {
+    for (let j = i + 1; j < items.length; j++) {
+      const item1 = items[i];
+      const item2 = items[j];
+      // if (checkLine(item1, item2)) {
+      if (true) {
+        context.beginPath();
+        context.moveTo(item1.x + item1.width / 2, item1.y + item1.height / 2);
+        context.lineTo(item2.x + item2.width / 2, item2.y + item2.height / 2);
+        context.stroke();
+      }
+    }
+  }
+}
+
+// // Helper function to check if two boxes are connected by a line
+// function checkLine(index1, index2) {
+//   // Find the two boxes
+//   const box1 = items[index1];
+//   const box2 = items[index2];
+
+//   // Calculate the centers of each box
+//   const center1 = {
+//     x: box1.x + box1.width / 2,
+//     y: box1.y + box1.height / 2,
+//   };
+//   const center2 = {
+//     x: box2.x + box2.width / 2,
+//     y: box2.y + box2.height / 2,
+//   };
+
+//   // Check if the distance between the centers is less than the sum of the radii
+//   const distance = Math.sqrt((center1.x - center2.x) ** 2 + (center1.y - center2.y) ** 2);
+//   const radius1 = Math.sqrt((box1.width / 2) ** 2 + (box1.height / 2) ** 2);
+//   const radius2 = Math.sqrt((box2.width / 2) ** 2 + (box2.height / 2) ** 2);
+//   return distance <= radius1 + radius2;
+// }
+
+
+// Add a button to generate the items
+const button = document.createElement('button');
+button.innerText = 'Generate Items';
+button.addEventListener('click', () => createItems(5, 5)); // set the desired values for n and m here
+document.body.appendChild(button);
+
+// Add a button to layout and redraw the items
+const button2 = document.createElement('button');
+button2.innerText = 'Layout Items';
+button2.addEventListener('click', () => layout());
+document.body.appendChild(button2);
+
+
+
+</script>
+</body>
+</html>

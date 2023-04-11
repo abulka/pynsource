@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Box and line layout algorithm</title>
+</head>
+<body>
+  <canvas id="canvas" width="1000" height="500"></canvas>
+  <!-- Insert the JavaScript code here -->
+  <script>
+
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+
+class Shape {
+  constructor(id, text, x, y, width, height, color, type) {
+    this.id = id;
+    this.text = text;
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.color = color;
+    this.type = type;
+  }
+}
+
+function createRandomShapes() {
+  const shapes = [];
+  
+  const colors = ['red', 'blue', 'green', 'yellow', 'orange', 'purple', 'pink'];
+  const types = ['box', 'line', 'text'];
+  
+  // create 20 random shapes
+  for (let i = 0; i < 20; i++) {
+    const id = i + 1;
+    const text = types[Math.floor(Math.random() * types.length)] === 'text' ? 'Lorem ipsum dolor sit amet' : '';
+    const x = Math.floor(Math.random() * 500);
+    const y = Math.floor(Math.random() * 500);
+    const width = Math.floor(Math.random() * 200) + 50;
+    const height = Math.floor(Math.random() * 200) + 50;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const type = types[Math.floor(Math.random() * types.length)];
+    
+    shapes.push(new Shape(id, text, x, y, width, height, color, type));
+  }
+  
+  // add lines between some boxes
+  for (let i = 0; i < shapes.length; i++) {
+    if (shapes[i].type === 'box') {
+      for (let j = i + 1; j < shapes.length; j++) {
+        if (shapes[j].type === 'box') {
+          // add a line between these two boxes
+          shapes.push(new Shape(shapes.length + 1, '', shapes[i].x + shapes[i].width / 2, shapes[i].y + shapes[i].height / 2, shapes[j].x - shapes[i].x - shapes[i].width, 0, colors[Math.floor(Math.random() * colors.length)], 'line'));
+        }
+      }
+    }
+  }
+  
+  // add lines with random colors
+  for (let i = 0; i < 5; i++) {
+    const index1 = Math.floor(Math.random() * shapes.length);
+    const index2 = Math.floor(Math.random() * shapes.length);
+    
+    shapes.push(new Shape(shapes.length + 1, '', shapes[index1].x + shapes[index1].width / 2, shapes[index1].y + shapes[index1].height / 2, shapes[index2].x - shapes[index1].x - shapes[index1].width, 0, colors[Math.floor(Math.random() * colors.length)], 'line'));
+  }
+  
+  return shapes;
+}
+
+
+
+
+function drawShapes(shapes) {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  // clear the canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  for (const shape of shapes) {
+    switch (shape.type) {
+      case 'box':
+        ctx.fillStyle = shape.color;
+        ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
+        break;
+      case 'line':
+        ctx.strokeStyle = shape.color;
+        ctx.beginPath();
+        ctx.moveTo(shape.x, shape.y);
+        ctx.lineTo(shape.x + shape.width, shape.y + shape.height);
+        ctx.stroke();
+        break;
+      case 'text':
+        ctx.fillStyle = shape.color;
+        ctx.font = 'bold 16px Arial';
+        ctx.fillText(shape.text, shape.x, shape.y);
+        break;
+      default:
+        console.error(`Unknown shape type: ${shape.type}`);
+    }
+  }
+}
+
+// example usage:
+const shapes = createRandomShapes();
+console.log(shapes);
+drawShapes(shapes);
+
+
+
+// Add a button to generate the items
+const button = document.createElement('button');
+button.innerText = 'Generate Items';
+button.addEventListener('click', () => createItems(5, 5)); // set the desired values for n and m here
+document.body.appendChild(button);
+
+// Add a button to layout and redraw the items
+const button2 = document.createElement('button');
+button2.innerText = 'Layout Items';
+button2.addEventListener('click', () => layout());
+document.body.appendChild(button2);
+
+
+
+</script>
+</body>
+</html>

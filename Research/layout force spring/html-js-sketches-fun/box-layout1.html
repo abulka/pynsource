@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Box and line layout algorithm</title>
+</head>
+<body>
+  <canvas id="canvas" width="500" height="300"></canvas>
+
+  <!-- Insert the JavaScript code here -->
+  <script>
+
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+
+// Define the items (boxes) and their positions
+const items = [
+  {x: 50, y: 50, width: 100, height: 50},
+  {x: 200, y: 75, width: 75, height: 75},
+  {x: 125, y: 150, width: 150, height: 75},
+  {x: 100, y: 225, width: 50, height: 50}
+];
+
+// Helper function to check for overlap between two items
+function checkOverlap(item1, item2, margin) {
+  return (
+    item1.x < item2.x + item2.width + margin &&
+    item1.x + item1.width + margin > item2.x &&
+    item1.y < item2.y + item2.height + margin &&
+    item1.y + item1.height + margin > item2.y
+  );
+}
+
+// Helper function to draw a line between two boxes
+function drawLine(index1, index2) {
+  const box1 = items[index1];
+  const box2 = items[index2];
+  context.beginPath();
+  context.moveTo(box1.x + box1.width / 2, box1.y + box1.height / 2);
+  context.lineTo(box2.x + box2.width / 2, box2.y + box2.height / 2);
+  context.stroke();
+}
+
+// Check for overlaps and move items to the right as needed
+const margin = 10; // set the desired margin here
+for (let i = 0; i < items.length; i++) {
+  const currentItem = items[i];
+  for (let j = 0; j < i; j++) {
+    const otherItem = items[j];
+    if (checkOverlap(currentItem, otherItem, margin)) {
+      currentItem.x = otherItem.x + otherItem.width + margin; // move to the right by the margin amount
+      // Draw the line between the two boxes
+      drawLine(i, j);
+    }
+  }
+}
+
+// Draw the boxes
+context.fillStyle = 'lightblue';
+for (let i = 0; i < items.length; i++) {
+  const currentItem = items[i];
+  context.fillRect(currentItem.x, currentItem.y, currentItem.width, currentItem.height);
+}
+
+
+
+</script>
+</body>
+</html>
