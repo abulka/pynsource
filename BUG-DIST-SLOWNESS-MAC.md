@@ -231,19 +231,27 @@ and not confounded by the patch level.
 3. Report upstream with the §4.3 reproducer. This looks like a genuine
    "framework CPython build + wxasync" defect on macOS, not project-specific.
 
-## 9. Side bug found while testing (unrelated, user-visible)
+## 9. Latent bug found in passing: `ast.Constant` handled through the removed `.s` alias
 
-Importing any `.py` file (File → Import, or passing files on the command line) pops:
+Both copies of the ALSM visitor do this:
 
+```python
+def visit_Constant(self, node):
+    self.write(repr(node.s))        # ast.Constant has .value; .s belonged to ast.Str (removed)
 ```
-Error during conversion of python AST into ALSM model: 'Constant' object has no attribute 's'
-```
 
-The ALSM converter still uses the `ast.Str` / `node.s` alias that CPython removed; `ast`
-gives `ast.Constant` with `.value`. Separate ticket — but it makes File → Import unusable in
-current builds and blocks the module-visualisation path. (`../alsm` parser is a fork of
-`src/parsing/core_parser_ast.py`; keep the typed_ast/`ast.Constant` handling in sync per
-AGENTS.md.)
+* `../alsm/alsm/python/python_ast.py:1253`
+* `src/parsing/core_parser_ast.py:1244` (its fork - keep them in sync)
+
+That raises `AttributeError: 'Constant' object has no attribute 's'`, which the ALSM converter
+catches and surfaces as "Error during conversion of python AST into ALSM model" in a dialog.
+It was observed while testing the frozen builds (first seen while trying Python 3.14), but it
+is **not reproducible on 3.13 for typical files**: parsing 176 `.py` files from this repo via
+`alsm.parse_python(f, options={"mode": 3})` recorded zero exceptions, and File > Import works
+normally (e.g. `ogl2/ogl2/bmpshape.py`). So: latent, not currently user-facing.
+
+Still worth fixing (one line each, `node.value`): the constant path will bite when it is
+reached, and CPython keeps removing the deprecated aliases (3.14+).
 
 ## 10. Measurement harness (how to repeat any of this)
 
@@ -276,3 +284,34 @@ teardown (`wxPyCallback::~wxPyCallback`); stop and drop the timer on exit.
   does `X`/`Y` matrix of `ASYNC` × interpreter show `ASYNC=False` as a complete workaround?
 * Should `ASYNC` be revisited on macOS in any case? `DispatchTimeout(0)` caps UI throughput
   at one wx event per 20 ms (≈50 Hz) even in the best case.
+
+## 12. Follow-up: onefile -> onedir (startup, and PyInstaller 7)
+
+Not a drag-perf issue at all: onedir vs onefile measured the same while running
+(40.6 vs 40.9 drag events/s - i.e. noise, no claim either way).
+
+The real difference is **launch time**, measured as launch -> window appears:
+
+| build | rep 1 | rep 2 | rep 3 |
+|---|---|---|---|
+| onefile (CI build 10) | 8.3 s | 1.9 s | 1.9 s |
+| onefile (local rebuild) | 8.9 s | 2.2 s | 1.9 s |
+| **onedir (local rebuild)** | **0.5 s** | **0.4 s** | **0.4 s** |
+
+Why: onefile unpacks the whole archive into a fresh `_MEIxxxx` temp directory on **every**
+launch (hence ~2 s even when warm), and the single 33 MB executable carries a whole-file
+ad-hoc seal (thousands of hashes) that macOS must verify on first launch (hence ~8-9 s cold,
+the "18 s" in the original report was the same effect on older, more heavily sealed builds).
+A onedir bundle runs straight out of the bundle and signs each file separately.
+
+Also (independent of performance): PyInstaller 6.22 already prints
+
+> Onefile mode in combination with macOS .app bundles (windowed mode) don't make sense
+> (a .app bundle can not be a single file) and clashes with macOS's security.
+> Please migrate to onedir mode. This will become an error in v7.0.
+
+Migration is a spec change only: keep `Analysis`/`PYZ`, use `EXE(..., exclude_binaries=True)`
++ `COLLECT(...)` and wrap the collected directory in `BUNDLE(...)`. Downside: ~78 MB on disk
+and many files inside the distributed zip instead of one 33 MB executable.
+
+Not done here - separate change, worth doing before PyInstaller 7.
