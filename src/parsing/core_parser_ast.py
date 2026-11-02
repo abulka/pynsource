@@ -8,9 +8,19 @@ from ast import *  # only used for all the symbols like '_ast.And' etc which are
 # lookup tables e.g. BOOLOP_SYMBOLS in a more general way e.g. 'And'
 import ast as ast_native  # native ast of the Python that is running
 
-if sys.version_info >= (3, 0):
-    import typed_ast.ast27  # py2 (requires Python 3 to be running)
-    import typed_ast.ast3  # py3 (requires Python 3 to be running)
+# typed_ast is EOL (last wheels for Python 3.10) and cannot even be built on
+# Python 3.11+. Python 2 parsing support is therefore dropped on modern
+# Pythons. Keep the import optional so the rest of Pynsource runs on 3.13+.
+try:
+    if sys.version_info >= (3, 0):
+        import typed_ast.ast27  # py2 (requires Python 3 to be running)
+        import typed_ast.ast3  # py3 (requires Python 3 to be running)
+        _HAS_TYPED_AST = True
+    else:
+        _HAS_TYPED_AST = False
+except ImportError:
+    typed_ast = None  # type: ignore
+    _HAS_TYPED_AST = False
 
 import inspect
 import logging
@@ -146,8 +156,14 @@ def parse(filename, log=None, options={}):
     # return pmodel, debuginfo
 
     # NEW
-    _mode = options.get("mode", 2)
-    mode(_mode)
+    _mode = options.get("mode", 3)  # default to Python 3; Python 2 (mode 2) no longer supported (typed_ast EOL)
+    try:
+        mode(_mode)
+    except RuntimeError as e:
+        pmodel = OldParseModel()
+        pmodel.filename = filename
+        pmodel.errors = str(e)
+        return pmodel, ""
     pmodel = OldParseModel()
 
     log_proper.info(f"Parsing {filename}, syntax mode {_mode}")
@@ -1534,37 +1550,35 @@ def mode(python=0):
     """
     Switch parser mode to deal with python 2 or 3 syntax.
 
+    Python 2 (mode 2) required typed_ast which is EOL and has no wheels for
+    Python 3.11+. It is no longer supported - a RuntimeError is raised.
 
-    :param python: 0 means use native Python ast, 2 or 3 means use typed_ast (which only works in Python 3)
+    :param python: 0 means use native Python ast, 3 means Python 3 (native ast),
+        2 means Python 2 (unsupported, raises RuntimeError).
     :return: -
     """
     global ast, last_python_mode
     if python == 3:
         assert sys.version_info >= (3, 0)
-        # print('mode 3')
-        ast = typed_ast.ast3
-
-        # Fix the fact that typed ast can't parse fstring variables and other 3.8 syntax
-        # We revert to the built in ast which is ok.
-        # NOTE: The official word on this is: https://github.com/python/typed_ast
-        # typed_ast will not be updated to support parsing Python 3.8 and newer.
-        # Instead, it is recommended to use the stdlib ast module there, which
-        # has been augmented to support extracting type comments and has limited
-        # support for parsing older versions of Python 3.
-        if sys.version_info[1] >= 8:
-            log_proper.debug(f"using native ast cos python 3.8 or above")
-            ast = ast_native
+        # typed_ast.ast3 is obsolete on Python 3.8+ (can't parse f-strings etc).
+        # Always use the native ast on modern Pythons.
+        ast = ast_native
 
     elif python == 2:
-        assert sys.version_info >= (3, 0)
-        # print('mode 2')
-        ast = typed_ast.ast27
+        raise RuntimeError(
+            "Python 2 parsing is no longer supported (typed_ast is end-of-life "
+            "and has no builds for Python 3.11+). "
+            "Run Pynsource in Python 3 mode."
+        )
     else:
         # print('Warning - running in python native mode')
         ast = ast_native
 
     Visitor.__bases__ = (ast.NodeVisitor,)
-    astpretty.ast = ast  # monkey patch the ast away from built in python to typed_ast
+    try:
+        astpretty.ast = ast  # monkey patch the ast away from built in python to typed_ast
+    except Exception:
+        pass
     last_python_mode = python
 
 

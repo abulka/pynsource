@@ -1,7 +1,7 @@
 # linux users please use the script bin/install-linux-* and not this file
 configobj
 requests
-typed_ast
+# typed_ast REMOVED - EOL, no wheels for Python 3.11+, Python 2 parsing dropped
 astpretty
 termcolor
 beautifultable
