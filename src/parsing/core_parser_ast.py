@@ -1241,7 +1241,10 @@ class Visitor(T):
     # Cos Python 3.8 reports: PendingDeprecationWarning: visit_Str is deprecated; add visit_Constant
     if sys.version_info.minor >= 8:
         def visit_Constant(self, node):
-            self.write(repr(node.s))
+            # ast.Constant carries .value; the old ast.Str/.s alias was a deprecated
+            # compatibility property and is GONE in Python 3.14, where node.s raises
+            # AttributeError ('Constant' object has no attribute 's').
+            self.write(repr(node.value))
     else:
         def visit_Str(self, node):
             self.write(repr(node.s))
