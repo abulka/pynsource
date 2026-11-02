@@ -281,6 +281,20 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.frame.Show(
             True
         )  # in wxpython2.8 this causes umlcanvas to grow too, but not in wxpython3 - till much later
+        if sys.platform == "darwin":
+            # Frozen .app launched from Finder doesn't come to the front on its
+            # own (no Developer ID signing). Best-effort activation, never fatal.
+            try:
+                self.frame.Raise()
+                import subprocess
+
+                subprocess.Popen(
+                    ["osascript", "-e", 'tell application "Pynsource" to activate'],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+            except Exception:
+                pass
         self.frame.Bind(wx.EVT_CLOSE, self.OnCloseFrame)
 
         self.popupmenu = None
