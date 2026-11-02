@@ -1306,6 +1306,17 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.printData.SetNoCopies(1)  # setting this works, ensure you pick a non thermal printer
         self.printData.SetPrintMode(wx.PRINT_MODE_PRINTER)
 
+        # Pynsource only ever prints a single page (see MyPrintout HasPage/GetPageInfo).
+        # wx.PrintPreview expects a wx.PrintDialogData (not wx.PrintData) - passing
+        # bare PrintData makes the preview fall back to defaults (1..9999/32000 on Mac).
+        # Explicitly clamp the range to 1..1 and hide the page-number control.
+        printDialogData = wx.PrintDialogData(self.printData)
+        printDialogData.SetMinPage(1)
+        printDialogData.SetMaxPage(1)
+        printDialogData.SetFromPage(1)
+        printDialogData.SetToPage(1)
+        printDialogData.EnablePageNumbers(False)
+
         if self.viewing_plantuml_tab:
             printout = MyPrintout(self.plantuml, self.log)
             printout2 = MyPrintout(self.plantuml, self.log)
@@ -1318,7 +1329,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         else:
             printout = MyPrintout(self.umlcanvas, self.log)
             printout2 = MyPrintout(self.umlcanvas, self.log)
-        self.preview = wx.PrintPreview(printout, printout2, self.printData)
+        self.preview = wx.PrintPreview(printout, printout2, printDialogData)
         if not self.preview.IsOk():
             self.log.WriteText("Houston, we have a problem...\n")
             return

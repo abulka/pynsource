@@ -83,10 +83,51 @@ class ShapeCanvas(wx.ScrolledWindow):
         self._checkTolerance = True
 
         self._buffer = wx.Bitmap(1, 1)
+        try:
+            self._buffer.SetScaleFactor(self.GetContentScaleFactor())
+        except Exception:
+            pass
 
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_SIZE, self.OnSize)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.OnMouseEvent)
+        try:
+            self.Bind(wx.EVT_DPI_CHANGED, self.OnDpiChanged)
+        except Exception:
+            pass
+
+    def _make_hidpi_buffer(self, size):
+        """Create a HiDPI-aware backing buffer.
+
+        GetVirtualSize/GetSize are in logical (DIP) units. A plain
+        wx.Bitmap(w, h) is w*h physical pixels, so on a Retina display
+        (content scale 2.0) it gets upscaled 2x -> blurry text. Creating
+        the bitmap at physical pixels with the window's scale factor
+        keeps text sharp.
+        """
+        w, h = max(int(size.x), 1), max(int(size.y), 1)
+        try:
+            scale = self.GetContentScaleFactor() or 1.0
+        except Exception:
+            scale = 1.0
+        if scale < 1.0:
+            scale = 1.0
+        buf = wx.Bitmap(int(w * scale), int(h * scale))
+        try:
+            buf.SetScaleFactor(scale)
+        except Exception:
+            pass
+        return buf
+
+    def OnDpiChanged(self, evt):
+        # Window moved between displays with different scaling - rebuild buffer
+        try:
+            self._buffer = self._make_hidpi_buffer(self.GetVirtualSize())
+            self.Draw()
+            self.Refresh()
+        except Exception:
+            pass
+        evt.Skip()
 
     def Draw(self):
         """
@@ -108,7 +149,7 @@ class ShapeCanvas(wx.ScrolledWindow):
 
         # Make sure we don't try to create a 0 size bitmap
         size = wx.Size(max(size.x, 1), max(size.y, 1))
-        self._buffer = wx.Bitmap(size.x, size.y)
+        self._buffer = self._make_hidpi_buffer(size)
         self.Draw()
 
     def GetBuffer(self):
