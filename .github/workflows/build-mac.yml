@@ -79,12 +79,6 @@ jobs:
         rm -f dist/Pynsource
         ls -l dist/
 
-    - name: Ad-hoc codesign (no Developer ID - users run fix-permissions.command)
-      shell: bash
-      run: |
-        codesign --deep --force -s - pynsource/dist/Pynsource.app
-        codesign -dv pynsource/dist/Pynsource.app 2>&1 | head -5
-
     - name: Get the tag name
       shell: bash
       run: |
