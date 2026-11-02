@@ -61,7 +61,7 @@ jobs:
         # Never fall back to a framework interpreter: framework Python + wxasync's
         # macOS event loop stalls the wx event pump for the whole duration of a
         # mouse drag (frozen canvas). uv's Python is a shared-libpython build and
-        # is measured fast. See BUG-DIST-SLOWNESS-MAC.md.
+        # is measured fast. See Admin/BUG-DIST-SLOWNESS-MAC.md.
         UV_PYTHON_PREFERENCE: only-managed
       run: |
         uv python install 3.13
@@ -102,7 +102,7 @@ jobs:
         echo "framework: $fw"
         [ -n "$lib" ] || { echo "::error::no bundled libpython3 found"; exit 1; }
         if [ -n "$fw" ]; then
-          echo "::error::bundled interpreter is a framework Python - the wxasync drag freeze will be back (see BUG-DIST-SLOWNESS-MAC.md)"
+          echo "::error::bundled interpreter is a framework Python - the wxasync drag freeze will be back (see Admin/BUG-DIST-SLOWNESS-MAC.md)"
           exit 1
         fi
         codesign --verify --deep --strict "$app" && echo "codesign verify OK"

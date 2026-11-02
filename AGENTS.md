@@ -58,6 +58,24 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
 - Artefacts differ by edition: binary builds (`bin/buildmac`, `bin/buildwin.bat`, snap) ship
   Community (no license embedded); the atug download page sells Pro.
 
+## Deploying (Mac)
+- Only supported route: CI `.github/workflows/build-mac.yml` — a `pre-*` tag builds a draft
+  pre-release (+ artifact), manual dispatch gives an artifact only.
+- The build **must** use uv's python-build-standalone, never `actions/setup-python`: a
+  framework Python plus wxasync's macOS loop freezes the canvas for the whole duration of a
+  mouse drag. Full write-up: `Admin/BUG-DIST-SLOWNESS-MAC.md`. The workflow prints
+  `BUILD PYTHON ... framework=''` and a guard step fails the build if a framework interpreter
+  or a onefile layout reappears.
+- Bundling is **onedir** (`../ogl2/bin/pynsource-github-actions.spec`): launch 0.4s vs 1.9s
+  for onefile, and PyInstaller 7 rejects onefile + `.app`. `dist/` then contains both
+  `dist/Pynsource/` (COLLECT output — delete it, it is duplicated inside the app) and
+  `dist/Pynsource.app` (what ships).
+- Zip with `-y` (`zip -r -y`, or `ditto -c -k --keepParent`); without it the
+  `Contents/Resources` symlinks are followed and the payload is stored twice (83MB vs 35MB).
+- Ad-hoc signed only (no Apple Developer account) — users still run `fix-permissions.command`.
+- Local `bin/buildmac.sh` works but picks up whatever `python3`/`pyinstaller` is on PATH,
+  which is exactly how the framework-Python bug got in. Prefer CI.
+
 ## Tests
 - `mkdir -p src/tests/logs && .venv/bin/python -m unittest discover -s src` — expect `158 tests OK`
   (a handful skip without wx / are pre-existing skips). Runs WITH wx installed too.

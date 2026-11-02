@@ -1,8 +1,14 @@
 # BUG: CI-built Mac app slow (drag/resize), local build fast
 
-**Status: ROOT CAUSE FOUND, FIXED AND VERIFIED** (branch `ci/uv-python-drag-fix`;
-CI build `pynsource-macos-ci-uv-python-drag-fix-10`, run 41438646072 — hand-tested
-2026-11-02: "runs perfectly and performs well").
+**Status: ROOT CAUSE FOUND, FIXED, VERIFIED AND MERGED INTO `2026-dustoff`.**
+
+Two changes shipped (2026-11-03):
+1. build with **python-build-standalone (uv)**, not `setup-python`'s framework Python
+   -> the drag freeze is gone (the actual bug);
+2. **onedir** bundling instead of onefile -> launch 8.3/1.9 s -> **0.4 s** (sections 12) .
+
+Verified on CI build 11 (`pynsource-macos-2026-dustoff-11`, run 41442554914) and
+hand-tested: "the build runs perfectly and starts super fast".
 
 Short version: the CI build baked in a **framework-built Python** (python.org, via
 `actions/setup-python`). A framework Python plus **wxasync**'s macOS event loop makes the wx
@@ -231,27 +237,37 @@ and not confounded by the patch level.
 3. Report upstream with the §4.3 reproducer. This looks like a genuine
    "framework CPython build + wxasync" defect on macOS, not project-specific.
 
-## 9. Latent bug found in passing: `ast.Constant` handled through the removed `.s` alias
+## 9. `ast.Constant` handled through the removed `.s` alias (fixed)
 
-Both copies of the ALSM visitor do this:
+Both copies of the ALSM visitor had this:
 
 ```python
 def visit_Constant(self, node):
-    self.write(repr(node.s))        # ast.Constant has .value; .s belonged to ast.Str (removed)
+    self.write(repr(node.s))        # ast.Constant has .value; .s belonged to ast.Str
 ```
 
-* `../alsm/alsm/python/python_ast.py:1253`
-* `src/parsing/core_parser_ast.py:1244` (its fork - keep them in sync)
+* `../alsm/alsm/python/python_ast.py` (fixed in alsm `59bd0a1`)
+* `src/parsing/core_parser_ast.py` (its fork - fixed in pynsource `617a2e6`)
 
-That raises `AttributeError: 'Constant' object has no attribute 's'`, which the ALSM converter
-catches and surfaces as "Error during conversion of python AST into ALSM model" in a dialog.
-It was observed while testing the frozen builds (first seen while trying Python 3.14), but it
-is **not reproducible on 3.13 for typical files**: parsing 176 `.py` files from this repo via
-`alsm.parse_python(f, options={"mode": 3})` recorded zero exceptions, and File > Import works
-normally (e.g. `ogl2/ogl2/bmpshape.py`). So: latent, not currently user-facing.
+**How it manifested:** it did *not* fail on Python 3.13. `ast.Constant` kept `.s` as a
+deprecated compatibility property, so every import worked. Python **3.14 removed those
+aliases**, so the first string/number literal the visitor reaches raises
+`AttributeError: 'Constant' object has no attribute 's'`. alsm catches it in
+`_convert_ast_to_alsm` and records "Error during conversion of python AST into ALSM model",
+which the app shows as a dialog, leaving the module model incomplete (module visualisation
+silently degraded). That is the popup seen while evaluating Python 3.14 - nothing to do with
+the drag bug, and invisible on 3.13, which is why it went unnoticed.
 
-Still worth fixing (one line each, `node.value`): the constant path will bite when it is
-reached, and CPython keeps removing the deprecated aliases (3.14+).
+Proven before/after on a 6-line file containing `X = "abc"`, `Y = 42` and a docstring:
+
+```
+3.13 before/after : error = None
+3.14 before       : error = "Error during conversion of python AST into ALSM model: 'Constant' object has no attribute 's'"
+3.14 after        : error = None
+```
+
+Fix is `node.value`; the old `visit_Str`/`visit_Bytes`/`visit_Num` branches remain for
+pre-3.8 nodes. 158 unit tests OK (8 skipped) after the change.
 
 ## 10. Measurement harness (how to repeat any of this)
 
@@ -340,3 +356,24 @@ Also updated: `.github/workflows/build-mac.yml` (guard now checks the onedir lay
 `dist/Pynsource/` COLLECT directory is deleted so the artifact isn't doubled) and
 `../ogl2/bin/buildmac.sh` (dist now holds both the payload dir and the `.app`; only the
 `.app` ships).
+
+## 13. Current deployment recipe (mac)
+
+* **CI**: `.github/workflows/build-mac.yml`. Builds on `pre-*` tags (draft pre-release) and
+  on manual dispatch (artifact only). This is the only supported way to produce a mac app.
+* **Interpreter**: `astral-sh/setup-uv` + `uv python install 3.13` +
+  `UV_PYTHON_PREFERENCE=only-managed`. Never `actions/setup-python` (framework Python).
+  The workflow prints `BUILD PYTHON ... framework=''` and a guard step fails the build if a
+  framework interpreter or a onefile layout appears.
+* **Bundling**: onedir (`EXE(exclude_binaries=True)` + `COLLECT` + `BUNDLE`) in
+  `../ogl2/bin/pynsource-github-actions.spec`. `dist/` then holds both `dist/Pynsource/`
+  (COLLECT output) and `dist/Pynsource.app`; only the `.app` ships, and the COLLECT dir is
+  deleted so the artifact is not doubled.
+* **Zip**: `zip -r -y` (or `ditto -c -k --keepParent`). Without `-y` zip follows the
+  `Contents/Resources` symlinks and stores the payload twice (83 MB vs 35 MB).
+* **Signing**: ad-hoc only (no Apple Developer account), so users still run
+  `fix-permissions.command` after unzipping. `codesign --verify --deep --strict` is part of
+  the guard step.
+* **Local build** (occasional): `bin/buildmac.sh`, which needs `pyinstaller` on PATH; it
+  ships the `.app` and zips with `-y` too. Prefer CI - a local build silently depends on
+  whichever Python is on PATH, which is exactly how this bug was born.

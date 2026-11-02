@@ -1,6 +1,6 @@
 # Bug: wxasync's macOS event loop stalls while the mouse button is held — only with a *framework* Python
 
-Minimal reproduction of the defect behind `BUG-DIST-SLOWNESS-MAC.md` (Pynsource's
+Minimal reproduction of the defect behind `Admin/BUG-DIST-SLOWNESS-MAC.md` (Pynsource's
 CI-built Mac app being unresponsive while dragging, while a locally-built app was fine).
 
 Everything here is plain wx + wxasync: **no Pynsource code involved.**
