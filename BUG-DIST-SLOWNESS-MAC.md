@@ -202,6 +202,15 @@ slow builds, so they are not a usable discriminator either.
 
 ### Verification of the new CI artefact
 
+First build with the fix: run `41438646072` on branch `ci/uv-python-drag-fix`. The log shows
+`BUILD PYTHON 3.13.18 framework= ''`, PyInstaller reports
+`Using Python shared library: .../cpython-3.13.18-macos-aarch64-none/lib/libpython3.13.dylib`,
+and the guard step lists `libpython3.13.dylib` (17.6 MB) with no `Python.framework`.
+
+Handy side effect: the new CI build runs CPython **3.13.18 shared**, i.e. the same version as
+the framework build that froze — so the framework/shared comparison is now version-for-version
+and not confounded by the patch level.
+
 * `sys._framework` in the build log (the workflow prints `BUILD PYTHON ...`).
 * the guard step's `pyi-archive_viewer` output.
 * manual: open the sample diagram, drag a class box in a circle — it must track the cursor
