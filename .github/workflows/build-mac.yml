@@ -1,0 +1,111 @@
+# CI Mac build - Phase 1 of the release-pipeline plan.
+# (Plan lives outside the repo in /Users/andy/.opencode/plan - pro/free build
+# details stay private.)
+#
+# Triggers on pre-* tags + manual dispatch only. Stable Mac releases stay local
+# (../ogl2/bin/buildmac.sh + manual upload to Releases) until this CI-built
+# .app passes the Gatekeeper/quarantine-trick test.
+#
+# No Apple Developer license: the .app is ad-hoc signed only. Users run the
+# bundled fix-permissions.command (right-click > Open) after unzipping.
+#
+# Sibling pins `ref: 2026-dustoff` are TEMPORARY - drop them once the
+# 2026-dustoff branches are merged to main/master. (pynsource-rego has no
+# such branch, so it tracks its default.)
+name: Pynsource app built on mac
+on:
+  push:
+    tags: ['pre-*']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14  # arm64; single-arch until Intel story is decided
+    steps:
+    - name: Check out pynsource (triggering ref)
+      uses: actions/checkout@v4
+      with:
+        path: pynsource/
+
+    - name: Check out ogl2 (private, branch pin - see header)
+      uses: actions/checkout@v4
+      with:
+        repository: abulka/ogl2
+        ref: 2026-dustoff
+        token: ${{ secrets.my_pat }}
+        path: ogl2/
+
+    - name: Check out pynsource-rego (private)
+      uses: actions/checkout@v4
+      with:
+        repository: abulka/pynsource-rego
+        token: ${{ secrets.my_pat }}
+        path: pynsource-rego/
+
+    - name: Check out ALSM (private, branch pin - see header)
+      uses: actions/checkout@v4
+      with:
+        repository: abulka/alsm
+        ref: 2026-dustoff
+        token: ${{ secrets.my_pat }}
+        path: alsm/
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install wheel
+        pip install wxpython
+        pip install pyinstaller
+        pip install -r pynsource/requirements.txt
+        pip install alsm/
+
+    - name: Build executable using Pyinstaller
+      shell: bash
+      run: |
+        cd pynsource/
+        python bin/_buildsamples.py
+        pyinstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
+        cp README.md dist/Readme.txt
+        cp CHANGELOG.md dist/Changelog.txt
+        cp .deploy-extras/macos/fix-permissions.command dist/
+        cp .deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt dist/
+        # The bare exe is useless on Mac, just want the .app (it was needed for the app phase)
+        rm -f dist/Pynsource
+        ls -l dist/
+
+    - name: Ad-hoc codesign (no Developer ID - users run fix-permissions.command)
+      shell: bash
+      run: |
+        codesign --deep --force -s - pynsource/dist/Pynsource.app
+        codesign -dv pynsource/dist/Pynsource.app 2>&1 | head -5
+
+    - name: Get the tag name
+      shell: bash
+      run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
+    - name: Zip the app bundle
+      shell: bash
+      run: |
+        cd pynsource/dist
+        zip -r pynsource-macos-${{ env.TAG }}.zip Pynsource.app Readme.txt Changelog.txt fix-permissions.command IMPORTANT-README-BEFORE-RUNNING.txt
+
+    - name: Save app bundle as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pynsource-macos-${{ env.TAG }}
+        path: pynsource/dist/
+
+    - name: Draft pre-release
+      if: startsWith(env.TAG, 'pre-')
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        draft: true
+        files: pynsource/dist/pynsource-macos-${{ env.TAG }}.zip
