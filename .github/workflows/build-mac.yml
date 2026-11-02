@@ -50,20 +50,28 @@ jobs:
         token: ${{ secrets.my_pat }}
         path: alsm/
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
+    - name: Setup uv (python-build-standalone interpreter - see the next step)
+      uses: astral-sh/setup-uv@v5
       with:
-        python-version: "3.13"
+        enable-cache: false
 
-    - name: Install dependencies
+    - name: Build interpreter + venv (python-build-standalone, NOT setup-python)
       shell: bash
+      env:
+        # Never fall back to a framework interpreter: framework Python + wxasync's
+        # macOS event loop stalls the wx event pump for the whole duration of a
+        # mouse drag (frozen canvas). uv's Python is a shared-libpython build and
+        # is measured fast. See BUG-DIST-SLOWNESS-MAC.md.
+        UV_PYTHON_PREFERENCE: only-managed
       run: |
-        python -m pip install --upgrade pip
-        pip install wheel
-        pip install wxpython
-        pip install pyinstaller
-        pip install -r pynsource/requirements.txt
-        pip install alsm/
+        uv python install 3.13
+        uv venv --python 3.13 --python-preference only-managed .venv
+        # make this venv the default python/pyinstaller for all later steps
+        echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+        uv pip install --python .venv/bin/python wheel wxpython pyinstaller
+        uv pip install --python .venv/bin/python -r pynsource/requirements.txt
+        uv pip install --python .venv/bin/python alsm/
+        .venv/bin/python -c "import sys, wx; print('BUILD PYTHON', sys.version.split()[0], 'framework=', repr(sys._framework), wx.version())"
 
     - name: Build executable using Pyinstaller
       shell: bash
@@ -78,6 +86,18 @@ jobs:
         # The bare exe is useless on Mac, just want the .app (it was needed for the app phase)
         rm -f dist/Pynsource
         ls -l dist/
+
+    - name: Guard - the bundled interpreter must not be a framework build
+      shell: bash
+      run: |
+        exe=pynsource/dist/Pynsource.app/Contents/MacOS/Pynsource
+        listing=$(.venv/bin/pyi-archive_viewer -l "$exe" | grep -E "libpython3|Python\.framework/Versions/[^ ]+/Python" || true)
+        echo "$listing"
+        if echo "$listing" | grep -q "Python.framework"; then
+          echo "::error::bundled interpreter is a framework Python - the wxasync drag freeze will be back (see BUG-DIST-SLOWNESS-MAC.md)"
+          exit 1
+        fi
+        echo "$listing" | grep -q "libpython3" || { echo "::error::no bundled libpython3 found"; exit 1; }
 
     - name: Get the tag name
       shell: bash
