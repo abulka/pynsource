@@ -300,10 +300,10 @@ def DrawFormattedText(dc, text_list, xpos, ypos, width, height, formatMode):
         yoffset = ypos - height / 2.0
 
     # +1 to allow for rounding errors
-    dc.SetClippingRegion(int(xpos - width / 2.0), int(ypos - height / 2.0), int(width + 1), int(height + 1)) # python 3.10 needs ints
+    dc.SetClippingRegion(int(round(xpos - width / 2.0)), int(round(ypos - height / 2.0)), int(width + 1), int(height + 1)) # python 3.10 needs ints
 
     for line in text_list:
-        dc.DrawText(line.GetText(), int(xoffset + line.GetX()), int(yoffset + line.GetY())) # python 3.10 needs ints
+        dc.DrawText(line.GetText(), int(round(xoffset + line.GetX())), int(round(yoffset + line.GetY()))) # python 3.10 needs ints
 
     dc.DestroyClippingRegion()
 

@@ -875,13 +875,6 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         menu1.AppendSeparator()
         Add(menu1, "&Import Python Code...", "Ctrl-I", self.OnFileImport)
 
-        # New way of wiring things up - see https://wxpython.org/blog/avoiding-window-ids/index.html
-        self.item_python3_mode = menu1.AppendCheckItem(
-            wx.ID_ANY, "Python 3 mode", help="Assume Python syntax 2/3"
-        )
-        self.Bind(wx.EVT_MENU, self.OnPythonMode, self.item_python3_mode)
-        self.item_python3_mode.Check()
-
         # Visualise Python Modules Checked Menu Item
         name = "Visualise Python Modules"
         if pro_image and ("wxGTK" in wx.PlatformInfo or "wxMSW" in wx.PlatformInfo):
@@ -1106,9 +1099,6 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         elif self.viewing_plantuml_tab:
             self.plantuml.zoom(reset=True)
 
-    def OnPythonMode(self, event):
-        log.info("python 3 syntax mode state now: %s" % self.item_python3_mode.IsChecked())
-
     def OnVisualiseModules(self, event):
         log.info("visualise Python Modules state now: %s" % self.item_visualise_modules.IsChecked())
 
@@ -1211,9 +1201,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.app.run.CmdColourSiblings(color_range_offset=True)
 
     def OnFileImport(self, event):
-        mode = 3 if self.item_python3_mode.IsChecked() else 2
         visualise_modules = self.item_visualise_modules.IsChecked()
-        self.app.run.CmdFileImportViaDialog(mode=mode, visualise_modules=visualise_modules)
+        self.app.run.CmdFileImportViaDialog(mode=3, visualise_modules=visualise_modules)
 
     def OnViewTogglePlantUml(self, event):
         if GUI_LAYOUT == "MULTI_TAB_GUI":

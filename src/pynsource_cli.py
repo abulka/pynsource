@@ -10,7 +10,7 @@ from gui.settings import APP_VERSION, APP_VERSION_FULL
 
 @click.command()
 @click.argument('files', nargs=-1)
-@click.option('--mode', default=3, help='Python 3 or Python 2 syntax mode')
+@click.option('--mode', default=3, help='Parser syntax mode (only Python 3 is supported; mode 2 reports an error)')
 @click.option('--graph', is_flag=True, default=False, help='Build graph of nodes representing class relationships')
 @click.option('--methods-list', is_flag=True, default=False, help='Dump simple list of methods')
 @click.option('--prop-decorator', is_flag=True, default=False, help='Treat property decorated methods as attributes, not methods')

@@ -1,5 +1,16 @@
 # Pynsource Change Log
 
+*November 2026*
+
+### 1.85
+
+- Revived with Python 3.13 and wxPython 4.3, isolated `uv` venv (`uv venv --python 3.13`, `uv pip install -r requirements.txt`)
+- Dropped Python 2 parsing (typed_ast is end-of-life, no builds for Python 3.11+)
+- Removed redundant File/Python 3 mode menu - always Python 3 now
+- Fixed Mac print preview page range showing 1..9999 (now correctly 1..1)
+- Fixed blurry UML text on Retina/HiDPI displays (HiDPI-aware canvas buffer, rounded text positioning in OGL and OGL2)
+- alsm and ogl2 updated for Python 3.13
+
 *February 2023*
 
 ### 1.85 beta

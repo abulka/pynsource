@@ -1,6 +1,11 @@
 {
- "latest_version" : 1.84,
+ "latest_version" : 1.85,
  "latest_announcement" : """
+- Python 3.13 and wxPython 4.3 support, isolated uv venv
+- Dropped Python 2 parsing (typed_ast end-of-life)
+- Fixed Mac print preview page range (now 1..1)
+- Fixed blurry UML text on Retina/HiDPI displays
+
 - fixed: more robust handling of type annotations on function and method arguments e.g. def foo(a: Optional[str])
 
 Recent changes:
