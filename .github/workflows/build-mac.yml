@@ -87,7 +87,13 @@ jobs:
 
     - name: Get the tag name
       shell: bash
-      run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+      run: |
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        else
+          # Manual dispatch: branch name + run number, slashes sanitized
+          echo "TAG=${GITHUB_REF_NAME//\//-}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+        fi
 
     - name: Zip the app bundle
       shell: bash
