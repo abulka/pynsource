@@ -1,6 +1,8 @@
 # BUG: CI-built Mac app slow (drag/resize), local build fast
 
-**Status: ROOT CAUSE FOUND AND FIXED (branch `ci/uv-python-drag-fix`).**
+**Status: ROOT CAUSE FOUND, FIXED AND VERIFIED** (branch `ci/uv-python-drag-fix`;
+CI build `pynsource-macos-ci-uv-python-drag-fix-10`, run 41438646072 — hand-tested
+2026-11-02: "runs perfectly and performs well").
 
 Short version: the CI build baked in a **framework-built Python** (python.org, via
 `actions/setup-python`). A framework Python plus **wxasync**'s macOS event loop makes the wx
@@ -214,7 +216,8 @@ and not confounded by the patch level.
 * `sys._framework` in the build log (the workflow prints `BUILD PYTHON ...`).
 * the guard step's `pyi-archive_viewer` output.
 * manual: open the sample diagram, drag a class box in a circle — it must track the cursor
-  continuously, not snap on release.
+  continuously, not snap on release. **Done on build 10: passes** (smooth drag, live resize,
+  responsive zoom).
 
 ## 8. Alternative fixes (if framework Python must be kept)
 
