@@ -304,14 +304,39 @@ ad-hoc seal (thousands of hashes) that macOS must verify on first launch (hence 
 the "18 s" in the original report was the same effect on older, more heavily sealed builds).
 A onedir bundle runs straight out of the bundle and signs each file separately.
 
-Also (independent of performance): PyInstaller 6.22 already prints
+Why it mattered at all (independent of performance): PyInstaller 6.22 already printed
 
 > Onefile mode in combination with macOS .app bundles (windowed mode) don't make sense
 > (a .app bundle can not be a single file) and clashes with macOS's security.
 > Please migrate to onedir mode. This will become an error in v7.0.
 
-Migration is a spec change only: keep `Analysis`/`PYZ`, use `EXE(..., exclude_binaries=True)`
-+ `COLLECT(...)` and wrap the collected directory in `BUNDLE(...)`. Downside: ~78 MB on disk
-and many files inside the distributed zip instead of one 33 MB executable.
+Migration done (`../ogl2/bin/pynsource-github-actions.spec`, commit `cd7e737`): keep
+`Analysis`/`PYZ`, use `EXE(pyz, a.scripts, [], exclude_binaries=True)` + `COLLECT(...)`, and
+wrap the collected directory in `BUNDLE(coll, ...)`.
 
-Not done here - separate change, worth doing before PyInstaller 7.
+Resulting bundle layout (verified on a local build of `2026-dustoff`):
+
+```
+Contents/MacOS/Pynsource        9.4 MB   bootloader + PYZ
+Contents/Frameworks/*          78.0 MB   114 files: libpython3.13.dylib, wx, numpy, datas
+Contents/Resources/*                     symlinks -> ../Frameworks/... (+ pynsource.icns)
+Contents/Info.plist                      unchanged (same bundle id, NSHighResolutionCapable)
+Contents/_CodeSignature                  571 hashes (was 8031)
+```
+
+Measured after the change:
+
+| check | result |
+|---|---|
+| launch -> window | 0.9 s first run, then **0.4 s** (was 8.3 / 1.9 s) |
+| download zip | **32.5 MB** with `ditto -c -k`, 35.0 MB with `zip -r -y` (onefile was 33.7 MB) |
+| zip without `-y` | 83 MB - `zip -r` follows the `Contents/Resources` symlinks and stores the payload twice |
+| `codesign --verify --deep --strict` | OK, ad-hoc, bundle id `com.pynsource.pynsource` |
+| ditto round-trip (zip -> unzip -> launch) | symlinks preserved, signature valid, 0.5 s launch |
+| icon / Info.plist | `pynsource.icns` in Resources, `CFBundleIconFile` set |
+
+Also updated: `.github/workflows/build-mac.yml` (guard now checks the onedir layout +
+`libpython3*.dylib` and runs `codesign --verify`; zip uses `-y`; the redundant
+`dist/Pynsource/` COLLECT directory is deleted so the artifact isn't doubled) and
+`../ogl2/bin/buildmac.sh` (dist now holds both the payload dir and the `.app`; only the
+`.app` ships).

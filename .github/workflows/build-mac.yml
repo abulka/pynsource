@@ -83,21 +83,29 @@ jobs:
         cp CHANGELOG.md dist/Changelog.txt
         cp .deploy-extras/macos/fix-permissions.command dist/
         cp .deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt dist/
-        # The bare exe is useless on Mac, just want the .app (it was needed for the app phase)
-        rm -f dist/Pynsource
+        # onedir: dist/Pynsource/ is the COLLECT directory (duplicate of what's inside the
+        # .app) - we only ship the .app, and uploading both would double the artifact size
+        rm -rf dist/Pynsource
         ls -l dist/
+        du -sh dist/Pynsource.app
 
-    - name: Guard - the bundled interpreter must not be a framework build
+    - name: Guard - onedir layout, and a non-framework bundled interpreter
       shell: bash
       run: |
-        exe=pynsource/dist/Pynsource.app/Contents/MacOS/Pynsource
-        listing=$(.venv/bin/pyi-archive_viewer -l "$exe" | grep -E "libpython3|Python\.framework/Versions/[^ ]+/Python" || true)
-        echo "$listing"
-        if echo "$listing" | grep -q "Python.framework"; then
+        app=pynsource/dist/Pynsource.app
+        [ -d "$app/Contents/MacOS" ] || { echo "::error::no Pynsource.app produced"; exit 1; }
+        # onedir expected: payload in Contents/Frameworks (onefile would put it in the exe)
+        [ -d "$app/Contents/Frameworks" ] || { echo "::error::Contents/Frameworks missing - did the spec revert to onefile? (PyInstaller 7 rejects onefile+.app)"; exit 1; }
+        lib=$(find "$app" -name 'libpython3*.dylib' | head -5)
+        fw=$(find "$app" -name 'Python.framework' | head -5)
+        echo "libpython: $lib"
+        echo "framework: $fw"
+        [ -n "$lib" ] || { echo "::error::no bundled libpython3 found"; exit 1; }
+        if [ -n "$fw" ]; then
           echo "::error::bundled interpreter is a framework Python - the wxasync drag freeze will be back (see BUG-DIST-SLOWNESS-MAC.md)"
           exit 1
         fi
-        echo "$listing" | grep -q "libpython3" || { echo "::error::no bundled libpython3 found"; exit 1; }
+        codesign --verify --deep --strict "$app" && echo "codesign verify OK"
 
     - name: Get the tag name
       shell: bash
@@ -113,7 +121,10 @@ jobs:
       shell: bash
       run: |
         cd pynsource/dist
-        zip -r pynsource-macos-${{ env.TAG }}.zip Pynsource.app Readme.txt Changelog.txt fix-permissions.command IMPORTANT-README-BEFORE-RUNNING.txt
+        # -y keeps the Contents/Resources symlinks as symlinks; without it zip stores the
+        # whole payload twice (83MB instead of 35MB)
+        zip -r -y pynsource-macos-${{ env.TAG }}.zip Pynsource.app Readme.txt Changelog.txt fix-permissions.command IMPORTANT-README-BEFORE-RUNNING.txt
+        ls -l pynsource-macos-${{ env.TAG }}.zip
 
     - name: Save app bundle as artifact
       uses: actions/upload-artifact@v4
