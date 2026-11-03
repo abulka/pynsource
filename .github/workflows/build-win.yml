@@ -1,0 +1,200 @@
+# CI Windows build - Phase 3 of the release-pipeline plan.
+# (Plan lives outside the repo in /Users/andy/.opencode/plan - pro/free build
+# details stay private.)
+#
+# Triggers on pre-* tags + manual dispatch. Mirrors build-mac.yml deliberately:
+# uv python-build-standalone (not actions/setup-python), sibling checkouts pinned
+# to 2026-dustoff, onedir bundle, artifact + draft pre-release.
+#
+# Differences from Mac, on purpose:
+#   * no framework/onedir codesign guard - that is mac-specific; the Windows
+#     equivalent is "the installer exists and the app launches" (see the two
+#     Guard steps).
+#   * the binary is unsigned (no code-signing certificate), so SmartScreen warns
+#     on first run - documented in .deploy-extras/windows/RELEASE-NOTES.md.
+#   * Inno Setup is not preinstalled on the runners, so it is installed with choco.
+#
+# Sibling pins `ref: 2026-dustoff` are TEMPORARY - drop them once the
+# 2026-dustoff branches are merged to main/master. (pynsource-rego has no
+# such branch, so it tracks its default.)
+name: Pynsource app built on Windows
+on:
+  push:
+    tags: ['pre-*']
+  workflow_dispatch:
+
+jobs:
+  build:
+    # windows-2022, not windows-latest: the image is rebuilt from scratch every
+    # year or so and the wx/Inno steps are the kind that break on a jump.
+    runs-on: windows-2022
+    defaults:
+      run:
+        shell: bash  # git bash, same idiom as build-mac.yml
+    steps:
+    - name: Check out pynsource (triggering ref)
+      uses: actions/checkout@v4
+      with:
+        path: pynsource/
+
+    - name: Check out ogl2 (private, branch pin - see header)
+      uses: actions/checkout@v4
+      with:
+        repository: abulka/ogl2
+        ref: 2026-dustoff
+        token: ${{ secrets.my_pat }}
+        path: ogl2/
+
+    - name: Check out pynsource-rego (private)
+      uses: actions/checkout@v4
+      with:
+        repository: abulka/pynsource-rego
+        token: ${{ secrets.my_pat }}
+        path: pynsource-rego/
+
+    - name: Check out ALSM (private, branch pin - see header)
+      uses: actions/checkout@v4
+      with:
+        repository: abulka/alsm
+        ref: 2026-dustoff
+        token: ${{ secrets.my_pat }}
+        path: alsm/
+
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: false
+
+    - name: Build interpreter + venv (python-build-standalone, NOT setup-python)
+      env:
+        # only-managed keeps the interpreter identical to the Mac workflow (and
+        # avoids picking up whatever python the runner image happens to ship).
+        UV_PYTHON_PREFERENCE: only-managed
+      # .venv/Scripts/python.exe is used explicitly below instead of putting it on
+      # PATH: $GITHUB_PATH wants native Windows paths and the MSYS $PWD is not one.
+      run: |
+        uv python install 3.13
+        uv venv --python 3.13 --python-preference only-managed .venv
+        PY=.venv/Scripts/python.exe
+        uv pip install --python "$PY" wheel wxpython pyinstaller
+        uv pip install --python "$PY" -r pynsource/requirements.txt
+        uv pip install --python "$PY" alsm/
+        "$PY" -c "import sys, wx; print('BUILD PYTHON', sys.version.split()[0], wx.version())"
+
+    - name: Build executable using Pyinstaller
+      run: |
+        cd pynsource/
+        ../.venv/Scripts/python.exe bin/_buildsamples.py
+        ../.venv/Scripts/python.exe -m PyInstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
+        cp README.md dist/Readme.txt
+        cp CHANGELOG.md dist/Changelog.txt
+        ls -l dist/
+        du -sh dist/Pynsource
+
+    - name: Guard - onedir payload present
+      run: |
+        dist=pynsource/dist/Pynsource
+        [ -f "$dist/Pynsource.exe" ] || { echo "::error::no Pynsource.exe produced (onedir COLLECT output missing)"; exit 1; }
+        # onedir puts the interpreter + libs in _internal\ (onefile would have no such dir)
+        ls "$dist/_internal/python313.dll" || { echo "::error::_internal/python313.dll missing - did the spec revert to onefile?"; exit 1; }
+        echo "dist/Pynsource:"; ls -l "$dist" | head -20
+        echo "payload files: $(find "$dist" -type f | wc -l)"
+
+    - name: Guard - the app actually launches
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        $exe = "pynsource\dist\Pynsource\Pynsource.exe"
+        $ok = $false
+        foreach ($attempt in 1..2) {
+          $p = Start-Process -FilePath $exe -PassThru
+          Start-Sleep -Seconds 20
+          if (-not $p.HasExited) {
+            Write-Host "Pynsource.exe still running after 20s (attempt $attempt) - window came up"
+            Stop-Process -Id $p.Id -Force
+            $ok = $true
+            break
+          }
+          Write-Host "::warning::Pynsource.exe exited after $([math]::Round(($p.ExitTime - $p.StartTime).TotalSeconds,1))s with code $($p.ExitCode) (attempt $attempt)"
+        }
+        if (-not $ok) { Write-Host "::error::Pynsource.exe did not stay running - the bundle is broken"; exit 1 }
+
+    - name: Install Inno Setup (not preinstalled on the runners)
+      run: |
+        choco install innosetup --no-progress -y
+        # find ISCC.exe wherever the chocolatey package put it (5/6/7 naming varies)
+        iscc=$(find "/c/Program Files (x86)" "/c/Program Files" -maxdepth 2 -iname ISCC.exe 2>/dev/null | head -1)
+        [ -n "$iscc" ] || { echo "::error::ISCC.exe not found after choco install innosetup"; exit 1; }
+        echo "iscc at: $iscc"
+        "$iscc" /? | head -3 || true
+        echo "ISCC=$iscc" >> "$GITHUB_ENV"
+
+    - name: Run Innosetup
+      run: |
+        cd pynsource
+        # the .iss expects onedir dist\Pynsource\* and writes dist-inno\ (see its header)
+        "$ISCC" .requirement-extras/buildwin_github-actions.iss
+        ls -l dist-inno/
+
+    - name: Get the tag name
+      run: |
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        else
+          # Manual dispatch: branch name + run number, slashes sanitized
+          echo "TAG=${GITHUB_REF_NAME//\//-}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+        fi
+
+    - name: Name the installer after the tag
+      run: |
+        cd pynsource/dist-inno
+        # the .iss OutputBaseFilename carries the tbump-managed APP_VERSION, which lags
+        # the tag on pre-* builds; rename so every run/asset is unique
+        for f in *.exe; do
+          [ "$f" = "pynsource-win-$TAG-setup.exe" ] || mv -f "$f" "pynsource-win-$TAG-setup.exe"
+        done
+        ls -l
+        echo "installer size: $(du -h pynsource-win-$TAG-setup.exe | cut -f1)"
+
+    - name: Guard - the installer installs and the installed app launches
+      shell: pwsh
+      env:
+        TAG: ${{ env.TAG }}
+      run: |
+        $ErrorActionPreference = 'Stop'
+        $setup = "pynsource\dist-inno\pynsource-win-$env:TAG-setup.exe"
+        if (-not (Test-Path $setup)) { Write-Host "::error::installer not produced at $setup"; exit 1 }
+        if ((Get-Item $setup).Length -lt 20MB) { Write-Host "::error::installer is suspiciously small"; exit 1 }
+
+        # silent install into a throwaway dir - proves the onedir [Files] block resolves
+        $target = "$env:RUNNER_TEMP\pninstall"
+        New-Item -ItemType Directory -Force -Path $target | Out-Null
+        $log = "$env:RUNNER_TEMP\inno-install.log"
+        $i = Start-Process -FilePath $setup -PassThru -Wait `
+             -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART","/DIR=`"$target`"","/LOG=`"$log`""
+        if ($i.ExitCode -ne 0) { Write-Host "::error::installer exited with code $($i.ExitCode)"; Get-Content $log -Tail 40; exit 1 }
+        if (-not (Test-Path "$target\Pynsource.exe")) { Write-Host "::error::Pynsource.exe not installed"; Get-Content $log -Tail 40; exit 1 }
+        if (-not (Test-Path "$target\_internal\python313.dll")) { Write-Host "::error::installed payload is onefile-shaped (no _internal)"; exit 1 }
+        Write-Host "installed files: $((Get-ChildItem $target -Recurse -File).Count)"
+
+        $p = Start-Process -FilePath "$target\Pynsource.exe" -PassThru
+        Start-Sleep -Seconds 20
+        if ($p.HasExited) { Write-Host "::error::installed Pynsource.exe exited with code $($p.ExitCode)"; exit 1 }
+        Write-Host "installed Pynsource.exe running - installer OK"
+        Stop-Process -Id $p.Id -Force
+
+    - name: Save installer as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pynsource-win-${{ env.TAG }}
+        path: pynsource/dist-inno/
+
+    - name: Draft pre-release
+      if: startsWith(env.TAG, 'pre-')
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        draft: true
+        body_path: pynsource/.deploy-extras/windows/RELEASE-NOTES.md
+        files: pynsource/dist-inno/pynsource-win-${{ env.TAG }}-setup.exe

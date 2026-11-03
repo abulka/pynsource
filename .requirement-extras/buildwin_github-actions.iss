@@ -1,3 +1,14 @@
+; Inno Setup script for the Windows installer.
+;
+; Used by .github/workflows/build-win.yml (CI) and ../ogl2/bin/buildwin.bat (local).
+; The PyInstaller build is ONEDIR (see ../ogl2/bin/pynsource-github-actions.spec), so
+; the payload is the directory dist\Pynsource\ (Pynsource.exe + _internal\). The old
+; onefile layout had a single ~34MB dist\Pynsource.exe.
+;
+; AppVersion / VersionInfoVersion / OutputBaseFilename below are bumped by tbump
+; (see ../tbump.toml). CI keeps them as-is and renames the generated setup to
+; pynsource-win-<tag>-setup.exe, so the release asset name follows the git tag.
+
 [Icons]
 ;Name: {group}\Pynsource; Filename: {app}\Pynsource.exe; IconFilename: {app}\Pynsource.exe; IconIndex: 0
 Name: {group}\Pynsource; Filename: {app}\Pynsource.exe; IconFilename: "{app}\pynsource.ico"
@@ -22,14 +33,20 @@ VersionInfoVersion=1.85
 OutputDir=..\dist-inno\
 OutputBaseFilename=pynsource-win-1.85-setup
 ArchitecturesInstallIn64BitMode=x64
+SetupIconFile=..\src\media\pynsource.ico
 
 [Files]
 ; cwd seems to be the location of THIS file, so relative links get us back to pynsource/
-Source: ..\dist\Pynsource.exe; DestDir: {app}; 
-;Source: ..\dist\*; DestDir: {app}; Flags: recursesubdirs
+; ONEDIR: the whole dist\Pynsource\ folder (Pynsource.exe + _internal\ + assets).
+; Onefile used to be a single ..\dist\Pynsource.exe here - it re-unpacks the payload
+; into %TEMP% on every launch, which is why the build is now onedir.
+Source: ..\dist\Pynsource\*; DestDir: {app}; Flags: recursesubdirs createallsubdirs
 Source: ..\README.md; DestDir: {app}; DestName: Readme.txt
 Source: ..\CHANGELOG.md; DestDir: {app}; DestName: Changelog.txt
 Source: ..\src\media\pynsource.ico; DestDir: {app}
+
+[Run]
+Filename: "{app}\Pynsource.exe"; Description: "Launch Pynsource"; Flags: nowait postinstall skipifsilent
 
 ; [Code]
 ; { 
