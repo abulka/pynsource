@@ -371,21 +371,29 @@ Also updated: `.github/workflows/build-mac.yml` (guard now checks the onedir lay
   deleted so the artifact is not doubled.
 * **Zip**: `zip -r -y` (or `ditto -c -k --keepParent`). Without `-y` zip follows the
   `Contents/Resources` symlinks and stores the payload twice (83 MB vs 35 MB).
-* **Signing**: ad-hoc only (no Apple Developer account), so users still run
-  `fix-permissions.command` after unzipping. `codesign --verify --deep --strict` is part of
-  the guard step.
+* **Signing**: ad-hoc only (no Apple Developer account), so users must clear the Gatekeeper
+  block once - instructions live in `.deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt`
+  (also used as the draft release body). `codesign --verify --deep --strict` is part of the
+  guard step.
 * **Local build** (occasional): `bin/buildmac.sh`, which needs `pyinstaller` on PATH; it
   ships the `.app` and zips with `-y` too. Prefer CI - a local build silently depends on
   whichever Python is on PATH, which is exactly how this bug was born.
 
 ### Gatekeeper friction (unavoidable without a Developer ID)
 
-Ad-hoc signing means every quarantined artefact (the `.app` **and** any helper script) is
-"rejected" by `spctl`, and on macOS 15+/27 the old inline "Open" button is gone: the user
-must go to System Settings > Privacy & Security > "Open Anyway". Two artefacts therefore
-cost two trips, which is why `fix-permissions.command` is now presented as an *optional*
-convenience rather than "the easy way" - the honest instructions lead with the app itself
-(one trip) and mention the script only as an alternative.
+Ad-hoc signing means the `.app` is "rejected" by `spctl`, and on macOS 15+/27 the old inline
+"Open" button is gone: the user must go to System Settings > Privacy & Security > "Open
+Anyway". A helper script would be blocked by exactly the same mechanism and add a *second*
+trip, so no helper script ships any more - the instructions lead with the app itself (one
+trip, once ever). The current dialog text is quoted verbatim in the instructions file:
+
+```
+"Pynsource" Not Opened
+Apple could not verify "Pynsource" is free of malware ...        [Done] [Move to Bin]
+   -> click Done (NOT Move to Bin)
+System Settings > Privacy & Security > (bottom) "Pynsource" was blocked ... [Open Anyway]
+   -> Open Anyway, then Open Anyway again, then authenticate
+```
 
 What actually removes this friction:
 
@@ -394,7 +402,7 @@ What actually removes this friction:
 | Apple Developer ID + notarisation | none | USD $99/year |
 | Homebrew cask (`brew install --cask`) | none (brew/curl fetches carry no quarantine flag) | needs a tap repo; users must know brew |
 | current instructions (System Settings) | one, once | none, but users must follow steps |
-| `.command` helper script | one for the script + one for the app | worst option - it is a shell script and looks scary |
+| ~~`.command` helper script~~ | ~~one for the script + one for the app~~ | removed 2026-11-03: same block, twice, and scarier |
 
 Non-options: a message inside the script (it cannot run before being allowed to run); signing
 the script ad-hoc (ad-hoc is exactly what triggers the block); `spctl`/API exceptions (require

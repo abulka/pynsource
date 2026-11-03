@@ -1,46 +1,35 @@
-PYNSOURCE — PLEASE READ BEFORE YOU DOUBLE-CLICK THE APP
-=======================================================
+PYNSOURCE — macOS blocks the app the first time. Here is exactly what to do.
+=============================================================================
 
-You do NOT need to run anything first. Do this instead:
+1. Double-click "Pynsource".
 
-STEP 1.  Double-click "Pynsource.app".
-         macOS will refuse to open it and offer you a "Done" button.
+2. macOS shows a box:
 
-STEP 2.  Open System Settings > Privacy & Security.
-         Scroll down to the "Security" section. You will see a line about
-         "Pynsource.app" was blocked, with an "Open Anyway" button. Click it.
-         Authenticate with your password / Touch ID.
+       "Pynsource" Not Opened
+       Apple could not verify "Pynsource" is free of malware that may harm your
+       Mac or compromise your privacy.
 
-STEP 3.  Double-click "Pynsource.app" again. Now it opens. macOS remembers this
-         permanently - you only ever do this once.
+                                                        [ Done ]  [ Move to Bin ]
 
-Why is this happening?
-----------------------
-The app is not signed with a paid Apple Developer ID (that is USD $99 per year),
-so macOS cannot verify who built it. It is the same for any small independent
-Mac app that is not notarised.
+   Click  Done.        <-- NOT "Move to Bin"
 
-If you prefer to skip the dialogs
----------------------------------
-Open Terminal (Applications > Utilities > Terminal), type
+3. Open  System Settings > Privacy & Security  and scroll to the bottom. You will see
 
-    xattr -dr com.apple.quarantine
+       "Pynsource" was blocked to protect your Mac.        [ Open Anyway ]
 
-then drag "Pynsource.app" from Finder into the Terminal window (this fills in the
-path for you), then press Return. Nothing is downloaded by that command - it only
-removes the "this file came from the internet" flag from the app.
+   Click  Open Anyway.
+   A second dialog asks the same thing - click  Open Anyway  again.
+   Then enter your password or use Touch ID.
 
-About "fix-permissions.command"
--------------------------------
-That script does exactly the same thing as the Terminal command above. It is
-provided for convenience, but it is itself unsigned, so macOS may refuse to run
-it as well (same "Open Anyway" treatment in System Settings). If you have already
-got Pynsource.app running via STEP 1-3, you can ignore the script completely.
+4. Double-click "Pynsource" again. It opens normally from now on.
 
-Troubleshooting
----------------
-* "Pynsource is damaged and can't be opened" - re-download the zip; a partially
-  downloaded or unzipped-over-an-old-copy app can trigger this.
-* Move the app to /Applications before running it for the first time, so the same
-  exception applies in future.
-* Windows / Linux builds do not need any of this.
+That is all, and you only ever do it once. It happens because the app is not signed
+with a paid Apple Developer ID (USD $99 a year), so macOS cannot verify who built it -
+the same as any small independent Mac app that is not notarised.
+
+Prefer the Terminal? One line, no dialogs:
+
+    xattr -dr com.apple.quarantine /Applications/Pynsource.app
+
+(nothing is downloaded by that command - it only removes the "came from the internet"
+flag from the app you already have).

@@ -72,7 +72,11 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   `dist/Pynsource.app` (what ships).
 - Zip with `-y` (`zip -r -y`, or `ditto -c -k --keepParent`); without it the
   `Contents/Resources` symlinks are followed and the payload is stored twice (83MB vs 35MB).
-- Ad-hoc signed only (no Apple Developer account) — users still run `fix-permissions.command`.
+- Ad-hoc signed only (no Apple Developer account). Users must clear the Gatekeeper block
+  once: `Done` on the block dialog, then System Settings > Privacy & Security > Open Anyway
+  (twice) — see `.deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt`, which is also the
+  draft release body. No helper script ships any more (an unsigned `.command` just added a
+  second identical block).
 - Local `bin/buildmac.sh` works but picks up whatever `python3`/`pyinstaller` is on PATH,
   which is exactly how the framework-Python bug got in. Prefer CI.
 

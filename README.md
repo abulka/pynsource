@@ -12,10 +12,11 @@ Reverse engineer Python source code into UML class diagrams.
 
 [Download](DOWNLOADS.md) - ready to run builds are available for Mac, Windows and Linux.
 
-> Mac users please [right click open](https://www.howtogeek.com/205393/gatekeeper-101-why-your-mac-only-allows-apple-approved-software-by-default/) the first time, 
-Mac Big Sur, Monterey, Ventura users need to first `xattr -dr com.apple.quarantine /Applications/Pynsource.app`. 
-🎉 Easier Technique for Mac Users: Right click on the supplied bash script `fix-permissions.command` and choose "Open" to apply the correct permissions to `Pynsource`.
-Then you can copy the app to you Applications/ folder and run it as normal.
+> **Mac users:** macOS will block the app the first time you double-click it.
+> Click **Done** (not "Move to Bin"), then go to **System Settings > Privacy & Security**,
+> scroll to the bottom and click **Open Anyway** (a second dialog asks again - click it again).
+> Full steps: `IMPORTANT-README-BEFORE-RUNNING.txt` inside the download, or drag the app into
+> Terminal and run `xattr -dr com.apple.quarantine /Applications/Pynsource.app`.
 
 An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
 like zoom and the ability to drag to connect shapes.

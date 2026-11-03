@@ -7,7 +7,7 @@
 # .app passes the Gatekeeper/quarantine-trick test.
 #
 # No Apple Developer license: the .app is ad-hoc signed only. Users run the
-# bundled fix-permissions.command (right-click > Open) after unzipping.
+# unzip, then follow the "Open Anyway" steps in IMPORTANT-README-BEFORE-RUNNING.txt.
 #
 # Sibling pins `ref: 2026-dustoff` are TEMPORARY - drop them once the
 # 2026-dustoff branches are merged to main/master. (pynsource-rego has no
@@ -81,7 +81,6 @@ jobs:
         pyinstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
         cp README.md dist/Readme.txt
         cp CHANGELOG.md dist/Changelog.txt
-        cp .deploy-extras/macos/fix-permissions.command dist/
         cp .deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt dist/
         # onedir: dist/Pynsource/ is the COLLECT directory (duplicate of what's inside the
         # .app) - we only ship the .app, and uploading both would double the artifact size
@@ -123,7 +122,7 @@ jobs:
         cd pynsource/dist
         # -y keeps the Contents/Resources symlinks as symlinks; without it zip stores the
         # whole payload twice (83MB instead of 35MB)
-        zip -r -y pynsource-macos-${{ env.TAG }}.zip Pynsource.app Readme.txt Changelog.txt fix-permissions.command IMPORTANT-README-BEFORE-RUNNING.txt
+        zip -r -y pynsource-macos-${{ env.TAG }}.zip Pynsource.app Readme.txt Changelog.txt IMPORTANT-README-BEFORE-RUNNING.txt
         ls -l pynsource-macos-${{ env.TAG }}.zip
 
     - name: Save app bundle as artifact
