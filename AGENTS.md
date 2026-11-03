@@ -92,6 +92,35 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
 - Local `bin/buildmac.sh` works but picks up whatever `python3`/`pyinstaller` is on PATH,
   which is exactly how the framework-Python bug got in. Prefer CI.
 
+## Deploying (Windows)
+- Route: CI `.github/workflows/build-win.yml` (windows-2022) — same triggers as Mac: a `pre-*`
+  tag adds `pynsource-win-<tag>-setup.exe` to the draft pre-release, manual dispatch gives an
+  artifact only. Both Mac and Windows workflows append to the *same* draft release for a tag;
+  Mac finishes first (~1 min vs ~2.5 min), so action-gh-release always finds an existing draft
+  and updates it (verified on `pre-2026-dustoff-4`).
+- Same uv python-build-standalone approach as Mac (`UV_PYTHON_PREFERENCE=only-managed`); the
+  framework-Python drag bug is Mac-only, but keeping one interpreter story avoids surprises.
+  Use `.venv/Scripts/python.exe` explicitly — `$GITHUB_PATH` wants native Windows paths, so
+  the Mac workflow's `echo $PWD/.venv/bin >> $GITHUB_PATH` idiom does not carry over.
+- Windows is **onedir** like Mac (shared spec, so no divergence; `BUNDLE` is a no-op off
+  macOS). The installer therefore ships `dist\Pynsource\*` (exe + `_internal\`), not a single
+  onefile exe — `.requirement-extras/buildwin_github-actions.iss` `[Files]` expects that.
+  Inno output goes to `dist-inno\`; CI renames it to `pynsource-win-<tag>-setup.exe`.
+- Inno Setup is **not preinstalled** (choco installs it, ISCC.exe in `Program Files (x86)`),
+  and the `.iss` needs Inno **6.3+** because it uses `ArchitecturesInstallIn64BitMode=x64compatible`
+  (the old `x64` is deprecated and excludes ARM64 Windows, where the x64 build runs emulated).
+- The `.iss` AppVersion/VersionInfoVersion/OutputBaseFilename are still tbump-managed; CI only
+  renames the output, so nothing needs bumping per tag.
+- Guards (Mac guard is mac-specific, don't copy it): onedir payload present
+  (`_internal/python313.dll`), `Pynsource.exe` stays alive 20 s, and a silent install
+  (`/VERYSILENT /DIR=<temp>`) produces a working exe that also stays alive. That is the whole
+  Windows verification - the installer cannot be tested on macOS; `innoextract` 1.9 cannot read
+  Inno 6.5 either.
+- Unsigned (no code-signing cert): users get "Windows protected your PC" → **More info > Run
+  anyway**. Documented in `.deploy-extras/windows/RELEASE-NOTES.md` (also the release body).
+- Local `bin/buildwin.bat` still works, same `.iss`, but needs Inno 6 and picks up whatever
+  python/pyinstaller is on PATH. Prefer CI.
+
 ## Tests
 - `mkdir -p src/tests/logs && .venv/bin/python -m unittest discover -s src` — expect `158 tests OK`
   (a handful skip without wx / are pre-existing skips). Runs WITH wx installed too.

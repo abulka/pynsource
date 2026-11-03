@@ -1,3 +1,7 @@
+# PARKED (offline/) - kept as the staging area for per-OS workflows.
+# The Windows job from this file has been promoted to ../build-win.yml
+# (onedir + Inno Setup, gates + draft pre-release). What remains here is the
+# Linux matrix, which Phase 4 replaces with an AppImage build.
 name: Pynsource app multi-OS
 on:
   push:

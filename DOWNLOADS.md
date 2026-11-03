@@ -32,9 +32,13 @@ Unzip and drag app into the Applications directory.
 > are in `IMPORTANT-README-BEFORE-RUNNING.txt` inside the download. Alternative, no dialogs:
 > `xattr -dr com.apple.quarantine /Applications/Pynsource.app`
 
-## Windows 10
+## Windows 10 / 11 (64-bit)
 
-Unzip and run the installer.
+Download `pynsource-win-<version>-setup.exe` and run it. It installs to
+`C:\Program Files\Pynsource`, adds a Start Menu entry, and uninstalls from *Apps & features*.
+
+> **Windows users:** the installer is unsigned (no code-signing certificate), so SmartScreen
+> blocks it on first run — click **More info**, then **Run anyway**.
 
 ## Linux
 
