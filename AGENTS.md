@@ -97,7 +97,12 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   tag adds `pynsource-win-<tag>-setup.exe` to the draft pre-release, manual dispatch gives an
   artifact only. Both Mac and Windows workflows append to the *same* draft release for a tag;
   Mac finishes first (~1 min vs ~2.5 min), so action-gh-release always finds an existing draft
-  and updates it (verified on `pre-2026-dustoff-4`).
+  and updates it (verified on `pre-2026-dustoff-4`). If the two runs create a draft
+  simultaneously, one is removed automatically as a duplicate, so the parallel trigger is safe.
+- **Release body caveat:** action-gh-release only writes `body_path` when it *creates* the
+  release; an existing draft is never re-bodied. Both workflows therefore share one
+  `.deploy-extras/RELEASE-NOTES.md`, and a notes change needs a *new* tag (or delete the draft)
+  to show up. Delete-then-re-push the same tag leaves a stale body behind.
 - Same uv python-build-standalone approach as Mac (`UV_PYTHON_PREFERENCE=only-managed`); the
   framework-Python drag bug is Mac-only, but keeping one interpreter story avoids surprises.
   Use `.venv/Scripts/python.exe` explicitly — `$GITHUB_PATH` wants native Windows paths, so
