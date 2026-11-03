@@ -34,7 +34,11 @@ The same steps are in `IMPORTANT-README-BEFORE-RUNNING.txt` inside the zip.
 
 ## Linux (AppImage, 64-bit)
 
-Download `pynsource-linux-<tag>-x86_64.AppImage`, then:
+Download the AppImage for your CPU — `uname -m` tells you which:
+
+- `pynsource-linux-<tag>-x86_64.AppImage` — Intel/AMD desktops and VMs
+- `pynsource-linux-<tag>-aarch64.AppImage` — ARM64 (Apple-silicon VMs such as UTM, Asahi
+  Linux, Raspberry Pi 4/5 with a 64-bit OS, ARM servers)
 
 ```
 chmod +x pynsource-linux-*.AppImage

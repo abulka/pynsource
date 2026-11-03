@@ -42,7 +42,13 @@ Download `pynsource-win-<version>-setup.exe` and run it. It installs to
 
 ## Linux (AppImage, 64-bit)
 
-Download `pynsource-linux-<version>-x86_64.AppImage`, make it executable and run it:
+Download the AppImage that matches your CPU — `uname -m` tells you which:
+
+- `pynsource-linux-<version>-x86_64.AppImage` — Intel/AMD desktops and VMs
+- `pynsource-linux-<version>-aarch64.AppImage` — ARM64 (Apple-silicon VMs such as UTM, Asahi
+  Linux, Raspberry Pi 4/5 on a 64-bit OS, ARM servers)
+
+Then make it executable and run it:
 
 ```bash
 chmod +x pynsource-linux-*.AppImage

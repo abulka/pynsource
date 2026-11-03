@@ -127,8 +127,16 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   python/pyinstaller is on PATH. Prefer CI.
 
 ## Deploying (Linux)
-- Route: CI `.github/workflows/build-linux.yml` (ubuntu-22.04) → `pynsource-linux-<tag>-x86_64.AppImage`
-  on the same draft release, artifact on dispatch. Same triggers as the other two.
+- Route: CI `.github/workflows/build-linux.yml` → `pynsource-linux-<tag>-<arch>.AppImage` on the
+  same draft release, artifact on dispatch. Same triggers as the other two. Two matrix legs:
+  `ubuntu-22.04` (x86_64) and `ubuntu-22.04-arm` (aarch64) — both standard 4-CPU runners, free
+  for public repos. `bin/build-appimage.sh` is arch-aware (`uname -m`) for the tool downloads
+  and the output name.
+- **The aarch64 leg compiles wxPython from source** (~30-60 min, cached as a wheel under
+  `~/wx-wheel-cache`, key `wxpython-4.2.5-cp313-ubuntu-22.04-arm64`): there are no Linux wheels
+  on PyPI at all, and extras.wxpython.org is x86_64 only. Build deps exclude gstreamer/webkit
+  dev packages — they only enable wx.media/wx.html2 (unused) and `libgstreamer1.0-dev` drags in
+  `libunwind-dev`, which is unsatisfiable on the arm runner image.
 - **ubuntu-22.04 is the glibc floor**, not `ubuntu-latest`: 22.04 = glibc 2.35, i.e. Ubuntu
   22.04+/Mint 21+/Debian 12+. Bumping the runner silently drops older distros.
 - **wxPython has no Linux wheels on PyPI** — only mac/win. It comes from
@@ -157,6 +165,11 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
 - Target requirement is "a GTK3 desktop" and nothing else: verified in clean `ubuntu:22.04` and
   `ubuntu:24.04` containers with only `libgtk-3-0` installed (plus xvfb for the display). A
   container with *no* GUI libs at all fails on fontconfig/fribidi — that is expected, not a bug.
+- Testing from an Apple-silicon Mac: use an **arm64** Linux VM/container (UTM, OrbStack) with
+  the aarch64 AppImage. The x86_64 one gives `Exec format error` there; `qemu-user-static`
+  works but is slow. Local arm64 container test: `docker run --platform linux/arm64
+  ubuntu:22.04`, install `libgtk-3-0 xvfb xauth`, then `./AppImage --appimage-extract` and run
+  `squashfs-root/AppRun` under xvfb.
 - FUSE is absent in CI and in most containers, so `appimagetool`/`linuxdeploy` run with
   `APPIMAGE_EXTRACT_AND_RUN=1` and the guard uses `--appimage-extract`.
 
