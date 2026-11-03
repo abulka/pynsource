@@ -105,5 +105,10 @@ parts:
         > "$CRAFT_PART_INSTALL/usr/bin/pynsource-cli"
       chmod +x "$CRAFT_PART_INSTALL/usr/bin/pynsource" "$CRAFT_PART_INSTALL/usr/bin/pynsource-cli"
 
+      # the wx wheel ships unstripped shared objects (_core alone is ~179MB), which is most of a
+      # 154MB snap; same fix as bin/build-appimage.sh
+      find "$SITE" -type f \( -name '*.so' -o -name '*.so.*' \) -print0 |
+        xargs -0 -r -n 20 strip --strip-unneeded 2>/dev/null || true
+
       ls -l "$CRAFT_PART_INSTALL/usr/bin" || true
-      ls "$SITE"
+      du -sh "$SITE"

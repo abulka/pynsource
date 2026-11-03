@@ -24,7 +24,12 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       TAG: ${{ github.ref_name }}
+      # "ci/snap" (branch) is not a valid artifact name
+      TAG_SLUG: ${{ github.ref_name }}
     steps:
+    - name: Sanitise the tag for artifact names
+      run: echo "TAG_SLUG=${TAG//\//-}" >> "$GITHUB_ENV"
+
     - name: Check out pynsource (triggering ref)
       uses: actions/checkout@v4
       with:
@@ -51,8 +56,17 @@ jobs:
     - name: Save the snap as an artifact
       uses: actions/upload-artifact@v4
       with:
-        name: pynsource-snap-${{ env.TAG }}
+        # a branch ref can be "ci/snap", and a slash is not allowed in an artifact name
+        name: pynsource-snap-${{ env.TAG_SLUG }}
         path: '*.snap'
+
+    # The point of a snap is that it runs on a stock Ubuntu, so actually install it here.
+    # Whatever the CLI prints is evidence the PYTHONPATH/entry-point wiring is right.
+    - name: Install the snap and run the CLI
+      run: |
+        sudo snap install --dangerous "$(ls *.snap)"
+        snap list pynsource
+        snap run pynsource-cli --version
 
     # Uploads the snap to the edge channel, test via: sudo snap refresh pynsource --edge
     - name: Push to edge
