@@ -19,9 +19,6 @@ name: Pynsource app built on Linux (AppImage)
 on:
   push:
     tags: ['pre-*']
-    # TEMPORARY - scratch branch used to iterate before the workflow exists on
-    # the default branch (workflow_dispatch needs that). Removed before merge.
-    branches: ['ci/arm64']
   workflow_dispatch:
 
 jobs:
@@ -216,7 +213,15 @@ jobs:
         appimage=dist/pynsource-linux-$TAG-${{ matrix.arch }}.AppImage
         file "$appimage"
         du -h "$appimage"
-        file "$appimage" | grep -q "AppImage" || { echo "::error::not an AppImage"; exit 1; }
+        # check the *content*, not the filename: bytes 8..10 of a type-2 AppImage are "AI\x02".
+        # (The old `file | grep AppImage` matched the path it printed, so it always passed.)
+        magic=$(dd if="$appimage" bs=1 skip=8 count=3 2>/dev/null | od -An -tx1 | tr -d ' \n')
+        echo "appimage magic at offset 8: $magic"
+        [ "$magic" = "414902" ] || { echo "::error::not a type-2 AppImage (magic $magic != 414902)"; exit 1; }
+        case "${{ matrix.arch }}" in
+          x86_64)  file -b "$appimage" | grep -q "x86-64"   || { echo "::error::expected an x86-64 ELF"; exit 1; } ;;
+          aarch64) file -b "$appimage" | grep -q "aarch64"  || { echo "::error::expected an aarch64 ELF"; exit 1; } ;;
+        esac
         # FUSE is not available on the runner: extract instead of mounting (same payload)
         rm -rf /tmp/appimage-extract && mkdir -p /tmp/appimage-extract
         ( cd /tmp/appimage-extract && "$GITHUB_WORKSPACE/pynsource/$appimage" --appimage-extract >/dev/null )
