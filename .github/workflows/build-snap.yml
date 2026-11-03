@@ -1,33 +1,62 @@
+# Snap build - Phase 5 of the release-pipeline plan.
+#
+# This workflow was dead: it used actions/upload-artifact@v3, which GitHub now rejects
+# before any step runs ("automatically failed because it uses a deprecated version"), so it
+# had not produced a snap since 2024.
+#
+# It builds with `snapcraft pack --destructive-mode` instead of a build action: no LXD
+# machinery, no third-party action to fall out of date, and the runner image matches the
+# base (ubuntu-24.04 <-> core24).
+#
+# Channel policy (see the plan): edge only, on pre-* tags. Stable is promoted by hand in the
+# store UI after a snap has actually been installed and run.
 name: Pynsource Snap
 on:
   push:
-    # branches: [ main ]
-    tags: ['v*', 'pre*']
+    tags: ['pre-*']
+    # TEMPORARY - scratch branch used to iterate before the workflow exists on
+    # the default branch (workflow_dispatch needs that). Removed before merge.
+    branches: ['ci/snap']
+  workflow_dispatch:
 
-    # To trigger a build when above is set to tag
-    # git tag -l
-    # git tag -a v1.nn
-    # git push --follow-tags
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    env:
+      TAG: ${{ github.ref_name }}
     steps:
-    - uses: actions/checkout@v3
-
-    - uses: snapcore/action-build@v1
-      id: snapcraft
-
-    - uses: actions/upload-artifact@v3
+    - name: Check out pynsource (triggering ref)
+      uses: actions/checkout@v4
       with:
-        name: snap
-        path: ${{ steps.snapcraft.outputs.snap }}
+        # `version: git` in snapcraft.yaml runs git describe: a shallow clone has no tags
+        # and silently produced version "0+git.98c57e6" in the store
+        fetch-depth: 0
 
-    # Uploads the snap to edge channel, test via: sudo snap refresh pynsource --edge
-    # This fails because of symlink issues, hopefully snapcraft 7.3.1.post17+git8b3ed19b and later fix it
-    # 
-    - name: Snap upload
-      id: snapcraft_upload
+    - name: Install snapcraft
+      run: |
+        sudo snap install snapcraft --classic
+        snapcraft --version
+
+    - name: Build the snap (destructive mode - the runner is the build environment)
+      run: |
+        sudo snapcraft pack --destructive-mode --verbosity=brief
+        ls -l *.snap
+
+    - name: Show the snap's version and confinement
+      run: |
+        # read the metadata straight out of the packed snap (a squashfs); no store round-trip
+        sudo apt-get install -y -qq squashfs-tools >/dev/null
+        unsquashfs -cat "$(ls *.snap)" meta/snap.yaml | head -20
+
+    - name: Save the snap as an artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pynsource-snap-${{ env.TAG }}
+        path: '*.snap'
+
+    # Uploads the snap to the edge channel, test via: sudo snap refresh pynsource --edge
+    - name: Push to edge
+      if: startsWith(github.ref, 'refs/tags/pre-')
       env:
         SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.snapcraft_store_credentials }}
-      run: |
-        snapcraft upload *.snap --release edge
+      run: snapcraft upload *.snap --release edge

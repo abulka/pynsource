@@ -1,34 +1,39 @@
-# Requires snapcraft snapcraft 7.3.1.post21+gitfa823013 from edge or later to build this snap
 name: pynsource
+title: Pynsource
 version: git
 summary: 'Pynsource - reverse engineer Python source code into UML'
 description: |
       UML tool for Python. Reverse engineer Python source code into UML.
+      Requires a GTK3 desktop (the gnome extension provides it).
 
 grade: stable # devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # strict # use 'strict' once you have the right plugs and slots
-base: core22
-architectures:
-  - build-on: [amd64]
+confinement: strict # devmode # strict is the goal; all Pro features are free on Linux,
+                    # so there is no licence file to write outside the sandbox
+base: core24
+
+# core24 wants `platforms:` (the old `architectures:` key is deprecated). amd64 only for now:
+# the wxPython wheel below is x86_64, and an arm64 snap needs a remote/arm build.
+platforms:
+  amd64:
 
 apps:
   # Once built and installed, you can also run with /snap/bin/pynsource. (hit TAB to autocomplete)
   pynsource:
     command: bin/pynsource
+    extensions:
+      # HINT: Adds plugs and changes environment variables when building and running
+      - gnome
     plugs:
       - desktop
       - desktop-legacy
       - x11
-      - pulseaudio
-      - home
+      - wayland
       - gsettings
+      - home
       - network
       - network-bind
       - removable-media
     desktop: usr/share/applications/pynsource.desktop
-    extensions:
-      # HINT: Adds plugs and changes environment variables when building and running
-      - gnome
   pynsource-cli:
     command: bin/pynsource-cli
     plugs:
@@ -41,29 +46,30 @@ parts:
   copy-media:
     plugin: dump
     source: src/media
+    # core24 = Python 3.12 (this used to be hardcoded to lib/python3.10)
     organize:
-      "*": lib/python3.10/site-packages/media/
+      "*": lib/python3.12/site-packages/media/
 
   # To get the HelpWindow.html and the help-images folder into the snap
   copy-dialogs:
     plugin: dump
     source: src/dialogs/
     organize:
-      "*": lib/python3.10/site-packages/dialogs/
+      "*": lib/python3.12/site-packages/dialogs/
 
   build-the-python-stuff-please:
     plugin: python
     source: .
+    build-packages:
+      - libsdl2-dev
     stage-packages:
       - libsdl2-2.0-0
     python-requirements:
-      - .requirement-extras/requirements-linux-common.txt
-    python-packages:
-      - wxasync
-      - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxPython-4.2.0-cp310-cp310-linux_x86_64.whl
+      # requirements-snap.txt pulls in requirements-linux-common.txt (relatively) and pins
+      # wxPython to the cp312 wheel built for ubuntu-24.04 - there are no Linux wheels on PyPI
+      - .requirement-extras/requirements-snap.txt
     override-build: |
-      # this .desktop file ends up in /var/lib/snapd/desktop/applications/pynsource_pynsource.desktop not the usual /usr/share/applications
+      # this .desktop file ends up in /var/lib/snapd/desktop/applications/pynsource_pynsource.desktop
+      # not the usual /usr/share/applications
       install -Dm644 "snap/gui/pynsource.desktop" -t "$CRAFT_PART_INSTALL/usr/share/applications/"
       craftctl default
-    organize:
-      usr/lib/$CRAFT_ARCH_TRIPLET/pulseaudio/libpulsecommon-15.99.so: usr/lib/$CRAFT_ARCH_TRIPLET/libpulsecommon-15.99.so
