@@ -105,4 +105,5 @@ parts:
         > "$CRAFT_PART_INSTALL/usr/bin/pynsource-cli"
       chmod +x "$CRAFT_PART_INSTALL/usr/bin/pynsource" "$CRAFT_PART_INSTALL/usr/bin/pynsource-cli"
 
-      ls -l "$CRAFT_PART_INSTALL/usr/bin" "$SITE" | head -20
+      ls -l "$CRAFT_PART_INSTALL/usr/bin" || true
+      ls "$SITE"
