@@ -11,7 +11,7 @@
 #     equivalent is "the installer exists and the app launches" (see the two
 #     Guard steps).
 #   * the binary is unsigned (no code-signing certificate), so SmartScreen warns
-#     on first run - documented in .deploy-extras/windows/RELEASE-NOTES.md.
+#     on first run - documented in .deploy-extras/RELEASE-NOTES.md.
 #   * Inno Setup is not preinstalled on the runners, so it is installed with choco.
 #
 # Sibling pins `ref: 2026-dustoff` are TEMPORARY - drop them once the
@@ -196,5 +196,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         draft: true
-        body_path: pynsource/.deploy-extras/windows/RELEASE-NOTES.md
+        # shared multi-OS body (also used by build-mac.yml) - see the file header
+        body_path: pynsource/.deploy-extras/RELEASE-NOTES.md
         files: pynsource/dist-inno/pynsource-win-${{ env.TAG }}-setup.exe

@@ -138,8 +138,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         draft: true
-        # short notes + an "Installation tips" section; the full Gatekeeper walkthrough lives in
-        # IMPORTANT-README-BEFORE-RUNNING.txt inside the zip (not as the whole body - it rendered
-        # as a giant heading)
-        body_path: pynsource/.deploy-extras/macos/RELEASE-NOTES.md
+        # one shared body for every OS: Mac and Windows workflows both write this file,
+        # so it no longer matters which of them finishes last
+        body_path: pynsource/.deploy-extras/RELEASE-NOTES.md
         files: pynsource/dist/pynsource-macos-${{ env.TAG }}.zip

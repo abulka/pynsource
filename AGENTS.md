@@ -117,7 +117,7 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   Windows verification - the installer cannot be tested on macOS; `innoextract` 1.9 cannot read
   Inno 6.5 either.
 - Unsigned (no code-signing cert): users get "Windows protected your PC" → **More info > Run
-  anyway**. Documented in `.deploy-extras/windows/RELEASE-NOTES.md` (also the release body).
+  anyway**. Documented in the shared `.deploy-extras/RELEASE-NOTES.md` (also the release body).
 - Local `bin/buildwin.bat` still works, same `.iss`, but needs Inno 6 and picks up whatever
   python/pyinstaller is on PATH. Prefer CI.
 

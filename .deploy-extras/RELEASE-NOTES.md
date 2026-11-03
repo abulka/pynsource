@@ -1,6 +1,15 @@
-macOS build of Pynsource — Apple silicon (arm64), Python 3.13, wxPython 4.3.2.
+Windows and macOS builds of Pynsource — Python 3.13, wxPython 4.3.2.
 
-## Install
+## Windows 10/11 (64-bit)
+
+Download `pynsource-win-<tag>-setup.exe` and run it. Installs to
+`C:\Program Files\Pynsource`, adds a Start Menu entry, uninstalls from *Apps & features*.
+
+**First run:** Windows SmartScreen warns because the installer is unsigned (no paid
+code-signing certificate) — on the blue *"Windows protected your PC"* box click
+**More info**, then **Run anyway**. The installer then runs normally.
+
+## macOS (Apple silicon)
 
 Homebrew, no Gatekeeper prompt:
 
@@ -10,10 +19,8 @@ brew install --cask abulka/pynsource/pynsource
 
 Or download the zip below, unzip, and drag `Pynsource.app` into `/Applications`.
 
-## Installation tips (first run)
-
-macOS blocks the app the first time you open it, because it is ad-hoc signed
-(no paid Apple Developer ID):
+**First run:** macOS blocks the app because it is ad-hoc signed (no paid Apple
+Developer ID):
 
 1. Double-click **Pynsource**, then click **Done** — *not* "Move to Bin".
 2. Open **System Settings → Privacy & Security**, scroll to the bottom, find
@@ -27,6 +34,6 @@ The same steps are in `IMPORTANT-README-BEFORE-RUNNING.txt` inside the zip.
 
 ## Notes
 
-- Apple silicon only (Intel Macs are not supported).
+- Apple silicon only on Mac (Intel Macs are not supported).
 - Editing diagrams is free; the Pro features (zoom, drag-to-connect, module
   visualisation) need a licence — https://www.pynsource.com/pricing.html
