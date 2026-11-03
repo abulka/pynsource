@@ -64,8 +64,15 @@ jobs:
     # Whatever the CLI prints is evidence the PYTHONPATH/entry-point wiring is right.
     - name: Install the snap and run the CLI
       run: |
+        snap=snap
+        echo "=== where did the modules land? ==="
+        sudo apt-get install -y -qq squashfs-tools >/dev/null
+        unsquashfs -l "$(ls *.snap)" | grep -E "pynsource_(cli|gui)\.py|site-packages$" | head -10
+        echo "=== app environment as snapd sets it ==="
         sudo snap install --dangerous "$(ls *.snap)"
         snap list pynsource
+        snap run --shell pynsource.pynsource-cli -c 'echo "PYTHONPATH=$PYTHONPATH"; ls "$SNAP/usr/lib/python3.12/site-packages" | head -8'
+        echo "=== the real smoke test ==="
         # the qualified form: the app is "pynsource-cli" inside the "pynsource" snap
         snap run pynsource.pynsource-cli --version
 
