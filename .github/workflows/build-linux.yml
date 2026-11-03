@@ -1,0 +1,174 @@
+# CI Linux build (AppImage) - Phase 4 of the release-pipeline plan.
+# (Plan lives outside the repo in /Users/andy/.opencode/plan - pro/free build
+# details stay private.)
+#
+# Triggers on pre-* tags + manual dispatch, same as build-mac.yml / build-win.yml.
+#
+# Two Linux-specific decisions:
+#   * ubuntu-22.04, not -latest: the glibc of the build machine is the AppImage's floor.
+#     22.04 = glibc 2.35, which covers Ubuntu 22.04+/Mint 21+/Debian 12+.
+#   * Linux is Pro-free (see the platform gate in src/gui/settings.py), so the bundle must
+#     contain ogl2 + alsm and needs no licence plumbing.
+#
+# wxPython on Linux has no PyPI wheels at all (mac/win only) - it comes from wxPython's
+# extras server, which is built per Ubuntu release/CPython. 4.2.5 is the newest cp313 build
+# for ubuntu-22.04, hence Linux runs 4.2.5 while Mac/Windows run 4.3.2. Install that wheel
+# BEFORE requirements.txt so the unpinned `wxpython` line is already satisfied.
+name: Pynsource app built on Linux (AppImage)
+on:
+  push:
+    tags: ['pre-*']
+    # TEMPORARY - scratch branch used to iterate before the workflow exists on
+    # the default branch (workflow_dispatch needs that). Removed before merge.
+    branches: ['ci/linux-build']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Check out pynsource (triggering ref)
+      uses: actions/checkout@v4
+      with:
+        path: pynsource/
+
+    - name: Check out ogl2 (private, branch pin - see header)
+      uses: actions/checkout@v4
+      with:
+        repository: abulka/ogl2
+        ref: 2026-dustoff
+        token: ${{ secrets.my_pat }}
+        path: ogl2/
+
+    - name: Check out pynsource-rego (private)
+      uses: actions/checkout@v4
+      with:
+        repository: abulka/pynsource-rego
+        token: ${{ secrets.my_pat }}
+        path: pynsource-rego/
+
+    - name: Check out ALSM (private, branch pin - see header)
+      uses: actions/checkout@v4
+      with:
+        repository: abulka/alsm
+        ref: 2026-dustoff
+        token: ${{ secrets.my_pat }}
+        path: alsm/
+
+    - name: Setup uv (python-build-standalone interpreter)
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: false
+
+    - name: System packages (GTK3 to run the GUI, xvfb to test it)
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq --no-install-recommends \
+          xvfb xauth libgtk-3-0 libgl1 libglib2.0-0 libxkbcommon-x11-0
+        echo "gtk: $(dpkg -l libgtk-3-0 | tail -1 | awk '{print $3}')"
+
+    - name: Build interpreter + venv (python-build-standalone, NOT setup-python)
+      env:
+        UV_PYTHON_PREFERENCE: only-managed
+      run: |
+        uv python install 3.13
+        uv venv --python 3.13 --python-preference only-managed .venv
+        PY=.venv/bin/python
+        echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+        uv pip install --python "$PY" wheel pyinstaller
+        # no cp313 Linux wheel on PyPI - see the header
+        uv pip install --python "$PY" \
+          "https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxpython-4.2.5-cp313-cp313-linux_x86_64.whl"
+        uv pip install --python "$PY" -r pynsource/requirements.txt
+        uv pip install --python "$PY" alsm/
+        "$PY" -c "import sys, wx; print('BUILD PYTHON', sys.version.split()[0], wx.version())"
+
+    - name: Guard - Linux runs Pro by platform, and alsm is importable
+      run: |
+        cd pynsource/src
+        python -c "
+        from gui.settings import PRO_EDITION, ALSM_PARSING, registered_to
+        print('PRO_EDITION =', PRO_EDITION, '| ALSM_PARSING =', ALSM_PARSING, '| registered_to =', repr(registered_to))
+        assert PRO_EDITION, 'Linux builds must be Pro-free (see src/gui/settings.py)'
+        assert ALSM_PARSING, 'alsm missing - module visualisation would be disabled'
+        "
+
+    - name: Run the test suite
+      run: |
+        mkdir -p pynsource/src/tests/logs
+        cd pynsource
+        python -m unittest discover -s src 2>&1 | tail -5
+
+    - name: Build executable using Pyinstaller
+      run: |
+        cd pynsource/
+        python bin/_buildsamples.py
+        pyinstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
+        cp README.md dist/Readme.txt
+        cp CHANGELOG.md dist/Changelog.txt
+        ls -l dist/
+        du -sh dist/Pynsource
+
+    - name: Get the tag name
+      run: |
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        else
+          # Manual dispatch: branch name + run number, slashes sanitized
+          echo "TAG=${GITHUB_REF_NAME//\//-}-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+        fi
+
+    - name: Build the AppImage
+      run: |
+        cd pynsource
+        PYTHON=../.venv/bin/python bin/build-appimage.sh "$TAG"
+        ls -l dist/*.AppImage
+
+    - name: Guard - AppImage is an AppImage, and the bundled app launches
+      run: |
+        cd pynsource
+        appimage=dist/pynsource-linux-$TAG-x86_64.AppImage
+        file "$appimage"
+        du -h "$appimage"
+        file "$appimage" | grep -q "AppImage" || { echo "::error::not an AppImage"; exit 1; }
+        # FUSE is not available on the runner: extract instead of mounting (same payload)
+        rm -rf /tmp/appimage-extract && mkdir -p /tmp/appimage-extract
+        ( cd /tmp/appimage-extract && "$GITHUB_WORKSPACE/pynsource/$appimage" --appimage-extract >/dev/null )
+        ls /tmp/appimage-extract/squashfs-root
+        # GUI smoke test on a virtual display; wx/GTK needs one even for a launch
+        cd /tmp/appimage-extract/squashfs-root
+        xvfb-run -a -s "-screen 0 1280x1024x24" ./AppRun > /tmp/appimage-run.log 2>&1 &
+        runner=$!
+        sleep 25
+        if ! kill -0 "$runner" 2>/dev/null; then
+          echo "::error::AppRun exited within 25s"
+          cat /tmp/appimage-run.log
+          exit 1
+        fi
+        kill "$runner" 2>/dev/null || true
+        echo "--- AppRun output (a 'Community Edition' line here would mean the Pro gate broke) ---"
+        cat /tmp/appimage-run.log
+        if grep -q "Running Community Edition" /tmp/appimage-run.log; then
+          echo "::error::Linux build came up as Community Edition - the platform gate in src/gui/settings.py is not working"
+          exit 1
+        fi
+
+    - name: Save AppImage as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pynsource-linux-${{ env.TAG }}
+        path: pynsource/dist/pynsource-linux-${{ env.TAG }}-x86_64.AppImage
+
+    - name: Draft pre-release
+      if: startsWith(env.TAG, 'pre-')
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        draft: true
+        # shared multi-OS body (also used by the mac and windows workflows) - see its header
+        body_path: pynsource/.deploy-extras/RELEASE-NOTES.md
+        files: pynsource/dist/pynsource-linux-${{ env.TAG }}-x86_64.AppImage

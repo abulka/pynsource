@@ -1,3 +1,5 @@
+import sys
+
 PRO_EDITION=True
 ALSM_PARSING=False
 NATIVE_LINES_OGL_LIKE=False
@@ -28,6 +30,17 @@ else:
     registered_to = rego.get_stored_serial_info()["name"] if rego.get_stored_serial_info() else ""
     enter_license = lambda name, serial : rego.enter_license(name, serial, APP_VERSION)
 
+# Linux editions are Pro-free: Pro is decided by platform, not by a licence file.
+#
+# Every Linux delivery route (AppImage, snap, distro package) ships with Pro enabled.
+# A licence file is not viable there: snaps cannot read or write one (HOME is per-revision
+# sandboxed, so registering would not survive an update) and the various Linux packaging
+# routes have no way to share one. So on Linux we skip the check entirely - which also
+# means the AppImage/snap must bundle ogl2 and alsm, since Pro features import them.
+if sys.platform.startswith("linux"):
+    PRO_EDITION = True
+    registered_to = "Linux users"
+
 if PRO_EDITION:
     try:
         import alsm
@@ -37,8 +50,12 @@ if PRO_EDITION:
         ALSM_PARSING = False
     if not ALSM_PARSING:
         print(f"Python Module Visualisation could not be enabled - 'alsm' package not installed 😳")
-        print(f"  👉 This is a config error when debugging and developing the PRO version of pynsource, which only the author can do.")
-        print(f"  👉 Andy, please run: pip install ../alsm-parsers/alsm/ (see alsm README.md for more info)")
+        if sys.platform.startswith("linux"):
+            # Linux runs Pro by default, so this is the normal user-facing case, not a dev error
+            print(f"  👉 Install it with: pip install alsm  (then restart Pynsource)")
+        else:
+            print(f"  👉 This is a config error when debugging and developing the PRO version of pynsource, which only the author can do.")
+            print(f"  👉 Andy, please run: pip install ../alsm-parsers/alsm/ (see alsm README.md for more info)")
 
 if not PRO_EDITION:
     print(f"Running Community Edition")

@@ -1,0 +1,17 @@
+# Desktop entry for the AppImage (and the snap in ../snap/gui/pynsource.desktop has its own
+# copy, because a snap injects ${SNAP} into the icon path).
+#
+# Icon name and Exec deliberately match the AppImage's top-level pynsource.png / pynsource.desktop,
+# which is how AppImage desktop-integration tools (appimaged, GearLever) match them up.
+[Desktop Entry]
+Type=Application
+Name=Pynsource
+GenericName=UML application
+Comment=Pynsource UML reverse engineer Python source into diagrams
+Exec=pynsource
+Icon=pynsource
+Terminal=false
+Categories=Development;
+Keywords=UML;Python;diagram;reverse-engineering;
+StartupNotify=true
+StartupWMClass=Pynsource

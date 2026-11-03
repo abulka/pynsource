@@ -1,4 +1,4 @@
-Windows and macOS builds of Pynsource — Python 3.13, wxPython 4.3.2.
+Windows, macOS and Linux builds of Pynsource — Python 3.13, wxPython 4.3.2 (4.2.5 on Linux).
 
 ## Windows 10/11 (64-bit)
 
@@ -31,6 +31,22 @@ Developer ID):
 Terminal alternative: `xattr -dr com.apple.quarantine /Applications/Pynsource.app`
 
 The same steps are in `IMPORTANT-README-BEFORE-RUNNING.txt` inside the zip.
+
+## Linux (AppImage, 64-bit)
+
+Download `pynsource-linux-<tag>-x86_64.AppImage`, then:
+
+```
+chmod +x pynsource-linux-*.AppImage
+./pynsource-linux-*.AppImage
+```
+
+One file, no install and no root. Works on Ubuntu 22.04+/Mint 21+/Debian 12+ (it is built on
+glibc 2.35) with any normal GTK3 desktop. If your file manager will not run it, use the two
+commands above from a terminal — most simply need *Properties → Permissions → Allow executing*.
+
+All Pro features (zoom, drag-to-connect, module visualisation) are **free on Linux** — no
+licence needed.
 
 ## Notes
 
