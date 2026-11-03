@@ -66,8 +66,14 @@ jobs:
     - name: System packages (GTK3 to run the GUI, xvfb to test it)
       run: |
         sudo apt-get update -qq
+        # The wxPython wheel is built on ubuntu-22.04 and links against these; a bare runner
+        # lacks several of them and `import wx` then dies on the first missing .so. PyInstaller
+        # packages whatever it can resolve, so installing them here also makes them part of the
+        # AppImage payload.
         sudo apt-get install -y -qq --no-install-recommends \
-          xvfb xauth libgtk-3-0 libgl1 libglib2.0-0 libxkbcommon-x11-0
+          xvfb xauth libgtk-3-0 libgl1 libglu1-mesa libglib2.0-0 libxkbcommon-x11-0 \
+          libnotify4 libsdl2-2.0-0 libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
+          libwebkit2gtk-4.0-37 libxtst6 libsm6 libice6 libpulse0 libjpeg-turbo8 libtiff5
         echo "gtk: $(dpkg -l libgtk-3-0 | tail -1 | awk '{print $3}')"
 
     - name: Build interpreter + venv (python-build-standalone, NOT setup-python)
