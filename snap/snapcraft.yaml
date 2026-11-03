@@ -109,13 +109,10 @@ parts:
 
       # wxPython: no Linux wheels on PyPI. The extras server only builds x86_64, so amd64 takes
       # the prebuilt cp312 wheel and arm64 compiles 4.2.5 from source (~15 min).
-      # CRAFT_ARCH_BUILD_FOR is set by snapcraft; `dpkg --print-architecture` is unreliable in
-      # the part environment (it came back empty, so amd64 fell into the compile branch)
       ARCH="${CRAFT_ARCH_BUILD_FOR:-$(dpkg --print-architecture)}"
       echo "=== building for $ARCH"
       if [ "$ARCH" = "amd64" ]; then
-        /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location \
-          "https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04/wxpython-4.2.5-cp312-cp312-linux_x86_64.whl"
+        WX="https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04/wxpython-4.2.5-cp312-cp312-linux_x86_64.whl"
       else
         # wxWidgets' bundled nanosvg uses unqualified isnan(), which gcc 13 (core24) no longer
         # pulls in transitively: "error: 'isnan' was not declared in this scope". gcc 11 on
@@ -125,11 +122,14 @@ parts:
         MAX_JOBS=$(nproc) /usr/bin/python3 -m pip wheel --no-binary wxpython "wxpython==4.2.5" \
           -w /tmp/wxwheel || { echo "ERROR: wxPython failed to compile for $ARCH" >&2; exit 1; }
         ls -l /tmp/wxwheel
-        /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location /tmp/wxwheel/wxpython-*.whl
+        WX="$(ls /tmp/wxwheel/wxpython-*.whl)"
       fi
 
+      # One pip invocation on purpose: requirements-linux-common.txt contains a bare `wxpython`
+      # line, and a --target install is invisible to a later pip call, so splitting this up makes
+      # pip try to build wx from source.
       /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location \
-        -r .requirement-extras/requirements-snap.txt
+        -r .requirement-extras/requirements-snap.txt "$WX"
       /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location --no-deps .
       # Pro is free on Linux, so the snap ships the Pro-only siblings. The workflow checks
       # them out next to this project; snapcraft's `source: .` copies them along.
