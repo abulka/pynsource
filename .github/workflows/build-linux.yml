@@ -106,7 +106,17 @@ jobs:
       run: |
         mkdir -p pynsource/src/tests/logs
         cd pynsource
-        python -m unittest discover -s src 2>&1 | tail -5
+        # xvfb, not TRAVIS=1: the wx-dependent tests (128 of 158) then actually run instead of
+        # skipping. Keep the full log - piping straight to tail conceals the traceback.
+        set +e
+        xvfb-run -a -s "-screen 0 1280x1024x24" python -m unittest discover -s src > /tmp/tests.log 2>&1
+        rc=$?
+        grep -E "^(Ran |OK|FAILED)" /tmp/tests.log
+        if [ $rc -ne 0 ]; then
+          echo "--- last 80 lines ---"
+          tail -80 /tmp/tests.log
+          exit $rc
+        fi
 
     - name: Build executable using Pyinstaller
       run: |
