@@ -131,6 +131,9 @@ jobs:
         cp CHANGELOG.md dist/Changelog.txt
         ls -l dist/
         du -sh dist/Pynsource
+        # size diagnostics - the Linux wx .so files are large; this shows where the bytes go
+        du -sh dist/Pynsource/_internal/* 2>/dev/null | sort -h | tail -8
+        find dist/Pynsource -type f -size +4M -printf '%s %p\n' | sort -n | tail -12
 
     - name: Get the tag name
       run: |
