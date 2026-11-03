@@ -32,7 +32,9 @@ VersionInfoVersion=1.85
 ; cwd seems to be the location of THIS file, so relative links get us back to pynsource/
 OutputDir=..\dist-inno\
 OutputBaseFilename=pynsource-win-1.85-setup
-ArchitecturesInstallIn64BitMode=x64
+; x64compatible (Inno Setup 6.3+) rather than the deprecated x64: it also installs on
+; ARM64 Windows, where the x64 build runs under emulation. CI gets Inno 6 via choco.
+ArchitecturesInstallIn64BitMode=x64compatible
 SetupIconFile=..\src\media\pynsource.ico
 
 [Files]
