@@ -80,10 +80,17 @@ ln -sf pynsource.png "$APPDIR/.DirIcon"
 
 # usr/bin/pynsource is what the desktop file's Exec refers to, and what linuxdeploy treats as
 # "the app". It is only a wrapper, so linuxdeploy leaves the PyInstaller tree alone.
+# It must put usr/lib on the loader path itself: linuxdeploy's GTK plugin normally does that by
+# setting an rpath on the binaries it deploys, which a shell wrapper cannot carry.
 cat > "$APPDIR/usr/bin/pynsource" <<'SH'
 #!/bin/sh
-# Wrapper: the PyInstaller tree lives next to this script so _internal/ stays with the exe.
+# Wrapper: the PyInstaller tree lives next to this script so _internal/ stays with the exe,
+# and linuxdeploy's GTK copy lives in usr/lib (three levels up from the real binary).
 HERE="$(dirname "$(readlink -f "$0")")"
+APPDIR="$(dirname "$(dirname "$HERE")")"
+if [ -d "$APPDIR/usr/lib" ]; then
+  export LD_LIBRARY_PATH="$APPDIR/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+fi
 exec "$HERE/Pynsource/Pynsource" "$@"
 SH
 chmod +x "$APPDIR/usr/bin/pynsource"
