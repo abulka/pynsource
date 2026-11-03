@@ -10,6 +10,12 @@
 #
 # Channel policy (see the plan): edge only, on pre-* tags. Stable is promoted by hand in the
 # store UI after a snap has actually been installed and run.
+#
+# The edge upload needs the SNAPCRAFT_STORE_CREDENTIALS secret, which is an *exported login*
+# with an expiry date. When it lapses the build and the install test still pass and only this
+# step fails ("Exported credentials are no longer valid for the Snap Store"); re-export with
+#   snapcraft export-login --snaps pynsource --channels edge,candidate,stable -
+# and `gh secret set SNAPCRAFT_STORE_CREDENTIALS`.
 name: Pynsource Snap
 on:
   push:
@@ -55,6 +61,20 @@ jobs:
         ref: 2026-dustoff
         token: ${{ secrets.my_pat }}
         path: alsm/
+
+    # `version: git` = git describe, which reports the nearest *older* tag
+    # ("pre-2026-dustoff-6+git13.86bdd0a") and, on a shallow clone, "0+git.<sha>". Set it from
+    # the ref instead so the store listing always matches the release it came from.
+    - name: Set the snap version from the ref
+      run: |
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          version="${GITHUB_REF#refs/tags/}"
+        else
+          version="dev-${GITHUB_SHA:0:7}"
+        fi
+        sed -i "s/^version: git$/version: \"$version\"/" snap/snapcraft.yaml
+        grep -E '^version:' snap/snapcraft.yaml
+        echo "SNAP_VERSION=$version" >> "$GITHUB_ENV"
 
     - name: Install snapcraft
       run: |
