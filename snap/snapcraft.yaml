@@ -5,6 +5,12 @@ summary: 'Pynsource - reverse engineer Python source code into UML'
 description: |
       UML tool for Python. Reverse engineer Python source code into UML.
       Requires a GTK3 desktop (the gnome extension provides it).
+contact: https://github.com/abulka/pynsource/issues
+license: MIT
+website: https://www.pynsource.com/
+source-code: https://github.com/abulka/pynsource
+issues: https://github.com/abulka/pynsource/issues
+icon: snap/gui/pynsource.png
 
 grade: stable # devel # must be 'stable' to release into candidate/stable channels
 confinement: strict # devmode # strict is the goal; all Pro features are free on Linux,
@@ -80,13 +86,23 @@ parts:
       # not the usual /usr/share/applications
       install -Dm644 "snap/gui/pynsource.desktop" -t "$CRAFT_PART_INSTALL/usr/share/applications/"
 
-      INSTALL="$CRAFT_PART_INSTALL/usr"
+      # --target rather than --prefix: Debian's python uses the `posix_local` sysconfig scheme,
+      # so --prefix silently puts scripts in usr/local/bin and modules in usr/local/lib.
+      SITE="$CRAFT_PART_INSTALL/usr/lib/python3.12/site-packages"
       # requirements-snap.txt pulls in requirements-linux-common.txt and pins wxPython to the
       # cp312 wheel built for ubuntu-24.04 - there are no Linux wheels on PyPI at all
-      /usr/bin/python3 -m pip install --prefix "$INSTALL" --no-warn-script-location \
+      /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location \
         -r .requirement-extras/requirements-snap.txt
-      # --no-deps: everything above is already installed; this just adds the entry-point
-      # scripts (usr/bin/pynsource, usr/bin/pynsource-cli) and the modules
-      /usr/bin/python3 -m pip install --prefix "$INSTALL" --no-warn-script-location --no-deps .
+      /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location --no-deps .
 
-      ls -l "$INSTALL/bin"
+      # console scripts by hand (no setuptools entry points to fight over): the app definition
+      # puts $SNAP/usr/lib/python3.12/site-packages on PYTHONPATH, so `-m` just works
+      install -d "$CRAFT_PART_INSTALL/usr/bin"
+      # run(), not `-m pynsource_gui`: the module's __main__ block is debug scaffolding
+      printf '#!/bin/sh\nexec /usr/bin/python3 -c "from pynsource_gui import run; run()" "$@"\n' \
+        > "$CRAFT_PART_INSTALL/usr/bin/pynsource"
+      printf '#!/bin/sh\nexec /usr/bin/python3 -c "from pynsource_cli import reverse_engineer; reverse_engineer()" "$@"\n' \
+        > "$CRAFT_PART_INSTALL/usr/bin/pynsource-cli"
+      chmod +x "$CRAFT_PART_INSTALL/usr/bin/pynsource" "$CRAFT_PART_INSTALL/usr/bin/pynsource-cli"
+
+      ls -l "$CRAFT_PART_INSTALL/usr/bin" "$SITE" | head -20
