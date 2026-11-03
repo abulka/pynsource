@@ -94,6 +94,16 @@ parts:
       /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location \
         -r .requirement-extras/requirements-snap.txt
       /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location --no-deps .
+      # Pro is free on Linux, so the snap ships the Pro-only siblings. The workflow checks
+      # them out next to this project; snapcraft's `source: .` copies them along.
+      for sibling in ogl2 alsm; do
+        if [ -d "$sibling" ]; then
+          /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location --no-deps "./$sibling"
+        else
+          echo "ERROR: $sibling/ not present - the snap would ship without Pro features" >&2
+          exit 1
+        fi
+      done
 
       # console scripts by hand (no setuptools entry points to fight over): the app definition
       # puts $SNAP/usr/lib/python3.12/site-packages on PYTHONPATH, so `-m` just works

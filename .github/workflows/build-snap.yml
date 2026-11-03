@@ -37,6 +37,25 @@ jobs:
         # and silently produced version "0+git.98c57e6" in the store
         fetch-depth: 0
 
+    # Linux is Pro-free (src/gui/settings.py), so the snap must carry the Pro-only packages:
+    # ogl2 (canvas: zoom, drag-to-connect) and alsm (module visualisation). They are separate
+    # private repos, checked out into the project dir so the snapcraft part can pip install them.
+    - name: Check out ogl2 (private, branch pin)
+      uses: actions/checkout@v4
+      with:
+        repository: abulka/ogl2
+        ref: 2026-dustoff
+        token: ${{ secrets.my_pat }}
+        path: ogl2/
+
+    - name: Check out ALSM (private, branch pin)
+      uses: actions/checkout@v4
+      with:
+        repository: abulka/alsm
+        ref: 2026-dustoff
+        token: ${{ secrets.my_pat }}
+        path: alsm/
+
     - name: Install snapcraft
       run: |
         sudo snap install snapcraft --classic
@@ -74,7 +93,13 @@ jobs:
         snap run --shell pynsource.pynsource-cli -c 'echo "PYTHONPATH=$PYTHONPATH"; ls "$SNAP/usr/lib/python3.12/site-packages" | head -8'
         echo "=== the real smoke test ==="
         # the qualified form: the app is "pynsource-cli" inside the "pynsource" snap
-        snap run pynsource.pynsource-cli --version
+        out=$(snap run pynsource.pynsource-cli --version 2>&1)
+        echo "$out"
+        echo "$out" | grep -q "Pynsource CLI version" || { echo "::error::CLI did not report a version"; exit 1; }
+        if echo "$out" | grep -q "could not be enabled"; then
+          echo "::error::alsm is missing - Pro module visualisation would be disabled on Linux"
+          exit 1
+        fi
 
     # Uploads the snap to the edge channel, test via: sudo snap refresh pynsource --edge
     - name: Push to edge
