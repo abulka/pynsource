@@ -89,8 +89,12 @@ jobs:
         uv pip install --python "$PY" \
           "https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxpython-4.2.5-cp313-cp313-linux_x86_64.whl"
         uv pip install --python "$PY" -r pynsource/requirements.txt
+        # Linux is Pro-free, so ogl2 (canvas) and alsm (module visualisation) are imported
+        # unconditionally - unlike Mac/Windows CI, which runs Community with no licence file.
+        uv pip install --python "$PY" -e ogl2/
+        uv pip install --python "$PY" -e pynsource-rego/
         uv pip install --python "$PY" alsm/
-        "$PY" -c "import sys, wx; print('BUILD PYTHON', sys.version.split()[0], wx.version())"
+        "$PY" -c "import sys, wx, ogl2, alsm; print('BUILD PYTHON', sys.version.split()[0], wx.version())"
 
     - name: Guard - Linux runs Pro by platform, and alsm is importable
       run: |
