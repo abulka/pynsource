@@ -22,9 +22,9 @@ Latest 2023 approach: Build pynsource as a package - see [instructions below](#b
 
 or...
 
-Please use the script `bin/install-linux-18.04` to pip install needed Ubuntu dependencies, including a wxPython wheel specific to `Ubuntu 18.04`. Use the script `bin/install-linux-20.04` if you are installing on `Ubuntu 20.04`.  If you are using a different version of Ubuntu simply copy and edit the script `bin/install-linux-nn.nn` and change the url of wxpython accordingly, to contain the ubuntu distro version number. Browse the wxpython versions available [here](https://extras.wxpython.org/wxPython4/extras/linux/gtk3/).
+Please use the script `bin/deprecated/install-linux-18.04` to pip install needed Ubuntu dependencies, including a wxPython wheel specific to `Ubuntu 18.04`. Use the script `bin/deprecated/install-linux-20.04` if you are installing on `Ubuntu 20.04`.  If you are using a different version of Ubuntu simply copy and edit the script `bin/deprecated/install-linux-nn.nn` and change the url of wxpython accordingly, to contain the ubuntu distro version number. Browse the wxpython versions available [here](https://extras.wxpython.org/wxPython4/extras/linux/gtk3/).
 
-Fedora Linux Users: can use the script `bin/install-linux-fedora-33` see [detailed steps](INSTALL-TIPS.md).
+Fedora Linux Users: can use the script `bin/deprecated/install-linux-fedora-33` see [detailed steps](INSTALL-TIPS.md).
 
 ## A note on wxPython
 

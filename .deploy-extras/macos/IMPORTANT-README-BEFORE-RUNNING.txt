@@ -1,5 +1,5 @@
-PYNSOURCE — macOS blocks the app the first time. Here is exactly what to do.
-=============================================================================
+PYNSOURCE - macOS blocks the app the first time. Here is exactly what to do.
+
 
 1. Double-click "Pynsource".
 
