@@ -96,9 +96,11 @@ parts:
       /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location --no-deps .
       # Pro is free on Linux, so the snap ships the Pro-only siblings. The workflow checks
       # them out next to this project; snapcraft's `source: .` copies them along.
+      # with dependencies: alsm pulls antlr4/esprima/javalang/prettyprinter/... which its
+      # modules import at load time (--no-deps leaves 'import alsm' failing at runtime)
       for sibling in ogl2 alsm; do
         if [ -d "$sibling" ]; then
-          /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location --no-deps "./$sibling"
+          /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location "./$sibling"
         else
           echo "ERROR: $sibling/ not present - the snap would ship without Pro features" >&2
           exit 1

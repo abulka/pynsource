@@ -97,6 +97,9 @@ jobs:
         echo "$out"
         echo "$out" | grep -q "Pynsource CLI version" || { echo "::error::CLI did not report a version"; exit 1; }
         if echo "$out" | grep -q "could not be enabled"; then
+          # settings.py only catches ModuleNotFoundError, so a missing alsm *dependency* looks
+          # like a missing alsm - show the real traceback
+          snap run --shell pynsource.pynsource-cli -c '/usr/bin/python3 -c "import alsm"' || true
           echo "::error::alsm is missing - Pro module visualisation would be disabled on Linux"
           exit 1
         fi
