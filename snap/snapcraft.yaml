@@ -68,6 +68,11 @@ parts:
       # requirements-snap.txt pulls in requirements-linux-common.txt (relatively) and pins
       # wxPython to the cp312 wheel built for ubuntu-24.04 - there are no Linux wheels on PyPI
       - .requirement-extras/requirements-snap.txt
+    build-environment:
+      # The gnome extension exports PYTHONPATH pointing at the gnome-46-2404-sdk snap, whose
+      # pip is broken ("cannot import name 'cli' from 'pip._internal.cli.main'"). Clear it for
+      # the python plugin build so pip comes from the core24 base instead.
+      - PYTHONPATH: 
     override-build: |
       # this .desktop file ends up in /var/lib/snapd/desktop/applications/pynsource_pynsource.desktop
       # not the usual /usr/share/applications
