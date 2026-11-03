@@ -132,9 +132,12 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   `ubuntu-22.04` (x86_64) and `ubuntu-22.04-arm` (aarch64) — both standard 4-CPU runners, free
   for public repos. `bin/build-appimage.sh` is arch-aware (`uname -m`) for the tool downloads
   and the output name.
-- **The aarch64 leg compiles wxPython from source** (~30-60 min, cached as a wheel under
-  `~/wx-wheel-cache`, key `wxpython-4.2.5-cp313-ubuntu-22.04-arm64`): there are no Linux wheels
-  on PyPI at all, and extras.wxpython.org is x86_64 only. Build deps exclude gstreamer/webkit
+- **The aarch64 leg compiles wxPython from source** (~15 min on the 4-CPU arm runner; there are
+  no Linux wheels on PyPI at all, and extras.wxpython.org is x86_64 only). A wheel cache exists
+  (`~/wx-wheel-cache`, key `wxpython-4.2.5-cp313-ubuntu-22.04-arm64`) but do not count on it:
+  GitHub cache scope is per-branch, and **tag builds can only restore caches created on the
+  default branch**, so a cache made on a scratch branch never helps a release build. Budget the
+  15 minutes. Build deps exclude gstreamer/webkit
   dev packages — they only enable wx.media/wx.html2 (unused) and `libgstreamer1.0-dev` drags in
   `libunwind-dev`, which is unsatisfiable on the arm runner image.
 - **ubuntu-22.04 is the glibc floor**, not `ubuntu-latest`: 22.04 = glibc 2.35, i.e. Ubuntu
