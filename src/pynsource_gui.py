@@ -95,7 +95,11 @@ config_log(log)
 class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 # class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnInit(self):
-        self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)  # needed for window 10
+        # wx.Locale(wx.LANGUAGE_ENGLISH) is a Windows 10 workaround. On Linux, constructing it
+        # pops "Cannot set locale to language "English"" at every launch when that locale is not
+        # installed/available (minimal installs, containers, LANG=C), so skip it there.
+        if wx.Platform != '__WXGTK__':
+            self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)  # needed for window 10
         # self.Init()  # initialize the inspection tool
         self.log = Log()
         self.working = False
