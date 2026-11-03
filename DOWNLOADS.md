@@ -40,15 +40,23 @@ Download `pynsource-win-<version>-setup.exe` and run it. It installs to
 > **Windows users:** the installer is unsigned (no code-signing certificate), so SmartScreen
 > blocks it on first run — click **More info**, then **Run anyway**.
 
-## Linux
+## Linux (AppImage, 64-bit)
 
-Unzip and run the standalone executables available. These are named Ubuntu but run in any debian based system like Mint 21 etc.
+Download `pynsource-linux-<version>-x86_64.AppImage`, make it executable and run it:
 
-The benefit of the binaries is that they run via the latest version of Python available, and will be able to parse advanced Python syntax like the walrus operator or Python 3.10 match-case syntax. They can also be registered with a Pro license (Python snaps cannot).
+```bash
+chmod +x pynsource-linux-*.AppImage
+./pynsource-linux-*.AppImage
+```
 
-Special rare builds running version 1.77:
- * [Ubuntu Linux 16.0.4 download](http://bit.ly/pynsource-1-77-ubuntu-16) (unzip and run the executable) 
- * [Ubuntu Fedora 31 download](https://github.com/abulka/pynsource/releases/download/version-1.77/pynsource-1.77-fedora-31.zip) (unzip and run the executable via the terminal e.g. `./Pynsource`)
+One file — nothing to install, no root, nothing to unpack. Needs Ubuntu 22.04+ / Mint 21+ /
+Debian 12+ (it is built against glibc 2.35) and any normal GTK3 desktop.
+
+**All Pro features are free on Linux** (zoom, drag-to-connect, module visualisation) — there is
+no licence key to enter.
+
+If your file manager will not run it, use the two commands above; most desktops just need
+*Properties → Permissions → Allow executing*.
 
 ## Ubuntu Snap Installation
 

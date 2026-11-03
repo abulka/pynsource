@@ -111,13 +111,15 @@ or if you are using venv
     $ pip install -e .
     $ pynsource
 
-## Releasing (macOS and Windows)
+## Releasing (macOS, Windows, Linux)
 
-- CI: `.github/workflows/build-mac.yml` and `.github/workflows/build-win.yml`. A `pre-*` tag
-  builds both and appends their assets to one draft pre-release, with the body from
+- CI: `.github/workflows/build-mac.yml`, `build-win.yml`, `build-linux.yml`. A `pre-*` tag builds
+  all three and appends their assets to one draft pre-release, with the body from
   `.deploy-extras/RELEASE-NOTES.md` (shared, so it does not matter which job finishes last);
   manual dispatch gives an artifact only. Windows needs Inno Setup 6.3+ and ships an
-  `...-setup.exe` built from the same onedir spec.
+  `...-setup.exe`; Linux ships an AppImage (`bin/build-appimage.sh`, linuxdeploy + GTK plugin,
+  built on ubuntu-22.04 for the glibc floor and on wxPython 4.2.5 because there are no cp313
+  Linux wheels on PyPI).
 - Bundling is onedir (spec in `../ogl2/bin/pynsource-github-actions.spec`) and the build
   interpreter must be uv's python-build-standalone - see `Admin/BUG-DIST-SLOWNESS-MAC.md`.
 - Homebrew tap `abulka/homebrew-pynsource`: bump `version` and `sha256` in `Casks/pynsource.rb`

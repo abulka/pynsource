@@ -126,6 +126,40 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
 - Local `bin/buildwin.bat` still works, same `.iss`, but needs Inno 6 and picks up whatever
   python/pyinstaller is on PATH. Prefer CI.
 
+## Deploying (Linux)
+- Route: CI `.github/workflows/build-linux.yml` (ubuntu-22.04) → `pynsource-linux-<tag>-x86_64.AppImage`
+  on the same draft release, artifact on dispatch. Same triggers as the other two.
+- **ubuntu-22.04 is the glibc floor**, not `ubuntu-latest`: 22.04 = glibc 2.35, i.e. Ubuntu
+  22.04+/Mint 21+/Debian 12+. Bumping the runner silently drops older distros.
+- **wxPython has no Linux wheels on PyPI** — only mac/win. It comes from
+  `https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/`, built per Ubuntu
+  release/CPython. 4.2.5 is the newest cp313 build there, so **Linux runs 4.2.5 while mac/win
+  run 4.3.2**. Install that wheel *before* `requirements.txt`, otherwise the unpinned `wxpython`
+  line makes uv build from source.
+- **Linux is Pro-free by platform** (`src/gui/settings.py`), so `ogl2` and `alsm` are imported
+  unconditionally: the venv must have them (`uv pip install -e ogl2/ -e pynsource-rego/ alsm/`),
+  and the bundle must contain them. Mac/Windows CI never notices this, it runs Community.
+- Packaging chain (`bin/build-appimage.sh`): PyInstaller onedir → AppDir → `strip` → linuxdeploy
+  + `linuxdeploy-plugin-gtk` (`DEPLOY_GTK_VERSION=3`) → appimagetool. Keep that order.
+  * The wx `.so` files ship with debug symbols (`_core` alone is 179 MB of a 349 MB tree);
+    stripping takes the AppImage from 136 MB to ~80 MB.
+  * `--library` bundles the wx leaf libs PyInstaller does not resolve (libnotify, libSM, libXtst,
+    libXxf86vm, libSDL2, libsecret, libpcre2-32, libcurl + fontconfig/freetype). Without them a
+    stock GTK desktop still lacks eight packages.
+  * The GTK plugin sets an rpath on the binaries it deploys, but `AppRun` is our shell wrapper,
+    so `usr/bin/pynsource` must export `LD_LIBRARY_PATH=$APPDIR/usr/lib` itself. Forgetting that
+    is a clean-room `libgtk-3.so.0: cannot open shared object file`.
+  * The spec (`../ogl2/bin/pynsource-github-actions.spec`) drops the partial GTK stack it would
+    otherwise bundle; the plugin's copy is then the only one. Platform-gated, mac/win untouched.
+- Guard: `xvfb-run` (a headless runner cannot create a `wx.App`), 158 tests, then extract the
+  AppImage (`--appimage-extract`, no FUSE on runners) and assert `AppRun` is still alive after
+  25 s **and** that the log has no "Running Community Edition" line.
+- Target requirement is "a GTK3 desktop" and nothing else: verified in clean `ubuntu:22.04` and
+  `ubuntu:24.04` containers with only `libgtk-3-0` installed (plus xvfb for the display). A
+  container with *no* GUI libs at all fails on fontconfig/fribidi — that is expected, not a bug.
+- FUSE is absent in CI and in most containers, so `appimagetool`/`linuxdeploy` run with
+  `APPIMAGE_EXTRACT_AND_RUN=1` and the guard uses `--appimage-extract`.
+
 ## Tests
 - `mkdir -p src/tests/logs && .venv/bin/python -m unittest discover -s src` — expect `158 tests OK`
   (a handful skip without wx / are pre-existing skips). Runs WITH wx installed too.
