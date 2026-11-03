@@ -29,9 +29,13 @@ else:
     for key in sorted(samples.keys()):
         od[key] = samples[key]
 
+    # Write a plain dict, not an OrderedDict: dicts are insertion-ordered (3.7+) and, unlike
+    # OrderedDict, their repr has been stable across Python versions. OrderedDict's repr
+    # changed in CPython 3.12 ("OrderedDict([('k', v)])" -> "OrderedDict({'k': v})"), which
+    # made this generated file churn every time someone built with a different interpreter.
     with open(OUTFILE, "w") as f:
-        f.write("from collections import OrderedDict\n")  # allow file to be valid python
         f.write("sample_files_dict = ")
-        f.write(repr(od))
+        f.write(repr(dict(od)))
+        f.write("\n")
 
 print("done generating sample uml diagram file resource dictionary.")

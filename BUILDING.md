@@ -110,3 +110,17 @@ or if you are using venv
     $ source venv/bin/activate
     $ pip install -e .
     $ pynsource
+
+## Releasing (macOS)
+
+- CI: `.github/workflows/build-mac.yml`. A `pre-*` tag builds a draft pre-release (asset + notes
+  from `.deploy-extras/macos/RELEASE-NOTES.md`); manual dispatch gives an artifact only.
+- Bundling is onedir (spec in `../ogl2/bin/pynsource-github-actions.spec`) and the build
+  interpreter must be uv's python-build-standalone - see `Admin/BUG-DIST-SLOWNESS-MAC.md`.
+- Homebrew tap `abulka/homebrew-pynsource`: bump `version` and `sha256` in `Casks/pynsource.rb`
+  for each release, and switch its `url` from the current `pre-*` asset to the
+  `version-#{version}` pattern at the next stable tag.
+- **Cask naming trap:** the unqualified `pynsource` cask belongs to Homebrew's own abandoned
+  1.84 build (Intel, disabled for failing Gatekeeper). Document and use the full name:
+  `brew info --cask abulka/pynsource/pynsource`,
+  `brew upgrade --cask abulka/pynsource/pynsource` (or plain `brew upgrade`).

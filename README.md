@@ -19,6 +19,17 @@ Reverse engineer Python source code into UML class diagrams.
 > scroll to the bottom and click **Open Anyway** (a second dialog asks again - click it again).
 > Full steps: `IMPORTANT-README-BEFORE-RUNNING.txt` inside the download, or drag the app into
 > Terminal and run `xattr -dr com.apple.quarantine /Applications/Pynsource.app`.
+>
+> **Use the full cask name:** `brew info pynsource` and `brew upgrade --cask pynsource` (no
+> `abulka/pynsource/` prefix) refer to Homebrew's own long-abandoned 1.84 cask, which is
+> *disabled* (old Intel build that fails the Gatekeeper check) - you will see a red `disabled`
+> and a Rosetta caveat that have nothing to do with this app. To inspect or upgrade this build:
+>
+> ```bash
+> brew info --cask abulka/pynsource/pynsource
+> brew upgrade                                  # upgrades it correctly
+> brew upgrade --cask abulka/pynsource/pynsource
+> ```
 
 An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
 like zoom and the ability to drag to connect shapes.

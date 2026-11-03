@@ -84,9 +84,11 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   quarantines every cask download and Homebrew 7 has no `--no-quarantine`, so the cask does
   `xattr -dr com.apple.quarantine` in `postflight`. Bump its `version`/`sha256` per release.
   Caveat: Homebrew's *own* `pynsource` cask (v1.84, Intel) still exists and is `disabled`
-  since 2026-09-01 for failing Gatekeeper, so the unqualified token (`brew info pynsource`,
-  `brew upgrade --cask pynsource`) points at that dead cask - docs must say to use the
-  tap-qualified name or plain `brew upgrade`.
+  since 2026-09-01 for failing Gatekeeper, so the unqualified token points at that dead cask.
+  Correct commands (keep these in README/DOWNLOADS too):
+  `brew info --cask abulka/pynsource/pynsource`, `brew upgrade` (no args), or
+  `brew upgrade --cask abulka/pynsource/pynsource`. Never document bare
+  `brew info pynsource` / `brew upgrade --cask pynsource`.
 - Local `bin/buildmac.sh` works but picks up whatever `python3`/`pyinstaller` is on PATH,
   which is exactly how the framework-Python bug got in. Prefer CI.
 
