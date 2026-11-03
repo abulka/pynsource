@@ -100,6 +100,13 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   `brew info pynsource` / `brew upgrade --cask pynsource`.
 - Local `bin/buildmac.sh` works but picks up whatever `python3`/`pyinstaller` is on PATH,
   which is exactly how the framework-Python bug got in. Prefer CI.
+- **`actions/upload-artifact` does not preserve symlinks**, and the `.app` is full of them
+  (`Contents/Resources`). The *artifact* copy therefore fails `codesign --verify --deep
+  --strict` ("a sealed resource is missing or invalid") even when the build was fine — verify
+  from the **release zip** instead, which CI creates before uploading.
+- The spec lives in the **ogl2 repo**: a spec change only reaches CI once it is *pushed* to
+  ogl2's `2026-dustoff`. Use `gh workflow run build-mac.yml --ref 2026-dustoff` (artifact only,
+  no release) to validate a spec change; it is ~1.5 min.
 
 ## Deploying (Windows)
 - Route: CI `.github/workflows/build-win.yml` (windows-2022) — same triggers as Mac: a `pre-*`
