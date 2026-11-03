@@ -19,7 +19,10 @@ platforms:
 apps:
   # Once built and installed, you can also run with /snap/bin/pynsource. (hit TAB to autocomplete)
   pynsource:
-    command: bin/pynsource
+    command: usr/bin/pynsource
+    environment:
+      # the python part installs under usr/, which core24's python does not search by default
+      PYTHONPATH: $SNAP/usr/lib/python3.12/site-packages
     extensions:
       # HINT: Adds plugs and changes environment variables when building and running
       - gnome
@@ -35,7 +38,9 @@ apps:
       - removable-media
     desktop: usr/share/applications/pynsource.desktop
   pynsource-cli:
-    command: bin/pynsource-cli
+    command: usr/bin/pynsource-cli
+    environment:
+      PYTHONPATH: $SNAP/usr/lib/python3.12/site-packages
     plugs:
       - home
       - network
@@ -48,33 +53,40 @@ parts:
     source: src/media
     # core24 = Python 3.12 (this used to be hardcoded to lib/python3.10)
     organize:
-      "*": lib/python3.12/site-packages/media/
+      "*": usr/lib/python3.12/site-packages/media/
 
   # To get the HelpWindow.html and the help-images folder into the snap
   copy-dialogs:
     plugin: dump
     source: src/dialogs/
     organize:
-      "*": lib/python3.12/site-packages/dialogs/
+      "*": usr/lib/python3.12/site-packages/dialogs/
 
-  build-the-python-stuff-please:
-    plugin: python
+  # Deliberately not `plugin: python`: on core24 that plugin (python_v2) refuses /usr/bin/python3
+  # and takes pip from $PATH, which the gnome extension points at the gnome-46-2404-sdk snap -
+  # whose pip is broken ("cannot import name 'cli' from 'pip._internal.cli.main'"). Doing the
+  # install by hand against the base interpreter is boring, but predictable.
+  pynsource:
+    plugin: nil
     source: .
     build-packages:
+      - python3-pip
       - libsdl2-dev
     stage-packages:
       - libsdl2-2.0-0
-    python-requirements:
-      # requirements-snap.txt pulls in requirements-linux-common.txt (relatively) and pins
-      # wxPython to the cp312 wheel built for ubuntu-24.04 - there are no Linux wheels on PyPI
-      - .requirement-extras/requirements-snap.txt
-    # NOTE: the gnome extension exports PYTHONPATH pointing at the gnome-46-2404-sdk snap, whose
-    # pip is broken ("cannot import name 'cli' from 'pip._internal.cli.main'"). unset in the
-    # override below so the python plugin's pip comes from the core24 base instead.
     override-build: |
-      # see the note above: the gnome SDK's broken pip must not be picked up
       unset PYTHONPATH
       # this .desktop file ends up in /var/lib/snapd/desktop/applications/pynsource_pynsource.desktop
       # not the usual /usr/share/applications
       install -Dm644 "snap/gui/pynsource.desktop" -t "$CRAFT_PART_INSTALL/usr/share/applications/"
-      craftctl default
+
+      INSTALL="$CRAFT_PART_INSTALL/usr"
+      # requirements-snap.txt pulls in requirements-linux-common.txt and pins wxPython to the
+      # cp312 wheel built for ubuntu-24.04 - there are no Linux wheels on PyPI at all
+      /usr/bin/python3 -m pip install --prefix "$INSTALL" --no-warn-script-location \
+        -r .requirement-extras/requirements-snap.txt
+      # --no-deps: everything above is already installed; this just adds the entry-point
+      # scripts (usr/bin/pynsource, usr/bin/pynsource-cli) and the modules
+      /usr/bin/python3 -m pip install --prefix "$INSTALL" --no-warn-script-location --no-deps .
+
+      ls -l "$INSTALL/bin"
