@@ -400,7 +400,7 @@ What actually removes this friction:
 | option | prompts | cost / caveat |
 |---|---|---|
 | Apple Developer ID + notarisation | none | USD $99/year |
-| Homebrew cask (`brew install --cask`) | none (brew/curl fetches carry no quarantine flag) | needs a tap repo; users must know brew |
+| Homebrew cask (`brew install --cask`) | none — but only because the cask un-quarantines in `postflight` | needs the tap repo `abulka/homebrew-pynsource`; users must know brew. Homebrew *does* quarantine every cask download (`cask/download.rb`) and Homebrew 7 has no `--no-quarantine`, so without the `postflight` xattr removal the Gatekeeper block would still appear. |
 | current instructions (System Settings) | one, once | none, but users must follow steps |
 | ~~`.command` helper script~~ | ~~one for the script + one for the app~~ | removed 2026-11-03: same block, twice, and scarier |
 

@@ -12,7 +12,9 @@ Reverse engineer Python source code into UML class diagrams.
 
 [Download](DOWNLOADS.md) - ready to run builds are available for Mac, Windows and Linux.
 
-> **Mac users:** macOS will block the app the first time you double-click it.
+> **Mac users** — easiest: `brew install --cask abulka/pynsource/pynsource` (no Gatekeeper
+> prompt at all). Downloading the zip instead means macOS will block the app the first time
+> you double-click it.
 > Click **Done** (not "Move to Bin"), then go to **System Settings > Privacy & Security**,
 > scroll to the bottom and click **Open Anyway** (a second dialog asks again - click it again).
 > Full steps: `IMPORTANT-README-BEFORE-RUNNING.txt` inside the download, or drag the app into

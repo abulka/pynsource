@@ -77,6 +77,10 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   (twice) — see `.deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt`, which is also the
   draft release body. No helper script ships any more (an unsigned `.command` just added a
   second identical block).
+- Users who use Homebrew get a prompt-free install via the separate tap
+  `abulka/homebrew-pynsource` (`brew install --cask abulka/pynsource/pynsource`). Homebrew
+  quarantines every cask download and Homebrew 7 has no `--no-quarantine`, so the cask does
+  `xattr -dr com.apple.quarantine` in `postflight`. Bump its `version`/`sha256` per release.
 - Local `bin/buildmac.sh` works but picks up whatever `python3`/`pyinstaller` is on PATH,
   which is exactly how the framework-Python bug got in. Prefer CI.
 

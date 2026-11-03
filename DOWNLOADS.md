@@ -6,7 +6,17 @@ The latest version is `1.85`
 
 Python 3.10 syntax is now supported - see [1.85 beta 2 release](https://github.com/abulka/pynsource/releases/tag/pre-70)
 
-## Mac
+## Mac (Homebrew — no Gatekeeper dialogs)
+
+```bash
+brew install --cask abulka/pynsource/pynsource
+```
+
+Install into `/Applications`, no unzipping, no Gatekeeper prompt (the cask clears the
+quarantine flag for you). Upgrade with `brew upgrade --cask pynsource`. Tap:
+[abulka/homebrew-pynsource](https://github.com/abulka/homebrew-pynsource).
+
+## Mac (zip download)
 
 Unzip and drag app into the Applications directory.
 
