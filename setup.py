@@ -12,7 +12,7 @@ setup(
     author='Andy Bulka',
     author_email='abulka@gmail.com',
 
-    py_modules=['pynsource_gui'],
+    py_modules=['pynsource_gui', 'pynsource_cli'],
 
     # You need both entries because packages tells setuptools to include all
     # packages found under the src directory, while package_dir tells it to use
