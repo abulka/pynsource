@@ -17,10 +17,12 @@ confinement: strict # devmode # strict is the goal; all Pro features are free on
                     # so there is no licence file to write outside the sandbox
 base: core24
 
-# core24 wants `platforms:` (the old `architectures:` key is deprecated). amd64 only for now:
-# the wxPython wheel below is x86_64, and an arm64 snap needs a remote/arm build.
+# core24 wants `platforms:` (the old `architectures:` key is deprecated). Both arches are built
+# natively by CI: ubuntu-24.04 for amd64, ubuntu-24.04-arm for arm64 (snapcraft cannot
+# cross-compile wxPython).
 platforms:
   amd64:
+  arm64:
 
 apps:
   # Once built and installed, you can also run with /snap/bin/pynsource. (hit TAB to autocomplete)
@@ -78,6 +80,21 @@ parts:
     build-packages:
       - python3-pip
       - libsdl2-dev
+      # only needed to compile wxPython on arm64, but apt-installing them on amd64 costs a
+      # minute and they are build-only (not staged into the snap)
+      - build-essential
+      - pkg-config
+      - libgtk-3-dev
+      - libnotify-dev
+      - libjpeg-dev
+      - libtiff-dev
+      - libpng-dev
+      - libgl1-mesa-dev
+      - libglu1-mesa-dev
+      - libsm-dev
+      - libxtst-dev
+      - libsecret-1-dev
+      - libpcre2-dev
     stage-packages:
       - libsdl2-2.0-0
     override-build: |
@@ -89,8 +106,20 @@ parts:
       # --target rather than --prefix: Debian's python uses the `posix_local` sysconfig scheme,
       # so --prefix silently puts scripts in usr/local/bin and modules in usr/local/lib.
       SITE="$CRAFT_PART_INSTALL/usr/lib/python3.12/site-packages"
-      # requirements-snap.txt pulls in requirements-linux-common.txt and pins wxPython to the
-      # cp312 wheel built for ubuntu-24.04 - there are no Linux wheels on PyPI at all
+
+      # wxPython: no Linux wheels on PyPI. The extras server only builds x86_64, so amd64 takes
+      # the prebuilt cp312 wheel and arm64 compiles 4.2.5 from source (~15 min).
+      ARCH="$(dpkg --print-architecture)"
+      echo "=== building for $ARCH"
+      if [ "$ARCH" = "amd64" ]; then
+        /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location \
+          "https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04/wxpython-4.2.5-cp312-cp312-linux_x86_64.whl"
+      else
+        /usr/bin/python3 -m pip wheel --no-binary wxpython "wxpython==4.2.5" -w /tmp/wxwheel \
+          || { echo "ERROR: wxPython failed to compile for $ARCH" >&2; exit 1; }
+        /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location /tmp/wxwheel/wxpython-*.whl
+      fi
+
       /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location \
         -r .requirement-extras/requirements-snap.txt
       /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location --no-deps .

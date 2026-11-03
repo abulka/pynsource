@@ -1,9 +1,8 @@
 # Snap-build requirements - see snap/snapcraft.yaml.
 #
-# wxPython has no Linux wheels on PyPI, so it comes from wxPython's extras server, built per
-# Ubuntu release/CPython. core24 = Ubuntu 24.04 = Python 3.12; 4.2.5 is the newest cp312 build
-# there. The wheel is x86_64, which is why snapcraft.yaml only declares the amd64 platform.
+# wxPython is deliberately NOT here: it has no Linux wheels on PyPI, and the prebuilt wheel from
+# wxPython's extras server is x86_64 only. snapcraft.yaml installs it per architecture instead
+# (prebuilt wheel on amd64, compiled from source on arm64).
 -r requirements-linux-common.txt
 
 wxasync
-https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04/wxpython-4.2.5-cp312-cp312-linux_x86_64.whl

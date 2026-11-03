@@ -20,6 +20,7 @@ name: Pynsource Snap
 on:
   push:
     tags: ['pre-*']
+    branches: ['ci/snap-arm']
     # TEMPORARY - scratch branch used to iterate before the workflow exists on
     # the default branch (workflow_dispatch needs that). Removed before merge.
 
@@ -27,7 +28,18 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    # Both arches are built natively: snapcraft cannot cross-compile wxPython, and there is no
+    # arm64 wx wheel anywhere (PyPI has none for Linux at all, extras.wxpython.org is x86_64).
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    name: snap ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
     env:
       TAG: ${{ github.ref_name }}
       # "ci/snap" (branch) is not a valid artifact name
@@ -83,8 +95,9 @@ jobs:
 
     - name: Build the snap (destructive mode - the runner is the build environment)
       run: |
-        sudo snapcraft pack --destructive-mode --verbosity=brief
+        sudo snapcraft pack --destructive-mode --verbosity=brief --build-for=${{ matrix.arch }}
         ls -l *.snap
+        file *.snap | head -2
 
     - name: Show the snap's version and confinement
       run: |
@@ -97,7 +110,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         # a branch ref can be "ci/snap", and a slash is not allowed in an artifact name
-        name: pynsource-snap-${{ env.TAG_SLUG }}
+        name: pynsource-snap-${{ matrix.arch }}-${{ env.TAG_SLUG }}
         path: '*.snap'
 
     # The point of a snap is that it runs on a stock Ubuntu, so actually install it here.
@@ -110,6 +123,7 @@ jobs:
         sudo snap install --dangerous "$(ls *.snap)"
         snap list pynsource
         # qualified form: the app is "pynsource-cli" inside the "pynsource" snap
+        # the snap just built is for this runner's architecture, so installing it is valid
         out=$(snap run pynsource.pynsource-cli --version 2>&1)
         echo "$out"
         echo "$out" | grep -q "Pynsource CLI version" || { echo "::error::CLI did not report a version"; exit 1; }
