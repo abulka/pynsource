@@ -16,7 +16,7 @@ on:
     tags: ['pre-*']
     # TEMPORARY - scratch branch used to iterate before the workflow exists on
     # the default branch (workflow_dispatch needs that). Removed before merge.
-    branches: ['ci/snap']
+
   workflow_dispatch:
 
 jobs:
@@ -71,6 +71,7 @@ jobs:
         # read the metadata straight out of the packed snap (a squashfs); no store round-trip
         sudo apt-get install -y -qq squashfs-tools >/dev/null
         unsquashfs -cat "$(ls *.snap)" meta/snap.yaml | head -20
+        du -h *.snap
 
     - name: Save the snap as an artifact
       uses: actions/upload-artifact@v4
@@ -81,30 +82,25 @@ jobs:
 
     # The point of a snap is that it runs on a stock Ubuntu, so actually install it here.
     # Whatever the CLI prints is evidence the PYTHONPATH/entry-point wiring is right.
+    # The point of a snap is that it installs and runs on a stock Ubuntu, so do that here.
+    # The CLI proves the PYTHONPATH/entry-point wiring; a missing alsm would leave Linux
+    # users without module visualisation, so that is a hard failure too.
     - name: Install the snap and run the CLI
       run: |
-        snap=snap
-        echo "=== where did the modules land? ==="
-        sudo apt-get install -y -qq squashfs-tools >/dev/null
-        unsquashfs -l "$(ls *.snap)" | grep -E "pynsource_(cli|gui)\.py|site-packages$" | head -10
-        echo "=== app environment as snapd sets it ==="
         sudo snap install --dangerous "$(ls *.snap)"
         snap list pynsource
-        snap run --shell pynsource.pynsource-cli -c 'echo "PYTHONPATH=$PYTHONPATH"; ls "$SNAP/usr/lib/python3.12/site-packages" | head -8'
-        echo "=== the real smoke test ==="
-        # the qualified form: the app is "pynsource-cli" inside the "pynsource" snap
+        # qualified form: the app is "pynsource-cli" inside the "pynsource" snap
         out=$(snap run pynsource.pynsource-cli --version 2>&1)
         echo "$out"
         echo "$out" | grep -q "Pynsource CLI version" || { echo "::error::CLI did not report a version"; exit 1; }
         if echo "$out" | grep -q "could not be enabled"; then
-          # settings.py only catches ModuleNotFoundError, so a missing alsm *dependency* looks
-          # like a missing alsm - show the real traceback
+          # settings.py catches only ModuleNotFoundError, so a missing alsm *dependency* also
+          # reads as "alsm not installed" - print the real traceback before failing
           snap run --shell pynsource.pynsource-cli -c '/usr/bin/python3 -c "import alsm"' || true
           echo "::error::alsm is missing - Pro module visualisation would be disabled on Linux"
           exit 1
         fi
 
-    # Uploads the snap to the edge channel, test via: sudo snap refresh pynsource --edge
     - name: Push to edge
       if: startsWith(github.ref, 'refs/tags/pre-')
       env:
