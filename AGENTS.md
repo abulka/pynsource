@@ -228,6 +228,15 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   `gh secret set SNAPCRAFT_STORE_CREDENTIALS`.
 - The smoke test installs the snap (`--dangerous`) and runs `snap run pynsource.pynsource-cli
   --version` (qualified app name), asserting the version line and that alsm loaded.
+- **Both arches are built natively** (`ubuntu-24.04` + `ubuntu-24.04-arm`): snapcraft cannot
+  cross-compile wxPython, and the store then has amd64 *and* arm64 on edge. Getting arm64 to
+  build took two fixes worth remembering (inside the part, `dpkg --print-architecture` came back
+  empty — use `CRAFT_ARCH_BUILD_FOR`):
+  * wx 4.2.5 does not compile with gcc 13 (core24): its bundled nanosvg uses unqualified
+    `isnan()` — build with `CXXFLAGS="-include cmath"`.
+  * `pip install --target` is invisible to a later pip run, so the bare `wxpython` line in
+    `requirements-linux-common.txt` re-triggered a source build; the wheel must go in the *same*
+    `pip install` command as the requirements file.
 
 ## Tests
 - Expect `158 tests OK (skipped=8)`: `mkdir -p src/tests/logs && .venv/bin/python -m unittest
