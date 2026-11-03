@@ -173,6 +173,43 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
 - FUSE is absent in CI and in most containers, so `appimagetool`/`linuxdeploy` run with
   `APPIMAGE_EXTRACT_AND_RUN=1` and the guard uses `--appimage-extract`.
 
+## Deploying (Snap)
+- Route: CI `.github/workflows/build-snap.yml` → `.snap` artifact; on `pre-*` tags it also
+  `snapcraft upload ... --release edge`. **Stable is promoted by hand in the store UI** after a
+  snap has actually been installed and run.
+- The workflow was dead for two years: `actions/upload-artifact@v3` is retired, and GitHub
+  rejects the whole run before any step executes ("automatically failed because it uses a
+  deprecated version"), so it produced nothing at all. Use `actions/*@v4` (and `@v5` for
+  setup-uv) — v3 anywhere kills the run outright.
+- Build with `snapcraft pack --destructive-mode` on **ubuntu-24.04** (the runner must match
+  `base: core24`): no LXD, no build action, one less thing to go stale.
+- **Do not use `plugin: python` here.** core24's python_v2 plugin rejects `/usr/bin/python3`
+  and takes pip from `$PATH`, which the `gnome` extension points at the `gnome-46-2404-sdk`
+  snap — and *that* pip is broken (`cannot import name 'cli' from 'pip._internal.cli.main'`).
+  `plugin: nil` + `pip install --target` against `/usr/bin/python3` is dull but predictable.
+- Use `--target`, not `--prefix`: Debian's python uses the `posix_local` sysconfig scheme, so
+  `--prefix` silently lands scripts in `usr/local/bin` and modules in `usr/local/lib`, and the
+  pack then fails with `usr/bin/pynsource does not exist`.
+- The app declares `PYTHONPATH: $SNAP/usr/lib/python3.12/site-packages` because core24's python
+  does not search our prefix by itself. Entry points are two-line shell wrappers calling
+  `run()` / `reverse_engineer()` — the `__main__` blocks in those modules are debug scaffolding.
+- **Linux is Pro-free, so the snap must bundle ogl2 + alsm** (checked out as siblings by the
+  workflow, installed *with* their dependencies — `--no-deps` leaves `import alsm` failing at
+  runtime, which `settings.py` then reports as "alsm not installed" because it only catches
+  `ModuleNotFoundError`).
+- Strip the bundled `.so` files: the wx wheel ships unstripped and turns a 154 MB snap into
+  49 MB.
+- `version: git` is wrong for CI: `git describe` reports the nearest *older* tag
+  (`pre-2026-dustoff-6+git13…`) and `0+git.<sha>` on a shallow clone. The workflow rewrites the
+  line to the tag (or `dev-<sha>` on a branch) before packing.
+- The edge upload needs the `SNAPCRAFT_STORE_CREDENTIALS` secret, an exported store login with
+  an expiry date. When it lapses only that step fails ("Exported credentials are no longer
+  valid for the Snap Store"); re-export with
+  `snapcraft export-login --snaps pynsource --channels edge,candidate,stable -` and
+  `gh secret set SNAPCRAFT_STORE_CREDENTIALS`.
+- The smoke test installs the snap (`--dangerous`) and runs `snap run pynsource.pynsource-cli
+  --version` (qualified app name), asserting the version line and that alsm loaded.
+
 ## Tests
 - `mkdir -p src/tests/logs && .venv/bin/python -m unittest discover -s src` — expect `158 tests OK`
   (a handful skip without wx / are pre-existing skips). Runs WITH wx installed too.

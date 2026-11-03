@@ -64,19 +64,22 @@ no licence key to enter.
 If your file manager will not run it, use the two commands above; most desktops just need
 *Properties → Permissions → Allow executing*.
 
-## Ubuntu Snap Installation
+## Ubuntu / Debian Snap
 
-Visit [Linux snap installer](http://bit.ly/pynsource-snap) (one-click install on any Ubuntu distro) or simply
+```bash
+sudo snap install pynsource
+```
 
-    sudo snap install pynsource
+Now built on **core24** (Ubuntu 24.04, Python 3.12, wxPython 4.2.5) and confined strictly, so it
+runs on any current Ubuntu without extra packages — the `gnome` extension supplies GTK3.
 
-Note re snaps under Ubuntu 16.04 Due to a bug in Snapcraft, if you are trying to install the snap on Ubuntu 16.04 the GUI installer will not work and you will have to install from the terminal.
+**All Pro features are free on Linux** (zoom, drag-to-connect, module visualisation) — no licence
+key to enter.
 
-    sudo snap install pynsource
-    sudo snap install core
-    pynsource 
-
-> Limitation: The Ubuntu Snap still uses Python 3.6 so cannot parse Python 3.10 syntax. The Canonical snap build system is buggy and poorly documented so I have not been able to get it to work with Python 3.10 yet.
+> Note: the current snap is published to the **edge** channel only while it is being tested:
+> `sudo snap install pynsource --edge`. The `stable` channel still has an old 2023 build
+> (Python 3.6, cannot parse Python 3.10 syntax); it is promoted by hand once the edge build has
+> been used for a while.
 
 ## Pro Edition
 
