@@ -41,6 +41,16 @@ mkdir -p "$APPDIR/usr/bin" \
 # The whole onedir tree goes in as one directory: the exe finds _internal/ next to itself.
 cp -a dist/Pynsource "$APPDIR/usr/bin/Pynsource"
 
+# The Linux wxPython wheels are built with debug symbols: _core.cpython-313-*.so alone is
+# ~179MB and the tree totals ~350MB. Stripping the bundled shared objects takes the AppImage
+# from ~136MB to ~45MB. Done here rather than with strip=True in the shared spec, so the
+# (verified) mac and windows bundles are untouched.
+if command -v strip >/dev/null 2>&1; then
+  echo "=== stripping debug symbols"
+  find "$APPDIR/usr/bin/Pynsource" -type f \( -name '*.so' -o -name '*.so.*' \) -print0 |
+    xargs -0 -r -n 20 strip --strip-unneeded 2>/dev/null || true
+fi
+
 # Icon: the .ico holds a single 150x150 frame, so downscale it to 128x128 rather than shipping a
 # 32x32 upscale (src/media/pynsource.png is only 32x32).
 "$PYTHON" - "$APPDIR" <<'PY'
