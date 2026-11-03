@@ -1,131 +1,144 @@
-# To run Pynsource from source code
+# Building and running Pynsource
 
-You need Python 3.6 or higher. Running with later versions of Python gives you the ability to parse newer Python syntax e.g. importing code into Pynsource containing the [walrus operator](https://realpython.com/lessons/assignment-expressions/) needs at least Pynsource running under Python 3.8 to work. The latest tested version is Python 3.10.
+Pynsource runs on **Python 3.13** with **wxPython 4.3.x** (4.2.5 on Linux — see
+[why](#linux-and-wxpython)). Everything below is for the Community build; the Pro-only packages
+(see [sibling repos](#sibling-repos-pro-only)) are already checked out next to this repo on this
+machine and are only needed for packaging.
 
-> Note Pynsource relies on the package [typed-ast](https://pypi.org/project/typed-ast/) for the ability to parse *both* Python 2 and Python 3. This package takes a while to get updated when a new Python gets released, so you might want to play it safe and run via Python 3.10 when Python 3.11 comes out.
+## Run from source
 
-For Mac or Windows run the following commands:
-
-    $ git clone https://github.com/abulka/pynsource.git
-    $ cd pynsource
-    $ pip3 install -r requirements.txt
-    $ ./bin/run           (Mac, Linux) or
-    $ .\bin\run-win10.bat (Windows 10)
-
-For installing under Linux, run the provided script (more information below).
-
-If you have installed from requirements.txt and still getting errors, you might need to update your pip packages to the latest versions. For example on Mac or Linux you can run `pip install $(pip list --outdated --format=columns |tail -n +3|cut -d" " -f1) --upgrade`. Note this bash command can upgrade some packages too high (pip dependency resolver is not smart) e.g. `idna` 3.2 is too high for `requests`, in which case to repair the situation uninstall both `pip uninstall requests idna` then just install `pip install requests` which fixes things.
-
-## Ubuntu Linux Users
-
-Latest 2023 approach: Build pynsource as a package - see [instructions below](#building-pynsource-as-a-package)
-
-or...
-
-Please use the script `bin/deprecated/install-linux-18.04` to pip install needed Ubuntu dependencies, including a wxPython wheel specific to `Ubuntu 18.04`. Use the script `bin/deprecated/install-linux-20.04` if you are installing on `Ubuntu 20.04`.  If you are using a different version of Ubuntu simply copy and edit the script `bin/deprecated/install-linux-nn.nn` and change the url of wxpython accordingly, to contain the ubuntu distro version number. Browse the wxpython versions available [here](https://extras.wxpython.org/wxPython4/extras/linux/gtk3/).
-
-Fedora Linux Users: can use the script `bin/deprecated/install-linux-fedora-33` see [detailed steps](INSTALL-TIPS.md).
-
-## A note on wxPython
-
-The GUI toolkit [wxpython](https://wxpython.org/) that `Pynsource` relies on  needs a ‘proper’ **framework/shared** Python environment to run in, which ideally means using your main Python e.g. brew Python on a Mac or an official install from python.org for Windows 10. The default Python 3 on Ubuntu 18.04 is fine too. 
-
-If you need to use a virtual environment I recommend that you use `pyenv` to first install the version of python that you need. You must use a [pyenv](https://github.com/pyenv/pyenv) framework/shared Python environment for building and running Pynsource. To achieve this, pass a special flag when installing Python through `pyenv` - see [this issue](https://github.com/abulka/pynsource/issues/68#issuecomment-605612292) for more info. E.g. `PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.8.6` on Mac or e.g. `PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.8.8` on linux.  When running under vscode, ensure you enter the path to the python interpreter correctly, to work around a [subtle vscode issue](https://github.com/microsoft/vscode-python/issues/16604).
-
-## latest wxpython installation tips
-See also https://stackoverflow.com/questions/71821635/pip-cannot-install-wxpython-for-python-3-10-32-bit/75542856#75542856 on installing `wxpython` on linux.
-
-Linux users: This approach happens to build the wxpython wheel ourselves rather than using the sometime limited choice of prebuilt wheels. This works on `intel x86` and also on ubuntu `arm` (tested on ubuntu arm virtual machine running under UTM on mac M1 processor). You will first need to run:
-
-    $ sudo apt-get install dpkg-dev build-essential python3-dev freeglut3-dev libgl1-mesa-dev libglu1-mesa-dev libgstreamer-plugins-base1.0-dev libgtk-3-dev libjpeg-dev libnotify-dev libpng-dev libsdl2-dev libsm-dev libtiff-dev libwebkit2gtk-4.0-dev libxtst-dev
-
-    $ pip install attrdict3 (see https://github.com/wxWidgets/Phoenix/issues/2225)
-
-
-Or simply use the ready-to-go prebuilt binary executables of pynsource for all platforms, incl ubuntu, mint, popos (all ubuntu based) 🎉 - see [Downloads](DOWNLOADS.md)
-
-## Running the tests
-
-Download the source code, install the dependencies (see above) then
-
-```
-./bin/testall            (Mac, Linux) or
-.\bin\testall-win10.bat  (Windows 10)
+```bash
+uv venv --python 3.13 .venv
+uv pip install -r requirements.txt
+.venv/bin/python src/pynsource_gui.py       # or: bin/run
 ```
 
-from the root of the project. You may need to alter the version of Python being invoked by the script e.g. `python` or `python3`.
+`bin/run` just does `cd src && python3 pynsource_gui.py`. On Windows use
+`bin\run-win10.bat`, substituting the path to your venv's `python.exe`.
 
-The environment variable `TRAVIS` is set by the script to avoid tests that involve loading the wxPython package - this is especially needed on Travis and GitHub actions. It may also not be possible on your machine if you are running certain Python environments e.g. I had a problem with a framework pyenv install on my Mac running any tests that imported `wx`, even though Pynsource itself ran OK.  P.S. The subset of packages `requirements-travis.txt` is all you need to run the tests, and these exclude wx.
+No system Python is required: `uv` fetches a python-build-standalone interpreter, which is also
+what CI (and therefore every shipped binary) uses.
 
-### Current Test Suite status
+### Optional: the CLI
 
-- Tests run through Travis, controlled by  `.travis.yml` ![Travis test status](https://github.com/abulka/pynsource/workflows/Python%20application/badge.svg)
-- Tests also run through GitHub Actions, controlled by `.github/workflows/pythonapp.yml` ![Tests github actions workflow status](https://github.com/abulka/pynsource/actions/workflows/python-tests.yml/badge.svg)
+`src/pynsource_cli.py` parses files and dumps the parse model — handy for debugging the parser, it
+does not draw anything:
 
-# Building pynsource as a package
+```bash
+.venv/bin/python src/pynsource_cli.py --methods-list src/common/*.py
+.venv/bin/python src/pynsource_cli.py --version
+```
 
-You can build pynsource as a package with
+## Run the tests
 
-    $ python setup.py sdist
-    
-This will create a `dist` directory containing a `pynsource-<version>.tar.gz` file. You can then install this package with
-    
-    $ pip install dist/pynsource-<version>.tar.gz
+```bash
+mkdir -p src/tests/logs
+.venv/bin/python -m unittest discover -s src     # expect: Ran 158 tests ... OK (skipped=8)
+```
 
-or install in dev mode with 
+The suite runs **with** wx installed — most tests build a real `wx.App`, so it needs a display. On
+a headless machine run it under a virtual one: `xvfb-run -a python -m unittest discover -s src`
+(that is exactly what the Linux CI does). `TRAVIS=1` still works as a legacy escape hatch that
+skips every wx-dependent test, but it hides most of the suite; don't use it to validate a release.
 
-    $ pip install -e .
+`bin/testall` is a thin wrapper around the above; `bin/testone` runs a single test by name.
 
-which actually installs lots of packages.
+## Linux and wxPython
 
-Run with:
+There are **no Linux wxPython wheels on PyPI** — only macOS and Windows. Linux wheels live on
+wxPython's extras server, built per Ubuntu release and CPython version:
 
-    pynsource
+<https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/>
 
-uninstall with
+That is why `uv pip install wxpython` on Linux tries to *compile* wxWidgets (30+ minutes). Install
+the matching wheel first, then the rest of the requirements (the unpinned `wxpython` line is then
+already satisfied):
 
-    $ pip uninstall pynsource
+```bash
+uv pip install "https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxpython-4.2.5-cp313-cp313-linux_x86_64.whl"
+uv pip install -r requirements.txt
+```
 
-## Why do this?
+4.2.5 is the newest cp313 build for ubuntu-22.04, so Linux runs 4.2.5 while macOS and Windows run
+4.3.x. On aarch64 nothing is prebuilt — CI compiles 4.2.5 from source (see
+[releasing](#releasing)). To build it yourself you need the GTK/SDL development headers:
 
-Installing pynsource as a package gives you two entry points
-    
-        $ pynsource
-        $ pynsource-cli
+```bash
+sudo apt install build-essential pkg-config libgtk-3-dev libsdl2-dev libnotify-dev \
+  libjpeg-dev libtiff-dev libpng-dev freeglut3-dev libgl1-mesa-dev libglu1-mesa-dev \
+  libsm-dev libxtst-dev libsecret-1-dev libpcre2-dev
+MAX_JOBS=$(nproc) pip wheel wxpython==4.2.5 --no-binary wxpython -w ~/wx-wheels
+```
 
-Typing `pynsource` will run the GUI - which might be an easier way to launch pynsource than invoking python etc.
+## Sibling repos (Pro only)
 
-Typing `pynsource-cli` is the command line interface. The command line interface is useful for batch processing of python files, e.g. to generate an analysis dump the structure of each python file. It won't produce diagrams though. So you can e.g. `pynsource-cli blah.py`.
+All live next to this repo and install editable. Without them you get the Community edition:
+no zoom, no drag-to-connect, no module visualisation.
 
-## virtual environments
+```bash
+uv pip install -e ../ogl2 -e ../pynsource-rego -e ../alsm
+```
 
-If you are using a virtual environment, ensure you install the package into the virtual environment. E.g. if you are using `pyenv` to manage your virtual environments, you can do this with    
+- `../ogl2` — the next-generation canvas. `ShapeCanvas` paints directly via `PaintDC` and supports
+  `scalex/scaley`, which is what zoom and drag-between-shapes need.
+- `../pynsource-rego` — licensing. `PRO_EDITION = rego.are_registered(APP_VERSION)`.
+  Self-sign a key: `cd ../pynsource-rego && ../pynsource/.venv/bin/python rego_gen.py gen Andy --version 1 --save`.
+- `../alsm` — module visualisation (`ALSM_PARSING`).
 
-    $ pyenv activate <your-virtual-env>
-    $ pip install -e .
-    $ pynsource
+See [AGENTS.md](AGENTS.md) for the edition switches and the sibling-repo coordination rules.
 
-or if you are using venv
+## Building Pynsource as a package
 
-    $ source venv/bin/activate
-    $ pip install -e .
-    $ pynsource
+```bash
+uv build                      # or: python setup.py sdist
+uv pip install dist/pynsource-*.tar.gz
+```
 
-## Releasing (macOS, Windows, Linux)
+That gives two entry points: `pynsource` (the GUI) and `pynsource-cli`. Dev install instead:
 
-- CI: `.github/workflows/build-mac.yml`, `build-win.yml`, `build-linux.yml`. A `pre-*` tag builds
-  all three and appends their assets to one draft pre-release, with the body from
-  `.deploy-extras/RELEASE-NOTES.md` (shared, so it does not matter which job finishes last);
-  manual dispatch gives an artifact only. Windows needs Inno Setup 6.3+ and ships an
-  `...-setup.exe`; Linux ships an AppImage (`bin/build-appimage.sh`, linuxdeploy + GTK plugin,
-  built on ubuntu-22.04 for the glibc floor and on wxPython 4.2.5 because there are no cp313
-  Linux wheels on PyPI).
-- Bundling is onedir (spec in `../ogl2/bin/pynsource-github-actions.spec`) and the build
-  interpreter must be uv's python-build-standalone - see `Admin/BUG-DIST-SLOWNESS-MAC.md`.
-- Homebrew tap `abulka/homebrew-pynsource`: bump `version` and `sha256` in `Casks/pynsource.rb`
-  for each release, and switch its `url` from the current `pre-*` asset to the
-  `version-#{version}` pattern at the next stable tag.
-- **Cask naming trap:** the unqualified `pynsource` cask belongs to Homebrew's own abandoned
-  1.84 build (Intel, disabled for failing Gatekeeper). Document and use the full name:
-  `brew info --cask abulka/pynsource/pynsource`,
-  `brew upgrade --cask abulka/pynsource/pynsource` (or plain `brew upgrade`).
+```bash
+uv pip install -e .
+```
+
+(Heads-up: `setup.py` turns `.requirement-extras/requirements-linux-22.txt` into `install_requires`,
+so this pulls the whole Linux dev set — pytest, black, py2app and friends. Fine, just slow.)
+
+## Releasing
+
+Every artefact is built by CI from a **`pre-*` tag** (draft → published by hand) or from a manual
+dispatch (artifact only). `.deploy-extras/RELEASE-NOTES.md` is the shared release body, so it does
+not matter which job finishes last.
+
+| workflow | runner | artefact |
+|---|---|---|
+| `build-mac.yml` | macos-14 | `pynsource-macos-<tag>.zip` (onedir `.app`, ad-hoc signed) |
+| `build-win.yml` | windows-2022 | `pynsource-win-<tag>-setup.exe` (Inno Setup) |
+| `build-linux.yml` | ubuntu-22.04 + ubuntu-22.04-arm | `pynsource-linux-<tag>-{x86_64,aarch64}.AppImage` |
+| `build-snap.yml` | ubuntu-24.04 | `.snap` artifact, plus `snapcraft upload --release edge` on tags |
+
+Things that bite, in order of how much time they cost when forgotten:
+
+- **Bundle onedir, never onefile.** The spec is `../ogl2/bin/pynsource-github-actions.spec`
+  (`EXE(exclude_binaries=True)` + `COLLECT` + `BUNDLE`): onefile unpacks itself into `%TEMP%` /
+  `$TMPDIR` on every launch (~2 s vs 0.4 s) and PyInstaller 7 rejects onefile + `.app` outright.
+- **The macOS build interpreter must be uv's python-build-standalone.** A framework Python plus
+  wxasync's macOS event loop freezes the canvas for the whole duration of a mouse drag — full
+  write-up in `Admin/BUG-DIST-SLOWNESS-MAC.md`, and CI fails the build if a framework interpreter
+  reappears. The macOS zip must be made with `zip -r -y`, otherwise the `Contents/Resources`
+  symlinks are followed and the payload is stored twice (83 MB instead of 35 MB).
+- **Set the macOS bundle version in the spec** (`version=APP_VERSION` on `BUNDLE`) — without it
+  Finder's *Get Info* shows `0.0.0`.
+- **Homebrew tap** `abulka/homebrew-pynsource`: bump `version` and `sha256` in
+  `Casks/pynsource.rb` per release, and move its `url` to the `version-#{version}` pattern at the
+  next stable tag. Verify with a real `brew upgrade` — that also checks the sha.
+- **The snap store credential expires.** `SNAPCRAFT_STORE_CREDENTIALS` is an exported login; when
+  it lapses only the upload step fails. Re-export with
+  `snapcraft export-login --snaps pynsource --channels edge,candidate,stable -` and
+  `gh secret set SNAPCRAFT_STORE_CREDENTIALS`.
+- Version bookkeeping (`tbump`, see `tbump.toml`): `src/gui/settings.py`,
+  `.requirement-extras/buildwin_github-actions.iss`, `DOWNLOADS.md`, `CHANGELOG.md`,
+  `Admin/site-atug/pynsource-latest{-devel,}.txt`.
+
+Local builds (`bin/buildmac`, `bin/buildwin.bat`, `bin/build-appimage.sh`) work but pick up
+whatever `python`/`pyinstaller` is on `PATH`, which is exactly how the macOS framework-Python bug
+got in. Prefer CI.

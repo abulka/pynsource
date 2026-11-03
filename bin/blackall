@@ -1,2 +1,2 @@
-black -l 100 src bin/buildsamples.py
+black -l 100 src bin/_buildsamples.py
 

@@ -1,14 +1,22 @@
 """
-Generate the links for
-    - DOWNLOADS.md
-    - Bitly
-    - Main website html
-from parsing the Github release page HTML information
+Generate the download links for DOWNLOADS.md, bit.ly and the website, from the GitHub
+release page.
+
+    $ python bitly.py                    # latest release
+    $ python bitly.py pre-2026-dustoff-7 # a specific tag
+
+Asset names it understands (the ones CI produces today):
+    pynsource-macos-<tag>.zip
+    pynsource-win-<tag>-setup.exe
+    pynsource-linux-<tag>-x86_64.AppImage
+    pynsource-linux-<tag>-aarch64.AppImage
+Legacy release assets (pynsource-1.77-macosx.zip, -win-, -ubuntu-16/-18) are recognised too, so
+old tags still work. Missing assets are skipped rather than raising, so a half-built release
+still generates something usable.
 """
 
+import sys
 import requests
-from bs4 import BeautifulSoup
-import bs4
 import os
 from dataclasses import dataclass  # requires 3.7
 from typing import List, Set, Dict, Tuple, Optional
@@ -16,17 +24,20 @@ import pprint
 from beautifultable import BeautifulTable
 from textwrap import dedent
 
-releaseUrl = "https://github.com/abulka/pynsource/releases/tag/version-1.77"
+tag = sys.argv[1] if len(sys.argv) > 1 else None
+# Use the API, not the release page: the page is client-rendered these days, so scraping it
+# silently finds zero assets and prints an empty download list.
+releaseApi = (
+    f"https://api.github.com/repos/abulka/pynsource/releases/tags/{tag}"
+    if tag
+    else "https://api.github.com/repos/abulka/pynsource/releases/latest"
+)
 
-response = requests.get(releaseUrl)
-assert response.status_code == 200
-
-html_doc = response.text
-# with open("junk.html", "w") as fp:
-#     fp.write(html_doc)
-
-soup = BeautifulSoup(html_doc, "html.parser")
-# print(soup)
+response = requests.get(releaseApi, headers={"Accept": "application/vnd.github+json"})
+assert response.status_code == 200, f"{releaseApi} -> {response.status_code}"
+release = response.json()
+if not tag:
+    tag = release["tag_name"]
 
 
 @dataclass
@@ -40,32 +51,32 @@ class DownloadEntity:
 
 downloads: Dict[str, DownloadEntity] = {}
 
-for link in soup.find_all("a"):
-    if "/abulka/pynsource/releases/download/" in link.get("href"):
-        # print(link.get('href'))
-        url = f"https://github.com{link.get('href')}"  # e.g. https://github.com/abulka/pynsource/releases/download/version-1.77/pynsource-1.77-macosx.zip
-        basename = os.path.basename(url)  # e.g. pynsource-1.77-macosx.zip
-        basenameNoExtension = os.path.splitext(basename)[0]  # e.g. pynsource-1.77-macosx
-        basenameNoExtension = basenameNoExtension.replace('.', '-')  # get rid of the illegal '.' chars bitly doesn't like e.g. pynsource-1-77-macosx
-        bitlyUrl = f"http://bit.ly/{basenameNoExtension}"  # e.g. http://bit.ly/pynsource-1-77-macosx
-        entity = DownloadEntity(
-            basename=basename,
-            basenameNoExtension=basenameNoExtension,
-            url=url,
-            bitlyUrl=bitlyUrl,
-        )
-        if "-macosx" in basename:
-            downloads["mac"] = entity
-        elif "-win-" in basename:
-            downloads["win"] = entity
-        elif "-ubuntu-18" in basename:
-            downloads["ubuntu-18"] = entity
-        elif "-ubuntu-16" in basename:
-            downloads["ubuntu-16"] = entity
-        else:
-            raise RuntimeError(
-                f"Unknown url on Github releases page {url} - cannot detect OS"
-            )
+for asset in release["assets"]:
+    url = asset["browser_download_url"]  # e.g. .../releases/download/pre-x/pynsource-macos-pre-x.zip
+    basename = os.path.basename(url)  # e.g. pynsource-macos-pre-x.zip
+    basenameNoExtension = os.path.splitext(basename)[0]  # e.g. pynsource-1.77-macosx
+    basenameNoExtension = basenameNoExtension.replace('.', '-')  # get rid of the illegal '.' chars bitly doesn't like e.g. pynsource-1-77-macosx
+    bitlyUrl = f"http://bit.ly/{basenameNoExtension}"  # e.g. http://bit.ly/pynsource-1-77-macosx
+    entity = DownloadEntity(
+        basename=basename,
+        basenameNoExtension=basenameNoExtension,
+        url=url,
+        bitlyUrl=bitlyUrl,
+    )
+    if "-macos" in basename or "-macosx" in basename:
+        downloads["mac"] = entity
+    elif "-win-" in basename:
+        downloads["win"] = entity
+    elif "-x86_64.AppImage" in basename:
+        downloads["linux-x86_64"] = entity
+    elif "-aarch64.AppImage" in basename:
+        downloads["linux-aarch64"] = entity
+    elif "-ubuntu-18" in basename:
+        downloads["ubuntu-18"] = entity
+    elif "-ubuntu-16" in basename:
+        downloads["ubuntu-16"] = entity
+    else:
+        print(f"skipping {url} - cannot detect OS")
 
 # validate that each download url exists OK - requests can't seem to handle it ?
 # 
@@ -111,13 +122,24 @@ for link in soup.find_all("a"):
 
 # Now that we have gathered up the information, generate the needed outputs
 
-downloadMarkdown = f"""
- * [Mac download]({downloads["mac"].bitlyUrl}) (unzip and drag app into the Applications directory) 
- * [Windows 10 download]({downloads["win"].bitlyUrl}) (unzip and run the installer) 
- * [Ubuntu Linux 18.0.4 download]({downloads["ubuntu-18"].bitlyUrl}) (unzip and run the executable) 
- * [Ubuntu Linux 16.0.4 download]({downloads["ubuntu-16"].bitlyUrl}) (unzip and run the executable) 
- * [Linux snap installer](http://bit.ly/pynsource-snap) (one-click install on any Ubuntu distro) 
-"""
+# One table drives both outputs, so a missing asset (an older or half-built release) is simply
+# left out instead of raising a KeyError.
+ENTRIES = [
+    ("mac", "Mac download", "(unzip and drag app into the Applications directory)"),
+    ("win", "Windows 10 download", "(run the installer)"),
+    ("linux-x86_64", "Linux x86_64 download", "(make executable and run the AppImage)"),
+    ("linux-aarch64", "Linux arm64 download", "(make executable and run the AppImage)"),
+    ("ubuntu-18", "Ubuntu Linux 18.04 download", "(unzip and run the executable)"),
+    ("ubuntu-16", "Ubuntu Linux 16.04 download", "(unzip and run the executable)"),
+]
+SNAP = ("http://bit.ly/pynsource-snap", "Linux snap installer",
+        "(one-click install on any Ubuntu distro)")
+
+downloadMarkdown = "\n".join(
+    [f" * [{label}]({downloads[key].bitlyUrl}) {suffix}"
+     for key, label, suffix in ENTRIES if key in downloads]
+    + [f" * [{SNAP[1]}]({SNAP[0]}) {SNAP[2]}"]
+)
 print("DOWNLOADS.md")
 print(downloadMarkdown)
 
@@ -138,15 +160,13 @@ print("Bitly Entries to create (click on each link in turn (in vscode terminal) 
 print(t)
 print()
 
-htmlFragmentForWebsite = dedent(f"""
-<p>The latest version is <code>1.77</code></p>
-<ul>
-    <li><a href="{downloads["mac"].bitlyUrl}" rel="nofollow">Mac download</a> (unzip and drag app into the Applications directory)</li>
-    <li><a href="{downloads["win"].bitlyUrl}" rel="nofollow">Windows 10 download</a> (unzip and run the installer)</li>
-    <li><a href="{downloads["ubuntu-18"].bitlyUrl}" rel="nofollow">Ubuntu Linux 18.0.4 download</a> (unzip and run the executable)</li>
-    <li><a href="{downloads["ubuntu-16"].bitlyUrl}" rel="nofollow">Ubuntu Linux 16.0.4 download</a> (unzip and run the executable)</li>
-    <li><a href="http://bit.ly/pynsource-snap" rel="nofollow">Linux snap installer</a> (one-click install on any Ubuntu distro)</li>
-</ul>
-""")
+htmlItems = "\n".join(
+    [f'    <li><a href="{downloads[key].bitlyUrl}" rel="nofollow">{label}</a> {suffix}</li>'
+     for key, label, suffix in ENTRIES if key in downloads]
+    + [f'    <li><a href="{SNAP[0]}" rel="nofollow">{SNAP[1]}</a> {SNAP[2]}</li>']
+)
+htmlFragmentForWebsite = (
+    f"<p>The latest version is <code>{tag or 'latest'}</code></p>\n<ul>\n{htmlItems}\n</ul>"
+)
 print("Fragment of HTML to put on official website on downloads page")
 print(htmlFragmentForWebsite)

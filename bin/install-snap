@@ -1,3 +1,0 @@
-# sudo snap install --devmode --dangerous snap-py-simple_1.0_multi.snap
-sudo snap install --devmode --dangerous *.snap
-snap list

@@ -10,7 +10,11 @@ activate when sibling packages + license are present.
 - `src/parsing/` — AST parser (`core_parser_ast.py`, visitor builds pmodel). `src/ogl/` — vendored
   copy of classic wx OGL used when `LOCAL_OGL=True` (Community canvas). Do NOT confuse with `../ogl2`.
 - `src/gui/settings.py` — `PRO_EDITION` / `ALSM_PARSING` flags, `APP_VERSION` / `PATCH` version source.
-- `bin/run` — runs GUI (`cd src && python3 pynsource_gui.py`). `bin/testall` — headless test run.
+- `bin/run` — runs GUI (`cd src && python3 pynsource_gui.py`). `bin/testall` — full test suite,
+  wx included (needs a display; `xvfb-run -a bin/testall` on a headless box).
+- Docs are split deliberately: `README.md` = pitch + install table, `DOWNLOADS.md` = the only
+  install/troubleshooting reference (linked from the website), `BUILDING.md` = the only developer
+  doc. Do not duplicate build/run/test instructions here — point at BUILDING.md.
 - `requirements.txt` — install with `uv pip install -r requirements.txt`.
 - `setup.py` — legacy; reads `.requirement-extras/requirements-linux-22.txt`. Prefer `uv` + running
   from source over `pip install -e .`.
@@ -19,9 +23,10 @@ activate when sibling packages + license are present.
   `Admin/site-atug/pynsource-latest{-devel,}.txt` (devel first, promote to latest after testing).
 
 ## Environment (Nov 2026 state)
-- Target: **Python 3.13** + **wxPython 4.3.x**, isolated venv: `uv venv --python 3.13 .venv`
-  then `uv pip install -r requirements.txt`. Old `pyenv --enable-framework` advice in
-  `BUILDING.md` is obsolete — modern/uv Pythons are framework-capable.
+- Target: **Python 3.13** + **wxPython 4.3.x** (4.2.5 on Linux), isolated venv: `uv venv
+  --python 3.13 .venv` then `uv pip install -r requirements.txt`. uv's python-build-standalone is
+  framework-capable, so the old `pyenv --enable-framework` dance is obsolete (it is also what the
+  macOS drag-freeze bug came from — see `Admin/BUG-DIST-SLOWNESS-MAC.md`).
 - `.venv/` is git-ignored (global ignore). Test logs go to `src/tests/logs/` (ignored).
 - **typed_ast is GONE** (EOL, no wheels for 3.11+, doesn't build on 3.13). Python 2 parsing
   (`mode=2`, `typed_ast.ast27`) was dropped: `mode(2)` raises friendly `RuntimeError`, default
@@ -53,6 +58,10 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   `scalex/scaley` zoom, zoom-to-fit, drag-between-shapes line creation). Module visualisation
   additionally needs `../alsm` (`ALSM_PARSING=True`); without alsm, Pro canvas works but module
   viz warns and disables.
+- **Linux is Pro by platform**, regardless of licences: `sys.platform.startswith("linux")` forces
+  `PRO_EDITION = True` in `src/gui/settings.py` (snaps cannot persist a licence file; there is no
+  way to buy one that survives the packaging routes). Consequence: every Linux artefact must
+  bundle ogl2 + alsm, and Linux CI runs the Pro code paths that macOS/Windows CI never executes.
 - Switching: install siblings editable + save a license (see above), relaunch — no code change.
   `print("Running Community Edition")` at startup tells you which you got.
 - Artefacts differ by edition: binary builds (`bin/buildmac`, `bin/buildwin.bat`, snap) ship
@@ -214,10 +223,12 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   --version` (qualified app name), asserting the version line and that alsm loaded.
 
 ## Tests
-- `mkdir -p src/tests/logs && .venv/bin/python -m unittest discover -s src` — expect `158 tests OK`
-  (a handful skip without wx / are pre-existing skips). Runs WITH wx installed too.
-- `TRAVIS=1` prefix = legacy headless flag (skips wx-dependent tests); kept for compat, not required.
+- Expect `158 tests OK (skipped=8)`: `mkdir -p src/tests/logs && .venv/bin/python -m unittest
+  discover -s src`. Most tests build a real `wx.App`, so a headless machine needs `xvfb-run` (the
+  Linux CI does this); `TRAVIS=1` is a legacy flag that skips them all — never use it to validate.
 - `../ogl2`: `.venv/bin/python -m pytest ../ogl2/tests/ -x -q`.
+- Parsing invariants live in `src/tests/` — if you touch the AST visitor, `test_parse_bugs*` and
+  `test_parse_type_annotations` are the ones that fail first.
 
 ## Gotchas / recent fixes (don't regress)
 - **Print preview range**: `FilePrint` must build `wx.PrintDialogData(self.printData)` with

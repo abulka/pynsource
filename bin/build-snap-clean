@@ -1,3 +1,0 @@
-rm *.snap
-snapcraft clean --use-lxd
-snapcraft --use-lxd

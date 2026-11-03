@@ -1,152 +1,102 @@
 # Pynsource
 
-Author: [Andy Bulka](http://www.andypatterns.com)
-
-![Python application](https://github.com/abulka/pynsource/workflows/Python%20application/badge.svg)
-
-## Overview
-
 Reverse engineer Python source code into UML class diagrams.
 
-## Installation
+[![latest release](https://img.shields.io/github/v/release/abulka/pynsource?include_prereleases&label=download)](https://github.com/abulka/pynsource/releases)
+[![license](https://img.shields.io/badge/license-GPL3%20%2F%20commercial-blue)](https://github.com/abulka/pynsource#license)
+[![website](https://img.shields.io/badge/docs-pynsource.com-informational)](https://www.pynsource.com)
 
-[Download](DOWNLOADS.md) - ready to run builds are available for Mac, Windows and Linux.
+![Screenshot of Pynsource showing a UML class diagram](https://www.dropbox.com/s/aq4hu3hfdvtxkp8/pynsource-comments.png?raw=1)
 
-> **Mac users** — easiest: `brew install --cask abulka/pynsource/pynsource` (no Gatekeeper
-> prompt at all). Downloading the zip instead means macOS will block the app the first time
-> you double-click it.
-> Click **Done** (not "Move to Bin"), then go to **System Settings > Privacy & Security**,
-> scroll to the bottom and click **Open Anyway** (a second dialog asks again - click it again).
-> Full steps: `IMPORTANT-README-BEFORE-RUNNING.txt` inside the download, or drag the app into
-> Terminal and run `xattr -dr com.apple.quarantine /Applications/Pynsource.app`.
->
-> **Use the full cask name:** `brew info pynsource` and `brew upgrade --cask pynsource` (no
-> `abulka/pynsource/` prefix) refer to Homebrew's own long-abandoned 1.84 cask, which is
-> *disabled* (old Intel build that fails the Gatekeeper check) - you will see a red `disabled`
-> and a Rosetta caveat that have nothing to do with this app. To inspect or upgrade this build:
->
-> ```bash
-> brew info --cask abulka/pynsource/pynsource
-> brew upgrade                                  # upgrades it correctly
-> brew upgrade --cask abulka/pynsource/pynsource
-> ```
+## Install
 
-An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) is also available with extra features 
-like zoom and the ability to drag to connect shapes.
+| | |
+|---|---|
+| **macOS** (Apple silicon) | `brew install --cask abulka/pynsource/pynsource` — or download the zip |
+| **Windows 10/11** (64-bit) | download `pynsource-win-<version>-setup.exe` and run it |
+| **Linux** (AppImage) | download `…-x86_64.AppImage` or `…-aarch64.AppImage` (`uname -m`) |
+| **Ubuntu/Debian** (snap) | `sudo snap install pynsource --edge` (edge while being tested) |
 
-To build and install from source code, see [building from source](BUILDING.md)
+Full instructions, including the one-off Gatekeeper (macOS) and SmartScreen (Windows) prompts
+and Linux troubleshooting: **[DOWNLOADS.md](DOWNLOADS.md)**.
 
-# Features
+Viewing and editing diagrams is free. The Pro features (zoom, drag-to-connect, module
+visualisation) need a [licence](https://pynsource.com/pricing.html) on macOS and Windows — they
+are **free on Linux**.
 
- - Generates UML diagrams from Python 3 or legacy Python source code
- - The only UML tool that recognises Python instance attributes (not just class attributes)
- - Type annotation support *(new for 2020)*
- - Layout algorithm
- - Toggle between UML, Ascii art UML and PlantUML views
- - Automatically colour sibling subclasses to enhance understanding
- - Print and Print preview
- - Windows 10, Mac OSX Mojave, Linux compatibility
- - Open Source
- - Pro edition with
-    - Faster performance
-    - Zoom
-    - Drag and Drop to connect shapes
-    - Optimal layout algorithm
-    - Access to generated PlantUML markup text
-    - Module Visualisation incl. variables and functions *(new for 2021, [youtube demo](https://youtu.be/AovrE7nWGss))*
+Building from source: **[BUILDING.md](BUILDING.md)**.
 
-# Examples
+## Features
 
-![](https://www.dropbox.com/s/aq4hu3hfdvtxkp8/pynsource-comments.png?raw=1)
+- Generates UML diagrams from Python 3 source
+- The only UML tool that recognises Python instance attributes (not just class attributes)
+- Type annotation support
+- Layout algorithm, and a toggle between UML, ASCII-art UML and PlantUML views
+- Automatically colours sibling subclasses to make inheritance easier to follow
+- Print and print preview
+- Runs on macOS, Windows and Linux
 
-![](https://www.dropbox.com/s/3o2p7h6qqf5hbhc/pynsource-zoom-line-edit.png?raw=1)
+Pro Edition adds:
 
-![](https://www.dropbox.com/s/w183c0vmt8o6qs9/pynsource-drag-drop-connect.png?raw=1)
+- Zoom, and drag-and-drop to connect shapes
+- Faster (re)layout, and access to the generated PlantUML markup
+- Module visualisation, including variables and functions
+  ([youtube demo](https://youtu.be/AovrE7nWGss)) — free on Linux
 
-Example of Ascii UML View:
+## Examples
 
+![Zoom and line editing](https://www.dropbox.com/s/3o2p7h6qqf5hbhc/pynsource-zoom-line-edit.png?raw=1)
 
-                                   +-----------------------+
-    +-------------------+          |RoleServicesObject     |
-    |AI                 |          |.......................|
-    |....................        * |role                   |
-    |roleServiceObjects '''''''''''|gameservices           |----- .|
-    |gameServices       |___       |_rolemanager           |       |
-    |...................|   |      |_etc1                  |       |
-    |API_RunABit        |   |      |.......................|       |
-    |API_GetOrdersForR  |   |      |API_GetCurrentStoryline|       |
-    |API_CreateRoleServc|   |      |API_GetCurrentRoleName |       |
-    +-------------------+   |      |API_GetRoleSubordinates|       |
-                            |      +-----------------------+       |
-                            |                                      |
-                            |                                      |
-                            | 1 +---------------------------+ /    |
-                            .---+GameServices               |_.....'
-                                +---------------------------| -.
-                                |_scenario                  |
-                                |_game                      |
-                                ............................|
-                                |API_GetAstarTravelTimeBlah |
-                                |API_GetOobtreeInfoOnOobId  |
-                                |API_GetOobtreeInfoOnMe     |
-                                +---------------------------+
+![Drag to connect shapes](https://www.dropbox.com/s/w183c0vmt8o6qs9/pynsource-drag-drop-connect.png?raw=1)
 
-Examples of PlantUML view:
+ASCII-art UML view:
 
-![](https://www.dropbox.com/s/v6f5t2hohl97hja/pynsource-plantuml-1.png?raw=1)
+```
+                               +-----------------------+
++-------------------+          |RoleServicesObject     |
+|AI                 |          |.......................|
+|....................        * |role                   |
+|roleServiceObjects '''''''''''|gameservices           |----- .|
+|gameServices       |___       |_rolemanager           |       |
+|...................|   |      |_etc1                  |       |
+|API_RunABit        |   |      |.......................|       |
+|API_GetOrdersForR  |   |      |API_GetCurrentStoryline|       |
+|API_CreateRoleServc|   |      |API_GetCurrentRoleName |       |
++-------------------+   |      |API_GetRoleSubordinates|       |
+                        |      +-----------------------+       |
+                        | 1 +---------------------------+ /    |
+                        .---+GameServices               |_.....'
+                            +---------------------------| -.
+                            |_scenario                  |
+                            |_game                      |
+                            ............................|
+                            |API_GetAstarTravelTimeBlah |
+                            |API_GetOobtreeInfoOnOobId  |
+                            +---------------------------+
+```
 
-![](https://www.dropbox.com/s/furf89q7b2brpr0/pynsource-plantuml-2.png?raw=1)
+PlantUML view (needs an internet connection, or your own PlantUML server):
 
-Note: PlantUML view requires an internet connection.
+![PlantUML view](https://www.dropbox.com/s/v6f5t2hohl97hja/pynsource-plantuml-1.png?raw=1)
 
-![](https://www.dropbox.com/s/3gqiyn7vlxbnhj3/pynsource-module-visualisation.gif?raw=1)
+## Learn more
 
-Note: Module Visualisation is a Pro feature.
-                                    
+- Website and screenshots: [www.pynsource.com](https://www.pynsource.com)
+- Help is built into the app — press `F1`
+- [Video tutorial](https://youtu.be/FEXeDI18LMs) and a [module visualisation demo](https://youtu.be/AovrE7nWGss)
+- To control the initial window size and position, see
+  [this note](https://github.com/abulka/pynsource/issues/49#issuecomment-475069439)
+
 ## What does Pynsource mean?
 
-    Py = Python
-    N = and
-    Source = Source code
+Py = Python, N = and, Source = source code. Longer answer: it was built in Australia, famous for
+meat pies with sauce at the football — Pie-and-Sauce.
 
-Long Answer: Since it was built in Australia, which is famous for its meat pies and sauce
-   at football matches, Pie-and-Sauce.  Where Py = Python and Source = source code.
-   
-## Home Page and Documentation
+## Credits
 
-More screenshots, videos and documentation can be found at
-www.pynsource.com
+Author: [Andy Bulka](http://www.andypatterns.com)
 
-- Help is built into the app - hit `F1`
+## License
 
-- View a [Youtube video tutorial](https://youtu.be/FEXeDI18LMs) on the basic usage of Pynsource (pro edition is featured).
-- [Module Visualisation](https://youtu.be/AovrE7nWGss) youtube demo.
-
-- If you want more control over the Pynsource initial window size and position see 
-[this link](https://github.com/abulka/pynsource/issues/49#issuecomment-475069439)
-
-### Run your own PlantUML server
-When using PlantUML view (which is not necessary to use the app), if you want to run your own PlantUML server (faster, larger diagrams, more secure), see the Pynsource built in help for installation and configuration instructions.  
-
-### Support the project
-Help support the project by [purchasing a Pro Edition license](https://pynsource.com/pricing.html) which contains extra features.  Future plans include
-undo/redo and line labels.
-  
-## Study the Source Code
-
-Create instant UML and [Literate Code Map](http://bit.ly/lcodemaps) diagrams of this GitHub project.
-
-[![button](https://www.dropbox.com/s/auynuqlfbrrxyhm/open_in_gituml_flat.png?raw=1)](http://gituml.com/ztree_scratchpad?user=abulka&repo=pynsource&commit=master)
-
-
-# Changelog
-
-View the [Changelog](CHANGELOG.md)
-<!-- https://github.com/abulka/pynsource/blob/master/CHANGELOG.md -->
-
-# License
-
-The Community Edition is open source, GPL3 licensed.
-
-The Pro Edition is commercially licensed and requires a valid license to use.
-  
+The Community Edition is open source, GPL3 licensed. The Pro Edition is commercially licensed and
+needs a valid licence on macOS and Windows. See [CHANGELOG.md](CHANGELOG.md) for the history.

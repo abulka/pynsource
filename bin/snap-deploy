@@ -1,4 +1,0 @@
-snapcraft push *.snap
-echo look at the number returned e.g. 2
-echo then run
-echo snapcraft release pynsource 2 stable

@@ -10,6 +10,12 @@
 - Fixed Mac print preview page range showing 1..9999 (now correctly 1..1)
 - Fixed blurry UML text on Retina/HiDPI displays (HiDPI-aware canvas buffer, rounded text positioning in OGL and OGL2)
 - alsm and ogl2 updated for Python 3.13
+- **Pro features are free on Linux** (zoom, drag-to-connect, module visualisation) - no licence needed
+- Linux ships as a single-file AppImage for x86_64 **and** arm64 (no install, no root)
+- Windows installer rebuilt on Inno Setup 6 and an onedir bundle; macOS ships an ad-hoc signed
+  onedir `.app`, installable prompt-free via `brew install --cask abulka/pynsource/pynsource`
+- Ubuntu snap modernised: core24, Python 3.12, strict confinement
+- Every platform is now built by CI from a `pre-*` tag and attached to one release
 
 *February 2023*
 
