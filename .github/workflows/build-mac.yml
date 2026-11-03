@@ -139,4 +139,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         draft: true
+        # put the Gatekeeper instructions on the release page itself - users see them
+        # before they download, not only inside the zip
+        body_path: pynsource/.deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt
         files: pynsource/dist/pynsource-macos-${{ env.TAG }}.zip

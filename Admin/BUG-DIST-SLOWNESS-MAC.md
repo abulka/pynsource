@@ -377,3 +377,29 @@ Also updated: `.github/workflows/build-mac.yml` (guard now checks the onedir lay
 * **Local build** (occasional): `bin/buildmac.sh`, which needs `pyinstaller` on PATH; it
   ships the `.app` and zips with `-y` too. Prefer CI - a local build silently depends on
   whichever Python is on PATH, which is exactly how this bug was born.
+
+### Gatekeeper friction (unavoidable without a Developer ID)
+
+Ad-hoc signing means every quarantined artefact (the `.app` **and** any helper script) is
+"rejected" by `spctl`, and on macOS 15+/27 the old inline "Open" button is gone: the user
+must go to System Settings > Privacy & Security > "Open Anyway". Two artefacts therefore
+cost two trips, which is why `fix-permissions.command` is now presented as an *optional*
+convenience rather than "the easy way" - the honest instructions lead with the app itself
+(one trip) and mention the script only as an alternative.
+
+What actually removes this friction:
+
+| option | prompts | cost / caveat |
+|---|---|---|
+| Apple Developer ID + notarisation | none | USD $99/year |
+| Homebrew cask (`brew install --cask`) | none (brew/curl fetches carry no quarantine flag) | needs a tap repo; users must know brew |
+| current instructions (System Settings) | one, once | none, but users must follow steps |
+| `.command` helper script | one for the script + one for the app | worst option - it is a shell script and looks scary |
+
+Non-options: a message inside the script (it cannot run before being allowed to run); signing
+the script ad-hoc (ad-hoc is exactly what triggers the block); `spctl`/API exceptions (require
+user consent anyway).
+
+The instructions live in `.deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt`, are copied
+into the release zip, and are also used as the draft release *body* so users see the steps
+before downloading.
