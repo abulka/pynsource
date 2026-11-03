@@ -20,7 +20,6 @@ name: Pynsource Snap
 on:
   push:
     tags: ['pre-*']
-    branches: ['ci/snapver']
     # TEMPORARY - scratch branch used to iterate before the workflow exists on
     # the default branch (workflow_dispatch needs that). Removed before merge.
 
