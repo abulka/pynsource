@@ -90,8 +90,8 @@ jobs:
     - name: System packages (wxPython build dependencies - aarch64 only)
       if: matrix.wxpython == 'source'
       run: |
-        sudo apt-get install -y -qq --no-install-recommends \
-          build-essential pkg-config dpkg-dev \
+        # not -qq: on a conflict apt only explains itself without it
+        sudo apt-get install -y --no-install-recommends \
           libgtk-3-dev libwebkit2gtk-4.0-dev libgstreamer1.0-dev \
           libgstreamer-plugins-base1.0-dev libsdl2-dev libnotify-dev \
           libjpeg-dev libtiff-dev libpng-dev freeglut3-dev \
