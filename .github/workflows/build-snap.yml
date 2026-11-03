@@ -66,7 +66,8 @@ jobs:
       run: |
         sudo snap install --dangerous "$(ls *.snap)"
         snap list pynsource
-        snap run pynsource-cli --version
+        # the qualified form: the app is "pynsource-cli" inside the "pynsource" snap
+        snap run pynsource.pynsource-cli --version
 
     # Uploads the snap to the edge channel, test via: sudo snap refresh pynsource --edge
     - name: Push to edge
