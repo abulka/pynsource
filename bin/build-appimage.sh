@@ -4,10 +4,11 @@
 #
 #   cd pynsource                                   # repo root
 #   pyinstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
-#   bin/build-appimage.sh pre-2026-dustoff-5       # -> dist/pynsource-linux-<tag>-x86_64.AppImage
+#   bin/build-appimage.sh pre-2026-dustoff-5       # -> dist/pynsource-linux-<tag>-<arch>.AppImage
 #
-# Used by .github/workflows/build-linux.yml. Run it on x86_64 Linux (the CI runner is
-# ubuntu-22.04, which decides the glibc floor: 2.35, so Ubuntu 22.04+/Mint 21+).
+# Used by .github/workflows/build-linux.yml. Run it on Linux of the arch you want to ship;
+# the CI runners are ubuntu-22.04 (x86_64) and ubuntu-22.04-arm (aarch64), which decide the
+# glibc floor: 2.35, so Ubuntu 22.04+/Mint 21+/Debian 12+.
 #
 # How the payload is assembled:
 #   1. the PyInstaller onedir tree goes to usr/bin/Pynsource/ (exe + _internal, already
@@ -34,7 +35,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 APPDIR="$ROOT/dist/appimage/Pynsource.AppDir"
-OUT="$ROOT/dist/pynsource-linux-$TAG-x86_64.AppImage"
+ARCH_NAME="$(uname -m)"                      # x86_64 | aarch64
+OUT="$ROOT/dist/pynsource-linux-$TAG-$ARCH_NAME.AppImage"
 TOOLS="$(mktemp -d)"
 
 [ -x dist/Pynsource/Pynsource ] || {
@@ -102,7 +104,7 @@ fetch() {  # fetch <url> <dest>
 if [ -z "${LINUXDEPLOY:-}" ]; then
   LINUXDEPLOY="$TOOLS/linuxdeploy"
   echo "=== downloading linuxdeploy"
-  fetch https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage "$LINUXDEPLOY"
+  fetch https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH_NAME.AppImage "$LINUXDEPLOY"
 fi
 if ! command -v linuxdeploy-plugin-gtk >/dev/null 2>&1; then
   echo "=== downloading linuxdeploy-plugin-gtk"
@@ -129,7 +131,7 @@ done
 echo "=== bundling leaf libs: ${#LIB_ARGS[@]} entries"
 
 # extract-and-run: no FUSE on CI runners. DEPLOY_GTK_VERSION=3 because wxWidgets 3.2 is GTK3.
-ARCH=x86_64 APPIMAGE_EXTRACT_AND_RUN=1 DEPLOY_GTK_VERSION=3 \
+ARCH=$ARCH_NAME APPIMAGE_EXTRACT_AND_RUN=1 DEPLOY_GTK_VERSION=3 \
   "$LINUXDEPLOY" --appdir "$APPDIR" --plugin gtk \
   --desktop-file "$APPDIR/pynsource.desktop" \
   --icon-file "$APPDIR/pynsource.png" \
@@ -142,12 +144,12 @@ echo "bundled in usr/lib: $(ls "$APPDIR/usr/lib" 2>/dev/null | wc -l) files"
 if [ -z "${APPIMAGETOOL:-}" ]; then
   APPIMAGETOOL="$TOOLS/appimagetool"
   echo "=== downloading appimagetool"
-  fetch https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage "$APPIMAGETOOL"
+  fetch https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$ARCH_NAME.AppImage "$APPIMAGETOOL"
 fi
 
 echo "=== appimagetool -> $OUT"
 rm -f "$OUT"
-ARCH=x86_64 APPIMAGE_EXTRACT_AND_RUN=1 "$APPIMAGETOOL" --no-appstream "$APPDIR" "$OUT"
+ARCH=$ARCH_NAME APPIMAGE_EXTRACT_AND_RUN=1 "$APPIMAGETOOL" --no-appstream "$APPDIR" "$OUT"
 
 echo "=== built:"
 ls -l "$OUT"

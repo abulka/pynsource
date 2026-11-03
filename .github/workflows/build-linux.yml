@@ -4,25 +4,40 @@
 #
 # Triggers on pre-* tags + manual dispatch, same as build-mac.yml / build-win.yml.
 #
-# Two Linux-specific decisions:
-#   * ubuntu-22.04, not -latest: the glibc of the build machine is the AppImage's floor.
-#     22.04 = glibc 2.35, which covers Ubuntu 22.04+/Mint 21+/Debian 12+.
-#   * Linux is Pro-free (see the platform gate in src/gui/settings.py), so the bundle must
-#     contain ogl2 + alsm and needs no licence plumbing.
+# Two arch-specific decisions:
+#   * ubuntu-22.04 (x86_64) and ubuntu-22.04-arm (aarch64), never -latest: the glibc of the
+#     build machine is the AppImage's floor. 22.04 = glibc 2.35, covering Ubuntu 22.04+/
+#     Mint 21+/Debian 12+. Both are standard 4-CPU runners, free for public repos.
+#   * wxPython has NO Linux wheels on PyPI (mac/win only). x86_64 takes the prebuilt wheel from
+#     wxPython's extras server; there is no aarch64 build there at all, so the arm job compiles
+#     4.2.5 from source (cached - it is a ~30-60 min compile otherwise). Both arches therefore
+#     run wxPython 4.2.5 on Linux while Mac/Windows run 4.3.2.
 #
-# wxPython on Linux has no PyPI wheels at all (mac/win only) - it comes from wxPython's
-# extras server, which is built per Ubuntu release/CPython. 4.2.5 is the newest cp313 build
-# for ubuntu-22.04, hence Linux runs 4.2.5 while Mac/Windows run 4.3.2. Install that wheel
-# BEFORE requirements.txt so the unpinned `wxpython` line is already satisfied.
+# Linux is Pro-free (see the platform gate in src/gui/settings.py), so both bundles must
+# contain ogl2 + alsm and need no licence plumbing.
 name: Pynsource app built on Linux (AppImage)
 on:
   push:
     tags: ['pre-*']
+    # TEMPORARY - scratch branch used to iterate before the workflow exists on
+    # the default branch (workflow_dispatch needs that). Removed before merge.
+    branches: ['ci/arm64']
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-22.04
+            arch: x86_64
+            wxpython: wheel
+          - runner: ubuntu-22.04-arm
+            arch: aarch64
+            wxpython: source
+    name: AppImage ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
     defaults:
       run:
         shell: bash
@@ -63,15 +78,24 @@ jobs:
     - name: System packages (GTK3 to run the GUI, xvfb to test it)
       run: |
         sudo apt-get update -qq
-        # The wxPython wheel is built on ubuntu-22.04 and links against these; a bare runner
-        # lacks several of them and `import wx` then dies on the first missing .so. PyInstaller
-        # packages whatever it can resolve, so installing them here also makes them part of the
-        # AppImage payload.
+        # The wxPython build on ubuntu-22.04 links against these; a bare runner lacks several of
+        # them and `import wx` then dies on the first missing .so.
         sudo apt-get install -y -qq --no-install-recommends \
           xvfb xauth libgtk-3-0 libgl1 libglu1-mesa libglib2.0-0 libxkbcommon-x11-0 \
           libnotify4 libsdl2-2.0-0 libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
-          libwebkit2gtk-4.0-37 libxtst6 libsm6 libice6 libpulse0 libjpeg-turbo8 libtiff5
+          libwebkit2gtk-4.0-37 libxtst6 libsm6 libice6 libpulse0 libjpeg-turbo8 libtiff5 \
+          libsecret-1-0 libpcre2-32-0 libxxf86vm1
         echo "gtk: $(dpkg -l libgtk-3-0 | tail -1 | awk '{print $3}')"
+
+    - name: System packages (wxPython build dependencies - aarch64 only)
+      if: matrix.wxpython == 'source'
+      run: |
+        sudo apt-get install -y -qq --no-install-recommends \
+          build-essential pkg-config dpkg-dev \
+          libgtk-3-dev libwebkit2gtk-4.0-dev libgstreamer1.0-dev \
+          libgstreamer-plugins-base1.0-dev libsdl2-dev libnotify-dev \
+          libjpeg-dev libtiff-dev libpng-dev freeglut3-dev \
+          libgl1-mesa-dev libglu1-mesa-dev libsm-dev libxtst-dev libsecret-1-dev libpcre2-dev
 
     - name: Build interpreter + venv (python-build-standalone, NOT setup-python)
       env:
@@ -82,16 +106,52 @@ jobs:
         PY=.venv/bin/python
         echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
         uv pip install --python "$PY" wheel pyinstaller
+        # NOTE: wxpython is installed in the next two steps, before requirements.txt, because
+        # that file's unpinned `wxpython` line would otherwise trigger a source build on x86_64.
+        "$PY" -c "import sys; print('BUILD PYTHON', sys.version.split()[0], sys.platform)"
+
+    - name: Install wxPython (prebuilt x86_64 wheel)
+      if: matrix.wxpython == 'wheel'
+      run: |
         # no cp313 Linux wheel on PyPI - see the header
-        uv pip install --python "$PY" \
+        uv pip install --python .venv/bin/python \
           "https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxpython-4.2.5-cp313-cp313-linux_x86_64.whl"
+
+    - name: Cache the locally built aarch64 wxPython wheel
+      if: matrix.wxpython == 'source'
+      uses: actions/cache@v4
+      with:
+        path: ~/wx-wheel-cache
+        key: wxpython-4.2.5-cp313-ubuntu-22.04-arm64
+
+    - name: Build wxPython from source (no Linux aarch64 wheels exist)
+      if: matrix.wxpython == 'source'
+      run: |
+        mkdir -p ~/wx-wheel-cache
+        if ls ~/wx-wheel-cache/*.whl >/dev/null 2>&1; then
+          echo "=== restoring cached wheel"
+          uv pip install --python .venv/bin/python ~/wx-wheel-cache/*.whl
+        else
+          echo "=== compiling wxPython 4.2.5 (the ~30-60 min step - cached afterwards)"
+          # a real wheel, so the cache has something to restore; pip (not uv) because wx's
+          # pyproject needs build isolation and we want the artefact on disk
+          uv pip install --python .venv/bin/python pip
+          time MAX_JOBS=$(nproc) .venv/bin/python -m pip wheel wxpython==4.2.5 \
+            --no-binary wxpython -w ~/wx-wheel-cache
+          ls -l ~/wx-wheel-cache
+          uv pip install --python .venv/bin/python ~/wx-wheel-cache/wxpython-*.whl
+        fi
+
+    - name: Install remaining dependencies + siblings
+      run: |
+        PY=.venv/bin/python
         uv pip install --python "$PY" -r pynsource/requirements.txt
         # Linux is Pro-free, so ogl2 (canvas) and alsm (module visualisation) are imported
         # unconditionally - unlike Mac/Windows CI, which runs Community with no licence file.
         uv pip install --python "$PY" -e ogl2/
         uv pip install --python "$PY" -e pynsource-rego/
         uv pip install --python "$PY" alsm/
-        "$PY" -c "import sys, wx, ogl2, alsm; print('BUILD PYTHON', sys.version.split()[0], wx.version())"
+        "$PY" -c "import sys, wx, ogl2, alsm; print('BUILD PYTHON', sys.version.split()[0], wx.version(), ogl2.__file__)"
 
     - name: Guard - Linux runs Pro by platform, and alsm is importable
       run: |
@@ -130,7 +190,6 @@ jobs:
         du -sh dist/Pynsource
         # size diagnostics - the Linux wx .so files are large; this shows where the bytes go
         du -sh dist/Pynsource/_internal/* 2>/dev/null | sort -h | tail -8
-        find dist/Pynsource -type f -size +4M -printf '%s %p\n' | sort -n | tail -12
 
     - name: Get the tag name
       run: |
@@ -150,7 +209,7 @@ jobs:
     - name: Guard - AppImage is an AppImage, and the bundled app launches
       run: |
         cd pynsource
-        appimage=dist/pynsource-linux-$TAG-x86_64.AppImage
+        appimage=dist/pynsource-linux-$TAG-${{ matrix.arch }}.AppImage
         file "$appimage"
         du -h "$appimage"
         file "$appimage" | grep -q "AppImage" || { echo "::error::not an AppImage"; exit 1; }
@@ -179,8 +238,8 @@ jobs:
     - name: Save AppImage as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: pynsource-linux-${{ env.TAG }}
-        path: pynsource/dist/pynsource-linux-${{ env.TAG }}-x86_64.AppImage
+        name: pynsource-linux-${{ matrix.arch }}-${{ env.TAG }}
+        path: pynsource/dist/pynsource-linux-${{ env.TAG }}-${{ matrix.arch }}.AppImage
 
     - name: Draft pre-release
       if: startsWith(env.TAG, 'pre-')
@@ -191,4 +250,4 @@ jobs:
         draft: true
         # shared multi-OS body (also used by the mac and windows workflows) - see its header
         body_path: pynsource/.deploy-extras/RELEASE-NOTES.md
-        files: pynsource/dist/pynsource-linux-${{ env.TAG }}-x86_64.AppImage
+        files: pynsource/dist/pynsource-linux-${{ env.TAG }}-${{ matrix.arch }}.AppImage
