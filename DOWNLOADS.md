@@ -13,8 +13,14 @@ brew install --cask abulka/pynsource/pynsource
 ```
 
 Install into `/Applications`, no unzipping, no Gatekeeper prompt (the cask clears the
-quarantine flag for you). Upgrade with `brew upgrade --cask pynsource`. Tap:
-[abulka/homebrew-pynsource](https://github.com/abulka/homebrew-pynsource).
+quarantine flag for you). Tap: [abulka/homebrew-pynsource](https://github.com/abulka/homebrew-pynsource).
+
+Upgrade with plain `brew upgrade`, or `brew upgrade --cask abulka/pynsource/pynsource` —
+**not** `brew upgrade --cask pynsource`, which is Homebrew's own long-abandoned 1.84 cask
+(Intel, and disabled since 2026-09-01 because it fails the macOS Gatekeeper check; that is
+also why `brew info pynsource` shows a red `disabled` and a Rosetta caveat).
+
+This build is **Apple silicon (arm64) only**.
 
 ## Mac (zip download)
 

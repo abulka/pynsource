@@ -72,6 +72,8 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   `dist/Pynsource.app` (what ships).
 - Zip with `-y` (`zip -r -y`, or `ditto -c -k --keepParent`); without it the
   `Contents/Resources` symlinks are followed and the payload is stored twice (83MB vs 35MB).
+- Builds are **arm64 only** (macos-14 runner); Intel Macs are not supported until someone
+  builds x86_64/universal (wxPython wheels are per-arch, so universal2 is not a one-liner).
 - Ad-hoc signed only (no Apple Developer account). Users must clear the Gatekeeper block
   once: `Done` on the block dialog, then System Settings > Privacy & Security > Open Anyway
   (twice) — see `.deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt`, which is also the
@@ -81,6 +83,10 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   `abulka/homebrew-pynsource` (`brew install --cask abulka/pynsource/pynsource`). Homebrew
   quarantines every cask download and Homebrew 7 has no `--no-quarantine`, so the cask does
   `xattr -dr com.apple.quarantine` in `postflight`. Bump its `version`/`sha256` per release.
+  Caveat: Homebrew's *own* `pynsource` cask (v1.84, Intel) still exists and is `disabled`
+  since 2026-09-01 for failing Gatekeeper, so the unqualified token (`brew info pynsource`,
+  `brew upgrade --cask pynsource`) points at that dead cask - docs must say to use the
+  tap-qualified name or plain `brew upgrade`.
 - Local `bin/buildmac.sh` works but picks up whatever `python3`/`pyinstaller` is on PATH,
   which is exactly how the framework-Python bug got in. Prefer CI.
 
