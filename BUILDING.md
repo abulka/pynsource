@@ -113,7 +113,7 @@ not matter which job finishes last.
 
 | workflow | runner | artefact |
 |---|---|---|
-| `build-mac.yml` | macos-14 | `pynsource-macos-<tag>.zip` (onedir `.app`, ad-hoc signed) |
+| `build-mac.yml` | macos-15 | `pynsource-macos-<tag>.zip` (onedir `.app`, ad-hoc signed) |
 | `build-win.yml` | windows-2022 | `pynsource-win-<tag>-setup.exe` (Inno Setup) |
 | `build-linux.yml` | ubuntu-22.04 + ubuntu-22.04-arm | `pynsource-linux-<tag>-{x86_64,aarch64}.AppImage` |
 | `build-snap.yml` | ubuntu-24.04 | `.snap` artifact, plus `snapcraft upload --release edge` on tags |

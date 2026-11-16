@@ -20,7 +20,10 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14  # arm64; single-arch until Intel story is decided
+    # macos-15 = arm64 standard runner. macos-14 was retired by GitHub on 2026-11-02
+    # ("The configuration 'macos-14-arm64-us-default' is not supported"), which fails the
+    # job in 1s before any step runs. Single-arch until the Intel story is decided.
+    runs-on: macos-15
     steps:
     - name: Check out pynsource (triggering ref)
       uses: actions/checkout@v4

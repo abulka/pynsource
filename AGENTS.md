@@ -83,7 +83,8 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   `dist/Pynsource.app` (what ships).
 - Zip with `-y` (`zip -r -y`, or `ditto -c -k --keepParent`); without it the
   `Contents/Resources` symlinks are followed and the payload is stored twice (83MB vs 35MB).
-- Builds are **arm64 only** (macos-14 runner); Intel Macs are not supported until someone
+- Builds are **arm64 only** (macos-15 runner; macos-14 was retired by GitHub on 2026-11-02,
+  which cancels the job in 1s with "configuration ... is not supported"); Intel Macs are not supported until someone
   builds x86_64/universal (wxPython wheels are per-arch, so universal2 is not a one-liner).
 - Ad-hoc signed only (no Apple Developer account). Users must clear the Gatekeeper block
   once: `Done` on the block dialog, then System Settings > Privacy & Security > Open Anyway
