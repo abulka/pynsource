@@ -44,11 +44,10 @@ jobs:
       with:
         path: pynsource/
 
-    - name: Check out ogl2 (private, branch pin - see header)
+    - name: Check out ogl2 (private, default branch - see header)
       uses: actions/checkout@v4
       with:
         repository: abulka/ogl2
-        ref: 2026-dustoff
         token: ${{ secrets.my_pat }}
         path: ogl2/
 
@@ -59,11 +58,10 @@ jobs:
         token: ${{ secrets.my_pat }}
         path: pynsource-rego/
 
-    - name: Check out ALSM (private, branch pin - see header)
+    - name: Check out ALSM (private, default branch - see header)
       uses: actions/checkout@v4
       with:
         repository: abulka/alsm
-        ref: 2026-dustoff
         token: ${{ secrets.my_pat }}
         path: alsm/
 

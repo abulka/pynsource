@@ -3,8 +3,8 @@
 # details stay private.)
 #
 # Triggers on pre-* tags + manual dispatch. Mirrors build-mac.yml deliberately:
-# uv python-build-standalone (not actions/setup-python), sibling checkouts pinned
-# to 2026-dustoff, onedir bundle, artifact + draft pre-release.
+# uv python-build-standalone (not actions/setup-python), sibling checkouts from their
+# default branches, onedir bundle, artifact + draft pre-release.
 #
 # Differences from Mac, on purpose:
 #   * no framework/onedir codesign guard - that is mac-specific; the Windows
@@ -14,9 +14,9 @@
 #     on first run - documented in .deploy-extras/RELEASE-NOTES.md.
 #   * Inno Setup is not preinstalled on the runners, so it is installed with choco.
 #
-# Sibling pins `ref: 2026-dustoff` are TEMPORARY - drop them once the
-# 2026-dustoff branches are merged to main/master. (pynsource-rego has no
-# such branch, so it tracks its default.)
+# Siblings (ogl2, pynsource-rego, alsm) come from their default branches. ogl2 is
+# frozen at 2026-dustoff, which is now its master head; future canvas work happens in
+# the separate wxdiagram project, which pynsource does not use yet (see Admin/ROADMAP.md).
 name: Pynsource app built on Windows
 on:
   push:
@@ -37,11 +37,10 @@ jobs:
       with:
         path: pynsource/
 
-    - name: Check out ogl2 (private, branch pin - see header)
+    - name: Check out ogl2 (private, default branch - see header)
       uses: actions/checkout@v4
       with:
         repository: abulka/ogl2
-        ref: 2026-dustoff
         token: ${{ secrets.my_pat }}
         path: ogl2/
 
@@ -52,11 +51,10 @@ jobs:
         token: ${{ secrets.my_pat }}
         path: pynsource-rego/
 
-    - name: Check out ALSM (private, branch pin - see header)
+    - name: Check out ALSM (private, default branch - see header)
       uses: actions/checkout@v4
       with:
         repository: abulka/alsm
-        ref: 2026-dustoff
         token: ${{ secrets.my_pat }}
         path: alsm/
 

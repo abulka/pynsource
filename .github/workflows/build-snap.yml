@@ -20,8 +20,6 @@ name: Pynsource Snap
 on:
   push:
     tags: ['pre-*']
-    # TEMPORARY - scratch branch used to iterate before the workflow exists on
-    # the default branch (workflow_dispatch needs that). Removed before merge.
 
   workflow_dispatch:
 
@@ -57,19 +55,17 @@ jobs:
     # Linux is Pro-free (src/gui/settings.py), so the snap must carry the Pro-only packages:
     # ogl2 (canvas: zoom, drag-to-connect) and alsm (module visualisation). They are separate
     # private repos, checked out into the project dir so the snapcraft part can pip install them.
-    - name: Check out ogl2 (private, branch pin)
+    - name: Check out ogl2 (private, default branch)
       uses: actions/checkout@v4
       with:
         repository: abulka/ogl2
-        ref: 2026-dustoff
         token: ${{ secrets.my_pat }}
         path: ogl2/
 
-    - name: Check out ALSM (private, branch pin)
+    - name: Check out ALSM (private, default branch)
       uses: actions/checkout@v4
       with:
         repository: abulka/alsm
-        ref: 2026-dustoff
         token: ${{ secrets.my_pat }}
         path: alsm/
 

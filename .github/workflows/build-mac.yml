@@ -9,9 +9,9 @@
 # No Apple Developer license: the .app is ad-hoc signed only. Users run the
 # unzip, then follow the "Open Anyway" steps in IMPORTANT-README-BEFORE-RUNNING.txt.
 #
-# Sibling pins `ref: 2026-dustoff` are TEMPORARY - drop them once the
-# 2026-dustoff branches are merged to main/master. (pynsource-rego has no
-# such branch, so it tracks its default.)
+# Siblings (ogl2, pynsource-rego, alsm) come from their default branches. ogl2 is
+# frozen at 2026-dustoff, which is now its master head; future canvas work happens in
+# the separate wxdiagram project, which pynsource does not use yet (see Admin/ROADMAP.md).
 name: Pynsource app built on mac
 on:
   push:
@@ -27,11 +27,10 @@ jobs:
       with:
         path: pynsource/
 
-    - name: Check out ogl2 (private, branch pin - see header)
+    - name: Check out ogl2 (private, default branch - see header)
       uses: actions/checkout@v4
       with:
         repository: abulka/ogl2
-        ref: 2026-dustoff
         token: ${{ secrets.my_pat }}
         path: ogl2/
 
@@ -42,11 +41,10 @@ jobs:
         token: ${{ secrets.my_pat }}
         path: pynsource-rego/
 
-    - name: Check out ALSM (private, branch pin - see header)
+    - name: Check out ALSM (private, default branch - see header)
       uses: actions/checkout@v4
       with:
         repository: abulka/alsm
-        ref: 2026-dustoff
         token: ${{ secrets.my_pat }}
         path: alsm/
 
