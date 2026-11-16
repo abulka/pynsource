@@ -15,7 +15,7 @@ Reverse engineer Python source code into UML class diagrams.
 | **macOS** (Apple silicon) | `brew install --cask abulka/pynsource/pynsource` — or download the zip |
 | **Windows 10/11** (64-bit) | download `pynsource-win-<version>-setup.exe` and run it |
 | **Linux** (AppImage) | download `…-x86_64.AppImage` or `…-aarch64.AppImage` (`uname -m`) |
-| **Ubuntu/Debian** (snap) | `sudo snap install pynsource --edge` (edge while being tested) |
+| **Ubuntu/Debian** (snap) | `sudo snap install pynsource` |
 
 Full instructions, including the one-off Gatekeeper (macOS) and SmartScreen (Windows) prompts
 and Linux troubleshooting: **[DOWNLOADS.md](DOWNLOADS.md)**.

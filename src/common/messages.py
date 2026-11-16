@@ -1,7 +1,14 @@
 # Constants used by both pynsource and pynsourcegui
 
-WEB_VERSION_CHECK_URL_TRACKED = "http://bit.ly/pynsource-update-check-gh"
-WEB_VERSION_CHECK_URL_TRACKED_DEVEL = "https://bit.ly/pynsource-update-check-devel-gh"
+# Direct raw.githubusercontent URLs, not bit.ly: the shortener's free plan is gone and a dead
+# short link makes the update check fail silently. Note these are compiled into each binary, so
+# installs older than the release that changed this still go through the old bit.ly links.
+WEB_VERSION_CHECK_URL_TRACKED = (
+    "https://raw.githubusercontent.com/abulka/pynsource/master/Admin/site-atug/pynsource-latest.txt"
+)
+WEB_VERSION_CHECK_URL_TRACKED_DEVEL = (
+    "https://raw.githubusercontent.com/abulka/pynsource/master/Admin/site-atug/pynsource-latest-devel.txt"
+)
 
 WEB_PYNSOURCE_HOME_URL = "http://www.pynsource.com"
 WEB_PYNSOURCE_YOUTUBE_URL = "https://www.youtube.com/channel/UCDHB9YT4BruI8hhCSsCbTkw"

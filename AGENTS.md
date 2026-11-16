@@ -20,6 +20,9 @@ activate when sibling packages + license are present.
 - `requirements.txt` — install with `uv pip install -r requirements.txt`.
 - `setup.py` — legacy; reads `.requirement-extras/requirements-linux-22.txt`. Prefer `uv` + running
   from source over `pip install -e .`.
+- No URL shortener anywhere: the update check reads raw.githubusercontent, the website links
+  at release assets, and `Admin/release-links/release_links.py <tag>` prints the links. bit.ly is
+  retired (paid now, and its links rotted).
 - Version bookkeeping (keep in sync, see `tbump.toml`): `src/gui/settings.py`, `DOWNLOADS.md`,
   `.requirement-extras/buildwin_github-actions.iss`, `CHANGELOG.md`,
   `Admin/site-atug/pynsource-latest{-devel,}.txt` (devel first, promote to latest after testing).
@@ -84,9 +87,10 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   `dist/Pynsource.app` (what ships).
 - Zip with `-y` (`zip -r -y`, or `ditto -c -k --keepParent`); without it the
   `Contents/Resources` symlinks are followed and the payload is stored twice (83MB vs 35MB).
-- Builds are **arm64 only** (macos-15 runner; macos-14 was retired by GitHub on 2026-11-02,
-  which cancels the job in 1s with "configuration ... is not supported"); Intel Macs are not supported until someone
-  builds x86_64/universal (wxPython wheels are per-arch, so universal2 is not a one-liner).
+- Builds are **arm64 only, by decision** (macos-15 runner; macos-14 was retired by GitHub on
+  2026-11-02, which cancels the job in 1s with "configuration ... is not supported"). Intel Macs
+  stop at 1.84 — an Intel job is possible (`macos-15-intel`, x86_64 wxPython wheels exist) but
+  GitHub retires those runners in Aug 2027 and universal2 is not a one-liner (per-arch wheels).
 - Ad-hoc signed only (no Apple Developer account). Users must clear the Gatekeeper block
   once: `Done` on the block dialog, then System Settings > Privacy & Security > Open Anyway
   (twice) — see `.deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt`, which is also the

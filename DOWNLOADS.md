@@ -81,10 +81,9 @@ sudo snap install pynsource
 Built on **core24** (Ubuntu 24.04, Python 3.12) and strictly confined, so it runs on any current
 Ubuntu without extra packages — the `gnome` extension supplies GTK3.
 
-> The snap is currently published to the **edge** channel while it is being tested:
-> `sudo snap install pynsource --edge`. The `stable` channel still has an old 2023 build
-> (Python 3.6, cannot parse Python 3.10 syntax); stable is promoted by hand once the edge build
-> has been in use for a while.
+> `stable` carries 1.86 (Python 3.13) for both amd64 and arm64. New builds are published to
+> `edge` first and promoted to `stable` by hand after a test install, so `--channel=edge` is
+> where to look for the next version.
 
 ## Troubleshooting
 

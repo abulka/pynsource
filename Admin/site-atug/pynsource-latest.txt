@@ -21,7 +21,7 @@ Recent changes:
 
 """,
  "version_syntax_format" : 1,
- "download_url" : "http://bit.ly/pynsource-upgrade-download"
+ "download_url" : "https://www.pynsource.com/download.html"
 }
 
 # Versions 1.51 and higher check for this announcement file.

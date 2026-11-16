@@ -29,8 +29,8 @@ to `master`; the merge is what this release formalises.
 Published as <https://github.com/abulka/pynsource/releases/tag/version-1.86> with both AppImages,
 the macOS zip and the Windows installer. Still to do:
 
-1. Promote snap revisions **34** (amd64) and **35** (arm64) from `edge` to `stable` in the store
-   UI, then drop the "edge while being tested" wording in README/DOWNLOADS.
+1. ~~Promote the snap to `stable`~~ — done 2026-11-16: rev 34 (amd64) and 35 (arm64) are on
+   `latest/stable`, and the "edge while being tested" wording is gone from README/DOWNLOADS.
 2. Sanity-check zoom speed on bare metal (mac + a real Linux desktop). A GPU-less VM is the
    worst case for a `PaintDC` canvas and is not evidence of a regression.
 3. Optional tidy: delete the old `pre-*` releases except the most recent.
@@ -82,5 +82,14 @@ is pushed to `ogl2`.
 - **A release body only sticks to a brand-new draft** (`action-gh-release` will not re-body an
   existing draft), so notes changes need a new tag or a deleted draft.
 - **Snap stable is promoted by hand** in the store UI after installing and running the build.
+- **No URL shortener.** The in-app update check reads `Admin/site-atug/pynsource-latest.txt`
+  straight from `raw.githubusercontent.com`, and the website links directly at release assets.
+  bit.ly's free plan is gone and its links rotted (one pointed at a two-year-old download page),
+  so nothing new should use it. Caveat: the update-check URL is compiled into each binary, so
+  only releases from 1.87 onward are free of the old short links.
+- **macOS is Apple silicon only, by decision.** Intel Macs stop at 1.84. The tooling would allow
+  an Intel build (`macos-15-intel` plus the existing x86_64 wxPython wheels), but GitHub retires
+  its Intel runners in August 2027 and macOS 26 is the last Intel macOS - not worth building a
+  path with a fixed expiry date.
 - **Pro is free on Linux by platform**, so every Linux artefact must bundle `ogl2` (and `alsm`
   for module visualisation). macOS/Windows CI never exercises those imports.
