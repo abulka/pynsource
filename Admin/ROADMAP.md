@@ -24,20 +24,16 @@ to `master`; the merge is what this release formalises.
 | 5 | Snap: core24, both arches, edge upload from CI | done, user-verified |
 | 6 | Flatpak / Flathub | **deferred** — see milestones |
 | 7 | Docs consolidation (README / DOWNLOADS / BUILDING) | done |
-| 8 | Merge to `master`, version 1.86, tag, publish, promote | in progress |
+| 8 | Merge to `master`, version 1.86, tag, publish, promote | **published 2026-11-16** |
 
-Remaining steps:
+Published as <https://github.com/abulka/pynsource/releases/tag/version-1.86> with both AppImages,
+the macOS zip and the Windows installer. Still to do:
 
-1. Bump 1.85 -> 1.86 (`tbump.toml`) and clear `PATCH` in `src/gui/settings.py`.
-2. Finish `CHANGELOG.md` and `.deploy-extras/RELEASE-NOTES.md` (the latter is the body of every
-   workflow's release step).
-3. Tag `version-1.86`; all four workflows build into a **draft** release.
-4. Publish by hand once every asset is attached.
-5. Promote outwards: both snap revisions to `stable` (then drop the "edge while being tested"
-   wording in README/DOWNLOADS), Homebrew cask version + sha256, `Admin/site-atug/`, website
-   download page (`Admin/bitly-releases/bitly.py version-1.86`), README/DOWNLOADS version numbers.
-6. Sanity-check zoom speed on bare metal (mac + a real Linux desktop). A GPU-less VM is the
+1. Promote snap revisions **34** (amd64) and **35** (arm64) from `edge` to `stable` in the store
+   UI, then drop the "edge while being tested" wording in README/DOWNLOADS.
+2. Sanity-check zoom speed on bare metal (mac + a real Linux desktop). A GPU-less VM is the
    worst case for a `PaintDC` canvas and is not evidence of a regression.
+3. Optional tidy: delete the old `pre-*` releases except the most recent.
 
 ## The canvas libraries: ogl2 (frozen) and wxdiagram (future)
 
