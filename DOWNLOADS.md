@@ -24,7 +24,7 @@ Upgrade with plain `brew upgrade`, or `brew upgrade --cask abulka/pynsource/pyns
 > *disabled* since 2026-09-01 because it fails the macOS Gatekeeper check. That is why those
 > commands show a red `disabled` and a Rosetta caveat that have nothing to do with this app.
 
-This build is **Apple silicon only** — Intel Macs are not supported.
+This build is **Apple silicon only** — Intel Macs stop at 1.84, which was the last Intel release. Rosetta does not help: it translates x86 on Apple silicon, not the other way round.
 
 ## macOS — zip download
 
