@@ -15,6 +15,8 @@ activate when sibling packages + license are present.
 - Docs are split deliberately: `README.md` = pitch + install table, `DOWNLOADS.md` = the only
   install/troubleshooting reference (linked from the website), `BUILDING.md` = the only developer
   doc. Do not duplicate build/run/test instructions here — point at BUILDING.md.
+  `Admin/ROADMAP.md` = release status + future milestones (and the ogl2-vs-wxdiagram library
+  split); working plans for a session stay outside the repo.
 - `requirements.txt` — install with `uv pip install -r requirements.txt`.
 - `setup.py` — legacy; reads `.requirement-extras/requirements-linux-22.txt`. Prefer `uv` + running
   from source over `pip install -e .`.
@@ -105,8 +107,10 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   --strict` ("a sealed resource is missing or invalid") even when the build was fine — verify
   from the **release zip** instead, which CI creates before uploading.
 - The spec lives in the **ogl2 repo**: a spec change only reaches CI once it is *pushed* to
-  ogl2's `2026-dustoff`. Use `gh workflow run build-mac.yml --ref 2026-dustoff` (artifact only,
-  no release) to validate a spec change; it is ~1.5 min.
+  ogl2's `master` (frozen at `2026-dustoff`). Use `gh workflow run build-mac.yml --ref master`
+  (artifact only, no release) to validate a spec change; it is ~1.5 min. The spec, the
+  mac/win build scripts and `media/pynsource.icns` must move into this repo before ogl2 is
+  archived — see `Admin/ROADMAP.md`.
 
 ## Deploying (Windows)
 - Route: CI `.github/workflows/build-win.yml` (windows-2022) — same triggers as Mac: a `pre-*`

@@ -2,8 +2,10 @@
 
 *November 2026*
 
-### 1.85
+### 1.86
 
+- First stable release since 1.84 (2022) - supersedes the 1.85 beta series, which is no longer
+  the current version
 - Revived with Python 3.13 and wxPython 4.3, isolated `uv` venv (`uv venv --python 3.13`, `uv pip install -r requirements.txt`)
 - Dropped Python 2 parsing (typed_ast is end-of-life, no builds for Python 3.11+)
 - Removed redundant File/Python 3 mode menu - always Python 3 now
