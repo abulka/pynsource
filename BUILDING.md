@@ -107,9 +107,10 @@ so this pulls the whole Linux dev set — pytest, black, py2app and friends. Fin
 
 Release status, the promotion checklist and future milestones live in `Admin/ROADMAP.md`.
 
-Every artefact is built by CI from a **`pre-*` tag** (draft → published by hand) or from a manual
-dispatch (artifact only). `.deploy-extras/RELEASE-NOTES.md` is the shared release body, so it does
-not matter which job finishes last.
+Every artefact is built by CI from a **`pre-*` or `version-*` tag** — the tag creates (or adds to)
+one draft release, which is published by hand — or from a manual dispatch (artifact only).
+`.deploy-extras/RELEASE-NOTES.md` is the shared release body, so it does not matter which job
+finishes last.
 
 | workflow | runner | artefact |
 |---|---|---|

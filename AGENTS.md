@@ -70,8 +70,9 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   Community (no license embedded); the atug download page sells Pro.
 
 ## Deploying (Mac)
-- Only supported route: CI `.github/workflows/build-mac.yml` — a `pre-*` tag builds a draft
-  pre-release (+ artifact), manual dispatch gives an artifact only.
+- Only supported route: CI `.github/workflows/build-mac.yml` — a `pre-*` or `version-*` tag builds
+  a draft release (+ artifact), manual dispatch gives an artifact only. `macos-14` is retired:
+  the runner is `macos-15`.
 - The build **must** use uv's python-build-standalone, never `actions/setup-python`: a
   framework Python plus wxasync's macOS loop freezes the canvas for the whole duration of a
   mouse drag. Full write-up: `Admin/BUG-DIST-SLOWNESS-MAC.md`. The workflow prints
@@ -114,8 +115,8 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   archived — see `Admin/ROADMAP.md`.
 
 ## Deploying (Windows)
-- Route: CI `.github/workflows/build-win.yml` (windows-2022) — same triggers as Mac: a `pre-*`
-  tag adds `pynsource-win-<tag>-setup.exe` to the draft pre-release, manual dispatch gives an
+- Route: CI `.github/workflows/build-win.yml` (windows-2022) — same triggers as Mac: a
+  `pre-*`/`version-*` tag adds `pynsource-win-<tag>-setup.exe` to the draft pre-release, manual dispatch gives an
   artifact only. Both Mac and Windows workflows append to the *same* draft release for a tag;
   Mac finishes first (~1 min vs ~2.5 min), so action-gh-release always finds an existing draft
   and updates it (verified on `pre-2026-dustoff-4`). If the two runs create a draft
@@ -198,8 +199,8 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   `APPIMAGE_EXTRACT_AND_RUN=1` and the guard uses `--appimage-extract`.
 
 ## Deploying (Snap)
-- Route: CI `.github/workflows/build-snap.yml` → `.snap` artifact; on `pre-*` tags it also
-  `snapcraft upload ... --release edge`. **Stable is promoted by hand in the store UI** after a
+- Route: CI `.github/workflows/build-snap.yml` → `.snap` artifact; on `pre-*` and `version-*`
+  tags it also `snapcraft upload ... --release edge`. **Stable is promoted by hand in the store UI** after a
   snap has actually been installed and run.
 - The workflow was dead for two years: `actions/upload-artifact@v3` is retired, and GitHub
   rejects the whole run before any step executes ("automatically failed because it uses a
