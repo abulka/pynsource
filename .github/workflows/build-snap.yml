@@ -8,8 +8,8 @@
 # machinery, no third-party action to fall out of date, and the runner image matches the
 # base (ubuntu-24.04 <-> core24).
 #
-# Channel policy (see the plan): edge only, on pre-* tags. Stable is promoted by hand in the
-# store UI after a snap has actually been installed and run.
+# Channel policy: CI always uploads to edge, for both pre-* and version-* tags. Stable is
+# promoted by hand in the store UI after a snap has actually been installed and run.
 #
 # The edge upload needs the SNAPCRAFT_STORE_CREDENTIALS secret, which is an *exported login*
 # with an expiry date. When it lapses the build and the install test still pass and only this
@@ -19,7 +19,7 @@
 name: Pynsource Snap
 on:
   push:
-    tags: ['pre-*']
+    tags: ['pre-*', 'version-*']
 
   workflow_dispatch:
 
@@ -131,7 +131,7 @@ jobs:
         fi
 
     - name: Push to edge
-      if: startsWith(github.ref, 'refs/tags/pre-')
+      if: startsWith(github.ref, 'refs/tags/')
       env:
         SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.snapcraft_store_credentials }}
       run: snapcraft upload *.snap --release edge

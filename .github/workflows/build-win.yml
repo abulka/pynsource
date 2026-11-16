@@ -2,7 +2,7 @@
 # (Plan lives outside the repo in /Users/andy/.opencode/plan - pro/free build
 # details stay private.)
 #
-# Triggers on pre-* tags + manual dispatch. Mirrors build-mac.yml deliberately:
+# Triggers on pre-* and version-* tags + manual dispatch. Mirrors build-mac.yml deliberately:
 # uv python-build-standalone (not actions/setup-python), sibling checkouts from their
 # default branches, onedir bundle, artifact + draft pre-release.
 #
@@ -20,7 +20,7 @@
 name: Pynsource app built on Windows
 on:
   push:
-    tags: ['pre-*']
+    tags: ['pre-*', 'version-*']
   workflow_dispatch:
 
 jobs:
@@ -187,8 +187,8 @@ jobs:
         name: pynsource-win-${{ env.TAG }}
         path: pynsource/dist-inno/
 
-    - name: Draft pre-release
-      if: startsWith(env.TAG, 'pre-')
+    - name: Draft release (published by hand)
+      if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
