@@ -20,7 +20,7 @@ Name: {group}\Changelog; Filename: {app}\Changelog.txt
 [Setup]
 AppCopyright=Andy Bulka
 AppName=Pynsource
-AppVersion=1.85
+AppVersion=1.86
 DefaultDirName={commonpf}\Pynsource
 ShowLanguageDialog=yes
 AppPublisher=Andy Bulka - WWare
@@ -28,10 +28,10 @@ AppPublisherURL=http://www.pynsource.com
 UninstallDisplayIcon={app}\Pynsource.exe
 UninstallDisplayName=Pynsource
 DefaultGroupName=Pynsource
-VersionInfoVersion=1.85
+VersionInfoVersion=1.86
 ; cwd seems to be the location of THIS file, so relative links get us back to pynsource/
 OutputDir=..\dist-inno\
-OutputBaseFilename=pynsource-win-1.85-setup
+OutputBaseFilename=pynsource-win-1.86-setup
 ; x64compatible (Inno Setup 6.3+) rather than the deprecated x64: it also installs on
 ; ARM64 Windows, where the x64 build runs under emulation. CI gets Inno 6 via choco.
 ArchitecturesInstallIn64BitMode=x64compatible
