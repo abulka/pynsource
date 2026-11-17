@@ -32,6 +32,7 @@
   through the same canvas flags
 - Canvas repaints use buffered painting, and macOS trackpad scrolling/panning is no longer
   over-sensitive (wxdiagram now uses wxOSX's precise deltas instead of scaling them by 20)
+- wxdiagram connectors gained edge labels and label hit-testing (available to pynsource lines)
 - Zoom-to-fit and the canvas scroll range now include imported images, so a resized image can
   always be scrolled to (previously its far edges were outside the scrollable area)
 - Content at negative diagram coordinates is now scrollable and framed by zoom-to-fit, so a
