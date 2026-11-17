@@ -67,6 +67,11 @@ class UmlLineShape(UmlShapeHandler, LineShapeUml):
 
 
 class UmlCanvas(wxdiagram.ShapeCanvas):
+    #: Use wx.AutoBufferedPaintDC (with BG_STYLE_PAINT) to smooth repaints while
+    #: dragging.  Must be a class attribute: ShapeCanvas.__init__ configures the
+    #: background style from it.
+    bufferedPainting = True
+
     def __init__(self, parent, log, frame):
         wxdiagram.ShapeCanvas.__init__(self, parent)
 
