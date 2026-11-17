@@ -130,6 +130,11 @@ Things that bite, in order of how much time they cost when forgotten:
   symlinks are followed and the payload is stored twice (83 MB instead of 35 MB).
 - **Set the macOS bundle version in the spec** (`version=APP_VERSION` on `BUNDLE`) — without it
   Finder's *Get Info* shows `0.0.0`.
+- **macOS window activation is frozen-only on purpose.** `MainApp.OnInit` raises the frame and,
+  in a frozen build only, activates its own `.app` with `open -a <path>`. Do not replace this
+  with `osascript -e 'tell application "Pynsource" to activate'`: AppleScript resolves the app by
+  name and launches an installed copy (it started 1.86 during a source run of 1.87). See the
+  macOS section of [AGENTS.md](AGENTS.md) for the full note.
 - **Homebrew tap** `abulka/homebrew-pynsource`: bump `version` and `sha256` in
   `Casks/pynsource.rb` per release, and move its `url` to the `version-#{version}` pattern at the
   next stable tag. Verify with a real `brew upgrade` — that also checks the sha.

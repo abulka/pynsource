@@ -89,6 +89,17 @@ Zoom, pan, drag-to-connect, resize and layout are free.
   (twice) — see `.deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt`, which is also the
   draft release body. No helper script ships any more (an unsigned `.command` just added a
   second identical block).
+- **macOS window activation is a deliberate frozen-only workaround.** An ad-hoc-signed `.app`
+  launched from Finder can open behind Terminal/Finder, and `wx.Frame.Raise()` only raises the
+  window *inside* the app. `MainApp.OnInit` therefore always calls `self.frame.Raise()`, and in a
+  frozen build only runs `open -a <this .app>` to activate the bundle **by path**.
+  Do **not** replace it with
+  `osascript -e 'tell application "Pynsource" to activate'`: AppleScript resolves the app by
+  name through LaunchServices and launches it if it is not running. That is what made a source
+  run of 1.87 start the separately installed 1.86 app alongside it. Source runs must skip the
+  native activation entirely. Original workaround: commit `37ee7da` (1.86). If a future macOS
+  stops opening the bundle behind other windows, test from Finder and then remove the
+  frozen-only block.
 - Users who use Homebrew get a prompt-free install via the separate tap
   `abulka/homebrew-pynsource` (`brew install --cask abulka/pynsource/pynsource`). Homebrew
   quarantines every cask download and Homebrew 7 has no `--no-quarantine`, so the cask does
