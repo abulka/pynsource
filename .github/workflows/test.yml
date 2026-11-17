@@ -71,6 +71,9 @@ jobs:
           uv pip install --python "$PY" -e alsm/ -e pynsource-rego/
 
       - name: Run unit tests
+        # Windows consoles default to cp1252; some parser tests print unicode.
+        env:
+          PYTHONUTF8: "1"
         run: |
           mkdir -p src/tests/logs
           PY=.venv/bin/python
