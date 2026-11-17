@@ -30,6 +30,8 @@
 - Dragging snaps to other shapes' edges and centres with alignment guides (wxdiagram's
   `alignmentGuides`, on by default); an optional background grid and snap-to-grid are available
   through the same canvas flags
+- Canvas repaints use buffered painting, and macOS trackpad scrolling/panning is no longer
+  over-sensitive (wxdiagram now uses wxOSX's precise deltas instead of scaling them by 20)
 - Zoom-to-fit and the canvas scroll range now include imported images, so a resized image can
   always be scrolled to (previously its far edges were outside the scrollable area)
 - Content at negative diagram coordinates is now scrollable and framed by zoom-to-fit, so a
