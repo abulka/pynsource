@@ -116,8 +116,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.frame.CreateStatusBar()
 
         """
-        Setting double buffered True solves blurring of shapes as you drag them under wx.ogl and solves the constant
-        flickering of the display due to the constant Refresh() thus paints happening.
+        Setting double buffered True keeps dragging smooth and avoids flicker from the
+        constant Refresh()/paint cycle.
         Its supposed to be true by default, however it is actually false by default on windows!.  Cannot turn off on Mac.
         """
         self.frame.SetDoubleBuffered(True)
