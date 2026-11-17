@@ -214,6 +214,8 @@ class CmdFileImportViaArgs(CmdFileImportBase):
 
 
 class CmdBootStrap(CmdBase):
+    undoable = False
+
     def execute(self):
         self.frame = self.context.frame
         self.app = self.context.wxapp.app
@@ -263,6 +265,9 @@ class CmdBootStrap(CmdBase):
         # bootstrap05()
         bootstrap07()  # <-- good one
         # bootstrap08()
+
+        # The sample is the starting document, not an editable action.
+        self.umlcanvas.clear_undo()
 
         # self.umlcanvas.set_uml_canvas_size((9000,9000))
         # self.context.frame.ShowFullScreen(True)

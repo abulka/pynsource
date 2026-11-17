@@ -36,6 +36,5 @@ class CmdNodeDeleteSelected(CmdNodeDeleteBase):
     def execute(self):
         """ Delete selected node. """
         selected = [s for s in self.context.umlcanvas.GetDiagram().GetShapeList() if s.Selected()]
-        if selected:
-            shape = selected[0]
+        for shape in selected:
             self.delete_shape(shape)

@@ -929,12 +929,17 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         K_ADD_COMMENT = "F4" if "wxGTK" in wx.PlatformInfo else "Ctrl-2"
         K_ADD_IMAGE = "F5" if "wxGTK" in wx.PlatformInfo else "Ctrl-3"
 
+        Add(menu2, "&Undo", "Ctrl-Z", self.OnUndo, self.OnUndo_update)
+        Add(menu2, "&Redo", "Ctrl-Shift-Z", self.OnRedo, self.OnRedo_update)
+        menu2.AppendSeparator()
         Add(menu2, "&Add Class...", K_ADD_CLASS, self.OnInsertClass, self.uml_only_view_update)
         if ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS:
             Add(menu2, "&Insert Comment...", K_ADD_COMMENT, self.OnInsertComment, self.uml_only_view_update)  # was Shift-I
             Add(menu2, "&Insert Image...", K_ADD_IMAGE, self.OnInsertImage, self.uml_only_view_update)
         menu2.AppendSeparator()
         Add(menu2, "&Duplicate", "Ctrl-D", self.OnDuplicate, self.OnDuplicateNode_update)
+        Add(menu2, "Bring to &Front", "", self.OnBringToFront, self.OnDuplicateNode_update)
+        Add(menu2, "Send to &Back", "", self.OnSendToBack, self.OnDuplicateNode_update)
         menu2.AppendSeparator()
         menu_item_delete_class = Add(
             menu2, "&Delete", "Del", self.OnDeleteNode, self.OnDeleteNode_update
@@ -1593,6 +1598,32 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnDuplicate(self, event):
         self.app.run.CmdDuplicate()
+
+    def OnBringToFront(self, event):
+        self.umlcanvas.bring_to_front()
+        self.umlcanvas.mega_refresh()
+
+    def OnSendToBack(self, event):
+        self.umlcanvas.send_to_back()
+        self.umlcanvas.mega_refresh()
+
+    def OnUndo(self, event):
+        if self.umlcanvas.undo():
+            self.umlcanvas.mega_refresh()
+            self.RefreshAsciiUmlTab()
+            wx.PostEvent(self.frame, RefreshPlantUmlEvent())
+
+    def OnRedo(self, event):
+        if self.umlcanvas.redo():
+            self.umlcanvas.mega_refresh()
+            self.RefreshAsciiUmlTab()
+            wx.PostEvent(self.frame, RefreshPlantUmlEvent())
+
+    def OnUndo_update(self, event):
+        event.Enable(self.viewing_uml_tab and self.umlcanvas.canUndo())
+
+    def OnRedo_update(self, event):
+        event.Enable(self.viewing_uml_tab and self.umlcanvas.canRedo())
 
     def OnEditProperties(self, event):
         from gui.node_edit_multi_purpose import node_edit_multi_purpose

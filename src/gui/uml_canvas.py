@@ -67,8 +67,13 @@ class UmlCanvas(ogl.ShapeCanvas):
         # Pynsource only keeps the layout coordinate mapper.
         self.autoVirtualSize = True
         self.zoomInputEnabled = True
-        self.panOnDrag = True
+        self.panOnDrag = True  # Alt/Space/middle drag; plain drag draws a marquee
+        self.emptyDragMode = self.EMPTY_DRAG_MARQUEE
         self.zoomAnchor = self.ZOOM_ANCHOR_SELECTION  # shape if selected, else mouse
+        # Ctrl+D/Ctrl+Z are pynsource menu commands (graph-aware); don't also
+        # apply the library's shape-only versions.
+        self.duplicateKeyEnabled = False
+        self.undoKeyBindings = False
 
         # self.observers = multicast()  # not used anymore, but see app.py to resurrect
 
@@ -586,6 +591,19 @@ class UmlCanvas(ogl.ShapeCanvas):
             """
             wx.SafeYield()
 
+    def nudge_selected(self, dx, dy):
+        # Wrap super() so the graph nodes are synced before the undo snapshot is
+        # compared; otherwise arrow-key nudges would not be undoable.
+        self.begin_undo()
+        try:
+            super().nudge_selected(dx, dy)
+            for shape in self.getSelectedShapes():
+                node = getattr(shape, "node", None)
+                if node is not None:
+                    node.left, node.top = getpos(shape)
+        finally:
+            self.commit_undo()
+
     def getContentBounds(self):
         """Fit-to-window should consider UML boxes and comments, not lines or images."""
         maxx = maxy = 0
@@ -594,6 +612,130 @@ class UmlCanvas(ogl.ShapeCanvas):
             maxx = max(maxx, shape.GetX() + width / 2)
             maxy = max(maxy, shape.GetY() + height / 2)
         return maxx, maxy
+
+    # --- Undo/redo snapshots (graph-aware) ---------------------------------
+
+    def snapshot_state(self):
+        """Snapshot the graph model, node colours and non-node shapes."""
+        if self.displaymodel is None or self.displaymodel.graph is None:
+            return super().snapshot_state()
+        graph = self.displaymodel.graph
+        nodes = []
+        for node in graph.nodes:
+            nodes.append(
+                {
+                    "type": type(node).__name__,
+                    "id": node.id,
+                    "left": node.left,
+                    "top": node.top,
+                    "width": node.width,
+                    "height": node.height,
+                    "attrs": list(getattr(node, "attrs", [])),
+                    "meths": list(getattr(node, "meths", [])),
+                    "comment": getattr(node, "comment", None),
+                    "colour_index": getattr(node, "colour_index", None),
+                    "brush": (
+                        tuple(node.shape._brush.Colour.Get(False))
+                        if getattr(node, "shape", None) is not None
+                        and getattr(node.shape, "_brush", None) is not None
+                        else None
+                    ),
+                }
+            )
+        edges = []
+        for edge in graph.edges:
+            edges.append(
+                {
+                    "source": edge["source"].id,
+                    "target": edge["target"].id,
+                    "uml_edge_type": edge.get("uml_edge_type", "association"),
+                    "weight": edge.get("weight"),
+                }
+            )
+        extra_shapes = []
+        for shape in self.GetDiagram().GetShapeList():
+            # UML shapes are rebuilt from graph nodes; keep images/other extras.
+            if not hasattr(shape, "node") and getattr(shape, "_from", None) is None:
+                extra_shapes.append((shape, tuple(shape.x), tuple(shape.y), shape.IsShown()))
+        order = tuple(self._shape_key(shape) for shape in self.GetDiagram().GetShapeList())
+        return {
+            "nodes": nodes,
+            "edges": edges,
+            "shapes": extra_shapes,
+            "order": order,
+        }
+
+    def _shape_key(self, shape):
+        node = getattr(shape, "node", None)
+        if node is not None:
+            return ("node", node.id)
+        if self.displaymodel is not None:
+            for index, edge in enumerate(self.displaymodel.graph.edges):
+                if edge.get("shape") is shape:
+                    return ("edge", index)
+        return ("shape", id(shape))
+
+    def restore_state(self, snapshot):
+        if not snapshot or "nodes" not in snapshot:
+            super().restore_state(snapshot)
+            return
+        self._restoring_state = True
+        try:
+            self.Clear()
+            dm = self.displaymodel
+            for data in snapshot["nodes"]:
+                node_type = data["type"]
+                if node_type == "CommentNode":
+                    node = dm.AddCommentNode(data["id"], data.get("comment") or "")
+                elif node_type == "UmlModuleNode":
+                    node = dm.AddUmlModuleNode(
+                        data["id"], list(data.get("attrs", [])), list(data.get("meths", []))
+                    )
+                else:
+                    node = dm.AddUmlNode(
+                        data["id"], list(data.get("attrs", [])), list(data.get("meths", []))
+                    )
+                node.left = data["left"]
+                node.top = data["top"]
+                node.width = data["width"]
+                node.height = data["height"]
+                if data.get("colour_index") is not None:
+                    node.colour_index = data["colour_index"]
+
+            for data in snapshot["edges"]:
+                source = dm.graph.FindNodeById(data["source"])
+                target = dm.graph.FindNodeById(data["target"])
+                if source and target:
+                    edge = dm.graph.AddEdge(source, target, data.get("weight"))
+                    edge["uml_edge_type"] = data.get("uml_edge_type", "association")
+
+            dm.build_view(translatecoords=False)
+
+            # Restore the exact fill colours (colour_index alone does not cover
+            # CmdCycleColours, which only changes the shape brush).
+            for data in snapshot["nodes"]:
+                node = dm.graph.FindNodeById(data["id"])
+                if node is not None and node.shape is not None and data.get("brush"):
+                    node.shape.SetBrush(wx.Brush(wx.Colour(*data["brush"])))
+
+            for shape, x, y, shown in snapshot.get("shapes", []):
+                if shape not in self.GetDiagram().GetShapeList():
+                    self.GetDiagram().AddShape(shape)
+                shape.x = list(x)
+                shape.y = list(y)
+                shape.SetCanvas(self)
+                shape.Show(shown)
+
+            order = {
+                key: index for index, key in enumerate(snapshot.get("order", ()))
+            }
+            self.GetDiagram().shapes.sort(
+                key=lambda shape: order.get(self._shape_key(shape), len(order))
+            )
+
+            self.mega_refresh()
+        finally:
+            self._restoring_state = False
 
     def mega_from_blackboard(self):
         MAX_SNAPSHOTS_TO_ANIMATE = 1

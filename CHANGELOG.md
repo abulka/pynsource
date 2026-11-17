@@ -11,6 +11,9 @@
   duplicated `CanvasResizer`/zoom code is gone
 - Smoother trackpad scrolling and panning (20px per wheel notch, fractional accumulation,
   3px pan threshold)
+- Marquee selection (plain drag on empty canvas), Shift/Ctrl add, Esc clear, arrow-key nudge
+- Undo/redo for editing commands and canvas drags, plus Bring to Front / Send to Back
+- Plain drag on empty canvas now marquees; use Alt/Space/middle-drag or the trackpad to pan
 - **Pro is now module visualisation only** (ALSM), still free on Linux
 - Simplified settings and canvas code: one canvas path, one coordinate convention, and the
   `Move2` monkeypatch replaced by `Shape.MoveTo`

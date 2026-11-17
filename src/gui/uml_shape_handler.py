@@ -51,8 +51,19 @@ class UmlShapeHandlerOglTwo(ogl.ShapeEvtHandler):
     def _SelectNodeNow(self, event):
         # print("_SelectNodeNow", self)
         shape = self
-        self.GetCanvas().SelectNodeNow(shape)  # usually no need, but need for r.click
-        self.GetCanvas().UpdateStatusBar(shape=self)
+        canvas = self.GetCanvas()
+        shift = event is not None and (
+            getattr(event, "ShiftDown", lambda: False)()
+            or getattr(event, "ControlDown", lambda: False)()
+            or getattr(event, "CmdDown", lambda: False)()
+        )
+        if shift and shape.Selected():
+            # Shift-click/up is additive; keep the rest of the multi-selection.
+            canvas.UpdateStatusBar(shape=shape)
+            self.focus_shape()
+            return
+        canvas.SelectNodeNow(shape)  # usually no need, but need for r.click
+        canvas.UpdateStatusBar(shape=shape)
         self.focus_shape()
 
     def _post_move_or_resize(self, event, shape):
