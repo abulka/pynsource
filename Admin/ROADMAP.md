@@ -49,8 +49,10 @@ The vendored classic OGL copy (`src/ogl/`) and the `ogl2` sibling are no longer 
 PyInstaller spec, mac/win build scripts and `.icns` icon now live in this repo (`bin/`,
 `src/media/`), so a build change no longer needs a push to another repo.
 
-The diagram is free: zoom, pan, drag-to-connect, resize and layout are not gated. `PRO_EDITION`
-only gates **module visualisation** (ALSM) on macOS/Windows; it is free on Linux builds.
+The diagram is free: zoom, pan, pinch, drag-to-connect, resize and layout are not gated.
+`wxdiagram` owns the viewport (zoom, Ctrl+wheel, pinch, drag-to-pan, virtual size); pynsource
+keeps only `coordmapper` for layout/world coordinates. `PRO_EDITION` only gates **module
+visualisation** (ALSM) on macOS/Windows; it is free on Linux builds.
 
 ## Milestones
 

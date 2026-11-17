@@ -604,9 +604,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
             # print("GetClientSize()", self.umlcanvas.GetClientSize(), wx.ClientDisplayRect(), wx.DisplaySize())
 
-            # self.umlcanvas.canvas_resizer.frame_calibration()  # do I really need this anymore?
-
-            self.umlcanvas.fix_scrollbars()
+            self.umlcanvas.update_virtual_size()
 
         event.Skip()
 
@@ -1089,7 +1087,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnZoomIn(self, event):
         if self.viewing_uml_tab:
-            self.umlcanvas.zoom_in()
+            self.umlcanvas.ZoomIn()
         elif self.viewing_asciiart_tab:
             self.ascii_art_zoom(direction=1, amount=2)  # little bit stronger zoom when via menu
         elif self.viewing_plantuml_tab:
@@ -1097,7 +1095,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnZoomOut(self, event):
         if self.viewing_uml_tab:
-            self.umlcanvas.zoom_out()
+            self.umlcanvas.ZoomOut()
         elif self.viewing_asciiart_tab:
             self.ascii_art_zoom(direction=-1, amount=2)
         elif self.viewing_plantuml_tab:
@@ -1105,7 +1103,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnZoomToFit(self, event):
         if self.viewing_uml_tab:
-            self.umlcanvas.zoom_to_fit()
+            self.umlcanvas.ZoomToFit()
         elif self.viewing_asciiart_tab:
             self.ascii_art_zoom(reset=True)
         elif self.viewing_plantuml_tab:
@@ -1113,7 +1111,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnZoomReset(self, event):
         if self.viewing_uml_tab:
-            self.umlcanvas.zoom_reset()
+            self.umlcanvas.ZoomReset()
         elif self.viewing_asciiart_tab:
             self.ascii_art_zoom(reset=True)
         elif self.viewing_plantuml_tab:

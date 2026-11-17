@@ -52,6 +52,12 @@ All live in `/Users/andy/Devel/pynsource-project/` and install editable into `.v
   keep `alsm/python/python_ast.py` in sync with `src/parsing/core_parser_ast.py` re typed_ast handling.
   Install: `uv pip install -e ../alsm`. (Its `typed-ast` pin was removed 2026-11.)
 
+## Viewport ownership
+`wxdiagram` owns zoom (`scalex/scaley`), Ctrl+wheel, macOS pinch, drag-to-pan and the
+canvas virtual size. `UmlCanvas` only supplies `getContentBounds()` (UML boxes and comments,
+not edges) and keeps `coordmapper` for layout/world-coordinate mapping. Do not reintroduce a
+second `CanvasResizer`/`_zoom` implementation in pynsource.
+
 ## Free canvas vs Pro module visualisation
 There is one canvas on every platform and edition: `wxdiagram` via `src/gui/uml_canvas.py`.
 Zoom, pan, drag-to-connect, resize and layout are free.

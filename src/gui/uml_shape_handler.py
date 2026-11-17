@@ -1,7 +1,7 @@
 import wx
 import wxdiagram as ogl
 
-from .coord_utils import setpos, getpos, ZoomInfo
+from .coord_utils import setpos, getpos
 from gui.shape_menu_mgr import ShapeMenuMgr
 from gui.node_edit_multi_purpose import node_edit_multi_purpose
 from typing import List, Set, Dict, Tuple, Optional
@@ -62,9 +62,7 @@ class UmlShapeHandlerOglTwo(ogl.ShapeEvtHandler):
         canvas.UpdateStatusBar(shape)  # was on shape event handler, now on canvas
         if not shift:
             canvas.remove_overlaps()
-        canvas.canvas_resizer.resize_virtual_canvas_tofit_bounds(bounds_dirty=True,
-                                                                 zoom_info=ZoomInfo(
-                                                                     scale=canvas.scalex))
+        canvas.update_virtual_size()
         # Invoke overlap removal (unless hold down shift key).
         # Also allows multiple shapes to be moved at the same time.
         if not shift:

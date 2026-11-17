@@ -674,6 +674,6 @@ class CmdInsertSingleLine(CmdFileLoadWorkspaceBase):
         umlcanvas.Refresh()
 
         umlcanvas.select(line)
-        umlcanvas.zoom_in()
-        umlcanvas.zoom_in()
-        umlcanvas.zoom_in()
+        umlcanvas.ZoomIn()
+        umlcanvas.ZoomIn()
+        umlcanvas.ZoomIn()

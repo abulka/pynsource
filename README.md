@@ -33,7 +33,7 @@ Building from source: **[BUILDING.md](BUILDING.md)**.
 - Type annotation support
 - Layout algorithm, and a toggle between UML, ASCII-art UML and PlantUML views
 - Automatically colours sibling subclasses to make inheritance easier to follow
-- Zoom, pan and zoom-to-fit; drag-and-drop to connect shapes
+- Zoom, pan, pinch-to-zoom (macOS trackpads) and zoom-to-fit; drag-and-drop to connect shapes
 - Faster (re)layout, and access to the generated PlantUML markup
 - Print and print preview
 - Runs on macOS, Windows and Linux

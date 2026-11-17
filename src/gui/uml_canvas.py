@@ -1,12 +1,11 @@
 from view.display_model import DisplayModel
 from view.display_model import CommentNode
 from .uml_shapes import *
-from .coord_utils import setpos, getpos, ZoomInfo
+from .coord_utils import setpos, getpos
 from layout.snapshots import GraphSnapshotMgr
 from layout.layout_spring import GraphLayoutSpring
 from layout.overlap_removal import OverlapRemoval
 from layout.coordinate_mapper import CoordinateMapper
-from .canvas_resizer import CanvasResizer
 from common.architecture_support import *
 from gui.shape_menu_mgr import MENU_ID_CANCEL_LINE
 import time
@@ -64,18 +63,18 @@ class UmlCanvas(ogl.ShapeCanvas):
     def __init__(self, parent, log, frame):
         ogl.ShapeCanvas.__init__(self, parent)
 
-        # Pynsource owns scrollbar/virtual-size management (CanvasResizer) and
-        # handles the mouse wheel itself (Shift+wheel expands/contracts layout).
-        self.autoVirtualSize = False
-        self.zoomInputEnabled = False
-        self.panOnDrag = False
+        # wxdiagram owns zoom, pinch, drag-to-pan and the virtual size.
+        # Pynsource only keeps the layout coordinate mapper.
+        self.autoVirtualSize = True
+        self.zoomInputEnabled = True
+        self.panOnDrag = True
+        self.zoomAnchor = self.ZOOM_ANCHOR_SELECTION  # shape if selected, else mouse
 
         # self.observers = multicast()  # not used anymore, but see app.py to resurrect
 
         self.app = None  # assigned later by app boot
 
         # set below
-        self.canvas_resizer = None
         self.displaymodel = None
         self.layout = None
 
@@ -88,7 +87,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.GetDiagram().SetCanvas(self)
 
         self.Bind(wx.EVT_WINDOW_DESTROY, self.OnDestroy)
-        self.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom)
         self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
         self.Bind(wx.EVT_CHAR, self.onKeyChar)
 
@@ -117,16 +115,6 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def InitSizeAndObjs(self):
         # Only call this once enclosing frame has been set up, so that get correct world coord dimensions
-
-        self.canvas_resizer = CanvasResizer(canvas=self)
-
-        # Don't assert canvas size sanity anymore as wxpython3 (phoenix) doesn't set canvas size
-        # as quickly as wxpython2.8 does, even though frame has been sized and shown
-        # with frame.SetSize(WINDOW_SIZE) and frame.Show(True)
-        # In wxpython3 (phoenix) canvas stays at (20,20) despite the frame increasing in size to (1024,768)
-        # but good ole wxpython2.8 does indeed change canvas size immediately to (1024,768)
-        #
-        # assert not self.canvas_resizer.canvas_too_small(), "InitSizeAndObjs being called too early - please set up enclosing frame size first"
 
         self.displaymodel = DisplayModel(self)
         self.snapshot_mgr = GraphSnapshotMgr(graph=self.displaymodel.graph, umlcanvas=self)
@@ -172,6 +160,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         )  # Clears screen - don't prepare the dc or it will only clear the top scrolled bit (see my mailing list discussion)
 
         self.displaymodel.Clear()
+        self.update_virtual_size()
 
         if "wxMac" in wx.PlatformInfo:  # Hack on Mac so that onKeyChar bindings take hold properly.
             wx.CallAfter(self.SetFocus)
@@ -523,7 +512,7 @@ class UmlCanvas(ogl.ShapeCanvas):
             CmdLayoutExpandContractBase,
             CmdInsertUmlClass
             umlcanvas.NewEdgeMarkTo
-            umlcanvas.OnWheelZoom_OverlapRemoval_Defunct
+            umlcanvas.OnMouseWheel
             LayoutBlackboard.LayoutThenPickBestScale
             LayoutBlackboard.Experiment1
             LayoutBlackboard.LayoutLoopTillNoChange
@@ -580,9 +569,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         # self.Update()
 
         if auto_resize_canvas:
-            zoom_info = self.prepare_zoom_info()
-            self.canvas_resizer.resize_virtual_canvas_tofit_bounds(bounds_dirty=True,
-                                                                   zoom_info=zoom_info)
+            self.update_virtual_size()
 
         # This cures so many phoenix refresh issues that I'm throwing it in here for fun too.
         # self.extra_refresh()
@@ -599,14 +586,14 @@ class UmlCanvas(ogl.ShapeCanvas):
             """
             wx.SafeYield()
 
-    def prepare_zoom_info(self, delta=None):
-        return ZoomInfo(scale=self.scalex, delta=delta)
-
     def getContentBounds(self):
         """Fit-to-window should consider UML boxes and comments, not lines or images."""
-        if getattr(self, "canvas_resizer", None) is None:
-            return super().getContentBounds()
-        return self.canvas_resizer.calc_allshapes_bounds()
+        maxx = maxy = 0
+        for shape in self.umlboxshapes:
+            width, height = shape.GetBoundingBoxMax()
+            maxx = max(maxx, shape.GetX() + width / 2)
+            maxy = max(maxy, shape.GetY() + height / 2)
+        return maxx, maxy
 
     def mega_from_blackboard(self):
         MAX_SNAPSHOTS_TO_ANIMATE = 1
@@ -640,9 +627,9 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         Returns: -
         """
-        self.canvas_resizer.frame_calibration(
-            auto_resize_virtualcanvas=False
-        )  # going to do a mega_refresh later so no point changing virt canvas now
+        width, height = self.GetSize()
+        if width >= 200 and height >= 200:
+            self.coordmapper.Recalibrate(self.frame.GetClientSize())
         self.AllToLayoutCoords()
         self.layouter.layout(keep_current_positions=False, optimise=True)
         self.AllToWorldCoords()
@@ -657,7 +644,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         Called by
 
             CmdInsertUmlClass, CmdInsertImage, CmdLayoutExpandContractBase,
-            umlcanvas.OnWheelZoom_OverlapRemoval_Defunct,
+            umlcanvas.OnMouseWheel,
             umlcanvas.layout_and_position_shapes,
             UmlShapeHandlerOglTwo.OnEndDragLeft
             UmlShapeHandlerOglTwo.OnSizingEndDragLeft
@@ -804,55 +791,24 @@ class UmlCanvas(ogl.ShapeCanvas):
         if not consumed:  # avoid forwarding if consumed, otherwise makes an annoying beep on Mac
             event.Skip()  # needed for Linux menu shortcuts to work!
 
-    def OnWheelZoom(self, event):
-        if self.working:
-            print("OnWheelZoom (uml_canvas) - working")
+    def OnMouseWheel(self, event):
+        """Shift+wheel keeps its pynsource meaning: expand/contract the layout.
+
+        Everything else (Ctrl+wheel zoom, plain scrolling) is wxdiagram's.
+        """
+        if event.ShiftDown() and not event.ControlDown():
+            if self.working:
+                return
+            self.working = True
+            try:
+                if event.GetWheelRotation() < 0:
+                    self.app.run.CmdLayoutContract(remove_overlaps=False)
+                else:
+                    self.app.run.CmdLayoutExpand(remove_overlaps=False)
+            finally:
+                self.working = False
             return
-        self.working = True
-
-        # self._report_mouse_position()
-
-        try:
-            if event.ControlDown():
-                # zoom
-                amount = 0.04
-                if event.GetWheelRotation() < 0:
-                    self.zoom_out(amount)
-                else:
-                    self.zoom_in(amount)
-            elif event.ShiftDown():
-                # Layout expansion and contraction
-                if event.GetWheelRotation() < 0:
-                    self.app.run.CmdLayoutContract(remove_overlaps=not event.ShiftDown())
-                else:
-                    self.app.run.CmdLayoutExpand(remove_overlaps=not event.ShiftDown())
-            else:
-                # Normal panning scroll - both vertical and horizontal
-
-                # print(f"OnWheelZoom (uml_canvas) {event} "
-                #       f"GetWheelRotation={event.GetWheelRotation():2} "
-                #       f"GetWheelAxis={event.GetWheelAxis():2} "
-                #       f"self.GetScrollPos(wx.HORIZONTAL)={self.GetScrollPos(wx.HORIZONTAL)} "
-                #       f"self.GetScrollPos(wx.VERTICAL)={self.GetScrollPos(wx.VERTICAL)} "
-                #       f"GetScrollRange(wx.HORIZONTAL)={self.GetScrollRange(wx.HORIZONTAL)} "
-                #       f"GetScrollRange(wx.VERTICAL)={self.GetScrollRange(wx.VERTICAL)}"
-                #       )
-
-                # self.Scroll(0, self.GetScrollRange(wx.VERTICAL))  # force scroll to bottom
-
-                if event.GetWheelAxis() == wx.MOUSE_WHEEL_VERTICAL:
-                    v = event.GetWheelRotation()
-                    if "wxMac" in wx.PlatformInfo:  # natural scrolling - should get from system
-                        v = -v
-                    self.Scroll(self.GetScrollPos(wx.HORIZONTAL),
-                                self.GetScrollPos(wx.VERTICAL) + v)
-                else:
-                    self.Scroll(self.GetScrollPos(wx.HORIZONTAL) + event.GetWheelRotation(),
-                                self.GetScrollPos(wx.VERTICAL))
-        except Exception as e:
-            print(getattr(e, "message", repr(e)))
-        finally:
-            self.working = False
+        super().OnMouseWheel(event)
 
     def _float_point_to_int(self, point: Tuple[float, float]) -> Tuple[int, int]:
         return tuple([int(coord) for coord in point])
@@ -883,146 +839,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         x = (mouse_client_x + scroll_pos_x) / self.scalex
         y = (mouse_client_y + scroll_pos_y) / self.scaley
         return x, y
-
-    def _zoom(self, amount=0.25, set_to_scale=None, reset=False):
-        old_scalex = self.scalex
-        old_scaley = self.scaley
-        if reset:
-            self.scalex = 1.0
-            self.scaley = 1.0
-        elif set_to_scale:
-            self.scalex = self.scaley = set_to_scale
-        else:
-            self.scalex = max(self.scalex + amount, 0.3)
-            self.scaley = max(self.scaley + amount, 0.3)
-        deltax = self.scalex - old_scalex
-        # print("deltax", deltax, "old_scalex", old_scalex, "self.scalex", self.scalex)
-        self.fix_scrollbars(deltax)
-        self.Refresh()
-
-    def zoom_out(self, amount=0.25):
-        self._zoom(-amount)
-
-    def zoom_in(self, amount=0.25):
-        self._zoom(amount)
-
-    def zoom_to_fit(self):
-
-        # def calc1(margin=60):
-        #     # initial attempt at fit to size - deprecated
-        #     from common.printframework import MyPrintout
-        #     printout = MyPrintout(self, self.log)
-        #     shapes_bounds_x, shapes_bounds_y = printout._fit_diagram_to_paper(self.GetSize()[0], self.GetSize()[1])
-        #     client_sizex, client_sizey = self.GetClientSize()
-        #     client_sizex -= margin
-        #     client_sizey -= margin
-        #     return shapes_bounds_x, shapes_bounds_y, client_sizex, client_sizey
-
-        # or
-
-        def calc2(margin=20):
-            # Idea: rather than subtracting from the client window
-            # We can add to the total shape bounds like calc_allshapes_bounds() does with
-            # margin of 20, which seems to work OK.
-            shapes_bounds_x, shapes_bounds_y = self.canvas_resizer.calc_allshapes_bounds()
-            client_sizex, client_sizey = self.GetClientSize()
-            client_sizex -= margin
-            client_sizey -= margin
-            return shapes_bounds_x, shapes_bounds_y, client_sizex, client_sizey
-
-
-        def calc_scale(shapes_bounds_x, shapes_bounds_y, client_sizex, client_sizey, debug=True):
-            ratio_x = client_sizex / shapes_bounds_x
-            ratio_y = client_sizey / shapes_bounds_y
-            ratio = min(ratio_x, ratio_y)
-            # new_scale = ratio / self.scalex
-            new_scale = ratio
-            if debug:
-                print(
-                    f"dBOUNDS {int(shapes_bounds_x)}, {int(shapes_bounds_y)} "
-                    "Scale ", self.scalex,
-                    "New Scale ", new_scale,
-                    " | "
-                    f"GetClientSize {self.GetClientSize()} "
-                    f"ratio {ratio:5.4f} out of ({ratio_x:4.1f}, {ratio_y:3.1f}) | ",
-                    f"DELTA {new_scale - self.scalex:3.1f}")
-            return new_scale
-
-        # def scan(_from, _to, want_value, func):
-        #     # diagnostics - loop up finding successful margins for subtracting off shape bounds
-        #     results = []
-        #     for margin in range(_from, _to):
-        #         shapes_bounds_x, shapes_bounds_y, client_sizex, client_sizey = func(margin)
-        #         new_scale = calc_scale(shapes_bounds_x, shapes_bounds_y, client_sizex, client_sizey, debug=False)
-        #         success = approx_equal(new_scale, want_value, 0.02)
-        #         results.append(success)
-        #     first_success = None
-        #     last_success = None
-        #     for index,success in enumerate(results):
-        #         if success and first_success is None:
-        #             first_success = index
-        #         if not success and first_success is not None and last_success is None:
-        #             last_success = index
-        #     print(f"scan: {func.__name__} {_from} {_to} wanting {want_value} success range is {first_success}..{last_success}")
-        #
-        # Looping and testing to find best margin factors for algorithms 1 and 2
-        #
-        # sample uml diagram - comment0
-        #
-        # scan(0, 50, want_value=1.2, func=calc1)
-        # scan(0, 50, want_value=1.2, func=calc2)
-        #
-        # sample uml diagram - uml00
-        #
-        # scan(0, 50, want_value=1.6, func=calc1)
-        # scan(0, 50, want_value=1.6, func=calc2)
-        #
-        # sample uml diagram - uml01
-        #
-        # scan(0, 50, want_value=1.9, func=calc1)
-        # scan(0, 50, want_value=1.9, func=calc2)
-        #
-        # Results:
-        """
-        sample uml diagram - comment0
-        scan: calc1 0 50 wanting 1.2 success range is 25..46
-        scan: calc2 0 50 wanting 1.2 success range is 1..23
-
-        sample uml diagram - uml00
-        scan: calc1 0 50 wanting 1.6 success range is None..None
-        scan: calc2 0 50 wanting 1.6 success range is 23..39
-
-        sample uml diagram - uml01
-        scan: calc1 0 50 wanting 1.9 success range is 34..47
-        scan: calc2 0 50 wanting 1.9 success range is 0..9
-
-        Conclusion: use calc2 algorithm, with margin 20 - seems to work OK.
-        """
-
-        shapes_bounds_x, shapes_bounds_y, client_sizex, client_sizey = calc2()
-        new_scale = calc_scale(shapes_bounds_x, shapes_bounds_y, client_sizex, client_sizey, debug=False)
-
-        # Useful assertions when you have a particular zoom to fit scale you want when loading
-        # a particular diagram.  Zoom manually to see what zoom you like and lock it in.  Then see
-        # if zoom to fit gets anywhere close.
-        #
-        # for uml00
-        # assert approx_equal(new_scale, 1.2, 0.02), f"scale should be about " \
-        #                                           f"1.2 not {new_scale}"
-        #
-        # for comment0
-        # assert approx_equal(new_scale, 1.6, 0.02), f"scale should be about " \
-        #                                           f"1.6 not {new_scale}"
-
-        self._zoom(set_to_scale=new_scale)
-
-    def zoom_reset(self):
-        self._zoom(reset=True)
-
-    def fix_scrollbars(self, deltax=None):
-        zoom_info = self.prepare_zoom_info(delta=deltax)
-        self.canvas_resizer.resize_virtual_canvas_tofit_bounds(bounds_dirty=False,
-                                                               zoom_info=zoom_info)
 
     def _dump_screen_info(self):
         print(" " * 41,
@@ -1074,12 +890,7 @@ class UmlCanvas(ogl.ShapeCanvas):
                 shape.SetCanvas(None)
 
     def CmdTrimScrollbars(self):
-        zoom_info = self.prepare_zoom_info()
-        self.canvas_resizer.resize_virtual_canvas_tofit_bounds(
-            shrinkage_leeway=0,
-            bounds_dirty=True,
-            zoom_info=zoom_info
-        )
+        self.update_virtual_size()
 
     def CmdRememberLayout1(self):
         self.snapshot_mgr.QuickSave(slot=1)
