@@ -288,6 +288,12 @@ class ShapeMenuMgr:
         def add_reset_image_size():
             add_menuitem("Reset Image Size", self.OnResetImageSize)
 
+        def add_arrange():
+            add_menuitem("Bring to Front", self.OnBringToFront)
+            add_menuitem("Bring Forward", self.OnBringForward)
+            add_menuitem("Send Backward", self.OnSendBackward)
+            add_menuitem("Send to Back", self.OnSendToBack)
+
         def add_delete():
             add_menuitem("Delete\tDel", self.OnRightClickDeleteNode)
 
@@ -330,10 +336,10 @@ class ShapeMenuMgr:
             add_edge_types()
             add_cancel()
         else:
-            if not hasattr(shape, "node"):
+            is_bitmap = getattr(shape, "is_bitmap", False)
+            if not is_bitmap and not hasattr(shape, "node"):
                 return
             from_node: GraphNode = self.shapehandler.umlcanvas.new_edge_from
-            is_bitmap = shape.__class__.__name__ == "BitmapShapeResizable"
             if is_bitmap:
                 is_comment = is_umlclass = False
             else:
@@ -347,6 +353,7 @@ class ShapeMenuMgr:
 
             if is_umlclass or is_comment:
                 add_properties()
+                add_arrange()
                 add_separator()
                 if not from_node:
                     add_from()
@@ -367,6 +374,8 @@ class ShapeMenuMgr:
                     pass  # don't offer 'to' menu choices cos haven't started connecting yet
             elif is_bitmap:
                 add_reset_image_size()
+                add_separator()
+                add_arrange()
             else:
                 raise RuntimeError("Right click on unknown shape")
 
@@ -436,6 +445,22 @@ class ShapeMenuMgr:
         # shape.GetCanvas().Refresh(False)   # don't seem to need since SelectNodeNow() might be doing it for us
         shape.GetCanvas().SelectNodeNow(shape)
         self.shapehandler.UpdateStatusBar(shape)
+
+    def _arrange(self, method):
+        method([self.GetShape()])
+        self.shapehandler.umlcanvas.mega_refresh()
+
+    def OnBringToFront(self, event):
+        self._arrange(self.shapehandler.umlcanvas.bring_to_front)
+
+    def OnBringForward(self, event):
+        self._arrange(self.shapehandler.umlcanvas.bring_forward)
+
+    def OnSendBackward(self, event):
+        self._arrange(self.shapehandler.umlcanvas.send_backward)
+
+    def OnSendToBack(self, event):
+        self._arrange(self.shapehandler.umlcanvas.send_to_back)
 
     def OnRightClickDeleteNode(self, event):
         self.shapehandler.umlcanvas.app.run.CmdNodeDelete(self.GetShape())

@@ -183,47 +183,6 @@ class DividedShapeSmall(DividedShape):
         self.GetCanvas().Refresh()
 
 
-class BitmapShapeResizable(ogl.BitmapShape):
-    """Draws a bitmap (andy's attempt at a resizable one)."""
-
-    def __init__(self):
-        ogl.BitmapShape.__init__(self)
-        self._ori_bmp = None  # ANDY ADDED
-
-    def ResetSize(self):  # ANDY ADDED
-        if self._bitmap.IsOk():  # Returns True if bitmap data is present.
-            w = int(self._ori_bmp.GetWidth()) # python 3.10 needs int
-            h = int(self._ori_bmp.GetHeight()) # python 3.10 needs int
-            self.SetSize(w, h)
-
-    def SetSize(self, w, h, recursive=True):
-        if self._bitmap.IsOk():
-
-            # ANDY ADDED
-            if self._bitmap.GetWidth() != w or self._bitmap.GetHeight() != h:
-                img = self._ori_bmp.ConvertToImage()
-                adjusted_img = img.Rescale(int(w), int(h), wx.IMAGE_QUALITY_HIGH) # python 3.10 needs ints
-                bitmap = wx.Bitmap(adjusted_img)
-                self._bitmap = (
-                    bitmap
-                )  # shape.SetBitmap(bitmap)  # don't call SetBitmap() cos it will infinite loop.  Plus don't want to destroy ori bmp info
-            ##########
-
-            w = self._bitmap.GetWidth()
-            h = self._bitmap.GetHeight()
-
-        self.SetAttachmentSize(w, h)
-
-        self._width = w
-        self._height = h
-
-        self.SetDefaultRegionSize()
-
-    def SetBitmap(self, bitmap):  # Override
-        ogl.BitmapShape.SetBitmap(self, bitmap)
-        self._ori_bmp = bitmap  # ANDY ADDED
-
-
 # Comment Shape
 
 # class DiamondShape(ogl.PolygonShape):

@@ -28,7 +28,7 @@ class CmdLayoutExpandContractBase(CmdBase):  # BASE
         coordmapper.AllToWorldCoords()
 
         if self.remove_overlaps:
-            self.context.umlcanvas.remove_overlaps(watch_removals=False)
+            self.context.umlcanvas.remove_overlaps(watch_removals=False, force=True)
         self.context.umlcanvas.mega_refresh()
         self.context.umlcanvas.extra_refresh()
 

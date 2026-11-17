@@ -52,6 +52,12 @@ class CommentShapeOglTwo(UmlShapeHandlerOglTwo, CommentShape, Connectable, Resiz
         self.OnDrawContents(dc)  # need to call explicitly cos not composite?
 
 
+class BitmapShapeOglTwo(UmlShapeHandlerOglTwo, ogl.ResizableBitmapShape):
+    def __init__(self, log, frame, canvas):
+        ogl.ResizableBitmapShape.__init__(self)
+        UmlShapeHandlerOglTwo.__init__(self, log, frame, canvas)
+
+
 class LineShapeUmlOglTwo(UmlShapeHandlerOglTwo, LineShapeUml):
     # Ensure UmlShapeHandlerOglTwo is first so it's methods take priority MRO
 
@@ -75,7 +81,9 @@ class UmlCanvas(ogl.ShapeCanvas):
         # apply the library's shape-only versions.
         self.duplicateKeyEnabled = False
         self.undoKeyBindings = False
+        self.bringClickedShapeToFront = False
         self._suspend_overlap_removal = False
+        self.auto_remove_overlaps = True
 
         # self.observers = multicast()  # not used anymore, but see app.py to resurrect
 
@@ -334,34 +342,18 @@ class UmlCanvas(ogl.ShapeCanvas):
         return shape
 
     def CreateImageShape(self, F):
-        # shape = ogl.BitmapShape()
-        shape = BitmapShapeResizable()
-        img = wx.Image(F, wx.BITMAP_TYPE_ANY)
-
-        # adjusted_img = img.AdjustChannels(factor_red = 1., factor_green = 1., factor_blue = 1., factor_alpha = 0.5)
-        # adjusted_img = img.Rescale(10,10)
-        adjusted_img = img
-
-        bmp = wx.Bitmap(adjusted_img)
-        shape.SetBitmap(bmp)
-
-        self.GetDiagram().AddShape(shape)
-        shape.Show(True)
-
-        evthandler = UmlShapeHandlerOglTwo(
-            self.log, self.frame, self
-        )  # just init the handler with whatever will be convenient for it to know.
-        evthandler.SetShape(shape)
-        evthandler.SetPreviousHandler(shape.GetEventHandler())
-        shape.SetEventHandler(evthandler)
-        # self.new_evthandler_housekeeping(evthandler)
-
-        setpos(shape, 0, 0)
-        # setpos(shape, node.left, node.top)
-        # node.width, node.height = shape.GetBoundingBoxMax()
-        # node.shape = shape
-        # shape.node = node
-        return shape
+        width, height = self.GetClientSize()
+        max_size = (max(200, int(width * 0.7)), max(200, int(height * 0.7)))
+        return self.AddImage(
+            F,
+            max_size=max_size,
+            center=True,
+            send_to_back=True,
+            shape_factory=BitmapShapeOglTwo,
+            log=self.log,
+            frame=self.frame,
+            canvas=self,
+        )
 
     def createNodeShape(self, node):  # FROM SPRING LAYOUT
         shape = ogl.RectangleShape(node.width, node.height)
@@ -777,10 +769,12 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.AllToLayoutCoords()
         self.layouter.layout(keep_current_positions=False, optimise=True)
         self.AllToWorldCoords()
-        if self.remove_overlaps():
+        if self.remove_overlaps(force=True):
             self.mega_refresh()
 
-    def remove_overlaps(self, watch_removals=True):
+    def remove_overlaps(self, watch_removals=True, force=False):
+        if not force and not self.auto_remove_overlaps:
+            return False
         """
         Returns T/F if any overlaps found, so caller can decide whether to
         redraw the screen

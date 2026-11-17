@@ -15,6 +15,11 @@
 - Dragging any shape in a multi-selection moves the whole group
 - Undo/redo for editing commands and canvas drags
 - Duplicate now offsets down and slightly right (deliberately overlapping) and selects the copies
+- Explicit z-order commands (Bring to Front / Forward, Send Backward / to Back) in the Edit menu
+  and shape context menu; click no longer changes z-order
+- Image import is centred, scaled to fit the viewport and sent to the back; resizable image support
+  now comes from wxdiagram
+- Layout menu has an "Auto Remove Overlaps" toggle, persisted in the user config
 - Plain drag on empty canvas now marquees; use Alt/Space/middle-drag or the trackpad to pan
 - **Pro is now module visualisation only** (ALSM), still free on Linux
 - Simplified settings and canvas code: one canvas path, one coordinate convention, and the

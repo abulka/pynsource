@@ -55,7 +55,11 @@ All live in `/Users/andy/Devel/pynsource-project/` and install editable into `.v
 ## Viewport ownership
 `wxdiagram` owns zoom (`scalex/scaley`), Ctrl+wheel, pinch, pan and the canvas virtual size.
 Plain drag on empty canvas is a marquee; Alt/Space/middle-drag pans. Clicking a shape that
-is already selected keeps the multi-selection for a group drag. `UmlCanvas` supplies
+is already selected keeps the multi-selection for a group drag. `bringClickedShapeToFront` is
+off in pynsource; z-order is explicit via the Edit/context menus. Imported images use
+wxdiagram's `AddImage`/`ResizableBitmapShape` (centred, scaled, sent to back). The Layout menu's
+"Auto Remove Overlaps" toggle is persisted as `AutoRemoveOverlaps` in the config; explicit layout
+commands still force overlap removal. `UmlCanvas` supplies
 `getContentBounds()` (UML boxes and comments, not edges), keeps `coordmapper` for
 layout/world-coordinate mapping, and overrides `snapshot_state()`/`restore_state()` so undo
 captures the graph model (nodes, edges, colours, module/comment types) rather than only shapes.

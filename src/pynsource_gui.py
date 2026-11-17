@@ -556,6 +556,12 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             if not self.config.get(key, None):
                 self.config[key] = os.path.expanduser("~/")
 
+        auto = self.config.get("AutoRemoveOverlaps", "True")
+        if isinstance(auto, str):
+            auto = auto.lower() == "true"
+        self.umlcanvas.auto_remove_overlaps = bool(auto)
+        self.config["AutoRemoveOverlaps"] = str(self.umlcanvas.auto_remove_overlaps)
+
         self.config.write()
 
 
@@ -938,6 +944,10 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             Add(menu2, "&Insert Image...", K_ADD_IMAGE, self.OnInsertImage, self.uml_only_view_update)
         menu2.AppendSeparator()
         Add(menu2, "&Duplicate", "Ctrl-D", self.OnDuplicate, self.OnDuplicateNode_update)
+        Add(menu2, "Bring to &Front", "", self.OnBringToFront, self.OnDuplicateNode_update)
+        Add(menu2, "Bring F&orward", "", self.OnBringForward, self.OnDuplicateNode_update)
+        Add(menu2, "Send Back&ward", "", self.OnSendBackward, self.OnDuplicateNode_update)
+        Add(menu2, "Send to &Back", "", self.OnSendToBack, self.OnDuplicateNode_update)
         menu2.AppendSeparator()
         menu_item_delete_class = Add(
             menu2, "&Delete", "Del", self.OnDeleteNode, self.OnDeleteNode_update
@@ -987,6 +997,15 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         AddSubMenu(menu5, menu5sub, "Advanced")
         menu5.AppendSeparator()
         Add(menu5, "&Redraw Screen", "Ctrl-R", self.OnRefreshUmlWindow)
+
+        self.item_auto_overlaps = menu3.AppendCheckItem(
+            wx.NewIdRef(),
+            "Auto Remove Overlaps",
+            "Automatically move overlapping UML boxes apart",
+        )
+        self.item_auto_overlaps.Check(self.umlcanvas.auto_remove_overlaps)
+        self.Bind(wx.EVT_MENU, self.OnToggleAutoOverlaps, self.item_auto_overlaps)
+        menu3.AppendSeparator()
 
         Add(menu3, "&Layout UML", "Ctrl-L", self.OnLayout, self.uml_only_view_update)
         Add(menu3, "&Layout UML Optimally", "Ctrl-B", self.OnDeepLayout, self.uml_only_view_update)
@@ -1596,6 +1615,28 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnDuplicate(self, event):
         self.app.run.CmdDuplicate()
+
+    def OnToggleAutoOverlaps(self, event):
+        enabled = self.item_auto_overlaps.IsChecked()
+        self.umlcanvas.auto_remove_overlaps = enabled
+        self.config["AutoRemoveOverlaps"] = str(enabled)
+        self.config.write()
+
+    def OnBringToFront(self, event):
+        self.umlcanvas.bring_to_front()
+        self.umlcanvas.mega_refresh()
+
+    def OnBringForward(self, event):
+        self.umlcanvas.bring_forward()
+        self.umlcanvas.mega_refresh()
+
+    def OnSendBackward(self, event):
+        self.umlcanvas.send_backward()
+        self.umlcanvas.mega_refresh()
+
+    def OnSendToBack(self, event):
+        self.umlcanvas.send_to_back()
+        self.umlcanvas.mega_refresh()
 
     def OnUndo(self, event):
         if self.umlcanvas.undo():

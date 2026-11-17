@@ -249,7 +249,6 @@ class CmdInsertImage(CmdBase):
 
         if filename:
             self.context.umlcanvas.CreateImageShape(filename)
-            self.context.umlcanvas.remove_overlaps()
             self.context.umlcanvas.mega_refresh()
             # self.SelectNodeNow(node.shape)
 

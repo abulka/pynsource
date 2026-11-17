@@ -9,7 +9,7 @@ class CmdNodeDeleteBase(CmdBase):
         gui = self.context.umlcanvas
 
         # Currently images are not nodes, just shapes, so skip deleting the node
-        if shape.GetShape().__class__.__name__ != "BitmapShapeResizable":
+        if not getattr(shape.GetShape(), "is_bitmap", False):
             displaymodel.delete_node_or_edge_for_shape(shape)
 
         gui.delete_shape_view(shape)
