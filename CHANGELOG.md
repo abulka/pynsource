@@ -32,8 +32,9 @@
   through the same canvas flags
 - Canvas repaints use buffered painting, and macOS trackpad scrolling/panning is no longer
   over-sensitive (wxdiagram now uses wxOSX's precise deltas instead of scaling them by 20)
-- wxdiagram connectors gained edge labels, label hit-testing and opt-in hybrid routing
-  (`LineShape.autoRoute`: straight, curved around boxes, orthogonal fallback, parallel lanes)
+- wxdiagram connectors gained edge labels, label hit-testing and hybrid routing
+  (`autoRoute = "curved"`: free bezier, obstacle detour, orthogonal fallback, parallel lanes);
+  UML edges now use the curved style
 - Zoom-to-fit and the canvas scroll range now include imported images, so a resized image can
   always be scrolled to (previously its far edges were outside the scrollable area)
 - Content at negative diagram coordinates is now scrollable and framed by zoom-to-fit, so a

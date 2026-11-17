@@ -61,6 +61,11 @@ class UmlBitmapShape(UmlShapeHandler, wxdiagram.ResizableBitmapShape):
 class UmlLineShape(UmlShapeHandler, LineShapeUml):
     # Ensure UmlShapeHandler is first so it's methods take priority MRO
 
+    #: Curved UML edges: free bezier when clear, bigger bend / orthogonal lane
+    #: when boxes are in the way.  Set to True for obstacle avoidance only, or
+    #: False for classic straight edges.
+    autoRoute = "curved"
+
     def __init__(self, log, frame, canvas):
         LineShapeUml.__init__(self)
         UmlShapeHandler.__init__(self, log, frame, canvas)
@@ -451,6 +456,7 @@ class UmlCanvas(wxdiagram.ShapeCanvas):
         # print(f"fromShape.AddLine: GetBoundingBoxMax {line.GetBoundingBoxMax()} line getpos() {getpos(line)}")
         self.GetDiagram().AddShape(line)
         line.Show(True)
+        line.UpdateRoute()
 
         # New - add shape handler to lines - should probably add its own custom shape handler
         shape = line
