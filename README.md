@@ -34,7 +34,7 @@ Building from source: **[BUILDING.md](BUILDING.md)**.
 - Layout algorithm, and a toggle between UML, ASCII-art UML and PlantUML views
 - Automatically colours sibling subclasses to make inheritance easier to follow
 - Zoom, pan, pinch-to-zoom (macOS trackpads) and zoom-to-fit; drag-and-drop to connect shapes
-- Marquee selection, multi-select, undo/redo, duplicate and z-order
+- Marquee selection, multi-select, undo/redo and duplicate
 - Faster (re)layout, and access to the generated PlantUML markup
 - Print and print preview
 - Runs on macOS, Windows and Linux

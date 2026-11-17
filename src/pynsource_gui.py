@@ -938,8 +938,6 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             Add(menu2, "&Insert Image...", K_ADD_IMAGE, self.OnInsertImage, self.uml_only_view_update)
         menu2.AppendSeparator()
         Add(menu2, "&Duplicate", "Ctrl-D", self.OnDuplicate, self.OnDuplicateNode_update)
-        Add(menu2, "Bring to &Front", "", self.OnBringToFront, self.OnDuplicateNode_update)
-        Add(menu2, "Send to &Back", "", self.OnSendToBack, self.OnDuplicateNode_update)
         menu2.AppendSeparator()
         menu_item_delete_class = Add(
             menu2, "&Delete", "Del", self.OnDeleteNode, self.OnDeleteNode_update
@@ -1598,14 +1596,6 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnDuplicate(self, event):
         self.app.run.CmdDuplicate()
-
-    def OnBringToFront(self, event):
-        self.umlcanvas.bring_to_front()
-        self.umlcanvas.mega_refresh()
-
-    def OnSendToBack(self, event):
-        self.umlcanvas.send_to_back()
-        self.umlcanvas.mega_refresh()
 
     def OnUndo(self, event):
         if self.umlcanvas.undo():

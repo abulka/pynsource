@@ -272,6 +272,7 @@ class CmdDuplicate(UtilCmdUmlClass):
         displaymodel = self.context.displaymodel
 
         selected = [s for s in umlcanvas.GetDiagram().GetShapeList() if s.Selected()]
+        new_shapes = []
         for shape in selected:
 
             if not hasattr(shape, "node"):
@@ -311,15 +312,21 @@ class CmdDuplicate(UtilCmdUmlClass):
 
             new_node.shape.Show(True)
             umlcanvas.diagram.ChangeShapeOrder(new_node.shape, 9999)
+            new_shapes.append(new_node.shape)
 
             # umlcanvas.remove_overlaps()
             umlcanvas.mega_refresh()
 
+        umlcanvas.deselect()
+        for shape in new_shapes:
+            umlcanvas.select(shape)
+        umlcanvas.mega_refresh()
+
     def adjust_node_position_slightly(self, node, new_node):
-        """Position the new shape slightly below the old one, but the same size"""
-        offsetx = random.randint(2, 20)
-        offsety = random.randint(-int(node.height/3), int(node.height/3))
-        new_node.left = node.left + node.width + offsetx
+        """Place the copy down and a little to the right, deliberately overlapping."""
+        offsetx = random.randint(10, 16)
+        offsety = random.randint(20, 30)
+        new_node.left = node.left + offsetx
         new_node.top = node.top + offsety
         new_node.width = node.width
         new_node.height = node.height

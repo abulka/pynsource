@@ -57,8 +57,9 @@ class UmlShapeHandlerOglTwo(ogl.ShapeEvtHandler):
             or getattr(event, "ControlDown", lambda: False)()
             or getattr(event, "CmdDown", lambda: False)()
         )
-        if shift and shape.Selected():
-            # Shift-click/up is additive; keep the rest of the multi-selection.
+        if shape.Selected() and (shift or len(canvas.getSelectedShapes()) > 1):
+            # Shift-click/up is additive, and clicking one shape of an existing
+            # multi-selection must not collapse it before/after a group drag.
             canvas.UpdateStatusBar(shape=shape)
             self.focus_shape()
             return
@@ -71,12 +72,12 @@ class UmlShapeHandlerOglTwo(ogl.ShapeEvtHandler):
         shift = True if event and event.ShiftDown() else False
 
         canvas.UpdateStatusBar(shape)  # was on shape event handler, now on canvas
-        if not shift:
-            canvas.remove_overlaps()
+        suspended = getattr(canvas, "_suspend_overlap_removal", False)
         canvas.update_virtual_size()
-        # Invoke overlap removal (unless hold down shift key).
-        # Also allows multiple shapes to be moved at the same time.
-        if not shift:
+        # Overlap removal is per-shape normally, but for a multi-shape drag the
+        # canvas runs it once after every node has been updated.
+        if not shift and not suspended:
+            canvas.remove_overlaps()
             canvas.mega_refresh(auto_resize_canvas=False)  # False cos we just did the resize, above
 
     def OnEndDragLeft(self, event):

@@ -12,7 +12,9 @@
 - Smoother trackpad scrolling and panning (20px per wheel notch, fractional accumulation,
   3px pan threshold)
 - Marquee selection (plain drag on empty canvas), Shift/Ctrl add, Esc clear, arrow-key nudge
-- Undo/redo for editing commands and canvas drags, plus Bring to Front / Send to Back
+- Dragging any shape in a multi-selection moves the whole group
+- Undo/redo for editing commands and canvas drags
+- Duplicate now offsets down and slightly right (deliberately overlapping) and selects the copies
 - Plain drag on empty canvas now marquees; use Alt/Space/middle-drag or the trackpad to pan
 - **Pro is now module visualisation only** (ALSM), still free on Linux
 - Simplified settings and canvas code: one canvas path, one coordinate convention, and the

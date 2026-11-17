@@ -17,6 +17,7 @@ from common.approx_equal import approx_equal
 from typing import List, Set, Dict, Tuple, Optional
 import wxdiagram as ogl
 from wxdiagram import Connectable, Resizeable, Selectable, Attributable
+from wxdiagram.geometry import ContinueDraggingLeft
 from .uml_shape_handler import UmlShapeHandlerOglTwo
 from gui.uml_lines import LineShapeUml, ARROW_UML_GENERALISATION, ARROW_UML_COMPOSITION
 
@@ -74,6 +75,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         # apply the library's shape-only versions.
         self.duplicateKeyEnabled = False
         self.undoKeyBindings = False
+        self._suspend_overlap_removal = False
 
         # self.observers = multicast()  # not used anymore, but see app.py to resurrect
 
@@ -814,11 +816,25 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.Delete()
 
     def OnLeftUp(self, event):
-        """The base canvas already deselects shapes on empty clicks."""
-        shape = self.getCurrentShape(event)
-        if shape is None:  # clicked on empty space
-            self.focus_canvas()
-        super().OnLeftUp(event)
+        """The base canvas already deselects shapes on empty clicks.
+
+        A multi-shape drag updates every graph node in the per-shape
+        OnEndDragLeft callbacks; suppress overlap removal until they have all
+        moved, then run it once.
+        """
+        multi_drag = len(self.getSelectedShapes()) > 1 and self._dragState == ContinueDraggingLeft
+        if multi_drag:
+            self._suspend_overlap_removal = True
+        try:
+            shape = self.getCurrentShape(event)
+            if shape is None:  # clicked on empty space
+                self.focus_canvas()
+            super().OnLeftUp(event)
+        finally:
+            self._suspend_overlap_removal = False
+        if multi_drag and not event.ShiftDown():
+            self.remove_overlaps()
+            self.mega_refresh()
 
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()  # http://www.wxpython.org/docs/api/wx.KeyEvent-class.html
