@@ -20,6 +20,7 @@
 - Image import is centred, scaled to fit the viewport and sent to the back; the new image is
   selected and shows resize handles, and resizing works via wxdiagram's ResizableBitmapShape
 - Image resize keeps its selection handles and no longer prints "no node model attached" warnings
+- Quieter startup: the debug `cwd_info` line is no longer printed to the console
 - Layout menu has an "Auto Remove Overlaps" toggle, persisted in the user config
 - Removed the last `*OglTwo` class names (`UmlDividedShape`, `UmlCommentShape`,
   `UmlLineShape`, `UmlBitmapShape`, `UmlShapeHandler`) and the `ogl` import alias

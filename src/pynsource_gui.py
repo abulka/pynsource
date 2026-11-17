@@ -468,7 +468,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         if "SNAP" in os.environ:
             cwd_info['SNAP'] = os.environ["SNAP"]
 
-        print("cwd_info", cwd_info)
+        log.debug("cwd_info %s", cwd_info)
         set_original_working_dir(cwd_info['__file__'])  # more accurate
         self.cwd_info = cwd_info
 
