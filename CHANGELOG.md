@@ -35,8 +35,9 @@
 - wxdiagram connectors gained edge labels, label hit-testing and hybrid routing
   (`autoRoute = "curved"`: free bezier, obstacle detour, orthogonal fallback, parallel lanes);
   UML edges now use the curved style
-- Right-click a line for Edge style: Straight / Curved / Avoid boxes; orthogonal routes now
-  leave along the attachment side instead of cutting across it
+- UML edges default to obstacle avoidance (straight unless a box is in the way); right-click a
+  line for Edge style: Straight / Curved / Avoid boxes.  Orthogonal routes now leave along the
+  attachment side instead of running along it
 - Zoom-to-fit and the canvas scroll range now include imported images, so a resized image can
   always be scrolled to (previously its far edges were outside the scrollable area)
 - Content at negative diagram coordinates is now scrollable and framed by zoom-to-fit, so a

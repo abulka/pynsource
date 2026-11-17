@@ -61,10 +61,10 @@ class UmlBitmapShape(UmlShapeHandler, wxdiagram.ResizableBitmapShape):
 class UmlLineShape(UmlShapeHandler, LineShapeUml):
     # Ensure UmlShapeHandler is first so it's methods take priority MRO
 
-    #: Curved UML edges: free bezier when clear, bigger bend / orthogonal lane
-    #: when boxes are in the way.  Set to True for obstacle avoidance only, or
-    #: False for classic straight edges.
-    autoRoute = "curved"
+    #: Straight edges, improved by obstacle avoidance when a box is in the way.
+    #: Use "curved" for an always-bowed free bezier, or False for classic
+    #: straight edges.  Per-edge overrides are in the right-click menu.
+    autoRoute = True
 
     def __init__(self, log, frame, canvas):
         LineShapeUml.__init__(self)
