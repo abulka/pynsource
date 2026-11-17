@@ -105,7 +105,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.log = Log()
         self.working = False
         self.printData = None
-        wx.InitAllImageHandlers()
+        # wx.App already calls InitAllImageHandlers(); calling it again
+        # logs "Adding duplicate image handler" for every format.
         self.andyapptitle = "Pynsource"
 
         self.args = sys.argv[1:]
