@@ -13,6 +13,8 @@
 - Build assets (PyInstaller spec, mac/win build scripts, `.icns`) moved into this repo
 - Single-instance guard: a second launch shows "Pynsource is already running" instead of
   opening another window (`PYNSOURCE_ALLOW_MULTIPLE=1` opts out)
+- Fixed: on macOS, a source run no longer launches the separately installed Pynsource app
+  through the window-activation `osascript` (that is now frozen-app only)
 - CI now checks out the public `wxdiagram` repo; the branch can be selected when dispatching
 - PlantUML markup/save and ASCII-art zoom are free (previously Pro)
 
