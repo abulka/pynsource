@@ -10,7 +10,7 @@ from gui.uml_lines import LineShape, LineShapeUml
 from textwrap import dedent
 import logging
 from common.logger import config_log
-from gui.uml_canvas import DividedShapeOglTwo as DividedShape
+from gui.uml_canvas import UmlDividedShape as DividedShape
 
 try:
     OPEN = wx.OPEN  # classic

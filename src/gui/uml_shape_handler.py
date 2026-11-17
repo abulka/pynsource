@@ -1,5 +1,5 @@
 import wx
-import wxdiagram as ogl
+import wxdiagram
 
 from .coord_utils import setpos, getpos
 from gui.shape_menu_mgr import ShapeMenuMgr
@@ -7,10 +7,10 @@ from gui.node_edit_multi_purpose import node_edit_multi_purpose
 from typing import List, Set, Dict, Tuple, Optional
 
 
-class UmlShapeHandlerOglTwo(ogl.ShapeEvtHandler):
+class UmlShapeHandler(wxdiagram.ShapeEvtHandler):
 
     def __init__(self, log, frame, shapecanvas):
-        ogl.ShapeEvtHandler.__init__(self)
+        wxdiagram.ShapeEvtHandler.__init__(self)
         self.log = log
         self.frame = frame  # these are arbitrary initialisations
         self.umlcanvas = shapecanvas  # these are arbitrary initialisations
@@ -105,7 +105,7 @@ class UmlShapeHandlerOglTwo(ogl.ShapeEvtHandler):
         canvas = shape.GetCanvas()
 
         # super
-        # ogl.ShapeEvtHandler.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
+        # wxdiagram.ShapeEvtHandler.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
 
         width, height = shape.GetBoundingBoxMin()
         if hasattr(shape, "node"):

@@ -60,7 +60,7 @@ from typing import List, Set, Dict, Tuple, Optional
 import webbrowser
 
 
-import wxdiagram as ogl
+import wxdiagram
 from gui.imageviewer import PynsourceImageViewer as ImageViewer
 
 WINDOW_SIZE = (1024, 768)
@@ -291,7 +291,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.sizer.Add(self.panel_two, 1, wx.EXPAND)
             self.frame.SetSizer(self.sizer)
 
-        ogl.initialize()  # sets up pens, brushes and fonts used by the canvas.
+        wxdiagram.initialize()  # sets up pens, brushes and fonts used by the canvas.
 
         # Set the frame to a good size for showing stuff
         self.frame.SetSize(WINDOW_SIZE)
@@ -1099,7 +1099,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnNewDividedShape(self, event):
         from gui.uml_canvas import DividedShape
-        # i = ogl.DividedShape(100,200)
+        # i = wxdiagram.DividedShape(100,200)
         i = DividedShape(300, 200, self.umlcanvas)
         i.fill = ["AQUAMARINE"]
         i.BuildRegions(self.umlcanvas)  # hmm, why pass in canvas again?!!

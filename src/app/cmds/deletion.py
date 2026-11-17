@@ -15,7 +15,7 @@ class CmdNodeDeleteBase(CmdBase):
         gui.delete_shape_view(shape)
 
         self.context.umlcanvas.extra_refresh()
-        self.context.umlcanvas.Refresh()  # needed for ogltwo
+        self.context.umlcanvas.Refresh()  # needed for wxdiagram
         # self.context.wxapp.RefreshAsciiUmlTab()
 
 
