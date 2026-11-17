@@ -102,6 +102,21 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         self.args = sys.argv[1:]
 
+        # Single-instance guard: a second launch (including the installed app plus
+        # a source run) exits instead of opening another main window.
+        # PYNSOURCE_ALLOW_MULTIPLE=1 opts out.
+        if not os.environ.get("PYNSOURCE_ALLOW_MULTIPLE"):
+            self._instance_checker = wx.SingleInstanceChecker("pynsource-gui")
+            if self._instance_checker.IsAnotherRunning():
+                wx.MessageBox(
+                    "Pynsource is already running.\n\n"
+                    "Quit the other instance before starting a new one.\n"
+                    "(Set PYNSOURCE_ALLOW_MULTIPLE=1 to allow multiple instances.)",
+                    "Pynsource",
+                    wx.OK | wx.ICON_INFORMATION,
+                )
+                return False
+
         self.frame = wx.Frame(
             None,
             -1,

@@ -11,6 +11,8 @@
 - Simplified settings and canvas code: one canvas path, one coordinate convention, and the
   `Move2` monkeypatch replaced by `Shape.MoveTo`
 - Build assets (PyInstaller spec, mac/win build scripts, `.icns`) moved into this repo
+- Single-instance guard: a second launch shows "Pynsource is already running" instead of
+  opening another window (`PYNSOURCE_ALLOW_MULTIPLE=1` opts out)
 - CI now checks out the public `wxdiagram` repo; the branch can be selected when dispatching
 - PlantUML markup/save and ASCII-art zoom are free (previously Pro)
 
