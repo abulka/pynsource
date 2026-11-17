@@ -36,12 +36,12 @@ jobs:
       with:
         path: pynsource/
 
-    - name: Check out ogl2 (private)
+    - name: Check out wxdiagram (public)
       uses: actions/checkout@v3
       with:
-        repository: abulka/ogl2
+        repository: abulka/wxdiagram
         token: ${{ secrets.my_pat }}
-        path: ogl2/
+        path: wxdiagram/
 
     - name: Check out pynsource-rego (private)
       uses: actions/checkout@v3
@@ -63,7 +63,7 @@ jobs:
         ls -l
         ls -l pynsource/
         ls -l pynsource-rego/
-        ls -l ogl2/
+        ls -l wxdiagram/
         ls -l alsm/
 
     - name: Setup Python please
@@ -107,7 +107,7 @@ jobs:
       run: |
         cd pynsource/
         python bin/_buildsamples.py
-        pyinstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
+        pyinstaller --noconfirm bin/pynsource-github-actions.spec
         cp README.md dist/Readme.txt
         cp CHANGELOG.md dist/Changelog.txt
         if [ "$RUNNER_OS" == "macOS" ]; then
@@ -122,7 +122,7 @@ jobs:
         cd pynsource
         echo hi
         dir
-        # iscc ..\ogl2\bin\buildwin_github-actions.iss
+        # iscc .requirement-extras\buildwin_github-actions.iss
         iscc .requirement-extras/buildwin_github-actions.iss
         dir dist-inno
 

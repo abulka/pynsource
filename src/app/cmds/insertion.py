@@ -5,7 +5,6 @@ from dialogs.DialogComment import DialogComment
 from dialogs.DialogUmlNodeEdit import DialogUmlNodeEdit
 from typing import List, Set, Dict, Tuple, Optional
 import copy
-from gui.settings import PRO_EDITION
 
 
 """
@@ -311,8 +310,7 @@ class CmdDuplicate(UtilCmdUmlClass):
 
 
             new_node.shape.Show(True)
-            if PRO_EDITION:
-                umlcanvas.diagram.ChangeShapeOrder(new_node.shape, 9999)
+            umlcanvas.diagram.ChangeShapeOrder(new_node.shape, 9999)
 
             # umlcanvas.remove_overlaps()
             umlcanvas.mega_refresh()

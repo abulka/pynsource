@@ -1,1 +1,79 @@
-../ogl2/bin/buildmac.sh
+#!/usr/bin/env bash
+
+# NOTE: This script is also used to build linux builds by passing a parameter to the script
+
+# Builds a standalone 64 bit pynsource-gui for mac and linux using PyInstaller
+#   - uses pynsource-gui.spec which can be regenerated
+#   - runs from the pynsource root directory (not src/)
+
+if [ $# -eq 0 ]
+  then
+    echo "No arguments supplied, doing mac build"
+    DESTZIP=pynsource-1.999-macosx.zip
+    DESTDIR="/Users/Andy/Dropbox/Pynsource/official releases/1.999 binaries"
+#   ls -l "$DESTDIR"
+  else
+    echo "Parameter detected, going for linux build" $1
+    DESTZIP=pynsource-1.999-ubuntu-$1.zip
+fi
+
+# echo $DESTZIP
+# exit 0
+
+# Need to use a brew python (which is a proper framework installation), not a virtual env
+# On Linux Ubuntu, a proper install is needed, too.
+# Not even a pyenv version of python is good enough for building via py2app or pyinstaller
+# Of course pyenv version ok for running in development mode.
+# Virtualenv python no good for either development mode or deploying (cos of wxpython)
+PYTHON=python3
+# PYTHON=/usr/local/bin/python3
+# PYTHON=/usr/local/Cellar/python/3.7.0/bin/python3
+# PYTHON=/usr/local/Cellar/python/3.7.2/bin/python3
+
+
+$PYTHON bin/_buildsamples.py
+
+pyinstaller --noconfirm bin/pynsource-github-actions.spec
+
+# The resulting .app is a directory structure and is only
+# treated as a single file on a Mac.  So we need to zip it.  Mac users simply unzip
+# and they have their app.  Note we use -r for recursion since the .app is a dir structure.
+# NOTE: corresponding steps need to be added to the github actions workflow file
+cd dist
+cp ../README.md Readme.txt
+
+# NOTE: the build is ONEDIR (COLLECT + BUNDLE), so dist/ contains BOTH:
+#   dist/Pynsource/       the collected payload (exe + Frameworks/Resources) - build input
+#   dist/Pynsource.app    the bundle we actually ship
+# (Onefile was dropped: it unpacked the whole archive to $TMPDIR on every launch, so
+# launch took ~2s even when warm, and PyInstaller 7 rejects onefile + .app outright.)
+
+if [ $# -eq 0 ]
+  then
+    rm -rf Pynsource          # collected payload dir, duplicated inside the .app
+    echo Mac zipping
+    # -y keeps Contents/Resources symlinks as symlinks; without it zip stores the
+    # payload twice (83MB instead of 35MB)
+    zip -r -y "$DESTZIP" Pynsource.app/ Readme.txt IMPORTANT-README-BEFORE-RUNNING.txt
+  else
+    echo Linux zipping
+    # onedir on linux is a directory: dist/Pynsource/{Pynsource,_internal,...}
+    zip -r "$DESTZIP" Pynsource Readme.txt
+fi
+
+cd ..
+echo 'done, building release'
+ls -l dist/$DESTZIP
+
+if [ $# -eq 0 ]
+  then
+    echo 'Mac copying to dropbox releases dir'
+    mkdir -p "$DESTDIR"
+#   cp dist/$DESTZIP "$DESTDIR"
+#   ls -l "$DESTDIR"
+#   echo 'Mac - copied for you ok'
+    echo 'NOT copied to dropbox anymore - look in dist/ directory instead 🔖'
+  else
+    echo 'done, please upload the following file to dropbox releases then upload to github releases'
+    echo 'Linux cannot copy to dropbox - please do this manually'
+fi

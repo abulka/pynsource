@@ -1,0 +1,77 @@
+# Fast test workflow for the wxdiagram canvas branch.
+#
+# The release workflows only run on tags, so this gives ordinary pushes and PRs
+# a quick unit-test gate. macOS and Windows are used because wxPython has
+# prebuilt wheels there; Linux needs a source build or the extra wheel server and
+# is covered by build-linux.yml.
+name: Pynsource tests
+
+on:
+  push:
+    branches: ['master', 'wxdiagram-canvas', 'wxdiagram-*']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      wxdiagram_ref:
+        description: wxdiagram git ref to build against
+        required: false
+        default: main
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out pynsource
+        uses: actions/checkout@v4
+
+      - name: Check out wxdiagram
+        uses: actions/checkout@v4
+        with:
+          repository: abulka/wxdiagram
+          ref: ${{ inputs.wxdiagram_ref || 'main' }}
+          path: wxdiagram/
+
+      - name: Check out ALSM (private)
+        uses: actions/checkout@v4
+        with:
+          repository: abulka/alsm
+          token: ${{ secrets.my_pat }}
+          path: alsm/
+
+      - name: Check out pynsource-rego (private)
+        uses: actions/checkout@v4
+        with:
+          repository: abulka/pynsource-rego
+          token: ${{ secrets.my_pat }}
+          path: pynsource-rego/
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: false
+
+      - name: Create venv and install
+        env:
+          UV_PYTHON_PREFERENCE: only-managed
+        run: |
+          uv python install 3.13
+          uv venv --python 3.13 --python-preference only-managed .venv
+          PY=.venv/bin/python
+          if [ "$RUNNER_OS" = "Windows" ]; then PY=.venv/Scripts/python.exe; fi
+          uv pip install --python "$PY" wheel wxpython
+          uv pip install --python "$PY" -e wxdiagram/
+          uv pip install --python "$PY" -r requirements.txt
+          uv pip install --python "$PY" -e alsm/ -e pynsource-rego/
+
+      - name: Run unit tests
+        run: |
+          PY=.venv/bin/python
+          if [ "$RUNNER_OS" = "Windows" ]; then PY=.venv/Scripts/python.exe; fi
+          "$PY" -m unittest discover -s src

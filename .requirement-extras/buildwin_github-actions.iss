@@ -1,7 +1,7 @@
 ; Inno Setup script for the Windows installer.
 ;
-; Used by .github/workflows/build-win.yml (CI) and ../ogl2/bin/buildwin.bat (local).
-; The PyInstaller build is ONEDIR (see ../ogl2/bin/pynsource-github-actions.spec), so
+; Used by .github/workflows/build-win.yml (CI) and bin/buildwin.bat (local).
+; The PyInstaller build is ONEDIR (see bin/pynsource-github-actions.spec), so
 ; the payload is the directory dist\Pynsource\ (Pynsource.exe + _internal\). The old
 ; onefile layout had a single ~34MB dist\Pynsource.exe.
 ;
@@ -20,7 +20,7 @@ Name: {group}\Changelog; Filename: {app}\Changelog.txt
 [Setup]
 AppCopyright=Andy Bulka
 AppName=Pynsource
-AppVersion=1.86
+AppVersion=1.87
 DefaultDirName={commonpf}\Pynsource
 ShowLanguageDialog=yes
 AppPublisher=Andy Bulka - WWare
@@ -28,10 +28,10 @@ AppPublisherURL=http://www.pynsource.com
 UninstallDisplayIcon={app}\Pynsource.exe
 UninstallDisplayName=Pynsource
 DefaultGroupName=Pynsource
-VersionInfoVersion=1.86
+VersionInfoVersion=1.87
 ; cwd seems to be the location of THIS file, so relative links get us back to pynsource/
 OutputDir=..\dist-inno\
-OutputBaseFilename=pynsource-win-1.86-setup
+OutputBaseFilename=pynsource-win-1.87-setup
 ; x64compatible (Inno Setup 6.3+) rather than the deprecated x64: it also installs on
 ; ARM64 Windows, where the x64 build runs under emulation. CI gets Inno 6 via choco.
 ArchitecturesInstallIn64BitMode=x64compatible

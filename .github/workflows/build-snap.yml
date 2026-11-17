@@ -22,6 +22,11 @@ on:
     tags: ['pre-*', 'version-*']
 
   workflow_dispatch:
+    inputs:
+      wxdiagram_ref:
+        description: wxdiagram git ref to build against
+        required: false
+        default: main
 
 jobs:
   build:
@@ -52,15 +57,15 @@ jobs:
         # and silently produced version "0+git.98c57e6" in the store
         fetch-depth: 0
 
-    # Linux is Pro-free (src/gui/settings.py), so the snap must carry the Pro-only packages:
-    # ogl2 (canvas: zoom, drag-to-connect) and alsm (module visualisation). They are separate
-    # private repos, checked out into the project dir so the snapcraft part can pip install them.
-    - name: Check out ogl2 (private, default branch)
+    # Linux is Pro-free (src/gui/settings.py), so the snap must carry the canvas and
+    # module visualisation: wxdiagram (public) and alsm (private). They are checked out
+    # into the project dir so the snapcraft part can pip install them from source.
+    - name: Check out wxdiagram (public canvas library)
       uses: actions/checkout@v4
       with:
-        repository: abulka/ogl2
-        token: ${{ secrets.my_pat }}
-        path: ogl2/
+        repository: abulka/wxdiagram
+        ref: ${{ inputs.wxdiagram_ref || 'main' }}
+        path: wxdiagram/
 
     - name: Check out ALSM (private, default branch)
       uses: actions/checkout@v4

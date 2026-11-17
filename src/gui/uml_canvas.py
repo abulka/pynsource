@@ -1,7 +1,7 @@
 from view.display_model import DisplayModel
 from view.display_model import CommentNode
 from .uml_shapes import *
-from .coord_utils import setpos, getpos, Move2, ZoomInfo
+from .coord_utils import setpos, getpos, ZoomInfo
 from layout.snapshots import GraphSnapshotMgr
 from layout.layout_spring import GraphLayoutSpring
 from layout.overlap_removal import OverlapRemoval
@@ -11,88 +11,64 @@ from common.architecture_support import *
 from gui.shape_menu_mgr import MENU_ID_CANCEL_LINE
 import time
 import pprint
-from gui.settings import PRO_EDITION, NATIVE_LINES_OGL_LIKE, ASYNC_BACKGROUND_REFRESH, LOCAL_OGL
+from gui.settings import ASYNC_BACKGROUND_REFRESH
 from gui.settings_wx import DEFAULT_COMMENT_FONT_SIZE, DEFAULT_CLASS_HEADING_FONT_SIZE, DEFAULT_CLASS_ATTRS_METHS_FONT_SIZE
 import wx
 from common.approx_equal import approx_equal
 from typing import List, Set, Dict, Tuple, Optional
-
-if PRO_EDITION:
-    import ogl2 as ogl
-    from ogl2 import Connectable, Resizeable, Selectable, Attributable
-    from .uml_shape_handler import UmlShapeHandlerOglTwo
-else:
-    if LOCAL_OGL:
-        import ogl
-    else:
-        import wx.lib.ogl as ogl
-    from gui.repair_ogl import repairOGL
-    repairOGL()
-    from .uml_shape_handler import UmlShapeHandler
-
-ogl.Shape.Move2 = Move2  # moves to the top left coordinate (not the silly centre x,y)
+import wxdiagram as ogl
+from wxdiagram import Connectable, Resizeable, Selectable, Attributable
+from .uml_shape_handler import UmlShapeHandlerOglTwo
 from gui.uml_lines import LineShapeUml, ARROW_UML_GENERALISATION, ARROW_UML_COMPOSITION
 
-if PRO_EDITION:
 
-    # class UmlBlock(ogl.Block):
-    #     def __init__(self):
-    #         super().__init__()
-    #         self.AddAttribute("attrs")
-    #         self.AddAttribute("methods")
-    #         self.code = ""
-    #         self.label = "class name here"
+class DividedShapeOglTwo(UmlShapeHandlerOglTwo, DividedShape):
+    # Ensure UmlShapeHandlerOglTwo is first so it's methods take priority MRO
 
-    class UmlShapeHandler:  # Mock
-        def __init__(self, log, frame, shapecanvas): pass
-        def SetShape(self, shape): pass
-        def SetPreviousHandler(self, eh): pass
+    def __init__(self, width, height, canvas, log, frame):
+        DividedShape.__init__(self, width=width, height=height, canvas=canvas)
+        UmlShapeHandlerOglTwo.__init__(self, log, frame, canvas)
 
 
-    class DividedShapeOglTwo(UmlShapeHandlerOglTwo, DividedShape):
-        # Ensure UmlShapeHandlerOglTwo is first so it's methods take priority MRO
+class CommentShapeOglTwo(UmlShapeHandlerOglTwo, CommentShape, Connectable, Resizeable, Selectable, Attributable):
 
-        def __init__(self, width, height, canvas, log, frame):
-            DividedShape.__init__(self, width=width, height=height, canvas=canvas)
-            UmlShapeHandlerOglTwo.__init__(self, log, frame, canvas)
+    def __init__(self, width, height, canvas, log, frame):
+
+        # Bypass CommentShape.__init__ (classic OGL's width/height signature)
+        # and use wxdiagram's x1, y1, x2, y2 rectangle signature.
+        ogl.RectangleShape.__init__(self, 10, 10, 10+width, 10+height)
+        UmlShapeHandlerOglTwo.__init__(self, log, frame, canvas)
+
+        Resizeable.__init__(self)
+        Connectable.__init__(self)
+        Attributable.__init__(self)
+
+        # MUST put UmlShapeHandlerOglTwo FIRST in the inheritance chain so that its
+        # OnEndDragLeft method gets called instead of ShapeEvtHandler's stub OnEndDragLeft (MRO)
+
+    def draw(self, dc):
+        super().draw(dc)
+        self.OnDraw(dc)  # add the comment corner fold drawing
+        self.OnDrawContents(dc)  # need to call explicitly cos not composite?
 
 
-    class CommentShapeOglTwo(UmlShapeHandlerOglTwo, CommentShape, Connectable, Resizeable, Selectable, Attributable):
+class LineShapeUmlOglTwo(UmlShapeHandlerOglTwo, LineShapeUml):
+    # Ensure UmlShapeHandlerOglTwo is first so it's methods take priority MRO
 
-        def __init__(self, width, height, canvas, log, frame):
-
-            # super().init()  - don't do this we want to bypass CommentShape init altogether
-            # and do an init based on ogltwo x,y,x2,y2
-            ogl.RectangleShape.__init__(self, 10, 10, 10+width, 10+height)
-            UmlShapeHandlerOglTwo.__init__(self, log, frame, canvas)
-
-            # ANDY #####
-            Resizeable.__init__(self)
-            Connectable.__init__(self)
-            Attributable.__init__(self)
-
-            # MUST put UmlShapeHandlerOglTwo FIRST in the inheritance chain so that it's
-            # OnEndDragLeft method gets called instead of ShapeEvtHandler's stub OnEndDragLeft (MRO)
-            # self.ping()
-
-        def draw(self, dc):
-            super().draw(dc)
-            self.OnDraw(dc) # hacky way to add the comment corner fold drawing stuff,
-                            # without changing the wx.ogl based CommentShape code.
-                            # the OnDraw will percolate to RectangleShape and stop there.
-            self.OnDrawContents(dc)  # need to call explicitly cos not composite?
-
-    class LineShapeUmlOglTwo(UmlShapeHandlerOglTwo, LineShapeUml):
-        # Ensure UmlShapeHandlerOglTwo is first so it's methods take priority MRO
-
-        def __init__(self, log, frame, canvas):
-            LineShapeUml.__init__(self)
-            UmlShapeHandlerOglTwo.__init__(self, log, frame, canvas)
+    def __init__(self, log, frame, canvas):
+        LineShapeUml.__init__(self)
+        UmlShapeHandlerOglTwo.__init__(self, log, frame, canvas)
 
 
 class UmlCanvas(ogl.ShapeCanvas):
     def __init__(self, parent, log, frame):
         ogl.ShapeCanvas.__init__(self, parent)
+
+        # Pynsource owns scrollbar/virtual-size management (CanvasResizer) and
+        # handles the mouse wheel itself (Shift+wheel expands/contracts layout).
+        self.autoVirtualSize = False
+        self.zoomInputEnabled = False
+        self.panOnDrag = False
 
         # self.observers = multicast()  # not used anymore, but see app.py to resurrect
 
@@ -172,7 +148,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         Returns:
 
         """
-        assert PRO_EDITION
         # print("join shapes on umlcanvas called")
         if not hasattr(fromShape, "node") or not hasattr(toShape, "node"):
             super().join_shapes(fromShape, toShape)
@@ -208,20 +183,6 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def CreateUmlShape(self, node, update_existing_shape: DividedShape = None):
 
-        # if PRO_EDITION:
-        #     shape = UmlBlock()
-        #     # self.canvas.AddShape(i)
-        #     self.InsertShape(shape, 999)
-        #     shape.label = node.classname
-        #     shape.move_to(node.left, node.top)
-        #     shape.SetSize(node.width, node.height)
-        #     shape.SetCanvas(self)
-        #     node.shape = shape
-        #     shape.node = node
-        #     self.deselect()
-        #     self.Refresh()
-        #     return shape
-
         def newRegion(font, name, textLst, maxWidth, totHeight=10):
             # Taken from Boa, but put into the canvas class instead of the scrolled window class.
             region = ogl.ShapeRegion()
@@ -247,11 +208,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         if update_existing_shape:
             shape = update_existing_shape
         else:
-            if PRO_EDITION:
-                # shape = DividedShapeOglTwo(width=99, height=98, canvas=self)
-                shape = DividedShapeOglTwo(width=99, height=98, canvas=self, log=self.log, frame=self.frame)
-            else:
-                shape = DividedShape(width=99, height=98, canvas=self)
+            shape = DividedShapeOglTwo(width=99, height=98, canvas=self, log=self.log, frame=self.frame)
         maxWidth = 10  # min node width, grows as we update it with text widths
 
         """
@@ -311,7 +268,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         )  # self.AddShape is ok too, ShapeCanvas's AddShape is delegated back to Diagram's AddShape.  ShapeCanvas-->Diagram
         shape.Show(True)
 
-        evthandler = UmlShapeHandler(
+        evthandler = UmlShapeHandlerOglTwo(
             self.log, self.frame, self
         )  # just init the handler with whatever will be convenient for it to know.
         evthandler.SetShape(shape)
@@ -348,31 +305,7 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def createCommentShape(self, node):
 
-        # if PRO_EDITION:
-        #     shape = UmlBlock()
-        #     # self.canvas.AddShape(i)
-        #     shape.fill = ["YELLOW"]
-        #     self.InsertShape(shape, 999)
-        #     # shape.label = "this is some comment\nthis is some comment222" # node.classname
-        #     shape.label = "this is some comment" # node.classname  # TODO MULTILINE and regions
-        #     shape.move_to(node.left, node.top)
-        #     shape.SetSize(node.width, node.height)
-        #     shape.SetCanvas(self)
-        #     node.shape = shape
-        #     shape.node = node
-        #     self.deselect()
-        #     self.Refresh()
-        #     return shape
-
-
-
-        # shape = ogl.TextShape( node.width, node.height )
-        if PRO_EDITION:
-            # shape = CommentShapeOglTwo(node.width, node.height)
-            shape = CommentShapeOglTwo(node.width, node.height, canvas=self, log=self.log, frame=self.frame)
-            # shape.ping()
-        else:
-            shape = CommentShape(node.width, node.height)
+        shape = CommentShapeOglTwo(node.width, node.height, canvas=self, log=self.log, frame=self.frame)
         shape.SetCentreResize(
             False
         )  # Specify whether the shape is to be resized from the centre (the centre stands still) or from the corner or side being dragged (the other corner or side stands still).
@@ -382,13 +315,8 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.SetBrush(wx.YELLOW_BRUSH)
         font2 = wx.Font(DEFAULT_COMMENT_FONT_SIZE, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         shape.SetFont(font2)
-        if PRO_EDITION:
-            # so ogl2 respects the change - need to investigate
-            # how wx.ogl and ogl2 differ re this stuff and why ogl2 needs this
-            # certainly ogl2 has font for shape and font for each region, yet
-            # somehow wx.ogl is smarter and one call for the shape fixes the region shape
-            # fot but in ogl2 it doesn't and this extra call is needed.
-            shape.GetRegions()[0].SetFont(font2)
+        # wxdiagram keeps separate fonts for the shape and its region.
+        shape.GetRegions()[0].SetFont(font2)
         for line in node.comment.split("\n"):
             shape.AddText(line)
 
@@ -400,7 +328,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.node = node
 
         # wire in the event handler for the new shape
-        evthandler = UmlShapeHandler(
+        evthandler = UmlShapeHandlerOglTwo(
             None, self.frame, self
         )  # just init the handler with whatever will be convenient for it to know.
         evthandler.SetShape(shape)
@@ -424,7 +352,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.GetDiagram().AddShape(shape)
         shape.Show(True)
 
-        evthandler = UmlShapeHandler(
+        evthandler = UmlShapeHandlerOglTwo(
             self.log, self.frame, self
         )  # just init the handler with whatever will be convenient for it to know.
         evthandler.SetShape(shape)
@@ -449,7 +377,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         shape.node = node
 
         # wire in the event handler for the new shape
-        evthandler = UmlShapeHandler(
+        evthandler = UmlShapeHandlerOglTwo(
             None, self.frame, self
         )  # just init the handler with whatever will be convenient for it to know.
         evthandler.SetShape(shape)
@@ -500,12 +428,6 @@ class UmlCanvas(ogl.ShapeCanvas):
         toShape = edge["target"].shape
         # print("edge target shape is", edge["target"])
 
-        # ANDY HACK
-
-        if PRO_EDITION and NATIVE_LINES_OGL_LIKE:
-            self.join_shapes(fromShape, toShape)
-            return
-
         edge_label = edge.get("uml_edge_type", "")
         if edge_label == "generalisation":
             arrowtype = ARROW_UML_GENERALISATION  # used to be ogl.ARROW_ARROW
@@ -514,10 +436,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         else:
             arrowtype = None
 
-        if PRO_EDITION:
-            line = LineShapeUmlOglTwo(self.log, self.frame, canvas=self)
-        else:
-            line = LineShapeUml()
+        line = LineShapeUmlOglTwo(self.log, self.frame, canvas=self)
 
         line.SetCanvas(self)
         edge["shape"] = line
@@ -543,7 +462,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         # New - add shape handler to lines - should probably add its own custom shape handler
         shape = line
         # wire in the event handler for the new shape
-        evthandler = UmlShapeHandler(
+        evthandler = UmlShapeHandlerOglTwo(
             None, self.frame, self
         )  # just init the handler with whatever will be convenient for it to know.
         evthandler.SetShape(shape)
@@ -581,10 +500,6 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         # canvas.Refresh(False)   # t/f or don't use - doesn't seem to make a difference
 
-        if not PRO_EDITION:  # fix selection change refresh bug on linux & windows
-            self.Draw()  # don't do self.mega_refresh() because it causes "drag unselected shape snaps back bug"
-            self.Refresh()
-
         # self.UpdateStatusBar(shape)  # only available in the shape evt handler (this method used to live there...)
 
     def mega_refresh(self, recalibrate=False, auto_resize_canvas=True):
@@ -621,8 +536,8 @@ class UmlCanvas(ogl.ShapeCanvas):
 
             CmdInsertImage
             umlcanvas.layout_and_position_shapes,
-            UmlShapeHandler.OnEndDragLeft
-            UmlShapeHandler.OnSizingEndDragLeft
+            UmlShapeHandlerOglTwo.OnEndDragLeft
+            UmlShapeHandlerOglTwo.OnSizingEndDragLeft
 
             recalibrate = True - called by core spring layout self.gui.mega_refresh()
 
@@ -640,15 +555,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         self.PrepareDC(dc)
 
         for node in self.displaymodel.graph.nodes:
-            node.shape.Move2(dc, node.left, node.top, display=False)
-        if not PRO_EDITION:
-            """
-            Critical call, that draws shapes to dc, this is what mouse motion deep in wx.ogl is doing
-            Not needed in ogl2 because there is no use of double buffering and we draw everything
-            in one hit during a paint.  Though some of the residual ogl library code is still being used
-            and might need a proper call to draw?
-            """
-            self.Draw()
+            node.shape.MoveTo(dc, node.left, node.top, display=False)
 
         """
         Pretty sure Update() not doing anything useful anymore and is not needed.
@@ -693,10 +600,13 @@ class UmlCanvas(ogl.ShapeCanvas):
             wx.SafeYield()
 
     def prepare_zoom_info(self, delta=None):
-        if PRO_EDITION:
-            return ZoomInfo(scale=self.scalex, delta=delta)
-        else:
-            return None
+        return ZoomInfo(scale=self.scalex, delta=delta)
+
+    def getContentBounds(self):
+        """Fit-to-window should consider UML boxes and comments, not lines or images."""
+        if getattr(self, "canvas_resizer", None) is None:
+            return super().getContentBounds()
+        return self.canvas_resizer.calc_allshapes_bounds()
 
     def mega_from_blackboard(self):
         MAX_SNAPSHOTS_TO_ANIMATE = 1
@@ -709,8 +619,8 @@ class UmlCanvas(ogl.ShapeCanvas):
 
     def extra_refresh(self):
         """
-        Draws all shapes onto the buffered dc, which is only needed for wx.ogl not for ogl2
-        which doesn't use buffered dc and does most of its drawing on the dc offered by paint.
+        Legacy hook. wxdiagram paints directly on the dc offered by EVT_PAINT, so no
+        separate buffered draw is needed.
 
         Historical note: when I first ported to phoenix I fixed a lot of new refresh problems
         by calling self.frame.Layout() which was effective, but the wrong solution.  A simple
@@ -718,9 +628,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         also has unnecessary overhead as it triggers the sizers in the frame, and also triggers an
         on resize frame.
         """
-        if not PRO_EDITION:
-            self.Draw()
-            # self.frame.Layout()  # needed when running phoenix
+        # wxdiagram paints on EVT_PAINT; no separate buffered Draw() is needed.
 
     def layout_and_position_shapes(self):
         """
@@ -751,8 +659,8 @@ class UmlCanvas(ogl.ShapeCanvas):
             CmdInsertUmlClass, CmdInsertImage, CmdLayoutExpandContractBase,
             umlcanvas.OnWheelZoom_OverlapRemoval_Defunct,
             umlcanvas.layout_and_position_shapes,
-            UmlShapeHandler.OnEndDragLeft
-            UmlShapeHandler.OnSizingEndDragLeft
+            UmlShapeHandlerOglTwo.OnEndDragLeft
+            UmlShapeHandlerOglTwo.OnSizingEndDragLeft
             LayoutBlackboard.LayoutLoopTillNoChange
         """
         self.overlap_remover.RemoveOverlaps(watch_removals=watch_removals)
@@ -776,18 +684,8 @@ class UmlCanvas(ogl.ShapeCanvas):
 
         shape.Delete()
 
-    def OnLeftClick(self, x, y, keys):
-        """Override of ShapeCanvas method - does not exist in ogltwo, see OnLeftUp() below"""
-        # keys is a bit list of the following: KEY_SHIFT  KEY_CTRL
-        assert not PRO_EDITION
-        self.app.run.CmdDeselectAllShapes()
-        self.focus_canvas()
-
     def OnLeftUp(self, event):
-        """ogltwo equivalent to OnLeftClick above, no need to deselect all shapes cos that's
-        automatically done in the base ogltwo shape canvas.
-        """
-        assert PRO_EDITION
+        """The base canvas already deselects shapes on empty clicks."""
         shape = self.getCurrentShape(event)
         if shape is None:  # clicked on empty space
             self.focus_canvas()
@@ -915,7 +813,7 @@ class UmlCanvas(ogl.ShapeCanvas):
         # self._report_mouse_position()
 
         try:
-            if event.ControlDown() and PRO_EDITION:
+            if event.ControlDown():
                 # zoom
                 amount = 0.04
                 if event.GetWheelRotation() < 0:
@@ -966,7 +864,6 @@ class UmlCanvas(ogl.ShapeCanvas):
     # Uncomment these as needed
 
     # def OnMotion(self, event):  # testing only, reports mouse position as you move it
-    #     assert PRO_EDITION
     #     super().OnMotion(event)  # keep things working esp. with ogltwo, not so imp with wx.ogl
     #     self._report_mouse_position()
     #     # self._dump_screen_info()
@@ -1268,19 +1165,11 @@ class UmlCanvas(ogl.ShapeCanvas):
         """
         # return [s for s in self.GetDiagram().GetShapeList() if not isinstance(s, ogl.LineShape)]
         # return [s for s in self.GetDiagram().GetShapeList() if isinstance(s, DividedShape)]
-        if PRO_EDITION:
-            return [
-                s
-                for s in self.GetDiagram().GetShapeList()
-                # if isinstance(s, UmlBlock)
-                if isinstance(s, (DividedShapeOglTwo, CommentShapeOglTwo))
-            ]
-        else:
-            return [
-                s
-                for s in self.GetDiagram().GetShapeList()
-                if isinstance(s, DividedShape) or isinstance(s, CommentShape)
-            ]
+        return [
+            s
+            for s in self.GetDiagram().GetShapeList()
+            if isinstance(s, (DividedShapeOglTwo, CommentShapeOglTwo))
+        ]
 
     umlboxshapes = property(get_umlboxshapes)
 

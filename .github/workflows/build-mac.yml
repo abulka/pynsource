@@ -4,19 +4,23 @@
 #
 # Triggers on pre-* and version-* tags + manual dispatch. A tag creates (or adds to) a DRAFT
 # release, which is published by hand once every platform's asset is attached; the same
-# workflows run the local `../ogl2/bin/buildmac.sh` replacements, no manual upload any more.
+# workflows replace the local build scripts, no manual upload any more.
 #
 # No Apple Developer license: the .app is ad-hoc signed only. Users run the
 # unzip, then follow the "Open Anyway" steps in IMPORTANT-README-BEFORE-RUNNING.txt.
 #
-# Siblings (ogl2, pynsource-rego, alsm) come from their default branches. ogl2 is
-# frozen at 2026-dustoff, which is now its master head; future canvas work happens in
-# the separate wxdiagram project, which pynsource does not use yet (see Admin/ROADMAP.md).
+# Siblings (wxdiagram, pynsource-rego, alsm): wxdiagram is the public canvas
+# library and can be overridden from workflow_dispatch; the other two are private.
 name: Pynsource app built on mac
 on:
   push:
     tags: ['pre-*', 'version-*']
   workflow_dispatch:
+    inputs:
+      wxdiagram_ref:
+        description: wxdiagram git ref to build against
+        required: false
+        default: main
 
 jobs:
   build:
@@ -30,12 +34,12 @@ jobs:
       with:
         path: pynsource/
 
-    - name: Check out ogl2 (private, default branch - see header)
+    - name: Check out wxdiagram (public canvas library)
       uses: actions/checkout@v4
       with:
-        repository: abulka/ogl2
-        token: ${{ secrets.my_pat }}
-        path: ogl2/
+        repository: abulka/wxdiagram
+        ref: ${{ inputs.wxdiagram_ref || 'main' }}
+        path: wxdiagram/
 
     - name: Check out pynsource-rego (private)
       uses: actions/checkout@v4
@@ -70,6 +74,7 @@ jobs:
         # make this venv the default python/pyinstaller for all later steps
         echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
         uv pip install --python .venv/bin/python wheel wxpython pyinstaller
+        uv pip install --python .venv/bin/python -e wxdiagram/
         uv pip install --python .venv/bin/python -r pynsource/requirements.txt
         uv pip install --python .venv/bin/python alsm/
         .venv/bin/python -c "import sys, wx; print('BUILD PYTHON', sys.version.split()[0], 'framework=', repr(sys._framework), wx.version())"
@@ -79,7 +84,7 @@ jobs:
       run: |
         cd pynsource/
         python bin/_buildsamples.py
-        pyinstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
+        pyinstaller --noconfirm bin/pynsource-github-actions.spec
         cp README.md dist/Readme.txt
         cp CHANGELOG.md dist/Changelog.txt
         cp .deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt dist/

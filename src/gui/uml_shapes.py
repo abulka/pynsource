@@ -1,14 +1,7 @@
 # gui_umlshapes
 
-from gui.settings import PRO_EDITION, LOCAL_OGL
 import wx
-if PRO_EDITION:
-    import ogl2 as ogl
-else:
-    if LOCAL_OGL:
-        import ogl
-    else:
-        import wx.lib.ogl as ogl
+import wxdiagram as ogl
 
 
 class DiamondShape(ogl.PolygonShape):
@@ -26,7 +19,7 @@ class DiamondShape(ogl.PolygonShape):
 
 # class RoundedRectangleShape(ogl.RectangleShape):
 #     def __init__(self, w=0.0, h=0.0):
-#         ogl.RectangleShape.__init__(self, w, h)
+#         ogl.RectangleShape.__init__(self, 0, 0, w, h)
 #         self.SetCornerRadius(-0.3)
 #
 #
@@ -252,7 +245,7 @@ class BitmapShapeResizable(ogl.BitmapShape):
 
 class CommentShape(ogl.RectangleShape):
     def __init__(self, w=0.0, h=0.0):
-        ogl.RectangleShape.__init__(self, w, h)
+        ogl.RectangleShape.__init__(self, 0, 0, w, h)
         # self.SetCornerRadius(-0.3)
 
     def OnDraw(self, dc):

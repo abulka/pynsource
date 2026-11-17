@@ -20,9 +20,9 @@ Reverse engineer Python source code into UML class diagrams.
 Full instructions, including the one-off Gatekeeper (macOS) and SmartScreen (Windows) prompts
 and Linux troubleshooting: **[DOWNLOADS.md](DOWNLOADS.md)**.
 
-Viewing and editing diagrams is free. The Pro features (zoom, drag-to-connect, module
-visualisation) need a [licence](https://pynsource.com/pricing.html) on macOS and Windows — they
-are **free on Linux**.
+Viewing, editing, zooming and connecting diagram shapes is free. Module visualisation is the
+only Pro feature: it needs a [licence](https://pynsource.com/pricing.html) on macOS and Windows,
+and is **free on Linux**.
 
 Building from source: **[BUILDING.md](BUILDING.md)**.
 
@@ -33,15 +33,13 @@ Building from source: **[BUILDING.md](BUILDING.md)**.
 - Type annotation support
 - Layout algorithm, and a toggle between UML, ASCII-art UML and PlantUML views
 - Automatically colours sibling subclasses to make inheritance easier to follow
+- Zoom, pan and zoom-to-fit; drag-and-drop to connect shapes
+- Faster (re)layout, and access to the generated PlantUML markup
 - Print and print preview
 - Runs on macOS, Windows and Linux
 
-Pro Edition adds:
-
-- Zoom, and drag-and-drop to connect shapes
-- Faster (re)layout, and access to the generated PlantUML markup
-- Module visualisation, including variables and functions
-  ([youtube demo](https://youtu.be/AovrE7nWGss)) — free on Linux
+Pro Edition adds module visualisation, including variables and functions
+([youtube demo](https://youtu.be/AovrE7nWGss)) — free on Linux.
 
 ## Examples
 
@@ -98,5 +96,6 @@ Author: [Andy Bulka](http://www.andypatterns.com)
 
 ## License
 
-The Community Edition is open source, GPL3 licensed. The Pro Edition is commercially licensed and
-needs a valid licence on macOS and Windows. See [CHANGELOG.md](CHANGELOG.md) for the history.
+The Community Edition is open source, GPL3 licensed. Pro module visualisation is commercially
+licensed and needs a valid licence on macOS and Windows. See [CHANGELOG.md](CHANGELOG.md) for the
+history.

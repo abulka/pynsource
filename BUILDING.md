@@ -1,9 +1,8 @@
 # Building and running Pynsource
 
 Pynsource runs on **Python 3.13** with **wxPython 4.3.x** (4.2.5 on Linux — see
-[why](#linux-and-wxpython)). Everything below is for the Community build; the Pro-only packages
-(see [sibling repos](#sibling-repos-pro-only)) are already checked out next to this repo on this
-machine and are only needed for packaging.
+[why](#linux-and-wxpython)). The diagram canvas is the `wxdiagram` library; module
+visualisation (the one remaining Pro feature) additionally needs `alsm`.
 
 ## Run from source
 
@@ -70,20 +69,20 @@ sudo apt install build-essential pkg-config libgtk-3-dev libsdl2-dev libnotify-d
 MAX_JOBS=$(nproc) pip wheel wxpython==4.2.5 --no-binary wxpython -w ~/wx-wheels
 ```
 
-## Sibling repos (Pro only)
+## Sibling repos
 
-All live next to this repo and install editable. Without them you get the Community edition:
-no zoom, no drag-to-connect, no module visualisation.
+All live next to this repo and install editable.
 
 ```bash
-uv pip install -e ../ogl2 -e ../pynsource-rego -e ../alsm
+uv pip install -e ../wxdiagram -e ../pynsource-rego -e ../alsm
 ```
 
-- `../ogl2` — the next-generation canvas. `ShapeCanvas` paints directly via `PaintDC` and supports
-  `scalex/scaley`, which is what zoom and drag-between-shapes need.
-- `../pynsource-rego` — licensing. `PRO_EDITION = rego.are_registered(APP_VERSION)`.
+- `../wxdiagram` — the canvas library (shapes, connectors, zoom/pan, selection,
+  JSON persistence). MIT, also on PyPI as `wxdiagram`.
+- `../pynsource-rego` — licensing for module visualisation.
+  `PRO_EDITION = rego.are_registered(APP_VERSION)`.
   Self-sign a key: `cd ../pynsource-rego && ../pynsource/.venv/bin/python rego_gen.py gen Andy --version 1 --save`.
-- `../alsm` — module visualisation (`ALSM_PARSING`).
+- `../alsm` — module visualisation (`ALSM_PARSING`). Pro; free on Linux builds.
 
 See [AGENTS.md](AGENTS.md) for the edition switches and the sibling-repo coordination rules.
 
@@ -121,7 +120,7 @@ finishes last.
 
 Things that bite, in order of how much time they cost when forgotten:
 
-- **Bundle onedir, never onefile.** The spec is `../ogl2/bin/pynsource-github-actions.spec`
+- **Bundle onedir, never onefile.** The spec is `bin/pynsource-github-actions.spec`
   (`EXE(exclude_binaries=True)` + `COLLECT` + `BUNDLE`): onefile unpacks itself into `%TEMP%` /
   `$TMPDIR` on every launch (~2 s vs 0.4 s) and PyInstaller 7 rejects onefile + `.app` outright.
 - **The macOS build interpreter must be uv's python-build-standalone.** A framework Python plus

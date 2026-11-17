@@ -23,4 +23,5 @@ coverage
 pytest-cov
 
 wxpython
+wxdiagram>=0.2,<0.3
 wxasync

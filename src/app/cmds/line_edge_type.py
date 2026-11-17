@@ -2,7 +2,6 @@ from .base_cmd import CmdBase
 import wx
 import random
 from typing import List, Set, Dict, Tuple, Optional
-from gui.settings import PRO_EDITION
 
 
 class UtilCmdLineChange(CmdBase):  # Not Used directly, please subclass
@@ -20,13 +19,8 @@ class UtilCmdLineChange(CmdBase):  # Not Used directly, please subclass
         # and rebuild the shape again
         umlcanvas.CreateUmlEdgeShape(edge)
         new_line_shape = edge["shape"]
-        # Yuk - different logic for different underlying ogl - handler stuff is particularly gnarly
-        if PRO_EDITION:
-            new_line_shape._SelectNodeNow(event=None)
-            umlcanvas.Refresh()
-        else:
-            new_line_shape.GetEventHandler()._SelectNodeNow(x=None, y=None)
-            umlcanvas.mega_refresh()
+        new_line_shape._SelectNodeNow(event=None)
+        umlcanvas.Refresh()
 
     def swap_edge_direction(self):
         umlcanvas = self.context.umlcanvas

@@ -5,6 +5,7 @@
 #wxPython>=4.0,<4.2.0 ; platform_system=="Linux" # See https://github.com/wxWidgets/Phoenix/issues/2225
 #wxPython==4.2.0 ; platform_system!="Linux"
 wxpython
+wxdiagram>=0.2,<0.3
 
 wxasync
 configobj

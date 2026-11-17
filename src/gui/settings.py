@@ -1,42 +1,42 @@
 import sys
 
-PRO_EDITION=True
-ALSM_PARSING=False
-NATIVE_LINES_OGL_LIKE=False
-ASYNC_BACKGROUND_REFRESH=False  # devel purposes only
+# The diagram canvas is free for everyone. PRO_EDITION now gates optional
+# module visualisation (ALSM), which is the only paid feature.
+PRO_EDITION = True
+ALSM_PARSING = False
+ASYNC_BACKGROUND_REFRESH = False  # devel purposes only
 
-APP_VERSION = 1.86
+APP_VERSION = 1.87
 
 # PATCH marker does not affect version checking, its just an annotation in the about box.
 # Use it with a future APP_VERSION to make betas e.g. "beta 2"
 # Or use it with the current APP_VERSION to make post release patches e.g. "2"
 PATCH = ""  # leave blank to turn off patch/beta annotation in about box
 
-LOCAL_OGL = True # use local copy of ogl.py, otherwise use wxPython's
-
 APP_VERSION_FULL = f"{APP_VERSION}"
 if PATCH:
-    APP_VERSION_FULL += f"-{PATCH}" 
+    APP_VERSION_FULL += f"-{PATCH}"
 
 try:
     import rego
 except ModuleNotFoundError:
     # print("rego functionality not found")
-    PRO_EDITION=False
+    PRO_EDITION = False
     registered_to = ""
-    enter_license = lambda name, serial : None # dummy function when no rego library e.g. running from community source or snap
+    enter_license = lambda name, serial: None  # dummy function when no rego library e.g. running from community source or snap
 else:
     PRO_EDITION = rego.are_registered(APP_VERSION)
     registered_to = rego.get_stored_serial_info()["name"] if rego.get_stored_serial_info() else ""
-    enter_license = lambda name, serial : rego.enter_license(name, serial, APP_VERSION)
+    enter_license = lambda name, serial: rego.enter_license(name, serial, APP_VERSION)
 
 # Linux editions are Pro-free: Pro is decided by platform, not by a licence file.
 #
-# Every Linux delivery route (AppImage, snap, distro package) ships with Pro enabled.
-# A licence file is not viable there: snaps cannot read or write one (HOME is per-revision
-# sandboxed, so registering would not survive an update) and the various Linux packaging
-# routes have no way to share one. So on Linux we skip the check entirely - which also
-# means the AppImage/snap must bundle ogl2 and alsm, since Pro features import them.
+# Every Linux delivery route (AppImage, snap, distro package) ships with module
+# visualisation enabled. A licence file is not viable there: snaps cannot read
+# or write one (HOME is per-revision sandboxed, so registering would not survive
+# an update) and the various Linux packaging routes have no way to share one.
+# So on Linux we skip the licence check entirely - which also means the
+# AppImage/snap must bundle alsm (module visualisation).
 if sys.platform.startswith("linux"):
     PRO_EDITION = True
     registered_to = "Linux users"

@@ -145,7 +145,7 @@ test case to send upstream (wxPython? wxasync? cpython-build-macos? TBD).
 |---|---|---|
 | wxPython version/build differs | **dead** | extracted both bundles' `wx` binaries: identical but `LC_UUID` |
 | onefile vs onedir | **dead** | 40.9 vs 40.6 drag events/s, 50.6 vs 50.8 paints/s |
-| Pro (ogl2 canvas) vs Community (classic OGL) | **dead** | 40.9 vs 33.6 events/s; both fine. (Community is lower by design — classic OGL drops sub-tolerance movement.) The shipped CI app logs `PRO=True`, same as local. |
+| Historical: Pro (ogl2 canvas) vs Community (classic OGL) | **dead** | 40.9 vs 33.6 events/s; both fine. (Community is lower by design — classic OGL drops sub-tolerance movement.) The shipped CI app logs `PRO=True`, same as local. |
 | PyInstaller version / SDK stamp | **dead** | bootloader differs only by build-SDK string (`sdk 26.2` vs `sdk 15.5`) and UUID |
 | Quarantine / location / translocation | **dead** | no `com.apple.quarantine`; slowness followed the file, not the folder (as noted originally) |
 | Activation | **real bug, separate** | fixed earlier; did not change drag perf |
@@ -326,7 +326,7 @@ Why it mattered at all (independent of performance): PyInstaller 6.22 already pr
 > (a .app bundle can not be a single file) and clashes with macOS's security.
 > Please migrate to onedir mode. This will become an error in v7.0.
 
-Migration done (`../ogl2/bin/pynsource-github-actions.spec`, commit `cd7e737`): keep
+Migration done (`bin/pynsource-github-actions.spec`, commit `cd7e737`): keep
 `Analysis`/`PYZ`, use `EXE(pyz, a.scripts, [], exclude_binaries=True)` + `COLLECT(...)`, and
 wrap the collected directory in `BUNDLE(coll, ...)`.
 
@@ -354,7 +354,7 @@ Measured after the change:
 Also updated: `.github/workflows/build-mac.yml` (guard now checks the onedir layout +
 `libpython3*.dylib` and runs `codesign --verify`; zip uses `-y`; the redundant
 `dist/Pynsource/` COLLECT directory is deleted so the artifact isn't doubled) and
-`../ogl2/bin/buildmac.sh` (dist now holds both the payload dir and the `.app`; only the
+`bin/buildmac` (dist now holds both the payload dir and the `.app`; only the
 `.app` ships).
 
 ## 13. Current deployment recipe (mac)
@@ -366,7 +366,7 @@ Also updated: `.github/workflows/build-mac.yml` (guard now checks the onedir lay
   The workflow prints `BUILD PYTHON ... framework=''` and a guard step fails the build if a
   framework interpreter or a onefile layout appears.
 * **Bundling**: onedir (`EXE(exclude_binaries=True)` + `COLLECT` + `BUNDLE`) in
-  `../ogl2/bin/pynsource-github-actions.spec`. `dist/` then holds both `dist/Pynsource/`
+  `bin/pynsource-github-actions.spec`. `dist/` then holds both `dist/Pynsource/`
   (COLLECT output) and `dist/Pynsource.app`; only the `.app` ships, and the COLLECT dir is
   deleted so the artifact is not doubled.
 * **Zip**: `zip -r -y` (or `ditto -c -k --keepParent`). Without `-y` zip follows the

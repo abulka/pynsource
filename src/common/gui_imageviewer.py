@@ -10,8 +10,6 @@ from io import StringIO
 # from pydbg import dbg
 from gui.coord_utils import ZoomInfo
 from typing import List, Set, Dict, Tuple, Optional
-from media import images
-from gui.settings import PRO_EDITION
 from generate_code.gen_plantuml import plant_uml_create_png_and_return_image_url_async
 from dialogs.DialogPlantUmlText import DialogPlantUmlText
 from common.dialog_dir_path import dialog_path_pyinstaller_push, dialog_path_pyinstaller_pop
@@ -30,7 +28,6 @@ ALLOW_DRAWING = True
 DEFAULT_IMAGE_SIZE = (21, 21)  # used to be 2000, 2000 for some reason
 BMP_EXTRA_MARGIN = 20  # margin for plantuml images to allow scrolling them fully into view
 
-unregistered = not PRO_EDITION
 
 
 class ImageViewer(wx.ScrolledWindow):
@@ -259,7 +256,6 @@ class ImageViewer(wx.ScrolledWindow):
 
         x, y = event.GetPosition()
         frame = self.GetTopLevelParent()
-        image = images.pro.GetBitmap() if unregistered else None
 
         if self.popupmenu:
             self.popupmenu.Destroy()  # wx.Menu objects need to be explicitly destroyed (e.g. menu.Destroy()) in this situation. Otherwise, they will rack up the USER Objects count on Windows; eventually crashing a program when USER Objects is maxed out. -- U. Artie Eoff  http://wiki.wxpython.org/index.cgi/PopupMenuOnRightClick
@@ -280,22 +276,13 @@ class ImageViewer(wx.ScrolledWindow):
 
         item = self.popupmenu.Append(wx.ID_ANY, "Save Image as PNG...")
         frame.Bind(wx.EVT_MENU, self.OnHandleSaveImage, item)
-        frame.Bind(wx.EVT_UPDATE_UI, self.OnPro_update, item)
-        if image:
-            item.SetBitmap(image)
 
         if self.bmp_transparent_ori:
             item = self.popupmenu.Append(wx.ID_ANY, "Save Image as PNG... (preserve transparent areas)")
             frame.Bind(wx.EVT_MENU, self.OnHandleSaveImagePreserveTransparencies, item)
-            frame.Bind(wx.EVT_UPDATE_UI, self.OnPro_update, item)
-            if image:
-                item.SetBitmap(image)
 
         item = self.popupmenu.Append(wx.ID_ANY, "Save Image as PNG... (incl. pen doodles)")
         frame.Bind(wx.EVT_MENU, self.OnHandleSaveImageInclDoodles, item)
-        frame.Bind(wx.EVT_UPDATE_UI, self.OnPro_update, item)
-        if image:
-            item.SetBitmap(image)
 
         self.popupmenu.AppendSeparator()
 
@@ -312,9 +299,6 @@ class ImageViewer(wx.ScrolledWindow):
         item = self.popupmenu.Append(wx.ID_ANY, "Cancel")
 
         frame.PopupMenu(self.popupmenu, wx.Point(x, y))
-
-    def OnPro_update(self, event):
-        event.Enable(not unregistered)
 
     def OnViewPlantUmlMarkup(self, event, alt_down=False):
         mouse_state: wx.MouseState = wx.GetMouseState()
@@ -343,7 +327,6 @@ class ImageViewer(wx.ScrolledWindow):
                 dialog = EditDialog(None)
                 dialog.txt_plantuml.Value = txt_plantuml
                 dialog.txt_plantuml.SetFocus()
-                dialog.txt_plantuml.Enable(not unregistered)
                 dialog.ShowModal()
                 # dialog.Show()
                 dialog.Destroy()

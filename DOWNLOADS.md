@@ -1,12 +1,12 @@
 # Download Pynsource
 
-The latest version is `1.86`. Every install path below is linked from
+The latest version is `1.87`. Every install path below is linked from
 **[the releases page](https://github.com/abulka/pynsource/releases)** — pre-releases (`pre-*` tags)
 are built by CI and are safe to try; stable releases use `version-*` tags.
 
-Viewing and editing diagrams is free. The Pro features (zoom, drag-to-connect, module
-visualisation) need a [licence](https://pynsource.com/pricing.html) on macOS and Windows, and are
-**free on Linux**.
+Viewing, editing, zooming and connecting diagram shapes is free. Module visualisation is the
+only Pro feature: it needs a [licence](https://pynsource.com/pricing.html) on macOS and Windows
+and is **free on Linux**.
 
 ## macOS (Apple silicon) — Homebrew
 
@@ -114,9 +114,10 @@ own PlantUML server, see the app's built-in help (`F1`).
 
 ## Pro Edition
 
-An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) adds zoom,
-drag-to-connect and module visualisation. Download the regular build and enter the licence key
-via **Help → Enter License…** (macOS and Windows; on Linux the Pro features are already enabled).
+An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) adds module
+visualisation (modules as UML boxes, with their variables and functions). Download the regular
+build and enter the licence key via **Help → Enter License…** (macOS and Windows; on Linux module
+visualisation is already enabled).
 
 ## Changelog
 

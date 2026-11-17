@@ -2,6 +2,18 @@
 
 *November 2026*
 
+### 1.87
+
+- New diagram canvas: pynsource now uses **wxdiagram** (MIT) on every platform and edition;
+  the vendored classic OGL copy and the `ogl2` dependency are gone
+- Zoom, pan, zoom-to-fit, drag-to-connect, resize and layout are **free for everyone**
+- **Pro is now module visualisation only** (ALSM), still free on Linux
+- Simplified settings and canvas code: one canvas path, one coordinate convention, and the
+  `Move2` monkeypatch replaced by `Shape.MoveTo`
+- Build assets (PyInstaller spec, mac/win build scripts, `.icns`) moved into this repo
+- CI now checks out the public `wxdiagram` repo; the branch can be selected when dispatching
+- PlantUML markup/save and ASCII-art zoom are free (previously Pro)
+
 ### 1.86
 
 - First stable release since 1.84 (2022) - supersedes the 1.85 beta series, which is no longer

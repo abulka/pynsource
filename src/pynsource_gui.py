@@ -34,7 +34,7 @@ import sys
 # from pydbg import dbg
 from common.messages import *
 import wx
-from gui.settings import PRO_EDITION, ASYNC_BACKGROUND_REFRESH, LOCAL_OGL
+from gui.settings import PRO_EDITION, ALSM_PARSING, ASYNC_BACKGROUND_REFRESH
 from common.printframework import MyPrintout
 from media import images
 from gui.settings import APP_VERSION, APP_VERSION_FULL, APP_ICON_PATH
@@ -60,15 +60,8 @@ from typing import List, Set, Dict, Tuple, Optional
 import webbrowser
 
 
-if PRO_EDITION:
-    import ogl2 as ogl
-    from pro.gui_imageviewer2 import ImageViewer2 as ImageViewer
-else:
-    if LOCAL_OGL:
-        import ogl
-    else:
-        import wx.lib.ogl as ogl
-    from common.gui_imageviewer import ImageViewer
+import wxdiagram as ogl
+from gui.imageviewer import PynsourceImageViewer as ImageViewer
 
 WINDOW_SIZE = (1024, 768)
 GUI_LAYOUT = "MULTI_TAB_GUI"  # "MULTI_TAB_GUI" or "SPLIT_GUI" or None
@@ -124,7 +117,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         """
         Setting double buffered True solves blurring of shapes as you drag them under wx.ogl and solves the constant
-        flickering of the display in ogl2 mode due to the constant Refresh() thus paints happening.
+        flickering of the display due to the constant Refresh() thus paints happening.
         Its supposed to be true by default, however it is actually false by default on windows!.  Cannot turn off on Mac.
         """
         self.frame.SetDoubleBuffered(True)
@@ -275,7 +268,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.sizer.Add(self.panel_two, 1, wx.EXPAND)
             self.frame.SetSizer(self.sizer)
 
-        ogl.OGLInitialize()  # creates some pens and brushes that the OGL library uses.
+        ogl.initialize()  # sets up pens, brushes and fonts used by the canvas.
 
         # Set the frame to a good size for showing stuff
         self.frame.SetSize(WINDOW_SIZE)
@@ -567,7 +560,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
     def OnResizeFrame(self, event):  # ANDY  interesting - GetVirtualSize grows when resize frame
         # print("OnResizeFrame event.EventObject", event.EventObject.__class__, event.EventObject == self.umlcanvas, isinstance(event.EventObject, wx.ScrolledWindow))
 
-        # if event.EventObject == self.umlcanvas:  # only works in ogl2 mode
+        # if event.EventObject == self.umlcanvas:  # only works when the canvas is the event source
         if isinstance(event.EventObject, wx.ScrolledWindow):
 
             # Proportionally constrained resize.  Nice trick from http://stackoverflow.com/questions/6005960/resizing-a-wxpython-window
@@ -581,22 +574,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
             self.umlcanvas.fix_scrollbars()
 
-            if 'wxMac' in wx.PlatformInfo and not PRO_EDITION:
-                # Protect against resizing to pure fullscreen, to avoid weird performance degredation
-                # Luckily the Messagebox kills the resize frame attempt!
-                # print(f"wx.DisplaySize()={wx.DisplaySize()}")
-                alarm = self.frame.GetScreenRect()[2] >= wx.DisplaySize()[0] and \
-                        self.frame.GetScreenRect()[3] >= wx.DisplaySize()[1]
-                # print(self.frame.GetClientSize(), self.frame.GetScreenRect(), alarm)
-                if alarm:
-                    # print("\n",whoscalling2())
-                    wx.CallAfter(self.mac_fullscreen_warning)
-
         event.Skip()
-
-    def mac_fullscreen_warning(self):
-        if 'wxMac' in wx.PlatformInfo:
-            self.MessageBox(PURE_MAC_FULLSCREEN_WARNING)
 
     def OnWheelZoom_ascii(self, event):
         # Since our binding of wx.EVT_MOUSEWHEEL to here takes over all wheel events
@@ -640,9 +618,6 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             event.Skip()  # Need this or regular mouse wheel scrolling breaks
 
     def ascii_art_zoom(self, direction=1, amount=1, reset=False):
-        if unregistered:
-            return
-
         font = self.multiText.GetFont()
         # dbg(font.GetPointSize())
         # dbg(direction)
@@ -814,12 +789,12 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.menuBar.EnableTop(2, False)  # disable layout menu
         wx.CallAfter(self.multiText.SetFocus)
         wx.CallAfter(self.multiText.SetInsertionPoint, 0)
-        self.frame.SetStatusText("Hold ALT whilst dragging to block select.  CMD/Ctrl + Mousewheel to zoom (Pro).")
+        self.frame.SetStatusText("Hold ALT whilst dragging to block select.  CMD/Ctrl + Mousewheel to zoom.")
 
     def PostOglViewSwitch(self):
         wx.CallAfter(self.umlcanvas.SetFocus)
         self.menuBar.EnableTop(2, True)  # enable layout menu
-        self.frame.SetStatusText("Click to select.  Drag to move.  Right click on shapes, lines and workspace.  CMD/Ctrl + Mousewheel to zoom (Pro).")
+        self.frame.SetStatusText("Click to select.  Drag to move.  Right click on shapes, lines and workspace.  CMD/Ctrl + Mousewheel to zoom.")
 
     def InitMenus(self):
         menuBar = wx.MenuBar()
@@ -889,7 +864,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu1, "&Save As...", "Ctrl-S", self.OnSaveGraph, self.uml_only_view_update)
         Add(menu1, "&Export Diagram to XML...", "", self.OnSaveGraphToXML, self.uml_only_view_update)
         menu1.AppendSeparator()
-        Add(menu1, "&Save PlantUML Image...", "", self.OnSavePlantUml, self.save_plantuml_update, image=pro_image)
+        Add(menu1, "&Save PlantUML Image...", "", self.OnSavePlantUml, self.save_plantuml_update)
         menu1.AppendSeparator()
         Add(menu1, "&Import Python Code...", "Ctrl-I", self.OnFileImport)
 
@@ -908,7 +883,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.item_visualise_modules.SetBitmap(pro_image)
         self.Bind(wx.EVT_MENU, self.OnVisualiseModules, self.item_visualise_modules)
         def visualise_modules_update(event):
-            event.Enable(PRO_EDITION)        
+            event.Enable(ALSM_PARSING)
         self.Bind(wx.EVT_UPDATE_UI, visualise_modules_update, id=id)
         self.item_visualise_modules.Check()
 
@@ -944,10 +919,10 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.OnEditProperties_update,
         )
 
-        Add(menu5, "Zoom In", "Ctrl-+", self.OnZoomIn, self.OnPro_update, image=pro_image)
-        Add(menu5, "Zoom Out", "Ctrl--", self.OnZoomOut, self.OnPro_update, image=pro_image)
-        Add(menu5, "Zoom To Fit", "Ctrl-9", self.OnZoomToFit, self.OnPro_update, image=pro_image)
-        Add(menu5, "Reset Zoom", "Ctrl-0", self.OnZoomReset, self.OnPro_update, image=pro_image)
+        Add(menu5, "Zoom In", "Ctrl-+", self.OnZoomIn)
+        Add(menu5, "Zoom Out", "Ctrl--", self.OnZoomOut)
+        Add(menu5, "Zoom To Fit", "Ctrl-9", self.OnZoomToFit)
+        Add(menu5, "Reset Zoom", "Ctrl-0", self.OnZoomReset)
 
         # Add(menu5, "test - add new code block", "Ctrl-7", self.OnNewCodeBlock)
         # Add(menu5, "test - add new DividedShape", "Ctrl-6", self.OnNewDividedShape)
@@ -979,7 +954,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu5, "&Redraw Screen", "Ctrl-R", self.OnRefreshUmlWindow)
 
         Add(menu3, "&Layout UML", "Ctrl-L", self.OnLayout, self.uml_only_view_update)
-        Add(menu3, "&Layout UML Optimally", "Ctrl-B", self.OnDeepLayout, self.OnPro_and_uml_view_only_update, image=pro_image)
+        Add(menu3, "&Layout UML Optimally", "Ctrl-B", self.OnDeepLayout, self.uml_only_view_update)
         menu3.AppendSeparator()
         Add(menu3, "&Expand Layout", "Ctrl-.", self.app.run.CmdLayoutExpand, self.uml_only_view_update)
         Add(menu3, "&Contract Layout", "Ctrl-,", self.app.run.CmdLayoutContract, self.uml_only_view_update)
@@ -1078,13 +1053,6 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.umlcanvas.deselect()
         self.umlcanvas.Refresh()
 
-    def OnNewCodeBlock(self, event):
-        i = ogl.CodeBlock()
-        # self.canvas.AddShape(i)
-        self.umlcanvas.InsertShape(i, 999)
-        self.umlcanvas.deselect()
-        self.umlcanvas.Refresh()
-
     def OnZoomIn(self, event):
         if self.viewing_uml_tab:
             self.umlcanvas.zoom_in()
@@ -1119,23 +1087,17 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnVisualiseModules(self, event):
         log.info("visualise Python Modules state now: %s" % self.item_visualise_modules.IsChecked())
+        if not ALSM_PARSING:
+            wx.MessageBox(
+                "Module visualisation needs the 'alsm' package.\n\n"
+                "Install it with: pip install alsm\n"
+                "Linux builds include it; on macOS/Windows it is a Pro feature.",
+                "Module Visualisation",
+            )
 
     def OnRightButtonMenu(self, event):  # Menu
         x, y = event.GetPosition()
-        if PRO_EDITION:
-            hit_which_shapes = self.umlcanvas.getCurrentShape(event)
-        else:
-            # but hittest fails when canvas is scrolled !!  Fix.
-            adjusted_x = x + self.umlcanvas.GetScrollPos(wx.HORIZONTAL)
-            adjusted_y = y + self.umlcanvas.GetScrollPos(wx.VERTICAL)
-            # Since our binding of wx.EVT_RIGHT_DOWN to here takes over all right click events
-            # we have to manually figure out if we have clicked on shape
-            # then allow natural shape node menu to kick in via UmlShapeHandler (defined above)
-            hit_which_shapes = [
-                s
-                for s in self.umlcanvas.GetDiagram().GetShapeList()
-                if s.HitTest(adjusted_x, adjusted_y)
-            ]
+        hit_which_shapes = self.umlcanvas.getCurrentShape(event)
         # print('hit_which_shapes', hit_which_shapes)  # hmm seems to pick up lines, too!
         if hit_which_shapes:
             event.Skip()  # will send the event on to the next handler, I think in the canvas
@@ -1583,13 +1545,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         event.Enable(self.viewing_uml_tab)
 
     def save_plantuml_update(self, event):
-        event.Enable(self.viewing_plantuml_tab and not unregistered)
-
-    def OnPro_update(self, event):
-        event.Enable(not unregistered)
-
-    def OnPro_and_uml_view_only_update(self, event):
-        event.Enable(not unregistered and self.viewing_uml_tab)
+        event.Enable(self.viewing_plantuml_tab)
 
     def OnSavePlantUml(self, event):
         self.plantuml.OnHandleSaveImage(event)

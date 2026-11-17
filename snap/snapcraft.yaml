@@ -13,7 +13,7 @@ issues: https://github.com/abulka/pynsource/issues
 icon: snap/gui/pynsource.png
 
 grade: stable # devel # must be 'stable' to release into candidate/stable channels
-confinement: strict # devmode # strict is the goal; all Pro features are free on Linux,
+confinement: strict # devmode # strict is the goal; module visualisation is free on Linux,
                     # so there is no licence file to write outside the sandbox
 base: core24
 
@@ -131,15 +131,15 @@ parts:
       /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location \
         -r .requirement-extras/requirements-snap.txt "$WX"
       /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location --no-deps .
-      # Pro is free on Linux, so the snap ships the Pro-only siblings. The workflow checks
-      # them out next to this project; snapcraft's `source: .` copies them along.
+      # wxdiagram (canvas) and alsm (module visualisation) are checked out next to
+      # this project by CI; snapcraft's `source: .` copies them along.
       # with dependencies: alsm pulls antlr4/esprima/javalang/prettyprinter/... which its
       # modules import at load time (--no-deps leaves 'import alsm' failing at runtime)
-      for sibling in ogl2 alsm; do
+      for sibling in wxdiagram alsm; do
         if [ -d "$sibling" ]; then
           /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location "./$sibling"
         else
-          echo "ERROR: $sibling/ not present - the snap would ship without Pro features" >&2
+          echo "ERROR: $sibling/ not present - the snap would ship without the canvas or module visualisation" >&2
           exit 1
         fi
       done

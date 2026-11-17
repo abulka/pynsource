@@ -2,9 +2,7 @@ import wx
 from typing import List, Set, Dict, Tuple, Optional
 from view.display_model import GraphNode, UmlNode, UmlModuleNode, CommentNode
 from gui.node_edit_multi_purpose import node_edit_multi_purpose
-from gui.settings import PRO_EDITION
 
-unregistered = not PRO_EDITION
 
 # not all are defined, as the rest of the ids are auto allocated, just nice not to waste id's :-)
 MENU_ID_SHAPE_PROPERTIES = wx.NewIdRef()
@@ -244,19 +242,6 @@ class ShapeMenuMgr:
                 key_code=ord("S"),
             )
 
-        def add_pro_advert():
-            from media import images
-
-            msg = "Edition lets you drag drop to connect!  Learn More..."
-            if "wxGTK" in wx.PlatformInfo or "wxMSW" in wx.PlatformInfo:  # ubuntu gtk all menus and windows popup menus have images disallowed, so add text
-                msg = '(Pro) ' + msg
-            item: wx.MenuItem = add_menuitem(
-                msg,
-                self.OnProDragDrop,
-                submenu=True,
-                image=images.pro.GetBitmap()
-            )
-
         def add_from(keycode_only=False):
             item: wx.MenuItem = add_menuitem(
                 "Begin - Remember selected class as FROM node (for drawing lines)\tq",
@@ -360,10 +345,6 @@ class ShapeMenuMgr:
 
             # The algorithm that builds the menu
 
-            if unregistered:
-                add_pro_advert()
-                add_submenu_separator()
-
             if is_umlclass or is_comment:
                 add_properties()
                 add_separator()
@@ -458,15 +439,6 @@ class ShapeMenuMgr:
 
     def OnRightClickDeleteNode(self, event):
         self.shapehandler.umlcanvas.app.run.CmdNodeDelete(self.GetShape())
-
-    def OnProDragDrop(self, event):
-        # self.shapehandler.umlcanvas.app.context.wxapp.MessageBox("asd")  # quick popup
-
-        from common.messages import PRO_DRAG_DROP_CONNECT_HELP, PRO_INFO_URL
-        import webbrowser
-        retCode = wx.MessageBox(PRO_DRAG_DROP_CONNECT_HELP.strip(), "Pro Edition Information", wx.YES_NO | wx.ICON_QUESTION)
-        if retCode == wx.YES:
-            webbrowser.open(PRO_INFO_URL)
 
     def OnPopupMenuCancel(self, event):
         pass

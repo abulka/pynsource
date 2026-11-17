@@ -5,7 +5,6 @@ from common.architecture_support import whoscalling2
 import wx
 from typing import List, Set, Dict, Tuple, Optional
 from enum import Enum
-from gui.settings import PRO_EDITION
 
 MIN_SENSIBLE_CANVAS_SIZE = 200
 
@@ -192,9 +191,6 @@ class CanvasResizer(object):
             int(oldscrollx), int(oldscrolly),  # new scroll positions
             noRefresh=True
         )
-        if not PRO_EDITION:
-            self.canvas.OnSize(evt=None)  # fix for GTK - will create a larger _buffer
-
         # Cache is different to last bounds value - cannot combine these concepts
         self.allshapes_bounds_last = bounds
         self.allshapes_bounds_cached = None

@@ -174,28 +174,6 @@ You can zoom with CTRL-mousewheel.
 You can annotate with SHIFT right mouse button drawing.
 """
 
-PRO_DRAG_DROP_CONNECT_HELP = """
-In the Pro Edition of Pynsource, not only do you get faster performance due to the newly rebuilt 
-diagramming engine, you can drag drop to connect shapes.  
-
-The Pro version also lets you zoom in and out of the workspace, as well as the handy 'zoom to fit'
-feature, which sizes the diagram to fit the available window.
-
-Click Yes to learn more about the Pro Edition.
-"""
-PRO_INFO_URL = WEB_PYNSOURCE_HOME_URL  # TODO, change to be more specific
-
-PURE_MAC_FULLSCREEN_WARNING = """
-Pure fullscreen (on Mac only) slows down this app due to a wxPython OGL bug. 
-
-** This limitation does not affect the PRO edition which uses a different, faster rendering engine. **
-
-Please limit yourself to maximised mode (hold ALT when pressing the maximise icon, or just double click on the titlebar).
-
-WARNING: If you have accidentally managed to get into pure fullscreen mode, performance will be very slow, even after you exit pure fullscreen mode - YOU WILL NEED TO QUIT AND RESTART Pynsource to REGAIN PERFORMANCE. 
-"""
-# If zoomed, you may get up to three of these popup messages for each maximise attempt - sorry about that.")
-
 PLANTUML_VIEW_INITAL_HELP = """
 No diagram to render!
 
@@ -251,6 +229,6 @@ User cancelled PlantUML rendering.
 %s
 """.strip() % PLANTUML_TRY_AGAIN_HELP
 
-STATUS_TEXT_UML_VIEW = "SHIFT drag to draw with pen.  Right click on workspace for menu.  Drag to pan.  CMD/Ctrl + Mousewheel to zoom (Pro)."
+STATUS_TEXT_UML_VIEW = "SHIFT drag to draw with pen.  Right click on workspace for menu.  Drag to pan.  CMD/Ctrl + Mousewheel to zoom."
 
 STATUS_TEXT_UML_VIEW_NO_PLANTUML_RESPONSE = "Error rendering with plantuml - do you have an internet connection? Please check the log file for errors Help/View Log..."
