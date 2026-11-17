@@ -27,6 +27,9 @@
   one axis, and the resize completes wherever the mouse is released
 - Alt resizes a shape from its centre, and drags/resizes ignore movement below 3px so a click
   with a small hand tremor no longer nudges a shape
+- Dragging snaps to other shapes' edges and centres with alignment guides (wxdiagram's
+  `alignmentGuides`, on by default); an optional background grid and snap-to-grid are available
+  through the same canvas flags
 - Zoom-to-fit and the canvas scroll range now include imported images, so a resized image can
   always be scrolled to (previously its far edges were outside the scrollable area)
 - Content at negative diagram coordinates is now scrollable and framed by zoom-to-fit, so a
