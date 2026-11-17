@@ -325,6 +325,10 @@ class ShapeMenuMgr:
             add_separator()
             add_menuitem("Reverse Link\tR", self.OnLineConvertToReverse, key_code=ord("R"))
             add_separator()
+            add_menuitem("Edge style: Straight", self.OnLineRouteStraight)
+            add_menuitem("Edge style: Curved", self.OnLineRouteCurved)
+            add_menuitem("Edge style: Avoid boxes", self.OnLineRouteAvoid)
+            add_separator()
             add_menuitem("Delete\tDel", self.OnRightClickDeleteNode)
             add_separator()
 
@@ -478,3 +482,17 @@ class ShapeMenuMgr:
         self.shapehandler.umlcanvas.app.run.CmdLineChangeToEdgeType(self.GetShape(), "association")
     def OnLineConvertToReverse(self, event):
         self.shapehandler.umlcanvas.app.run.CmdLineChangeToReverse(self.GetShape())
+
+    def _set_line_route(self, mode):
+        line = self.GetShape()
+        line.SetRouteMode(mode)
+        self.shapehandler.umlcanvas.mega_refresh(auto_resize_canvas=False)
+
+    def OnLineRouteStraight(self, event):
+        self._set_line_route("straight")
+
+    def OnLineRouteCurved(self, event):
+        self._set_line_route("curved")
+
+    def OnLineRouteAvoid(self, event):
+        self._set_line_route("avoid")
