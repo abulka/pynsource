@@ -23,6 +23,8 @@
 - Image and rectangle resize now track the mouse at any zoom level (wxdiagram no longer snaps
   resize geometry to whole units), corner drags clamp at the opposite corner, and Shift keeps
   the aspect ratio
+- Zoom-to-fit and the canvas scroll range now include imported images, so a resized image can
+  always be scrolled to (previously its far edges were outside the scrollable area)
 - Quieter startup: the debug `cwd_info` line is no longer printed to the console
 - Layout menu has an "Auto Remove Overlaps" toggle, persisted in the user config
 - Removed the last `*OglTwo` class names (`UmlDividedShape`, `UmlCommentShape`,

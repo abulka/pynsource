@@ -599,9 +599,20 @@ class UmlCanvas(wxdiagram.ShapeCanvas):
             self.commit_undo()
 
     def getContentBounds(self):
-        """Fit-to-window should consider UML boxes and comments, not lines or images."""
+        """Bounds for zoom-to-fit and for the canvas scroll range.
+
+        Covers UML class boxes, comment boxes and imported images.  Images are
+        included because they can be resized far beyond the model, and their
+        far edges must stay reachable when zoomed in (and visible when fitting
+        to window).  Lines are left out: an edge's extent is already bounded by
+        the boxes it joins, and a stray arrow should not stretch the fit.
+        """
         maxx = maxy = 0
-        for shape in self.umlboxshapes:
+        shapes = list(self.umlboxshapes)
+        shapes.extend(
+            s for s in self.GetDiagram().GetShapeList() if getattr(s, "is_bitmap", False)
+        )
+        for shape in shapes:
             width, height = shape.GetBoundingBoxMax()
             maxx = max(maxx, shape.GetX() + width / 2)
             maxy = max(maxy, shape.GetY() + height / 2)
@@ -1127,7 +1138,8 @@ class UmlCanvas(wxdiagram.ShapeCanvas):
         """
         Return list of all uml classes and comment shapes
 
-        TODO take into account images and other future shapes
+        Images are not boxes; getContentBounds() adds them separately so they
+        count towards fit-to-window and the scroll range.
 
         Returns: list of all shapes
         """
