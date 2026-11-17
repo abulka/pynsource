@@ -85,12 +85,10 @@ class UmlShapeHandler(wxdiagram.ShapeEvtHandler):
         # print("OnEndDragLeft COMMON", shape)
         newpos = getpos(shape)
         canvas = shape.GetCanvas()
-        try:
-            # print shape.node.id, "moved from", oldpos, "to", newpos
+        node = getattr(shape, "node", None)
+        if node is not None:
             # Adjust the GraphNode to match the shape x,y
-            shape.node.left, shape.node.top = newpos
-        except:
-            print("Warning OnEndDragLeft: no node model attached to this shape?")
+            node.left, node.top = newpos
 
         self._post_move_or_resize(event, shape)
 
