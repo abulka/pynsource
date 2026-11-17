@@ -36,8 +36,8 @@
   (`autoRoute = "curved"`: free bezier, obstacle detour, orthogonal fallback, parallel lanes);
   UML edges now use the curved style
 - UML edges default to obstacle avoidance (straight unless a box is in the way); right-click a
-  line for Edge style: Straight / Curved / Avoid boxes.  Orthogonal routes now leave along the
-  attachment side instead of running along it
+  line for Edge style: Straight / Curved / Avoid boxes / Orthogonal (the menu ticks the current
+  style).  Orthogonal routes leave along the attachment side; arrowheads follow routed curves
 - Zoom-to-fit and the canvas scroll range now include imported images, so a resized image can
   always be scrolled to (previously its far edges were outside the scrollable area)
 - Content at negative diagram coordinates is now scrollable and framed by zoom-to-fit, so a

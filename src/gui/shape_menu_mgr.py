@@ -231,6 +231,11 @@ class ShapeMenuMgr:
         def add_separator():
             self.popupmenu.AppendSeparator()
 
+        def add_radio_menuitem(text, method, checked):
+            item = self.popupmenu.AppendRadioItem(wx.ID_ANY, text)
+            item.Check(checked)
+            self.frame.Bind(wx.EVT_MENU, method, source=item)
+
         def add_submenu_separator():
             self.submenu.AppendSeparator()
 
@@ -325,9 +330,20 @@ class ShapeMenuMgr:
             add_separator()
             add_menuitem("Reverse Link\tR", self.OnLineConvertToReverse, key_code=ord("R"))
             add_separator()
-            add_menuitem("Edge style: Straight", self.OnLineRouteStraight)
-            add_menuitem("Edge style: Curved", self.OnLineRouteCurved)
-            add_menuitem("Edge style: Avoid boxes", self.OnLineRouteAvoid)
+            line = self.shapehandler.GetShape()
+            current = line.GetRouteMode() if hasattr(line, "GetRouteMode") else None
+            add_radio_menuitem(
+                "Edge style: Straight", self.OnLineRouteStraight, current == "straight"
+            )
+            add_radio_menuitem(
+                "Edge style: Curved", self.OnLineRouteCurved, current == "curved"
+            )
+            add_radio_menuitem(
+                "Edge style: Avoid boxes", self.OnLineRouteAvoid, current == "avoid"
+            )
+            add_radio_menuitem(
+                "Edge style: Orthogonal", self.OnLineRouteOrthogonal, current == "orthogonal"
+            )
             add_separator()
             add_menuitem("Delete\tDel", self.OnRightClickDeleteNode)
             add_separator()
@@ -496,3 +512,6 @@ class ShapeMenuMgr:
 
     def OnLineRouteAvoid(self, event):
         self._set_line_route("avoid")
+
+    def OnLineRouteOrthogonal(self, event):
+        self._set_line_route("orthogonal")

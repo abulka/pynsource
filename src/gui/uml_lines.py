@@ -34,10 +34,9 @@ class LineShapeUml(LineShape):
     def DrawArrow(self, dc, arrow, XOffset, proportionalOffset):
         """Draw the given arrowhead (or annotation)."""
         first_line_point = self._lineControlPoints[0]
-        second_line_point = self._lineControlPoints[1]
-
         last_line_point = self._lineControlPoints[-1]
-        second_last_line_point = self._lineControlPoints[-2]
+        # Spline-aware neighbours, so heads on routed curves follow the curve.
+        second_line_point, second_last_line_point = self._arrow_reference_points()
 
         # Position of start point of line, at the end of which we draw the arrow
         startPositionX, startPositionY = 0.0, 0.0
