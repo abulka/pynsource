@@ -88,6 +88,14 @@ config_log(log)
 class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 # class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnInit(self):
+        # macOS builds the "Hide <name>" / "Quit <name>" items from the wx app
+        # name.  Set it before any frame/menu exists, otherwise a source run
+        # shows "Hide Pynsource_gui".  The top-left application menu on macOS
+        # still comes from the interpreter's .app bundle, so it says "Python"
+        # for source runs and "Pynsource" for the frozen bundle.
+        self.SetAppName(ABOUT_APPNAME)
+        self.SetAppDisplayName(ABOUT_APPNAME)
+
         # wx.Locale(wx.LANGUAGE_ENGLISH) is a Windows 10 workaround. On Linux, constructing it
         # pops "Cannot set locale to language "English"" at every launch when that locale is not
         # installed/available (minimal installs, containers, LANG=C), so skip it there.

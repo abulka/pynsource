@@ -100,6 +100,12 @@ Zoom, pan, drag-to-connect, resize and layout are free.
   native activation entirely. Original workaround: commit `37ee7da` (1.86). If a future macOS
   stops opening the bundle behind other windows, test from Finder and then remove the
   frozen-only block.
+- **macOS app-name trivia.** The top-left application menu is macOS's name for the running
+  executable: the Python interpreter's bundle in a source run ("python"), `Pynsource` in the
+  frozen `.app` (from `CFBundleName`). It is not reliably settable from inside an unbundled
+  process. The auto-generated "Hide …"/"Quit …" items *are* settable, via
+  `self.SetAppName(ABOUT_APPNAME)` / `SetAppDisplayName(...)` at the **start of `OnInit`**
+  before any frame/menu exists; otherwise they say "Hide Pynsource_gui".
 - Users who use Homebrew get a prompt-free install via the separate tap
   `abulka/homebrew-pynsource` (`brew install --cask abulka/pynsource/pynsource`). Homebrew
   quarantines every cask download and Homebrew 7 has no `--no-quarantine`, so the cask does
