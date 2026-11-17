@@ -1,4 +1,4 @@
-# Image viewer - Pro
+# PlantUML image viewer (zoom + save)
 
 import wx
 import sys
