@@ -302,11 +302,18 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
                 try:
                     import subprocess
 
-                    subprocess.Popen(
-                        ["osascript", "-e", 'tell application "Pynsource" to activate'],
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL,
+                    # Activate this specific bundle.  `tell application
+                    # "Pynsource"` goes through LaunchServices and can launch a
+                    # separately installed copy with the same name.
+                    bundle = os.path.abspath(
+                        os.path.join(os.path.dirname(sys.executable), "..", "..")
                     )
+                    if bundle.endswith(".app"):
+                        subprocess.Popen(
+                            ["open", "-a", bundle],
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL,
+                        )
                 except Exception:
                     pass
         self.frame.Bind(wx.EVT_CLOSE, self.OnCloseFrame)
