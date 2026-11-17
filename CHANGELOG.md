@@ -9,6 +9,8 @@
 - Zoom, pan, zoom-to-fit, drag-to-connect, resize and layout are **free for everyone**
 - wxdiagram now owns zoom, pinch-to-zoom, drag-to-pan and the canvas virtual size; the
   duplicated `CanvasResizer`/zoom code is gone
+- Smoother trackpad scrolling and panning (20px per wheel notch, fractional accumulation,
+  3px pan threshold)
 - **Pro is now module visualisation only** (ALSM), still free on Linux
 - Simplified settings and canvas code: one canvas path, one coordinate convention, and the
   `Move2` monkeypatch replaced by `Shape.MoveTo`
