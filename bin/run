@@ -1,3 +1,4 @@
-cd src
-PYTHON=python3
-$PYTHON pynsource_gui.py
+#cd src
+#PYTHON=python3
+#$PYTHON pynsource_gui.py "$@"
+.venv/bin/python src/pynsource_gui.py "$@"

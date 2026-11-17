@@ -26,6 +26,59 @@ class PynsourceImageViewer(ImageViewer):
     def OnHandleSaveImage(self, event):
         self.SaveImage(self.bmp, format="png")
 
+    def OnHandleSaveSvg(self, event):
+        self.SavePlantUmlImage(default_format="svg")
+
+    def SavePlantUmlImage(self, default_format="svg"):
+        """Export the PlantUML diagram, offering SVG (default) and PNG.
+
+        SVG export writes the raw vector bytes fetched from the server, so it
+        stays sharp at any size. PNG export writes the displayed bitmap.
+        """
+        frame = self.GetTopLevelParent()
+
+        thisdir = self.context.config.get("LastDirInsertImage", os.path.expanduser("~/"))
+
+        svg_bytes = None
+        if getattr(self, "plantuml_text", None):
+            from generate_code.gen_plantuml import plant_uml_fetch_svg
+            plantuml_server_local_url = self.context.config.get("PlantUmlServerUrl", None)
+            frame.SetStatusText("Fetching PlantUML SVG for export...")
+            try:
+                svg_bytes = plant_uml_fetch_svg(self.plantuml_text, plantuml_server_local_url)
+            finally:
+                frame.SetStatusText("")
+
+        has_svg = bool(svg_bytes)
+        if has_svg:
+            wildcard = "SVG vector image (*.svg)|*.svg|PNG image (*.png)|*.png"
+        else:
+            wildcard = "PNG image (*.png)|*.png"
+
+        dlg = wx.FileDialog(
+            parent=frame,
+            message="Save PlantUML image",
+            defaultDir=thisdir,
+            defaultFile="",
+            wildcard=wildcard,
+            style=wx.FD_SAVE,
+            pos=wx.DefaultPosition,
+        )
+        if has_svg:
+            dlg.SetFilterIndex(0 if default_format == "svg" else 1)
+        if dlg.ShowModal() == wx.ID_OK:
+            filename = dlg.GetPath()
+            if filename.lower().endswith(".svg") and has_svg:
+                with open(filename, "wb") as fp:
+                    fp.write(svg_bytes)
+            else:
+                if not filename.lower().endswith(".png"):
+                    filename += ".png"
+                self.bmp.SaveFile(filename, wx.BITMAP_TYPE_PNG)
+            self.context.config["LastDirInsertImage"] = dlg.GetDirectory()  # remember dir path
+            self.context.config.write()
+        dlg.Destroy()
+
     def OnHandleSaveImagePreserveTransparencies(self, event):
         self.SaveImage(self.bmp_transparent_ori, format="png")
 
@@ -50,14 +103,6 @@ class PynsourceImageViewer(ImageViewer):
         dc.SelectObject(wx.NullBitmap)
 
         self.SaveImage(bmp, format="png")
-
-    def zoom_initial(self):
-        self.SetVirtualSize((self.maxWidth, self.maxHeight))
-        self.SetScrollRate(1, 1)  # set the ScrollRate to 1 in order for panning to work nicely
-        self.Scroll(0, 0)
-        self.zoomscale = 1.0
-        self.clear_whole_window = False
-        self.Refresh()
 
     def zoom_to_fit(self):
 

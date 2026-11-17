@@ -142,6 +142,7 @@ class ImageViewer(wx.ScrolledWindow):
     async def ViewImage(self, thefile="", url=""):
         """Loads url or file and sets .bmp and .bmp_transparent_ori, the img is discarded"""
         self.error_msg = None
+        bmp = None
         if thefile:
             img = wx.Image(thefile, wx.BITMAP_TYPE_ANY)
             bmp = wx.Bitmap(img)  # ANDY added 2019
@@ -172,6 +173,11 @@ class ImageViewer(wx.ScrolledWindow):
         #     print(e)
         #     return
 
+        if bmp is not None and bmp.IsOk():
+            self._set_bitmap(bmp)
+
+    def _set_bitmap(self, bmp):
+        """Adopt a freshly rasterized bitmap as the viewed image."""
         self.maxWidth, self.maxHeight = bmp.GetWidth(), bmp.GetHeight()
         self.maxHeight += BMP_EXTRA_MARGIN  # stop bitmaps getting slightly clipped
 
@@ -181,6 +187,7 @@ class ImageViewer(wx.ScrolledWindow):
 
         # Render bmp to a second white bmp to remove transparency effects
         # if False and bmp.HasAlpha():
+        img = bmp.ConvertToImage()
         if img.HasAlpha():
             self.bmp_transparent_ori = bmp
             bmp2 = wx.Bitmap(bmp.GetWidth(), bmp.GetHeight())
@@ -193,7 +200,6 @@ class ImageViewer(wx.ScrolledWindow):
         else:
             self.bmp_transparent_ori = None
             self.bmp = bmp
-
 
     # def OnIdle(self, event):
     #     """Idle Handler."""
@@ -231,6 +237,9 @@ class ImageViewer(wx.ScrolledWindow):
 
     def OnHandleSaveImageInclDoodles(self, event):
         pass  # pro feature
+
+    def OnHandleSaveSvg(self, event):
+        pass  # overridden in PynsourceImageViewer - saves server SVG bytes
 
     def OnHandleQuickLoadImage(self, event):
         self.ViewImage(FILE)
@@ -276,6 +285,12 @@ class ImageViewer(wx.ScrolledWindow):
 
         item = self.popupmenu.Append(wx.ID_ANY, "Save Image as PNG...")
         frame.Bind(wx.EVT_MENU, self.OnHandleSaveImage, item)
+
+        if getattr(self, "plantuml_text", None):
+            # SVG export fetches vector bytes on demand, so it is offered in
+            # every display mode - not just when viewing the SVG render.
+            item = self.popupmenu.Append(wx.ID_ANY, "Save Image as SVG...")
+            frame.Bind(wx.EVT_MENU, self.OnHandleSaveSvg, item)
 
         if self.bmp_transparent_ori:
             item = self.popupmenu.Append(wx.ID_ANY, "Save Image as PNG... (preserve transparent areas)")
@@ -353,6 +368,14 @@ class ImageViewer(wx.ScrolledWindow):
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
             self.ViewImage(filename)
+
+    def zoom_initial(self, scale=1.0):
+        self.SetVirtualSize((self.maxWidth, self.maxHeight))
+        self.SetScrollRate(1, 1)  # set the ScrollRate to 1 in order for panning to work nicely
+        self.Scroll(0, 0)
+        self.zoomscale = scale
+        self.clear_whole_window = False
+        self.Refresh()
 
     def SetScrollRateSmart(self, newstep=None, printinfo=False):
         """changing scrollwindow scroll unit without scroll pos changing - utility.

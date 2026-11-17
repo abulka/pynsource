@@ -7,11 +7,10 @@ import logging
 from common.logger import config_log
 import functools
 from common.url_to_data import url_to_data
-from common.plantuml import deflate_and_encode
+from common.plantuml import deflate_and_encode, plant_uml_url
 import asyncio
 from async_lru import alru_cache
 import aiohttp
-from generate_code.plantuml_html_scan import extract_image_url
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -121,10 +120,34 @@ class CmdLinePythonToPlantUml(CmdLineGenerator):
             print("Done!")
 
 
+async def _plant_uml_fetch_direct_async(plant_uml_txt: str, fmt: str, plant_uml_server: str):
+    """Fetch raw image bytes straight from the PlantUML server, no HTML scraping.
+
+    Returns (data, status_code) or (None, None) on connection failure.
+    """
+    url = plant_uml_url(plant_uml_txt, fmt=fmt, server_url=plant_uml_server)
+    try:
+        data, status_code = await url_to_data(url)
+        log.info(f"Response for url {url} from plant_uml_server status_code is {status_code}")
+        return data, status_code
+    except (ConnectionError,
+            requests.exceptions.RequestException,
+            aiohttp.client_exceptions.ClientConnectorError) as e:
+        log.error(
+            f"Error trying to fetch {fmt} from plantuml server {plant_uml_server} {str(e)}")
+        return None, None
+    except asyncio.TimeoutError:
+        log.error(f"TimeoutError getting plantuml {fmt}")
+        raise
+
+
 @alru_cache(maxsize=32)
 async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str, plantuml_server_local_url: str) -> str:
     """Async version of getting image url from plantuml.  This does not get the actual image,
     that is a separate call - unlike in a browser where that second call is done automatically.
+
+    The direct /png/ server URL is used (no HTML scraping), so the returned url
+    can be fetched straight away by the image viewer.
 
     Uses `url_to_data`, and only returns extracted url, no response object is returned by this
     routine, cos it was never used by anyone recently.
@@ -138,51 +161,39 @@ async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str, pl
     plant_uml_server = plantuml_server_local_url if plantuml_server_local_url else PLANTUML_URL_ON_INTERNET
     log.info("plant_uml_server calculated to be %s" % (plant_uml_server,))
 
-    try:
-        # url = os.path.join(plant_uml_server, deflate_and_encode(plant_uml_txt))  # fails on windows cos \ char is not proper url
-        url = plant_uml_server + "/" + deflate_and_encode(plant_uml_txt)
-        data, status_code = await url_to_data(url)
-        log.info(f"Response for url {url} from plant_uml_server status_code is {status_code}")
-        response_text = data.decode('utf-8')
-
-    except (ConnectionError,
-            requests.exceptions.RequestException,
-            aiohttp.client_exceptions.ClientConnectorError) as e:
-        # log.exception("Trying to render using plantuml server %s str(e)" % plant_uml_server)
-        log.error(
-            f"Error trying to fetch initial html from plantuml server {plant_uml_server} {str(e)}")
+    data, status_code = await _plant_uml_fetch_direct_async(plant_uml_txt, "png", plant_uml_server)
+    if data is None:
         return None
-    except asyncio.TimeoutError as e:  # there is no string repr of this exception
-        log.error("TimeoutError getting plantuml html")
-        raise
 
     if status_code == 200:
-        log.info("plant_uml_server responded with 200 ok, next we try to extract diagram url from this HTML...")
-
-        # Uncomment for debugging
-        # log.info("plant_uml_server responded with 200 ok, see plantuml_server_response.html for full page response")
-        # with open("plantuml_server_response.html", "w") as f:
-        #     f.write(response_text)
-        
-        image_url = extract_image_url(response_text)
-        if image_url:
-            # this is likely referencing localhost due to calc_plantuml_server_url() giving us a localhost
-            image_url = image_url[0]
-
-            if image_url.startswith("//"):
-                from urllib.parse import urlparse
-                o = urlparse(plant_uml_server)
-                image_url = f"{o.scheme}:{image_url}"  # add the scheme back in e.g. http
-        else:
-            image_url = None
-            log.error(f"could not extract image from plant_uml_server - plantuml server html format has probably changed - please report this to https://github.com/abulka/pynsource/issues")
-
-        log.info("extracted actual diagram image_url of %s" % image_url)
-
+        image_url = plant_uml_url(plant_uml_txt, fmt="png", server_url=plant_uml_server)
+        log.info("direct diagram image_url of %s" % image_url)
         return image_url
     else:
         log.error(f"plant_uml_server responded with {status_code} ok")
         return None
+
+@functools.lru_cache(maxsize=32)
+def plant_uml_fetch_svg(plant_uml_txt: str, plantuml_server_local_url: str = None) -> bytes:
+    """Fetch the diagram as SVG bytes from the PlantUML server (blocking).
+
+    Used for on-demand SVG export from the GUI save dialog. Returns the raw
+    SVG document, or None on failure.
+    """
+    PLANTUML_URL_ON_INTERNET = "http://www.plantuml.com/plantuml/uml"
+    plant_uml_server = plantuml_server_local_url or PLANTUML_URL_ON_INTERNET
+    url = plant_uml_url(plant_uml_txt, fmt="svg", server_url=plant_uml_server)
+    log.info("fetching svg from %s" % url)
+    try:
+        response = requests.get(url, timeout=60)
+    except (ConnectionError, requests.exceptions.RequestException) as e:
+        log.error(f"Error fetching svg from plantuml server {plant_uml_server} {str(e)}")
+        return None
+    if response.status_code == 200 and response.content.lstrip()[:1] == b"<":
+        return response.content
+    log.error(f"plant_uml_server responded with {response.status_code} for svg")
+    return None
+
 
 @functools.lru_cache(maxsize=32)
 def plant_uml_create_png_and_return_image_url(plant_uml_txt):

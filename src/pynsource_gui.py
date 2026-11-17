@@ -737,10 +737,12 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         """Build plantuml view from display model, which involves converting to PlantUML text and
         sending to PlantUML server to render.
 
-        There are actually two steps.
-            1. plant_uml_create_png_and_return_image_url(plant_uml_txt) - contacts plantuml
-               server and gets back a html page with the url of the resulting image inside
-            2. self.plantuml.ViewImage(url=image_url) - contacts the plantuml server to get image
+        PNG display only (SVG is export-only): the server renders with a
+        `scale` directive for HiDPI crispness, and the viewer starts zoomed
+        out by the same factor so apparent size is unchanged:
+            1. plant_uml_create_png_and_return_image_url_async(plant_uml_txt)
+               -> direct /png/ url
+            2. self.plantuml.ViewImage(url=image_url) - fetches the image
 
         'force' means do it regardless of what tab is visible
 
@@ -754,6 +756,9 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         then that will be used as the Plantuml server url, otherwise the url defaults to
         "http://www.plantuml.com/plantuml/uml"
+
+        PlantUmlScale = 2 in the same file controls the server-side scale
+        (1-4, default 2) for HiDPI displays.
 
         For instructions on installing PlantUML server see http://plantuml.com/server or
         otherwise google for advice.
@@ -770,11 +775,19 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
                     self.plantuml.render_in_progress(True, self.frame)
                     StartCoroutine(self.update_refresh_plantuml_view_clock, self.frame)
 
-                    # internet connection errors getting initial plantuml html are
-                    # handled internally to this function
+                    try:
+                        plantuml_scale = int(self.config.get("PlantUmlScale", 2))
+                    except (TypeError, ValueError):
+                        plantuml_scale = 2
+                    plantuml_scale = max(1, min(4, plantuml_scale))
+
+                    # internet connection errors are handled internally to this function
                     plantuml_server_local_url = self.config.get("PlantUmlServerUrl", None)
+                    fetch_txt = plant_uml_txt
+                    if plantuml_scale > 1:
+                        fetch_txt = f"scale {plantuml_scale}\n{plant_uml_txt}"
                     image_url = await plant_uml_create_png_and_return_image_url_async(
-                        plant_uml_txt,
+                        fetch_txt,
                         plantuml_server_local_url=plantuml_server_local_url
                     )
 
@@ -787,11 +800,15 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
                     if image_url:
                         await self.plantuml.ViewImage(url=image_url)
+                        # HiDPI bitmap carries plantuml_scale x the pixels: start
+                        # zoomed out by the same factor so apparent size matches
+                        # a 1x render, but with crisp detail when zooming in.
+                        self.plantuml.zoom_initial(scale=1.0 / plantuml_scale)
                         self.plantuml.plantuml_text = plant_uml_txt
                         self.frame.SetStatusText(STATUS_TEXT_UML_VIEW)
                     else:
                         self.frame.SetStatusText(STATUS_TEXT_UML_VIEW_NO_PLANTUML_RESPONSE)
-                        self.plantuml.clear_cos_connection_error(msg=f"(no image_url from plantuml at {plantuml_server_local_url})") # this is what I was just getting
+                        self.plantuml.clear_cos_connection_error(msg=f"(no image from plantuml at {plantuml_server_local_url})") # this is what I was just getting
                         self.plantuml.plantuml_text = plant_uml_txt  # fixed - ensure plantuml_text always available
                 finally:
                     self.plantuml.render_in_progress(False, self.frame)
@@ -1603,7 +1620,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         event.Enable(self.viewing_plantuml_tab)
 
     def OnSavePlantUml(self, event):
-        self.plantuml.OnHandleSaveImage(event)
+        self.plantuml.SavePlantUmlImage()
 
     def OnInsertComment(self, event):
         self.app.run.CmdInsertComment()

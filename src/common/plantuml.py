@@ -17,6 +17,30 @@ __email__ = "doug.napoleone+plantuml@gmail.com"
 #: Default plantuml service url
 SERVER_URL = "http://www.plantuml.com/plantuml/img/"
 
+#: Image formats the PlantUML server renders directly, e.g.
+#: http://www.plantuml.com/plantuml/svg/<encoded> or /png/<encoded>
+PLANTUML_IMAGE_FORMATS = ("png", "svg")
+
+
+def plant_uml_url(plantuml_text, fmt="svg", server_url=None):
+    """Build a direct PlantUML server image URL for the given format.
+
+    :param str plantuml_text: The plantuml markup to render
+    :param str fmt: "svg" or "png"
+    :param str server_url: Server base, either the page endpoint
+        (e.g. http://www.plantuml.com/plantuml/uml or a local
+        http://localhost:8080/plantuml/uml) or the bare base
+        (e.g. http://www.plantuml.com/plantuml). None means the
+        public plantuml.com server.
+    :returns: direct image URL, no HTML scraping needed
+    """
+    if fmt not in PLANTUML_IMAGE_FORMATS:
+        raise ValueError(f"Unsupported PlantUML image format {fmt!r}, expected one of {PLANTUML_IMAGE_FORMATS}")
+    server = (server_url or "http://www.plantuml.com/plantuml/uml").rstrip("/")
+    if server.endswith("/uml"):
+        server = server[: -len("/uml")]
+    return f"{server}/{fmt}/{deflate_and_encode(plantuml_text)}"
+
 
 class PlantUMLError(Exception):
     """Error in processing.

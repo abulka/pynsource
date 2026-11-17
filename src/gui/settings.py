@@ -1,4 +1,16 @@
+import os
 import sys
+
+# Test override: force Community Edition even when registered (or on Linux).
+#   PYNSOURCE_FORCE_COMMUNITY=1 bin/run       (env var, works for GUI, CLI, tests)
+#   bin/run --community                        (CLI flag, stripped from sys.argv here
+#                                              so wx/click arg handling never sees it)
+FORCE_COMMUNITY = False
+if os.environ.get("PYNSOURCE_FORCE_COMMUNITY"):
+    FORCE_COMMUNITY = True
+if "--community" in sys.argv:
+    FORCE_COMMUNITY = True
+    sys.argv = [a for a in sys.argv if a != "--community"]
 
 # The diagram canvas is free for everyone. PRO_EDITION now gates optional
 # module visualisation (ALSM), which is the only paid feature.
@@ -17,29 +29,36 @@ APP_VERSION_FULL = f"{APP_VERSION}"
 if PATCH:
     APP_VERSION_FULL += f"-{PATCH}"
 
-try:
-    import rego
-except ModuleNotFoundError:
-    # print("rego functionality not found")
+if FORCE_COMMUNITY:
+    # Explicit test override wins over licence check and Linux force-Pro.
     PRO_EDITION = False
     registered_to = ""
-    enter_license = lambda name, serial: None  # dummy function when no rego library e.g. running from community source or snap
+    enter_license = lambda name, serial: None  # dummy function, same as no-rego case
+    print(f"Running Community Edition (forced by --community / PYNSOURCE_FORCE_COMMUNITY)")
 else:
-    PRO_EDITION = rego.are_registered(APP_VERSION)
-    registered_to = rego.get_stored_serial_info()["name"] if rego.get_stored_serial_info() else ""
-    enter_license = lambda name, serial: rego.enter_license(name, serial, APP_VERSION)
+    try:
+        import rego
+    except ModuleNotFoundError:
+        # print("rego functionality not found")
+        PRO_EDITION = False
+        registered_to = ""
+        enter_license = lambda name, serial: None  # dummy function when no rego library e.g. running from community source or snap
+    else:
+        PRO_EDITION = rego.are_registered(APP_VERSION)
+        registered_to = rego.get_stored_serial_info()["name"] if rego.get_stored_serial_info() else ""
+        enter_license = lambda name, serial: rego.enter_license(name, serial, APP_VERSION)
 
-# Linux editions are Pro-free: Pro is decided by platform, not by a licence file.
-#
-# Every Linux delivery route (AppImage, snap, distro package) ships with module
-# visualisation enabled. A licence file is not viable there: snaps cannot read
-# or write one (HOME is per-revision sandboxed, so registering would not survive
-# an update) and the various Linux packaging routes have no way to share one.
-# So on Linux we skip the licence check entirely - which also means the
-# AppImage/snap must bundle alsm (module visualisation).
-if sys.platform.startswith("linux"):
-    PRO_EDITION = True
-    registered_to = "Linux users"
+    # Linux editions are Pro-free: Pro is decided by platform, not by a licence file.
+    #
+    # Every Linux delivery route (AppImage, snap, distro package) ships with module
+    # visualisation enabled. A licence file is not viable there: snaps cannot read
+    # or write one (HOME is per-revision sandboxed, so registering would not survive
+    # an update) and the various Linux packaging routes have no way to share one.
+    # So on Linux we skip the licence check entirely - which also means the
+    # AppImage/snap must bundle alsm (module visualisation).
+    if sys.platform.startswith("linux"):
+        PRO_EDITION = True
+        registered_to = "Linux users"
 
 if PRO_EDITION:
     try:
@@ -57,7 +76,7 @@ if PRO_EDITION:
             print(f"  👉 This is a config error when debugging and developing the PRO version of pynsource, which only the author can do.")
             print(f"  👉 Andy, please run: pip install ../alsm-parsers/alsm/ (see alsm README.md for more info)")
 
-if not PRO_EDITION:
+if not PRO_EDITION and not FORCE_COMMUNITY:
     print(f"Running Community Edition")
 
 # APP_ICON_PATH = "/home/andy/.pyenv/versions/3.7.1/lib/python3.7/site-packages/wx/py/Py.ico"
