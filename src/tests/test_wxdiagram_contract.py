@@ -57,6 +57,7 @@ class TestWxdiagramContract(unittest.TestCase):
     def test_canvas_extension_points(self):
         self.assertTrue(hasattr(wxdiagram.Shape, "MoveTo"))
         self.assertTrue(hasattr(wxdiagram.ShapeCanvas, "getContentBounds"))
+        self.assertTrue(hasattr(wxdiagram.ShapeCanvas, "getContentOrigin"))
         for name in ["update_virtual_size", "ZoomToFit", "ZoomIn", "ZoomOut", "ZoomReset"]:
             self.assertTrue(hasattr(wxdiagram.ShapeCanvas, name), name)
 

@@ -21,10 +21,12 @@
   selected and shows resize handles, and resizing works via wxdiagram's ResizableBitmapShape
 - Image resize keeps its selection handles and no longer prints "no node model attached" warnings
 - Image and rectangle resize now track the mouse at any zoom level (wxdiagram no longer snaps
-  resize geometry to whole units), corner drags clamp at the opposite corner, and Shift keeps
-  the aspect ratio
+  resize geometry to whole units), corner drags clamp at the opposite corner, and resizing is
+  proportional by default (hold Shift for free aspect)
 - Zoom-to-fit and the canvas scroll range now include imported images, so a resized image can
   always be scrolled to (previously its far edges were outside the scrollable area)
+- Content at negative diagram coordinates is now scrollable and framed by zoom-to-fit, so a
+  shape dragged or resized past the top-left origin is no longer stranded off-canvas
 - Quieter startup: the debug `cwd_info` line is no longer printed to the console
 - Layout menu has an "Auto Remove Overlaps" toggle, persisted in the user config
 - Removed the last `*OglTwo` class names (`UmlDividedShape`, `UmlCommentShape`,
