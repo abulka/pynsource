@@ -719,6 +719,11 @@ class UmlCanvas(wxdiagram.ShapeCanvas):
                 shape.y = list(y)
                 shape.SetCanvas(self)
                 shape.Show(shown)
+                if getattr(shape, "is_bitmap", False):
+                    shape.SetSize(
+                        max(1, int(abs(shape.x[1] - shape.x[0]))),
+                        max(1, int(abs(shape.y[1] - shape.y[0]))),
+                    )
 
             order = {
                 key: index for index, key in enumerate(snapshot.get("order", ()))

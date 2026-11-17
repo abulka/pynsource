@@ -248,8 +248,11 @@ class CmdInsertImage(CmdBase):
         import os
 
         if filename:
-            self.context.umlcanvas.CreateImageShape(filename)
-            self.context.umlcanvas.mega_refresh()
+            shape = self.context.umlcanvas.CreateImageShape(filename)
+            if shape is not None:
+                self.context.umlcanvas.deselect()
+                self.context.umlcanvas.select(shape)
+                self.context.umlcanvas.mega_refresh()
             # self.SelectNodeNow(node.shape)
 
     def undo(self):  # override

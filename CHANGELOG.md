@@ -17,8 +17,8 @@
 - Duplicate now offsets down and slightly right (deliberately overlapping) and selects the copies
 - Explicit z-order commands (Bring to Front / Forward, Send Backward / to Back) in the Edit menu
   and shape context menu; click no longer changes z-order
-- Image import is centred, scaled to fit the viewport and sent to the back; resizable image support
-  now comes from wxdiagram
+- Image import is centred, scaled to fit the viewport and sent to the back; the new image is
+  selected and shows resize handles, and resizing works via wxdiagram's ResizableBitmapShape
 - Layout menu has an "Auto Remove Overlaps" toggle, persisted in the user config
 - Removed the last `*OglTwo` class names (`UmlDividedShape`, `UmlCommentShape`,
   `UmlLineShape`, `UmlBitmapShape`, `UmlShapeHandler`) and the `ogl` import alias
