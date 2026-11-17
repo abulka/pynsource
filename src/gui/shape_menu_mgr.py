@@ -344,6 +344,11 @@ class ShapeMenuMgr:
                 current == "auto",
             )
             add_radio_menuitem(
+                "Edge style: Avoid boxes (orth fallback)",
+                self.OnLineRouteAvoid,
+                current == "avoid",
+            )
+            add_radio_menuitem(
                 "Edge style: Orthogonal", self.OnLineRouteOrthogonal, current == "orthogonal"
             )
             add_separator()
@@ -515,8 +520,8 @@ class ShapeMenuMgr:
     def OnLineRouteAuto(self, event):
         self._set_line_route("auto")
 
-    def OnLineRouteAvoid(self, event):  # legacy alias
-        self._set_line_route("auto")
+    def OnLineRouteAvoid(self, event):
+        self._set_line_route("avoid")
 
     def OnLineRouteOrthogonal(self, event):
         self._set_line_route("orthogonal")

@@ -37,8 +37,8 @@
   UML edges now use the curved style
 - UML edges default to "Straight or curved" (wxdiagram `auto`): straight unless a box blocks the
   path, then a curve - never an orthogonal detour while routing is experimental.  Right-click a
-  line for Edge style: Straight / Curved / Straight or curved / Orthogonal (the menu ticks the
-  current style).  Arrowheads follow routed curves
+  line for Edge style: Straight / Curved / Straight or curved / Avoid boxes (orth fallback) /
+  Orthogonal (the menu ticks the current style).  Arrowheads follow routed curves
 - Zoom-to-fit and the canvas scroll range now include imported images, so a resized image can
   always be scrolled to (previously its far edges were outside the scrollable area)
 - wxdiagram composites are resizable (children scale with the frame) and polygons are clickable
