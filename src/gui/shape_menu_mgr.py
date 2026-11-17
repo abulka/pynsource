@@ -339,7 +339,9 @@ class ShapeMenuMgr:
                 "Edge style: Curved", self.OnLineRouteCurved, current == "curved"
             )
             add_radio_menuitem(
-                "Edge style: Avoid boxes", self.OnLineRouteAvoid, current == "avoid"
+                "Edge style: Straight or curved",
+                self.OnLineRouteAuto,
+                current == "auto",
             )
             add_radio_menuitem(
                 "Edge style: Orthogonal", self.OnLineRouteOrthogonal, current == "orthogonal"
@@ -510,8 +512,11 @@ class ShapeMenuMgr:
     def OnLineRouteCurved(self, event):
         self._set_line_route("curved")
 
-    def OnLineRouteAvoid(self, event):
-        self._set_line_route("avoid")
+    def OnLineRouteAuto(self, event):
+        self._set_line_route("auto")
+
+    def OnLineRouteAvoid(self, event):  # legacy alias
+        self._set_line_route("auto")
 
     def OnLineRouteOrthogonal(self, event):
         self._set_line_route("orthogonal")
