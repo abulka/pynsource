@@ -4,7 +4,8 @@
 
 ### 1.87
 
-- New diagram canvas: pynsource now uses **wxdiagram** (MIT) on every platform and edition;
+- New diagram canvas: pynsource now uses **wxdiagram** (MIT) on every platform and edition
+  (0.2.1, the first published release since 0.1.0);
   the vendored classic OGL copy and the `ogl2` dependency are gone
 - Zoom, pan, zoom-to-fit, drag-to-connect, resize and layout are **free for everyone**
 - wxdiagram now owns zoom, pinch-to-zoom, drag-to-pan and the canvas virtual size; the

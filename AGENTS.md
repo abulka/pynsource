@@ -42,7 +42,7 @@ only module visualisation (ALSM) on macOS/Windows; it is free on Linux builds.
 All live in `/Users/andy/Devel/pynsource-project/` and install editable into `.venv`:
 - `../wxdiagram` (`wxdiagram` package, 0.2.x) — the canvas library (shapes, connectors,
   selection, zoom/pan, JSON persistence). Pynsource uses it on every platform and edition.
-  Install: `uv pip install -e ../wxdiagram`. PyPI: `wxdiagram>=0.2,<0.3`.
+  Install: `uv pip install -e ../wxdiagram`. PyPI: `wxdiagram>=0.2.1,<0.3`.
 - `../pynsource-rego` (`rego` package) — licensing. `PRO_EDITION = rego.are_registered(APP_VERSION)`
   (`int(APP_VERSION)` + 5-version forward window, so 1.x bumps keep old licenses; never jump to 2.x
   lightly). Self-sign: `cd ../pynsource-rego && ../pynsource/.venv/bin/python rego_gen.py gen <Name> --version 1 --save`.
