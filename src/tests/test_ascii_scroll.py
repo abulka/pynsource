@@ -94,6 +94,18 @@ class TestAsciiScrollAxisLock(unittest.TestCase):
         self.assertGreater(viewer.asciiart.position[0], 300)
         self.assertEqual(viewer.asciiart.position[1], 300)
 
+    def test_vertical_scroll_takes_over_right_after_horizontal(self):
+        viewer = make_viewer()
+        for _ in range(10):
+            viewer.OnWheelZoom_ascii(FakeWheel(8, wx.MOUSE_WHEEL_HORIZONTAL))
+        after_sideways = viewer.asciiart.position[0]
+
+        for _ in range(6):
+            viewer.OnWheelZoom_ascii(FakeWheel(-10, wx.MOUSE_WHEEL_VERTICAL))
+
+        self.assertGreater(viewer.asciiart.position[1], 300)
+        self.assertEqual(viewer.asciiart.position[0], after_sideways)
+
 
 if __name__ == "__main__":
     unittest.main()

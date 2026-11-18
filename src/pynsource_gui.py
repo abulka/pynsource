@@ -78,6 +78,7 @@ ASCII_WHEEL_PIXELS = 20  # Windows/Linux wheel notch in pixels
 ASCII_WHEEL_MACOS_SCALE = 2.0  # wxOSX delta is already in pixels; scale for text
 # Sideways trackpad noise during a vertical swipe must not scroll the view.
 ASCII_HORIZONTAL_DEADZONE = 28  # pixels of deliberate sideways movement
+ASCII_VERTICAL_DEADZONE = 16  # let vertical take back over promptly
 ASCII_AXIS_LOCK_SECONDS = 0.3  # keep one axis in charge for this long
 
 # if 'wxMac' in wx.PlatformInfo:
@@ -654,6 +655,10 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         if horizontal:
             if self._ascii_scroll_axis == "x":
                 self._ascii_axis_time = now
+                # Horizontal motion wins while it continues; discard any
+                # vertical candidate so a long sideways swipe does not later
+                # jump vertically.
+                self._ascii_scroll_remainder = 0.0
                 self._scroll_ascii_horizontally(pixels)
                 return
             # Ignore small sideways noise from a mostly-vertical swipe.
@@ -670,14 +675,24 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self._scroll_ascii_horizontally()
             return
 
-        # Vertical events: a deliberate horizontal gesture keeps control until
-        # it stops for ASCII_AXIS_LOCK_SECONDS.
+        # Vertical events normally take control immediately, but if horizontal
+        # control is recent, require a deliberate vertical movement first.
+        # This makes the next down-swipe work right after a sideways swipe.
         if self._ascii_scroll_axis == "x":
-            return
-        self._ascii_scroll_axis = "y"
-        self._ascii_axis_time = now
-        self._ascii_scroll_remainder_x = 0.0
-        self._ascii_scroll_remainder += pixels
+            self._ascii_scroll_remainder += pixels
+            if abs(self._ascii_scroll_remainder) < ASCII_VERTICAL_DEADZONE:
+                return
+            self._ascii_scroll_axis = "y"
+            self._ascii_axis_time = now
+            self._ascii_scroll_remainder_x = 0.0
+            sign = 1.0 if self._ascii_scroll_remainder > 0 else -1.0
+            self._ascii_scroll_remainder -= sign * ASCII_VERTICAL_DEADZONE
+        else:
+            self._ascii_scroll_axis = "y"
+            self._ascii_axis_time = now
+            self._ascii_scroll_remainder_x = 0.0
+            self._ascii_scroll_remainder += pixels
+
         amount = int(self._ascii_scroll_remainder)
         if amount:
             self._ascii_scroll_remainder -= amount
