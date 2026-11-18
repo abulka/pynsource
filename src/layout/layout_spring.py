@@ -1,3 +1,14 @@
+# pynsource spring layout (application-specific engine).
+#
+# This is the original pynsource force layout.  It is not a copy of
+# wxdiagram's SpringLayout: this engine writes dimensionless layoutPosX/Y and
+# is coupled to CoordinateMapper, OverlapRemoval, snapshots and the deep-layout
+# blackboard.  wxdiagram ships a separate, newer, deterministic and
+# node-size-aware spring engine for generic diagrams.
+#
+# Keep the two separate unless a proper visual-regression spike says otherwise;
+# see Admin/LAYOUT-WXDIAGRAM-CONSIDERATIONS.md for the decision record.
+#
 # spring force layout
 #
 # Ported and Adapted from Graph::Layouter::Spring in
