@@ -74,12 +74,14 @@ ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS = True
 ASCII_MIN_FONT_SIZE = 4
 ASCII_MAX_FONT_SIZE = 65
 ASCII_WHEEL_PIXELS = 20  # Windows/Linux wheel notch in pixels
+ASCII_WHEEL_MACOS_SCALE = 2.0  # wxOSX delta is already in pixels; scale for text
 
 # if 'wxMac' in wx.PlatformInfo:
 #     GUI_LAYOUT = None
 
 from gui.uml_canvas import UmlCanvas
 from gui.wx_log import Log
+from gui.ascii_view import AsciiView
 from ascii_uml.layout_ascii import model_to_ascii_builder
 import logging
 from common.logger import config_log
@@ -179,37 +181,13 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.notebook.AddPage(self.umlcanvas, "UML", True)
 
             # Page 1
-            self.asciiart = wx.ScrolledWindow(
-                self.notebook,
-                wx.ID_ANY,
-                wx.DefaultPosition,
-                wx.DefaultSize,
-                wx.HSCROLL | wx.VSCROLL,
-            )
-            self.asciiart.SetScrollRate(1, 1)
-            asciiart_sizer = wx.BoxSizer(wx.VERTICAL)
-
-            # txt = u"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, \n" * 10
-            # self.multiText = wx.StaticText(self.asciiart, wx.ID_ANY, txt, wx.DefaultPosition, wx.DefaultSize, 0)
-            # self.multiText.Wrap(600)
-            # asciiart_sizer.Add(self.multiText, 1, wx.ALL, 0)
-
-            self.multiText = wx.TextCtrl(
-                self.asciiart, wx.ID_ANY, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE | wx.HSCROLL
-            )
-
-            if 'wxMac' in wx.PlatformInfo:
-                # Prevent '-' being turned into special dash which causes ascii lines to look wrong
-                self.multiText.OSXEnableAutomaticDashSubstitution(False)
+            self.asciiart = AsciiView(self.notebook)
+            self.multiText = self.asciiart
 
             self.multiText.SetFont(
                 wx.Font(DEFAULT_ASCII_UML_FONT_SIZE, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
-            )  # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
-            
-            asciiart_sizer.Add(self.multiText, 1, wx.EXPAND | wx.ALL, 0)
-            self.asciiart.SetSizer(asciiart_sizer)
-            self.asciiart.Layout()
-            self._resize_ascii_text()
+            )
+            self.multiText.SetValue(ASCII_UML_HELP_MSG)
             self.notebook.AddPage(self.asciiart, "Ascii Art", True)
 
             # Page 2
@@ -655,7 +633,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         if wx.Platform == "__WXMAC__":
             # wxOSX reports the precise NSEvent scrolling delta directly.
-            pixels = rotation
+            pixels = rotation * ASCII_WHEEL_MACOS_SCALE
         else:
             pixels = rotation / (event.GetWheelDelta() or 120) * ASCII_WHEEL_PIXELS
 
@@ -676,29 +654,6 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             if amount:
                 self._ascii_scroll_remainder -= amount
                 self.asciiart.Scroll(sx, max(0, sy - amount))
-
-    def _resize_ascii_text(self):
-        """Size the text control to its full content so the viewport scrolls.
-
-        A native wx.TextCtrl cannot be scrolled reliably with ScrollLines() on
-        macOS.  Giving it the full text height inside a wx.ScrolledWindow means
-        the outer window owns scrolling (pixel-based, trackpad-friendly) while
-        selection and copy still work in the text control.
-        """
-        if GUI_LAYOUT != "MULTI_TAB_GUI" or not isinstance(
-            self.asciiart, wx.ScrolledWindow
-        ):
-            return
-        text = self.multiText.GetValue()
-        lines = text.splitlines() or [""]
-        longest = max(len(line) for line in lines)
-        text_width, line_height = self.multiText.GetTextExtent("M" * max(1, longest))
-        text_height = line_height * max(1, self.multiText.GetNumberOfLines()) + 8
-        self.multiText.SetMinSize((text_width + 24, text_height))
-        sizer = self.asciiart.GetSizer()
-        if sizer is not None:
-            sizer.Layout()
-        self.asciiart.FitInside()
 
     def OnMagnifyZoom_ascii(self, event):
         """Trackpad pinch changes the ASCII font size."""
@@ -733,7 +688,6 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             wx.Font(point_size, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         )
         self._ascii_zoom_point_size = float(point_size)
-        self._resize_ascii_text()
 
     def ascii_art_zoom(self, direction=1, amount=1, reset=False):
         font = self.multiText.GetFont()
@@ -1426,9 +1380,6 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             if str(s).strip() == "":
                 self.multiText.SetValue(ASCII_UML_HELP_MSG)
             self.multiText.ShowPosition(0)
-            self._resize_ascii_text()
-            if isinstance(self.asciiart, wx.ScrolledWindow):
-                self.asciiart.Scroll(0, 0)
         finally:
             wx.EndBusyCursor()
 
