@@ -37,33 +37,33 @@ jobs:
         shell: bash  # git bash, same idiom as build-mac.yml
     steps:
     - name: Check out pynsource (triggering ref)
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         path: pynsource/
 
     - name: Check out wxdiagram (public canvas library)
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: abulka/wxdiagram
         ref: ${{ inputs.wxdiagram_ref || 'main' }}
         path: wxdiagram/
 
     - name: Check out pynsource-rego (private)
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: abulka/pynsource-rego
         token: ${{ secrets.my_pat }}
         path: pynsource-rego/
 
     - name: Check out ALSM (private, default branch - see header)
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: abulka/alsm
         token: ${{ secrets.my_pat }}
         path: alsm/
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
         enable-cache: false
 
@@ -187,14 +187,14 @@ jobs:
         Stop-Process -Id $p.Id -Force
 
     - name: Save installer as artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: pynsource-win-${{ env.TAG }}
         path: pynsource/dist-inno/
 
     - name: Draft release (published by hand)
       if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:

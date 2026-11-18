@@ -32,19 +32,44 @@ ABOUT_APPNAME = "Pynsource"
 VENDOR_NAME = "Wware"
 ABOUT_LICENSE = "License: GPL 3"
 ABOUT_LICENSE_PRO = "License: Purchased Pro"
+# Linux builds are Pro-free by platform (see gui/settings.py), so the About box must not
+# advertise a paid licence there.
+ABOUT_LICENSE_PRO_FREE = "License: GPL 3 - free on Linux"
 ABOUT_LICENSE_DETAILS = """Pynsource Community Edition is free software; 
 you can redistribute it and/or modify it under the terms of the 
 GNU General Public License as published by the Free Software Foundation; 
 either version 2 of the License, or (at your option) any later version.
 
-Pynsource PRO edition is a Commercial product and requires a valid paid license.
-Please support further development of this project by purchasing a 
-license www.pynsource.com/buy
-
 Pynsource is distributed in the hope that it will be useful, 
 but WITHOUT ANY WARRANTY; without even the implied warranty 
 of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 """
+ABOUT_LICENSE_PRO_PAID_NOTE = """Pynsource PRO edition is a Commercial product and requires a valid paid license.
+Please support further development of this project by purchasing a 
+license www.pynsource.com/buy"""
+ABOUT_LICENSE_PRO_FREE_NOTE = """Pynsource PRO edition is free on Linux: every feature, including module
+visualisation, is enabled at no cost and no license is required."""
+
+
+def about_license_texts(unregistered, pro_free, registered_to):
+    """Return (edition, licence header, licence details) for the About box.
+
+    pro_free is True on Linux, where Pro is free by platform rather than licensed - the About
+    box must not advertise a paid licence there.
+    """
+    if unregistered:
+        return "Community Edition", ABOUT_LICENSE, ABOUT_LICENSE_DETAILS
+    if pro_free:
+        return (
+            "PRO Edition - free on Linux",
+            ABOUT_LICENSE_PRO_FREE,
+            ABOUT_LICENSE_PRO_FREE_NOTE + "\n\n" + ABOUT_LICENSE_DETAILS,
+        )
+    return (
+        f'PRO Edition - registered to "{registered_to}"\nThank you for your support!',
+        ABOUT_LICENSE_PRO,
+        ABOUT_LICENSE_PRO_PAID_NOTE + "\n\n" + ABOUT_LICENSE_DETAILS,
+    )
 ABOUT_MSG = """
 UML diagramming and reverse engineering for Python.
 """

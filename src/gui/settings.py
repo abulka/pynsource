@@ -16,6 +16,9 @@ if "--community" in sys.argv:
 # module visualisation (ALSM), which is the only paid feature.
 PRO_EDITION = True
 ALSM_PARSING = False
+# True when Pro is free by platform (Linux) rather than licensed. The About box uses this so it
+# does not advertise a paid licence to Linux users.
+PRO_EDITION_FREE = False
 ASYNC_BACKGROUND_REFRESH = False  # devel purposes only
 
 APP_VERSION = 1.87
@@ -58,6 +61,7 @@ else:
     # AppImage/snap must bundle alsm (module visualisation).
     if sys.platform.startswith("linux"):
         PRO_EDITION = True
+        PRO_EDITION_FREE = True
         registered_to = "Linux users"
 
 if PRO_EDITION:

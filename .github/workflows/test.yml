@@ -29,31 +29,31 @@ jobs:
         shell: bash
     steps:
       - name: Check out pynsource
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Check out wxdiagram
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: abulka/wxdiagram
           ref: ${{ inputs.wxdiagram_ref || 'main' }}
           path: wxdiagram-src/
 
       - name: Check out ALSM (private)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: abulka/alsm
           token: ${{ secrets.my_pat }}
           path: alsm/
 
       - name: Check out pynsource-rego (private)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: abulka/pynsource-rego
           token: ${{ secrets.my_pat }}
           path: pynsource-rego/
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: false
 

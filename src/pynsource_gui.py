@@ -1432,9 +1432,12 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         # self.MessageBox(ABOUT_MSG.strip() %  APP_VERSION)
 
         from wx.adv import AboutDialogInfo, AboutBox
-        from gui.settings import registered_to
+        from gui.settings import registered_to, PRO_EDITION_FREE
 
-        license = "Community Edition" if unregistered else f"PRO Edition - registered to \"{registered_to}\"\nThank you for your support!"
+        edition, license, license_details = about_license_texts(
+            unregistered, PRO_EDITION_FREE, registered_to
+        )
+
         info = AboutDialogInfo()
 
         # image appears on left on all platforms, so make sure the image is small
@@ -1444,12 +1447,10 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         # info.SetVersion(str(APP_VERSION))
         info.SetVersion(APP_VERSION_FULL)
         info.SetWebSite(WEB_PYNSOURCE_HOME_URL, "Home Page")
-        info.SetDescription(f"{ABOUT_MSG}\n{license}\n")
+        info.SetDescription(f"{ABOUT_MSG}\n{edition}\n")
         # info.Description = wordwrap(ABOUT_MSG, 350, wx.ClientDC(self.frame))
         info.SetCopyright(ABOUT_AUTHOR)
-        license = ABOUT_LICENSE if unregistered else ABOUT_LICENSE_PRO
-        license += "\n\n" + ABOUT_LICENSE_DETAILS
-        info.SetLicence(license)
+        info.SetLicence(license + "\n\n" + license_details)
         info.AddDeveloper(ABOUT_AUTHORS)
         # info.AddDocWriter(ABOUT_FEATURES)
         # info.AddArtist('Blah')
