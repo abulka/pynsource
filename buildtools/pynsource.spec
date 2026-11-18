@@ -2,8 +2,8 @@
 import os
 import platform
 
-# To build, from the pynsource/ dir run: 
-# pyinstaller bin/pynsource-github-actions.spec
+# To build, from the pynsource/ dir run:
+# pyinstaller buildtools/pynsource.spec
 # or bin/buildmac
 
 print(os.getcwd())  # should be 'pynsource' dir
@@ -81,7 +81,7 @@ pyz = PYZ(a.pure, a.zipped_data,
 # $TMPDIR/_MEIxxxxxx on EVERY launch (~2s even when warm, ~8s on first launch while
 # macOS verifies a single 34MB fully-sealed executable) and PyInstaller 7 refuses
 # onefile + .app outright. Onedir runs straight out of the bundle: measured 0.4s
-# launch -> window. See pynsource/BUG-DIST-SLOWNESS-MAC.md section 12.
+# launch -> window. See Admin/BUG-DIST-SLOWNESS-MAC.md section 12.
 exe = EXE(pyz,
         a.scripts,
         [],

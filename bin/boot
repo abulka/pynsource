@@ -35,7 +35,7 @@ MSG
 MINGW* | MSYS* | CYGWIN*)
   cat >&2 <<'MSG'
 bin/boot: this script is for macOS/Linux. On Windows create the venv and install the
-requirements yourself, then use bin\run-win10.bat / bin\testall-win10.bat:
+requirements yourself, then use bin\runwin.bat / bin\testallwin.bat:
 
   uv venv --python 3.13 .venv
   uv pip install -r requirements.txt

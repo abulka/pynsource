@@ -35,9 +35,9 @@ else
   DESTZIP="pynsource-$APP_VERSION-ubuntu-$1.zip"
 fi
 
-"$ROOT/.venv/bin/python" bin/_buildsamples.py
+"$ROOT/.venv/bin/python" buildtools/buildsamples.py
 
-"$PYINSTALLER" --noconfirm bin/pynsource-github-actions.spec
+"$PYINSTALLER" --noconfirm buildtools/pynsource.spec
 
 # NOTE: the build is ONEDIR (COLLECT + BUNDLE), so dist/ contains BOTH:
 #   dist/Pynsource/       the collected payload (exe + _internal) - build input

@@ -186,8 +186,8 @@ jobs:
     - name: Build executable using Pyinstaller
       run: |
         cd pynsource/
-        python bin/_buildsamples.py
-        pyinstaller --noconfirm bin/pynsource-github-actions.spec
+        python buildtools/buildsamples.py
+        pyinstaller --noconfirm buildtools/pynsource.spec
         cp README.md dist/Readme.txt
         cp CHANGELOG.md dist/Changelog.txt
         ls -l dist/

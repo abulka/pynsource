@@ -529,7 +529,7 @@ class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
     Reason for doing this: allows us to keep 'file' resources in the app itself,
     thus no need for loading external file - which is problematic e.g. on the mac
     
-    Run bin/_buildsamples.py to update it.
+    Run buildtools/buildsamples.py to update it.
     """
 
     def execute(self):

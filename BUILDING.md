@@ -17,7 +17,7 @@ bin/run         # launch the GUI; equivalent to: cd src && ../.venv/bin/python p
 Linux — install the wxPython wheel first, see [Linux and wxPython](#linux-and-wxpython). The
 manual equivalent on any platform is those two `uv` lines.
 
-On Windows use `bin\run-win10.bat` after creating the venv and installing the requirements
+On Windows use `bin\runwin.bat` after creating the venv and installing the requirements
 yourself; the batch files just prefer `.venv\Scripts\python.exe`. [bin/README.md](bin/README.md)
 indexes every script.
 
@@ -130,7 +130,7 @@ finishes last.
 
 Things that bite, in order of how much time they cost when forgotten:
 
-- **Bundle onedir, never onefile.** The spec is `bin/pynsource-github-actions.spec`
+- **Bundle onedir, never onefile.** The spec is `buildtools/pynsource.spec`
   (`EXE(exclude_binaries=True)` + `COLLECT` + `BUNDLE`): onefile unpacks itself into `%TEMP%` /
   `$TMPDIR` on every launch (~2 s vs 0.4 s) and PyInstaller 7 rejects onefile + `.app` outright.
 - **The macOS build interpreter must be uv's python-build-standalone.** A framework Python plus

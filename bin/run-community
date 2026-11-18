@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+#
+# Run the GUI forced into Community Edition, whatever the licence or platform:
+#
+#   bin/run-community
+#
+# Same as PYNSOURCE_FORCE_COMMUNITY=1 bin/run (src/gui/settings.py strips the flag from
+# sys.argv before wx sees it). Any further arguments are passed through.
+
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec "$HERE/run" --community "$@"

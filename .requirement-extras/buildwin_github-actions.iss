@@ -1,7 +1,7 @@
 ; Inno Setup script for the Windows installer.
 ;
 ; Used by .github/workflows/build-win.yml (CI) and bin/buildwin.bat (local).
-; The PyInstaller build is ONEDIR (see bin/pynsource-github-actions.spec), so
+; The PyInstaller build is ONEDIR (see buildtools/pynsource.spec), so
 ; the payload is the directory dist\Pynsource\ (Pynsource.exe + _internal\). The old
 ; onefile layout had a single ~34MB dist\Pynsource.exe.
 ;

@@ -87,8 +87,8 @@ jobs:
     - name: Build executable using Pyinstaller
       run: |
         cd pynsource/
-        ../.venv/Scripts/python.exe bin/_buildsamples.py
-        ../.venv/Scripts/python.exe -m PyInstaller --noconfirm bin/pynsource-github-actions.spec
+        ../.venv/Scripts/python.exe buildtools/buildsamples.py
+        ../.venv/Scripts/python.exe -m PyInstaller --noconfirm buildtools/pynsource.spec
         cp README.md dist/Readme.txt
         cp CHANGELOG.md dist/Changelog.txt
         ls -l dist/

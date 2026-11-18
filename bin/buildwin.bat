@@ -9,11 +9,11 @@ set PYTHON=.venv\Scripts\python.exe
 if not exist "%PYTHON%" set PYTHON=python
 
 echo Building sample UML diagrams...
-call "%PYTHON%" bin\_buildsamples.py
+call "%PYTHON%" buildtools\buildsamples.py
 if errorlevel 1 goto :error
 
 echo Running PyInstaller (onedir)...
-call "%PYTHON%" -m PyInstaller --noconfirm bin\pynsource-github-actions.spec
+call "%PYTHON%" -m PyInstaller --noconfirm buildtools\pynsource.spec
 if errorlevel 1 goto :error
 
 echo Running Inno Setup...

@@ -14,6 +14,10 @@ only module visualisation (ALSM) on macOS/Windows; it is free on Linux builds.
   worktree setup (uv venv + editable siblings + requirements), `bin/run` = GUI from source,
   `bin/testall` = full test suite, wx included (needs a display; `xvfb-run -a bin/testall` on a
   headless box). Nothing there ships; CI is the supported build route.
+- `buildtools/` — release-build inputs, not commands: `pynsource.spec` (the shared PyInstaller
+  onedir spec) and `buildsamples.py` (regenerates the bundled sample diagrams in
+  `src/samples/files_as_resource.py`). Both are run from the repo root by CI and by
+  `bin/buildmac` / `bin/buildwin.bat`.
 - Docs are split deliberately: `README.md` = pitch + install table, `DOWNLOADS.md` = the only
   install/troubleshooting reference (linked from the website), `BUILDING.md` = the only developer
   doc. Do not duplicate build/run/test instructions here — point at BUILDING.md.
@@ -92,7 +96,7 @@ Zoom, pan, drag-to-connect, resize and layout are free.
   mouse drag. Full write-up: `Admin/BUG-DIST-SLOWNESS-MAC.md`. The workflow prints
   `BUILD PYTHON ... framework=''` and a guard step fails the build if a framework interpreter
   or a onefile layout reappears.
-- Bundling is **onedir** (`bin/pynsource-github-actions.spec`): launch 0.4s vs 1.9s
+- Bundling is **onedir** (`buildtools/pynsource.spec`): launch 0.4s vs 1.9s
   for onefile, and PyInstaller 7 rejects onefile + `.app`. `dist/` then contains both
   `dist/Pynsource/` (COLLECT output — delete it, it is duplicated inside the app) and
   `dist/Pynsource.app` (what ships).
@@ -212,7 +216,7 @@ Zoom, pan, drag-to-connect, resize and layout are free.
   * The GTK plugin sets an rpath on the binaries it deploys, but `AppRun` is our shell wrapper,
     so `usr/bin/pynsource` must export `LD_LIBRARY_PATH=$APPDIR/usr/lib` itself. Forgetting that
     is a clean-room `libgtk-3.so.0: cannot open shared object file`.
-  * The spec (`bin/pynsource-github-actions.spec`) drops the partial GTK stack it would
+  * The spec (`buildtools/pynsource.spec`) drops the partial GTK stack it would
     otherwise bundle; the plugin's copy is then the only one. Platform-gated, mac/win untouched.
 - Guard: `xvfb-run` (a headless runner cannot create a `wx.App`), the full test suite, then extract the
   AppImage (`--appimage-extract`, no FUSE on runners) and assert `AppRun` is still alive after
