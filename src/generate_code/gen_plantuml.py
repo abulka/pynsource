@@ -385,12 +385,31 @@ def plant_uml_probe_server(plantuml_server_local_url: str = None, timeout=15):
     return True, "Server is working"
 
 
+def svg_on_white_background(svg_bytes: bytes, colour="#ffffff") -> bytes:
+    """Insert an opaque background rect into a PlantUML SVG document.
+
+    PlantUML's SVG output has a transparent page by default.  On a dark desktop
+    theme the black class borders then disappear while the coloured fills stay
+    visible.  A white rect immediately after the root ``<svg>`` makes the
+    exported file viewer-independent.
+    """
+    if not svg_bytes:
+        return svg_bytes
+    match = re.search(rb"<svg\b[^>]*>", svg_bytes, re.IGNORECASE)
+    if not match:
+        return svg_bytes
+    background = (
+        f'<rect x="0" y="0" width="100%" height="100%" fill="{colour}"/>'
+    ).encode("ascii")
+    return svg_bytes[: match.end()] + background + svg_bytes[match.end():]
+
+
 @functools.lru_cache(maxsize=32)
 def plant_uml_fetch_svg(plant_uml_txt: str, plantuml_server_local_url: str = None) -> bytes:
     """Fetch the diagram as SVG bytes from the PlantUML server (blocking).
 
     Used for on-demand SVG export from the GUI save dialog. Returns the raw
-    SVG document, or None on failure.
+    SVG document with an opaque white page, or None on failure.
     """
     PLANTUML_URL_ON_INTERNET = "http://www.plantuml.com/plantuml/uml"
     plant_uml_server = plantuml_server_local_url or PLANTUML_URL_ON_INTERNET
@@ -402,7 +421,7 @@ def plant_uml_fetch_svg(plant_uml_txt: str, plantuml_server_local_url: str = Non
         log.error(f"Error fetching svg from plantuml server {plant_uml_server} {str(e)}")
         return None
     if response.status_code == 200 and response.content.lstrip()[:1] == b"<":
-        return response.content
+        return svg_on_white_background(response.content)
     log.error(f"plant_uml_server responded with {response.status_code} for svg")
     return None
 

@@ -7,15 +7,17 @@
 - New diagram canvas: pynsource now uses **wxdiagram** (MIT) on every platform and edition
   (0.2.1, the first published release since 0.1.0);
   the vendored classic OGL copy and the `ogl2` dependency are gone
-- wxdiagram upgraded to **0.2.5**: dragging a multi-selection that includes an edge no longer
+- wxdiagram upgraded to **0.2.6**: dragging a multi-selection that includes an edge no longer
   stretches the edge (it now follows its endpoint shapes exactly), dragging an edge on its own
   leaves it attached, changing diagrams clears the old selection handles immediately, and
-  connection targets show all four round drop dots instead of only the left-hand port
+  connection targets show all four round drop dots (forward and reverse drags)
 - New comments and classes are created at the top of the z-order, so a new comment is visible
   even when it lands over an existing shape
-- PlantUML view requests the display's own pixel scale on GTK, so a 2x render is no longer
-  downscaled in the DC and thin shape borders are not dropped on Linux (saving PNG/SVG was
-  already correct)
+- PlantUML view composites transparent PNGs onto an explicit white page and requests the
+  display's own pixel scale on GTK, so a 2x render is no longer downscaled in the DC and thin
+  shape borders are not dropped on Linux
+- PlantUML SVG export inserts an explicit white background, so black borders stay visible in
+  dark-themed SVG viewers on Ubuntu
 - ASCII UML view now uses a lightweight custom text view: two-finger scrolling is pixel-based
   and smooth, text selection/copy still works, Cmd/Ctrl-wheel zooms the font, and trackpad pinch
   zooms it too (native macOS wx.TextCtrl could not scroll programmatically and was slow and
