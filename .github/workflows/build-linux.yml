@@ -14,12 +14,17 @@
 #     run wxPython 4.2.5 on Linux while Mac/Windows run 4.3.2.
 #
 # Linux is Pro-free (see the platform gate in src/gui/settings.py), so both bundles must
-# contain ogl2 + alsm and need no licence plumbing.
+# contain wxdiagram + alsm and need no licence plumbing.
 name: Pynsource app built on Linux (AppImage)
 on:
   push:
     tags: ['pre-*', 'version-*']
   workflow_dispatch:
+    inputs:
+      wxdiagram_ref:
+        description: wxdiagram git ref to build against
+        required: false
+        default: main
 
 jobs:
   build:
@@ -40,33 +45,33 @@ jobs:
         shell: bash
     steps:
     - name: Check out pynsource (triggering ref)
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         path: pynsource/
 
-    - name: Check out ogl2 (private, default branch - see header)
-      uses: actions/checkout@v4
+    - name: Check out wxdiagram (public canvas library)
+      uses: actions/checkout@v5
       with:
-        repository: abulka/ogl2
-        token: ${{ secrets.my_pat }}
-        path: ogl2/
+        repository: abulka/wxdiagram
+        ref: ${{ inputs.wxdiagram_ref || 'main' }}
+        path: wxdiagram/
 
     - name: Check out pynsource-rego (private)
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: abulka/pynsource-rego
         token: ${{ secrets.my_pat }}
         path: pynsource-rego/
 
     - name: Check out ALSM (private, default branch - see header)
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: abulka/alsm
         token: ${{ secrets.my_pat }}
         path: alsm/
 
     - name: Setup uv (python-build-standalone interpreter)
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
         enable-cache: false
 
@@ -118,7 +123,7 @@ jobs:
 
     - name: Cache the locally built aarch64 wxPython wheel
       if: matrix.wxpython == 'source'
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/wx-wheel-cache
         key: wxpython-4.2.5-cp313-ubuntu-22.04-arm64
@@ -144,13 +149,13 @@ jobs:
     - name: Install remaining dependencies + siblings
       run: |
         PY=.venv/bin/python
+        # Install the canvas first: it satisfies requirements.txt's wxdiagram range even
+        # before that exact version is on PyPI.
+        uv pip install --python "$PY" -e wxdiagram/
         uv pip install --python "$PY" -r pynsource/requirements.txt
-        # Linux is Pro-free, so ogl2 (canvas) and alsm (module visualisation) are imported
-        # unconditionally - unlike Mac/Windows CI, which runs Community with no licence file.
-        uv pip install --python "$PY" -e ogl2/
         uv pip install --python "$PY" -e pynsource-rego/
         uv pip install --python "$PY" alsm/
-        "$PY" -c "import sys, wx, ogl2, alsm; print('BUILD PYTHON', sys.version.split()[0], wx.version(), ogl2.__file__)"
+        "$PY" -c "import sys, wx, wxdiagram, alsm; print('BUILD PYTHON', sys.version.split()[0], wx.version(), wxdiagram.__file__)"
 
     - name: Guard - Linux runs Pro by platform, and alsm is importable
       run: |
@@ -166,8 +171,8 @@ jobs:
       run: |
         mkdir -p pynsource/src/tests/logs
         cd pynsource
-        # xvfb, not TRAVIS=1: the wx-dependent tests (128 of 158) then actually run instead of
-        # skipping. Keep the full log - piping straight to tail conceals the traceback.
+        # xvfb, not TRAVIS=1: the wx-dependent tests then actually run instead of being skipped.
+        # Keep the full log - piping straight to tail conceals the traceback.
         set +e
         xvfb-run -a -s "-screen 0 1280x1024x24" python -m unittest discover -s src > /tmp/tests.log 2>&1
         rc=$?
@@ -181,8 +186,8 @@ jobs:
     - name: Build executable using Pyinstaller
       run: |
         cd pynsource/
-        python bin/_buildsamples.py
-        pyinstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
+        python buildtools/buildsamples.py
+        pyinstaller --noconfirm buildtools/pynsource.spec
         cp README.md dist/Readme.txt
         cp CHANGELOG.md dist/Changelog.txt
         ls -l dist/
@@ -243,14 +248,14 @@ jobs:
         fi
 
     - name: Save AppImage as artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: pynsource-linux-${{ matrix.arch }}-${{ env.TAG }}
         path: pynsource/dist/pynsource-linux-${{ env.TAG }}-${{ matrix.arch }}.AppImage
 
     - name: Draft release (published by hand)
       if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:

@@ -1,5 +1,32 @@
-#cd src
-#python -m unittest tests.test_parse_bugs_incoming.TestIncomingBugs.test_issue_subscript_issue_93
-#python -m unittest tests.test_parse_type_annotations.TestTypeHintsOnFunctionArguments
+#!/usr/bin/env bash
+#
+# Run one test, or every test matching a pattern:
+#
+#   bin/testone TestTypeHintsOnFunctionArguments
+#   bin/testone tests.test_parse_bugs_incoming.TestIncomingBugs.test_issue_subscript_issue_93
+#   bin/testone test_parse_type_annotations test_parse_bugs      (either pattern matches)
+#
+# Patterns go to unittest's -k, so they match against the full dotted test id.
 
-python -m unittest discover -v -s src -k TestTypeHintsOnFunctionArguments
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+PYTHON="${PYTHON:-$ROOT/.venv/bin/python}"
+
+if [ $# -eq 0 ]; then
+  echo "usage: bin/testone <pattern> [more patterns...]" >&2
+  echo "e.g.   bin/testone TestTypeHintsOnFunctionArguments" >&2
+  exit 2
+fi
+
+mkdir -p src/tests/logs
+
+# unittest accepts -k more than once (the patterns are OR'ed).
+patterns=()
+for arg in "$@"; do
+  patterns+=(-k "$arg")
+done
+
+exec "$PYTHON" -m unittest discover -v -s src "${patterns[@]}"

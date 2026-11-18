@@ -1,6 +1,6 @@
 # Pynsource roadmap and release status
 
-Current stable: **1.86** (November 2026). Previous stable: 1.84 (2022); 1.85 was a beta series.
+Current stable: **1.86** (November 2026). Next: **1.87**, the wxdiagram canvas release. Previous stable: 1.84 (2022); 1.85 was a beta series.
 
 This file is the durable, public-safe summary: what is shipping, what is next, and how the
 canvas libraries relate. Detailed working notes stay outside the repo (this repo is public, so
@@ -35,42 +35,40 @@ the macOS zip and the Windows installer. Still to do:
    worst case for a `PaintDC` canvas and is not evidence of a regression.
 3. Optional tidy: delete the old `pre-*` releases except the most recent.
 
-## The canvas libraries: ogl2 (frozen) and wxdiagram (future)
+## The canvas: wxdiagram
 
-Pynsource has two canvases and they are chosen by edition in `src/gui/settings.py`:
+Pynsource has **one canvas on every platform and edition**: `wxdiagram` (MIT), driven by
+`src/gui/uml_canvas.py`. The old choices are gone:
 
 | Edition | Canvas | Where it lives |
 |---|---|---|
-| Community | vendored classic OGL | `src/ogl/` in this repo |
-| Pro / Linux | `ogl2` | separate repo `abulka/ogl2` |
+| Community | `wxdiagram` | separate repo `abulka/wxdiagram` |
+| Pro / Linux | `wxdiagram` | same |
 
-`ogl2` is now **frozen at `2026-dustoff`**, which is its `master` head. It is MIT, carries the
-OGL-like shape/connector canvas (zoom, pan, drag-to-connect, JSON persistence) and is bundled
-into the Linux artefacts, where Pro is free.
+The vendored classic OGL copy (`src/ogl/`) and the `ogl2` sibling are no longer used. The
+PyInstaller spec, mac/win build scripts and `.icns` icon now live in this repo (`bin/`,
+`src/media/`), so a build change no longer needs a push to another repo.
 
-Its successor is **`wxdiagram`** — a clean-history library built from the ogl2 `standalone`
-work, with the package renamed and the pynsource/app debris removed (`pro/`, `bin/`, `media/`,
-`CodeBlock`, `ContainerBlock`). It is *not* a dependency of pynsource 1.x:
-
-- **pynsource 1.x uses `ogl2`** and will keep doing so.
-- **pynsource 2.x will use `wxdiagram`** and drop `ogl2`.
-- No release may depend on both.
-
-Consequence for later cleanup: the PyInstaller spec, mac/win build scripts and the `.icns`
-icon still live in `ogl2` (`bin/`, `media/`) because that is where they grew up. They must move
-into this repo **before `ogl2` is archived**; until then, a spec change only reaches CI once it
-is pushed to `ogl2`.
+The diagram is free: zoom, pan, pinch, drag-to-connect, resize and layout are not gated.
+`wxdiagram` owns the viewport (zoom, Ctrl+wheel, pinch, drag-to-pan, virtual size); pynsource
+keeps only `coordmapper` for layout/world coordinates. `PRO_EDITION` only gates **module
+visualisation** (ALSM) on macOS/Windows; it is free on Linux builds.
 
 ## Milestones
 
 | Milestone | Content | Notes |
 |---|---|---|
-| 1.86 | First stable release since 1.84; all platforms built by CI | now |
-| 1.86.x | Patch releases via `PATCH` in `src/gui/settings.py` | no retagging |
-| wxdiagram 0.1.0 | Renamed library, correctness pass from the OGL comparison, docs site | own repo, own release |
-| pynsource 2.0 | Port the Pro canvas to `wxdiagram`; `ogl2` archived | planned, not started |
+| 1.86 | First stable release since 1.84; all platforms built by CI | published |
+| 1.87 | One canvas (`wxdiagram`); diagram free; Pro = ALSM only | in progress |
+| 1.87.x | Patch releases via `PATCH` in `src/gui/settings.py` | no retagging |
+| wxdiagram 0.2 | Integration hooks (`MoveTo`, `getContentBounds`, opt-out flags) | own repo/release |
 | Flatpak / Flathub | Manifest that survives review, `com.pynsource.Pynsource` app id | deferred: a release-page `.flatpak` is close to useless, and the AppImage already covers Linux |
-| Community canvas | Decide whether Community keeps `src/ogl` or moves to `wxdiagram` | after 2.0 |
+
+- **Legacy attachment-node drop path (wxdiagram).**  `INode`/`InputHandleNode`
+  dot-drop and the newer "drop anywhere on the target body" path both finish
+  edges and both read Shift/Alt.  Once pynsource no longer depends on the old
+  path, unify them, keep the modifier behaviour under test, and remove the
+  duplicate `ONode`/`INode` plumbing.
 
 ## Watch-outs
 
@@ -91,5 +89,5 @@ is pushed to `ogl2`.
   an Intel build (`macos-15-intel` plus the existing x86_64 wxPython wheels), but GitHub retires
   its Intel runners in August 2027 and macOS 26 is the last Intel macOS - not worth building a
   path with a fixed expiry date.
-- **Pro is free on Linux by platform**, so every Linux artefact must bundle `ogl2` (and `alsm`
-  for module visualisation). macOS/Windows CI never exercises those imports.
+- **Pro is free on Linux by platform**, so every Linux artefact must bundle `wxdiagram` and
+  `alsm`.

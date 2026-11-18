@@ -3,7 +3,7 @@
 # Build a single-file Pynsource AppImage from an existing PyInstaller onedir build.
 #
 #   cd pynsource                                   # repo root
-#   pyinstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
+#   pyinstaller --noconfirm buildtools/pynsource.spec
 #   bin/build-appimage.sh pre-2026-dustoff-5       # -> dist/pynsource-linux-<tag>-<arch>.AppImage
 #
 # Used by .github/workflows/build-linux.yml. Run it on Linux of the arch you want to ship;
@@ -24,7 +24,7 @@
 # resulting AppImage runs on a bare system (verified in a clean ubuntu container with no GTK).
 #
 # The spec still drops the partial GTK stack it would otherwise bundle (see
-# ../ogl2/bin/pynsource-github-actions.spec), so the plugin's copy is the only one present.
+# buildtools/pynsource.spec), so the plugin's copy is the only one present.
 #
 # Set APPIMAGETOOL / LINUXDEPLOY to pre-downloaded binaries to skip the downloads.
 set -euo pipefail

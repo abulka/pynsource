@@ -13,7 +13,7 @@ issues: https://github.com/abulka/pynsource/issues
 icon: snap/gui/pynsource.png
 
 grade: stable # devel # must be 'stable' to release into candidate/stable channels
-confinement: strict # devmode # strict is the goal; all Pro features are free on Linux,
+confinement: strict # devmode # strict is the goal; module visualisation is free on Linux,
                     # so there is no licence file to write outside the sandbox
 base: core24
 
@@ -125,24 +125,29 @@ parts:
         WX="$(ls /tmp/wxwheel/wxpython-*.whl)"
       fi
 
-      # One pip invocation on purpose: requirements-linux-common.txt contains a bare `wxpython`
-      # line, and a --target install is invisible to a later pip call, so splitting this up makes
-      # pip try to build wx from source.
+      # "$WX" must be in the same pip invocation as the requirement list: a --target install is
+      # invisible to a later pip call, so any later resolution of `wxpython` would rebuild it
+      # from source (there are no Linux wheels on PyPI).
       /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location \
         -r .requirement-extras/requirements-snap.txt "$WX"
       /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location --no-deps .
-      # Pro is free on Linux, so the snap ships the Pro-only siblings. The workflow checks
-      # them out next to this project; snapcraft's `source: .` copies them along.
-      # with dependencies: alsm pulls antlr4/esprima/javalang/prettyprinter/... which its
-      # modules import at load time (--no-deps leaves 'import alsm' failing at runtime)
-      for sibling in ogl2 alsm; do
-        if [ -d "$sibling" ]; then
-          /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location "./$sibling"
-        else
-          echo "ERROR: $sibling/ not present - the snap would ship without Pro features" >&2
+      # wxdiagram (canvas) and alsm (module visualisation) are checked out next to this project
+      # by CI; snapcraft's `source: .` copies them along.
+      #
+      # wxdiagram: --no-deps. Its only runtime dependency is wxpython, which is already in
+      # $SITE; letting pip resolve it makes it rebuild wxPython from source (invisible --target
+      # install + no Linux wheels), which fails under core24's gcc 13 (nanosvg isnan).
+      # alsm: dependencies on purpose - it pulls antlr4/esprima/javalang/prettyprinter/... which
+      # its modules import at load time (--no-deps leaves 'import alsm' failing at runtime,
+      # which settings.py then reports as "alsm not installed").
+      for sibling in wxdiagram alsm; do
+        if [ ! -d "$sibling" ]; then
+          echo "ERROR: $sibling/ not present - the snap would ship without the canvas or module visualisation" >&2
           exit 1
         fi
       done
+      /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location --no-deps ./wxdiagram
+      /usr/bin/python3 -m pip install --target "$SITE" --no-warn-script-location ./alsm
 
       # console scripts by hand (no setuptools entry points to fight over): the app definition
       # puts $SNAP/usr/lib/python3.12/site-packages on PYTHONPATH, so `-m` just works

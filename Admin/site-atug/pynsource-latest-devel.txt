@@ -1,14 +1,11 @@
 {
- "latest_version" : 1.86,
+ "latest_version" : 1.87,
  "latest_announcement" : """
-- First stable release since 1.84 (2022)
-- Python 3.13 and wxPython 4.3 support, isolated uv venv
-- Dropped Python 2 parsing (typed_ast end-of-life)
-- Fixed Mac print preview page range (now 1..1)
-- Fixed blurry UML text on Retina/HiDPI displays
-- All Pro features (zoom, drag-to-connect, module visualisation) are free on Linux
-- Rebuilt installers on every platform: Windows setup, macOS app (Homebrew or zip),
-  AppImage for x86_64 and arm64, and a snap
+- New diagram canvas: the diagram now uses the wxdiagram library on every platform
+- Zoom, pan, drag-to-connect and layout are free for everyone
+- Module visualisation is the only Pro feature (free on Linux)
+- One canvas everywhere: the old classic OGL and ogl2 paths are gone
+- Simplified build: the PyInstaller spec and icons now live in the pynsource repo
 
 Recent changes:
 - fixed: more robust handling of type annotations on function and method arguments e.g. def foo(a: Optional[str])

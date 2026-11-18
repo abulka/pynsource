@@ -1,52 +1,20 @@
 import math
-from gui.settings import PRO_EDITION, LOCAL_OGL
-import wx
 import sys
+import wx
 
-if PRO_EDITION:
-    # import ogl
-    from ogl2 import LineShape
-    from ogl2 import GetPointOnLine
-    from ogl2 import GetArrowPoints
-    from ogl2 import ARROW_POSITION_START
-    from ogl2 import ARROW_POSITION_MIDDLE
-    from ogl2 import ARROW_POSITION_END
-
-    from ogl2 import ARROW_HOLLOW_CIRCLE
-    from ogl2 import ARROW_FILLED_CIRCLE
-    from ogl2 import ARROW_ARROW
-    from ogl2 import ARROW_SINGLE_OBLIQUE
-    from ogl2 import ARROW_DOUBLE_OBLIQUE
-    from ogl2 import ARROW_METAFILE
-
-    from ogl2 import ShapeRegion, RectangleShape, Selectable
-else:
-    if LOCAL_OGL:
-        from ogl import LineShape
-        from ogl import GetPointOnLine
-        from ogl import GetArrowPoints
-        from ogl import ARROW_POSITION_START
-        from ogl import ARROW_POSITION_MIDDLE
-        from ogl import ARROW_POSITION_END
-        from ogl import ARROW_HOLLOW_CIRCLE
-        from ogl import ARROW_FILLED_CIRCLE
-        from ogl import ARROW_ARROW
-        from ogl import ARROW_SINGLE_OBLIQUE
-        from ogl import ARROW_DOUBLE_OBLIQUE
-        from ogl import ARROW_METAFILE
-    else:
-        from wx.lib.ogl import LineShape
-        from wx.lib.ogl import GetPointOnLine
-        from wx.lib.ogl import GetArrowPoints
-        from wx.lib.ogl import ARROW_POSITION_START
-        from wx.lib.ogl import ARROW_POSITION_MIDDLE
-        from wx.lib.ogl import ARROW_POSITION_END
-        from wx.lib.ogl import ARROW_HOLLOW_CIRCLE
-        from wx.lib.ogl import ARROW_FILLED_CIRCLE
-        from wx.lib.ogl import ARROW_ARROW
-        from wx.lib.ogl import ARROW_SINGLE_OBLIQUE
-        from wx.lib.ogl import ARROW_DOUBLE_OBLIQUE
-        from wx.lib.ogl import ARROW_METAFILE
+from wxdiagram import LineShape
+from wxdiagram import GetPointOnLine
+from wxdiagram import GetArrowPoints
+from wxdiagram import ARROW_POSITION_START
+from wxdiagram import ARROW_POSITION_MIDDLE
+from wxdiagram import ARROW_POSITION_END
+from wxdiagram import ARROW_HOLLOW_CIRCLE
+from wxdiagram import ARROW_FILLED_CIRCLE
+from wxdiagram import ARROW_ARROW
+from wxdiagram import ARROW_SINGLE_OBLIQUE
+from wxdiagram import ARROW_DOUBLE_OBLIQUE
+from wxdiagram import ARROW_METAFILE
+from wxdiagram import ShapeRegion, RectangleShape, Selectable
 
 # Custom styles
 ARROW_UML_GENERALISATION = 200
@@ -66,10 +34,9 @@ class LineShapeUml(LineShape):
     def DrawArrow(self, dc, arrow, XOffset, proportionalOffset):
         """Draw the given arrowhead (or annotation)."""
         first_line_point = self._lineControlPoints[0]
-        second_line_point = self._lineControlPoints[1]
-
         last_line_point = self._lineControlPoints[-1]
-        second_last_line_point = self._lineControlPoints[-2]
+        # Spline-aware neighbours, so heads on routed curves follow the curve.
+        second_line_point, second_last_line_point = self._arrow_reference_points()
 
         # Position of start point of line, at the end of which we draw the arrow
         startPositionX, startPositionY = 0.0, 0.0

@@ -31,22 +31,13 @@ class DialogPlantUmlText ( wx.Dialog ):
 
 		self.txt_plantuml = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
 		self.txt_plantuml.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Courier" ) )
-		self.txt_plantuml.Enable( False )
+		self.txt_plantuml.Enable( True )
 
 		bSizer13.Add( self.txt_plantuml, 5, wx.ALL|wx.EXPAND, 5 )
 
 		bSizer6 = wx.BoxSizer( wx.VERTICAL )
 
 		bSizer4 = wx.BoxSizer( wx.HORIZONTAL )
-
-		self.m_bitmap1 = wx.StaticBitmap( self.m_panel2, wx.ID_ANY, wx.Bitmap( u"help-images/pro.jpg", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer4.Add( self.m_bitmap1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-
-		self.m_staticText1 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Pro Edition enables the selection and copying of generated PlantUML text.", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText1.Wrap( 380 )
-
-		bSizer4.Add( self.m_staticText1, 0, wx.ALL, 5 )
-
 
 		bSizer6.Add( bSizer4, 0, wx.EXPAND, 5 )
 

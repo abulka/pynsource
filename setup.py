@@ -1,39 +1,58 @@
-import os
-from setuptools import setup, find_packages
-import sys
-print(sys.path)
-print("on linux please run: sudo apt-get install dpkg-dev build-essential python3-dev freeglut3-dev libgl1-mesa-dev libglu1-mesa-dev libgstreamer-plugins-base1.0-dev libgtk-3-dev libjpeg-dev libnotify-dev libpng-dev libsdl2-dev libsm-dev libtiff-dev libwebkit2gtk-4.0-dev libxtst-dev")
-with open('.requirement-extras/requirements-linux-22.txt') as f:
-    requirements = f.read().splitlines()
+"""
+Legacy setuptools metadata: `uv build` and `pip install .` use this. The PyInstaller builds in
+CI do not - they run the spec directly.
+
+Version is scraped from src/gui/settings.py so the sdist and the about box agree, and
+install_requires is requirements.txt verbatim (one requirements file for the venv and the
+package). Linux users must install a wxPython wheel before this pulls wxpython, because there
+are none on PyPI - see BUILDING.md, "Linux and wxPython".
+"""
+
+import re
+from pathlib import Path
+
+from setuptools import find_packages, setup
+
+ROOT = Path(__file__).parent
+
+# Scraped rather than imported: src/gui/settings.py sets up logging and imports rego/appdirs at
+# import time, which the isolated build environment does not have.
+APP_VERSION = re.search(
+    r"^APP_VERSION = ([\d.]+)",
+    (ROOT / "src" / "gui" / "settings.py").read_text(),
+    re.MULTILINE,
+).group(1)
+
+requirements = [
+    line
+    for line in (
+        stripped.strip()
+        for stripped in (ROOT / "requirements.txt").read_text().splitlines()
+    )
+    if line and not line.startswith("#")
+]
+
 setup(
-    name='pynsource',
-    version='1.0.0',
-    url='https://github.com/abuka/pynsource',
-    author='Andy Bulka',
-    author_email='abulka@gmail.com',
+    name="pynsource",
+    version=APP_VERSION,
+    url="https://github.com/abulka/pynsource",
+    author="Andy Bulka",
+    author_email="abulka@gmail.com",
 
-    py_modules=['pynsource_gui', 'pynsource_cli'],
+    py_modules=["pynsource_gui", "pynsource_cli"],
 
-    # You need both entries because packages tells setuptools to include all
-    # packages found under the src directory, while package_dir tells it to use
-    # src as the root directory for the package hierarchy. Without package_dir,
-    # setuptools would look for packages relative to the root directory of the
-    # project, which would result in the packages not being found. Similarly,
-    # without packages, setuptools would not include any packages in the
-    # distribution, even though they would be found under src.    
-    # 
-    # packages=['common'],
-    packages=find_packages(where='src'),
-    package_dir={'': 'src'},
+    # You need both entries because packages tells setuptools to include all packages found
+    # under src, while package_dir tells it to use src as the root of the package hierarchy.
+    # Without package_dir setuptools would look for packages relative to the project root;
+    # without packages it would include none of them.
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
 
-    # install_requires=[
-    #     # Add your requirements here
-    # ],
     install_requires=requirements,
     entry_points={
-        'console_scripts': [
-            'pynsource=pynsource_gui:run',
-            'pynsource-cli=pynsource_cli:reverse_engineer'
+        "console_scripts": [
+            "pynsource=pynsource_gui:run",
+            "pynsource-cli=pynsource_cli:reverse_engineer",
         ],
-    },    
+    },
 )

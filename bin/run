@@ -1,3 +1,15 @@
-cd src
-PYTHON=python3
-$PYTHON pynsource_gui.py
+#!/usr/bin/env bash
+#
+# Run the GUI from source, from any directory:
+#
+#   bin/run
+#   bin/run --community      (force Community Edition, see src/gui/settings.py)
+#
+# The app assumes src/ is the working directory, so we cd there; the interpreter is absolute
+# so the script does not depend on the caller's cwd.
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT/src"
+exec "$ROOT/.venv/bin/python" pynsource_gui.py "$@"

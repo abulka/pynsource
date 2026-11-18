@@ -14,14 +14,18 @@
 #     on first run - documented in .deploy-extras/RELEASE-NOTES.md.
 #   * Inno Setup is not preinstalled on the runners, so it is installed with choco.
 #
-# Siblings (ogl2, pynsource-rego, alsm) come from their default branches. ogl2 is
-# frozen at 2026-dustoff, which is now its master head; future canvas work happens in
-# the separate wxdiagram project, which pynsource does not use yet (see Admin/ROADMAP.md).
+# Siblings (wxdiagram, pynsource-rego, alsm): wxdiagram is the public canvas
+# library and can be overridden from workflow_dispatch; the other two are private.
 name: Pynsource app built on Windows
 on:
   push:
     tags: ['pre-*', 'version-*']
   workflow_dispatch:
+    inputs:
+      wxdiagram_ref:
+        description: wxdiagram git ref to build against
+        required: false
+        default: main
 
 jobs:
   build:
@@ -33,33 +37,33 @@ jobs:
         shell: bash  # git bash, same idiom as build-mac.yml
     steps:
     - name: Check out pynsource (triggering ref)
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         path: pynsource/
 
-    - name: Check out ogl2 (private, default branch - see header)
-      uses: actions/checkout@v4
+    - name: Check out wxdiagram (public canvas library)
+      uses: actions/checkout@v5
       with:
-        repository: abulka/ogl2
-        token: ${{ secrets.my_pat }}
-        path: ogl2/
+        repository: abulka/wxdiagram
+        ref: ${{ inputs.wxdiagram_ref || 'main' }}
+        path: wxdiagram/
 
     - name: Check out pynsource-rego (private)
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: abulka/pynsource-rego
         token: ${{ secrets.my_pat }}
         path: pynsource-rego/
 
     - name: Check out ALSM (private, default branch - see header)
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: abulka/alsm
         token: ${{ secrets.my_pat }}
         path: alsm/
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
         enable-cache: false
 
@@ -75,6 +79,7 @@ jobs:
         uv venv --python 3.13 --python-preference only-managed .venv
         PY=.venv/Scripts/python.exe
         uv pip install --python "$PY" wheel wxpython pyinstaller
+        uv pip install --python "$PY" -e wxdiagram/
         uv pip install --python "$PY" -r pynsource/requirements.txt
         uv pip install --python "$PY" alsm/
         "$PY" -c "import sys, wx; print('BUILD PYTHON', sys.version.split()[0], wx.version())"
@@ -82,8 +87,8 @@ jobs:
     - name: Build executable using Pyinstaller
       run: |
         cd pynsource/
-        ../.venv/Scripts/python.exe bin/_buildsamples.py
-        ../.venv/Scripts/python.exe -m PyInstaller --noconfirm ../ogl2/bin/pynsource-github-actions.spec
+        ../.venv/Scripts/python.exe buildtools/buildsamples.py
+        ../.venv/Scripts/python.exe -m PyInstaller --noconfirm buildtools/pynsource.spec
         cp README.md dist/Readme.txt
         cp CHANGELOG.md dist/Changelog.txt
         ls -l dist/
@@ -182,14 +187,14 @@ jobs:
         Stop-Process -Id $p.Id -Force
 
     - name: Save installer as artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: pynsource-win-${{ env.TAG }}
         path: pynsource/dist-inno/
 
     - name: Draft release (published by hand)
       if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:

@@ -31,16 +31,19 @@ http://pynsource.atug.com/buy
 
 import os
 import sys
+import time
 # from pydbg import dbg
 from common.messages import *
 import wx
-from gui.settings import PRO_EDITION, ASYNC_BACKGROUND_REFRESH, LOCAL_OGL
+from gui.settings import PRO_EDITION, ALSM_PARSING, ASYNC_BACKGROUND_REFRESH
 from common.printframework import MyPrintout
 from media import images
 from gui.settings import APP_VERSION, APP_VERSION_FULL, APP_ICON_PATH
 from gui.settings_wx import DEFAULT_ASCII_UML_FONT_SIZE
 from generate_code.gen_plantuml import displaymodel_to_plantuml
 from generate_code.gen_plantuml import plant_uml_create_png_and_return_image_url_async
+from generate_code.gen_plantuml import plant_uml_fetch_svg_bytes_async
+from generate_code.gen_plantuml import set_progress_callback
 from common.dialog_dir_path import dialog_path_pyinstaller_push, dialog_path_pyinstaller_pop, set_original_working_dir
 from configobj import ConfigObj  # pip install configobj
 from appdirs import AppDirs  # pip install appdirs
@@ -60,26 +63,30 @@ from typing import List, Set, Dict, Tuple, Optional
 import webbrowser
 
 
-if PRO_EDITION:
-    import ogl2 as ogl
-    from pro.gui_imageviewer2 import ImageViewer2 as ImageViewer
-else:
-    if LOCAL_OGL:
-        import ogl
-    else:
-        import wx.lib.ogl as ogl
-    from common.gui_imageviewer import ImageViewer
+import wxdiagram
+from gui.imageviewer import PynsourceImageViewer as ImageViewer
 
 WINDOW_SIZE = (1024, 768)
 GUI_LAYOUT = "MULTI_TAB_GUI"  # "MULTI_TAB_GUI" or "SPLIT_GUI" or None
 USE_SIZER = False
 ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS = True
 
+# ASCII UML view: trackpad-friendly wheel scrolling and font zoom.
+ASCII_MIN_FONT_SIZE = 4
+ASCII_MAX_FONT_SIZE = 65
+ASCII_WHEEL_PIXELS = 20  # Windows/Linux wheel notch in pixels
+ASCII_WHEEL_MACOS_SCALE = 2.0  # wxOSX delta is already in pixels; scale for text
+# Sideways trackpad noise during a vertical swipe must not scroll the view.
+ASCII_HORIZONTAL_DEADZONE = 28  # pixels of deliberate sideways movement
+ASCII_VERTICAL_DEADZONE = 16  # let vertical take back over promptly
+ASCII_AXIS_LOCK_SECONDS = 0.3  # keep one axis in charge for this long
+
 # if 'wxMac' in wx.PlatformInfo:
 #     GUI_LAYOUT = None
 
 from gui.uml_canvas import UmlCanvas
 from gui.wx_log import Log
+from gui.ascii_view import AsciiView
 from ascii_uml.layout_ascii import model_to_ascii_builder
 import logging
 from common.logger import config_log
@@ -95,6 +102,14 @@ config_log(log)
 class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 # class MainApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnInit(self):
+        # macOS builds the "Hide <name>" / "Quit <name>" items from the wx app
+        # name.  Set it before any frame/menu exists, otherwise a source run
+        # shows "Hide Pynsource_gui".  The top-left application menu on macOS
+        # still comes from the interpreter's .app bundle, so it says "Python"
+        # for source runs and "Pynsource" for the frozen bundle.
+        self.SetAppName(ABOUT_APPNAME)
+        self.SetAppDisplayName(ABOUT_APPNAME)
+
         # wx.Locale(wx.LANGUAGE_ENGLISH) is a Windows 10 workaround. On Linux, constructing it
         # pops "Cannot set locale to language "English"" at every launch when that locale is not
         # installed/available (minimal installs, containers, LANG=C), so skip it there.
@@ -104,10 +119,31 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.log = Log()
         self.working = False
         self.printData = None
-        wx.InitAllImageHandlers()
+        self._ascii_scroll_remainder = 0.0
+        self._ascii_scroll_remainder_x = 0.0
+        self._ascii_scroll_axis = None
+        self._ascii_axis_time = 0.0
+        self._ascii_zoom_point_size = None
+        # wx.App already calls InitAllImageHandlers(); calling it again
+        # logs "Adding duplicate image handler" for every format.
         self.andyapptitle = "Pynsource"
 
         self.args = sys.argv[1:]
+
+        # Single-instance guard: a second launch (including the installed app plus
+        # a source run) exits instead of opening another main window.
+        # PYNSOURCE_ALLOW_MULTIPLE=1 opts out.
+        if not os.environ.get("PYNSOURCE_ALLOW_MULTIPLE"):
+            self._instance_checker = wx.SingleInstanceChecker("pynsource-gui")
+            if self._instance_checker.IsAnotherRunning():
+                wx.MessageBox(
+                    "Pynsource is already running.\n\n"
+                    "Quit the other instance before starting a new one.\n"
+                    "(Set PYNSOURCE_ALLOW_MULTIPLE=1 to allow multiple instances.)",
+                    "Pynsource",
+                    wx.OK | wx.ICON_INFORMATION,
+                )
+                return False
 
         self.frame = wx.Frame(
             None,
@@ -123,8 +159,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.frame.CreateStatusBar()
 
         """
-        Setting double buffered True solves blurring of shapes as you drag them under wx.ogl and solves the constant
-        flickering of the display in ogl2 mode due to the constant Refresh() thus paints happening.
+        Setting double buffered True keeps dragging smooth and avoids flicker from the
+        constant Refresh()/paint cycle.
         Its supposed to be true by default, however it is actually false by default on windows!.  Cannot turn off on Mac.
         """
         self.frame.SetDoubleBuffered(True)
@@ -152,37 +188,13 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.notebook.AddPage(self.umlcanvas, "UML", True)
 
             # Page 1
-            self.asciiart = wx.ScrolledWindow(
-                self.notebook,
-                wx.ID_ANY,
-                wx.DefaultPosition,
-                wx.DefaultSize,
-                wx.HSCROLL | wx.VSCROLL,
-            )
-            self.asciiart.SetScrollRate(5, 5)
-            asciiart_sizer = wx.BoxSizer(wx.VERTICAL)
-
-            # txt = u"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, \n" * 10
-            # self.multiText = wx.StaticText(self.asciiart, wx.ID_ANY, txt, wx.DefaultPosition, wx.DefaultSize, 0)
-            # self.multiText.Wrap(600)
-            # asciiart_sizer.Add(self.multiText, 1, wx.ALL, 0)
-
-            self.multiText = wx.TextCtrl(
-                self.asciiart, wx.ID_ANY, ASCII_UML_HELP_MSG, style=wx.TE_MULTILINE | wx.HSCROLL
-            )
-
-            if 'wxMac' in wx.PlatformInfo:
-                # Prevent '-' being turned into special dash which causes ascii lines to look wrong
-                self.multiText.OSXEnableAutomaticDashSubstitution(False)
+            self.asciiart = AsciiView(self.notebook)
+            self.multiText = self.asciiart
 
             self.multiText.SetFont(
                 wx.Font(DEFAULT_ASCII_UML_FONT_SIZE, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
-            )  # see http://www.wxpython.org/docs/api/wx.Font-class.html for more fonts
-            
-            asciiart_sizer.Add(self.multiText, 1, wx.EXPAND | wx.ALL, 0)
-            self.asciiart.SetSizer(asciiart_sizer)
-            self.asciiart.Layout()
-            asciiart_sizer.Fit(self.asciiart)
+            )
+            self.multiText.SetValue(ASCII_UML_HELP_MSG)
             self.notebook.AddPage(self.asciiart, "Ascii Art", True)
 
             # Page 2
@@ -197,6 +209,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.notebook.ChangeSelection(0)
 
             self.multiText.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom_ascii)
+            if hasattr(wx, "EVT_MAGNIFY"):
+                self.multiText.Bind(wx.EVT_MAGNIFY, self.OnMagnifyZoom_ascii)
             self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabPageChanged)  # builds ascii
 
         elif GUI_LAYOUT == "SPLIT_GUI":
@@ -275,7 +289,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.sizer.Add(self.panel_two, 1, wx.EXPAND)
             self.frame.SetSizer(self.sizer)
 
-        ogl.OGLInitialize()  # creates some pens and brushes that the OGL library uses.
+        wxdiagram.initialize()  # sets up pens, brushes and fonts used by the canvas.
 
         # Set the frame to a good size for showing stuff
         self.frame.SetSize(WINDOW_SIZE)
@@ -286,19 +300,30 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             True
         )  # in wxpython2.8 this causes umlcanvas to grow too, but not in wxpython3 - till much later
         if sys.platform == "darwin":
-            # Frozen .app launched from Finder doesn't come to the front on its
-            # own (no Developer ID signing). Best-effort activation, never fatal.
-            try:
-                self.frame.Raise()
-                import subprocess
+            # macOS window activation (deliberate, frozen-only workaround):
+            # an ad-hoc-signed .app launched from Finder can open behind other
+            # windows, and wx's Raise() only raises the window inside the app.
+            # Activate *this bundle by path* with `open -a`.  Do NOT use
+            # `osascript -e 'tell application "Pynsource" to activate'`: it
+            # resolves the name through LaunchServices and can launch a
+            # separately installed copy (that started 1.86 during a 1.87 source
+            # run).  Source runs skip this and rely on Raise().
+            self.frame.Raise()
+            if getattr(sys, "frozen", False):
+                try:
+                    import subprocess
 
-                subprocess.Popen(
-                    ["osascript", "-e", 'tell application "Pynsource" to activate'],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                )
-            except Exception:
-                pass
+                    bundle = os.path.abspath(
+                        os.path.join(os.path.dirname(sys.executable), "..", "..")
+                    )
+                    if bundle.endswith(".app"):
+                        subprocess.Popen(
+                            ["open", "-a", bundle],
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL,
+                        )
+                except Exception:
+                    pass
         self.frame.Bind(wx.EVT_CLOSE, self.OnCloseFrame)
 
         self.popupmenu = None
@@ -441,7 +466,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         if "SNAP" in os.environ:
             cwd_info['SNAP'] = os.environ["SNAP"]
 
-        print("cwd_info", cwd_info)
+        log.debug("cwd_info %s", cwd_info)
         set_original_working_dir(cwd_info['__file__'])  # more accurate
         self.cwd_info = cwd_info
 
@@ -529,6 +554,12 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             if not self.config.get(key, None):
                 self.config[key] = os.path.expanduser("~/")
 
+        auto = self.config.get("AutoRemoveOverlaps", "True")
+        if isinstance(auto, str):
+            auto = auto.lower() == "true"
+        self.umlcanvas.auto_remove_overlaps = bool(auto)
+        self.config["AutoRemoveOverlaps"] = str(self.umlcanvas.auto_remove_overlaps)
+
         self.config.write()
 
 
@@ -567,7 +598,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
     def OnResizeFrame(self, event):  # ANDY  interesting - GetVirtualSize grows when resize frame
         # print("OnResizeFrame event.EventObject", event.EventObject.__class__, event.EventObject == self.umlcanvas, isinstance(event.EventObject, wx.ScrolledWindow))
 
-        # if event.EventObject == self.umlcanvas:  # only works in ogl2 mode
+        # if event.EventObject == self.umlcanvas:  # only works when the canvas is the event source
         if isinstance(event.EventObject, wx.ScrolledWindow):
 
             # Proportionally constrained resize.  Nice trick from http://stackoverflow.com/questions/6005960/resizing-a-wxpython-window
@@ -577,80 +608,145 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
             # print("GetClientSize()", self.umlcanvas.GetClientSize(), wx.ClientDisplayRect(), wx.DisplaySize())
 
-            # self.umlcanvas.canvas_resizer.frame_calibration()  # do I really need this anymore?
-
-            self.umlcanvas.fix_scrollbars()
-
-            if 'wxMac' in wx.PlatformInfo and not PRO_EDITION:
-                # Protect against resizing to pure fullscreen, to avoid weird performance degredation
-                # Luckily the Messagebox kills the resize frame attempt!
-                # print(f"wx.DisplaySize()={wx.DisplaySize()}")
-                alarm = self.frame.GetScreenRect()[2] >= wx.DisplaySize()[0] and \
-                        self.frame.GetScreenRect()[3] >= wx.DisplaySize()[1]
-                # print(self.frame.GetClientSize(), self.frame.GetScreenRect(), alarm)
-                if alarm:
-                    # print("\n",whoscalling2())
-                    wx.CallAfter(self.mac_fullscreen_warning)
+            self.umlcanvas.update_virtual_size()
 
         event.Skip()
 
-    def mac_fullscreen_warning(self):
-        if 'wxMac' in wx.PlatformInfo:
-            self.MessageBox(PURE_MAC_FULLSCREEN_WARNING)
-
     def OnWheelZoom_ascii(self, event):
-        # Since our binding of wx.EVT_MOUSEWHEEL to here takes over all wheel events
-        # we have to manually do the normal test scrolling.  This event can't propogate via event.skip()
-        #
-        # The native widgets handle the low level
-        # events (or not) their own way and wx makes no guarantees about behaviors
-        # when intercepting them yourself.
-        # --
-        # Robin Dunn
-        #
-        # Update - this doesn't seem true anymore, since my adding event.Skip() at the end
-        # of this routine allow regular mouse wheel scrolling to continue to work.
+        """Cmd/Ctrl+wheel zooms the ASCII font; a plain wheel scrolls smoothly.
 
-        # print "MOUSEWHEEEL self.working=", self.working
+        The native macOS text control truncates high-resolution trackpad deltas
+        to zero, which makes two-finger scrolling sticky or dead.  The text is
+        laid out at full content size inside the scrolled window, so we can
+        scroll the viewport by pixels ourselves.
+        """
         if self.working:
             return
-        self.working = True
 
-        # print event.ShouldPropagate(), dir(event)
-
-        controlDown = event.CmdDown()
-        if controlDown:
-            direction = event.GetWheelRotation()
-            self.ascii_art_zoom(direction)
-            self.multiText.ShowPosition(0)
-
-        # don't need this explicit scroll code - it happens naturally
-        # else:
-        #     if event.GetWheelRotation() < 0:
-        #         self.multiText.ScrollLines(4)
-        #     else:
-        #         self.multiText.ScrollLines(-4)
-
-        self.working = False
-
-        # self.frame.GetEventHandler().ProcessEvent(event)
-        # wx.PostEvent(self.frame, event)
-
-        if not controlDown:
-            event.Skip()  # Need this or regular mouse wheel scrolling breaks
-
-    def ascii_art_zoom(self, direction=1, amount=1, reset=False):
-        if unregistered:
+        if event.CmdDown() or event.ControlDown():
+            self.working = True
+            try:
+                self.ascii_art_zoom(event.GetWheelRotation())
+                self.multiText.ShowPosition(0)
+                self.asciiart.Scroll(0, 0)
+            finally:
+                self.working = False
             return
 
+        rotation = event.GetWheelRotation()
+        if not rotation:
+            event.Skip()
+            return
+
+        if wx.Platform == "__WXMAC__":
+            # wxOSX reports the precise NSEvent scrolling delta directly.
+            pixels = rotation * ASCII_WHEEL_MACOS_SCALE
+        else:
+            pixels = rotation / (event.GetWheelDelta() or 120) * ASCII_WHEEL_PIXELS
+
+        horizontal = (
+            getattr(event, "GetWheelAxis", lambda: wx.MOUSE_WHEEL_VERTICAL)()
+            == wx.MOUSE_WHEEL_HORIZONTAL
+        )
+        now = time.monotonic()
+        if now - self._ascii_axis_time > ASCII_AXIS_LOCK_SECONDS:
+            self._ascii_scroll_axis = None
+
+        if horizontal:
+            if self._ascii_scroll_axis == "x":
+                self._ascii_axis_time = now
+                # Horizontal motion wins while it continues; discard any
+                # vertical candidate so a long sideways swipe does not later
+                # jump vertically.
+                self._ascii_scroll_remainder = 0.0
+                self._scroll_ascii_horizontally(pixels)
+                return
+            # Ignore small sideways noise from a mostly-vertical swipe.
+            # Sideways takes over only after a deliberate horizontal movement.
+            self._ascii_scroll_remainder_x += pixels
+            if abs(self._ascii_scroll_remainder_x) < ASCII_HORIZONTAL_DEADZONE:
+                return
+            self._ascii_scroll_axis = "x"
+            self._ascii_axis_time = now
+            self._ascii_scroll_remainder = 0.0
+            # Swallow the deadzone so the view does not jump on takeover.
+            sign = 1.0 if self._ascii_scroll_remainder_x > 0 else -1.0
+            self._ascii_scroll_remainder_x -= sign * ASCII_HORIZONTAL_DEADZONE
+            self._scroll_ascii_horizontally()
+            return
+
+        # Vertical events normally take control immediately, but if horizontal
+        # control is recent, require a deliberate vertical movement first.
+        # This makes the next down-swipe work right after a sideways swipe.
+        if self._ascii_scroll_axis == "x":
+            self._ascii_scroll_remainder += pixels
+            if abs(self._ascii_scroll_remainder) < ASCII_VERTICAL_DEADZONE:
+                return
+            self._ascii_scroll_axis = "y"
+            self._ascii_axis_time = now
+            self._ascii_scroll_remainder_x = 0.0
+            sign = 1.0 if self._ascii_scroll_remainder > 0 else -1.0
+            self._ascii_scroll_remainder -= sign * ASCII_VERTICAL_DEADZONE
+        else:
+            self._ascii_scroll_axis = "y"
+            self._ascii_axis_time = now
+            self._ascii_scroll_remainder_x = 0.0
+            self._ascii_scroll_remainder += pixels
+
+        amount = int(self._ascii_scroll_remainder)
+        if amount:
+            self._ascii_scroll_remainder -= amount
+            sx, sy = self.asciiart.GetViewStart()
+            self.asciiart.Scroll(sx, max(0, sy - amount))
+
+    def _scroll_ascii_horizontally(self, pixels=0.0):
+        self._ascii_scroll_remainder_x += pixels
+        amount = int(self._ascii_scroll_remainder_x)
+        if not amount:
+            return
+        self._ascii_scroll_remainder_x -= amount
+        sx, sy = self.asciiart.GetViewStart()
+        self.asciiart.Scroll(max(0, sx + amount), sy)
+
+    def OnMagnifyZoom_ascii(self, event):
+        """Trackpad pinch changes the ASCII font size."""
+        if self.working:
+            return
+        magnification = event.GetMagnification()
+        if not magnification:
+            return
+        self.working = True
+        try:
+            font = self.multiText.GetFont()
+            current = float(font.GetPointSize())
+            if (
+                self._ascii_zoom_point_size is None
+                or abs(self._ascii_zoom_point_size - current) > 1.5
+            ):
+                self._ascii_zoom_point_size = current
+            self._ascii_zoom_point_size = max(
+                ASCII_MIN_FONT_SIZE,
+                min(ASCII_MAX_FONT_SIZE, self._ascii_zoom_point_size * (1.0 + magnification)),
+            )
+            new_size = int(round(self._ascii_zoom_point_size))
+            if new_size != font.GetPointSize():
+                self._set_ascii_font_size(new_size)
+        finally:
+            self.working = False
+
+    def _set_ascii_font_size(self, point_size):
+        """Apply an ASCII font size and keep the pinch accumulator in sync."""
+        point_size = max(ASCII_MIN_FONT_SIZE, min(ASCII_MAX_FONT_SIZE, int(point_size)))
+        self.multiText.SetFont(
+            wx.Font(point_size, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+        )
+        self._ascii_zoom_point_size = float(point_size)
+
+    def ascii_art_zoom(self, direction=1, amount=1, reset=False):
         font = self.multiText.GetFont()
-        # dbg(font.GetPointSize())
-        # dbg(direction)
-        MIN_FONT_SIZE = 4
-        MAX_FONT_SIZE = 65
 
         if reset:
-            self.multiText.SetFont(wx.Font(DEFAULT_ASCII_UML_FONT_SIZE, wx.MODERN, wx.NORMAL, wx.NORMAL, False))
+            self._set_ascii_font_size(DEFAULT_ASCII_UML_FONT_SIZE)
             return
 
         if direction < 0:
@@ -658,8 +754,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         else:
             newfontsize = font.GetPointSize() + amount
 
-        if newfontsize > MIN_FONT_SIZE and newfontsize < MAX_FONT_SIZE:
-            self.multiText.SetFont(wx.Font(newfontsize, wx.MODERN, wx.NORMAL, wx.NORMAL, False))
+        if ASCII_MIN_FONT_SIZE < newfontsize < ASCII_MAX_FONT_SIZE:
+            self._set_ascii_font_size(newfontsize)
 
     def OnDumpDisplayModel(self, event):
         self.app.run.CmdDumpDisplayModel()
@@ -723,23 +819,29 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         """Build plantuml view from display model, which involves converting to PlantUML text and
         sending to PlantUML server to render.
 
-        There are actually two steps.
-            1. plant_uml_create_png_and_return_image_url(plant_uml_txt) - contacts plantuml
-               server and gets back a html page with the url of the resulting image inside
-            2. self.plantuml.ViewImage(url=image_url) - contacts the plantuml server to get image
+        PNG display only (SVG is export-only): the server renders with a
+        `scale` directive for HiDPI crispness, and the viewer starts zoomed
+        out by the same factor so apparent size is unchanged:
+            1. plant_uml_create_png_and_return_image_url_async(plant_uml_txt)
+               -> direct /png/ url
+            2. self.plantuml.ViewImage(url=image_url) - fetches the image
 
         'force' means do it regardless of what tab is visible
 
-        If there is an entry in
+        The server and scale are chosen via View / PlantUML Server..., which
+        stores them in
 
             ~/Library/Preferences/Pynsource/pynsource.ini
 
-        and it contains
+        as
 
             PlantUmlServerUrl = http://localhost:8080/plantuml/uml
+            PlantUmlScale = 2
 
-        then that will be used as the Plantuml server url, otherwise the url defaults to
-        "http://www.plantuml.com/plantuml/uml"
+        PlantUmlServerUrl empty/absent means "http://www.plantuml.com/plantuml/uml".
+        PlantUmlScale (1-4, default 2) controls the server-side scale for HiDPI
+        displays; gen_plantuml steps that scale down for very wide diagrams,
+        because the server crops anything bigger than 4096 px.
 
         For instructions on installing PlantUML server see http://plantuml.com/server or
         otherwise google for advice.
@@ -756,28 +858,62 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
                     self.plantuml.render_in_progress(True, self.frame)
                     StartCoroutine(self.update_refresh_plantuml_view_clock, self.frame)
 
-                    # internet connection errors getting initial plantuml html are
-                    # handled internally to this function
+                    try:
+                        plantuml_scale = int(self.config.get("PlantUmlScale", 2))
+                    except (TypeError, ValueError):
+                        plantuml_scale = 2
+                    plantuml_scale = max(1, min(4, plantuml_scale))
+                    if wx.Platform == "__WXGTK__":
+                        # GTK's DC scaling drops thin 1px PlantUML borders when a
+                        # 2x render is displayed at 0.5 zoom.  Request only the
+                        # display's own scale so the bitmap is drawn 1:1.
+                        display_scale = max(
+                            1, int(round(self.frame.GetContentScaleFactor()))
+                        )
+                        plantuml_scale = min(plantuml_scale, display_scale)
+
+                    # internet connection errors are handled internally to this function
                     plantuml_server_local_url = self.config.get("PlantUmlServerUrl", None)
-                    image_url = await plant_uml_create_png_and_return_image_url_async(
-                        plant_uml_txt,
-                        plantuml_server_local_url=plantuml_server_local_url
-                    )
+
+                    def on_render_progress(message):
+                        """Show a retry in the PlantUML view instead of just waiting."""
+                        self.plantuml.fetching_msg = message
+                        self.plantuml.Refresh()
+
+                    set_progress_callback(on_render_progress)
+                    try:
+                        render = await plant_uml_create_png_and_return_image_url_async(
+                            plant_uml_txt,
+                            plantuml_server_local_url=plantuml_server_local_url or None,
+                            requested_scale=plantuml_scale,
+                        )
+                    finally:
+                        set_progress_callback(None)
 
                     # Simulate failures
                     # import random
                     # if random.randint(1,2) == 1:
                     #     image_url = None
 
+                    image_url = render.image_url if render else None
                     log.info("image_url of UML %s" % image_url)
 
                     if image_url:
                         await self.plantuml.ViewImage(url=image_url)
+                        # HiDPI bitmap carries plantuml_scale x the pixels: start
+                        # zoomed out by the same factor so apparent size matches
+                        # a 1x render, but with crisp detail when zooming in.
+                        # render.scale can be lower than requested, see clamping
+                        # of wide diagrams in gen_plantuml.
+                        self.plantuml.zoom_initial(scale=1.0 / render.scale)
                         self.plantuml.plantuml_text = plant_uml_txt
-                        self.frame.SetStatusText(STATUS_TEXT_UML_VIEW)
+                        if render.too_wide:
+                            self.frame.SetStatusText(STATUS_TEXT_UML_VIEW_TOO_WIDE)
+                        else:
+                            self.frame.SetStatusText(STATUS_TEXT_UML_VIEW)
                     else:
                         self.frame.SetStatusText(STATUS_TEXT_UML_VIEW_NO_PLANTUML_RESPONSE)
-                        self.plantuml.clear_cos_connection_error(msg=f"(no image_url from plantuml at {plantuml_server_local_url})") # this is what I was just getting
+                        self.plantuml.clear_cos_connection_error(msg=f"(no image from plantuml at {plantuml_server_local_url})") # this is what I was just getting
                         self.plantuml.plantuml_text = plant_uml_txt  # fixed - ensure plantuml_text always available
                 finally:
                     self.plantuml.render_in_progress(False, self.frame)
@@ -814,12 +950,12 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.menuBar.EnableTop(2, False)  # disable layout menu
         wx.CallAfter(self.multiText.SetFocus)
         wx.CallAfter(self.multiText.SetInsertionPoint, 0)
-        self.frame.SetStatusText("Hold ALT whilst dragging to block select.  CMD/Ctrl + Mousewheel to zoom (Pro).")
+        self.frame.SetStatusText("Hold ALT whilst dragging to block select.  CMD/Ctrl + Mousewheel to zoom.")
 
     def PostOglViewSwitch(self):
         wx.CallAfter(self.umlcanvas.SetFocus)
         self.menuBar.EnableTop(2, True)  # enable layout menu
-        self.frame.SetStatusText("Click to select.  Drag to move.  Right click on shapes, lines and workspace.  CMD/Ctrl + Mousewheel to zoom (Pro).")
+        self.frame.SetStatusText("Click to select.  Drag to move.  Right click on shapes, lines and workspace.  CMD/Ctrl + Mousewheel to zoom.")
 
     def InitMenus(self):
         menuBar = wx.MenuBar()
@@ -889,7 +1025,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         Add(menu1, "&Save As...", "Ctrl-S", self.OnSaveGraph, self.uml_only_view_update)
         Add(menu1, "&Export Diagram to XML...", "", self.OnSaveGraphToXML, self.uml_only_view_update)
         menu1.AppendSeparator()
-        Add(menu1, "&Save PlantUML Image...", "", self.OnSavePlantUml, self.save_plantuml_update, image=pro_image)
+        Add(menu1, "&Save PlantUML Image...", "", self.OnSavePlantUml, self.save_plantuml_update)
         menu1.AppendSeparator()
         Add(menu1, "&Import Python Code...", "Ctrl-I", self.OnFileImport)
 
@@ -908,7 +1044,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.item_visualise_modules.SetBitmap(pro_image)
         self.Bind(wx.EVT_MENU, self.OnVisualiseModules, self.item_visualise_modules)
         def visualise_modules_update(event):
-            event.Enable(PRO_EDITION)        
+            event.Enable(ALSM_PARSING)
         self.Bind(wx.EVT_UPDATE_UI, visualise_modules_update, id=id)
         self.item_visualise_modules.Check()
 
@@ -922,12 +1058,19 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         K_ADD_COMMENT = "F4" if "wxGTK" in wx.PlatformInfo else "Ctrl-2"
         K_ADD_IMAGE = "F5" if "wxGTK" in wx.PlatformInfo else "Ctrl-3"
 
+        Add(menu2, "&Undo", "Ctrl-Z", self.OnUndo, self.OnUndo_update)
+        Add(menu2, "&Redo", "Ctrl-Shift-Z", self.OnRedo, self.OnRedo_update)
+        menu2.AppendSeparator()
         Add(menu2, "&Add Class...", K_ADD_CLASS, self.OnInsertClass, self.uml_only_view_update)
         if ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS:
             Add(menu2, "&Insert Comment...", K_ADD_COMMENT, self.OnInsertComment, self.uml_only_view_update)  # was Shift-I
             Add(menu2, "&Insert Image...", K_ADD_IMAGE, self.OnInsertImage, self.uml_only_view_update)
         menu2.AppendSeparator()
         Add(menu2, "&Duplicate", "Ctrl-D", self.OnDuplicate, self.OnDuplicateNode_update)
+        Add(menu2, "Bring to &Front", "", self.OnBringToFront, self.OnDuplicateNode_update)
+        Add(menu2, "Bring F&orward", "", self.OnBringForward, self.OnDuplicateNode_update)
+        Add(menu2, "Send Back&ward", "", self.OnSendBackward, self.OnDuplicateNode_update)
+        Add(menu2, "Send to &Back", "", self.OnSendToBack, self.OnDuplicateNode_update)
         menu2.AppendSeparator()
         menu_item_delete_class = Add(
             menu2, "&Delete", "Del", self.OnDeleteNode, self.OnDeleteNode_update
@@ -944,10 +1087,10 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.OnEditProperties_update,
         )
 
-        Add(menu5, "Zoom In", "Ctrl-+", self.OnZoomIn, self.OnPro_update, image=pro_image)
-        Add(menu5, "Zoom Out", "Ctrl--", self.OnZoomOut, self.OnPro_update, image=pro_image)
-        Add(menu5, "Zoom To Fit", "Ctrl-9", self.OnZoomToFit, self.OnPro_update, image=pro_image)
-        Add(menu5, "Reset Zoom", "Ctrl-0", self.OnZoomReset, self.OnPro_update, image=pro_image)
+        Add(menu5, "Zoom In", "Ctrl-+", self.OnZoomIn)
+        Add(menu5, "Zoom Out", "Ctrl--", self.OnZoomOut)
+        Add(menu5, "Zoom To Fit", "Ctrl-9", self.OnZoomToFit)
+        Add(menu5, "Reset Zoom", "Ctrl-0", self.OnZoomReset)
 
         # Add(menu5, "test - add new code block", "Ctrl-7", self.OnNewCodeBlock)
         # Add(menu5, "test - add new DividedShape", "Ctrl-6", self.OnNewDividedShape)
@@ -962,6 +1105,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         Add(menu5, "&Toggle Ascii Art UML", "Ctrl-J", self.OnViewToggleAscii)
         Add(menu5, "&Toggle PlantUML", "Ctrl-K", self.OnViewTogglePlantUml)
+        Add(menu5, "PlantUML &Server...", "", self.OnPlantUmlServer)
         menu5.AppendSeparator()
         Add(menu5, "Colour &Sibling Classes", "Ctrl-F", self.OnColourSiblings, self.uml_only_view_update)
 
@@ -978,8 +1122,17 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         menu5.AppendSeparator()
         Add(menu5, "&Redraw Screen", "Ctrl-R", self.OnRefreshUmlWindow)
 
+        self.item_auto_overlaps = menu3.AppendCheckItem(
+            wx.NewIdRef(),
+            "Auto Remove Overlaps",
+            "Automatically move overlapping UML boxes apart",
+        )
+        self.item_auto_overlaps.Check(self.umlcanvas.auto_remove_overlaps)
+        self.Bind(wx.EVT_MENU, self.OnToggleAutoOverlaps, self.item_auto_overlaps)
+        menu3.AppendSeparator()
+
         Add(menu3, "&Layout UML", "Ctrl-L", self.OnLayout, self.uml_only_view_update)
-        Add(menu3, "&Layout UML Optimally", "Ctrl-B", self.OnDeepLayout, self.OnPro_and_uml_view_only_update, image=pro_image)
+        Add(menu3, "&Layout UML Optimally", "Ctrl-B", self.OnDeepLayout, self.uml_only_view_update)
         menu3.AppendSeparator()
         Add(menu3, "&Expand Layout", "Ctrl-.", self.app.run.CmdLayoutExpand, self.uml_only_view_update)
         Add(menu3, "&Contract Layout", "Ctrl-,", self.app.run.CmdLayoutContract, self.uml_only_view_update)
@@ -1070,7 +1223,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnNewDividedShape(self, event):
         from gui.uml_canvas import DividedShape
-        # i = ogl.DividedShape(100,200)
+        # i = wxdiagram.DividedShape(100,200)
         i = DividedShape(300, 200, self.umlcanvas)
         i.fill = ["AQUAMARINE"]
         i.BuildRegions(self.umlcanvas)  # hmm, why pass in canvas again?!!
@@ -1078,16 +1231,9 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.umlcanvas.deselect()
         self.umlcanvas.Refresh()
 
-    def OnNewCodeBlock(self, event):
-        i = ogl.CodeBlock()
-        # self.canvas.AddShape(i)
-        self.umlcanvas.InsertShape(i, 999)
-        self.umlcanvas.deselect()
-        self.umlcanvas.Refresh()
-
     def OnZoomIn(self, event):
         if self.viewing_uml_tab:
-            self.umlcanvas.zoom_in()
+            self.umlcanvas.ZoomIn()
         elif self.viewing_asciiart_tab:
             self.ascii_art_zoom(direction=1, amount=2)  # little bit stronger zoom when via menu
         elif self.viewing_plantuml_tab:
@@ -1095,7 +1241,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnZoomOut(self, event):
         if self.viewing_uml_tab:
-            self.umlcanvas.zoom_out()
+            self.umlcanvas.ZoomOut()
         elif self.viewing_asciiart_tab:
             self.ascii_art_zoom(direction=-1, amount=2)
         elif self.viewing_plantuml_tab:
@@ -1103,7 +1249,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnZoomToFit(self, event):
         if self.viewing_uml_tab:
-            self.umlcanvas.zoom_to_fit()
+            self.umlcanvas.ZoomToFit()
         elif self.viewing_asciiart_tab:
             self.ascii_art_zoom(reset=True)
         elif self.viewing_plantuml_tab:
@@ -1111,7 +1257,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnZoomReset(self, event):
         if self.viewing_uml_tab:
-            self.umlcanvas.zoom_reset()
+            self.umlcanvas.ZoomReset()
         elif self.viewing_asciiart_tab:
             self.ascii_art_zoom(reset=True)
         elif self.viewing_plantuml_tab:
@@ -1119,23 +1265,17 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnVisualiseModules(self, event):
         log.info("visualise Python Modules state now: %s" % self.item_visualise_modules.IsChecked())
+        if not ALSM_PARSING:
+            wx.MessageBox(
+                "Module visualisation needs the 'alsm' package.\n\n"
+                "Install it with: pip install alsm\n"
+                "Linux builds include it; on macOS/Windows it is a Pro feature.",
+                "Module Visualisation",
+            )
 
     def OnRightButtonMenu(self, event):  # Menu
         x, y = event.GetPosition()
-        if PRO_EDITION:
-            hit_which_shapes = self.umlcanvas.getCurrentShape(event)
-        else:
-            # but hittest fails when canvas is scrolled !!  Fix.
-            adjusted_x = x + self.umlcanvas.GetScrollPos(wx.HORIZONTAL)
-            adjusted_y = y + self.umlcanvas.GetScrollPos(wx.VERTICAL)
-            # Since our binding of wx.EVT_RIGHT_DOWN to here takes over all right click events
-            # we have to manually figure out if we have clicked on shape
-            # then allow natural shape node menu to kick in via UmlShapeHandler (defined above)
-            hit_which_shapes = [
-                s
-                for s in self.umlcanvas.GetDiagram().GetShapeList()
-                if s.HitTest(adjusted_x, adjusted_y)
-            ]
+        hit_which_shapes = self.umlcanvas.getCurrentShape(event)
         # print('hit_which_shapes', hit_which_shapes)  # hmm seems to pick up lines, too!
         if hit_which_shapes:
             event.Skip()  # will send the event on to the next handler, I think in the canvas
@@ -1228,6 +1368,34 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
                 self.notebook.SetSelection(2)
             else:
                 self.notebook.SetSelection(0)
+
+    def OnPlantUmlServer(self, event):
+        """Choose which PlantUML server renders the diagram (and the HiDPI scale)."""
+        from dialogs.DialogPlantUmlServer import DialogPlantUmlServer
+
+        try:
+            current_scale = int(self.config.get("PlantUmlScale", 2))
+        except (TypeError, ValueError):
+            current_scale = 2
+
+        dlg = DialogPlantUmlServer(
+            self.frame,
+            current_url=self.config.get("PlantUmlServerUrl", "") or "",
+            current_scale=current_scale,
+        )
+        if dlg.ShowModal() == wx.ID_OK:
+            server_url = dlg.GetServerUrl()
+            self.config["PlantUmlServerUrl"] = server_url
+            self.config["PlantUmlScale"] = str(dlg.GetScale())
+            self.config.write()
+            log.info(f"PlantUML server set to '{server_url}' scale {dlg.GetScale()}")
+            # both caches are keyed on the old url, so drop them
+            plant_uml_create_png_and_return_image_url_async.cache_clear()
+            plant_uml_fetch_svg_bytes_async.cache_clear()
+            url_to_data.cache_clear()
+            wx.PostEvent(self.frame, RefreshPlantUmlEvent(force=True))
+            self.frame.SetStatusText(STATUS_TEXT_UML_VIEW_SERVER % (server_url or "www.plantuml.com"))
+        dlg.Destroy()
 
     def OnViewToggleAscii(self, event):
         if GUI_LAYOUT == "MULTI_TAB_GUI":
@@ -1352,9 +1520,12 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         # self.MessageBox(ABOUT_MSG.strip() %  APP_VERSION)
 
         from wx.adv import AboutDialogInfo, AboutBox
-        from gui.settings import registered_to
+        from gui.settings import registered_to, PRO_EDITION_FREE
 
-        license = "Community Edition" if unregistered else f"PRO Edition - registered to \"{registered_to}\"\nThank you for your support!"
+        edition, license, license_details = about_license_texts(
+            unregistered, PRO_EDITION_FREE, registered_to
+        )
+
         info = AboutDialogInfo()
 
         # image appears on left on all platforms, so make sure the image is small
@@ -1364,12 +1535,10 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         # info.SetVersion(str(APP_VERSION))
         info.SetVersion(APP_VERSION_FULL)
         info.SetWebSite(WEB_PYNSOURCE_HOME_URL, "Home Page")
-        info.SetDescription(f"{ABOUT_MSG}\n{license}\n")
+        info.SetDescription(f"{ABOUT_MSG}\n{edition}\n")
         # info.Description = wordwrap(ABOUT_MSG, 350, wx.ClientDC(self.frame))
         info.SetCopyright(ABOUT_AUTHOR)
-        license = ABOUT_LICENSE if unregistered else ABOUT_LICENSE_PRO
-        license += "\n\n" + ABOUT_LICENSE_DETAILS
-        info.SetLicence(license)
+        info.SetLicence(license + "\n\n" + license_details)
         info.AddDeveloper(ABOUT_AUTHORS)
         # info.AddDocWriter(ABOUT_FEATURES)
         # info.AddArtist('Blah')
@@ -1583,16 +1752,10 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         event.Enable(self.viewing_uml_tab)
 
     def save_plantuml_update(self, event):
-        event.Enable(self.viewing_plantuml_tab and not unregistered)
-
-    def OnPro_update(self, event):
-        event.Enable(not unregistered)
-
-    def OnPro_and_uml_view_only_update(self, event):
-        event.Enable(not unregistered and self.viewing_uml_tab)
+        event.Enable(self.viewing_plantuml_tab)
 
     def OnSavePlantUml(self, event):
-        self.plantuml.OnHandleSaveImage(event)
+        self.plantuml.SavePlantUmlImage()
 
     def OnInsertComment(self, event):
         self.app.run.CmdInsertComment()
@@ -1605,6 +1768,46 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnDuplicate(self, event):
         self.app.run.CmdDuplicate()
+
+    def OnToggleAutoOverlaps(self, event):
+        enabled = self.item_auto_overlaps.IsChecked()
+        self.umlcanvas.auto_remove_overlaps = enabled
+        self.config["AutoRemoveOverlaps"] = str(enabled)
+        self.config.write()
+
+    def OnBringToFront(self, event):
+        self.umlcanvas.bring_to_front()
+        self.umlcanvas.mega_refresh()
+
+    def OnBringForward(self, event):
+        self.umlcanvas.bring_forward()
+        self.umlcanvas.mega_refresh()
+
+    def OnSendBackward(self, event):
+        self.umlcanvas.send_backward()
+        self.umlcanvas.mega_refresh()
+
+    def OnSendToBack(self, event):
+        self.umlcanvas.send_to_back()
+        self.umlcanvas.mega_refresh()
+
+    def OnUndo(self, event):
+        if self.umlcanvas.undo():
+            self.umlcanvas.mega_refresh()
+            self.RefreshAsciiUmlTab()
+            wx.PostEvent(self.frame, RefreshPlantUmlEvent())
+
+    def OnRedo(self, event):
+        if self.umlcanvas.redo():
+            self.umlcanvas.mega_refresh()
+            self.RefreshAsciiUmlTab()
+            wx.PostEvent(self.frame, RefreshPlantUmlEvent())
+
+    def OnUndo_update(self, event):
+        event.Enable(self.viewing_uml_tab and self.umlcanvas.canUndo())
+
+    def OnRedo_update(self, event):
+        event.Enable(self.viewing_uml_tab and self.umlcanvas.canRedo())
 
     def OnEditProperties(self, event):
         from gui.node_edit_multi_purpose import node_edit_multi_purpose

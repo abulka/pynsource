@@ -1,12 +1,12 @@
 # Download Pynsource
 
-The latest version is `1.86`. Every install path below is linked from
+The latest version is `1.87`. Every install path below is linked from
 **[the releases page](https://github.com/abulka/pynsource/releases)** — pre-releases (`pre-*` tags)
 are built by CI and are safe to try; stable releases use `version-*` tags.
 
-Viewing and editing diagrams is free. The Pro features (zoom, drag-to-connect, module
-visualisation) need a [licence](https://pynsource.com/pricing.html) on macOS and Windows, and are
-**free on Linux**.
+Viewing, editing, zooming and connecting diagram shapes is free. Module visualisation is the
+only Pro feature: it needs a [licence](https://pynsource.com/pricing.html) on macOS and Windows
+and is **free on Linux**.
 
 ## macOS (Apple silicon) — Homebrew
 
@@ -108,15 +108,40 @@ instead: `./pynsource-linux-*.AppImage --appimage-extract` then run
 **PlantUML view is blank** — it renders server-side and needs an internet connection. To run your
 own PlantUML server, see the app's built-in help (`F1`).
 
+**PlantUML view draws the boxes but no text** — that comes from the server, not Pynsource. The
+public plantuml.com server sometimes returns a picture with every label missing (the boxes and lines
+are drawn, the glyphs are not). Pynsource detects the narrow result, re-requests and says
+"retrying" in the view; if it persists, switch server with **View → PlantUML Server…** (your own
+server, or a custom url), or save with `File → Save PlantUML Image…` choosing SVG, which keeps the
+text because SVG text is drawn by your machine. The same menu sets the render scale (2 = crisp on
+Retina).
+
+Full technical write-up of every PlantUML quirk (text-less renders, the 4096 px crop, scale
+clamping, `/dpng` dark mode, macOS smart dashes) and where each is handled in the code:
+`Admin/PLANTUML-QUIRKS.md`.
+
+**PlantUML says "Syntax Error" when you paste its markup somewhere else** — macOS "Smart dashes"
+(System Settings → Keyboard → Text) rewrites `--|>` as a long dash `—|>` as the text enters another
+app, and PlantUML rejects that character. The markup Pynsource sends itself is plain ASCII, so this
+only bites manual copy/paste. The markup dialog's copy button verifies what really reached the
+clipboard, and its **Open in browser** button sends the diagram to the chosen server without
+touching the clipboard at all.
+
+**The PlantUML picture is cut off on the right** — the PlantUML server refuses to draw wider than
+4096 px and crops the rest. Pynsource steps the HiDPI scale down for wide diagrams (and says so in
+the status bar when even 1x is too wide); use SVG export for the whole diagram, or raise
+`PLANTUML_LIMIT_SIZE` on your own server.
+
 **Where are my settings and logs?** Per-user app data (`appdirs`): macOS
 `~/Library/Application Support/PyNsource`, Windows `%APPDATA%\PyNsource`, Linux
 `~/.local/share/PyNsource` and `~/.cache/pynsource/log`.
 
 ## Pro Edition
 
-An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) adds zoom,
-drag-to-connect and module visualisation. Download the regular build and enter the licence key
-via **Help → Enter License…** (macOS and Windows; on Linux the Pro features are already enabled).
+An affordable, commercial [Pro Edition](http://pynsource.com/pricing.html) adds module
+visualisation (modules as UML boxes, with their variables and functions). Download the regular
+build and enter the licence key via **Help → Enter License…** (macOS and Windows; on Linux module
+visualisation is already enabled).
 
 ## Changelog
 

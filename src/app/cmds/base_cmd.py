@@ -4,6 +4,9 @@ from common.command_pattern import Command
 class CmdBase(Command):
     """ Base command """
 
+    #: set False for commands that should not create an undo entry (e.g. startup)
+    undoable = True
+
     def execute(self):
         raise Exception("virtual, not implemented")
 

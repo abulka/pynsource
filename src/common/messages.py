@@ -32,19 +32,44 @@ ABOUT_APPNAME = "Pynsource"
 VENDOR_NAME = "Wware"
 ABOUT_LICENSE = "License: GPL 3"
 ABOUT_LICENSE_PRO = "License: Purchased Pro"
+# Linux builds are Pro-free by platform (see gui/settings.py), so the About box must not
+# advertise a paid licence there.
+ABOUT_LICENSE_PRO_FREE = "License: GPL 3 - free on Linux"
 ABOUT_LICENSE_DETAILS = """Pynsource Community Edition is free software; 
 you can redistribute it and/or modify it under the terms of the 
 GNU General Public License as published by the Free Software Foundation; 
 either version 2 of the License, or (at your option) any later version.
 
-Pynsource PRO edition is a Commercial product and requires a valid paid license.
-Please support further development of this project by purchasing a 
-license www.pynsource.com/buy
-
 Pynsource is distributed in the hope that it will be useful, 
 but WITHOUT ANY WARRANTY; without even the implied warranty 
 of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 """
+ABOUT_LICENSE_PRO_PAID_NOTE = """Pynsource PRO edition is a Commercial product and requires a valid paid license.
+Please support further development of this project by purchasing a 
+license www.pynsource.com/buy"""
+ABOUT_LICENSE_PRO_FREE_NOTE = """Pynsource PRO edition is free on Linux: every feature, including module
+visualisation, is enabled at no cost and no license is required."""
+
+
+def about_license_texts(unregistered, pro_free, registered_to):
+    """Return (edition, licence header, licence details) for the About box.
+
+    pro_free is True on Linux, where Pro is free by platform rather than licensed - the About
+    box must not advertise a paid licence there.
+    """
+    if unregistered:
+        return "Community Edition", ABOUT_LICENSE, ABOUT_LICENSE_DETAILS
+    if pro_free:
+        return (
+            "PRO Edition - free on Linux",
+            ABOUT_LICENSE_PRO_FREE,
+            ABOUT_LICENSE_PRO_FREE_NOTE + "\n\n" + ABOUT_LICENSE_DETAILS,
+        )
+    return (
+        f'PRO Edition - registered to "{registered_to}"\nThank you for your support!',
+        ABOUT_LICENSE_PRO,
+        ABOUT_LICENSE_PRO_PAID_NOTE + "\n\n" + ABOUT_LICENSE_DETAILS,
+    )
 ABOUT_MSG = """
 UML diagramming and reverse engineering for Python.
 """
@@ -141,6 +166,8 @@ end.
 ASCII_UML_HELP_MSG = (
     "Use the file menu to import python source code "
     "and generate UML ascii art here.\n\n"
+    "Zoom with Cmd/Ctrl-mousewheel or a trackpad pinch; "
+    "scroll with a two-finger swipe.\n\n"
     "Optionally join up your asci art UML using a tool like "
     "e.g Java Ascii Versatile Editor http://www.jave.de/\n\n"
     "Idea: Paste your UML Ascii art into your source code as comments!\n\n"
@@ -173,28 +200,6 @@ You cannot edit these diagrams, each import overwrites the previous.  You can ho
 You can zoom with CTRL-mousewheel.
 You can annotate with SHIFT right mouse button drawing.
 """
-
-PRO_DRAG_DROP_CONNECT_HELP = """
-In the Pro Edition of Pynsource, not only do you get faster performance due to the newly rebuilt 
-diagramming engine, you can drag drop to connect shapes.  
-
-The Pro version also lets you zoom in and out of the workspace, as well as the handy 'zoom to fit'
-feature, which sizes the diagram to fit the available window.
-
-Click Yes to learn more about the Pro Edition.
-"""
-PRO_INFO_URL = WEB_PYNSOURCE_HOME_URL  # TODO, change to be more specific
-
-PURE_MAC_FULLSCREEN_WARNING = """
-Pure fullscreen (on Mac only) slows down this app due to a wxPython OGL bug. 
-
-** This limitation does not affect the PRO edition which uses a different, faster rendering engine. **
-
-Please limit yourself to maximised mode (hold ALT when pressing the maximise icon, or just double click on the titlebar).
-
-WARNING: If you have accidentally managed to get into pure fullscreen mode, performance will be very slow, even after you exit pure fullscreen mode - YOU WILL NEED TO QUIT AND RESTART Pynsource to REGAIN PERFORMANCE. 
-"""
-# If zoomed, you may get up to three of these popup messages for each maximise attempt - sorry about that.")
 
 PLANTUML_VIEW_INITAL_HELP = """
 No diagram to render!
@@ -251,6 +256,13 @@ User cancelled PlantUML rendering.
 %s
 """.strip() % PLANTUML_TRY_AGAIN_HELP
 
-STATUS_TEXT_UML_VIEW = "SHIFT drag to draw with pen.  Right click on workspace for menu.  Drag to pan.  CMD/Ctrl + Mousewheel to zoom (Pro)."
+STATUS_TEXT_UML_VIEW = "SHIFT drag to draw with pen.  Right click on workspace for menu.  Drag to pan.  CMD/Ctrl + Mousewheel to zoom."
 
 STATUS_TEXT_UML_VIEW_NO_PLANTUML_RESPONSE = "Error rendering with plantuml - do you have an internet connection? Please check the log file for errors Help/View Log..."
+
+STATUS_TEXT_UML_VIEW_TOO_WIDE = (
+    "Diagram is too wide for the PlantUML server to draw as PNG (4096 px limit) - "
+    "the right hand side is missing. Use File/Save PlantUML Image (SVG) for the whole diagram."
+)
+
+STATUS_TEXT_UML_VIEW_SERVER = "Rendering with PlantUML server: %s"

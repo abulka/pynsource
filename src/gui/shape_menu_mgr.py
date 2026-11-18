@@ -2,9 +2,7 @@ import wx
 from typing import List, Set, Dict, Tuple, Optional
 from view.display_model import GraphNode, UmlNode, UmlModuleNode, CommentNode
 from gui.node_edit_multi_purpose import node_edit_multi_purpose
-from gui.settings import PRO_EDITION
 
-unregistered = not PRO_EDITION
 
 # not all are defined, as the rest of the ids are auto allocated, just nice not to waste id's :-)
 MENU_ID_SHAPE_PROPERTIES = wx.NewIdRef()
@@ -233,6 +231,11 @@ class ShapeMenuMgr:
         def add_separator():
             self.popupmenu.AppendSeparator()
 
+        def add_radio_menuitem(text, method, checked):
+            item = self.popupmenu.AppendRadioItem(wx.ID_ANY, text)
+            item.Check(checked)
+            self.frame.Bind(wx.EVT_MENU, method, source=item)
+
         def add_submenu_separator():
             self.submenu.AppendSeparator()
 
@@ -242,19 +245,6 @@ class ShapeMenuMgr:
                 self.OnNodeProperties,
                 id=MENU_ID_SHAPE_PROPERTIES,
                 key_code=ord("S"),
-            )
-
-        def add_pro_advert():
-            from media import images
-
-            msg = "Edition lets you drag drop to connect!  Learn More..."
-            if "wxGTK" in wx.PlatformInfo or "wxMSW" in wx.PlatformInfo:  # ubuntu gtk all menus and windows popup menus have images disallowed, so add text
-                msg = '(Pro) ' + msg
-            item: wx.MenuItem = add_menuitem(
-                msg,
-                self.OnProDragDrop,
-                submenu=True,
-                image=images.pro.GetBitmap()
             )
 
         def add_from(keycode_only=False):
@@ -303,6 +293,12 @@ class ShapeMenuMgr:
         def add_reset_image_size():
             add_menuitem("Reset Image Size", self.OnResetImageSize)
 
+        def add_arrange():
+            add_menuitem("Bring to Front", self.OnBringToFront)
+            add_menuitem("Bring Forward", self.OnBringForward)
+            add_menuitem("Send Backward", self.OnSendBackward)
+            add_menuitem("Send to Back", self.OnSendToBack)
+
         def add_delete():
             add_menuitem("Delete\tDel", self.OnRightClickDeleteNode)
 
@@ -334,6 +330,28 @@ class ShapeMenuMgr:
             add_separator()
             add_menuitem("Reverse Link\tR", self.OnLineConvertToReverse, key_code=ord("R"))
             add_separator()
+            line = self.shapehandler.GetShape()
+            current = line.GetRouteMode() if hasattr(line, "GetRouteMode") else None
+            add_radio_menuitem(
+                "Edge style: Straight", self.OnLineRouteStraight, current == "straight"
+            )
+            add_radio_menuitem(
+                "Edge style: Curved", self.OnLineRouteCurved, current == "curved"
+            )
+            add_radio_menuitem(
+                "Edge style: Straight or curved",
+                self.OnLineRouteAuto,
+                current == "auto",
+            )
+            add_radio_menuitem(
+                "Edge style: Avoid boxes (orth fallback)",
+                self.OnLineRouteAvoid,
+                current == "avoid",
+            )
+            add_radio_menuitem(
+                "Edge style: Orthogonal", self.OnLineRouteOrthogonal, current == "orthogonal"
+            )
+            add_separator()
             add_menuitem("Delete\tDel", self.OnRightClickDeleteNode)
             add_separator()
 
@@ -345,10 +363,10 @@ class ShapeMenuMgr:
             add_edge_types()
             add_cancel()
         else:
-            if not hasattr(shape, "node"):
+            is_bitmap = getattr(shape, "is_bitmap", False)
+            if not is_bitmap and not hasattr(shape, "node"):
                 return
             from_node: GraphNode = self.shapehandler.umlcanvas.new_edge_from
-            is_bitmap = shape.__class__.__name__ == "BitmapShapeResizable"
             if is_bitmap:
                 is_comment = is_umlclass = False
             else:
@@ -360,12 +378,9 @@ class ShapeMenuMgr:
 
             # The algorithm that builds the menu
 
-            if unregistered:
-                add_pro_advert()
-                add_submenu_separator()
-
             if is_umlclass or is_comment:
                 add_properties()
+                add_arrange()
                 add_separator()
                 if not from_node:
                     add_from()
@@ -386,6 +401,8 @@ class ShapeMenuMgr:
                     pass  # don't offer 'to' menu choices cos haven't started connecting yet
             elif is_bitmap:
                 add_reset_image_size()
+                add_separator()
+                add_arrange()
             else:
                 raise RuntimeError("Right click on unknown shape")
 
@@ -456,17 +473,24 @@ class ShapeMenuMgr:
         shape.GetCanvas().SelectNodeNow(shape)
         self.shapehandler.UpdateStatusBar(shape)
 
+    def _arrange(self, method):
+        method([self.GetShape()])
+        self.shapehandler.umlcanvas.mega_refresh()
+
+    def OnBringToFront(self, event):
+        self._arrange(self.shapehandler.umlcanvas.bring_to_front)
+
+    def OnBringForward(self, event):
+        self._arrange(self.shapehandler.umlcanvas.bring_forward)
+
+    def OnSendBackward(self, event):
+        self._arrange(self.shapehandler.umlcanvas.send_backward)
+
+    def OnSendToBack(self, event):
+        self._arrange(self.shapehandler.umlcanvas.send_to_back)
+
     def OnRightClickDeleteNode(self, event):
         self.shapehandler.umlcanvas.app.run.CmdNodeDelete(self.GetShape())
-
-    def OnProDragDrop(self, event):
-        # self.shapehandler.umlcanvas.app.context.wxapp.MessageBox("asd")  # quick popup
-
-        from common.messages import PRO_DRAG_DROP_CONNECT_HELP, PRO_INFO_URL
-        import webbrowser
-        retCode = wx.MessageBox(PRO_DRAG_DROP_CONNECT_HELP.strip(), "Pro Edition Information", wx.YES_NO | wx.ICON_QUESTION)
-        if retCode == wx.YES:
-            webbrowser.open(PRO_INFO_URL)
 
     def OnPopupMenuCancel(self, event):
         pass
@@ -481,3 +505,23 @@ class ShapeMenuMgr:
         self.shapehandler.umlcanvas.app.run.CmdLineChangeToEdgeType(self.GetShape(), "association")
     def OnLineConvertToReverse(self, event):
         self.shapehandler.umlcanvas.app.run.CmdLineChangeToReverse(self.GetShape())
+
+    def _set_line_route(self, mode):
+        line = self.GetShape()
+        line.SetRouteMode(mode)
+        self.shapehandler.umlcanvas.mega_refresh(auto_resize_canvas=False)
+
+    def OnLineRouteStraight(self, event):
+        self._set_line_route("straight")
+
+    def OnLineRouteCurved(self, event):
+        self._set_line_route("curved")
+
+    def OnLineRouteAuto(self, event):
+        self._set_line_route("auto")
+
+    def OnLineRouteAvoid(self, event):
+        self._set_line_route("avoid")
+
+    def OnLineRouteOrthogonal(self, event):
+        self._set_line_route("orthogonal")

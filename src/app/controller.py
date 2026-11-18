@@ -47,7 +47,15 @@ class CmdInvoker:  # version 4 - see pyNsource\trunk\Research\python advanced\co
         def cmd_invoker_f(*args, **kwargs):
             cmd = eval(klass + "(*args, **kwargs)", globals(), locals())
             cmd.context = self.context
-            self.cmd_mgr.run(cmd)
+            canvas = getattr(self.context, "umlcanvas", None)
+            record = canvas is not None and getattr(cmd, "undoable", True)
+            if record:
+                canvas.begin_undo()
+            try:
+                self.cmd_mgr.run(cmd)
+            finally:
+                if record:
+                    canvas.commit_undo()
 
         return cmd_invoker_f
 

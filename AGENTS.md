@@ -2,24 +2,32 @@
 
 ## What this is
 Pynsource: reverse-engineers Python source into UML class diagrams (wxPython GUI + CLI).
-Community edition in this repo; Pro features (zoom, drag-to-connect, module visualisation)
-activate when sibling packages + license are present.
+The diagram canvas is `wxdiagram` and is free for everyone. `PRO_EDITION` now gates
+only module visualisation (ALSM) on macOS/Windows; it is free on Linux builds.
 
 ## Layout
 - `src/` — all code. Entry points: `src/pynsource_gui.py` (GUI), `src/pynsource_cli.py` (CLI).
-- `src/parsing/` — AST parser (`core_parser_ast.py`, visitor builds pmodel). `src/ogl/` — vendored
-  copy of classic wx OGL used when `LOCAL_OGL=True` (Community canvas). Do NOT confuse with `../ogl2`.
+- `src/parsing/` — AST parser (`core_parser_ast.py`, visitor builds pmodel).
+- `src/gui/uml_canvas.py` — the application canvas, built on `wxdiagram`.
 - `src/gui/settings.py` — `PRO_EDITION` / `ALSM_PARSING` flags, `APP_VERSION` / `PATCH` version source.
-- `bin/run` — runs GUI (`cd src && python3 pynsource_gui.py`). `bin/testall` — full test suite,
-  wx included (needs a display; `xvfb-run -a bin/testall` on a headless box).
+- `bin/` — developer convenience only, indexed in `bin/README.md`. `bin/boot` = first-time/new
+  worktree setup (uv venv + editable siblings + requirements), `bin/run` = GUI from source,
+  `bin/testall` = full test suite, wx included (needs a display; `xvfb-run -a bin/testall` on a
+  headless box). Nothing there ships; CI is the supported build route.
+- `buildtools/` — release-build inputs, not commands: `pynsource.spec` (the shared PyInstaller
+  onedir spec) and `buildsamples.py` (regenerates the bundled sample diagrams in
+  `src/samples/files_as_resource.py`). Both are run from the repo root by CI and by
+  `bin/buildmac` / `bin/buildwin.bat`.
 - Docs are split deliberately: `README.md` = pitch + install table, `DOWNLOADS.md` = the only
   install/troubleshooting reference (linked from the website), `BUILDING.md` = the only developer
   doc. Do not duplicate build/run/test instructions here — point at BUILDING.md.
-  `Admin/ROADMAP.md` = release status + future milestones (and the ogl2-vs-wxdiagram library
-  split); working plans for a session stay outside the repo.
-- `requirements.txt` — install with `uv pip install -r requirements.txt`.
-- `setup.py` — legacy; reads `.requirement-extras/requirements-linux-22.txt`. Prefer `uv` + running
-  from source over `pip install -e .`.
+  `Admin/ROADMAP.md` = release status + future milestones; working plans for a session stay
+  outside the repo.
+- `requirements.txt` — install with `uv pip install -r requirements.txt` (or just `bin/boot`).
+- `setup.py` — legacy; `install_requires` is `requirements.txt` verbatim and the version is
+  scraped from `src/gui/settings.py`. Still needed because the snap does `pip install .`; see
+  `Admin/PLAN-LINUX-CLEANUP.md` before deleting it. Prefer `uv` + running from source over
+  `pip install -e .`.
 - No URL shortener anywhere: the update check reads raw.githubusercontent, the website links
   at release assets, and `Admin/release-links/release_links.py <tag>` prints the links. bit.ly is
   retired (paid now, and its links rotted).
@@ -36,13 +44,14 @@ activate when sibling packages + license are present.
 - **typed_ast is GONE** (EOL, no wheels for 3.11+, doesn't build on 3.13). Python 2 parsing
   (`mode=2`, `typed_ast.ast27`) was dropped: `mode(2)` raises friendly `RuntimeError`, default
   parse mode is 3, `mode(3)` always uses stdlib `ast`. Same fix applied in `../alsm`.
-- `pydbg` import is commented out everywhere; `appdirs` still used (logs/config paths).
+- `pydbg` removed from `requirements.txt` (Rust-built debugger, every import commented out);
+  `appdirs` still used (logs/config paths). Existing venvs keep it — `uv pip uninstall pydbg`.
 
 ## Sibling repos (separate git repos — commit in each repo, not here)
 All live in `/Users/andy/Devel/pynsource-project/` and install editable into `.venv`:
-- `../ogl2` (`ogl2` package, v1.0.5) — next-gen OGL canvas. Used ONLY when `PRO_EDITION=True`.
-  `ShapeCanvas` (`ogl2/ogl_like.py:1019`) paints direct via `PaintDC` (no backing buffer).
-  Install: `uv pip install -e ../ogl2`.
+- `../wxdiagram` (`wxdiagram` package, 0.2.x) — the canvas library (shapes, connectors,
+  selection, zoom/pan, JSON persistence). Pynsource uses it on every platform and edition.
+  Install: `uv pip install -e ../wxdiagram`. PyPI: `wxdiagram>=0.2.1,<0.3`.
 - `../pynsource-rego` (`rego` package) — licensing. `PRO_EDITION = rego.are_registered(APP_VERSION)`
   (`int(APP_VERSION)` + 5-version forward window, so 1.x bumps keep old licenses; never jump to 2.x
   lightly). Self-sign: `cd ../pynsource-rego && ../pynsource/.venv/bin/python rego_gen.py gen <Name> --version 1 --save`.
@@ -52,25 +61,31 @@ All live in `/Users/andy/Devel/pynsource-project/` and install editable into `.v
   keep `alsm/python/python_ast.py` in sync with `src/parsing/core_parser_ast.py` re typed_ast handling.
   Install: `uv pip install -e ../alsm`. (Its `typed-ast` pin was removed 2026-11.)
 
-## Community vs Pro
-Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
-- **Community** (no `rego` installed, or no valid license file): canvas = vendored classic OGL
-  (`src/ogl/`, `LOCAL_OGL=True`, `ogl.ShapeCanvas` with HiDPI backing buffer). No zoom
-  (View/Zoom menu items disabled via `OnPro_update`), no drag-to-connect (`NATIVE_LINES_OGL_LIKE=False`
-  path), no module visualisation. Free, fully working UML editor — this is what CI/tests exercise.
-- **Pro** (rego installed + valid license in `~/Library/Application Support/PyNsource/` on Mac):
-  canvas = `../ogl2` (`ShapeCanvas` in `ogl2/ogl_like.py:1019`, direct `PaintDC`, supports
-  `scalex/scaley` zoom, zoom-to-fit, drag-between-shapes line creation). Module visualisation
-  additionally needs `../alsm` (`ALSM_PARSING=True`); without alsm, Pro canvas works but module
-  viz warns and disables.
-- **Linux is Pro by platform**, regardless of licences: `sys.platform.startswith("linux")` forces
-  `PRO_EDITION = True` in `src/gui/settings.py` (snaps cannot persist a licence file; there is no
-  way to buy one that survives the packaging routes). Consequence: every Linux artefact must
-  bundle ogl2 + alsm, and Linux CI runs the Pro code paths that macOS/Windows CI never executes.
-- Switching: install siblings editable + save a license (see above), relaunch — no code change.
-  `print("Running Community Edition")` at startup tells you which you got.
-- Artefacts differ by edition: binary builds (`bin/buildmac`, `bin/buildwin.bat`, snap) ship
-  Community (no license embedded); the atug download page sells Pro.
+## Viewport ownership
+`wxdiagram` owns zoom (`scalex/scaley`), Ctrl+wheel, pinch, pan and the canvas virtual size.
+Plain drag on empty canvas is a marquee; Alt/Space/middle-drag pans. Clicking a shape that
+is already selected keeps the multi-selection for a group drag. `bringClickedShapeToFront` is
+off in pynsource; z-order is explicit via the Edit/context menus. Imported images use
+wxdiagram's `AddImage`/`ResizableBitmapShape` (centred, scaled, sent to back). The Layout menu's
+"Auto Remove Overlaps" toggle is persisted as `AutoRemoveOverlaps` in the config; explicit layout
+commands still force overlap removal. `UmlCanvas` supplies
+`getContentBounds()` (UML boxes and comments, not edges), keeps `coordmapper` for
+layout/world-coordinate mapping, and overrides `snapshot_state()`/`restore_state()` so undo
+captures the graph model (nodes, edges, colours, module/comment types) rather than only shapes.
+Do not reintroduce a second `CanvasResizer`/`_zoom` implementation in pynsource.
+
+## Free canvas vs Pro module visualisation
+There is one canvas on every platform and edition: `wxdiagram` via `src/gui/uml_canvas.py`.
+Zoom, pan, drag-to-connect, resize and layout are free.
+- **Community** (no `rego` installed, or no valid licence): everything except module
+  visualisation. `PRO_EDITION=False`, `ALSM_PARSING=False`.
+- **Pro** (rego installed + valid licence, or Linux): module visualisation is enabled when
+  `alsm` is importable (`ALSM_PARSING=True`). The licence check is `rego.are_registered(APP_VERSION)`;
+  it uses `int(APP_VERSION)` with a 5-version forward window, so 1.x bumps keep old licences.
+  Never jump to 2.x without re-issuing keys.
+- **Linux is Pro by platform**: `sys.platform.startswith("linux")` forces `PRO_EDITION=True`
+  (snaps cannot persist a licence file). Every Linux artefact must bundle `wxdiagram` + `alsm`.
+- `print("Running Community Edition")` at startup tells you which you got.
 
 ## Deploying (Mac)
 - Only supported route: CI `.github/workflows/build-mac.yml` — a `pre-*` or `version-*` tag builds
@@ -81,7 +96,7 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   mouse drag. Full write-up: `Admin/BUG-DIST-SLOWNESS-MAC.md`. The workflow prints
   `BUILD PYTHON ... framework=''` and a guard step fails the build if a framework interpreter
   or a onefile layout reappears.
-- Bundling is **onedir** (`../ogl2/bin/pynsource-github-actions.spec`): launch 0.4s vs 1.9s
+- Bundling is **onedir** (`buildtools/pynsource.spec`): launch 0.4s vs 1.9s
   for onefile, and PyInstaller 7 rejects onefile + `.app`. `dist/` then contains both
   `dist/Pynsource/` (COLLECT output — delete it, it is duplicated inside the app) and
   `dist/Pynsource.app` (what ships).
@@ -96,6 +111,23 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   (twice) — see `.deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt`, which is also the
   draft release body. No helper script ships any more (an unsigned `.command` just added a
   second identical block).
+- **macOS window activation is a deliberate frozen-only workaround.** An ad-hoc-signed `.app`
+  launched from Finder can open behind Terminal/Finder, and `wx.Frame.Raise()` only raises the
+  window *inside* the app. `MainApp.OnInit` therefore always calls `self.frame.Raise()`, and in a
+  frozen build only runs `open -a <this .app>` to activate the bundle **by path**.
+  Do **not** replace it with
+  `osascript -e 'tell application "Pynsource" to activate'`: AppleScript resolves the app by
+  name through LaunchServices and launches it if it is not running. That is what made a source
+  run of 1.87 start the separately installed 1.86 app alongside it. Source runs must skip the
+  native activation entirely. Original workaround: commit `37ee7da` (1.86). If a future macOS
+  stops opening the bundle behind other windows, test from Finder and then remove the
+  frozen-only block.
+- **macOS app-name trivia.** The top-left application menu is macOS's name for the running
+  executable: the Python interpreter's bundle in a source run ("python"), `Pynsource` in the
+  frozen `.app` (from `CFBundleName`). It is not reliably settable from inside an unbundled
+  process. The auto-generated "Hide …"/"Quit …" items *are* settable, via
+  `self.SetAppName(ABOUT_APPNAME)` / `SetAppDisplayName(...)` at the **start of `OnInit`**
+  before any frame/menu exists; otherwise they say "Hide Pynsource_gui".
 - Users who use Homebrew get a prompt-free install via the separate tap
   `abulka/homebrew-pynsource` (`brew install --cask abulka/pynsource/pynsource`). Homebrew
   quarantines every cask download and Homebrew 7 has no `--no-quarantine`, so the cask does
@@ -106,17 +138,15 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   `brew info --cask abulka/pynsource/pynsource`, `brew upgrade` (no args), or
   `brew upgrade --cask abulka/pynsource/pynsource`. Never document bare
   `brew info pynsource` / `brew upgrade --cask pynsource`.
-- Local `bin/buildmac.sh` works but picks up whatever `python3`/`pyinstaller` is on PATH,
+- Local `bin/buildmac` works but picks up whatever `python3`/`pyinstaller` is on PATH,
   which is exactly how the framework-Python bug got in. Prefer CI.
 - **`actions/upload-artifact` does not preserve symlinks**, and the `.app` is full of them
   (`Contents/Resources`). The *artifact* copy therefore fails `codesign --verify --deep
   --strict` ("a sealed resource is missing or invalid") even when the build was fine — verify
   from the **release zip** instead, which CI creates before uploading.
-- The spec lives in the **ogl2 repo**: a spec change only reaches CI once it is *pushed* to
-  ogl2's `master` (frozen at `2026-dustoff`). Use `gh workflow run build-mac.yml --ref master`
-  (artifact only, no release) to validate a spec change; it is ~1.5 min. The spec, the
-  mac/win build scripts and `media/pynsource.icns` must move into this repo before ogl2 is
-  archived — see `Admin/ROADMAP.md`.
+- The spec and mac/win build scripts are now in this repo (`bin/`, `src/media/pynsource.icns`),
+  so a spec change no longer needs a push to another repo. Use
+  `gh workflow run build-mac.yml --ref wxdiagram-canvas` (artifact only) to validate it.
 
 ## Deploying (Windows)
 - Route: CI `.github/workflows/build-win.yml` (windows-2022) — same triggers as Mac: a
@@ -173,8 +203,8 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   release/CPython. 4.2.5 is the newest cp313 build there, so **Linux runs 4.2.5 while mac/win
   run 4.3.2**. Install that wheel *before* `requirements.txt`, otherwise the unpinned `wxpython`
   line makes uv build from source.
-- **Linux is Pro-free by platform** (`src/gui/settings.py`), so `ogl2` and `alsm` are imported
-  unconditionally: the venv must have them (`uv pip install -e ogl2/ -e pynsource-rego/ alsm/`),
+- **Linux is Pro-free by platform** (`src/gui/settings.py`), so `wxdiagram` and `alsm` are
+  installed unconditionally: the venv must have them (`uv pip install -e wxdiagram/ -e pynsource-rego/ -e alsm/`),
   and the bundle must contain them. Mac/Windows CI never notices this, it runs Community.
 - Packaging chain (`bin/build-appimage.sh`): PyInstaller onedir → AppDir → `strip` → linuxdeploy
   + `linuxdeploy-plugin-gtk` (`DEPLOY_GTK_VERSION=3`) → appimagetool. Keep that order.
@@ -186,9 +216,9 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   * The GTK plugin sets an rpath on the binaries it deploys, but `AppRun` is our shell wrapper,
     so `usr/bin/pynsource` must export `LD_LIBRARY_PATH=$APPDIR/usr/lib` itself. Forgetting that
     is a clean-room `libgtk-3.so.0: cannot open shared object file`.
-  * The spec (`../ogl2/bin/pynsource-github-actions.spec`) drops the partial GTK stack it would
+  * The spec (`buildtools/pynsource.spec`) drops the partial GTK stack it would
     otherwise bundle; the plugin's copy is then the only one. Platform-gated, mac/win untouched.
-- Guard: `xvfb-run` (a headless runner cannot create a `wx.App`), 158 tests, then extract the
+- Guard: `xvfb-run` (a headless runner cannot create a `wx.App`), the full test suite, then extract the
   AppImage (`--appimage-extract`, no FUSE on runners) and assert `AppRun` is still alive after
   25 s **and** that the log has no "Running Community Edition" line.
 - Target requirement is "a GTK3 desktop" and nothing else: verified in clean `ubuntu:22.04` and
@@ -222,10 +252,12 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
 - The app declares `PYTHONPATH: $SNAP/usr/lib/python3.12/site-packages` because core24's python
   does not search our prefix by itself. Entry points are two-line shell wrappers calling
   `run()` / `reverse_engineer()` — the `__main__` blocks in those modules are debug scaffolding.
-- **Linux is Pro-free, so the snap must bundle ogl2 + alsm** (checked out as siblings by the
-  workflow, installed *with* their dependencies — `--no-deps` leaves `import alsm` failing at
-  runtime, which `settings.py` then reports as "alsm not installed" because it only catches
-  `ModuleNotFoundError`).
+- **Linux is Pro-free, so the snap must bundle wxdiagram + alsm** (checked out as siblings by the
+  workflow). Install **wxdiagram with `--no-deps`** — its only dependency is wxpython, which is
+  already in the target dir, and a `--target` install is invisible to a later pip run, so letting
+  pip resolve it rebuilds wxPython from source (fails on core24/gcc 13). Install **alsm with its
+  dependencies** — `--no-deps` leaves `import alsm` failing at runtime, which `settings.py` then
+  reports as "alsm not installed" because it only catches `ModuleNotFoundError`.
 - Strip the bundled `.so` files: the wx wheel ships unstripped and turns a 154 MB snap into
   49 MB.
 - `version: git` is wrong for CI: `git describe` reports the nearest *older* tag
@@ -244,15 +276,16 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   empty — use `CRAFT_ARCH_BUILD_FOR`):
   * wx 4.2.5 does not compile with gcc 13 (core24): its bundled nanosvg uses unqualified
     `isnan()` — build with `CXXFLAGS="-include cmath"`.
-  * `pip install --target` is invisible to a later pip run, so the bare `wxpython` line in
-    `requirements-linux-common.txt` re-triggered a source build; the wheel must go in the *same*
-    `pip install` command as the requirements file.
+  * `pip install --target` is invisible to a later pip run, so wx must go in the *same*
+    `pip install` command as the requirements file, otherwise pip re-triggers a source build.
+    (The old reason given here — a bare `wxpython` line in `requirements-linux-common.txt` — is
+    stale; the file no longer has one. See `Admin/PLAN-LINUX-CLEANUP.md` for the pending cleanup.)
 
 ## Tests
-- Expect `158 tests OK (skipped=8)`: `mkdir -p src/tests/logs && .venv/bin/python -m unittest
+- Expect `184 tests OK (skipped=8)`: `mkdir -p src/tests/logs && .venv/bin/python -m unittest
   discover -s src`. Most tests build a real `wx.App`, so a headless machine needs `xvfb-run` (the
   Linux CI does this); `TRAVIS=1` is a legacy flag that skips them all — never use it to validate.
-- `../ogl2`: `.venv/bin/python -m pytest ../ogl2/tests/ -x -q`.
+- `../wxdiagram`: `.venv/bin/python -m pytest ../wxdiagram/tests/ -x -q`.
 - Parsing invariants live in `src/tests/` — if you touch the AST visitor, `test_parse_bugs*` and
   `test_parse_type_annotations` are the ones that fail first.
 
@@ -262,10 +295,15 @@ Same codebase, behaviour switches on `PRO_EDITION` in `src/gui/settings.py`:
   (passing bare `wx.PrintData` falls back to 1..9999 on Mac). `HasPage(page<=1)` +
   `GetPageInfo(1,1,1,1)` in `src/common/printframework.py` stay as belt-and-braces
   (wxPython has no `GetPagesInfo` binding).
-- **Blurry UML text**: `src/ogl/canvas.py` backing buffer is HiDPI-aware (physical pixels ×
-  `GetContentScaleFactor()`, rebuilt on `EVT_DPI_CHANGED`). ogl2 path has no buffer — its
+- **Blurry UML text**: wxdiagram paints directly on `PaintDC`; pynsource sets
+  `frame.SetDoubleBuffered(True)` to keep dragging smooth.
   sharpness fix is `int(round(...))` (not `int(...)`) in `DrawFormattedText` in BOTH
-  `src/ogl/oglmisc.py` and `ogl2/ogl2/oglmisc.py` (vendored mirrors, fix both).
-- Fonts: UML regions use `wx.MODERN` 10/14pt (`src/gui/uml_canvas.py`); ogl2 defaults are
-  `FONTFAMILY_SWISS` 14pt (`ogl2/ogl_like.py`). Don't change families without a screenshot check.
+- Fonts: UML regions use `wx.MODERN` 10/14pt (`src/gui/uml_canvas.py`). Don't change
+  families without a screenshot check.
 - No `timeout(1)` on macOS — use `cmd & sleep; kill` pattern for GUI smoke tests.
+- **PlantUML view quirks** are all server-side, not ours: plantuml.com sometimes returns PNGs with
+  every label missing, and crops anything over 4096 px (so `scale 2` halves the usable width);
+  `/dpng/` is the dark-mode variant, not a cache buster; macOS "smart dashes" turns `--|>` into an em
+  dash, which every PlantUML version rejects. Handled in `src/generate_code/gen_plantuml.py` (SVG
+  width as reference + retry with a trailing `' pynsource-retry N` comment, scale clamp) and the
+  markup dialog's clipboard verification. Full write-up: `Admin/PLANTUML-QUIRKS.md`.

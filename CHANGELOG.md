@@ -2,6 +2,90 @@
 
 *November 2026*
 
+### 1.87
+
+- New diagram canvas: pynsource now uses **wxdiagram** (MIT) on every platform and edition;
+  the vendored classic OGL copy and the `ogl2` dependency are gone
+- wxdiagram **0.2.7** is what these builds ship: dragging a multi-selection that includes an
+  edge no longer stretches the edge (it now follows its endpoint shapes exactly), dragging an
+  edge on its own leaves it attached, changing diagrams clears the old selection handles
+  immediately, and connection targets show all four round drop dots (forward and reverse drags)
+- New comments and classes are created at the top of the z-order, so a new comment is visible
+  even when it lands over an existing shape
+- PlantUML view composites transparent PNGs onto an explicit white page and requests the
+  display's own pixel scale on GTK, so a 2x render is no longer downscaled in the DC and thin
+  shape borders are not dropped on Linux
+- PlantUML SVG export inserts an explicit white background, so black borders stay visible in
+  dark-themed SVG viewers on Ubuntu
+- ASCII UML view now uses a lightweight custom text view: two-finger scrolling is pixel-based
+  and smooth, text selection/copy still works, Cmd/Ctrl-wheel zooms the font, and trackpad pinch
+  zooms it too (native macOS wx.TextCtrl could not scroll programmatically and was slow and
+  jerky when enlarged to the full document)
+- Zoom, pan, zoom-to-fit, drag-to-connect, resize and layout are **free for everyone**
+- wxdiagram now owns zoom, pinch-to-zoom, drag-to-pan and the canvas virtual size; the
+  duplicated `CanvasResizer`/zoom code is gone
+- Smoother trackpad scrolling and panning (20px per wheel notch, fractional accumulation,
+  3px pan threshold)
+- Marquee selection (plain drag on empty canvas), Shift/Ctrl add, Esc clear, arrow-key nudge
+- Dragging any shape in a multi-selection moves the whole group
+- Undo/redo for editing commands and canvas drags
+- Duplicate now offsets down and slightly right (deliberately overlapping) and selects the copies
+- Explicit z-order commands (Bring to Front / Forward, Send Backward / to Back) in the Edit menu
+  and shape context menu; click no longer changes z-order
+- Image import is centred, scaled to fit the viewport and sent to the back; the new image is
+  selected and shows resize handles, and resizing works via wxdiagram's ResizableBitmapShape
+- Image resize keeps its selection handles and no longer prints "no node model attached" warnings
+- Image and rectangle resize now track the mouse at any zoom level (wxdiagram no longer snaps
+  resize geometry to whole units), corner drags clamp at the opposite corner, and resizing is
+  proportional by default (hold Shift for free aspect)
+- Shapes show eight resize handles (four corners plus four edge midpoints); edge handles resize
+  one axis, and the resize completes wherever the mouse is released
+- Alt resizes a shape from its centre, and drags/resizes ignore movement below 3px so a click
+  with a small hand tremor no longer nudges a shape
+- Dragging snaps to other shapes' edges and centres with alignment guides (wxdiagram's
+  `alignmentGuides`, on by default); an optional background grid and snap-to-grid are available
+  through the same canvas flags
+- Canvas repaints use buffered painting, and macOS trackpad scrolling/panning is no longer
+  over-sensitive (wxdiagram now uses wxOSX's precise deltas instead of scaling them by 20)
+- wxdiagram connectors gained edge labels, label hit-testing and hybrid routing
+  (`autoRoute = "curved"`: free bezier, obstacle detour, orthogonal fallback, parallel lanes);
+  UML edges now use the curved style
+- UML edges default to "Straight or curved" (wxdiagram `auto`): straight unless a box blocks the
+  path, then a curve - never an orthogonal detour while routing is experimental.  Right-click a
+  line for Edge style: Straight / Curved / Straight or curved / Avoid boxes (orth fallback) /
+  Orthogonal (the menu ticks the current style).  Arrowheads follow routed curves
+- Zoom-to-fit and the canvas scroll range now include imported images, so a resized image can
+  always be scrolled to (previously its far edges were outside the scrollable area)
+- wxdiagram composites are resizable (children scale with the frame) and polygons are clickable
+  anywhere inside, not just on their outline
+- Content at negative diagram coordinates is now scrollable and framed by zoom-to-fit, so a
+  shape dragged or resized past the top-left origin is no longer stranded off-canvas
+- Quieter startup: the debug `cwd_info` line is no longer printed to the console
+- Layout menu has an "Auto Remove Overlaps" toggle, persisted in the user config
+- Removed the last `*OglTwo` class names (`UmlDividedShape`, `UmlCommentShape`,
+  `UmlLineShape`, `UmlBitmapShape`, `UmlShapeHandler`) and the `ogl` import alias
+- Plain drag on empty canvas now marquees; use Alt/Space/middle-drag or the trackpad to pan
+- **Pro is now module visualisation only** (ALSM), still free on Linux
+- Simplified settings and canvas code: one canvas path, one coordinate convention, and the
+  `Move2` monkeypatch replaced by `Shape.MoveTo`
+- Build assets (PyInstaller spec, mac/win build scripts, `.icns`) moved into this repo
+- Single-instance guard: a second launch shows "Pynsource is already running" instead of
+  opening another window (`PYNSOURCE_ALLOW_MULTIPLE=1` opts out)
+- Fixed: on macOS, a source run no longer launches the separately installed Pynsource app
+  through the window-activation `osascript` (that is now frozen-app only)
+- CI now checks out the public `wxdiagram` repo; the branch can be selected when dispatching
+- PlantUML markup/save and ASCII-art zoom are free (previously Pro)
+- PlantUML view: new **View / PlantUML Server...** dialog to choose the server (official, your own,
+  or a custom url) with a Test button, instead of editing the config file by hand
+- PlantUML view: wide diagrams are no longer silently cropped. The server caps images at 4096 px,
+  so the HiDPI scale now steps down automatically and the status bar says when a diagram is too big
+  for PNG at all (use SVG export)
+- PlantUML view: recovers from the public server's "boxes but no text" renders by re-requesting a
+  fresh url, and never shows the narrower text-less version when a good one is available
+- PlantUML markup dialog: the copy button verifies what actually reached the clipboard (macOS
+  "smart dashes" can turn `--|>` into an em dash), and a new "Open in browser" button sends the
+  diagram to the chosen server without copy/paste at all
+
 ### 1.86
 
 - First stable release since 1.84 (2022) - supersedes the 1.85 beta series, which is no longer

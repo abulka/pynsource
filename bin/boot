@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+#
+# First-time setup for a clone or a fresh worktree. Idempotent: re-running just re-syncs.
+#
+#   bin/boot          then: bin/run (GUI), bin/testall (suite)
+#
+# The manual equivalent is "Run from source" in BUILDING.md. The install sequence deliberately
+# mirrors .github/workflows/test.yml ("Create venv and install") - keep the two in step.
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+if ! command -v uv >/dev/null 2>&1; then
+  echo "bin/boot: uv not found. Install it from https://docs.astral.sh/uv/ (see BUILDING.md)." >&2
+  exit 1
+fi
+
+case "$(uname -s)" in
+Linux)
+  cat >&2 <<'MSG'
+bin/boot: stopping on Linux on purpose.
+
+wxPython has no wheels on PyPI for Linux, so `uv pip install -r requirements.txt` would compile
+wxWidgets from source (30+ minutes, and it needs the GTK/SDL headers). Install the prebuilt
+wheel for your distro first, then re-run bin/boot:
+
+  https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/
+
+See "Linux and wxPython" in BUILDING.md. CI does this itself (see .github/workflows/build-linux.yml).
+MSG
+  exit 1
+  ;;
+MINGW* | MSYS* | CYGWIN*)
+  cat >&2 <<'MSG'
+bin/boot: this script is for macOS/Linux. On Windows create the venv and install the
+requirements yourself, then use bin\runwin.bat / bin\testallwin.bat:
+
+  uv venv --python 3.13 .venv
+  uv pip install -r requirements.txt
+MSG
+  exit 1
+  ;;
+esac
+
+PY=.venv/bin/python
+
+if [ -x "$PY" ]; then
+  echo "=== venv already present ($("$PY" -V 2>&1))"
+else
+  echo "=== venv (python 3.13)"
+  uv venv --python 3.13 .venv
+fi
+
+# Siblings only exist in the author's working copies; a plain clone gets everything from
+# requirements.txt / PyPI. Install them editable *before* requirements.txt so the local
+# wxdiagram satisfies the `wxdiagram>=0.2.1,<0.3` pin instead of downloading it.
+for sibling in wxdiagram pynsource-rego alsm; do
+  if [ -d "../$sibling" ]; then
+    echo "=== editable sibling: $sibling"
+    uv pip install --python "$PY" -e "../$sibling"
+  fi
+done
+
+echo "=== requirements.txt"
+uv pip install --python "$PY" -r requirements.txt
+
+# Most tests build a real wx.App and write logs here; the directory is git-ignored.
+mkdir -p src/tests/logs
+
+cat <<'MSG'
+
+Ready.
+
+  bin/run       run the GUI from source
+  bin/testall   full test suite (expect 184 tests OK, skipped=8)
+  bin/testone   one test, e.g. bin/testone test_parse_type_annotations
+
+See bin/README.md for the rest.
+MSG

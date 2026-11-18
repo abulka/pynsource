@@ -1,19 +1,12 @@
 # gui_umlshapes
 
-from gui.settings import PRO_EDITION, LOCAL_OGL
 import wx
-if PRO_EDITION:
-    import ogl2 as ogl
-else:
-    if LOCAL_OGL:
-        import ogl
-    else:
-        import wx.lib.ogl as ogl
+import wxdiagram
 
 
-class DiamondShape(ogl.PolygonShape):
+class DiamondShape(wxdiagram.PolygonShape):
     def __init__(self, w=0.0, h=0.0):
-        ogl.PolygonShape.__init__(self)
+        wxdiagram.PolygonShape.__init__(self)
         if w == 0.0:
             w = 60.0
         if h == 0.0:
@@ -24,15 +17,15 @@ class DiamondShape(ogl.PolygonShape):
         self.Create(points)
 
 
-# class RoundedRectangleShape(ogl.RectangleShape):
+# class RoundedRectangleShape(wxdiagram.RectangleShape):
 #     def __init__(self, w=0.0, h=0.0):
-#         ogl.RectangleShape.__init__(self, w, h)
+#         wxdiagram.RectangleShape.__init__(self, 0, 0, w, h)
 #         self.SetCornerRadius(-0.3)
 #
 #
-# class CompositeDivisionShape(ogl.CompositeShape):
+# class CompositeDivisionShape(wxdiagram.CompositeShape):
 #     def __init__(self, canvas):
-#         ogl.CompositeShape.__init__(self)
+#         wxdiagram.CompositeShape.__init__(self)
 #
 #         self.SetCanvas(canvas)
 #
@@ -40,7 +33,7 @@ class DiamondShape(ogl.PolygonShape):
 #         self.MakeContainer()
 #
 #         # add a shape to the original division
-#         shape2 = ogl.RectangleShape(40, 60)
+#         shape2 = wxdiagram.RectangleShape(40, 60)
 #         self.GetDivisions()[0].AddChild(shape2)
 #
 #         # now divide the division so we get 2
@@ -48,7 +41,7 @@ class DiamondShape(ogl.PolygonShape):
 #
 #         # and add a shape to the second division (and move it to the
 #         # centre of the division)
-#         shape3 = ogl.CircleShape(40)
+#         shape3 = wxdiagram.CircleShape(40)
 #         shape3.SetBrush(wx.CYAN_BRUSH)
 #         self.GetDivisions()[1].AddChild(shape3)
 #         shape3.SetX(self.GetDivisions()[1].GetX())
@@ -57,15 +50,15 @@ class DiamondShape(ogl.PolygonShape):
 #             division.SetSensitivityFilter(0)
 #
 #
-# class CompositeShape(ogl.CompositeShape):
+# class CompositeShape(wxdiagram.CompositeShape):
 #     def __init__(self, canvas):
-#         ogl.CompositeShape.__init__(self)
+#         wxdiagram.CompositeShape.__init__(self)
 #
 #         self.SetCanvas(canvas)
 #
-#         constraining_shape = ogl.RectangleShape(120, 100)
-#         constrained_shape1 = ogl.CircleShape(50)
-#         constrained_shape2 = ogl.RectangleShape(80, 20)
+#         constraining_shape = wxdiagram.RectangleShape(120, 100)
+#         constrained_shape1 = wxdiagram.CircleShape(50)
+#         constrained_shape2 = wxdiagram.RectangleShape(80, 20)
 #
 #         constraining_shape.SetBrush(wx.BLUE_BRUSH)
 #         constrained_shape2.SetBrush(wx.RED_BRUSH)
@@ -74,8 +67,8 @@ class DiamondShape(ogl.PolygonShape):
 #         self.AddChild(constrained_shape1)
 #         self.AddChild(constrained_shape2)
 #
-#         constraint = ogl.Constraint(
-#             ogl.CONSTRAINT_MIDALIGNED_BOTTOM,
+#         constraint = wxdiagram.Constraint(
+#             wxdiagram.CONSTRAINT_MIDALIGNED_BOTTOM,
 #             constraining_shape,
 #             [constrained_shape1, constrained_shape2],
 #         )
@@ -92,29 +85,29 @@ class DiamondShape(ogl.PolygonShape):
 #         constraining_shape.SetSensitivityFilter(0)
 
 
-class DividedShape(ogl.DividedShape):
+class DividedShape(wxdiagram.DividedShape):
     def __init__(self, width, height, canvas):
-        ogl.DividedShape.__init__(self, width, height)
+        wxdiagram.DividedShape.__init__(self, width, height)
 
     def BuildRegions(self, canvas):
-        region1 = ogl.ShapeRegion()
+        region1 = wxdiagram.ShapeRegion()
         region1.SetText("DividedShape")
         region1.SetProportions(0.0, 0.2)
-        region1.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
+        region1.SetFormatMode(wxdiagram.FORMAT_CENTRE_HORIZ)
         self.AddRegion(region1)
 
-        region2 = ogl.ShapeRegion()
+        region2 = wxdiagram.ShapeRegion()
         region2.SetText("This is Region number two.")
         region2.SetProportions(0.0, 0.3)
-        region2.SetFormatMode(ogl.FORMAT_NONE)
-        # region2.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ|ogl.FORMAT_CENTRE_VERT)
+        region2.SetFormatMode(wxdiagram.FORMAT_NONE)
+        # region2.SetFormatMode(wxdiagram.FORMAT_CENTRE_HORIZ|wxdiagram.FORMAT_CENTRE_VERT)
         self.AddRegion(region2)
 
-        region3 = ogl.ShapeRegion()
+        region3 = wxdiagram.ShapeRegion()
 
         region3.SetText("blah\nblah\nblah blah")
         region3.SetProportions(0.0, 0.5)
-        region3.SetFormatMode(ogl.FORMAT_NONE)
+        region3.SetFormatMode(wxdiagram.FORMAT_NONE)
         self.AddRegion(region3)
 
         # Andy Added
@@ -151,7 +144,7 @@ class DividedShape(ogl.DividedShape):
             rnum += 1
 
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
-        ogl.DividedShape.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
+        wxdiagram.DividedShape.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
         self.SetRegionSizes()
         self.ReformatRegions()
         self.GetCanvas().Refresh()
@@ -162,10 +155,10 @@ class DividedShapeSmall(DividedShape):
         DividedShape.__init__(self, width, height, canvas)
 
     def BuildRegions(self, canvas):
-        region1 = ogl.ShapeRegion()
+        region1 = wxdiagram.ShapeRegion()
         region1.SetText("wxDividedShapeSmall")
         region1.SetProportions(0.0, 0.9)
-        region1.SetFormatMode(ogl.FORMAT_CENTRE_HORIZ)
+        region1.SetFormatMode(wxdiagram.FORMAT_CENTRE_HORIZ)
         self.AddRegion(region1)
 
         self.region1 = region1  # for external access...
@@ -184,58 +177,17 @@ class DividedShapeSmall(DividedShape):
             rnum += 1
 
     def OnSizingEndDragLeft(self, pt, x, y, keys, attch):
-        ogl.DividedShape.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
+        wxdiagram.DividedShape.OnSizingEndDragLeft(self, pt, x, y, keys, attch)
         self.SetRegionSizes()
         self.ReformatRegions()
         self.GetCanvas().Refresh()
 
 
-class BitmapShapeResizable(ogl.BitmapShape):
-    """Draws a bitmap (andy's attempt at a resizable one)."""
-
-    def __init__(self):
-        ogl.BitmapShape.__init__(self)
-        self._ori_bmp = None  # ANDY ADDED
-
-    def ResetSize(self):  # ANDY ADDED
-        if self._bitmap.IsOk():  # Returns True if bitmap data is present.
-            w = int(self._ori_bmp.GetWidth()) # python 3.10 needs int
-            h = int(self._ori_bmp.GetHeight()) # python 3.10 needs int
-            self.SetSize(w, h)
-
-    def SetSize(self, w, h, recursive=True):
-        if self._bitmap.IsOk():
-
-            # ANDY ADDED
-            if self._bitmap.GetWidth() != w or self._bitmap.GetHeight() != h:
-                img = self._ori_bmp.ConvertToImage()
-                adjusted_img = img.Rescale(int(w), int(h), wx.IMAGE_QUALITY_HIGH) # python 3.10 needs ints
-                bitmap = wx.Bitmap(adjusted_img)
-                self._bitmap = (
-                    bitmap
-                )  # shape.SetBitmap(bitmap)  # don't call SetBitmap() cos it will infinite loop.  Plus don't want to destroy ori bmp info
-            ##########
-
-            w = self._bitmap.GetWidth()
-            h = self._bitmap.GetHeight()
-
-        self.SetAttachmentSize(w, h)
-
-        self._width = w
-        self._height = h
-
-        self.SetDefaultRegionSize()
-
-    def SetBitmap(self, bitmap):  # Override
-        ogl.BitmapShape.SetBitmap(self, bitmap)
-        self._ori_bmp = bitmap  # ANDY ADDED
-
-
 # Comment Shape
 
-# class DiamondShape(ogl.PolygonShape):
+# class DiamondShape(wxdiagram.PolygonShape):
 #     def __init__(self, w=0.0, h=0.0):
-#         ogl.PolygonShape.__init__(self)
+#         wxdiagram.PolygonShape.__init__(self)
 #         if w == 0.0:
 #             w = 60.0
 #         if h == 0.0:
@@ -250,14 +202,14 @@ class BitmapShapeResizable(ogl.BitmapShape):
 #         self.Create(points)
 
 
-class CommentShape(ogl.RectangleShape):
+class CommentShape(wxdiagram.RectangleShape):
     def __init__(self, w=0.0, h=0.0):
-        ogl.RectangleShape.__init__(self, w, h)
+        wxdiagram.RectangleShape.__init__(self, 0, 0, w, h)
         # self.SetCornerRadius(-0.3)
 
     def OnDraw(self, dc):
         """The draw handler."""
-        ogl.RectangleShape.OnDraw(self, dc)
+        wxdiagram.RectangleShape.OnDraw(self, dc)
 
         # print("drawing comment shape....")
 

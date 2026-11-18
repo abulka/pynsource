@@ -5,15 +5,12 @@ import os
 from parsing.api import old_parser, new_parser
 from app.settings import RefreshPlantUmlEvent
 from gui.coord_utils import setpos, getpos
-from gui.settings import PRO_EDITION, ALSM_PARSING
+from gui.settings import ALSM_PARSING
 from gui.uml_lines import LineShape, LineShapeUml
 from textwrap import dedent
 import logging
 from common.logger import config_log
-if PRO_EDITION:
-    from gui.uml_canvas import DividedShapeOglTwo as DividedShape
-else:
-    from gui.uml_canvas import DividedShape
+from gui.uml_canvas import UmlDividedShape as DividedShape
 
 try:
     OPEN = wx.OPEN  # classic
@@ -49,7 +46,7 @@ class CmdFileImportBase(CmdBase):  # BASE
                 msgs = self._old_parse_and_build_graph()
                 msgs += f"\nSuccess! 🎉\n"
                 msgs += dedent("""
-                Pynsource Pro Edition can:
+                Pynsource Pro adds module visualisation:
                 - Display modules (.py) as UML boxes
                 - Module level variables visualised
                 - Module function names visualised
@@ -206,9 +203,9 @@ class CmdFileImportViaArgs(CmdFileImportBase):
     configurable, but could be changed in src/pynsource_gui.py line 379 by passing a 2 instead of a 3.
     
     If running the PRO edition (the command would be)
-        cd src; PYTHONPATH="/Users/andy/Devel/ogl2/:/Users/andy/Devel/pynsource-rego/" python3 pynsource_gui.py layout/overlap_removal.py ; cd ..
+        cd src; PYTHONPATH="/Users/andy/Devel/pynsource-project/wxdiagram/:/Users/andy/Devel/pynsource-rego/" python3 pynsource_gui.py layout/overlap_removal.py ; cd ..
     or more simply
-        PYTHONPATH="/Users/andy/Devel/ogl2/:/Users/andy/Devel/pynsource-rego/" python3 src/pynsource_gui.py src/layout/overlap_removal.py
+        PYTHONPATH="/Users/andy/Devel/pynsource-project/wxdiagram/:/Users/andy/Devel/pynsource-rego/" python3 src/pynsource_gui.py src/layout/overlap_removal.py
     """
     def __init__(self, files=None, mode=3):
         self.files = files
@@ -217,6 +214,8 @@ class CmdFileImportViaArgs(CmdFileImportBase):
 
 
 class CmdBootStrap(CmdBase):
+    undoable = False
+
     def execute(self):
         self.frame = self.context.frame
         self.app = self.context.wxapp.app
@@ -266,6 +265,9 @@ class CmdBootStrap(CmdBase):
         # bootstrap05()
         bootstrap07()  # <-- good one
         # bootstrap08()
+
+        # The sample is the starting document, not an editable action.
+        self.umlcanvas.clear_undo()
 
         # self.umlcanvas.set_uml_canvas_size((9000,9000))
         # self.context.frame.ShowFullScreen(True)
@@ -527,7 +529,7 @@ class CmdFileLoadWorkspaceSampleViaPickList(CmdFileLoadWorkspaceBase):
     Reason for doing this: allows us to keep 'file' resources in the app itself,
     thus no need for loading external file - which is problematic e.g. on the mac
     
-    Run bin/_buildsamples.py to update it.
+    Run buildtools/buildsamples.py to update it.
     """
 
     def execute(self):
@@ -635,8 +637,6 @@ class CmdInsertSingleLine(CmdFileLoadWorkspaceBase):
         wxapp = self.context.wxapp
         displaymodel = self.context.displaymodel
 
-        # assert PRO_EDITION
-
         width = 50
         height = 50
 
@@ -677,10 +677,8 @@ class CmdInsertSingleLine(CmdFileLoadWorkspaceBase):
         line.Show(True)
     
         umlcanvas.Refresh()
-        if not PRO_EDITION:
-            umlcanvas.extra_refresh()  # wx.ogl needs
 
         umlcanvas.select(line)
-        umlcanvas.zoom_in()
-        umlcanvas.zoom_in()
-        umlcanvas.zoom_in()
+        umlcanvas.ZoomIn()
+        umlcanvas.ZoomIn()
+        umlcanvas.ZoomIn()

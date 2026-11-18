@@ -1,0 +1,3 @@
+# setup.py reads requirements.txt at build time (install_requires), so it has to travel in the
+# sdist - otherwise `pip install dist/pynsource-*.tar.gz` fails while building the wheel.
+include requirements.txt

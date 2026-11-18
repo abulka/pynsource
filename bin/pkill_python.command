@@ -1,2 +1,0 @@
-#pkill Python
-pkill Pynsource

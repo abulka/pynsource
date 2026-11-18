@@ -9,13 +9,13 @@ class CmdNodeDeleteBase(CmdBase):
         gui = self.context.umlcanvas
 
         # Currently images are not nodes, just shapes, so skip deleting the node
-        if shape.GetShape().__class__.__name__ != "BitmapShapeResizable":
+        if not getattr(shape.GetShape(), "is_bitmap", False):
             displaymodel.delete_node_or_edge_for_shape(shape)
 
         gui.delete_shape_view(shape)
 
         self.context.umlcanvas.extra_refresh()
-        self.context.umlcanvas.Refresh()  # needed for ogltwo
+        self.context.umlcanvas.Refresh()  # needed for wxdiagram
         # self.context.wxapp.RefreshAsciiUmlTab()
 
 
@@ -36,6 +36,5 @@ class CmdNodeDeleteSelected(CmdNodeDeleteBase):
     def execute(self):
         """ Delete selected node. """
         selected = [s for s in self.context.umlcanvas.GetDiagram().GetShapeList() if s.Selected()]
-        if selected:
-            shape = selected[0]
+        for shape in selected:
             self.delete_shape(shape)

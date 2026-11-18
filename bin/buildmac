@@ -1,1 +1,64 @@
-../ogl2/bin/buildmac.sh
+#!/usr/bin/env bash
+#
+# Local macOS build (or, with a parameter, a local Linux zip). CI is the supported route:
+# .github/workflows/build-mac.yml (macos-15, uv's python-build-standalone, onedir bundle).
+#
+#   bin/buildmac                 -> dist/pynsource-<APP_VERSION>-macos.zip
+#   bin/buildmac 22.04           -> dist/pynsource-<APP_VERSION>-ubuntu-22.04.zip
+#
+# It uses .venv/bin/pyinstaller, never whatever `python3` is on PATH: a framework Python plus
+# wxasync's macOS event loop freezes the canvas during a mouse drag (see
+# Admin/BUG-DIST-SLOWNESS-MAC.md), and that bug got in exactly this way.
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+APP_VERSION="$(sed -n 's/^APP_VERSION = //p' src/gui/settings.py | head -1)"
+if [ -z "$APP_VERSION" ]; then
+  echo "error: could not read APP_VERSION from src/gui/settings.py" >&2
+  exit 1
+fi
+
+PYINSTALLER="$ROOT/.venv/bin/pyinstaller"
+if [ ! -x "$PYINSTALLER" ]; then
+  echo "error: $PYINSTALLER not found - run bin/boot, or uv pip install pyinstaller" >&2
+  exit 1
+fi
+
+if [ $# -eq 0 ]; then
+  echo "No arguments supplied, doing mac build"
+  DESTZIP="pynsource-$APP_VERSION-macos.zip"
+else
+  echo "Parameter detected, going for linux build $1"
+  DESTZIP="pynsource-$APP_VERSION-ubuntu-$1.zip"
+fi
+
+"$ROOT/.venv/bin/python" buildtools/buildsamples.py
+
+"$PYINSTALLER" --noconfirm buildtools/pynsource.spec
+
+# NOTE: the build is ONEDIR (COLLECT + BUNDLE), so dist/ contains BOTH:
+#   dist/Pynsource/       the collected payload (exe + _internal) - build input
+#   dist/Pynsource.app    the bundle we actually ship
+# (Onefile was dropped: it unpacked the whole archive to $TMPDIR on every launch, so
+# launch took ~2s even when warm, and PyInstaller 7 rejects onefile + .app outright.)
+cd dist
+cp ../README.md Readme.txt
+cp ../.deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt .
+
+if [ $# -eq 0 ]; then
+  rm -rf Pynsource          # collected payload dir, duplicated inside the .app
+  echo "Mac zipping"
+  # -y keeps Contents/Resources symlinks as symlinks; without it zip stores the
+  # payload twice (83MB instead of 35MB)
+  zip -r -y "$DESTZIP" Pynsource.app/ Readme.txt IMPORTANT-README-BEFORE-RUNNING.txt
+else
+  echo "Linux zipping"
+  # onedir on linux is a directory: dist/Pynsource/{Pynsource,_internal,...}
+  zip -r "$DESTZIP" Pynsource Readme.txt
+fi
+
+cd ..
+echo "done: dist/$DESTZIP"

@@ -1,7 +1,22 @@
-python3 setup.py sdist
-#python3 setup.py sdist bdist_wheel
+#!/usr/bin/env bash
+#
+# Build the sdist and wheel (this replaces `python setup.py sdist`, which setuptools deprecates).
+# Version and install_requires come from src/gui/settings.py and requirements.txt respectively.
+#
+#   bin/build-package
+#
+# Dev install instead of the tar.gz: uv pip install -e .
 
-echo Andy Tip: install in dev mode with 
-echo "    pip install -e ."
-echo uninstall with
-echo "    pip uninstall pynsource"
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+uv build
+
+echo
+echo "Install the built package:  uv pip install dist/pynsource-*.tar.gz"
+echo "Install in dev mode:        uv pip install -e ."
+echo "Uninstall:                  uv pip uninstall pynsource"
+echo
+ls -l dist/
