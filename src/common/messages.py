@@ -232,3 +232,10 @@ User cancelled PlantUML rendering.
 STATUS_TEXT_UML_VIEW = "SHIFT drag to draw with pen.  Right click on workspace for menu.  Drag to pan.  CMD/Ctrl + Mousewheel to zoom."
 
 STATUS_TEXT_UML_VIEW_NO_PLANTUML_RESPONSE = "Error rendering with plantuml - do you have an internet connection? Please check the log file for errors Help/View Log..."
+
+STATUS_TEXT_UML_VIEW_TOO_WIDE = (
+    "Diagram is too wide for the PlantUML server to draw as PNG (4096 px limit) - "
+    "the right hand side is missing. Use File/Save PlantUML Image (SVG) for the whole diagram."
+)
+
+STATUS_TEXT_UML_VIEW_SERVER = "Rendering with PlantUML server: %s"

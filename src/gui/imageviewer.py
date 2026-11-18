@@ -165,41 +165,9 @@ class PynsourceImageViewer(ImageViewer):
         self.SaveImage(bmp, format="png")
 
     def OnViewPlantUmlMarkup(self, event, alt_down=False):
-        mouse_state: wx.MouseState = wx.GetMouseState()
-        if mouse_state.AltDown():
-            print(self.plantuml_text)
-
-        from dialogs.DialogPlantUmlText import DialogPlantUmlText
-        from common.dialog_dir_path import dialog_path_pyinstaller_push
-
-        def display_dialog(txt_plantuml):
-            """
-            Displays dialog for editing comments
-
-            Args:
-                comment: comment string
-
-            Returns: (result, comment)
-            """
-
-            class EditDialog(DialogPlantUmlText):
-                # Custom dialog built via wxformbuilder - subclass it first, to hook up event handlers
-                def OnClassNameEnter(self, event):
-                    self.EndModal(wx.ID_OK)
-
-            # change cwd so that dialog can find the 'pro' image jpg which is relative to dialogs/
-            # when deployed via pyinstaller, this path is a bit tricky to find, so use this func.
-            dir = dialog_path_pyinstaller_push(frame = self)
-
-            dialog = EditDialog(None)
-            dialog.txt_plantuml.Value = txt_plantuml
-            dialog.txt_plantuml.SetFocus()
-            dialog.ShowModal()
-            # dialog.Show()
-            dialog.Destroy()
-
-        display_dialog(self.plantuml_text)
-        # wx.MessageBox(f"PRO mode lets you copy the PlantUML text to the clipboard\n\n{self.plantuml_text}")
+        # inherited from ImageViewer in common/gui_imageviewer.py, which shows the
+        # generated markup together with the two copy-to-clipboard buttons
+        ImageViewer.OnViewPlantUmlMarkup(self, event, alt_down)
 
     def SaveImage(self, bmp, format="png"):
         frame = self.GetTopLevelParent()

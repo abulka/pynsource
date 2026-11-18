@@ -41,6 +41,8 @@ from gui.settings import APP_VERSION, APP_VERSION_FULL, APP_ICON_PATH
 from gui.settings_wx import DEFAULT_ASCII_UML_FONT_SIZE
 from generate_code.gen_plantuml import displaymodel_to_plantuml
 from generate_code.gen_plantuml import plant_uml_create_png_and_return_image_url_async
+from generate_code.gen_plantuml import plant_uml_fetch_svg_bytes_async
+from generate_code.gen_plantuml import set_progress_callback
 from common.dialog_dir_path import dialog_path_pyinstaller_push, dialog_path_pyinstaller_pop, set_original_working_dir
 from configobj import ConfigObj  # pip install configobj
 from appdirs import AppDirs  # pip install appdirs
@@ -746,19 +748,20 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         'force' means do it regardless of what tab is visible
 
-        If there is an entry in
+        The server and scale are chosen via View / PlantUML Server..., which
+        stores them in
 
             ~/Library/Preferences/Pynsource/pynsource.ini
 
-        and it contains
+        as
 
             PlantUmlServerUrl = http://localhost:8080/plantuml/uml
+            PlantUmlScale = 2
 
-        then that will be used as the Plantuml server url, otherwise the url defaults to
-        "http://www.plantuml.com/plantuml/uml"
-
-        PlantUmlScale = 2 in the same file controls the server-side scale
-        (1-4, default 2) for HiDPI displays.
+        PlantUmlServerUrl empty/absent means "http://www.plantuml.com/plantuml/uml".
+        PlantUmlScale (1-4, default 2) controls the server-side scale for HiDPI
+        displays; gen_plantuml steps that scale down for very wide diagrams,
+        because the server crops anything bigger than 4096 px.
 
         For instructions on installing PlantUML server see http://plantuml.com/server or
         otherwise google for advice.
@@ -783,19 +786,28 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
                     # internet connection errors are handled internally to this function
                     plantuml_server_local_url = self.config.get("PlantUmlServerUrl", None)
-                    fetch_txt = plant_uml_txt
-                    if plantuml_scale > 1:
-                        fetch_txt = f"scale {plantuml_scale}\n{plant_uml_txt}"
-                    image_url = await plant_uml_create_png_and_return_image_url_async(
-                        fetch_txt,
-                        plantuml_server_local_url=plantuml_server_local_url
-                    )
+
+                    def on_render_progress(message):
+                        """Show a retry in the PlantUML view instead of just waiting."""
+                        self.plantuml.fetching_msg = message
+                        self.plantuml.Refresh()
+
+                    set_progress_callback(on_render_progress)
+                    try:
+                        render = await plant_uml_create_png_and_return_image_url_async(
+                            plant_uml_txt,
+                            plantuml_server_local_url=plantuml_server_local_url or None,
+                            requested_scale=plantuml_scale,
+                        )
+                    finally:
+                        set_progress_callback(None)
 
                     # Simulate failures
                     # import random
                     # if random.randint(1,2) == 1:
                     #     image_url = None
 
+                    image_url = render.image_url if render else None
                     log.info("image_url of UML %s" % image_url)
 
                     if image_url:
@@ -803,9 +815,14 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
                         # HiDPI bitmap carries plantuml_scale x the pixels: start
                         # zoomed out by the same factor so apparent size matches
                         # a 1x render, but with crisp detail when zooming in.
-                        self.plantuml.zoom_initial(scale=1.0 / plantuml_scale)
+                        # render.scale can be lower than requested, see clamping
+                        # of wide diagrams in gen_plantuml.
+                        self.plantuml.zoom_initial(scale=1.0 / render.scale)
                         self.plantuml.plantuml_text = plant_uml_txt
-                        self.frame.SetStatusText(STATUS_TEXT_UML_VIEW)
+                        if render.too_wide:
+                            self.frame.SetStatusText(STATUS_TEXT_UML_VIEW_TOO_WIDE)
+                        else:
+                            self.frame.SetStatusText(STATUS_TEXT_UML_VIEW)
                     else:
                         self.frame.SetStatusText(STATUS_TEXT_UML_VIEW_NO_PLANTUML_RESPONSE)
                         self.plantuml.clear_cos_connection_error(msg=f"(no image from plantuml at {plantuml_server_local_url})") # this is what I was just getting
@@ -1000,6 +1017,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
 
         Add(menu5, "&Toggle Ascii Art UML", "Ctrl-J", self.OnViewToggleAscii)
         Add(menu5, "&Toggle PlantUML", "Ctrl-K", self.OnViewTogglePlantUml)
+        Add(menu5, "PlantUML &Server...", "", self.OnPlantUmlServer)
         menu5.AppendSeparator()
         Add(menu5, "Colour &Sibling Classes", "Ctrl-F", self.OnColourSiblings, self.uml_only_view_update)
 
@@ -1262,6 +1280,34 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
                 self.notebook.SetSelection(2)
             else:
                 self.notebook.SetSelection(0)
+
+    def OnPlantUmlServer(self, event):
+        """Choose which PlantUML server renders the diagram (and the HiDPI scale)."""
+        from dialogs.DialogPlantUmlServer import DialogPlantUmlServer
+
+        try:
+            current_scale = int(self.config.get("PlantUmlScale", 2))
+        except (TypeError, ValueError):
+            current_scale = 2
+
+        dlg = DialogPlantUmlServer(
+            self.frame,
+            current_url=self.config.get("PlantUmlServerUrl", "") or "",
+            current_scale=current_scale,
+        )
+        if dlg.ShowModal() == wx.ID_OK:
+            server_url = dlg.GetServerUrl()
+            self.config["PlantUmlServerUrl"] = server_url
+            self.config["PlantUmlScale"] = str(dlg.GetScale())
+            self.config.write()
+            log.info(f"PlantUML server set to '{server_url}' scale {dlg.GetScale()}")
+            # both caches are keyed on the old url, so drop them
+            plant_uml_create_png_and_return_image_url_async.cache_clear()
+            plant_uml_fetch_svg_bytes_async.cache_clear()
+            url_to_data.cache_clear()
+            wx.PostEvent(self.frame, RefreshPlantUmlEvent(force=True))
+            self.frame.SetStatusText(STATUS_TEXT_UML_VIEW_SERVER % (server_url or "www.plantuml.com"))
+        dlg.Destroy()
 
     def OnViewToggleAscii(self, event):
         if GUI_LAYOUT == "MULTI_TAB_GUI":

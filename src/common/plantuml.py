@@ -42,6 +42,18 @@ def plant_uml_url(plantuml_text, fmt="svg", server_url=None):
     return f"{server}/{fmt}/{deflate_and_encode(plantuml_text)}"
 
 
+def plant_uml_view_url(plantuml_text, server_url=None):
+    """The interactive PlantUML server page for a diagram, ready for a browser.
+
+    Handy for checking a diagram on the server without copy/paste (which is
+    where macOS text substitution can mangle `--|>` into an em dash).
+    """
+    server = (server_url or "http://www.plantuml.com/plantuml/uml").rstrip("/")
+    if server.endswith("/uml"):
+        server = server[: -len("/uml")]
+    return f"{server}/uml/{deflate_and_encode(plantuml_text)}"
+
+
 class PlantUMLError(Exception):
     """Error in processing.
     """

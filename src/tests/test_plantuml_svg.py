@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.append("../src")
-from common.plantuml import plant_uml_url, deflate_and_encode
+from common.plantuml import plant_uml_url, deflate_and_encode, plant_uml_view_url
 
 
 class TestCasePlantUmlUrl(unittest.TestCase):
@@ -35,6 +35,17 @@ class TestCasePlantUmlUrl(unittest.TestCase):
         url = plant_uml_url(txt, fmt="svg", server_url="http://www.plantuml.com/plantuml/uml/")
         self.assertTrue(url.startswith("http://www.plantuml.com/plantuml/svg/"))
         self.assertNotIn("//svg", url.split("http://")[1])
+
+    def test_view_url_points_at_the_interactive_page(self):
+        txt = "class Foo {\n}\n"
+        expected_payload = deflate_and_encode(txt)
+        self.assertEqual(
+            plant_uml_view_url(txt),
+            "http://www.plantuml.com/plantuml/uml/" + expected_payload)
+        for server in ("http://localhost:8080/plantuml/uml", "http://localhost:8080/plantuml"):
+            self.assertEqual(
+                plant_uml_view_url(txt, server),
+                "http://localhost:8080/plantuml/uml/" + expected_payload)
 
     def test_invalid_format_raises(self):
         with self.assertRaises(ValueError):

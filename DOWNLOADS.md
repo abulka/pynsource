@@ -108,6 +108,30 @@ instead: `./pynsource-linux-*.AppImage --appimage-extract` then run
 **PlantUML view is blank** — it renders server-side and needs an internet connection. To run your
 own PlantUML server, see the app's built-in help (`F1`).
 
+**PlantUML view draws the boxes but no text** — that comes from the server, not Pynsource. The
+public plantuml.com server sometimes returns a picture with every label missing (the boxes and lines
+are drawn, the glyphs are not). Pynsource detects the narrow result, re-requests and says
+"retrying" in the view; if it persists, switch server with **View → PlantUML Server…** (your own
+server, or a custom url), or save with `File → Save PlantUML Image…` choosing SVG, which keeps the
+text because SVG text is drawn by your machine. The same menu sets the render scale (2 = crisp on
+Retina).
+
+Full technical write-up of every PlantUML quirk (text-less renders, the 4096 px crop, scale
+clamping, `/dpng` dark mode, macOS smart dashes) and where each is handled in the code:
+`Admin/PLANTUML-QUIRKS.md`.
+
+**PlantUML says "Syntax Error" when you paste its markup somewhere else** — macOS "Smart dashes"
+(System Settings → Keyboard → Text) rewrites `--|>` as a long dash `—|>` as the text enters another
+app, and PlantUML rejects that character. The markup Pynsource sends itself is plain ASCII, so this
+only bites manual copy/paste. The markup dialog's copy button verifies what really reached the
+clipboard, and its **Open in browser** button sends the diagram to the chosen server without
+touching the clipboard at all.
+
+**The PlantUML picture is cut off on the right** — the PlantUML server refuses to draw wider than
+4096 px and crops the rest. Pynsource steps the HiDPI scale down for wide diagrams (and says so in
+the status bar when even 1x is too wide); use SVG export for the whole diagram, or raise
+`PLANTUML_LIMIT_SIZE` on your own server.
+
 **Where are my settings and logs?** Per-user app data (`appdirs`): macOS
 `~/Library/Application Support/PyNsource`, Windows `%APPDATA%\PyNsource`, Linux
 `~/.local/share/PyNsource` and `~/.cache/pynsource/log`.

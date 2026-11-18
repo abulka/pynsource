@@ -289,3 +289,9 @@ Zoom, pan, drag-to-connect, resize and layout are free.
 - Fonts: UML regions use `wx.MODERN` 10/14pt (`src/gui/uml_canvas.py`). Don't change
   families without a screenshot check.
 - No `timeout(1)` on macOS — use `cmd & sleep; kill` pattern for GUI smoke tests.
+- **PlantUML view quirks** are all server-side, not ours: plantuml.com sometimes returns PNGs with
+  every label missing, and crops anything over 4096 px (so `scale 2` halves the usable width);
+  `/dpng/` is the dark-mode variant, not a cache buster; macOS "smart dashes" turns `--|>` into an em
+  dash, which every PlantUML version rejects. Handled in `src/generate_code/gen_plantuml.py` (SVG
+  width as reference + retry with a trailing `' pynsource-retry N` comment, scale clamp) and the
+  markup dialog's clipboard verification. Full write-up: `Admin/PLANTUML-QUIRKS.md`.

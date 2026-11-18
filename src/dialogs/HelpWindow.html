@@ -66,10 +66,29 @@ Zooming will be towards the mouse position.</p>
 <h3>PlantUML - View</h3>
 <p><img src="help-images/plantuml01.jpg" /></p>
 <p>The PlantUML view renders a UML diagram image using the <a target="_blank" href="http://plantuml.com/class-diagram">PlantUML web service</a>&nbsp;which requires an internet connection.</p>
-<p>There is a limitation on the size of diagram which this service will render.</p>
+<p>There is a limitation on the size of diagram which this service will render: anything wider or taller than 4096 pixels is cropped. Because the view renders at double size on HiDPI screens, Pynsource automatically drops back to 1x for wide diagrams, and tells you in the status bar when the diagram is too big to fit at all. Use <i>File / Save PlantUML Image...</i> and choose SVG to get the whole diagram.</p>
 <p>There is no ability to select and move shapes.
     You can however switch to the main UML view, where everthing is editable, then switch back to PlantUML view (the UML image will be re-rendered).</p>
 <p>Printing, zooming (pro) and saving of images (pro) are also available whilst in PlantUML view.</p>
+
+<h4>Choosing the PlantUML server</h4>
+<p>Use <i>View / PlantUML Server...</i> to pick which server renders the diagram - the official public
+    server, one of your own servers, or a custom url - and to test it. The setting is remembered in your
+    config file as <code>PlantUmlServerUrl</code> (an empty value means the official server).</p>
+<p><b>Diagram renders but all the text is missing</b> - that is the server, not Pynsource. The public
+    plantuml.com server occasionally returns a picture with the text missing; the boxes and lines are drawn
+    but the letters are not. Pynsource notices (the picture is narrower than the SVG layout) and asks again -
+    the view says "PlantUML picture came back with no text - retrying..." while it does. If it still fails,
+    retry later or switch to your own server with <i>View / PlantUML Server...</i>. Saving as SVG is always
+    exact, because SVG text is drawn by your machine, not the server.</p>
+<p><b>The picture is cut off on the right</b> - the PlantUML server crops anything wider than 4096 pixels
+    instead of shrinking it; see the size limitation above, and use SVG export for the whole diagram.</p>
+<p><b>Syntax Error from PlantUML when you paste the markup elsewhere</b> - check the arrows. macOS
+    "Smart dashes" (System Settings / Keyboard / Text) rewrites <code>--|&gt;</code> into a long dash
+    <code>&mdash;|&gt;</code> as the text enters another app, and PlantUML rejects that. The text Pynsource
+    itself sends is always plain ASCII. The markup dialog's copy button verifies what actually landed
+    on the clipboard, and its <i>Open in browser</i> button sends the diagram to the chosen server
+    without using the clipboard at all.</p>
 
 <h4>Debugging PlantUML server rendering failures</h4>
 <p>If you are having problems generating PlantUML diagrams, view the <b>Pynsource log file</b> using the menu 
@@ -81,7 +100,7 @@ Zooming will be towards the mouse position.</p>
     if you would like some help diagnosing the issue.</p>
 <h4>Running your own PlantUML server</h4>
 <p>If you have trouble accessing the internet, or you want faster rendering speed and larger diagrams capacity, consider running your own plantUML server 
-    and tell Pynsource to use it. Simply add e.g. the line <pre>PlantUmlServerUrl = http://localhost:8080/plantuml/uml        
+    and tell Pynsource to use it, either with <i>View / PlantUML Server...</i> or by adding e.g. the line <pre>PlantUmlServerUrl = http://localhost:8080/plantuml/uml        
     </pre> to your Pynsource config file.
 </p>
 <p>Another example is <code>PlantUmlServerUrl = http://plantuml.dokku.nas/uml</code> 

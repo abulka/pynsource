@@ -11,6 +11,7 @@ from io import StringIO
 from gui.coord_utils import ZoomInfo
 from typing import List, Set, Dict, Tuple, Optional
 from generate_code.gen_plantuml import plant_uml_create_png_and_return_image_url_async
+from generate_code.gen_plantuml import plant_uml_fetch_svg_bytes_async
 from dialogs.DialogPlantUmlText import DialogPlantUmlText
 from common.dialog_dir_path import dialog_path_pyinstaller_push, dialog_path_pyinstaller_pop
 from common.messages import *
@@ -28,6 +29,124 @@ ALLOW_DRAWING = True
 DEFAULT_IMAGE_SIZE = (21, 21)  # used to be 2000, 2000 for some reason
 BMP_EXTRA_MARGIN = 20  # margin for plantuml images to allow scrolling them fully into view
 
+
+class PlantUmlMarkupDialog(DialogPlantUmlText):
+    """The generated markup, plus copy and browser buttons.
+
+    Copying markup out of Pynsource into a browser can pick up macOS "smart
+    dashes", which rewrite `--|>` as an em dash and make PlantUML answer with a
+    syntax error. The copy button verifies what actually landed on the
+    clipboard, so it is obvious whether the clipboard or the receiving app is at
+    fault, and "Open in browser" avoids the clipboard entirely.
+    """
+
+    def __init__(self, parent, pure_text, server_url=""):
+        DialogPlantUmlText.__init__(self, parent)
+        self.pure_text = pure_text
+        self.server_url = server_url
+        self._add_copy_buttons()
+
+    def _add_copy_buttons(self):
+        panel = self.m_panel2
+        panel_sizer = panel.GetSizer()
+
+        button_row = wx.BoxSizer(wx.HORIZONTAL)
+        self.btn_copy_pure = wx.Button(panel, label="Copy pure markup")
+        self.btn_open_browser = wx.Button(panel, label="Open in browser")
+        button_row.Add(self.btn_copy_pure, 0, wx.RIGHT, 6)
+        button_row.Add(self.btn_open_browser, 0, wx.RIGHT, 8)
+        panel_sizer.Insert(len(panel_sizer.GetChildren()) - 1, button_row, 0, wx.EXPAND | wx.ALL, 5)
+
+        self.lbl_copy = wx.StaticText(panel, label="")
+        self.lbl_copy.Wrap(400)
+        panel_sizer.Insert(len(panel_sizer.GetChildren()) - 1, self.lbl_copy, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
+
+        panel.Layout()
+        self.btn_copy_pure.Bind(wx.EVT_BUTTON, self.OnCopyPure)
+        self.btn_open_browser.Bind(wx.EVT_BUTTON, self.OnOpenInBrowser)
+
+    def OnCopyPure(self, event):
+        message = self.copy_to_clipboard(self.pure_text, "pure markup")
+        # changing the button label too - the message line can be easy to miss
+        self.btn_copy_pure.SetLabel("Copied!")
+        wx.CallLater(1500, self._restore_copy_button)
+        return message
+
+    def _restore_copy_button(self):
+        try:
+            self.btn_copy_pure.SetLabel("Copy pure markup")
+        except RuntimeError:  # dialog already destroyed
+            pass
+
+    def OnOpenInBrowser(self, event):
+        from common.plantuml import plant_uml_view_url
+
+        url = plant_uml_view_url(self.pure_text, self.server_url)
+        wx.LaunchDefaultBrowser(url)
+        self.show_message(f"Opened in your browser: {url}")
+
+    @staticmethod
+    def read_clipboard():
+        """What the clipboard actually holds, as another app will see it."""
+        text = ""
+        if wx.TheClipboard.Open():
+            try:
+                data = wx.TextDataObject()
+                if wx.TheClipboard.GetData(data):
+                    text = data.GetText()
+            finally:
+                wx.TheClipboard.Close()
+        return text
+
+    def copy_to_clipboard(self, text, what):
+        if wx.TheClipboard.Open():
+            wx.TheClipboard.SetData(wx.TextDataObject(text))
+            wx.TheClipboard.Close()
+
+        message = f"Copied {what} ({len(text)} chars)"
+        on_clipboard = self.read_clipboard()
+        if on_clipboard != text:
+            position, char_sent, char_clip = first_difference(text, on_clipboard)
+            message += (f" - CLIPBOARD CHANGED IT at char {position}: sent "
+                        f"{describe_char(char_sent)} got {describe_char(char_clip)}")
+        else:
+            message += " - clipboard verified"
+
+        box_text = self.txt_plantuml.GetValue()
+        if box_text != self.pure_text:
+            position, char_pure, char_box = first_difference(self.pure_text, box_text)
+            message += (f" - text box differs from markup at char {position}: "
+                        f"markup {describe_char(char_pure)} vs box {describe_char(char_box)}")
+        self.show_message(message)
+        return message
+
+    def show_message(self, message):
+        self.lbl_copy.SetLabel(message)
+        self.lbl_copy.Wrap(400)
+        self.m_panel2.Layout()
+        self.Layout()
+        self.Refresh()
+        self.Update()
+
+    def OnClassNameEnter(self, event):
+        self.EndModal(wx.ID_OK)
+
+
+def first_difference(a, b):
+    """(index, char_in_a, char_in_b) of the first difference, or (None, '', '')."""
+    for i, (char_a, char_b) in enumerate(zip(a, b)):
+        if char_a != char_b:
+            return i, char_a, char_b
+    if len(a) != len(b):
+        i = min(len(a), len(b))
+        return i, a[i:i + 1], b[i:i + 1]
+    return None, "", ""
+
+
+def describe_char(char):
+    if not char:
+        return "<end>"
+    return f"{char!r} (U+{ord(char):04X})"
 
 
 class ImageViewer(wx.ScrolledWindow):
@@ -113,12 +232,14 @@ class ImageViewer(wx.ScrolledWindow):
         self.error_msg = PLANTUML_VIEW_INTERNET_FAIL % msg
         # print(plant_uml_create_png_and_return_image_url.cache_info())
         plant_uml_create_png_and_return_image_url_async.cache_clear()
+        plant_uml_fetch_svg_bytes_async.cache_clear()
         url_to_data.cache_clear()
         self.Refresh()
 
     def user_aborted(self):
         self.error_msg = PLANTUML_VIEW_USER_ABORT
         plant_uml_create_png_and_return_image_url_async.cache_clear()
+        plant_uml_fetch_svg_bytes_async.cache_clear()
         url_to_data.cache_clear()
         self.Refresh()
 
@@ -320,36 +441,22 @@ class ImageViewer(wx.ScrolledWindow):
         if mouse_state.AltDown():
             print(self.plantuml_text)
 
-        def display_dialog(txt_plantuml):
-            """
-            Displays dialog for editing comments
-
-            Args:
-                comment: comment string
-
-            Returns: (result, comment)
-            """
-
-            class EditDialog(DialogPlantUmlText):
-                # Custom dialog built via wxformbuilder - subclass it first, to hook up event handlers
-                def OnClassNameEnter(self, event):
-                    self.EndModal(wx.ID_OK)
-
-            # change cwd so that dialog can find the 'pro' image jpg which is relative to dialogs/
-            # when deployed via pyinstaller, this path is a bit tricky to find, so use this func.
-            dir = dialog_path_pyinstaller_push(frame = self)
-            try:
-                dialog = EditDialog(None)
-                dialog.txt_plantuml.Value = txt_plantuml
-                dialog.txt_plantuml.SetFocus()
-                dialog.ShowModal()
-                # dialog.Show()
-                dialog.Destroy()
-            finally:
-                dialog_path_pyinstaller_pop()
-
-        display_dialog(self.plantuml_text)
-        # wx.MessageBox(f"PRO mode lets you copy the PlantUML text to the clipboard\n\n{self.plantuml_text}")
+        # change cwd so that dialog can find the 'pro' image jpg which is relative to dialogs/
+        # when deployed via pyinstaller, this path is a bit tricky to find, so use this func.
+        dir = dialog_path_pyinstaller_push(frame = self)
+        try:
+            server_url = ""
+            config = getattr(getattr(self, "context", None), "config", None)
+            if config is not None:
+                server_url = config.get("PlantUmlServerUrl", "") or ""
+            dialog = PlantUmlMarkupDialog(None, self.plantuml_text, server_url=server_url)
+            dialog.txt_plantuml.Value = self.plantuml_text
+            dialog.txt_plantuml.SetFocus()
+            dialog.ShowModal()
+            # dialog.Show()
+            dialog.Destroy()
+        finally:
+            dialog_path_pyinstaller_pop()
 
     def OnHandleFileLoad(self, event):
         frame = self.GetTopLevelParent()

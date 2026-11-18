@@ -61,6 +61,16 @@
   through the window-activation `osascript` (that is now frozen-app only)
 - CI now checks out the public `wxdiagram` repo; the branch can be selected when dispatching
 - PlantUML markup/save and ASCII-art zoom are free (previously Pro)
+- PlantUML view: new **View / PlantUML Server...** dialog to choose the server (official, your own,
+  or a custom url) with a Test button, instead of editing the config file by hand
+- PlantUML view: wide diagrams are no longer silently cropped. The server caps images at 4096 px,
+  so the HiDPI scale now steps down automatically and the status bar says when a diagram is too big
+  for PNG at all (use SVG export)
+- PlantUML view: recovers from the public server's "boxes but no text" renders by re-requesting a
+  fresh url, and never shows the narrower text-less version when a good one is available
+- PlantUML markup dialog: the copy button verifies what actually reached the clipboard (macOS
+  "smart dashes" can turn `--|>` into an em dash), and a new "Open in browser" button sends the
+  diagram to the chosen server without copy/paste at all
 
 ### 1.86
 

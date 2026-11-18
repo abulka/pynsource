@@ -1,5 +1,6 @@
 import os
 import re
+from collections import namedtuple
 import requests
 from .gen_base import ReportGenerator, CmdLineGenerator
 # from pydbg import dbg
@@ -120,6 +121,103 @@ class CmdLinePythonToPlantUml(CmdLineGenerator):
             print("Done!")
 
 
+PLANTUML_URL_ON_INTERNET = "http://www.plantuml.com/plantuml/uml"
+
+# The PlantUML server refuses to draw an image bigger than this (its
+# PLANTUML_LIMIT_SIZE default) - it silently crops anything over the limit.
+PLANTUML_PNG_LIMIT = 4096
+
+# How many times we are prepared to re-request a PNG from the server. Fresh
+# renders on the public server sometimes come back with the text missing (the
+# glyphs measure zero width, so the boxes collapse); a different url usually
+# gets a good one back. See Admin notes / DOWNLOADS.md troubleshooting.
+PLANTUML_MAX_RENDER_ATTEMPTS = 3
+
+# Result of a render: the url the viewer should fetch, the scale actually used
+# (may be lower than requested, see clamp_plantuml_scale) and whether the
+# diagram is too big for the server to draw at all.
+PlantUmlRender = namedtuple("PlantUmlRender", "image_url scale too_wide attempts")
+
+# Optional GUI hook: called with a short message whenever a render has to be
+# retried, so the view can show what is going on instead of just waiting.
+_progress_callback = None
+
+
+def set_progress_callback(callback):
+    global _progress_callback
+    _progress_callback = callback
+
+
+def _report_progress(message):
+    if _progress_callback is not None:
+        try:
+            _progress_callback(message)
+        except Exception:
+            log.exception("Error in plantuml progress callback")
+
+
+def png_pixel_size(data):
+    """(width, height) read straight out of the PNG header, or None.
+
+    Deliberately avoids Pillow - it is only a dev/test dependency.
+    """
+    if not data or len(data) < 24 or data[:8] != b"\x89PNG\r\n\x1a\n":
+        return None
+    width = int.from_bytes(data[16:20], "big")
+    height = int.from_bytes(data[20:24], "big")
+    if width <= 0 or height <= 0:
+        return None
+    return (width, height)
+
+
+def svg_pixel_size(svg_bytes):
+    """(width, height) of the root <svg> element, or None.
+
+    PlantUML writes e.g. <svg ... style="width:5649px;height:368px;"
+    width="5649px" height="368px" viewBox="0 0 5649 368">. Only the root tag is
+    inspected, so the width= of the first <rect> inside the document is not
+    mistaken for the diagram size.
+    """
+    if not svg_bytes:
+        return None
+    try:
+        head = svg_bytes[:4000].decode("utf-8", "replace")
+    except (UnicodeDecodeError, AttributeError):
+        return None
+    match = re.search(r"<svg\b[^>]*>", head, re.IGNORECASE)
+    if not match:
+        return None
+    root_tag = match.group(0)
+
+    def attr(name):
+        found = re.search(rf'\b{name}\s*=\s*"([0-9.]+)\s*(?:px)?"', root_tag, re.IGNORECASE)
+        return float(found.group(1)) if found else None
+
+    width, height = attr("width"), attr("height")
+    if width is None or height is None:
+        return None
+    return (int(round(width)), int(round(height)))
+
+
+def clamp_plantuml_scale(requested_scale, diagram_width, limit=PLANTUML_PNG_LIMIT):
+    """Work out what scale the server can actually draw this diagram at.
+
+    Returns (scale, too_wide). Asking for a scale that would push the image past
+    the server's size limit gets the right hand side of the diagram cropped off
+    without any warning, so we step the scale down instead.
+    """
+    try:
+        scale = max(1, int(requested_scale or 1))
+    except (TypeError, ValueError):
+        scale = 1
+    if not diagram_width:
+        return scale, False
+    max_scale = int(limit // diagram_width)
+    if max_scale < 1:
+        return 1, True  # too wide even at 1x - the server will crop it
+    return min(scale, max_scale), False
+
+
 async def _plant_uml_fetch_direct_async(plant_uml_txt: str, fmt: str, plant_uml_server: str):
     """Fetch raw image bytes straight from the PlantUML server, no HTML scraping.
 
@@ -142,36 +240,150 @@ async def _plant_uml_fetch_direct_async(plant_uml_txt: str, fmt: str, plant_uml_
 
 
 @alru_cache(maxsize=32)
-async def plant_uml_create_png_and_return_image_url_async(plant_uml_txt: str, plantuml_server_local_url: str) -> str:
-    """Async version of getting image url from plantuml.  This does not get the actual image,
-    that is a separate call - unlike in a browser where that second call is done automatically.
+async def plant_uml_fetch_svg_bytes_async(plant_uml_txt: str, plantuml_server_local_url: str = None):
+    """Fetch the diagram as SVG bytes (async, cached).
 
-    The direct /png/ server URL is used (no HTML scraping), so the returned url
-    can be fetched straight away by the image viewer.
-
-    Uses `url_to_data`, and only returns extracted url, no response object is returned by this
-    routine, cos it was never used by anyone recently.
-
-    I'm caching the result, though truthfully the call to `url_to_data` is already cached,
-    so it probably doesn't make much difference.
+    Used as the reference for the layout width. The SVG is laid out by the same
+    server, so it can occasionally come back degraded too (text running outside
+    its boxes); the caller corrects for that by also looking at the PNG width.
     """
-    PLANTUML_URL_ON_INTERNET = "http://www.plantuml.com/plantuml/uml"
-    # PLANTUML_URL_LOCAL = "http://localhost:8080/plantuml/uml"
+    url = plant_uml_url(plant_uml_txt, fmt="svg", server_url=plantuml_server_local_url)
+    try:
+        data, status_code = await url_to_data(url)
+    except (ConnectionError,
+            requests.exceptions.RequestException,
+            aiohttp.client_exceptions.ClientConnectorError) as e:
+        log.error(f"Error trying to fetch svg from plantuml server "
+                  f"{plantuml_server_local_url} {str(e)}")
+        return None
+    except asyncio.TimeoutError:
+        log.error("TimeoutError getting plantuml svg")
+        return None
+    if status_code == 200 and data and data.lstrip()[:1] == b"<":
+        return data
+    log.error(f"plant_uml_server responded with {status_code} for svg")
+    return None
 
+
+@alru_cache(maxsize=32)
+async def plant_uml_create_png_and_return_image_url_async(
+        plant_uml_txt: str,
+        plantuml_server_local_url: str = None,
+        requested_scale: int = 1) -> PlantUmlRender:
+    """Render the diagram as PNG and return a PlantUmlRender.
+
+    Three things are handled here:
+
+    1. The server crops anything wider than 4096 px, so the requested HiDPI
+       scale is stepped down for wide diagrams (clamp_plantuml_scale).
+    2. The public server sometimes returns a render with all the text missing.
+       The layout collapses, so comparing the PNG width against the SVG width
+       detects it; we then re-request with a slightly different url (a trailing
+       comment line changes the encoded url, not the diagram).
+    3. If everything fails, the caller gets None.
+
+    The returned url is what the image viewer fetches, so it may include the
+    retry comment.
+    """
     plant_uml_server = plantuml_server_local_url if plantuml_server_local_url else PLANTUML_URL_ON_INTERNET
     log.info("plant_uml_server calculated to be %s" % (plant_uml_server,))
 
-    data, status_code = await _plant_uml_fetch_direct_async(plant_uml_txt, "png", plant_uml_server)
-    if data is None:
+    svg_bytes = await plant_uml_fetch_svg_bytes_async(plant_uml_txt, plantuml_server_local_url)
+    svg_size = svg_pixel_size(svg_bytes) if svg_bytes else None
+    diagram_width = svg_size[0] if svg_size else None
+
+    chosen = None  # (url, scale, png_width) - the best render seen so far
+    attempts = 0
+    for attempt in range(PLANTUML_MAX_RENDER_ATTEMPTS):
+        attempts = attempt + 1
+        scale, _ = clamp_plantuml_scale(requested_scale, diagram_width)
+        if scale > 1:
+            attempt_txt = f"scale {scale}\n{plant_uml_txt}"
+        else:
+            attempt_txt = plant_uml_txt
+        if attempt > 0:
+            # a trailing comment is harmless to PlantUML but changes the url,
+            # which gets us a fresh render instead of the cached textless one
+            attempt_txt = f"{attempt_txt}\n' pynsource-retry {attempt}\n"
+
+        data, status_code = await _plant_uml_fetch_direct_async(attempt_txt, "png", plant_uml_server)
+        if not data or status_code != 200:
+            continue
+
+        png_size = png_pixel_size(data)
+        if not png_size:
+            continue
+        width = png_size[0]
+
+        # Both the PNG and the SVG are laid out by the server, so either can come
+        # back with the text missing - which only ever makes the layout narrower.
+        # The wider of the two is therefore the honest width.
+        logical_width = int(round(width / scale))
+        if diagram_width is None or logical_width > diagram_width + 2:
+            if diagram_width is not None:
+                log.warning(f"plantuml svg width {diagram_width} looks short, "
+                            f"using {logical_width} from the png instead")
+            diagram_width = logical_width
+
+        expected_width = min(int(round(diagram_width * scale)), PLANTUML_PNG_LIMIT)
+        url = plant_uml_url(attempt_txt, fmt="png", server_url=plant_uml_server)
+        if abs(width - expected_width) <= 2:
+            chosen = (url, scale, width)
+            break
+
+        log.warning(f"plantuml render looks like it lost its text "
+                    f"(png width {width}, expected {expected_width}) - retrying")
+        if attempt + 1 < PLANTUML_MAX_RENDER_ATTEMPTS:
+            _report_progress(
+                f"PlantUML picture came back with no text - retrying "
+                f"({attempt + 2} of {PLANTUML_MAX_RENDER_ATTEMPTS})...")
+        else:
+            _report_progress(
+                "PlantUML picture came back with no text - keeping the best one we got")
+        if chosen is None or width > chosen[2]:
+            chosen = (url, scale, width)
+
+    if chosen is None:
         return None
 
-    if status_code == 200:
-        image_url = plant_uml_url(plant_uml_txt, fmt="png", server_url=plant_uml_server)
-        log.info("direct diagram image_url of %s" % image_url)
-        return image_url
-    else:
-        log.error(f"plant_uml_server responded with {status_code} ok")
-        return None
+    image_url, scale, width = chosen
+    # a png sitting exactly on the server's limit was cropped - the server does
+    # not warn, it just cuts the right hand side (or bottom) off
+    too_wide = width >= PLANTUML_PNG_LIMIT or diagram_width > PLANTUML_PNG_LIMIT
+    log.info("direct diagram image_url of %s (scale %d, too_wide %s, attempts %d)"
+             % (image_url, scale, too_wide, attempts))
+    return PlantUmlRender(image_url, scale, too_wide, attempts)
+
+
+def plant_uml_probe_server(plantuml_server_local_url: str = None, timeout=15):
+    """Blocking health check of a PlantUML server, for the settings dialog.
+
+    Returns (ok, message). Renders a trivial diagram as both SVG and PNG and
+    compares the widths: a PNG that is much narrower than its SVG means the
+    server returned a render with the text missing.
+    """
+    plant_uml_server = plantuml_server_local_url if plantuml_server_local_url else PLANTUML_URL_ON_INTERNET
+    probe_txt = "class Pynsource {\n  server_probe\n}\n"
+    try:
+        svg_response = requests.get(
+            plant_uml_url(probe_txt, fmt="svg", server_url=plant_uml_server), timeout=timeout)
+        png_response = requests.get(
+            plant_uml_url(probe_txt, fmt="png", server_url=plant_uml_server), timeout=timeout)
+    except (ConnectionError, requests.exceptions.RequestException) as e:
+        return False, f"Cannot reach {plant_uml_server} - {str(e)}"
+
+    if png_response.status_code != 200:
+        return False, f"Server responded {png_response.status_code} for png"
+    content_type = png_response.headers.get("Content-Type", "")
+    if not content_type.startswith("image"):
+        return False, f"Server did not return an image (got {content_type})"
+
+    png_size = png_pixel_size(png_response.content)
+    svg_size = svg_pixel_size(svg_response.content) if svg_response.status_code == 200 else None
+    if png_size and svg_size and abs(png_size[0] - svg_size[0]) > 2:
+        return False, "Server responds, but the image came back with no text"
+    return True, "Server is working"
+
 
 @functools.lru_cache(maxsize=32)
 def plant_uml_fetch_svg(plant_uml_txt: str, plantuml_server_local_url: str = None) -> bytes:
