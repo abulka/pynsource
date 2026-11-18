@@ -5,11 +5,11 @@ The diagram canvas is now `wxdiagram`. Everything below is built by CI from this
 
 | Platform | Download |
 |---|---|
-| Windows 10/11 | `pynsource-win-version-1.87-setup.exe` |
-| macOS (Apple silicon) | `pynsource-macos-version-1.87.zip` (or Homebrew, below) |
-| Linux x86_64 | `pynsource-linux-version-1.87-x86_64.AppImage` |
-| Linux aarch64 | `pynsource-linux-version-1.87-aarch64.AppImage` |
-| Ubuntu/Debian | `sudo snap install pynsource` |
+| Windows 10/11 | [`pynsource-win-version-1.87-setup.exe`](https://github.com/abulka/pynsource/releases/download/version-1.87/pynsource-win-version-1.87-setup.exe) |
+| macOS (Apple silicon) | [`pynsource-macos-version-1.87.zip`](https://github.com/abulka/pynsource/releases/download/version-1.87/pynsource-macos-version-1.87.zip) (or Homebrew, below) |
+| Linux x86_64 | [`pynsource-linux-version-1.87-x86_64.AppImage`](https://github.com/abulka/pynsource/releases/download/version-1.87/pynsource-linux-version-1.87-x86_64.AppImage) |
+| Linux aarch64 | [`pynsource-linux-version-1.87-aarch64.AppImage`](https://github.com/abulka/pynsource/releases/download/version-1.87/pynsource-linux-version-1.87-aarch64.AppImage) |
+| Ubuntu/Debian | [snapcraft.io/pynsource](https://snapcraft.io/pynsource) — or `sudo snap install pynsource` |
 
 ## What's new
 
@@ -25,7 +25,9 @@ The diagram canvas is now `wxdiagram`. Everything below is built by CI from this
 
 ## Windows 10/11 (64-bit)
 
-Download `pynsource-win-version-1.87-setup.exe` and run it. Installs to
+Download
+[`pynsource-win-version-1.87-setup.exe`](https://github.com/abulka/pynsource/releases/download/version-1.87/pynsource-win-version-1.87-setup.exe)
+and run it. Installs to
 `C:\Program Files\Pynsource`, adds a Start Menu entry, uninstalls from *Apps & features*.
 
 **First run:** Windows SmartScreen warns because the installer is unsigned (no paid
@@ -40,7 +42,9 @@ Homebrew, no Gatekeeper prompt:
 brew install --cask abulka/pynsource/pynsource
 ```
 
-Or download the zip below, unzip, and drag `Pynsource.app` into `/Applications`.
+Or download the
+[zip](https://github.com/abulka/pynsource/releases/download/version-1.87/pynsource-macos-version-1.87.zip),
+unzip it, and drag `Pynsource.app` into `/Applications`.
 
 **First run:** macOS blocks the app because it is ad-hoc signed (no paid Apple
 Developer ID):
@@ -59,8 +63,10 @@ The same steps are in `IMPORTANT-README-BEFORE-RUNNING.txt` inside the zip.
 
 Download the AppImage for your CPU — `uname -m` tells you which:
 
-- `pynsource-linux-version-1.87-x86_64.AppImage` — Intel/AMD desktops and VMs
-- `pynsource-linux-version-1.87-aarch64.AppImage` — ARM64 (Apple-silicon VMs such as UTM, Asahi
+- [`pynsource-linux-version-1.87-x86_64.AppImage`](https://github.com/abulka/pynsource/releases/download/version-1.87/pynsource-linux-version-1.87-x86_64.AppImage)
+  — Intel/AMD desktops and VMs
+- [`pynsource-linux-version-1.87-aarch64.AppImage`](https://github.com/abulka/pynsource/releases/download/version-1.87/pynsource-linux-version-1.87-aarch64.AppImage)
+  — ARM64 (Apple-silicon VMs such as UTM, Asahi
   Linux, Raspberry Pi 4/5 with a 64-bit OS, ARM servers)
 
 ```
@@ -81,7 +87,7 @@ sudo snap install pynsource
 ```
 
 Built for both amd64 and arm64. If `pynsource` is already installed, `sudo snap refresh
-pynsource` moves it to this version.
+pynsource` moves it to this version. Store page: [snapcraft.io/pynsource](https://snapcraft.io/pynsource).
 
 ## Notes
 

@@ -2,7 +2,7 @@
 
 Reverse engineer Python source code into UML class diagrams.
 
-[![latest release](https://img.shields.io/github/v/release/abulka/pynsource?include_prereleases&label=download)](https://github.com/abulka/pynsource/releases)
+[![latest release](https://img.shields.io/github/v/release/abulka/pynsource?label=download)](https://github.com/abulka/pynsource/releases/latest)
 [![license](https://img.shields.io/badge/license-GPL3%20%2F%20commercial-blue)](https://github.com/abulka/pynsource#license)
 [![website](https://img.shields.io/badge/docs-pynsource.com-informational)](https://www.pynsource.com)
 
@@ -12,10 +12,14 @@ Reverse engineer Python source code into UML class diagrams.
 
 | | |
 |---|---|
-| **macOS** (Apple silicon) | `brew install --cask abulka/pynsource/pynsource` — or download the zip |
-| **Windows 10/11** (64-bit) | download `pynsource-win-<version>-setup.exe` and run it |
-| **Linux** (AppImage) | download `…-x86_64.AppImage` or `…-aarch64.AppImage` (`uname -m`) |
-| **Ubuntu/Debian** (snap) | `sudo snap install pynsource` |
+| **macOS** (Apple silicon) | `brew install --cask abulka/pynsource/pynsource` — or download the [zip](https://github.com/abulka/pynsource/releases/latest) |
+| **Windows 10/11** (64-bit) | download [`pynsource-win-<version>-setup.exe`](https://github.com/abulka/pynsource/releases/latest) and run it |
+| **Linux** (AppImage) | download the [`x86_64`](https://github.com/abulka/pynsource/releases/latest) or [`aarch64`](https://github.com/abulka/pynsource/releases/latest) AppImage (`uname -m`) |
+| **Ubuntu/Debian** (snap) | `sudo snap install pynsource` — [snapcraft.io/pynsource](https://snapcraft.io/pynsource) |
+
+**All downloads:** [latest release](https://github.com/abulka/pynsource/releases/latest) ·
+[all releases](https://github.com/abulka/pynsource/releases) ·
+[pynsource.com/download.html](https://www.pynsource.com/download.html)
 
 Full instructions, including the one-off Gatekeeper (macOS) and SmartScreen (Windows) prompts
 and Linux troubleshooting: **[DOWNLOADS.md](DOWNLOADS.md)**.

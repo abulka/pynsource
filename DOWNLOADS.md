@@ -1,12 +1,28 @@
 # Download Pynsource
 
-The latest version is `1.88`. Every install path below is linked from
-**[the releases page](https://github.com/abulka/pynsource/releases)** — pre-releases (`pre-*` tags)
-are built by CI and are safe to try; stable releases use `version-*` tags.
+The latest version is `1.88`. Every install path below is on the
+**[latest release page](https://github.com/abulka/pynsource/releases/latest)**; the
+**[full list](https://github.com/abulka/pynsource/releases)** also carries `pre-*` tags, which CI
+builds and which are safe to try (stable releases use `version-*` tags).
 
 Viewing, editing, zooming and connecting diagram shapes is free. Module visualisation is the
 only Pro feature: it needs a [licence](https://pynsource.com/pricing.html) on macOS and Windows
 and is **free on Linux**.
+
+## Get it
+
+Everything is attached to the [latest release](https://github.com/abulka/pynsource/releases/latest).
+Pick your platform:
+
+| Platform | Download |
+|---|---|
+| macOS (Apple silicon) | [zip](https://github.com/abulka/pynsource/releases/latest), or `brew install --cask abulka/pynsource/pynsource` |
+| Windows 10/11 (64-bit) | [installer](https://github.com/abulka/pynsource/releases/latest) |
+| Linux x86_64 | [AppImage](https://github.com/abulka/pynsource/releases/latest) |
+| Linux aarch64 | [AppImage](https://github.com/abulka/pynsource/releases/latest) |
+| Ubuntu / Debian | [snap](https://snapcraft.io/pynsource) |
+
+The detail for each route (first-run prompts, CPU choice, troubleshooting) follows below.
 
 ## macOS (Apple silicon) — Homebrew
 
@@ -28,7 +44,8 @@ This build is **Apple silicon only** — Intel Macs stop at 1.84, which was the 
 
 ## macOS — zip download
 
-Download `pynsource-macos-<version>.zip`, unzip and drag `Pynsource.app` into `/Applications`.
+Download [`pynsource-macos-<version>.zip`](https://github.com/abulka/pynsource/releases/latest),
+unzip and drag `Pynsource.app` into `/Applications`.
 
 macOS will block it the first time, because the app is ad-hoc signed (no paid Apple Developer ID):
 
@@ -44,7 +61,8 @@ The same steps are in `IMPORTANT-README-BEFORE-RUNNING.txt` inside the zip.
 
 ## Windows 10 / 11 (64-bit)
 
-Download `pynsource-win-<version>-setup.exe` and run it. It installs to
+Download [`pynsource-win-<version>-setup.exe`](https://github.com/abulka/pynsource/releases/latest)
+and run it. It installs to
 `C:\Program Files\Pynsource`, adds a Start Menu entry, and can be removed again from
 *Apps & features*.
 
@@ -57,9 +75,11 @@ The installer is unsigned (no code-signing certificate), so SmartScreen warns on
 
 Download the AppImage that matches your CPU — `uname -m` tells you which:
 
-- `pynsource-linux-<version>-x86_64.AppImage` — Intel/AMD desktops and VMs
-- `pynsource-linux-<version>-aarch64.AppImage` — ARM64: Apple-silicon VMs (UTM, Parallels),
-  Asahi Linux, Raspberry Pi 4/5 on a 64-bit OS, ARM servers
+- [`pynsource-linux-<version>-x86_64.AppImage`](https://github.com/abulka/pynsource/releases/latest)
+  — Intel/AMD desktops and VMs
+- [`pynsource-linux-<version>-aarch64.AppImage`](https://github.com/abulka/pynsource/releases/latest)
+  — ARM64: Apple-silicon VMs (UTM, Parallels), Asahi Linux, Raspberry Pi 4/5 on a 64-bit OS,
+  ARM servers
 
 ```bash
 chmod +x pynsource-linux-*.AppImage
@@ -79,7 +99,8 @@ sudo snap install pynsource
 ```
 
 Built on **core24** (Ubuntu 24.04, Python 3.12) and strictly confined, so it runs on any current
-Ubuntu without extra packages — the `gnome` extension supplies GTK3.
+Ubuntu without extra packages — the `gnome` extension supplies GTK3. Store page:
+[snapcraft.io/pynsource](https://snapcraft.io/pynsource).
 
 > `stable` carries 1.87 for both amd64 and arm64. New builds are published to `edge` first and
 > promoted to `stable` by hand after a test install, so `--channel=edge` is where to look for
@@ -135,6 +156,11 @@ the status bar when even 1x is too wide); use SVG export for the whole diagram, 
 **Where are my settings and logs?** Per-user app data (`appdirs`): macOS
 `~/Library/Application Support/PyNsource`, Windows `%APPDATA%\PyNsource`, Linux
 `~/.local/share/PyNsource` and `~/.cache/pynsource/log`.
+
+Nothing here helped? Grab the
+[latest release](https://github.com/abulka/pynsource/releases/latest) again, or
+[open an issue](https://github.com/abulka/pynsource/issues) with your OS, Pynsource version
+(**Help → About**) and what you saw.
 
 ## Pro Edition
 
