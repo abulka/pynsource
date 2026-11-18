@@ -64,6 +64,12 @@ visualisation** (ALSM) on macOS/Windows; it is free on Linux builds.
 | wxdiagram 0.2 | Integration hooks (`MoveTo`, `getContentBounds`, opt-out flags) | own repo/release |
 | Flatpak / Flathub | Manifest that survives review, `com.pynsource.Pynsource` app id | deferred: a release-page `.flatpak` is close to useless, and the AppImage already covers Linux |
 
+- **Legacy attachment-node drop path (wxdiagram).**  `INode`/`InputHandleNode`
+  dot-drop and the newer "drop anywhere on the target body" path both finish
+  edges and both read Shift/Alt.  Once pynsource no longer depends on the old
+  path, unify them, keep the modifier behaviour under test, and remove the
+  duplicate `ONode`/`INode` plumbing.
+
 ## Watch-outs
 
 - **One version number, several files.** `tbump.toml` patches `src/gui/settings.py`,

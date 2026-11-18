@@ -31,6 +31,7 @@ http://pynsource.atug.com/buy
 
 import os
 import sys
+import time
 # from pydbg import dbg
 from common.messages import *
 import wx
@@ -75,6 +76,9 @@ ASCII_MIN_FONT_SIZE = 4
 ASCII_MAX_FONT_SIZE = 65
 ASCII_WHEEL_PIXELS = 20  # Windows/Linux wheel notch in pixels
 ASCII_WHEEL_MACOS_SCALE = 2.0  # wxOSX delta is already in pixels; scale for text
+# Sideways trackpad noise during a vertical swipe must not scroll the view.
+ASCII_HORIZONTAL_DEADZONE = 28  # pixels of deliberate sideways movement
+ASCII_AXIS_LOCK_SECONDS = 0.3  # keep one axis in charge for this long
 
 # if 'wxMac' in wx.PlatformInfo:
 #     GUI_LAYOUT = None
@@ -116,6 +120,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.printData = None
         self._ascii_scroll_remainder = 0.0
         self._ascii_scroll_remainder_x = 0.0
+        self._ascii_scroll_axis = None
+        self._ascii_axis_time = 0.0
         self._ascii_zoom_point_size = None
         # wx.App already calls InitAllImageHandlers(); calling it again
         # logs "Adding duplicate image handler" for every format.
@@ -641,19 +647,51 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             getattr(event, "GetWheelAxis", lambda: wx.MOUSE_WHEEL_VERTICAL)()
             == wx.MOUSE_WHEEL_HORIZONTAL
         )
-        sx, sy = self.asciiart.GetViewStart()
+        now = time.monotonic()
+        if now - self._ascii_axis_time > ASCII_AXIS_LOCK_SECONDS:
+            self._ascii_scroll_axis = None
+
         if horizontal:
+            if self._ascii_scroll_axis == "x":
+                self._ascii_axis_time = now
+                self._scroll_ascii_horizontally(pixels)
+                return
+            # Ignore small sideways noise from a mostly-vertical swipe.
+            # Sideways takes over only after a deliberate horizontal movement.
             self._ascii_scroll_remainder_x += pixels
-            amount = int(self._ascii_scroll_remainder_x)
-            if amount:
-                self._ascii_scroll_remainder_x -= amount
-                self.asciiart.Scroll(max(0, sx - amount), sy)
-        else:
-            self._ascii_scroll_remainder += pixels
-            amount = int(self._ascii_scroll_remainder)
-            if amount:
-                self._ascii_scroll_remainder -= amount
-                self.asciiart.Scroll(sx, max(0, sy - amount))
+            if abs(self._ascii_scroll_remainder_x) < ASCII_HORIZONTAL_DEADZONE:
+                return
+            self._ascii_scroll_axis = "x"
+            self._ascii_axis_time = now
+            self._ascii_scroll_remainder = 0.0
+            # Swallow the deadzone so the view does not jump on takeover.
+            sign = 1.0 if self._ascii_scroll_remainder_x > 0 else -1.0
+            self._ascii_scroll_remainder_x -= sign * ASCII_HORIZONTAL_DEADZONE
+            self._scroll_ascii_horizontally()
+            return
+
+        # Vertical events: a deliberate horizontal gesture keeps control until
+        # it stops for ASCII_AXIS_LOCK_SECONDS.
+        if self._ascii_scroll_axis == "x":
+            return
+        self._ascii_scroll_axis = "y"
+        self._ascii_axis_time = now
+        self._ascii_scroll_remainder_x = 0.0
+        self._ascii_scroll_remainder += pixels
+        amount = int(self._ascii_scroll_remainder)
+        if amount:
+            self._ascii_scroll_remainder -= amount
+            sx, sy = self.asciiart.GetViewStart()
+            self.asciiart.Scroll(sx, max(0, sy - amount))
+
+    def _scroll_ascii_horizontally(self, pixels=0.0):
+        self._ascii_scroll_remainder_x += pixels
+        amount = int(self._ascii_scroll_remainder_x)
+        if not amount:
+            return
+        self._ascii_scroll_remainder_x -= amount
+        sx, sy = self.asciiart.GetViewStart()
+        self.asciiart.Scroll(max(0, sx - amount), sy)
 
     def OnMagnifyZoom_ascii(self, event):
         """Trackpad pinch changes the ASCII font size."""

@@ -42,6 +42,18 @@ Building from source: **[BUILDING.md](BUILDING.md)**.
 Pro Edition adds module visualisation, including variables and functions
 ([youtube demo](https://youtu.be/AovrE7nWGss)) — free on Linux.
 
+## Connecting shapes
+
+Drag from a shape's round side dot onto another shape.  The target shows four
+round drop dots while you drag.  Hold a modifier when you release to choose the
+UML relationship:
+
+| Modifier | Edge type |
+|---|---|
+| none | association |
+| `Shift` | generalisation (inheritance) |
+| `Alt` / `Option` | composition |
+
 ## Examples
 
 ![Zoom and line editing](https://www.dropbox.com/s/3o2p7h6qqf5hbhc/pynsource-zoom-line-edit.png?raw=1)
