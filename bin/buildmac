@@ -1,79 +1,64 @@
 #!/usr/bin/env bash
+#
+# Local macOS build (or, with a parameter, a local Linux zip). CI is the supported route:
+# .github/workflows/build-mac.yml (macos-15, uv's python-build-standalone, onedir bundle).
+#
+#   bin/buildmac                 -> dist/pynsource-<APP_VERSION>-macos.zip
+#   bin/buildmac 22.04           -> dist/pynsource-<APP_VERSION>-ubuntu-22.04.zip
+#
+# It uses .venv/bin/pyinstaller, never whatever `python3` is on PATH: a framework Python plus
+# wxasync's macOS event loop freezes the canvas during a mouse drag (see
+# Admin/BUG-DIST-SLOWNESS-MAC.md), and that bug got in exactly this way.
 
-# NOTE: This script is also used to build linux builds by passing a parameter to the script
+set -euo pipefail
 
-# Builds a standalone 64 bit pynsource-gui for mac and linux using PyInstaller
-#   - uses pynsource-gui.spec which can be regenerated
-#   - runs from the pynsource root directory (not src/)
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
 
-if [ $# -eq 0 ]
-  then
-    echo "No arguments supplied, doing mac build"
-    DESTZIP=pynsource-1.999-macosx.zip
-    DESTDIR="/Users/Andy/Dropbox/Pynsource/official releases/1.999 binaries"
-#   ls -l "$DESTDIR"
-  else
-    echo "Parameter detected, going for linux build" $1
-    DESTZIP=pynsource-1.999-ubuntu-$1.zip
+APP_VERSION="$(sed -n 's/^APP_VERSION = //p' src/gui/settings.py | head -1)"
+if [ -z "$APP_VERSION" ]; then
+  echo "error: could not read APP_VERSION from src/gui/settings.py" >&2
+  exit 1
 fi
 
-# echo $DESTZIP
-# exit 0
+PYINSTALLER="$ROOT/.venv/bin/pyinstaller"
+if [ ! -x "$PYINSTALLER" ]; then
+  echo "error: $PYINSTALLER not found - run bin/boot, or uv pip install pyinstaller" >&2
+  exit 1
+fi
 
-# Need to use a brew python (which is a proper framework installation), not a virtual env
-# On Linux Ubuntu, a proper install is needed, too.
-# Not even a pyenv version of python is good enough for building via py2app or pyinstaller
-# Of course pyenv version ok for running in development mode.
-# Virtualenv python no good for either development mode or deploying (cos of wxpython)
-PYTHON=python3
-# PYTHON=/usr/local/bin/python3
-# PYTHON=/usr/local/Cellar/python/3.7.0/bin/python3
-# PYTHON=/usr/local/Cellar/python/3.7.2/bin/python3
+if [ $# -eq 0 ]; then
+  echo "No arguments supplied, doing mac build"
+  DESTZIP="pynsource-$APP_VERSION-macos.zip"
+else
+  echo "Parameter detected, going for linux build $1"
+  DESTZIP="pynsource-$APP_VERSION-ubuntu-$1.zip"
+fi
 
+"$ROOT/.venv/bin/python" bin/_buildsamples.py
 
-$PYTHON bin/_buildsamples.py
-
-pyinstaller --noconfirm bin/pynsource-github-actions.spec
-
-# The resulting .app is a directory structure and is only
-# treated as a single file on a Mac.  So we need to zip it.  Mac users simply unzip
-# and they have their app.  Note we use -r for recursion since the .app is a dir structure.
-# NOTE: corresponding steps need to be added to the github actions workflow file
-cd dist
-cp ../README.md Readme.txt
+"$PYINSTALLER" --noconfirm bin/pynsource-github-actions.spec
 
 # NOTE: the build is ONEDIR (COLLECT + BUNDLE), so dist/ contains BOTH:
-#   dist/Pynsource/       the collected payload (exe + Frameworks/Resources) - build input
+#   dist/Pynsource/       the collected payload (exe + _internal) - build input
 #   dist/Pynsource.app    the bundle we actually ship
 # (Onefile was dropped: it unpacked the whole archive to $TMPDIR on every launch, so
 # launch took ~2s even when warm, and PyInstaller 7 rejects onefile + .app outright.)
+cd dist
+cp ../README.md Readme.txt
+cp ../.deploy-extras/macos/IMPORTANT-README-BEFORE-RUNNING.txt .
 
-if [ $# -eq 0 ]
-  then
-    rm -rf Pynsource          # collected payload dir, duplicated inside the .app
-    echo Mac zipping
-    # -y keeps Contents/Resources symlinks as symlinks; without it zip stores the
-    # payload twice (83MB instead of 35MB)
-    zip -r -y "$DESTZIP" Pynsource.app/ Readme.txt IMPORTANT-README-BEFORE-RUNNING.txt
-  else
-    echo Linux zipping
-    # onedir on linux is a directory: dist/Pynsource/{Pynsource,_internal,...}
-    zip -r "$DESTZIP" Pynsource Readme.txt
+if [ $# -eq 0 ]; then
+  rm -rf Pynsource          # collected payload dir, duplicated inside the .app
+  echo "Mac zipping"
+  # -y keeps Contents/Resources symlinks as symlinks; without it zip stores the
+  # payload twice (83MB instead of 35MB)
+  zip -r -y "$DESTZIP" Pynsource.app/ Readme.txt IMPORTANT-README-BEFORE-RUNNING.txt
+else
+  echo "Linux zipping"
+  # onedir on linux is a directory: dist/Pynsource/{Pynsource,_internal,...}
+  zip -r "$DESTZIP" Pynsource Readme.txt
 fi
 
 cd ..
-echo 'done, building release'
-ls -l dist/$DESTZIP
-
-if [ $# -eq 0 ]
-  then
-    echo 'Mac copying to dropbox releases dir'
-    mkdir -p "$DESTDIR"
-#   cp dist/$DESTZIP "$DESTDIR"
-#   ls -l "$DESTDIR"
-#   echo 'Mac - copied for you ok'
-    echo 'NOT copied to dropbox anymore - look in dist/ directory instead 🔖'
-  else
-    echo 'done, please upload the following file to dropbox releases then upload to github releases'
-    echo 'Linux cannot copy to dropbox - please do this manually'
-fi
+echo "done: dist/$DESTZIP"

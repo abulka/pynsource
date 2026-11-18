@@ -1,4 +1,9 @@
+@echo off
+REM Run the GUI from source. Equivalent of bin/run on mac/linux.
 setlocal
-cd src
-python pynsource_gui.py
+set ROOT=%~dp0..
+set PYTHON=%ROOT%\.venv\Scripts\python.exe
+if not exist "%PYTHON%" set PYTHON=python
+cd /d "%ROOT%\src"
+"%PYTHON%" pynsource_gui.py %*
 endlocal

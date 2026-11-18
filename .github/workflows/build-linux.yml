@@ -171,8 +171,8 @@ jobs:
       run: |
         mkdir -p pynsource/src/tests/logs
         cd pynsource
-        # xvfb, not TRAVIS=1: the wx-dependent tests (128 of 158) then actually run instead of
-        # skipping. Keep the full log - piping straight to tail conceals the traceback.
+        # xvfb, not TRAVIS=1: the wx-dependent tests then actually run instead of being skipped.
+        # Keep the full log - piping straight to tail conceals the traceback.
         set +e
         xvfb-run -a -s "-screen 0 1280x1024x24" python -m unittest discover -s src > /tmp/tests.log 2>&1
         rc=$?

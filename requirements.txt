@@ -1,4 +1,8 @@
-# linux users please use the script bin/install-linux-* and not this file
+# Runtime + test dependencies, installed into .venv by bin/boot (see BUILDING.md).
+# setup.py also reads this file for install_requires, so keep it free of URLs and options.
+#
+# Linux: do not install this before a wxPython wheel - there are no Linux wheels on PyPI, so
+# wx would be compiled from source. See BUILDING.md, "Linux and wxPython".
 configobj
 requests
 # typed_ast REMOVED - EOL, no wheels for Python 3.11+, Python 2 parsing dropped
@@ -7,16 +11,13 @@ termcolor
 beautifultable
 appdirs
 
-# wheel needed when running pip install ../alsm-parsers/alsm/
-# also needed for installing pydbg which is a rust based print debugger thing
+# needed to build/install the sibling repos and sdists
 wheel
 
-pydbg
 aiohttp
 async_lru
 
 Pillow
-# py2app - uses fcntl module which is not available on Windows - https://stackoverflow.com/questions/73272911/lux-api-package-installation-python
 click
 pytest
 coverage

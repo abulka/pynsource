@@ -1,4 +1,0 @@
-#!/bin/bash
-cd dist/Pynsource.app/Contents/MacOS/
-ls -l
-./Pynsource

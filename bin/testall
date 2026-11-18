@@ -1,14 +1,21 @@
-# cd src
-# bin/testall
+#!/usr/bin/env bash
+#
+# Run the full test suite, wx included - most tests build a real wx.App, so this needs a display.
+#
+#   bin/testall
+#   xvfb-run -a bin/testall           on a headless box
+#   PYTHON=python3 bin/testall        use another interpreter
+#
+# Expect "158 tests OK (skipped=8)". TRAVIS=1 skips every wx test - legacy escape hatch,
+# don't use it to validate a release.
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+PYTHON="${PYTHON:-$ROOT/.venv/bin/python}"
 
 mkdir -p src/tests/logs
-
-# Runs the full suite, wx included - most tests build a real wx.App, so this needs a display.
-# On a headless box: xvfb-run -a bin/testall   (TRAVIS=1 skips every wx test - legacy escape hatch)
-
-# point this at the venv interpreter if python3 on PATH is not it, e.g.
-# PYTHON=/path/to/pynsource/.venv/bin/python
-PYTHON=python3
-
-$PYTHON --version
-$PYTHON -m unittest discover -v -s src
+"$PYTHON" --version
+exec "$PYTHON" -m unittest discover -v -s src

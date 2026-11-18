@@ -10,16 +10,20 @@ only module visualisation (ALSM) on macOS/Windows; it is free on Linux builds.
 - `src/parsing/` — AST parser (`core_parser_ast.py`, visitor builds pmodel).
 - `src/gui/uml_canvas.py` — the application canvas, built on `wxdiagram`.
 - `src/gui/settings.py` — `PRO_EDITION` / `ALSM_PARSING` flags, `APP_VERSION` / `PATCH` version source.
-- `bin/run` — runs GUI (`cd src && python3 pynsource_gui.py`). `bin/testall` — full test suite,
-  wx included (needs a display; `xvfb-run -a bin/testall` on a headless box).
+- `bin/` — developer convenience only, indexed in `bin/README.md`. `bin/boot` = first-time/new
+  worktree setup (uv venv + editable siblings + requirements), `bin/run` = GUI from source,
+  `bin/testall` = full test suite, wx included (needs a display; `xvfb-run -a bin/testall` on a
+  headless box). Nothing there ships; CI is the supported build route.
 - Docs are split deliberately: `README.md` = pitch + install table, `DOWNLOADS.md` = the only
   install/troubleshooting reference (linked from the website), `BUILDING.md` = the only developer
   doc. Do not duplicate build/run/test instructions here — point at BUILDING.md.
   `Admin/ROADMAP.md` = release status + future milestones; working plans for a session stay
   outside the repo.
-- `requirements.txt` — install with `uv pip install -r requirements.txt`.
-- `setup.py` — legacy; reads `.requirement-extras/requirements-linux-22.txt`. Prefer `uv` + running
-  from source over `pip install -e .`.
+- `requirements.txt` — install with `uv pip install -r requirements.txt` (or just `bin/boot`).
+- `setup.py` — legacy; `install_requires` is `requirements.txt` verbatim and the version is
+  scraped from `src/gui/settings.py`. Still needed because the snap does `pip install .`; see
+  `Admin/PLAN-LINUX-CLEANUP.md` before deleting it. Prefer `uv` + running from source over
+  `pip install -e .`.
 - No URL shortener anywhere: the update check reads raw.githubusercontent, the website links
   at release assets, and `Admin/release-links/release_links.py <tag>` prints the links. bit.ly is
   retired (paid now, and its links rotted).
@@ -36,7 +40,8 @@ only module visualisation (ALSM) on macOS/Windows; it is free on Linux builds.
 - **typed_ast is GONE** (EOL, no wheels for 3.11+, doesn't build on 3.13). Python 2 parsing
   (`mode=2`, `typed_ast.ast27`) was dropped: `mode(2)` raises friendly `RuntimeError`, default
   parse mode is 3, `mode(3)` always uses stdlib `ast`. Same fix applied in `../alsm`.
-- `pydbg` import is commented out everywhere; `appdirs` still used (logs/config paths).
+- `pydbg` removed from `requirements.txt` (Rust-built debugger, every import commented out);
+  `appdirs` still used (logs/config paths). Existing venvs keep it — `uv pip uninstall pydbg`.
 
 ## Sibling repos (separate git repos — commit in each repo, not here)
 All live in `/Users/andy/Devel/pynsource-project/` and install editable into `.venv`:
@@ -209,7 +214,7 @@ Zoom, pan, drag-to-connect, resize and layout are free.
     is a clean-room `libgtk-3.so.0: cannot open shared object file`.
   * The spec (`bin/pynsource-github-actions.spec`) drops the partial GTK stack it would
     otherwise bundle; the plugin's copy is then the only one. Platform-gated, mac/win untouched.
-- Guard: `xvfb-run` (a headless runner cannot create a `wx.App`), 158 tests, then extract the
+- Guard: `xvfb-run` (a headless runner cannot create a `wx.App`), the full test suite, then extract the
   AppImage (`--appimage-extract`, no FUSE on runners) and assert `AppRun` is still alive after
   25 s **and** that the log has no "Running Community Edition" line.
 - Target requirement is "a GTK3 desktop" and nothing else: verified in clean `ubuntu:22.04` and
@@ -265,12 +270,13 @@ Zoom, pan, drag-to-connect, resize and layout are free.
   empty — use `CRAFT_ARCH_BUILD_FOR`):
   * wx 4.2.5 does not compile with gcc 13 (core24): its bundled nanosvg uses unqualified
     `isnan()` — build with `CXXFLAGS="-include cmath"`.
-  * `pip install --target` is invisible to a later pip run, so the bare `wxpython` line in
-    `requirements-linux-common.txt` re-triggered a source build; the wheel must go in the *same*
-    `pip install` command as the requirements file.
+  * `pip install --target` is invisible to a later pip run, so wx must go in the *same*
+    `pip install` command as the requirements file, otherwise pip re-triggers a source build.
+    (The old reason given here — a bare `wxpython` line in `requirements-linux-common.txt` — is
+    stale; the file no longer has one. See `Admin/PLAN-LINUX-CLEANUP.md` for the pending cleanup.)
 
 ## Tests
-- Expect `158 tests OK (skipped=8)`: `mkdir -p src/tests/logs && .venv/bin/python -m unittest
+- Expect `184 tests OK (skipped=8)`: `mkdir -p src/tests/logs && .venv/bin/python -m unittest
   discover -s src`. Most tests build a real `wx.App`, so a headless machine needs `xvfb-run` (the
   Linux CI does this); `TRAVIS=1` is a legacy flag that skips them all — never use it to validate.
 - `../wxdiagram`: `.venv/bin/python -m pytest ../wxdiagram/tests/ -x -q`.

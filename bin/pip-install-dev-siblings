@@ -1,3 +1,0 @@
-pip install -e ../alsm
-pip install -e ../wxdiagram
-pip install -e ../pynsource-rego

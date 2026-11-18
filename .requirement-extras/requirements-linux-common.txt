@@ -1,4 +1,6 @@
-# linux users please use the script bin/install-linux-* and not this file
+# Snap-only dependency list, pulled in by .requirement-extras/requirements-snap.txt.
+# It still contains dev/test tools the snap does not need (pytest, coverage, black, py2app) -
+# pending cleanup, see Admin/PLAN-LINUX-CLEANUP.md. Do not use this file for a dev venv.
 configobj
 requests
 # typed_ast REMOVED - EOL, no wheels for Python 3.11+, Python 2 parsing dropped
