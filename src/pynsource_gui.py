@@ -70,6 +70,11 @@ GUI_LAYOUT = "MULTI_TAB_GUI"  # "MULTI_TAB_GUI" or "SPLIT_GUI" or None
 USE_SIZER = False
 ALLOW_INSERT_IMAGE_AND_COMMENT_COMMANDS = True
 
+# ASCII UML view: trackpad-friendly wheel scrolling and font zoom.
+ASCII_MIN_FONT_SIZE = 4
+ASCII_MAX_FONT_SIZE = 65
+ASCII_WHEEL_PIXELS = 20  # Windows/Linux wheel notch in pixels
+
 # if 'wxMac' in wx.PlatformInfo:
 #     GUI_LAYOUT = None
 
@@ -107,6 +112,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.log = Log()
         self.working = False
         self.printData = None
+        self._ascii_scroll_remainder = 0.0
+        self._ascii_zoom_point_size = None
         # wx.App already calls InitAllImageHandlers(); calling it again
         # logs "Adding duplicate image handler" for every format.
         self.andyapptitle = "Pynsource"
@@ -216,6 +223,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             self.notebook.ChangeSelection(0)
 
             self.multiText.Bind(wx.EVT_MOUSEWHEEL, self.OnWheelZoom_ascii)
+            if hasattr(wx, "EVT_MAGNIFY"):
+                self.multiText.Bind(wx.EVT_MAGNIFY, self.OnMagnifyZoom_ascii)
             self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabPageChanged)  # builds ascii
 
         elif GUI_LAYOUT == "SPLIT_GUI":
@@ -618,55 +627,92 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         event.Skip()
 
     def OnWheelZoom_ascii(self, event):
-        # Since our binding of wx.EVT_MOUSEWHEEL to here takes over all wheel events
-        # we have to manually do the normal test scrolling.  This event can't propogate via event.skip()
-        #
-        # The native widgets handle the low level
-        # events (or not) their own way and wx makes no guarantees about behaviors
-        # when intercepting them yourself.
-        # --
-        # Robin Dunn
-        #
-        # Update - this doesn't seem true anymore, since my adding event.Skip() at the end
-        # of this routine allow regular mouse wheel scrolling to continue to work.
+        """Cmd/Ctrl+wheel zooms the ASCII font; a plain wheel scrolls smoothly.
 
-        # print "MOUSEWHEEEL self.working=", self.working
+        The native macOS text control truncates the high-resolution trackpad
+        deltas to whole lines, which makes two-finger scrolling feel sticky and
+        slow.  Accumulate the precise deltas ourselves and scroll whole lines
+        only when a line's worth of movement has built up.
+        """
         if self.working:
             return
+
+        if event.CmdDown() or event.ControlDown():
+            self.working = True
+            try:
+                self.ascii_art_zoom(event.GetWheelRotation())
+                self.multiText.ShowPosition(0)
+            finally:
+                self.working = False
+            return
+
+        # Horizontal trackpad swipes stay native; there is no portable
+        # line-based horizontal scroll API on wx.TextCtrl.
+        if (
+            getattr(event, "GetWheelAxis", lambda: wx.MOUSE_WHEEL_VERTICAL)()
+            != wx.MOUSE_WHEEL_VERTICAL
+        ):
+            event.Skip()
+            return
+
+        rotation = event.GetWheelRotation()
+        if not rotation:
+            event.Skip()
+            return
+
+        if wx.Platform == "__WXMAC__":
+            # wxOSX reports the precise NSEvent scrolling delta directly.
+            pixels = rotation
+        else:
+            pixels = rotation / (event.GetWheelDelta() or 120) * ASCII_WHEEL_PIXELS
+
+        self._ascii_scroll_remainder += pixels
+        line_height = max(1, self.multiText.GetTextExtent("X").height)
+        lines = int(self._ascii_scroll_remainder / line_height)
+        if lines:
+            self._ascii_scroll_remainder -= lines * line_height
+            # Positive wheel rotation means scroll up.
+            self.multiText.ScrollLines(-lines)
+
+    def OnMagnifyZoom_ascii(self, event):
+        """Trackpad pinch changes the ASCII font size."""
+        if self.working:
+            return
+        magnification = event.GetMagnification()
+        if not magnification:
+            return
         self.working = True
+        try:
+            font = self.multiText.GetFont()
+            current = float(font.GetPointSize())
+            if (
+                self._ascii_zoom_point_size is None
+                or abs(self._ascii_zoom_point_size - current) > 1.5
+            ):
+                self._ascii_zoom_point_size = current
+            self._ascii_zoom_point_size = max(
+                ASCII_MIN_FONT_SIZE,
+                min(ASCII_MAX_FONT_SIZE, self._ascii_zoom_point_size * (1.0 + magnification)),
+            )
+            new_size = int(round(self._ascii_zoom_point_size))
+            if new_size != font.GetPointSize():
+                self._set_ascii_font_size(new_size)
+        finally:
+            self.working = False
 
-        # print event.ShouldPropagate(), dir(event)
-
-        controlDown = event.CmdDown()
-        if controlDown:
-            direction = event.GetWheelRotation()
-            self.ascii_art_zoom(direction)
-            self.multiText.ShowPosition(0)
-
-        # don't need this explicit scroll code - it happens naturally
-        # else:
-        #     if event.GetWheelRotation() < 0:
-        #         self.multiText.ScrollLines(4)
-        #     else:
-        #         self.multiText.ScrollLines(-4)
-
-        self.working = False
-
-        # self.frame.GetEventHandler().ProcessEvent(event)
-        # wx.PostEvent(self.frame, event)
-
-        if not controlDown:
-            event.Skip()  # Need this or regular mouse wheel scrolling breaks
+    def _set_ascii_font_size(self, point_size):
+        """Apply an ASCII font size and keep the pinch accumulator in sync."""
+        point_size = max(ASCII_MIN_FONT_SIZE, min(ASCII_MAX_FONT_SIZE, int(point_size)))
+        self.multiText.SetFont(
+            wx.Font(point_size, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+        )
+        self._ascii_zoom_point_size = float(point_size)
 
     def ascii_art_zoom(self, direction=1, amount=1, reset=False):
         font = self.multiText.GetFont()
-        # dbg(font.GetPointSize())
-        # dbg(direction)
-        MIN_FONT_SIZE = 4
-        MAX_FONT_SIZE = 65
 
         if reset:
-            self.multiText.SetFont(wx.Font(DEFAULT_ASCII_UML_FONT_SIZE, wx.MODERN, wx.NORMAL, wx.NORMAL, False))
+            self._set_ascii_font_size(DEFAULT_ASCII_UML_FONT_SIZE)
             return
 
         if direction < 0:
@@ -674,8 +720,8 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         else:
             newfontsize = font.GetPointSize() + amount
 
-        if newfontsize > MIN_FONT_SIZE and newfontsize < MAX_FONT_SIZE:
-            self.multiText.SetFont(wx.Font(newfontsize, wx.MODERN, wx.NORMAL, wx.NORMAL, False))
+        if ASCII_MIN_FONT_SIZE < newfontsize < ASCII_MAX_FONT_SIZE:
+            self._set_ascii_font_size(newfontsize)
 
     def OnDumpDisplayModel(self, event):
         self.app.run.CmdDumpDisplayModel()

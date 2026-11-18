@@ -10,6 +10,9 @@
 - wxdiagram upgraded to **0.2.4**: dragging a multi-selection that includes an edge no longer
   stretches the edge (it now follows its endpoint shapes exactly), dragging an edge on its own
   leaves it attached, and changing diagrams clears the old selection handles immediately
+- ASCII UML view scrolls smoothly with a two-finger trackpad swipe (high-resolution deltas are
+  accumulated instead of being truncated to zero by the native text control); Cmd/Ctrl-wheel
+  still zooms the font, and a trackpad pinch now zooms it too
 - Zoom, pan, zoom-to-fit, drag-to-connect, resize and layout are **free for everyone**
 - wxdiagram now owns zoom, pinch-to-zoom, drag-to-pan and the canvas virtual size; the
   duplicated `CanvasResizer`/zoom code is gone
