@@ -253,9 +253,11 @@ Zoom, pan, drag-to-connect, resize and layout are free.
   does not search our prefix by itself. Entry points are two-line shell wrappers calling
   `run()` / `reverse_engineer()` — the `__main__` blocks in those modules are debug scaffolding.
 - **Linux is Pro-free, so the snap must bundle wxdiagram + alsm** (checked out as siblings by the
-  workflow, installed *with* their dependencies — `--no-deps` leaves `import alsm` failing at
-  runtime, which `settings.py` then reports as "alsm not installed" because it only catches
-  `ModuleNotFoundError`).
+  workflow). Install **wxdiagram with `--no-deps`** — its only dependency is wxpython, which is
+  already in the target dir, and a `--target` install is invisible to a later pip run, so letting
+  pip resolve it rebuilds wxPython from source (fails on core24/gcc 13). Install **alsm with its
+  dependencies** — `--no-deps` leaves `import alsm` failing at runtime, which `settings.py` then
+  reports as "alsm not installed" because it only catches `ModuleNotFoundError`.
 - Strip the bundled `.so` files: the wx wheel ships unstripped and turns a 154 MB snap into
   49 MB.
 - `version: git` is wrong for CI: `git describe` reports the nearest *older* tag
