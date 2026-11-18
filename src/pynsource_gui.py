@@ -113,6 +113,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         self.working = False
         self.printData = None
         self._ascii_scroll_remainder = 0.0
+        self._ascii_scroll_remainder_x = 0.0
         self._ascii_zoom_point_size = None
         # wx.App already calls InitAllImageHandlers(); calling it again
         # logs "Adding duplicate image handler" for every format.
@@ -185,7 +186,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
                 wx.DefaultSize,
                 wx.HSCROLL | wx.VSCROLL,
             )
-            self.asciiart.SetScrollRate(5, 5)
+            self.asciiart.SetScrollRate(1, 1)
             asciiart_sizer = wx.BoxSizer(wx.VERTICAL)
 
             # txt = u"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, \n" * 10
@@ -208,7 +209,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             asciiart_sizer.Add(self.multiText, 1, wx.EXPAND | wx.ALL, 0)
             self.asciiart.SetSizer(asciiart_sizer)
             self.asciiart.Layout()
-            asciiart_sizer.Fit(self.asciiart)
+            self._resize_ascii_text()
             self.notebook.AddPage(self.asciiart, "Ascii Art", True)
 
             # Page 2
@@ -629,10 +630,10 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
     def OnWheelZoom_ascii(self, event):
         """Cmd/Ctrl+wheel zooms the ASCII font; a plain wheel scrolls smoothly.
 
-        The native macOS text control truncates the high-resolution trackpad
-        deltas to whole lines, which makes two-finger scrolling feel sticky and
-        slow.  Accumulate the precise deltas ourselves and scroll whole lines
-        only when a line's worth of movement has built up.
+        The native macOS text control truncates high-resolution trackpad deltas
+        to zero, which makes two-finger scrolling sticky or dead.  The text is
+        laid out at full content size inside the scrolled window, so we can
+        scroll the viewport by pixels ourselves.
         """
         if self.working:
             return
@@ -642,17 +643,9 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             try:
                 self.ascii_art_zoom(event.GetWheelRotation())
                 self.multiText.ShowPosition(0)
+                self.asciiart.Scroll(0, 0)
             finally:
                 self.working = False
-            return
-
-        # Horizontal trackpad swipes stay native; there is no portable
-        # line-based horizontal scroll API on wx.TextCtrl.
-        if (
-            getattr(event, "GetWheelAxis", lambda: wx.MOUSE_WHEEL_VERTICAL)()
-            != wx.MOUSE_WHEEL_VERTICAL
-        ):
-            event.Skip()
             return
 
         rotation = event.GetWheelRotation()
@@ -666,13 +659,46 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
         else:
             pixels = rotation / (event.GetWheelDelta() or 120) * ASCII_WHEEL_PIXELS
 
-        self._ascii_scroll_remainder += pixels
-        line_height = max(1, self.multiText.GetTextExtent("X").height)
-        lines = int(self._ascii_scroll_remainder / line_height)
-        if lines:
-            self._ascii_scroll_remainder -= lines * line_height
-            # Positive wheel rotation means scroll up.
-            self.multiText.ScrollLines(-lines)
+        horizontal = (
+            getattr(event, "GetWheelAxis", lambda: wx.MOUSE_WHEEL_VERTICAL)()
+            == wx.MOUSE_WHEEL_HORIZONTAL
+        )
+        sx, sy = self.asciiart.GetViewStart()
+        if horizontal:
+            self._ascii_scroll_remainder_x += pixels
+            amount = int(self._ascii_scroll_remainder_x)
+            if amount:
+                self._ascii_scroll_remainder_x -= amount
+                self.asciiart.Scroll(max(0, sx - amount), sy)
+        else:
+            self._ascii_scroll_remainder += pixels
+            amount = int(self._ascii_scroll_remainder)
+            if amount:
+                self._ascii_scroll_remainder -= amount
+                self.asciiart.Scroll(sx, max(0, sy - amount))
+
+    def _resize_ascii_text(self):
+        """Size the text control to its full content so the viewport scrolls.
+
+        A native wx.TextCtrl cannot be scrolled reliably with ScrollLines() on
+        macOS.  Giving it the full text height inside a wx.ScrolledWindow means
+        the outer window owns scrolling (pixel-based, trackpad-friendly) while
+        selection and copy still work in the text control.
+        """
+        if GUI_LAYOUT != "MULTI_TAB_GUI" or not isinstance(
+            self.asciiart, wx.ScrolledWindow
+        ):
+            return
+        text = self.multiText.GetValue()
+        lines = text.splitlines() or [""]
+        longest = max(len(line) for line in lines)
+        text_width, line_height = self.multiText.GetTextExtent("M" * max(1, longest))
+        text_height = line_height * max(1, self.multiText.GetNumberOfLines()) + 8
+        self.multiText.SetMinSize((text_width + 24, text_height))
+        sizer = self.asciiart.GetSizer()
+        if sizer is not None:
+            sizer.Layout()
+        self.asciiart.FitInside()
 
     def OnMagnifyZoom_ascii(self, event):
         """Trackpad pinch changes the ASCII font size."""
@@ -707,6 +733,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             wx.Font(point_size, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         )
         self._ascii_zoom_point_size = float(point_size)
+        self._resize_ascii_text()
 
     def ascii_art_zoom(self, direction=1, amount=1, reset=False):
         font = self.multiText.GetFont()
@@ -1399,6 +1426,9 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             if str(s).strip() == "":
                 self.multiText.SetValue(ASCII_UML_HELP_MSG)
             self.multiText.ShowPosition(0)
+            self._resize_ascii_text()
+            if isinstance(self.asciiart, wx.ScrolledWindow):
+                self.asciiart.Scroll(0, 0)
         finally:
             wx.EndBusyCursor()
 
