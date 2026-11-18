@@ -1,31 +1,69 @@
-"""SVG exports must carry an explicit white page background."""
-
+import unittest
 import os
 import sys
-import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-from generate_code.gen_plantuml import svg_on_white_background  # noqa: E402
+sys.path.append("../src")
+from common.plantuml import plant_uml_url, deflate_and_encode, plant_uml_view_url
 
 
-class TestPlantUmlSvgBackground(unittest.TestCase):
-    def test_white_rect_is_inserted_after_root_svg(self):
-        svg = (
-            b'<?xml version="1.0"?>\n'
-            b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">'
-            b"<g><rect width=\"5\" height=\"5\"/></g></svg>"
-        )
-        result = svg_on_white_background(svg)
+class TestCasePlantUmlUrl(unittest.TestCase):
 
-        self.assertIn(b'fill="#ffffff"', result)
-        self.assertGreater(result.index(b"<rect"), result.index(b"<svg"))
-        self.assertLess(result.index(b'fill="#ffffff"'), result.index(b"<g>"))
+    def test_svg_and_png_share_encoded_payload(self):
+        txt = "class Foo {\n  bar()\n}\n"
+        svg_url = plant_uml_url(txt, fmt="svg")
+        png_url = plant_uml_url(txt, fmt="png")
+        self.assertTrue(svg_url.startswith("http://www.plantuml.com/plantuml/svg/"))
+        self.assertTrue(png_url.startswith("http://www.plantuml.com/plantuml/png/"))
+        # same diagram -> same encoded payload, only the format differs
+        self.assertEqual(svg_url.split("/svg/")[1], png_url.split("/png/")[1])
+        self.assertEqual(svg_url.split("/svg/")[1], deflate_and_encode(txt))
 
-    def test_non_svg_and_empty_inputs_are_unchanged(self):
-        self.assertEqual(svg_on_white_background(b""), b"")
-        self.assertEqual(svg_on_white_background(b"not an svg"), b"not an svg")
+    def test_uml_page_endpoint_swapped_for_format(self):
+        # the configured server url is the /uml/ page endpoint - the
+        # direct image endpoints are siblings of it
+        txt = "class Foo {\n}\n"
+        url = plant_uml_url(txt, fmt="svg", server_url="http://localhost:8080/plantuml/uml")
+        self.assertTrue(url.startswith("http://localhost:8080/plantuml/svg/"))
+
+    def test_bare_base_server_url(self):
+        txt = "class Foo {\n}\n"
+        url = plant_uml_url(txt, fmt="png", server_url="http://localhost:8080/plantuml")
+        self.assertTrue(url.startswith("http://localhost:8080/plantuml/png/"))
+
+    def test_trailing_slash_tolerated(self):
+        txt = "class Foo {\n}\n"
+        url = plant_uml_url(txt, fmt="svg", server_url="http://www.plantuml.com/plantuml/uml/")
+        self.assertTrue(url.startswith("http://www.plantuml.com/plantuml/svg/"))
+        self.assertNotIn("//svg", url.split("http://")[1])
+
+    def test_view_url_points_at_the_interactive_page(self):
+        txt = "class Foo {\n}\n"
+        expected_payload = deflate_and_encode(txt)
+        self.assertEqual(
+            plant_uml_view_url(txt),
+            "http://www.plantuml.com/plantuml/uml/" + expected_payload)
+        for server in ("http://localhost:8080/plantuml/uml", "http://localhost:8080/plantuml"):
+            self.assertEqual(
+                plant_uml_view_url(txt, server),
+                "http://localhost:8080/plantuml/uml/" + expected_payload)
+
+    def test_invalid_format_raises(self):
+        with self.assertRaises(ValueError):
+            plant_uml_url("class Foo {\n}\n", fmt="jpg")
+
+
+def suite():
+    suite1 = unittest.makeSuite(TestCasePlantUmlUrl, "test")
+    alltests = unittest.TestSuite((suite1,))
+    return alltests
+
+
+def main():
+    runner = unittest.TextTestRunner(
+        descriptions=0, verbosity=2
+    )  # default is descriptions=1, verbosity=1
+    runner.run(suite())
 
 
 if __name__ == "__main__":
-    unittest.main()
+    main()
