@@ -7,7 +7,7 @@
 - New diagram canvas: pynsource now uses **wxdiagram** (MIT) on every platform and edition
   (0.2.1, the first published release since 0.1.0);
   the vendored classic OGL copy and the `ogl2` dependency are gone
-- wxdiagram upgraded to **0.2.3**: dragging a multi-selection that includes an edge no longer
+- wxdiagram upgraded to **0.2.4**: dragging a multi-selection that includes an edge no longer
   stretches the edge (it now follows its endpoint shapes exactly), dragging an edge on its own
   leaves it attached, and changing diagrams clears the old selection handles immediately
 - Zoom, pan, zoom-to-fit, drag-to-connect, resize and layout are **free for everyone**
