@@ -91,7 +91,7 @@ class TestAsciiScrollAxisLock(unittest.TestCase):
         for _ in range(10):
             viewer.OnWheelZoom_ascii(FakeWheel(8, wx.MOUSE_WHEEL_HORIZONTAL))
 
-        self.assertLess(viewer.asciiart.position[0], 300)
+        self.assertGreater(viewer.asciiart.position[0], 300)
         self.assertEqual(viewer.asciiart.position[1], 300)
 
 

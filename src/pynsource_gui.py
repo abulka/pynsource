@@ -691,7 +691,7 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
             return
         self._ascii_scroll_remainder_x -= amount
         sx, sy = self.asciiart.GetViewStart()
-        self.asciiart.Scroll(max(0, sx - amount), sy)
+        self.asciiart.Scroll(max(0, sx + amount), sy)
 
     def OnMagnifyZoom_ascii(self, event):
         """Trackpad pinch changes the ASCII font size."""
