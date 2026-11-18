@@ -314,8 +314,13 @@ class ImageViewer(wx.ScrolledWindow):
             bmp2 = wx.Bitmap(bmp.GetWidth(), bmp.GetHeight())
             dc = wx.MemoryDC()
             dc.SelectObject(bmp2)
+            # PlantUML's transparent PNG assumes a white page.  Clear to an
+            # explicit white background: a freshly created wx.Bitmap is
+            # uninitialised on GTK, which made thin black shape borders
+            # disappear or turn random colours on Linux.
+            dc.SetBackground(wx.Brush(wx.WHITE))
             dc.Clear()
-            dc.DrawBitmap(bmp, 0, 0, True)
+            dc.DrawBitmap(bmp, 0, 0, False)
             dc.SelectObject(wx.NullBitmap)
             self.bmp = bmp2
         else:

@@ -810,6 +810,14 @@ class MainApp(WxAsyncApp):  #, wx.lib.mixins.inspection.InspectionMixin):
                     except (TypeError, ValueError):
                         plantuml_scale = 2
                     plantuml_scale = max(1, min(4, plantuml_scale))
+                    if wx.Platform == "__WXGTK__":
+                        # GTK's DC scaling drops thin 1px PlantUML borders when a
+                        # 2x render is displayed at 0.5 zoom.  Request only the
+                        # display's own scale so the bitmap is drawn 1:1.
+                        display_scale = max(
+                            1, int(round(self.frame.GetContentScaleFactor()))
+                        )
+                        plantuml_scale = min(plantuml_scale, display_scale)
 
                     # internet connection errors are handled internally to this function
                     plantuml_server_local_url = self.config.get("PlantUmlServerUrl", None)

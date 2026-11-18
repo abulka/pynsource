@@ -277,10 +277,10 @@ class UmlCanvas(wxdiagram.ShapeCanvas):
             # print("setpos being called on shape", node.left, node.top)
             assert getpos(shape) == (node.left, node.top)
             # should we also update node positions to match the shape positions?
-
-        self.GetDiagram().AddShape(
-            shape
-        )  # self.AddShape is ok too, ShapeCanvas's AddShape is delegated back to Diagram's AddShape.  ShapeCanvas-->Diagram
+            # New shapes go on top.  AddShape() inserts at index 0 (the back of
+            # the diagram), which hid a new comment under an existing shape in
+            # the same place.
+            self.GetDiagram().AppendShape(shape)
         shape.Show(True)
 
         evthandler = UmlShapeHandler(
@@ -338,7 +338,7 @@ class UmlCanvas(wxdiagram.ShapeCanvas):
         setpos(shape, node.left, node.top)
         # shape.SetSize(node.width, node.height)  # this is already done!?
         # shape.SetDraggable(True, True)
-        self.AddShape(shape)
+        self.AppendShape(shape)  # new comments go on top
         node.shape = shape
         shape.node = node
 
@@ -371,7 +371,7 @@ class UmlCanvas(wxdiagram.ShapeCanvas):
         shape.AddText(node.id)
         setpos(shape, node.left, node.top)
         # shape.SetDraggable(True, True)
-        self.AddShape(shape)
+        self.AppendShape(shape)
         node.shape = shape
         shape.node = node
 
