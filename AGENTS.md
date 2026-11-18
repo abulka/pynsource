@@ -146,7 +146,7 @@ Zoom, pan, drag-to-connect, resize and layout are free.
   from the **release zip** instead, which CI creates before uploading.
 - The spec and mac/win build scripts are now in this repo (`bin/`, `src/media/pynsource.icns`),
   so a spec change no longer needs a push to another repo. Use
-  `gh workflow run build-mac.yml --ref wxdiagram-canvas` (artifact only) to validate it.
+  `gh workflow run build-mac.yml --ref master` (artifact only) to validate it.
 
 ## Deploying (Windows)
 - Route: CI `.github/workflows/build-win.yml` (windows-2022) — same triggers as Mac: a

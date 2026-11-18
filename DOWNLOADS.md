@@ -1,6 +1,6 @@
 # Download Pynsource
 
-The latest version is `1.87`. Every install path below is linked from
+The latest version is `1.88`. Every install path below is linked from
 **[the releases page](https://github.com/abulka/pynsource/releases)** — pre-releases (`pre-*` tags)
 are built by CI and are safe to try; stable releases use `version-*` tags.
 

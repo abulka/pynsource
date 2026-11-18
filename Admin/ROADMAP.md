@@ -1,6 +1,7 @@
 # Pynsource roadmap and release status
 
-Current stable: **1.86** (November 2026). Next: **1.87**, the wxdiagram canvas release. Previous stable: 1.84 (2022); 1.85 was a beta series.
+Current stable: **1.87** (November 2026), the wxdiagram canvas release. Next: 1.88 (patches via
+`PATCH` in `src/gui/settings.py`). Previous stable: 1.86; 1.84 (2022); 1.85 was a beta series.
 
 This file is the durable, public-safe summary: what is shipping, what is next, and how the
 canvas libraries relate. Detailed working notes stay outside the repo (this repo is public, so
@@ -10,7 +11,23 @@ Related docs: [BUILDING.md](../BUILDING.md) (build, test, CI), [DOWNLOADS.md](..
 (user install + troubleshooting), [AGENTS.md](../AGENTS.md) (contributor/session notes),
 [CHANGELOG.md](../CHANGELOG.md) (what shipped).
 
-## 1.86 — release train (current)
+## 1.87 — wxdiagram canvas (current)
+
+Published as <https://github.com/abulka/pynsource/releases/tag/version-1.87> with the macOS zip,
+the Windows installer, both AppImages, and the Homebrew cask bumped to 1.87.
+
+- One canvas on every platform and edition: **wxdiagram 0.2.7**, replacing the vendored classic
+  OGL copy and `ogl2`. Build inputs live in this repo (`buildtools/`), so a spec change no longer
+  needs a push to another repo.
+- The diagram is free: zoom, pan, pinch, marquee/multi-select, drag-to-connect, resize and layout.
+  Pro is **module visualisation only**, and free on Linux by platform.
+- Linux is the only CI platform that exercises the Pro code paths, so every Linux artefact
+  bundles `wxdiagram` + `alsm` (and the snap installs wxdiagram with `--no-deps`).
+- The About box no longer advertises a paid licence on Linux ("PRO Edition - free on Linux").
+- Remaining after publish: install the edge snap and promote it to `stable` in the store UI, then
+  update the `stable` note in [DOWNLOADS.md](../DOWNLOADS.md).
+
+## 1.86 — release train (previous)
 
 Every packaging route was built and verified on the `2026-dustoff` branch before it was merged
 to `master`; the merge is what this release formalises.
@@ -59,7 +76,7 @@ visualisation** (ALSM) on macOS/Windows; it is free on Linux builds.
 | Milestone | Content | Notes |
 |---|---|---|
 | 1.86 | First stable release since 1.84; all platforms built by CI | published |
-| 1.87 | One canvas (`wxdiagram`); diagram free; Pro = ALSM only | in progress |
+| 1.87 | One canvas (`wxdiagram`); diagram free; Pro = ALSM only | published |
 | 1.87.x | Patch releases via `PATCH` in `src/gui/settings.py` | no retagging |
 | wxdiagram 0.2 | Integration hooks (`MoveTo`, `getContentBounds`, opt-out flags) | own repo/release |
 | Flatpak / Flathub | Manifest that survives review, `com.pynsource.Pynsource` app id | deferred: a release-page `.flatpak` is close to useless, and the AppImage already covers Linux |

@@ -2,6 +2,10 @@
 
 *November 2026*
 
+### 1.88
+
+- Development version since 1.87 (unreleased). No user-facing changes yet.
+
 ### 1.87
 
 - New diagram canvas: pynsource now uses **wxdiagram** (MIT) on every platform and edition;

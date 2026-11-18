@@ -21,7 +21,7 @@ ALSM_PARSING = False
 PRO_EDITION_FREE = False
 ASYNC_BACKGROUND_REFRESH = False  # devel purposes only
 
-APP_VERSION = 1.87
+APP_VERSION = 1.88
 
 # PATCH marker does not affect version checking, its just an annotation in the about box.
 # Use it with a future APP_VERSION to make betas e.g. "beta 2"
