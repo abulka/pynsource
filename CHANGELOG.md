@@ -4,13 +4,12 @@
 
 ### 1.87
 
-- New diagram canvas: pynsource now uses **wxdiagram** (MIT) on every platform and edition
-  (0.2.1, the first published release since 0.1.0);
+- New diagram canvas: pynsource now uses **wxdiagram** (MIT) on every platform and edition;
   the vendored classic OGL copy and the `ogl2` dependency are gone
-- wxdiagram upgraded to **0.2.6**: dragging a multi-selection that includes an edge no longer
-  stretches the edge (it now follows its endpoint shapes exactly), dragging an edge on its own
-  leaves it attached, changing diagrams clears the old selection handles immediately, and
-  connection targets show all four round drop dots (forward and reverse drags)
+- wxdiagram **0.2.7** is what these builds ship: dragging a multi-selection that includes an
+  edge no longer stretches the edge (it now follows its endpoint shapes exactly), dragging an
+  edge on its own leaves it attached, changing diagrams clears the old selection handles
+  immediately, and connection targets show all four round drop dots (forward and reverse drags)
 - New comments and classes are created at the top of the z-order, so a new comment is visible
   even when it lands over an existing shape
 - PlantUML view composites transparent PNGs onto an explicit white page and requests the
